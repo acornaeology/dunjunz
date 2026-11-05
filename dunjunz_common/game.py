@@ -15,6 +15,7 @@ def annotate(a: Annotator) -> None:
     _screen(a)
     _text_output(a)
     annotate_state(a)
+    annotate_routines(a)
 
 
 # ---------------------------------------------------------------------------
@@ -491,3 +492,250 @@ def annotate_state(a: Annotator) -> None:
         "energy drainer (advancing with each hit), &5F Boots of Speed, &60 "
         "magic helmet, &61 potion of healing, &62 pile of weapons, &63 "
         "magic sword."))
+
+
+# ---------------------------------------------------------------------------
+# Routines
+
+
+def annotate_routines(a: Annotator) -> None:
+    X_HERO = {"X": "hero number (0-3)"}
+    X_KEPT = {"X": "preserved"}
+
+    # Scores and the status panel
+    a.sub(0x0400, "add_thousand_points", "Add 1000 to a hero's score",
+          "Advance the thousands digit of hero X's score. When it passes 9 it "
+          "goes back to 0 and the ten-thousands digit, kept separately as one "
+          "of the small digit sprites, goes up (to at most 9); that digit is "
+          "then drawn below the score, with four further small sprites beside "
+          "it.", on_entry=X_HERO, on_exit=X_KEPT)
+    a.sub(0x0ECF, "reset_hero", "Give a hero their starting attributes",
+          "Set hero X's missile limit, missile damage and damage taken from "
+          "the starting tables, and their score to zero. The units digit is "
+          "set one below 0 because draw_status_panel draws the score by "
+          "adding a point.", on_entry=X_HERO, on_exit=X_KEPT)
+    a.sub(0x0EF7, "draw_status_panel", "Draw the status panel",
+          "Draw each hero's section of the status panel to the right of the "
+          "views: health and score (by taking a health point and adding a "
+          "score point, from starting values one beyond those wanted), face, "
+          "shield and armour rating, one icon per missile allowed, and "
+          "missile damage.")
+    a.sub(0x0F68, "plot_panel_sprite", "Plot a sprite in a hero's panel section",
+          "Plot sprite A at byte column X and pixel row Y + hero_panel_y - "
+          "14 for the hero being drawn (draw_status_panel's loop counter).",
+          on_entry={"A": "sprite number", "X": "byte column",
+                    "Y": "row within the hero's panel section"})
+    a.sub(0x7221, "lose_health_point", "Take one health point from a hero",
+          "If hero X is in play, take one from their health and redraw it. "
+          "When it falls below 00 the hero dies: their sprite is erased, "
+          "they leave play, and their number joins returning_hero_queue.",
+          on_entry=X_HERO, on_exit=X_KEPT)
+    a.sub(0x728C, "add_point", "Add one point to a hero's score",
+          "Add one to hero X's score, carrying into the higher digits, and "
+          "redraw it.", on_entry=X_HERO, on_exit=X_KEPT)
+    a.sub(0x729B, "add_ten_points", "Add ten points to a hero's score",
+          "Add ten to hero X's score, carrying into the higher digits, and "
+          "redraw it.", on_entry=X_HERO, on_exit=X_KEPT)
+    a.sub(0x75F9, "point_at_boots_icon", "Set the position of a hero's boots icon",
+          "Set plot_x and plot_y to the place in hero X's panel section that "
+          "shows the lightning bolt for Boots of Speed.", on_entry=X_HERO)
+    a.sub(0x7606, "plot_boots_icon", "Show a hero's boots icon",
+          "Plot the lightning bolt at plot_x, plot_y.", on_exit=X_KEPT)
+    a.sub(0x760D, "erase_boots_icon", "Remove a hero's boots icon",
+          "Plot the blank sprite over the lightning bolt at plot_x, plot_y.",
+          on_exit=X_KEPT)
+
+    # The hero-selection menu
+    a.sub(0x0500, "hero_menu", "Choose the heroes and the sound",
+          "Clear the left of the screen, print the menu and let the players "
+          "toggle each hero (keys 1-4) and the sound (5 on, 6 off). SPACE "
+          "starts the game if at least one hero is playing.")
+    a.sub(0x0524, "print_menu", "Print the menu text",
+          "Print the sixteen positioned strings of menu_text.")
+    a.sub(0x052E, "print_menu_string", "Print one menu string",
+          "Move the text cursor to the column and row in the two bytes at "
+          "menu_text+Y, then print the following characters up to and "
+          "including a carriage return.",
+          on_entry={"Y": "offset of the string in menu_text"},
+          on_exit={"Y": "offset of the next string"})
+    a.sub(0x054D, "set_menu_no", "Change a menu entry to NO",
+          "Write \"NO \" at menu_text+Y.", on_entry={"Y": "offset of the entry"})
+    a.sub(0x055D, "set_menu_yes", "Change a menu entry to YES",
+          "Write \"YES\" at menu_text+Y.", on_entry={"Y": "offset of the entry"})
+    a.sub(0x056D, "set_menu_off", "Change the sound entry to OFF",
+          "Write \"FF\" at menu_text+Y, after its \"O\".",
+          on_entry={"Y": "offset of the entry's second character"})
+    a.sub(0x0576, "set_menu_on", "Change the sound entry to ON",
+          "Write \"N \" at menu_text+Y, after its \"O\".",
+          on_entry={"Y": "offset of the entry's second character"})
+    a.sub(0x06B0, "remove_absent_heroes", "Take the heroes nobody plays out of the game",
+          "Draw any ten-thousands score digits, then put every hero switched "
+          "off on the menu out of play, with a &64 entry in "
+          "returning_hero_queue in their place.")
+
+    # Levels
+    a.sub(0x14A0, "reset_workspace", "Reset the game workspace for a new level",
+          "Copy workspace_template into page &0D and clear the per-level "
+          "state.")
+    a.sub(0x14D7, "draw_view_frames", "Draw the frames round the four views",
+          "With the MOS's own text output restored, send the twenty PLOT "
+          "commands of view_frame_plots, draw the four views, then put the "
+          "game's WRCHV handler back.",
+          on_entry={"plot_x": "address of view_frame_plots, low byte",
+                    "plot_y": "address of view_frame_plots, high byte"})
+    a.sub(0x1510, "unpack_level", "Copy the loaded level into the game's tables",
+          "Distribute the level file at &6B00 into the object, door, key, "
+          "trapdoor and map tables.")
+    a.sub(0x1583, "reset_monsters", "Clear the monsters for a new level",
+          "Mark every monster as not yet appeared, give each the level's "
+          "starting hit points, and clear the heroes' keys and the "
+          "returning_hero_queue.")
+    a.sub(0x161A, "clear_text_area", "Clear the left of the screen",
+          "Set a text window over the left of the screen and clear it.")
+
+    # Winning
+    a.sub(0x1070, "check_for_victory", "Check whether the Chalice has been found",
+          "On level 25, if a hero stands on the cell where the Chalice is, "
+          "play the victory sequence, print the closing message, wait for a "
+          "key and reset the machine through the RESET vector.")
+    a.sub(0x10E9, "victory_sequence", "Play the victory sequence",
+          "Spin sprites round the Chalice with a rising tone, then dissolve "
+          "it.")
+    a.sub(0x1149, "draw_victory_ring", "Draw the ring of sprites round the Chalice",
+          "Plot the current victory sprite at the twelve cells round the "
+          "Chalice, changing sprite as it goes.")
+    a.sub(0x119A, "plot_victory_sprite", "Plot a victory sprite at a cell",
+          "Plot the current victory sprite at the map cell in &80, &81.")
+    a.sub(0x11AC, "next_victory_sprite", "Choose the next victory sprite",
+          "Step the victory sprite through &16-&19.")
+    a.sub(0x11BE, "dissolve_chalice", "Clear a random byte of the Chalice",
+          "Use the System VIA timer to pick a byte of the Chalice sprite, "
+          "clear it, and redraw the Chalice.")
+    a.sub(0x11F2, "plot_chalice", "Plot the Chalice",
+          "Plot the Chalice sprite at its place on the map.")
+
+    # The main loop
+    a.sub(0x1CC0, "update_game", "Run one frame of play",
+          "Move the heroes, open doors for heroes carrying the right key, "
+          "pick up and swap keys, then draw the objects, move the missiles "
+          "and the monsters, and handle the pause key.")
+    a.sub(0x203A, "hero_enters_exit", "Start a hero going down the exit",
+          "Play the exit sound and begin shrinking the hero's sprites.",
+          on_entry=X_HERO)
+    a.sub(0x2050, "restore_hero_sprites", "Restore a hero's sprite sizes",
+          "Put back the width and height of all eight of hero X's sprites, "
+          "which the exit animation shrinks.", on_entry=X_HERO)
+    a.sub(0x2091, "drop_key", "Drop the key a hero carries",
+          "Put hero X's key in a free cell next to them, and remove it from "
+          "their panel section.", on_entry=X_HERO, on_exit=X_KEPT)
+    a.sub(0x20D0, "find_open_neighbour", "Find a free cell next to a cell",
+          "Starting with cell_x, cell_y, try the cells above, to the right, "
+          "below and to the left, and leave cell_x, cell_y at the first "
+          "without a wall.")
+    a.sub(0x16A0, "queue_exit_marker", "Sound the exit and add a queue marker",
+          "Play the exit sound and put a &64 entry in the first free slot of "
+          "returning_hero_queue.")
+
+    # Heroes
+    a.sub(0x6E80, "move_heroes", "Move the heroes",
+          "For each hero in play: continue a step between cells, or read the "
+          "hero's keys (and, for heroes 0 and 1, the magic key) and start a "
+          "step or fire a missile; check the new cell for walls, monsters, "
+          "other heroes and objects, change view when the hero enters "
+          "another room, and draw the hero.")
+    a.sub(0x7B62, "start_hero_step", "Start a hero's step between cells",
+          "Set hero X's step counter to 1 and their pixel offsets for the "
+          "direction they face: 6 rows up or down, or 2 byte columns left or "
+          "right.",
+          on_entry=X_HERO, on_exit=X_KEPT)
+    a.sub(0x7BA2, "continue_hero_step", "Continue a hero's step between cells",
+          "Toggle hero X's animation frame and count down their step. When "
+          "it ends, move the hero one cell in the direction they face and "
+          "clear the pixel offsets. The offsets are then doubled.",
+          on_entry=X_HERO, on_exit=X_KEPT)
+    a.sub(0x76DA, "hero_arrives", "Bring a returning hero into play",
+          "Every other frame, show the next of the hero's arrival sprites. "
+          "After the last, put the hero in play facing down with health 32 "
+          "(set to 33 and drawn by taking a point).", on_entry=X_HERO)
+    a.sub(0x7732, "draw_hero", "Draw a hero",
+          "Plot sprite_number at hero X's cell and pixel offset in every view "
+          "that shows it.", on_entry=X_HERO, on_exit=X_KEPT)
+    a.sub(0x777A, "get_hero_cell", "Copy a hero's position to cell_x, cell_y",
+          on_entry=X_HERO, on_exit=X_KEPT)
+    a.sub(0x7329, "collect_objects", "Pick up the object in a hero's cell",
+          "Find the object at hero X's cell and act on it: score, health, "
+          "teleport, resurrection, energy drain, or one of the magic items.",
+          on_entry=X_HERO)
+    a.sub(0x74A3, "play_pickup_sound", "Play the pickup sound",
+          "Define the pickup envelope and play the pickup sound, from the "
+          "OSWORD parameter blocks at &192C and &193A.")
+
+    # Missiles
+    a.sub(0x70CA, "move_missiles", "Move the missiles",
+          "Advance every missile in flight one cell. A missile stops at a "
+          "wall, damages a monster or hero it meets, and bounces back off an "
+          "energy drainer, wearing it down.")
+    a.sub(0x7747, "flip_firer_frame", "Animate the hero who fired a missile",
+          "Toggle the animation frame of the hero whose missile is in slot X.",
+          on_entry={"X": "missile slot"})
+    a.sub(0x76B1, "credit_missile_owner", "Give a point to the hero who fired a missile",
+          on_entry={"X": "missile slot"}, on_exit=X_KEPT)
+
+    # The views
+    a.sub(0x7788, "draw_all_views", "Draw all four views",
+          "Draw the room each hero's view shows.")
+    a.sub(0x7795, "draw_view_0", "Draw the top-left view",
+          "Draw the room in hero 0's view.")
+    a.sub(0x77A7, "draw_view_1", "Draw the top-right view",
+          "Draw the room in hero 1's view.")
+    a.sub(0x77B9, "draw_view_2", "Draw the bottom-left view",
+          "Draw the room in hero 2's view.")
+    a.sub(0x77CB, "draw_view_3", "Draw the bottom-right view",
+          "Draw the room in hero 3's view.")
+    a.sub(0x77DE, "draw_room", "Draw a room",
+          "Draw the eight rows of walls of the room at &7B, &7C (a pointer "
+          "into room_walls) with its top-left at plot_y and the column in "
+          "cell_x, then draw the doors.")
+    a.sub(0x7820, "draw_room_row", "Draw one row of a room",
+          "Plot a wall or a blank for each of the eight bits of scratch, "
+          "four byte columns apart, starting at byte column cell_x.")
+    a.sub(0x7852, "plot_at_cell", "Plot a sprite at a map cell in every view",
+          "Plot sprite_number at map cell cell_x, cell_y, shifted by the "
+          "pixel offsets in &7D, &7E, in each view that shows the cell's "
+          "room. Cells are four byte columns wide and twelve pixel rows "
+          "high.", on_entry={"cell_x": "map x", "cell_y": "map y",
+                             "sprite_number": "sprite to plot"})
+    a.sub(0x78FC, "test_wall", "Test for a wall at a map cell",
+          "Return the room_walls bit for cell cell_x, cell_y: non-zero if "
+          "there is a wall. Also leaves &7B, &7C pointing at the cell's room.",
+          on_exit={"A": "wall bit", "Y": "wall bit", "Z": "set if no wall"})
+    a.sub(0x7938, "test_object_map", "Test for an object at a map cell",
+          "Return the object_map bit for cell cell_x, cell_y: non-zero if an "
+          "object may lie there.",
+          on_exit={"A": "object bit", "Y": "object bit", "Z": "set if none"})
+    a.sub(0x7974, "find_creature", "Look for a monster or hero at a cell",
+          "Look for a monster, other than monster number scratch, at cell_x, "
+          "cell_y. If scratch is non-zero, also look for a hero there, and "
+          "if one is found take hero_damage_taken points of their health.",
+          on_exit={"A": "non-zero if something was found",
+                   "Y": "non-zero if a monster was found"})
+
+    # Monsters
+    a.sub(0x79C1, "update_monsters", "Draw the trapdoors and move the monsters",
+          "Draw the eight trapdoors, then for each monster continue its step "
+          "or start a new one, turning a random way when it is blocked, and "
+          "advance dying monsters until they reappear at a trapdoor.")
+    a.sub(0x7BEB, "start_monster_step", "Start a monster's step between cells",
+          "Set the step counter and the pixel offsets for monster X's "
+          "direction.", on_entry={"X": "monster number"})
+    a.sub(0x7C2B, "continue_monster_step", "Continue a monster's step between cells",
+          "Toggle monster X's frame and move its pixel offsets towards zero, "
+          "moving it to the next cell when the step ends.",
+          on_entry={"X": "monster number"})
+
+    # Keyboard
+    a.sub(0x7C95, "test_key", "Test whether a key is pressed",
+          "Scan the key whose INKEY number is in A with OSBYTE &81.",
+          on_entry={"A": "INKEY key number (negative, as a byte)"},
+          on_exit={"A": "0 if the key is pressed, 1 if not",
+                   "Z": "set if the key is pressed", "X": "preserved"})

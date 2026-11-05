@@ -5,8 +5,8 @@ osbyte_bell_frequency                = &d5
 osbyte_bell_duration                 = &d6
 osbyte_flush_buffer_class            = &0f
 osbyte_inkey                         = &81
-osword_sound                         = &07
 osword_envelope                      = &08
+osword_sound                         = &07
 osbyte_scan_keyboard_from_16         = &7a
 osbyte_escape_break_effect           = &c8
 osbyte_read_adc_or_get_buffer_status = &80
@@ -111,7 +111,7 @@ osasci             = &ffe3
 oswrch             = &ffee
 ; &ffee referenced 60 times by &35c8, &35cd, &35d2, &35d7, &35dc, &35e1, &37dc, &37e1, &37e6, &37eb, &37f0, &37f5, &386d, &3b54, &3b59, &3b5e, &3b63, &3b68, &3b6b, &3b6e, &3b71, &3b74, &3b77, &3c27, &3c2e, &3d5c, &3d61, &3d66, &3d6b, &3d70, &3d75, &500b, &5010, &504f, &5059, &5094, &50e7, &50ec, &50f4, &52b2, &52b7, &52bc, &52c1, &52c6, &52cb, &52e0, &52e6, &52ed, &52f4, &56b2, &56b7, &56bc, &56c1, &56c6, &56cb, &56e0, &56e6, &56ed, &56f4, &6f47
 osword             = &fff1
-; &fff1 referenced 13 times by &4458, &45ed, &45f6, &736d, &7376, &73b9, &73e3, &748c, &74a9, &74b2, &7586, &7634, &763d
+; &fff1 referenced 15 times by &3de6, &3def, &4458, &45ed, &45f6, &736d, &7376, &73b9, &73e3, &748c, &74a9, &74b2, &7586, &7634, &763d
 osbyte             = &fff4
 ; &fff4 referenced 27 times by &3477, &3480, &3489, &3492, &3600, &3609, &3814, &382d, &3868, &4619, &4620, &4627, &5006, &50a7, &50d4, &5333, &533c, &539d, &5733, &573c, &579d, &594f, &595d, &596c, &597a, &5989, &7c9e
 oscli              = &fff7
@@ -369,7 +369,7 @@ data_09ff = sub_09a0+95
 ; &0b28 referenced 3 times by &765e, &768f, &7699
 .magic_kill_count
     equb &00, &10
-; &0b2a referenced 3 times by &7421, &742b, &7432; also used as index base 5 times by &3cdc, &549c, &589c, &7256, &725f
+; &0b2a referenced 3 times by &7421, &742b, &7432; also used as index base 7 times by &3cdc, &3df4, &3dfb, &549c, &589c, &7256, &725f
 .returning_hero_queue
 ; &326b referenced 2 times by &742f, &7438
 data_0b2b = returning_hero_queue+1
@@ -651,11 +651,11 @@ data_0dff = sub_0ded+18
     tax
 ; &0e09 referenced 1 time by &354f
 .code_0e09
-    jsr sub_0ecf
+    jsr reset_hero
     inx
     cpx #4
     bne code_0e09
-    jsr data_0500
+    jsr hero_menu
 ; &0e14 referenced 1 time by &34bc
 .code_0e14
     lda data_08bc
@@ -678,8 +678,8 @@ data_0dff = sub_0ded+18
 ; &0e57 referenced 1 time by &355e
 .code_0e57
     jsr sub_1400
-    jsr sub_0ef7
-    jsr data_06b0
+    jsr draw_status_panel
+    jsr remove_absent_heroes
     lda #1
     sta os_vsync_counter
     jsr code_1f00
@@ -690,7 +690,7 @@ data_0dff = sub_0ded+18
     lda hero_health_tens,x
     cmp #&1d
     bne code_0e7a
-    jsr sub_0ecf
+    jsr reset_hero
     inc data_0ff2
 ; &0e7a referenced 1 time by &35b2
 .code_0e7a
@@ -737,8 +737,20 @@ data_0dff = sub_0ded+18
     lda #osbyte_inkey
     jsr osbyte                          ; INKEY: Scan for a key with positive X, or read internal key number EOR 128 for negative X
     jmp code_144f                       ; X=ASCII code typed (positive timeout) or internal key number EOR 128 (negative scan) / Y=0 if a key was pressed, Y=&FF on time-out, Y=&1B on Escape
+; ***************************************************************************************
+; Give a hero their starting attributes
+;
+; Set hero X's missile limit, missile damage and damage taken from the starting tables,
+; and their score to zero. The units digit is set one below 0 because draw_status_panel
+; draws the score by adding a point.
+;
+; On Entry:
+;     X: hero number (0-3)
+;
+; On Exit:
+;     X: preserved
 ; &0ecf referenced 2 times by &3549, &35b4
-.sub_0ecf
+.reset_hero
     lda data_0f80,x
     sta hero_max_missiles,x
     lda data_0f84,x
@@ -754,30 +766,37 @@ data_0dff = sub_0ded+18
     lda #&69 ; 'i'
     sta data_08b0,x
     rts
+; ***************************************************************************************
+; Draw the status panel
+;
+; Draw each hero's section of the status panel to the right of the views: health and
+; score (by taking a health point and adding a score point, from starting values one
+; beyond those wanted), face, shield and armour rating, one icon per missile allowed, and
+; missile damage.
 ; &0ef7 referenced 1 time by &359a
-.sub_0ef7
+.draw_status_panel
     lda #0
     sta data_0ff1
 ; &0efc referenced 1 time by &36a5
 .code_0efc
     ldx data_0ff1
-    jsr sub_7221
-    jsr sub_728c
+    jsr lose_health_point
+    jsr add_point
     lda data_0f8c,x
     ldx #&45 ; 'E'
     ldy #0
-    jsr sub_0f68
+    jsr plot_panel_sprite
     ldx #&4d ; 'M'
     ldy #0
     lda #&69 ; 'i'
-    jsr sub_0f68
+    jsr plot_panel_sprite
     ldx data_0ff1
     sec
     lda #&73 ; 's'
     sbc hero_damage_taken,x
     ldx #&4e ; 'N'
     ldy #2
-    jsr sub_0f68
+    jsr plot_panel_sprite
     ldx data_0ff1
     lda hero_max_missiles,x
     asl a
@@ -792,7 +811,7 @@ data_0dff = sub_0ded+18
     pha
     ldx #&4b ; 'K'
     lda #&74 ; 't'
-    jsr sub_0f68
+    jsr plot_panel_sprite
     pla
     clc
     adc #3
@@ -805,14 +824,24 @@ data_0dff = sub_0ded+18
     adc #&69 ; 'i'
     ldx #&4c ; 'L'
     ldy #&0a
-    jsr sub_0f68
+    jsr plot_panel_sprite
     inc data_0ff1
     lda data_0ff1
     cmp #4
     bne code_0efc
     rts
+; ***************************************************************************************
+; Plot a sprite in a hero's panel section
+;
+; Plot sprite A at byte column X and pixel row Y + hero_panel_y - 14 for the hero being
+; drawn (draw_status_panel's loop counter).
+;
+; On Entry:
+;     A: sprite number
+;     X: byte column
+;     Y: row within the hero's panel section
 ; &0f68 referenced 5 times by &364c, &3655, &3665, &3680, &369a
-.sub_0f68
+.plot_panel_sprite
     stx plot_x
     sta sprite_number
     tya
@@ -872,8 +901,14 @@ data_0ff2 = sub_0fea+8
     equs "ND!"
     equb &00
     equs "&C2"
+; ***************************************************************************************
+; Check whether the Chalice has been found
+;
+; On level 25, if a hero stands on the cell where the Chalice is, play the victory
+; sequence, print the closing message, wait for a key and reset the machine through the
+; RESET vector.
 ; &1070 referenced 1 time by &464a
-.sub_1070
+.check_for_victory
     lda data_169f
     cmp #&19
     bne return_2
@@ -903,7 +938,7 @@ data_0ff2 = sub_0fea+8
     bne code_1084
 ; &1097 referenced 2 times by &37cf, &37d3
 .code_1097
-    jsr sub_10e9
+    jsr victory_sequence
     lda #&1c
     jsr oswrch
     lda #0
@@ -945,8 +980,12 @@ data_10e7 = sub_10e6+1
 ; &3828 referenced 1 time by &3823
 data_10e8 = sub_10e6+2
     jsr data_0000
+; ***************************************************************************************
+; Play the victory sequence
+;
+; Spin sprites round the Chalice with a rising tone, then dissolve it.
 ; &10e9 referenced 1 time by &37d7
-.sub_10e9
+.victory_sequence
     lda #osbyte_bell_envelope
     ldx #8
     jsr osbyte                          ; osbyte: bell envelope
@@ -987,11 +1026,11 @@ data_10e8 = sub_10e6+2
     jsr osbyte                          ; osbyte: bell frequency
     lda #7
     jsr oswrch
-    jsr sub_1149
+    jsr draw_victory_ring
     lda data_0084
     cmp #1
     bne code_113c
-    jsr sub_11be
+    jsr dissolve_chalice
 ; &113c referenced 1 time by &3877
 .code_113c
     ldx data_0084
@@ -1005,53 +1044,66 @@ data_10e8 = sub_10e6+2
     dex
     bne code_113e
     jmp code_110a
+; ***************************************************************************************
+; Draw the ring of sprites round the Chalice
+;
+; Plot the current victory sprite at the twelve cells round the Chalice, changing sprite
+; as it goes.
 ; &1149 referenced 2 times by &3870, &3917
-.sub_1149
+.draw_victory_ring
     lda #&1c
     sta data_0080
     lda #3
     sta data_0081
-    jsr sub_119a
+    jsr plot_victory_sprite
     dec data_0080
-    jsr sub_119a
+    jsr plot_victory_sprite
     dec data_0080
-    jsr sub_119a
+    jsr plot_victory_sprite
     lda data_0082
     sta data_0dff
-    jsr sub_11ac
+    jsr next_victory_sprite
     dec data_0080
-    jsr sub_119a
+    jsr plot_victory_sprite
     inc data_0081
-    jsr sub_119a
+    jsr plot_victory_sprite
     inc data_0081
-    jsr sub_119a
-    jsr sub_11ac
+    jsr plot_victory_sprite
+    jsr next_victory_sprite
     inc data_0081
-    jsr sub_119a
+    jsr plot_victory_sprite
     inc data_0080
-    jsr sub_119a
+    jsr plot_victory_sprite
     inc data_0080
-    jsr sub_119a
-    jsr sub_11ac
+    jsr plot_victory_sprite
+    jsr next_victory_sprite
     inc data_0080
-    jsr sub_119a
+    jsr plot_victory_sprite
     dec data_0081
-    jsr sub_119a
+    jsr plot_victory_sprite
     dec data_0081
-    jsr sub_119a
+    jsr plot_victory_sprite
     rts
+; ***************************************************************************************
+; Plot a victory sprite at a cell
+;
+; Plot the current victory sprite at the map cell in &80, &81.
 ; &119a referenced 12 times by &3891, &3896, &389b, &38a8, &38ad, &38b2, &38ba, &38bf, &38c4, &38cc, &38d1, &38d6
-.sub_119a
+.plot_victory_sprite
     lda data_0080
     sta cell_x
     lda data_0081
     sta cell_y
     lda data_0082
     sta sprite_number
-    jsr sub_7852
+    jsr plot_at_cell
     rts
+; ***************************************************************************************
+; Choose the next victory sprite
+;
+; Step the victory sprite through &16-&19.
 ; &11ac referenced 3 times by &38a3, &38b5, &38c7
-.sub_11ac
+.next_victory_sprite
     lda data_0082
     cmp #&15
     beq code_11bb
@@ -1064,8 +1116,13 @@ data_10e8 = sub_10e6+2
 .code_11bb
     sta data_0082
     rts
+; ***************************************************************************************
+; Clear a random byte of the Chalice
+;
+; Use the System VIA timer to pick a byte of the Chalice sprite, clear it, and redraw the
+; Chalice.
 ; &11be referenced 1 time by &3879
-.sub_11be
+.dissolve_chalice
     lda system_via_t1c_l
     eor data_00fc
     eor data_00fa
@@ -1074,7 +1131,7 @@ data_10e8 = sub_10e6+2
     tax
     lda #0
     sta data_1210,x
-    jsr sub_11f2
+    jsr plot_chalice
 ; &11d2 referenced 1 time by &3907
 .return_3
     rts
@@ -1082,7 +1139,7 @@ data_10e8 = sub_10e6+2
 .code_11d3
     lda #&15
     sta data_0082
-    jsr sub_1149
+    jsr draw_victory_ring
     ldx #&c1
     lda #0
 ; &11de referenced 1 time by &3922
@@ -1090,7 +1147,7 @@ data_10e8 = sub_10e6+2
     sta data_120f,x
     dex
     bne code_11de
-    jsr sub_11f2
+    jsr plot_chalice
     lda #&ff
     sta os_vsync_counter
 ; &11ec referenced 1 time by &392f
@@ -1098,15 +1155,19 @@ data_10e8 = sub_10e6+2
     lda os_vsync_counter
     bne code_11ec
     rts
+; ***************************************************************************************
+; Plot the Chalice
+;
+; Plot the Chalice sprite at its place on the map.
 ; &11f2 referenced 2 times by &390f, &3924
-.sub_11f2
+.plot_chalice
     lda #&1a
     sta cell_x
     lda #4
     sta cell_y
     lda #&73 ; 's'
     sta sprite_number
-    jsr sub_7852
+    jsr plot_at_cell
     rts
 .sub_1204
 ; &394f used as index base 1 time by &391e
@@ -1221,10 +1282,10 @@ data_12d4 = saved_wrchv+1
 .sub_1400
     jsr sub_15b1
     jsr sub_1446
-    jsr sub_1510
-    jsr sub_14a0
-    jsr sub_1583
-    jsr sub_161a
+    jsr unpack_level
+    jsr reset_workspace
+    jsr reset_monsters
+    jsr clear_text_area
     lda #&17
     jsr oswrch
     lda #0
@@ -1244,7 +1305,7 @@ data_12d4 = saved_wrchv+1
     sta plot_x
     lda #&16
     sta plot_y
-    jsr sub_14d7
+    jsr draw_view_frames
     rts
 ; &1446 referenced 1 time by &3b43
 .sub_1446
@@ -1281,8 +1342,12 @@ data_12d4 = saved_wrchv+1
     equb &0d, &9c, &14, &a9, &ff, &20, &00
     equs "0LP"
     equb &04
+; ***************************************************************************************
+; Reset the game workspace for a new level
+;
+; Copy workspace_template into page &0D and clear the per-level state.
 ; &14a0 referenced 1 time by &3b49
-.sub_14a0
+.reset_workspace
     ldx #0
 ; &14a2 referenced 1 time by &3be9
 .code_14a2
@@ -1307,8 +1372,17 @@ data_12d4 = saved_wrchv+1
     lda #3
     sta data_09fc
     rts
+; ***************************************************************************************
+; Draw the frames round the four views
+;
+; With the MOS's own text output restored, send the twenty PLOT commands of
+; view_frame_plots, draw the four views, then put the game's WRCHV handler back.
+;
+; On Entry:
+;     PLOT_X: address of view_frame_plots, low byte
+;     PLOT_Y: address of view_frame_plots, high byte
 ; &14d7 referenced 1 time by &3b82
-.sub_14d7
+.draw_view_frames
     lda saved_wrchv
     sta wrchv
     lda data_12d4
@@ -1333,14 +1407,18 @@ data_12d4 = saved_wrchv+1
     ldy #0
     dex
     bne code_14e5
-    jsr sub_7788
+    jsr draw_all_views
     lda #&8f
     sta wrchv
     lda #&7f
     sta wrchv + 1
     rts
+; ***************************************************************************************
+; Copy the loaded level into the game's tables
+;
+; Distribute the level file at &6B00 into the object, door, key, trapdoor and map tables.
 ; &1510 referenced 1 time by &3b46
-.sub_1510
+.unpack_level
     ldx #&1e
 ; &1512 referenced 1 time by &3c65
 .code_1512
@@ -1401,8 +1479,13 @@ data_12d4 = saved_wrchv+1
     cpx #&30 ; '0'
     bne code_1577
     rts
+; ***************************************************************************************
+; Clear the monsters for a new level
+;
+; Mark every monster as not yet appeared, give each the level's starting hit points, and
+; clear the heroes' keys and the returning_hero_queue.
 ; &1583 referenced 1 time by &3b4c
-.sub_1583
+.reset_monsters
     ldx #&1e
 ; &1585 referenced 1 time by &3cd6
 .code_1585
@@ -1429,7 +1512,7 @@ data_12d4 = saved_wrchv+1
     rts
 ; &15b1 referenced 1 time by &3b40
 .sub_15b1
-    jsr sub_161a
+    jsr clear_text_area
     rts
     equb &90, &18, &a9, &16, &20, &ee, &ff, &a9
     equb &02, &20, &ee, &ff, &a2, &e0, &a0, &15
@@ -1448,8 +1531,12 @@ data_12d4 = saved_wrchv+1
     equb &ff, &a9, &0e, &20, &ee, &ff, &a9, &11
     equb &20, &ee, &ff, &a9, &11, &20, &ee, &ff
     equb &a9, &02, &20, &ee, &ff, &60
+; ***************************************************************************************
+; Clear the left of the screen
+;
+; Set a text window over the left of the screen and clear it.
 ; &161a referenced 2 times by &3b4f, &3cf1
-.sub_161a
+.clear_text_area
     lda #&1c
     jsr oswrch
     lda #0
@@ -1481,13 +1568,34 @@ data_169f = sub_1639+102
     equb &08, &00, &66, &02, &04, &28, &02, &66
     equb &02, &01, &00, &00, &7c, &fe, &01, &08
     equb &02, &00, &00, &01, &00, &00, &84, &01
-    equb &05, &28, &02, &66, &02, &08, &01, &a2
-    equb &58, &a0, &19, &a9, &08, &20, &f1, &ff
-    equb &a2, &66, &a0, &19, &a9, &07, &20, &f1
-    equb &ff, &a2, &00, &bd, &2a, &0b, &d0, &06
-    equb &a9, &64, &9d, &2a, &0b, &60, &e8, &d0
-    equb &f2, &02, &02, &00, &00, &83, &00, &00
-    equb &00, &00, &00, &00, &31, &00, &8d
+    equb &05, &28, &02, &66, &02, &08, &01
+; ***************************************************************************************
+; Sound the exit and add a queue marker
+;
+; Play the exit sound and put a &64 entry in the first free slot of returning_hero_queue.
+.queue_exit_marker
+    ldx #&58 ; 'X'
+    ldy #&19
+    lda #osword_envelope
+    jsr osword                          ; ENVELOPE command
+    ldx #&66 ; 'f'
+    ldy #&19
+    lda #osword_sound
+    jsr osword                          ; SOUND command
+    ldx #0
+; &16b4 referenced 1 time by &3e00
+.code_16b4
+    lda returning_hero_queue,x
+    bne code_16bf
+    lda #&64 ; 'd'
+    sta returning_hero_queue,x
+    rts
+; &16bf referenced 1 time by &3df7
+.code_16bf
+    inx
+    bne code_16b4
+    equb &02, &02, &00, &00, &83, &00, &00, &00
+    equb &00, &00, &00, &31, &00, &8d
     equs "LEVEL1"
     equb &0d, &0d, &70, &00, &8d, &35, &f8, &00
     equb &00, &00, &00
@@ -1716,9 +1824,14 @@ data_16ff = sub_16e5+26
     equb &0c, &0c, &0c, &0c, &0c, &0c, &0c, &0c
     equb &0c, &0c, &05, &05, &05, &05, &05, &05
     equb &05, &05, &05, &18, &03, &06, &08, &06
+; ***************************************************************************************
+; Run one frame of play
+;
+; Move the heroes, open doors for heroes carrying the right key, pick up and swap keys,
+; then draw the objects, move the missiles and the monsters, and handle the pause key.
 ; &1cc0 referenced 1 time by &464d
-.sub_1cc0
-    jsr sub_6e80
+.update_game
+    jsr move_heroes
     ldx #0
 ; &1cc5 referenced 1 time by &44ff
 .code_1cc5
@@ -1763,7 +1876,7 @@ data_16ff = sub_16e5+26
 .code_1d03
     tya
     pha
-    jsr sub_728c
+    jsr add_point
     pla
     tay
     dey
@@ -1785,7 +1898,7 @@ data_16ff = sub_16e5+26
     lda #0
     sta data_007d
     sta data_007e
-    jsr sub_7852
+    jsr plot_at_cell
     lda data_7e23
     sta cell_x
     lda data_7e4c
@@ -1876,7 +1989,7 @@ data_16ff = sub_16e5+26
     sta cell_y
     txa
     pha
-    jsr sub_7852
+    jsr plot_at_cell
     pla
     tax
     dex
@@ -1946,7 +2059,7 @@ data_16ff = sub_16e5+26
     sta data_007e
     txa
     pha
-    jsr sub_7852
+    jsr plot_at_cell
     pla
     tax
     pla
@@ -2013,8 +2126,8 @@ data_16ff = sub_16e5+26
 ; &1ece referenced 1 time by &4609
 .code_1ece
     jsr sub_7305
-    jsr sub_70ca
-    jsr sub_79c1
+    jsr move_missiles
+    jsr update_monsters
     lda #osbyte_scan_keyboard_from_16
     jsr osbyte                          ; Scan keyboard from key 16
     cpx #&37 ; '7'
@@ -2042,8 +2155,8 @@ data_16ff = sub_16e5+26
     bpl code_1f00
     lda #2
     sta os_vsync_counter
-    jsr sub_1070
-    jsr sub_1cc0
+    jsr check_for_victory
+    jsr update_game
     lda data_09f2
     bne code_1f36
     ldx #4
@@ -2063,7 +2176,7 @@ data_16ff = sub_16e5+26
     bne code_1f17
     ldx data_09ff
     bmi return_5
-    jsr sub_2050
+    jsr restore_hero_sprites
 ; &1f35 referenced 1 time by &4670
 .return_5
     rts
@@ -2078,7 +2191,7 @@ data_16ff = sub_16e5+26
     lda hero_y,x
     cmp exit_y
     bne code_1f91
-    jsr sub_2091
+    jsr drop_key
     lda #&63 ; 'c'
     sta hero_step,x
     lda #0
@@ -2094,7 +2207,7 @@ data_16ff = sub_16e5+26
     sta sprite_number
     txa
     pha
-    jsr sub_7852
+    jsr plot_at_cell
     pla
     tax
     lda #&ff
@@ -2106,7 +2219,7 @@ data_16ff = sub_16e5+26
     lda #&ff
     sta exit_x
     sta exit_y
-    jsr sub_203a
+    jsr hero_enters_exit
     jmp code_1f96
 ; &1f91 referenced 2 times by &467e, &4686
 .code_1f91
@@ -2130,7 +2243,7 @@ data_16ff = sub_16e5+26
     sta cell_y
     lda #&51 ; 'Q'
     sta sprite_number
-    jsr sub_7852
+    jsr plot_at_cell
     ldx data_09f5
     clc
     lda data_09f3
@@ -2151,7 +2264,7 @@ data_16ff = sub_16e5+26
     sta data_007d
     lda data_09fa,x
     sta data_007e
-    jsr sub_7852
+    jsr plot_at_cell
     jmp code_1f00
 ; &1ff2 referenced 1 time by &4708
 .code_1ff2
@@ -2173,14 +2286,29 @@ data_16ff = sub_16e5+26
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00
+; ***************************************************************************************
+; Start a hero going down the exit
+;
+; Play the exit sound and begin shrinking the hero's sprites.
+;
+; On Entry:
+;     X: hero number (0-3)
 ; &203a referenced 1 time by &46cb
-.sub_203a
+.hero_enters_exit
     brk
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00
+; ***************************************************************************************
+; Restore a hero's sprite sizes
+;
+; Put back the width and height of all eight of hero X's sprites, which the exit
+; animation shrinks.
+;
+; On Entry:
+;     X: hero number (0-3)
 ; &2050 referenced 1 time by &4672
-.sub_2050
+.restore_hero_sprites
     brk
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -2190,15 +2318,19 @@ data_16ff = sub_16e5+26
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
+; ***************************************************************************************
+; Drop the key a hero carries
+;
+; Put hero X's key in a free cell next to them, and remove it from their panel section.
+;
+; On Entry:
+;     X: hero number (0-3)
+;
+; On Exit:
+;     X: preserved
 ; &2091 referenced 1 time by &4688
-.sub_2091
+.drop_key
     brk
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -2207,6 +2339,19 @@ data_16ff = sub_16e5+26
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00
+; ***************************************************************************************
+; Find a free cell next to a cell
+;
+; Starting with cell_x, cell_y, try the cells above, to the right, below and to the left,
+; and leave cell_x, cell_y at the first without a wall.
+.find_open_neighbour
+    brk
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
 ; &2100 used as index base 1 time by &3cad
 .object_map
 ; &487a used as index base 1 time by &3807
@@ -2238,8 +2383,22 @@ data_213a = object_map+58
 
 ; Move 2: &51b0 to &0400 for length 1024
     org &0400
+; ***************************************************************************************
+; Add 1000 to a hero's score
+;
+; Advance the thousands digit of hero X's score. When it passes 9 it goes back to 0 and
+; the ten-thousands digit, kept separately as one of the small digit sprites, goes up (to
+; at most 9); that digit is then drawn below the score, with four further small sprites
+; beside it.
+;
+; On Entry:
+;     X: hero number (0-3)
+;
+; On Exit:
+;     X: preserved
 ; &0400 referenced 1 time by &72b9
-.data_0400
+.add_thousand_points
+.add_thousand_points_joy
     inc hero_score_thousands,x
     lda hero_score_thousands,x
     cmp #&28 ; '('
@@ -2336,8 +2495,15 @@ data_213a = object_map+58
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00
+; ***************************************************************************************
+; Choose the heroes and the sound
+;
+; Clear the left of the screen, print the menu and let the players toggle each hero (keys
+; 1-4) and the sound (5 on, 6 off). SPACE starts the game if at least one hero is
+; playing.
 ; &0500 referenced 1 time by &3551
-.data_0500
+.hero_menu
+.hero_menu_joy
     lda #&1c
     jsr oswrch
     lda #0
@@ -2350,19 +2516,36 @@ data_213a = object_map+58
     jsr oswrch
     lda #&0c
     jsr oswrch
-    jsr data_0524
+    jsr print_menu
     jmp data_0581
+; ***************************************************************************************
+; Print the menu text
+;
+; Print the sixteen positioned strings of menu_text.
 ; &0524 referenced 6 times by &52ce, &5373, &53a0, &56ce, &5773, &57a0
-.data_0524
+.print_menu
+.print_menu_joy
     ldx #&0f
     ldy #0
 ; &0528 referenced 2 times by &52dc, &56dc
 .data_0528
-    jsr data_052e
+    jsr print_menu_string
     dex
     bne data_0528
+; ***************************************************************************************
+; Print one menu string
+;
+; Move the text cursor to the column and row in the two bytes at menu_text+Y, then print
+; the following characters up to and including a carriage return.
+;
+; On Entry:
+;     Y: offset of the string in menu_text
+;
+; On Exit:
+;     Y: offset of the next string
 ; &052e referenced 2 times by &52d8, &56d8
-.data_052e
+.print_menu_string
+.print_menu_string_joy
     lda #&1f
     jsr oswrch
     lda data_0600,y
@@ -2379,8 +2562,16 @@ data_213a = object_map+58
     bne data_0540
     iny
     rts
+; ***************************************************************************************
+; Change a menu entry to NO
+;
+; Write "NO " at menu_text+Y.
+;
+; On Entry:
+;     Y: offset of the entry
 ; &054d referenced 2 times by &5370, &5770
-.data_054d
+.set_menu_no
+.set_menu_no_joy
     lda #&4e ; 'N'
     sta data_0600,y
     lda #&4f ; 'O'
@@ -2388,8 +2579,16 @@ data_213a = object_map+58
     lda #&20 ; ' '
     sta data_0602,y
     rts
+; ***************************************************************************************
+; Change a menu entry to YES
+;
+; Write "YES" at menu_text+Y.
+;
+; On Entry:
+;     Y: offset of the entry
 ; &055d referenced 2 times by &536a, &576a
-.data_055d
+.set_menu_yes
+.set_menu_yes_joy
     lda #&59 ; 'Y'
     sta data_0600,y
     lda #&45 ; 'E'
@@ -2397,14 +2596,30 @@ data_213a = object_map+58
     lda #&53 ; 'S'
     sta data_0602,y
     rts
+; ***************************************************************************************
+; Change the sound entry to OFF
+;
+; Write "FF" at menu_text+Y, after its "O".
+;
+; On Entry:
+;     Y: offset of the entry's second character
 ; &056d referenced 2 times by &5394, &5794
-.data_056d
+.set_menu_off
+.set_menu_off_joy
     lda #&46 ; 'F'
     sta data_0600,y
     sta data_0601,y
     rts
+; ***************************************************************************************
+; Change the sound entry to ON
+;
+; Write "N " at menu_text+Y, after its "O".
+;
+; On Entry:
+;     Y: offset of the entry's second character
 ; &0576 referenced 2 times by &538d, &578d
-.data_0576
+.set_menu_on
+.set_menu_on_joy
     lda #&4e ; 'N'
     sta data_0600,y
     lda #&20 ; ' '
@@ -2441,14 +2656,14 @@ data_213a = object_map+58
     eor #1
     sta data_08b4,x
     bne data_05c0
-    jsr data_055d
+    jsr set_menu_yes
     jmp data_05c3
 ; &05c0 referenced 2 times by &5368, &5768
 .data_05c0
-    jsr data_054d
+    jsr set_menu_no
 ; &05c3 referenced 2 times by &536d, &576d
 .data_05c3
-    jsr data_0524
+    jsr print_menu
     jmp data_0581
 ; &05c9 referenced 2 times by &5344, &5744
 .data_05c9
@@ -2468,19 +2683,19 @@ data_213a = object_map+58
     ldy #&99
     cmp #5
     beq data_05e4
-    jsr data_0576
+    jsr set_menu_on
     ldx #0
     beq data_05e9
 ; &05e4 referenced 2 times by &538b, &578b
 .data_05e4
-    jsr data_056d
+    jsr set_menu_off
     ldx #1
 ; &05e9 referenced 2 times by &5392, &5792
 .data_05e9
     lda #osbyte_sound_suppression
     ldy #0
     jsr osbyte                          ; osbyte: sound suppression
-    jsr data_0524
+    jsr print_menu
     jmp data_0581
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &4f, &06, &00
@@ -2518,8 +2733,14 @@ data_213a = object_map+58
     equb &0d, &03, &14
     equs "SPACE TO PLAY"
     equb &0d, &00, &0d, &a9, &63
+; ***************************************************************************************
+; Take the heroes nobody plays out of the game
+;
+; Draw any ten-thousands score digits, then put every hero switched off on the menu out
+; of play, with a &64 entry in returning_hero_queue in their place.
 ; &06b0 referenced 1 time by &359d
-.data_06b0
+.remove_absent_heroes
+.remove_absent_heroes_joy
     ldx #0
     ldy #0
 ; &06b4 referenced 2 times by &54a3, &58a3
@@ -2601,20 +2822,33 @@ data_213a = object_map+58
     ; Copy the newly assembled block of code back to it's proper place in the binary
     ; file.
     ; (Note the parameter order: 'copyblock <start>,<end>,<dest>')
-    copyblock data_0400, *, &51b0
+    copyblock add_thousand_points, *, &51b0
 
     ; Clear the area of memory we just temporarily used to assemble the new block,
     ; allowing us to assemble there again if needed
-    clear data_0400, &0800
+    clear add_thousand_points, &0800
 
     ; Set the program counter to the next position in the binary file.
-    org &51b0 + (* - data_0400)
+    org &51b0 + (* - add_thousand_points)
 
 
     org &55b0
 
 ; Move 3: &55b0 to &0400 for length 1024
     org &0400
+; ***************************************************************************************
+; Add 1000 to a hero's score
+;
+; Advance the thousands digit of hero X's score. When it passes 9 it goes back to 0 and
+; the ten-thousands digit, kept separately as one of the small digit sprites, goes up (to
+; at most 9); that digit is then drawn below the score, with four further small sprites
+; beside it.
+;
+; On Entry:
+;     X: hero number (0-3)
+;
+; On Exit:
+;     X: preserved
     inc hero_score_thousands,x
     lda hero_score_thousands,x
     cmp #&28 ; '('
@@ -2697,6 +2931,12 @@ data_213a = object_map+58
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00
+; ***************************************************************************************
+; Choose the heroes and the sound
+;
+; Clear the left of the screen, print the menu and let the players toggle each hero (keys
+; 1-4) and the sound (5 on, 6 off). SPACE starts the game if at least one hero is
+; playing.
     lda #&1c
     jsr oswrch
     lda #0
@@ -2709,13 +2949,28 @@ data_213a = object_map+58
     jsr oswrch
     lda #&0c
     jsr oswrch
-    jsr data_0524
+    jsr print_menu
     jmp data_0581
+; ***************************************************************************************
+; Print the menu text
+;
+; Print the sixteen positioned strings of menu_text.
     ldx #&0f
     ldy #0
-    jsr data_052e
+    jsr print_menu_string
     dex
     bne data_0528
+; ***************************************************************************************
+; Print one menu string
+;
+; Move the text cursor to the column and row in the two bytes at menu_text+Y, then print
+; the following characters up to and including a carriage return.
+;
+; On Entry:
+;     Y: offset of the string in menu_text
+;
+; On Exit:
+;     Y: offset of the next string
     lda #&1f
     jsr oswrch
     lda data_0600,y
@@ -2730,6 +2985,13 @@ data_213a = object_map+58
     bne data_0540
     iny
     rts
+; ***************************************************************************************
+; Change a menu entry to NO
+;
+; Write "NO " at menu_text+Y.
+;
+; On Entry:
+;     Y: offset of the entry
     lda #&4e ; 'N'
     sta data_0600,y
     lda #&4f ; 'O'
@@ -2737,6 +2999,13 @@ data_213a = object_map+58
     lda #&20 ; ' '
     sta data_0602,y
     rts
+; ***************************************************************************************
+; Change a menu entry to YES
+;
+; Write "YES" at menu_text+Y.
+;
+; On Entry:
+;     Y: offset of the entry
     lda #&59 ; 'Y'
     sta data_0600,y
     lda #&45 ; 'E'
@@ -2744,10 +3013,24 @@ data_213a = object_map+58
     lda #&53 ; 'S'
     sta data_0602,y
     rts
+; ***************************************************************************************
+; Change the sound entry to OFF
+;
+; Write "FF" at menu_text+Y, after its "O".
+;
+; On Entry:
+;     Y: offset of the entry's second character
     lda #&46 ; 'F'
     sta data_0600,y
     sta data_0601,y
     rts
+; ***************************************************************************************
+; Change the sound entry to ON
+;
+; Write "N " at menu_text+Y, after its "O".
+;
+; On Entry:
+;     Y: offset of the entry's second character
     lda #&4e ; 'N'
     sta data_0600,y
     lda #&20 ; ' '
@@ -2782,10 +3065,10 @@ data_213a = object_map+58
     eor #1
     sta data_08b4,x
     bne data_05c0
-    jsr data_055d
+    jsr set_menu_yes
     jmp data_05c3
-    jsr data_054d
-    jsr data_0524
+    jsr set_menu_no
+    jsr print_menu
     jmp data_0581
     ldx #3
     lda data_08b4,x
@@ -2797,15 +3080,15 @@ data_213a = object_map+58
     ldy #&99
     cmp #5
     beq data_05e4
-    jsr data_0576
+    jsr set_menu_on
     ldx #0
     beq data_05e9
-    jsr data_056d
+    jsr set_menu_off
     ldx #1
     lda #osbyte_sound_suppression
     ldy #0
     jsr osbyte                          ; osbyte: sound suppression
-    jsr data_0524
+    jsr print_menu
     jmp data_0581
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &4f, &06, &00
@@ -2841,6 +3124,11 @@ data_213a = object_map+58
     equb &0d, &03, &14
     equs "SPACE TO PLAY"
     equb &0d, &00, &0d, &a9, &63
+; ***************************************************************************************
+; Take the heroes nobody plays out of the game
+;
+; Draw any ten-thousands score digits, then put every hero switched off on the menu out
+; of play, with a &64 entry in returning_hero_queue in their place.
     ldx #0
     ldy #0
     lda data_08b0,x
@@ -2970,14 +3258,14 @@ data_213a = object_map+58
     ; Copy the newly assembled block of code back to it's proper place in the binary
     ; file.
     ; (Note the parameter order: 'copyblock <start>,<end>,<dest>')
-    copyblock data_0400, *, &55b0
+    copyblock add_thousand_points, *, &55b0
 
     ; Clear the area of memory we just temporarily used to assemble the new block,
     ; allowing us to assemble there again if needed
-    clear data_0400, &0800
+    clear add_thousand_points, &0800
 
     ; Set the program counter to the next position in the binary file.
-    org &55b0 + (* - data_0400)
+    org &55b0 + (* - add_thousand_points)
 
 
     org &2000
@@ -2990,8 +3278,9 @@ data_213a = object_map+58
     equb &0d, &d0, &f1, &4c, &00, &1f, &ad, &f0
     equb &09, &8d, &3e, &7f, &ad, &f1, &09, &8d
     equb &5d, &7f, &a9, &00, &8d, &f2, &09, &4c
-    equb &00, &1f, &8e, &01, &0d, &20, &a0, &16
-    equb &a9, &04, &8d, &f6, &09, &ae, &ff, &09
+    equb &00, &1f
+    equb &8e, &01, &0d, &20, &a0, &16, &a9, &04
+    equb &8d, &f6, &09, &ae, &ff, &09
     equs "0, P Lv "
     equb &18, &bd, &b5, &0d, &69, &01, &aa, &a8
     equb &69, &07, &8d, &00, &0d, &a9, &04, &99
@@ -3001,14 +3290,15 @@ data_213a = object_map+58
     equb &8d, &f2, &09, &ad, &01, &0d, &8d, &f5
     equb &09, &8d, &ff, &09, &a9, &ff, &8d, &f3
     equb &09, &a9, &04, &8d, &f4, &09, &4c, &00
-    equb &1f, &bd, &10, &0d, &8d, &02, &0d, &bd
-    equb &15, &0d, &8d, &03, &0d, &8a, &48, &20
-    equb &d0, &20, &68, &aa, &bc, &e0, &22, &ad
-    equb &02, &0d, &99, &60, &22, &ad, &03, &0d
-    equb &99, &80, &22, &a9, &00, &9d, &e0, &22
-    equb &a9, &1a, &85, &7a, &bd, &d0, &0d, &38
-    equb &e9, &0d, &85, &71, &a9, &4a, &85, &70
-    equb &8a, &48, &20, &00, &09, &68, &aa, &60
+    equb &1f
+    equb &bd, &10, &0d, &8d, &02, &0d, &bd, &15
+    equb &0d, &8d, &03, &0d, &8a, &48, &20, &d0
+    equb &20, &68, &aa, &bc, &e0, &22, &ad, &02
+    equb &0d, &99, &60, &22, &ad, &03, &0d, &99
+    equb &80, &22, &a9, &00, &9d, &e0, &22, &a9
+    equb &1a, &85, &7a, &bd, &d0, &0d, &38, &e9
+    equb &0d, &85, &71, &a9, &4a, &85, &70, &8a
+    equb &48, &20, &00, &09, &68, &aa, &60
     equb &ce, &03, &0d, &20, &fc, &78, &c0, &00
     equb &d0, &01, &60, &ee, &03, &0d, &ee, &02
     equb &0d, &20, &fc, &78, &c0, &00, &d0, &01
@@ -4729,8 +5019,15 @@ data_6d80 = sub_59b0+5072
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
+; ***************************************************************************************
+; Move the heroes
+;
+; For each hero in play: continue a step between cells, or read the hero's keys (and, for
+; heroes 0 and 1, the magic key) and start a step or fire a missile; check the new cell
+; for walls, monsters, other heroes and objects, change view when the hero enters another
+; room, and draw the hero.
 ; &6e80 referenced 1 time by &4400
-.sub_6e80
+.move_heroes
     ldx #0
 ; &6e82 referenced 1 time by &70c6
 .code_6e82
@@ -4742,7 +5039,7 @@ data_6d80 = sub_59b0+5072
     jmp code_70c1
 ; &6e91 referenced 1 time by &6e8c
 .code_6e91
-    jsr sub_76da
+    jsr hero_arrives
     jmp code_70c1
 ; &6e97 referenced 1 time by &6e85
 .code_6e97
@@ -4756,7 +5053,7 @@ data_6d80 = sub_59b0+5072
     sta previous_offset_y
     lda hero_step,x
     beq code_6eba
-    jsr sub_7ba2
+    jsr continue_hero_step
     jmp code_7075
 ; &6eba referenced 1 time by &6eb2
 .code_6eba
@@ -4766,43 +5063,43 @@ data_6d80 = sub_59b0+5072
 ; &6ec1 referenced 2 times by &6ebc, &76ab
 .code_6ec1
     lda hero_key_up,x
-    jsr sub_7c95
+    jsr test_key
     bne code_6ed4
     lda #1
     sta hero_direction,x
-    jsr sub_7b62
+    jsr start_hero_step
     jmp code_6f79
 ; &6ed4 referenced 1 time by &6ec7
 .code_6ed4
     lda hero_key_down,x
-    jsr sub_7c95
+    jsr test_key
     bne code_6ee7
     lda #5
     sta hero_direction,x
-    jsr sub_7b62
+    jsr start_hero_step
     jmp code_6f79
 ; &6ee7 referenced 1 time by &6eda
 .code_6ee7
     lda hero_key_right,x
-    jsr sub_7c95
+    jsr test_key
     bne code_6efa
     lda #3
     sta hero_direction,x
-    jsr sub_7b62
+    jsr start_hero_step
     jmp code_6f79
 ; &6efa referenced 1 time by &6eed
 .code_6efa
     lda hero_key_left,x
-    jsr sub_7c95
+    jsr test_key
     bne code_6f0d
     lda #7
     sta hero_direction,x
-    jsr sub_7b62
+    jsr start_hero_step
     jmp code_6f79
 ; &6f0d referenced 1 time by &6f00
 .code_6f0d
     lda hero_key_fire,x
-    jsr sub_7c95
+    jsr test_key
     beq code_6f18
     jmp code_7096
 ; &6f18 referenced 1 time by &6f13
@@ -4883,7 +5180,7 @@ data_6d80 = sub_59b0+5072
     sta cell_y
     txa
     pha
-    jsr sub_78fc
+    jsr test_wall
     pla
     tax
     cpy #0
@@ -4905,7 +5202,7 @@ data_6d80 = sub_59b0+5072
     sta scratch
     txa
     pha
-    jsr sub_7974
+    jsr find_creature
     pla
     tax
     cpy #0
@@ -4918,7 +5215,7 @@ data_6d80 = sub_59b0+5072
     sta hero_step,x
     sta hero_offset_x,x
     sta hero_offset_y,x
-    jsr sub_7221
+    jsr lose_health_point
     jmp code_7075
 ; &7002 referenced 1 time by &6fe3
 .code_7002
@@ -4993,7 +5290,7 @@ data_6d80 = sub_59b0+5072
     sta data_007e
     txa
     pha
-    jsr sub_7852
+    jsr plot_at_cell
     pla
     tax
 ; &7096 referenced 4 times by &6f15, &6f6a, &6f76, &76ae
@@ -5004,19 +5301,19 @@ data_6d80 = sub_59b0+5072
     adc hero_frame,x
     adc hero_sprites,x
     sta sprite_number
-    jsr sub_7732
+    jsr draw_hero
     lda hero_x,x
     sta cell_x
     lda hero_y,x
     sta cell_y
     txa
     pha
-    jsr sub_7938
+    jsr test_object_map
     pla
     tax
     cpy #0
     bne code_70c1
-    jsr sub_7329
+    jsr collect_objects
 ; &70c1 referenced 4 times by &6e8e, &6e94, &709a, &70bc
 .code_70c1
     inx
@@ -5026,8 +5323,13 @@ data_6d80 = sub_59b0+5072
 ; &70c9 referenced 1 time by &70c4
 .return_6
     rts
+; ***************************************************************************************
+; Move the missiles
+;
+; Advance every missile in flight one cell. A missile stops at a wall, damages a monster
+; or hero it meets, and bounces back off an energy drainer, wearing it down.
 ; &70ca referenced 1 time by &4611
-.sub_70ca
+.move_missiles
     lda #0
     sta data_007d
     sta data_007e
@@ -5042,7 +5344,7 @@ data_6d80 = sub_59b0+5072
     bpl code_70e7
     and #&7f
     sta missile_direction,x
-    jsr sub_7747
+    jsr flip_firer_frame
     jmp code_70fe
 ; &70e7 referenced 1 time by &70da
 .code_70e7
@@ -5054,7 +5356,7 @@ data_6d80 = sub_59b0+5072
     sta cell_y
     txa
     pha
-    jsr sub_7852
+    jsr plot_at_cell
     pla
     tax
 ; &70fe referenced 1 time by &70e4
@@ -5086,7 +5388,7 @@ data_6d80 = sub_59b0+5072
     sta cell_y
     txa
     pha
-    jsr sub_78fc
+    jsr test_wall
     beq code_713a
 ; &7130 referenced 2 times by &71fe, &75ab
 .code_7130
@@ -5101,7 +5403,7 @@ data_6d80 = sub_59b0+5072
 .code_713a
     lda #0
     sta scratch
-    jsr sub_7974
+    jsr find_creature
     beq code_7156
     lda monster_sprite,x
     cmp #&16
@@ -5111,7 +5413,7 @@ data_6d80 = sub_59b0+5072
     jmp code_757c
 ; &7150 referenced 1 time by &75a3
 .code_7150
-    jsr sub_76b1
+    jsr credit_missile_owner
     jmp code_7132
 ; &7156 referenced 2 times by &7142, &7149
 .code_7156
@@ -5123,7 +5425,7 @@ data_6d80 = sub_59b0+5072
     sta cell_y
     txa
     pha
-    jsr sub_7938
+    jsr test_object_map
     pla
     tax
     cpy #0
@@ -5155,7 +5457,7 @@ data_6d80 = sub_59b0+5072
 .code_71a0
     pla
     tax
-    jsr sub_76b1
+    jsr credit_missile_owner
     lda missile_direction,x
     cmp #1
     bne code_71b4
@@ -5211,7 +5513,7 @@ data_6d80 = sub_59b0+5072
 .loop_71f4
     tya
     pha
-    jsr sub_7221
+    jsr lose_health_point
     pla
     tay
     dey
@@ -5230,7 +5532,7 @@ data_6d80 = sub_59b0+5072
     sta sprite_number
     txa
     pha
-    jsr sub_7852
+    jsr plot_at_cell
     pla
     tax
 ; &7218 referenced 2 times by &70d7, &7137
@@ -5242,8 +5544,20 @@ data_6d80 = sub_59b0+5072
 ; &7220 referenced 1 time by &721b
 .return_7
     rts
+; ***************************************************************************************
+; Take one health point from a hero
+;
+; If hero X is in play, take one from their health and redraw it. When it falls below 00
+; the hero dies: their sprite is erased, they leave play, and their number joins
+; returning_hero_queue.
+;
+; On Entry:
+;     X: hero number (0-3)
+;
+; On Exit:
+;     X: preserved
 ; &7221 referenced 8 times by &363f, &6ffc, &71f6, &749a, &7512, &7654, &772a, &79ac
-.sub_7221
+.lose_health_point
     lda hero_direction,x
     bne code_7227
     rts
@@ -5261,7 +5575,7 @@ data_6d80 = sub_59b0+5072
     bne code_7266
     lda #&15
     sta sprite_number
-    jsr sub_7732
+    jsr draw_hero
     lda #0
     sta hero_direction,x
     lda #1
@@ -5304,16 +5618,36 @@ data_6d80 = sub_59b0+5072
     pla
     tax
     rts
+; ***************************************************************************************
+; Add one point to a hero's score
+;
+; Add one to hero X's score, carrying into the higher digits, and redraw it.
+;
+; On Entry:
+;     X: hero number (0-3)
+;
+; On Exit:
+;     X: preserved
 ; &728c referenced 5 times by &3642, &4445, &73a9, &76a2, &76d4
-.sub_728c
+.add_point
     inc hero_score_units,x
     lda hero_score_units,x
     cmp #&28 ; '('
     bne code_72bc
     lda #&1e
     sta hero_score_units,x
+; ***************************************************************************************
+; Add ten points to a hero's score
+;
+; Add ten to hero X's score, carrying into the higher digits, and redraw it.
+;
+; On Entry:
+;     X: hero number (0-3)
+;
+; On Exit:
+;     X: preserved
 ; &729b referenced 4 times by &737f, &7382, &7419, &74d5
-.sub_729b
+.add_ten_points
     inc hero_score_tens,x
     lda hero_score_tens,x
     cmp #&28 ; '('
@@ -5326,7 +5660,7 @@ data_6d80 = sub_59b0+5072
     bne code_72bc
     lda #&1e
     sta hero_score_hundreds,x
-    jsr data_0400
+    jsr add_thousand_points
 ; &72bc referenced 3 times by &7294, &72a3, &72b2
 .code_72bc
     clc
@@ -5386,14 +5720,22 @@ data_6d80 = sub_59b0+5072
     sta sprite_number
     txa
     pha
-    jsr sub_7852
+    jsr plot_at_cell
     pla
     tax
     dex
     bne loop_730d
     rts
+; ***************************************************************************************
+; Pick up the object in a hero's cell
+;
+; Find the object at hero X's cell and act on it: score, health, teleport, resurrection,
+; energy drain, or one of the magic items.
+;
+; On Entry:
+;     X: hero number (0-3)
 ; &7329 referenced 1 time by &70be
-.sub_7329
+.collect_objects
     lda hero_x,x
     sta cell_x
     lda hero_y,x
@@ -5417,8 +5759,8 @@ data_6d80 = sub_59b0+5072
     pha
     lda #0
     sta hero_has_boots,x
-    jsr sub_75f9
-    jsr sub_760d
+    jsr point_at_boots_icon
+    jsr erase_boots_icon
     pla
     tay
     lda object_type,y
@@ -5442,8 +5784,8 @@ data_6d80 = sub_59b0+5072
     tax
     tya
     pha
-    jsr sub_729b
-    jsr sub_729b
+    jsr add_ten_points
+    jsr add_ten_points
     pla
     tay
     jmp code_7467
@@ -5468,7 +5810,7 @@ data_6d80 = sub_59b0+5072
 .loop_73a7
     tya
     pha
-    jsr sub_728c
+    jsr add_point
     pla
     tay
     dey
@@ -5532,10 +5874,10 @@ data_6d80 = sub_59b0+5072
     lda #&ff
     sta object_x,y
     sta object_y,y
-    jsr sub_729b
+    jsr add_ten_points
     txa
     pha
-    jsr sub_74a3
+    jsr play_pickup_sound
     lda returning_hero_queue
     bne code_7429
     pla
@@ -5613,14 +5955,19 @@ data_6d80 = sub_59b0+5072
 .loop_7498
     tya
     pha
-    jsr sub_7221
+    jsr lose_health_point
     pla
     tay
     dey
     bne loop_7498
     rts
+; ***************************************************************************************
+; Play the pickup sound
+;
+; Define the pickup envelope and play the pickup sound, from the OSWORD parameter blocks
+; at &192C and &193A.
 ; &74a3 referenced 2 times by &741e, &74ca
-.sub_74a3
+.play_pickup_sound
     ldx #&2c ; ','
     ldy #&19
     lda #osword_envelope
@@ -5642,17 +5989,17 @@ data_6d80 = sub_59b0+5072
     and #7
     asl a
     asl a
-    jsr sub_74a3
+    jsr play_pickup_sound
     pla
     tax
     lda hero_score_units,x
     sta scratch2
-    jsr sub_729b
+    jsr add_ten_points
     lda scratch
     cmp #&5f ; '_'
     bne code_74eb
-    jsr sub_75f9
-    jsr sub_7606
+    jsr point_at_boots_icon
+    jsr plot_boots_icon
     lda #1
     sta hero_has_boots,x
     rts
@@ -5677,7 +6024,7 @@ data_6d80 = sub_59b0+5072
     inc scratch2
     lda scratch2
     sta hero_health_units,x
-    jsr sub_7221
+    jsr lose_health_point
     rts
 ; &7516 referenced 1 time by &7501
 .code_7516
@@ -5700,7 +6047,7 @@ data_6d80 = sub_59b0+5072
     sta cell_y
     txa
     pha
-    jsr sub_78fc
+    jsr test_wall
     pla
     tax
     pha
@@ -5710,7 +6057,7 @@ data_6d80 = sub_59b0+5072
     sta view_room,y
     cpx #0
     bne code_7551
-    jsr sub_7795
+    jsr draw_view_0
     pla
     tax
     rts
@@ -5718,7 +6065,7 @@ data_6d80 = sub_59b0+5072
 .code_7551
     cpx #1
     bne code_755b
-    jsr sub_77a7
+    jsr draw_view_1
     pla
     tax
     rts
@@ -5726,13 +6073,13 @@ data_6d80 = sub_59b0+5072
 .code_755b
     cpx #2
     bne code_7565
-    jsr sub_77b9
+    jsr draw_view_2
     pla
     tax
     rts
 ; &7565 referenced 1 time by &755d
 .code_7565
-    jsr sub_77cb
+    jsr draw_view_3
     pla
     tax
     rts
@@ -5818,8 +6165,16 @@ data_6d80 = sub_59b0+5072
     adc #&69 ; 'i'
     sta sprite_number
     jmp code_7611
+; ***************************************************************************************
+; Set the position of a hero's boots icon
+;
+; Set plot_x and plot_y to the place in hero X's panel section that shows the lightning
+; bolt for Boots of Speed.
+;
+; On Entry:
+;     X: hero number (0-3)
 ; &75f9 referenced 2 times by &7354, &74df
-.sub_75f9
+.point_at_boots_icon
     lda #&4a ; 'J'
     sta plot_x
     sec
@@ -5827,13 +6182,27 @@ data_6d80 = sub_59b0+5072
     sbc #8
     sta plot_y
     rts
+; ***************************************************************************************
+; Show a hero's boots icon
+;
+; Plot the lightning bolt at plot_x, plot_y.
+;
+; On Exit:
+;     X: preserved
 ; &7606 referenced 1 time by &74e2
-.sub_7606
+.plot_boots_icon
     lda #&75 ; 'u'
     sta sprite_number
     jmp code_7611
+; ***************************************************************************************
+; Remove a hero's boots icon
+;
+; Plot the blank sprite over the lightning bolt at plot_x, plot_y.
+;
+; On Exit:
+;     X: preserved
 ; &760d referenced 1 time by &7357
-.sub_760d
+.erase_boots_icon
     lda #&77 ; 'w'
     sta sprite_number
 ; &7611 referenced 4 times by &75c2, &75df, &75f6, &760a
@@ -5854,7 +6223,7 @@ data_6d80 = sub_59b0+5072
     lda #1
     sta hero_magic_delay,x
     lda hero_magic_key,x
-    jsr sub_7c95
+    jsr test_key
     bne code_76ab
     txa
     pha
@@ -5881,7 +6250,7 @@ data_6d80 = sub_59b0+5072
 .code_7652
     tya
     pha
-    jsr sub_7221
+    jsr lose_health_point
     pla
     tay
     dey
@@ -5900,7 +6269,7 @@ data_6d80 = sub_59b0+5072
     sta cell_y
     txa
     pha
-    jsr sub_78fc
+    jsr test_wall
     pla
     tax
     ldy sprite_number
@@ -5927,7 +6296,7 @@ data_6d80 = sub_59b0+5072
     beq code_76ae
     tya
     pha
-    jsr sub_728c
+    jsr add_point
     pla
     tay
     dey
@@ -5938,8 +6307,16 @@ data_6d80 = sub_59b0+5072
 ; &76ae referenced 1 time by &769e
 .code_76ae
     jmp code_7096
+; ***************************************************************************************
+; Give a point to the hero who fired a missile
+;
+; On Entry:
+;     X: missile slot
+;
+; On Exit:
+;     X: preserved
 ; &76b1 referenced 2 times by &7150, &71a2
-.sub_76b1
+.credit_missile_owner
     ldy missile_sprite_base,x
     txa
     pha
@@ -5965,12 +6342,20 @@ data_6d80 = sub_59b0+5072
     ldx #3
 ; &76d4 referenced 3 times by &76bd, &76c6, &76cf
 .code_76d4
-    jsr sub_728c
+    jsr add_point
     pla
     tax
     rts
+; ***************************************************************************************
+; Bring a returning hero into play
+;
+; Every other frame, show the next of the hero's arrival sprites. After the last, put the
+; hero in play facing down with health 32 (set to 33 and drawn by taking a point).
+;
+; On Entry:
+;     X: hero number (0-3)
 ; &76da referenced 1 time by &6e91
-.sub_76da
+.hero_arrives
     dec hero_offset_y,x
     beq code_76e0
     rts
@@ -5978,7 +6363,7 @@ data_6d80 = sub_59b0+5072
 .code_76e0
     lda #2
     sta hero_offset_y,x
-    jsr sub_777a
+    jsr get_hero_cell
     lda #0
     sta data_007d
     sta data_007e
@@ -5988,7 +6373,7 @@ data_6d80 = sub_59b0+5072
     sta sprite_number
     txa
     pha
-    jsr sub_7852
+    jsr plot_at_cell
     pla
     tax
     clc
@@ -6011,27 +6396,44 @@ data_6d80 = sub_59b0+5072
     lda #&21 ; '!'
     sta hero_health_tens,x
     sta hero_health_units,x
-    jsr sub_7221
+    jsr lose_health_point
     rts
 ; &772e referenced 1 time by &770d
 .code_772e
     sta hero_frame,x
     rts
+; ***************************************************************************************
+; Draw a hero
+;
+; Plot sprite_number at hero X's cell and pixel offset in every view that shows it.
+;
+; On Entry:
+;     X: hero number (0-3)
+;
+; On Exit:
+;     X: preserved
 ; &7732 referenced 2 times by &70a4, &7244
-.sub_7732
-    jsr sub_777a
+.draw_hero
+    jsr get_hero_cell
     lda hero_offset_x,x
     sta data_007d
     lda hero_offset_y,x
     sta data_007e
     txa
     pha
-    jsr sub_7852
+    jsr plot_at_cell
     pla
     tax
     rts
+; ***************************************************************************************
+; Animate the hero who fired a missile
+;
+; Toggle the animation frame of the hero whose missile is in slot X.
+;
+; On Entry:
+;     X: missile slot
 ; &7747 referenced 1 time by &70e1
-.sub_7747
+.flip_firer_frame
     lda missile_sprite_base,x
     cmp #&10
     bne code_7757
@@ -6061,64 +6463,97 @@ data_6d80 = sub_59b0+5072
     eor #1
     sta data_0d23
     rts
+; ***************************************************************************************
+; Copy a hero's position to cell_x, cell_y
+;
+; On Entry:
+;     X: hero number (0-3)
+;
+; On Exit:
+;     X: preserved
 ; &777a referenced 2 times by &76e5, &7732
-.sub_777a
+.get_hero_cell
     lda hero_x,x
     sta cell_x
     lda hero_y,x
     sta cell_y
     rts
     equb &73
+; ***************************************************************************************
+; Draw all four views
+;
+; Draw the room each hero's view shows.
 ; &7788 referenced 1 time by &3c42
-.sub_7788
-    jsr sub_7795
-    jsr sub_77a7
-    jsr sub_77b9
-    jsr sub_77cb
+.draw_all_views
+    jsr draw_view_0
+    jsr draw_view_1
+    jsr draw_view_2
+    jsr draw_view_3
     rts
+; ***************************************************************************************
+; Draw the top-left view
+;
+; Draw the room in hero 0's view.
 ; &7795 referenced 2 times by &754b, &7788
-.sub_7795
+.draw_view_0
     lda #1
     sta plot_y
     lda #1
     sta cell_x
     lda view_room
     sta data_007b
-    jsr sub_77de
+    jsr draw_room
     rts
+; ***************************************************************************************
+; Draw the top-right view
+;
+; Draw the room in hero 1's view.
 ; &77a7 referenced 2 times by &7555, &778b
-.sub_77a7
+.draw_view_1
     lda #1
     sta plot_y
     lda #&23 ; '#'
     sta cell_x
     lda data_0da2
     sta data_007b
-    jsr sub_77de
+    jsr draw_room
     rts
+; ***************************************************************************************
+; Draw the bottom-left view
+;
+; Draw the room in hero 2's view.
 ; &77b9 referenced 2 times by &755f, &778e
-.sub_77b9
+.draw_view_2
     lda #&67 ; 'g'
     sta plot_y
     lda #1
     sta cell_x
     lda data_0da4
     sta data_007b
-    jsr sub_77de
+    jsr draw_room
     rts
+; ***************************************************************************************
+; Draw the bottom-right view
+;
+; Draw the room in hero 3's view.
 ; &77cb referenced 2 times by &7565, &7791
-.sub_77cb
+.draw_view_3
     lda #&67 ; 'g'
     sta plot_y
     lda #&23 ; '#'
     sta cell_x
     lda data_0da6
     sta data_007b
-    jsr sub_77de
+    jsr draw_room
     rts
     equb &60
+; ***************************************************************************************
+; Draw a room
+;
+; Draw the eight rows of walls of the room at &7B, &7C (a pointer into room_walls) with
+; its top-left at plot_y and the column in cell_x, then draw the doors.
 ; &77de referenced 4 times by &77a3, &77b5, &77c7, &77d9
-.sub_77de
+.draw_room
     lda #&0c
     sta data_007c
     ldy #0
@@ -6128,7 +6563,7 @@ data_6d80 = sub_59b0+5072
     sta scratch
     tya
     pha
-    jsr sub_7820
+    jsr draw_room_row
     clc
     lda plot_y
     adc #&0c
@@ -6152,14 +6587,19 @@ data_6d80 = sub_59b0+5072
     sta sprite_number
     txa
     pha
-    jsr sub_7852
+    jsr plot_at_cell
     pla
     tax
     dex
     bne loop_77fe
     rts
+; ***************************************************************************************
+; Draw one row of a room
+;
+; Plot a wall or a blank for each of the eight bits of scratch, four byte columns apart,
+; starting at byte column cell_x.
 ; &7820 referenced 1 time by &77eb
-.sub_7820
+.draw_room_row
     lda cell_x
     sta plot_x
     ldx #&80
@@ -6191,8 +6631,19 @@ data_6d80 = sub_59b0+5072
     tax
     bne loop_7827
     rts
+; ***************************************************************************************
+; Plot a sprite at a map cell in every view
+;
+; Plot sprite_number at map cell cell_x, cell_y, shifted by the pixel offsets in &7D,
+; &7E, in each view that shows the cell's room. Cells are four byte columns wide and
+; twelve pixel rows high.
+;
+; On Entry:
+;     CELL_X: map x
+;     CELL_Y: map y
+;     SPRITE_NUMBER: sprite to plot
 ; &7852 referenced 19 times by &38e8, &3940, &4476, &451c, &45a1, &46ad, &46f7, &472c, &7091, &70f9, &7213, &7320, &76f9, &7741, &7817, &79db, &7a07, &7b25, &7b5c
-.sub_7852
+.plot_at_cell
     lda cell_y
     and #&f8
     sta scratch
@@ -6275,8 +6726,18 @@ data_6d80 = sub_59b0+5072
 ; &78fb referenced 1 time by &78e7
 .return_9
     rts
+; ***************************************************************************************
+; Test for a wall at a map cell
+;
+; Return the room_walls bit for cell cell_x, cell_y: non-zero if there is a wall. Also
+; leaves &7B, &7C pointing at the cell's room.
+;
+; On Exit:
+;     A: wall bit
+;     Y: wall bit
+;     Z: set if no wall
 ; &78fc referenced 5 times by &6fb2, &712b, &753a, &7675, &7a51
-.sub_78fc
+.test_wall
     lda cell_y
     and #&f8
     sta scratch
@@ -6304,8 +6765,17 @@ data_6d80 = sub_59b0+5072
     sta data_008f
     tay
     rts
+; ***************************************************************************************
+; Test for an object at a map cell
+;
+; Return the object_map bit for cell cell_x, cell_y: non-zero if an object may lie there.
+;
+; On Exit:
+;     A: object bit
+;     Y: object bit
+;     Z: set if none
 ; &7938 referenced 2 times by &70b5, &7166
-.sub_7938
+.test_object_map
     lda cell_y
     and #&f8
     sta scratch
@@ -6333,8 +6803,18 @@ data_6d80 = sub_59b0+5072
     sta data_008f
     tay
     rts
+; ***************************************************************************************
+; Look for a monster or hero at a cell
+;
+; Look for a monster, other than monster number scratch, at cell_x, cell_y. If scratch is
+; non-zero, also look for a hero there, and if one is found take hero_damage_taken points
+; of their health.
+;
+; On Exit:
+;     A: non-zero if something was found
+;     Y: non-zero if a monster was found
 ; &7974 referenced 4 times by &6fdc, &713f, &7a8c, &7ce6
-.sub_7974
+.find_creature
     ldx #&1e
 ; &7976 referenced 1 time by &798e
 .loop_7976
@@ -6368,7 +6848,7 @@ data_6d80 = sub_59b0+5072
 .loop_79aa
     tya
     pha
-    jsr sub_7221
+    jsr lose_health_point
     pla
     tay
     dey
@@ -6385,8 +6865,14 @@ data_6d80 = sub_59b0+5072
     lda #0
     ldy #0
     rts
+; ***************************************************************************************
+; Draw the trapdoors and move the monsters
+;
+; Draw the eight trapdoors, then for each monster continue its step or start a new one,
+; turning a random way when it is blocked, and advance dying monsters until they reappear
+; at a trapdoor.
 ; &79c1 referenced 1 time by &4614
-.sub_79c1
+.update_monsters
     ldx #8
     lda #0
     sta data_007d
@@ -6401,7 +6887,7 @@ data_6d80 = sub_59b0+5072
     sta cell_y
     txa
     pha
-    jsr sub_7852
+    jsr plot_at_cell
     pla
     tax
     dex
@@ -6423,7 +6909,7 @@ data_6d80 = sub_59b0+5072
     sta data_007d
     lda monster_offset_y,x
     sta data_007e
-    jsr sub_7852
+    jsr plot_at_cell
     pla
     pha
     tax
@@ -6435,7 +6921,7 @@ data_6d80 = sub_59b0+5072
 .code_7a17
     lda monster_step,x
     beq code_7a23
-    jsr sub_7c2b
+    jsr continue_monster_step
     pla
     jmp code_7b04
 ; &7a23 referenced 1 time by &7a1a
@@ -6461,12 +6947,12 @@ data_6d80 = sub_59b0+5072
     dec monster_x,x
 ; &7a42 referenced 1 time by &7a3d
 .code_7a42
-    jsr sub_7beb
+    jsr start_monster_step
     lda monster_x,x
     sta cell_x
     lda monster_y,x
     sta cell_y
-    jsr sub_78fc
+    jsr test_wall
     beq code_7a87
     pla
     tax
@@ -6495,7 +6981,7 @@ data_6d80 = sub_59b0+5072
     pla
     pha
     sta scratch
-    jsr sub_7974
+    jsr find_creature
     cmp #0
     beq code_7ac1
     pla
@@ -6569,7 +7055,7 @@ data_6d80 = sub_59b0+5072
     sta data_007e
     txa
     pha
-    jsr sub_7852
+    jsr plot_at_cell
 ; &7b28 referenced 3 times by &7b5f, &7cf8, &7cfb
 .code_7b28
     pla
@@ -6602,10 +7088,21 @@ data_6d80 = sub_59b0+5072
     sta data_007d
     lda monster_offset_y,x
     sta data_007e
-    jsr sub_7852
+    jsr plot_at_cell
     jmp code_7b28
+; ***************************************************************************************
+; Start a hero's step between cells
+;
+; Set hero X's step counter to 1 and their pixel offsets for the direction they face: 6
+; rows up or down, or 2 byte columns left or right.
+;
+; On Entry:
+;     X: hero number (0-3)
+;
+; On Exit:
+;     X: preserved
 ; &7b62 referenced 4 times by &6ece, &6ee1, &6ef4, &6f07
-.sub_7b62
+.start_hero_step
     lda #1
     sta hero_step,x
     lda hero_direction,x
@@ -6641,8 +7138,20 @@ data_6d80 = sub_59b0+5072
     lda #&fe
     sta hero_offset_x,x
     rts
+; ***************************************************************************************
+; Continue a hero's step between cells
+;
+; Toggle hero X's animation frame and count down their step. When it ends, move the hero
+; one cell in the direction they face and clear the pixel offsets. The offsets are then
+; doubled.
+;
+; On Entry:
+;     X: hero number (0-3)
+;
+; On Exit:
+;     X: preserved
 ; &7ba2 referenced 1 time by &6eb4
-.sub_7ba2
+.continue_hero_step
     lda hero_frame,x
     eor #1
     sta hero_frame,x
@@ -6683,8 +7192,15 @@ data_6d80 = sub_59b0+5072
     adc hero_offset_y,x
     sta hero_offset_y,x
     rts
+; ***************************************************************************************
+; Start a monster's step between cells
+;
+; Set the step counter and the pixel offsets for monster X's direction.
+;
+; On Entry:
+;     X: monster number
 ; &7beb referenced 1 time by &7a42
-.sub_7beb
+.start_monster_step
     lda #3
     sta monster_step,x
     lda monster_sprite,x
@@ -6720,8 +7236,16 @@ data_6d80 = sub_59b0+5072
     lda #&ff
     sta monster_offset_x,x
     rts
+; ***************************************************************************************
+; Continue a monster's step between cells
+;
+; Toggle monster X's frame and move its pixel offsets towards zero, moving it to the next
+; cell when the step ends.
+;
+; On Entry:
+;     X: monster number
 ; &7c2b referenced 1 time by &7a1c
-.sub_7c2b
+.continue_monster_step
     lda monster_frame,x
     eor #1
     sta monster_frame,x
@@ -6782,8 +7306,20 @@ data_6d80 = sub_59b0+5072
     rts
     equb &de, &35, &0d, &bd, &35, &0d, &d0, &00
     equb &60
+; ***************************************************************************************
+; Test whether a key is pressed
+;
+; Scan the key whose INKEY number is in A with OSBYTE &81.
+;
+; On Entry:
+;     A: INKEY key number (negative, as a byte)
+;
+; On Exit:
+;     A: 0 if the key is pressed, 1 if not
+;     Z: set if the key is pressed
+;     X: preserved
 ; &7c95 referenced 6 times by &6ec4, &6ed7, &6eea, &6efd, &6f10, &7627
-.sub_7c95
+.test_key
     tay
     txa
     pha
@@ -6830,7 +7366,7 @@ data_6d80 = sub_59b0+5072
     txa
     pha
     stx scratch
-    jsr sub_7974
+    jsr find_creature
     cmp #0
     beq code_7cfb
     pla
@@ -7104,7 +7640,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     hero_direction:            19
 ;     hero_offset_x:             19
 ;     monster_sprite:            19
-;     sub_7852:                  19
+;     plot_at_cell:              19
 ;     data_007d:                 18
 ;     data_007e:                 18
 ;     monster_offset_y:          17
@@ -7113,18 +7649,19 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     sprite_width:              16
 ;     hero_frame:                15
 ;     monster_offset_x:          15
+;     osword:                    15
 ;     data_0600:                 14
 ;     hero_step:                 13
-;     osword:                    13
 ;     screen_ptr:                13
 ;     data_0080:                 12
 ;     data_0581:                 12
 ;     missile_direction:         12
-;     sub_119a:                  12
+;     plot_victory_sprite:       12
 ;     data_0081:                 11
 ;     hero_health_tens:          11
 ;     previous_x:                11
 ;     previous_y:                11
+;     returning_hero_queue:      10
 ;     hero_max_missiles:          9
 ;     hero_panel_y:               9
 ;     object_x:                   9
@@ -7136,8 +7673,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     hero_key:                   8
 ;     hero_score_thousands:       8
 ;     hero_score_units:           8
-;     returning_hero_queue:       8
-;     sub_7221:                   8
+;     lose_health_point:          8
 ;     cell_room:                  7
 ;     data_008f:                  7
 ;     hero_damage_taken:          7
@@ -7149,15 +7685,17 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     sprite_height:              7
 ;     code_7b04:                  6
 ;     data_0082:                  6
-;     data_0524:                  6
 ;     data_06f8:                  6
 ;     data_08bc:                  6
 ;     key_x:                      6
 ;     key_y:                      6
 ;     missile_x:                  6
 ;     missile_y:                  6
+;     print_menu:                 6
+;     print_menu_joy:             6
 ;     scratch2:                   6
-;     sub_7c95:                   6
+;     test_key:                   6
+;     add_point:                  5
 ;     code_7075:                  5
 ;     code_71d9:                  5
 ;     data_0084:                  5
@@ -7170,10 +7708,10 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     hero_score_hundreds:        5
 ;     hero_score_tens:            5
 ;     next_trapdoor:              5
-;     sub_0f68:                   5
-;     sub_728c:                   5
-;     sub_78fc:                   5
+;     plot_panel_sprite:          5
+;     test_wall:                  5
 ;     view_room:                  5
+;     add_ten_points:             4
 ;     code_1ec6:                  4
 ;     code_1f00:                  4
 ;     code_6f79:                  4
@@ -7191,15 +7729,14 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_09f3:                  4
 ;     door_x:                     4
 ;     door_y:                     4
+;     draw_room:                  4
+;     find_creature:              4
 ;     hero_door_x:                4
 ;     hero_door_y:                4
 ;     hero_key_dropped:           4
 ;     missile_sprite_base:        4
 ;     monster_hit_points:         4
-;     sub_729b:                   4
-;     sub_77de:                   4
-;     sub_7974:                   4
-;     sub_7b62:                   4
+;     start_hero_step:            4
 ;     wrchv:                      4
 ;     wrchv + 1:                  4
 ;     bit_masks:                  3
@@ -7228,14 +7765,15 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     missile_damage:             3
 ;     monster_frame:              3
 ;     monster_start_hit_points:   3
+;     next_victory_sprite:        3
 ;     osasci:                     3
 ;     oscli:                      3
 ;     osrdch:                     3
 ;     room_walls:                 3
 ;     sprite_data_ptr:            3
-;     sub_11ac:                   3
 ;     system_via_t1c_l:           3
 ;     user_char_128:              3
+;     clear_text_area:            2
 ;     code_108a:                  2
 ;     code_1097:                  2
 ;     code_111c:                  2
@@ -7262,6 +7800,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     code_7af8:                  2
 ;     code_7c6f:                  2
 ;     code_7cae:                  2
+;     credit_missile_owner:       2
 ;     data_0288:                  2
 ;     data_0289:                  2
 ;     data_0437:                  2
@@ -7270,12 +7809,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_0484:                  2
 ;     data_0490:                  2
 ;     data_0528:                  2
-;     data_052e:                  2
 ;     data_0540:                  2
-;     data_054d:                  2
-;     data_055d:                  2
-;     data_056d:                  2
-;     data_0576:                  2
 ;     data_05c0:                  2
 ;     data_05c3:                  2
 ;     data_05c9:                  2
@@ -7307,32 +7841,43 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_7e4c:                  2
 ;     data_e772:                  2
 ;     door_sprite:                2
+;     draw_hero:                  2
+;     draw_victory_ring:          2
+;     draw_view_0:                2
+;     draw_view_1:                2
+;     draw_view_2:                2
+;     draw_view_3:                2
+;     get_hero_cell:              2
 ;     mos_oswrch_default:         2
+;     play_pickup_sound:          2
+;     plot_chalice:               2
+;     point_at_boots_icon:        2
 ;     previous_offset_x:          2
 ;     previous_offset_y:          2
+;     print_menu_string:          2
+;     print_menu_string_joy:      2
+;     reset_hero:                 2
 ;     return_11:                  2
 ;     row_start_ptr:              2
 ;     row_start_ptr_hi:           2
 ;     saved_wrchv:                2
+;     set_menu_no:                2
+;     set_menu_no_joy:            2
+;     set_menu_off:               2
+;     set_menu_off_joy:           2
+;     set_menu_on:                2
+;     set_menu_on_joy:            2
+;     set_menu_yes:               2
+;     set_menu_yes_joy:           2
 ;     sprite_data_ptr_hi:         2
-;     sub_0ecf:                   2
-;     sub_1149:                   2
-;     sub_11f2:                   2
-;     sub_161a:                   2
-;     sub_74a3:                   2
-;     sub_75f9:                   2
-;     sub_76b1:                   2
-;     sub_7732:                   2
-;     sub_777a:                   2
-;     sub_7795:                   2
-;     sub_77a7:                   2
-;     sub_77b9:                   2
-;     sub_77cb:                   2
-;     sub_7938:                   2
+;     test_object_map:            2
 ;     trapdoor_x:                 2
 ;     trapdoor_y:                 2
+;     add_thousand_points:        1
+;     add_thousand_points_joy:    1
 ;     bytev:                      1
 ;     bytev + 1:                  1
+;     check_for_victory:          1
 ;     code_091d:                  1
 ;     code_0929:                  1
 ;     code_0938:                  1
@@ -7377,6 +7922,8 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     code_1577:                  1
 ;     code_1585:                  1
 ;     code_159c:                  1
+;     code_16b4:                  1
+;     code_16bf:                  1
 ;     code_1cc5:                  1
 ;     code_1cd8:                  1
 ;     code_1ce3:                  1
@@ -7534,13 +8081,13 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     code_7fb8:                  1
 ;     code_7fbd:                  1
 ;     code_7fda:                  1
+;     collect_objects:            1
+;     continue_hero_step:         1
+;     continue_monster_step:      1
 ;     data_0000:                  1
 ;     data_00fa:                  1
 ;     data_00fc:                  1
-;     data_0400:                  1
 ;     data_0450:                  1
-;     data_0500:                  1
-;     data_06b0:                  1
 ;     data_079b:                  1
 ;     data_07a9:                  1
 ;     data_07b8:                  1
@@ -7595,16 +8142,28 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_6d80:                  1
 ;     data_fffc:                  1
 ;     data_fffd:                  1
+;     dissolve_chalice:           1
+;     draw_all_views:             1
+;     draw_room_row:              1
+;     draw_status_panel:          1
+;     draw_view_frames:           1
+;     drop_key:                   1
+;     erase_boots_icon:           1
+;     flip_firer_frame:           1
 ;     font_digits:                1
 ;     font_letters:               1
 ;     game_entry:                 1
 ;     hero_arrival_sprites:       1
+;     hero_arrives:               1
+;     hero_enters_exit:           1
 ;     hero_key_down:              1
 ;     hero_key_fire:              1
 ;     hero_key_left:              1
 ;     hero_key_right:             1
 ;     hero_key_up:                1
 ;     hero_magic_key:             1
+;     hero_menu:                  1
+;     hero_menu_joy:              1
 ;     hero_missile_sprites:       1
 ;     level_tail:                 1
 ;     loop_504c:                  1
@@ -7633,7 +8192,15 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     loop_7fe8:                  1
 ;     mos_row_offsets:            1
 ;     mos_row_offsets_lo:         1
+;     move_heroes:                1
+;     move_missiles:              1
 ;     object_map:                 1
+;     plot_boots_icon:            1
+;     remove_absent_heroes:       1
+;     remove_absent_heroes_joy:   1
+;     reset_monsters:             1
+;     reset_workspace:            1
+;     restore_hero_sprites:       1
 ;     return_1:                   1
 ;     return_10:                  1
 ;     return_2:                   1
@@ -7649,35 +8216,15 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     sprite_addr_lo:             1
 ;     sprite_heights:             1
 ;     sprite_widths:              1
-;     sub_0ef7:                   1
-;     sub_1070:                   1
-;     sub_10e9:                   1
-;     sub_11be:                   1
+;     start_monster_step:         1
 ;     sub_1400:                   1
 ;     sub_1446:                   1
-;     sub_14a0:                   1
-;     sub_14d7:                   1
-;     sub_1510:                   1
-;     sub_1583:                   1
 ;     sub_15b1:                   1
-;     sub_1cc0:                   1
-;     sub_203a:                   1
-;     sub_2050:                   1
-;     sub_2091:                   1
-;     sub_6e80:                   1
-;     sub_70ca:                   1
 ;     sub_7305:                   1
-;     sub_7329:                   1
-;     sub_7606:                   1
-;     sub_760d:                   1
-;     sub_76da:                   1
-;     sub_7747:                   1
-;     sub_7788:                   1
-;     sub_7820:                   1
-;     sub_79c1:                   1
-;     sub_7ba2:                   1
-;     sub_7beb:                   1
-;     sub_7c2b:                   1
+;     unpack_level:               1
+;     update_game:                1
+;     update_monsters:            1
+;     victory_sequence:           1
 ;     workspace_template:         1
 
 ; Automatically generated labels:
@@ -7729,6 +8276,8 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     code_1577
 ;     code_1585
 ;     code_159c
+;     code_16b4
+;     code_16bf
 ;     code_1cc5
 ;     code_1cd8
 ;     code_1ce3
@@ -7946,7 +8495,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_0287
 ;     data_0288
 ;     data_0289
-;     data_0400
 ;     data_041e
 ;     data_0437
 ;     data_0447
@@ -7955,15 +8503,8 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_046b
 ;     data_0484
 ;     data_0490
-;     data_0500
-;     data_0524
 ;     data_0528
-;     data_052e
 ;     data_0540
-;     data_054d
-;     data_055d
-;     data_056d
-;     data_0576
 ;     data_0581
 ;     data_05c0
 ;     data_05c3
@@ -7976,7 +8517,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_0600
 ;     data_0601
 ;     data_0602
-;     data_06b0
 ;     data_06b4
 ;     data_06c9
 ;     data_06f0
@@ -8109,82 +8649,31 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     sub_0d72
 ;     sub_0d88
 ;     sub_0ded
-;     sub_0ecf
-;     sub_0ef7
-;     sub_0f68
 ;     sub_0f7d
 ;     sub_0f8d
 ;     sub_0fea
-;     sub_1070
 ;     sub_10e6
-;     sub_10e9
-;     sub_1149
-;     sub_119a
-;     sub_11ac
-;     sub_11be
-;     sub_11f2
 ;     sub_1204
 ;     sub_1400
 ;     sub_1446
-;     sub_14a0
-;     sub_14d7
-;     sub_1510
-;     sub_1583
 ;     sub_15b1
-;     sub_161a
 ;     sub_1624
 ;     sub_1639
 ;     sub_16e5
-;     sub_1cc0
-;     sub_203a
-;     sub_2050
-;     sub_2091
 ;     sub_5167
 ;     sub_5178
 ;     sub_59b0
-;     sub_6e80
-;     sub_70ca
-;     sub_7221
-;     sub_728c
-;     sub_729b
 ;     sub_7305
-;     sub_7329
-;     sub_74a3
-;     sub_75f9
-;     sub_7606
-;     sub_760d
-;     sub_76b1
-;     sub_76da
-;     sub_7732
-;     sub_7747
-;     sub_777a
-;     sub_7788
-;     sub_7795
-;     sub_77a7
-;     sub_77b9
-;     sub_77cb
-;     sub_77de
-;     sub_7820
-;     sub_7852
-;     sub_78fc
-;     sub_7938
-;     sub_7974
-;     sub_79c1
-;     sub_7b62
-;     sub_7ba2
-;     sub_7beb
-;     sub_7c2b
-;     sub_7c95
 ;     sub_7db9
 ;     sub_7e30
 
 ; Stats:
 ;     Total size (Code + Data) = 24576 bytes
-;     Code                     = 7346 bytes (30%)
-;     Data                     = 17230 bytes (70%)
+;     Code                     = 7381 bytes (30%)
+;     Data                     = 17195 bytes (70%)
 ;
-;     Number of instructions   = 3385
-;     Number of data bytes     = 15712 bytes
+;     Number of instructions   = 3402
+;     Number of data bytes     = 15677 bytes
 ;     Number of data words     = 0 bytes
 ;     Number of string bytes   = 1518 bytes
 ;     Number of strings        = 226

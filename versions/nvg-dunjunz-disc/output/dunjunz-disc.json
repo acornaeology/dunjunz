@@ -30,12 +30,12 @@
       "value": 129
     },
     {
-      "name": "osword_sound",
-      "value": 7
-    },
-    {
       "name": "osword_envelope",
       "value": 8
+    },
+    {
+      "name": "osword_sound",
+      "value": 7
     },
     {
       "name": "osbyte_scan_keyboard_from_16",
@@ -191,6 +191,648 @@
         "X": "preserved",
         "Y": "preserved"
       }
+    },
+    {
+      "addr": 1024,
+      "binary_addr": 20912,
+      "name": "add_thousand_points",
+      "title": "Add 1000 to a hero's score",
+      "description": "Advance the thousands digit of hero X's score. When it passes 9 it goes back to 0 and the ten-thousands digit, kept separately as one of the small digit sprites, goes up (to at most 9); that digit is then drawn below the score, with four further small sprites beside it.",
+      "on_entry": {
+        "X": "hero number (0-3)"
+      },
+      "on_exit": {
+        "X": "preserved"
+      }
+    },
+    {
+      "addr": 1024,
+      "binary_addr": 21936,
+      "name": "add_thousand_points_joy",
+      "title": "Add 1000 to a hero's score",
+      "description": "Advance the thousands digit of hero X's score. When it passes 9 it goes back to 0 and the ten-thousands digit, kept separately as one of the small digit sprites, goes up (to at most 9); that digit is then drawn below the score, with four further small sprites beside it.",
+      "on_entry": {
+        "X": "hero number (0-3)"
+      },
+      "on_exit": {
+        "X": "preserved"
+      }
+    },
+    {
+      "addr": 3791,
+      "binary_addr": 13839,
+      "name": "reset_hero",
+      "title": "Give a hero their starting attributes",
+      "description": "Set hero X's missile limit, missile damage and damage taken from the starting tables, and their score to zero. The units digit is set one below 0 because draw_status_panel draws the score by adding a point.",
+      "on_entry": {
+        "X": "hero number (0-3)"
+      },
+      "on_exit": {
+        "X": "preserved"
+      }
+    },
+    {
+      "addr": 3831,
+      "binary_addr": 13879,
+      "name": "draw_status_panel",
+      "title": "Draw the status panel",
+      "description": "Draw each hero's section of the status panel to the right of the views: health and score (by taking a health point and adding a score point, from starting values one beyond those wanted), face, shield and armour rating, one icon per missile allowed, and missile damage."
+    },
+    {
+      "addr": 3944,
+      "binary_addr": 13992,
+      "name": "plot_panel_sprite",
+      "title": "Plot a sprite in a hero's panel section",
+      "description": "Plot sprite A at byte column X and pixel row Y + hero_panel_y - 14 for the hero being drawn (draw_status_panel's loop counter).",
+      "on_entry": {
+        "A": "sprite number",
+        "X": "byte column",
+        "Y": "row within the hero's panel section"
+      }
+    },
+    {
+      "addr": 29217,
+      "name": "lose_health_point",
+      "title": "Take one health point from a hero",
+      "description": "If hero X is in play, take one from their health and redraw it. When it falls below 00 the hero dies: their sprite is erased, they leave play, and their number joins returning_hero_queue.",
+      "on_entry": {
+        "X": "hero number (0-3)"
+      },
+      "on_exit": {
+        "X": "preserved"
+      }
+    },
+    {
+      "addr": 29324,
+      "name": "add_point",
+      "title": "Add one point to a hero's score",
+      "description": "Add one to hero X's score, carrying into the higher digits, and redraw it.",
+      "on_entry": {
+        "X": "hero number (0-3)"
+      },
+      "on_exit": {
+        "X": "preserved"
+      },
+      "fall_through": true
+    },
+    {
+      "addr": 29339,
+      "name": "add_ten_points",
+      "title": "Add ten points to a hero's score",
+      "description": "Add ten to hero X's score, carrying into the higher digits, and redraw it.",
+      "on_entry": {
+        "X": "hero number (0-3)"
+      },
+      "on_exit": {
+        "X": "preserved"
+      }
+    },
+    {
+      "addr": 30201,
+      "name": "point_at_boots_icon",
+      "title": "Set the position of a hero's boots icon",
+      "description": "Set plot_x and plot_y to the place in hero X's panel section that shows the lightning bolt for Boots of Speed.",
+      "on_entry": {
+        "X": "hero number (0-3)"
+      }
+    },
+    {
+      "addr": 30214,
+      "name": "plot_boots_icon",
+      "title": "Show a hero's boots icon",
+      "description": "Plot the lightning bolt at plot_x, plot_y.",
+      "on_exit": {
+        "X": "preserved"
+      }
+    },
+    {
+      "addr": 30221,
+      "name": "erase_boots_icon",
+      "title": "Remove a hero's boots icon",
+      "description": "Plot the blank sprite over the lightning bolt at plot_x, plot_y.",
+      "on_exit": {
+        "X": "preserved"
+      }
+    },
+    {
+      "addr": 1280,
+      "binary_addr": 21168,
+      "name": "hero_menu",
+      "title": "Choose the heroes and the sound",
+      "description": "Clear the left of the screen, print the menu and let the players toggle each hero (keys 1-4) and the sound (5 on, 6 off). SPACE starts the game if at least one hero is playing."
+    },
+    {
+      "addr": 1280,
+      "binary_addr": 22192,
+      "name": "hero_menu_joy",
+      "title": "Choose the heroes and the sound",
+      "description": "Clear the left of the screen, print the menu and let the players toggle each hero (keys 1-4) and the sound (5 on, 6 off). SPACE starts the game if at least one hero is playing."
+    },
+    {
+      "addr": 1316,
+      "binary_addr": 21204,
+      "name": "print_menu",
+      "title": "Print the menu text",
+      "description": "Print the sixteen positioned strings of menu_text.",
+      "fall_through": true
+    },
+    {
+      "addr": 1316,
+      "binary_addr": 22228,
+      "name": "print_menu_joy",
+      "title": "Print the menu text",
+      "description": "Print the sixteen positioned strings of menu_text.",
+      "fall_through": true
+    },
+    {
+      "addr": 1326,
+      "binary_addr": 21214,
+      "name": "print_menu_string",
+      "title": "Print one menu string",
+      "description": "Move the text cursor to the column and row in the two bytes at menu_text+Y, then print the following characters up to and including a carriage return.",
+      "on_entry": {
+        "Y": "offset of the string in menu_text"
+      },
+      "on_exit": {
+        "Y": "offset of the next string"
+      }
+    },
+    {
+      "addr": 1326,
+      "binary_addr": 22238,
+      "name": "print_menu_string_joy",
+      "title": "Print one menu string",
+      "description": "Move the text cursor to the column and row in the two bytes at menu_text+Y, then print the following characters up to and including a carriage return.",
+      "on_entry": {
+        "Y": "offset of the string in menu_text"
+      },
+      "on_exit": {
+        "Y": "offset of the next string"
+      }
+    },
+    {
+      "addr": 1357,
+      "binary_addr": 21245,
+      "name": "set_menu_no",
+      "title": "Change a menu entry to NO",
+      "description": "Write \"NO \" at menu_text+Y.",
+      "on_entry": {
+        "Y": "offset of the entry"
+      }
+    },
+    {
+      "addr": 1357,
+      "binary_addr": 22269,
+      "name": "set_menu_no_joy",
+      "title": "Change a menu entry to NO",
+      "description": "Write \"NO \" at menu_text+Y.",
+      "on_entry": {
+        "Y": "offset of the entry"
+      }
+    },
+    {
+      "addr": 1373,
+      "binary_addr": 21261,
+      "name": "set_menu_yes",
+      "title": "Change a menu entry to YES",
+      "description": "Write \"YES\" at menu_text+Y.",
+      "on_entry": {
+        "Y": "offset of the entry"
+      }
+    },
+    {
+      "addr": 1373,
+      "binary_addr": 22285,
+      "name": "set_menu_yes_joy",
+      "title": "Change a menu entry to YES",
+      "description": "Write \"YES\" at menu_text+Y.",
+      "on_entry": {
+        "Y": "offset of the entry"
+      }
+    },
+    {
+      "addr": 1389,
+      "binary_addr": 21277,
+      "name": "set_menu_off",
+      "title": "Change the sound entry to OFF",
+      "description": "Write \"FF\" at menu_text+Y, after its \"O\".",
+      "on_entry": {
+        "Y": "offset of the entry's second character"
+      }
+    },
+    {
+      "addr": 1389,
+      "binary_addr": 22301,
+      "name": "set_menu_off_joy",
+      "title": "Change the sound entry to OFF",
+      "description": "Write \"FF\" at menu_text+Y, after its \"O\".",
+      "on_entry": {
+        "Y": "offset of the entry's second character"
+      }
+    },
+    {
+      "addr": 1398,
+      "binary_addr": 21286,
+      "name": "set_menu_on",
+      "title": "Change the sound entry to ON",
+      "description": "Write \"N \" at menu_text+Y, after its \"O\".",
+      "on_entry": {
+        "Y": "offset of the entry's second character"
+      }
+    },
+    {
+      "addr": 1398,
+      "binary_addr": 22310,
+      "name": "set_menu_on_joy",
+      "title": "Change the sound entry to ON",
+      "description": "Write \"N \" at menu_text+Y, after its \"O\".",
+      "on_entry": {
+        "Y": "offset of the entry's second character"
+      }
+    },
+    {
+      "addr": 1712,
+      "binary_addr": 21600,
+      "name": "remove_absent_heroes",
+      "title": "Take the heroes nobody plays out of the game",
+      "description": "Draw any ten-thousands score digits, then put every hero switched off on the menu out of play, with a &64 entry in returning_hero_queue in their place."
+    },
+    {
+      "addr": 1712,
+      "binary_addr": 22624,
+      "name": "remove_absent_heroes_joy",
+      "title": "Take the heroes nobody plays out of the game",
+      "description": "Draw any ten-thousands score digits, then put every hero switched off on the menu out of play, with a &64 entry in returning_hero_queue in their place."
+    },
+    {
+      "addr": 5280,
+      "binary_addr": 15328,
+      "name": "reset_workspace",
+      "title": "Reset the game workspace for a new level",
+      "description": "Copy workspace_template into page &0D and clear the per-level state."
+    },
+    {
+      "addr": 5335,
+      "binary_addr": 15383,
+      "name": "draw_view_frames",
+      "title": "Draw the frames round the four views",
+      "description": "With the MOS's own text output restored, send the twenty PLOT commands of view_frame_plots, draw the four views, then put the game's WRCHV handler back.",
+      "on_entry": {
+        "plot_x": "address of view_frame_plots, low byte",
+        "plot_y": "address of view_frame_plots, high byte"
+      }
+    },
+    {
+      "addr": 5392,
+      "binary_addr": 15440,
+      "name": "unpack_level",
+      "title": "Copy the loaded level into the game's tables",
+      "description": "Distribute the level file at &6B00 into the object, door, key, trapdoor and map tables."
+    },
+    {
+      "addr": 5507,
+      "binary_addr": 15555,
+      "name": "reset_monsters",
+      "title": "Clear the monsters for a new level",
+      "description": "Mark every monster as not yet appeared, give each the level's starting hit points, and clear the heroes' keys and the returning_hero_queue."
+    },
+    {
+      "addr": 5658,
+      "binary_addr": 15706,
+      "name": "clear_text_area",
+      "title": "Clear the left of the screen",
+      "description": "Set a text window over the left of the screen and clear it."
+    },
+    {
+      "addr": 4208,
+      "binary_addr": 14256,
+      "name": "check_for_victory",
+      "title": "Check whether the Chalice has been found",
+      "description": "On level 25, if a hero stands on the cell where the Chalice is, play the victory sequence, print the closing message, wait for a key and reset the machine through the RESET vector.",
+      "fall_through": true
+    },
+    {
+      "addr": 4329,
+      "binary_addr": 14377,
+      "name": "victory_sequence",
+      "title": "Play the victory sequence",
+      "description": "Spin sprites round the Chalice with a rising tone, then dissolve it."
+    },
+    {
+      "addr": 4425,
+      "binary_addr": 14473,
+      "name": "draw_victory_ring",
+      "title": "Draw the ring of sprites round the Chalice",
+      "description": "Plot the current victory sprite at the twelve cells round the Chalice, changing sprite as it goes."
+    },
+    {
+      "addr": 4506,
+      "binary_addr": 14554,
+      "name": "plot_victory_sprite",
+      "title": "Plot a victory sprite at a cell",
+      "description": "Plot the current victory sprite at the map cell in &80, &81."
+    },
+    {
+      "addr": 4524,
+      "binary_addr": 14572,
+      "name": "next_victory_sprite",
+      "title": "Choose the next victory sprite",
+      "description": "Step the victory sprite through &16-&19."
+    },
+    {
+      "addr": 4542,
+      "binary_addr": 14590,
+      "name": "dissolve_chalice",
+      "title": "Clear a random byte of the Chalice",
+      "description": "Use the System VIA timer to pick a byte of the Chalice sprite, clear it, and redraw the Chalice."
+    },
+    {
+      "addr": 4594,
+      "binary_addr": 14642,
+      "name": "plot_chalice",
+      "title": "Plot the Chalice",
+      "description": "Plot the Chalice sprite at its place on the map."
+    },
+    {
+      "addr": 7360,
+      "binary_addr": 17408,
+      "name": "update_game",
+      "title": "Run one frame of play",
+      "description": "Move the heroes, open doors for heroes carrying the right key, pick up and swap keys, then draw the objects, move the missiles and the monsters, and handle the pause key."
+    },
+    {
+      "addr": 8250,
+      "binary_addr": 18298,
+      "name": "hero_enters_exit",
+      "title": "Start a hero going down the exit",
+      "description": "Play the exit sound and begin shrinking the hero's sprites.",
+      "on_entry": {
+        "X": "hero number (0-3)"
+      }
+    },
+    {
+      "addr": 8272,
+      "binary_addr": 18320,
+      "name": "restore_hero_sprites",
+      "title": "Restore a hero's sprite sizes",
+      "description": "Put back the width and height of all eight of hero X's sprites, which the exit animation shrinks.",
+      "on_entry": {
+        "X": "hero number (0-3)"
+      }
+    },
+    {
+      "addr": 8337,
+      "binary_addr": 18385,
+      "name": "drop_key",
+      "title": "Drop the key a hero carries",
+      "description": "Put hero X's key in a free cell next to them, and remove it from their panel section.",
+      "on_entry": {
+        "X": "hero number (0-3)"
+      },
+      "on_exit": {
+        "X": "preserved"
+      }
+    },
+    {
+      "addr": 8400,
+      "binary_addr": 18448,
+      "name": "find_open_neighbour",
+      "title": "Find a free cell next to a cell",
+      "description": "Starting with cell_x, cell_y, try the cells above, to the right, below and to the left, and leave cell_x, cell_y at the first without a wall."
+    },
+    {
+      "addr": 5792,
+      "binary_addr": 15840,
+      "name": "queue_exit_marker",
+      "title": "Sound the exit and add a queue marker",
+      "description": "Play the exit sound and put a &64 entry in the first free slot of returning_hero_queue.",
+      "fall_through": true
+    },
+    {
+      "addr": 28288,
+      "name": "move_heroes",
+      "title": "Move the heroes",
+      "description": "For each hero in play: continue a step between cells, or read the hero's keys (and, for heroes 0 and 1, the magic key) and start a step or fire a missile; check the new cell for walls, monsters, other heroes and objects, change view when the hero enters another room, and draw the hero."
+    },
+    {
+      "addr": 31586,
+      "name": "start_hero_step",
+      "title": "Start a hero's step between cells",
+      "description": "Set hero X's step counter to 1 and their pixel offsets for the direction they face: 6 rows up or down, or 2 byte columns left or right.",
+      "on_entry": {
+        "X": "hero number (0-3)"
+      },
+      "on_exit": {
+        "X": "preserved"
+      }
+    },
+    {
+      "addr": 31650,
+      "name": "continue_hero_step",
+      "title": "Continue a hero's step between cells",
+      "description": "Toggle hero X's animation frame and count down their step. When it ends, move the hero one cell in the direction they face and clear the pixel offsets. The offsets are then doubled.",
+      "on_entry": {
+        "X": "hero number (0-3)"
+      },
+      "on_exit": {
+        "X": "preserved"
+      }
+    },
+    {
+      "addr": 30426,
+      "name": "hero_arrives",
+      "title": "Bring a returning hero into play",
+      "description": "Every other frame, show the next of the hero's arrival sprites. After the last, put the hero in play facing down with health 32 (set to 33 and drawn by taking a point).",
+      "on_entry": {
+        "X": "hero number (0-3)"
+      }
+    },
+    {
+      "addr": 30514,
+      "name": "draw_hero",
+      "title": "Draw a hero",
+      "description": "Plot sprite_number at hero X's cell and pixel offset in every view that shows it.",
+      "on_entry": {
+        "X": "hero number (0-3)"
+      },
+      "on_exit": {
+        "X": "preserved"
+      }
+    },
+    {
+      "addr": 30586,
+      "name": "get_hero_cell",
+      "title": "Copy a hero's position to cell_x, cell_y",
+      "on_entry": {
+        "X": "hero number (0-3)"
+      },
+      "on_exit": {
+        "X": "preserved"
+      }
+    },
+    {
+      "addr": 29481,
+      "name": "collect_objects",
+      "title": "Pick up the object in a hero's cell",
+      "description": "Find the object at hero X's cell and act on it: score, health, teleport, resurrection, energy drain, or one of the magic items.",
+      "on_entry": {
+        "X": "hero number (0-3)"
+      }
+    },
+    {
+      "addr": 29859,
+      "name": "play_pickup_sound",
+      "title": "Play the pickup sound",
+      "description": "Define the pickup envelope and play the pickup sound, from the OSWORD parameter blocks at &192C and &193A."
+    },
+    {
+      "addr": 28874,
+      "name": "move_missiles",
+      "title": "Move the missiles",
+      "description": "Advance every missile in flight one cell. A missile stops at a wall, damages a monster or hero it meets, and bounces back off an energy drainer, wearing it down."
+    },
+    {
+      "addr": 30535,
+      "name": "flip_firer_frame",
+      "title": "Animate the hero who fired a missile",
+      "description": "Toggle the animation frame of the hero whose missile is in slot X.",
+      "on_entry": {
+        "X": "missile slot"
+      }
+    },
+    {
+      "addr": 30385,
+      "name": "credit_missile_owner",
+      "title": "Give a point to the hero who fired a missile",
+      "on_entry": {
+        "X": "missile slot"
+      },
+      "on_exit": {
+        "X": "preserved"
+      }
+    },
+    {
+      "addr": 30600,
+      "name": "draw_all_views",
+      "title": "Draw all four views",
+      "description": "Draw the room each hero's view shows."
+    },
+    {
+      "addr": 30613,
+      "name": "draw_view_0",
+      "title": "Draw the top-left view",
+      "description": "Draw the room in hero 0's view."
+    },
+    {
+      "addr": 30631,
+      "name": "draw_view_1",
+      "title": "Draw the top-right view",
+      "description": "Draw the room in hero 1's view."
+    },
+    {
+      "addr": 30649,
+      "name": "draw_view_2",
+      "title": "Draw the bottom-left view",
+      "description": "Draw the room in hero 2's view."
+    },
+    {
+      "addr": 30667,
+      "name": "draw_view_3",
+      "title": "Draw the bottom-right view",
+      "description": "Draw the room in hero 3's view."
+    },
+    {
+      "addr": 30686,
+      "name": "draw_room",
+      "title": "Draw a room",
+      "description": "Draw the eight rows of walls of the room at &7B, &7C (a pointer into room_walls) with its top-left at plot_y and the column in cell_x, then draw the doors."
+    },
+    {
+      "addr": 30752,
+      "name": "draw_room_row",
+      "title": "Draw one row of a room",
+      "description": "Plot a wall or a blank for each of the eight bits of scratch, four byte columns apart, starting at byte column cell_x."
+    },
+    {
+      "addr": 30802,
+      "name": "plot_at_cell",
+      "title": "Plot a sprite at a map cell in every view",
+      "description": "Plot sprite_number at map cell cell_x, cell_y, shifted by the pixel offsets in &7D, &7E, in each view that shows the cell's room. Cells are four byte columns wide and twelve pixel rows high.",
+      "on_entry": {
+        "cell_x": "map x",
+        "cell_y": "map y",
+        "sprite_number": "sprite to plot"
+      }
+    },
+    {
+      "addr": 30972,
+      "name": "test_wall",
+      "title": "Test for a wall at a map cell",
+      "description": "Return the room_walls bit for cell cell_x, cell_y: non-zero if there is a wall. Also leaves &7B, &7C pointing at the cell's room.",
+      "on_exit": {
+        "A": "wall bit",
+        "Y": "wall bit",
+        "Z": "set if no wall"
+      }
+    },
+    {
+      "addr": 31032,
+      "name": "test_object_map",
+      "title": "Test for an object at a map cell",
+      "description": "Return the object_map bit for cell cell_x, cell_y: non-zero if an object may lie there.",
+      "on_exit": {
+        "A": "object bit",
+        "Y": "object bit",
+        "Z": "set if none"
+      }
+    },
+    {
+      "addr": 31092,
+      "name": "find_creature",
+      "title": "Look for a monster or hero at a cell",
+      "description": "Look for a monster, other than monster number scratch, at cell_x, cell_y. If scratch is non-zero, also look for a hero there, and if one is found take hero_damage_taken points of their health.",
+      "on_exit": {
+        "A": "non-zero if something was found",
+        "Y": "non-zero if a monster was found"
+      }
+    },
+    {
+      "addr": 31169,
+      "name": "update_monsters",
+      "title": "Draw the trapdoors and move the monsters",
+      "description": "Draw the eight trapdoors, then for each monster continue its step or start a new one, turning a random way when it is blocked, and advance dying monsters until they reappear at a trapdoor."
+    },
+    {
+      "addr": 31723,
+      "name": "start_monster_step",
+      "title": "Start a monster's step between cells",
+      "description": "Set the step counter and the pixel offsets for monster X's direction.",
+      "on_entry": {
+        "X": "monster number"
+      }
+    },
+    {
+      "addr": 31787,
+      "name": "continue_monster_step",
+      "title": "Continue a monster's step between cells",
+      "description": "Toggle monster X's frame and move its pixel offsets towards zero, moving it to the next cell when the step ends.",
+      "on_entry": {
+        "X": "monster number"
+      }
+    },
+    {
+      "addr": 31893,
+      "name": "test_key",
+      "title": "Test whether a key is pressed",
+      "description": "Scan the key whose INKEY number is in A with OSBYTE &81.",
+      "on_entry": {
+        "A": "INKEY key number (negative, as a byte)"
+      },
+      "on_exit": {
+        "A": "0 if the key is pressed, 1 if not",
+        "Z": "set if the key is pressed",
+        "X": "preserved"
+      }
     }
   ],
   "banners": [
@@ -271,7 +913,8 @@
     "data_0287": 647,
     "data_0288": 648,
     "data_0289": 649,
-    "data_0400": 1024,
+    "add_thousand_points": 1024,
+    "add_thousand_points_joy": 1024,
     "data_041e": 1054,
     "data_0437": 1079,
     "data_0447": 1095,
@@ -280,15 +923,22 @@
     "data_046b": 1131,
     "data_0484": 1156,
     "data_0490": 1168,
-    "data_0500": 1280,
-    "data_0524": 1316,
+    "hero_menu": 1280,
+    "hero_menu_joy": 1280,
+    "print_menu": 1316,
+    "print_menu_joy": 1316,
     "data_0528": 1320,
-    "data_052e": 1326,
+    "print_menu_string": 1326,
+    "print_menu_string_joy": 1326,
     "data_0540": 1344,
-    "data_054d": 1357,
-    "data_055d": 1373,
-    "data_056d": 1389,
-    "data_0576": 1398,
+    "set_menu_no": 1357,
+    "set_menu_no_joy": 1357,
+    "set_menu_yes": 1373,
+    "set_menu_yes_joy": 1373,
+    "set_menu_off": 1389,
+    "set_menu_off_joy": 1389,
+    "set_menu_on": 1398,
+    "set_menu_on_joy": 1398,
     "data_0581": 1409,
     "data_05c0": 1472,
     "data_05c3": 1475,
@@ -301,7 +951,8 @@
     "data_0600": 1536,
     "data_0601": 1537,
     "data_0602": 1538,
-    "data_06b0": 1712,
+    "remove_absent_heroes": 1712,
+    "remove_absent_heroes_joy": 1712,
     "data_06b4": 1716,
     "data_06c9": 1737,
     "data_06f0": 1776,
@@ -620,33 +1271,15 @@
         9,
         76,
         0,
-        31,
-        142,
-        1,
-        13,
-        32,
-        160,
-        22,
-        169,
-        4,
-        141,
-        246,
-        9,
-        174,
-        255,
-        9
+        31
       ],
       "sub_labels": {
         "8230": [
           "code_2026"
-        ],
-        "8250": [
-          "sub_203a"
         ]
       },
       "xref_summaries": [
-        "&2026 referenced 1 time by &473a",
-        "&203a referenced 1 time by &46cb"
+        "&2026 referenced 1 time by &473a"
       ],
       "type": "byte",
       "values": [
@@ -707,7 +1340,42 @@
         9,
         76,
         0,
-        31,
+        31
+      ]
+    },
+    {
+      "addr": 8250,
+      "bytes": [
+        142,
+        1,
+        13,
+        32,
+        160,
+        22,
+        169,
+        4,
+        141,
+        246,
+        9,
+        174,
+        255,
+        9
+      ],
+      "labels": [
+        "hero_enters_exit"
+      ],
+      "xref_summaries": [
+        "&203a referenced 1 time by &1f8b[1]"
+      ],
+      "references": [
+        {
+          "addr": 8075,
+          "kind": "direct",
+          "move_id": 1
+        }
+      ],
+      "type": "byte",
+      "values": [
         142,
         1,
         13,
@@ -806,135 +1474,19 @@
         9,
         76,
         0,
-        31,
-        189,
-        16,
-        13,
-        141,
-        2,
-        13,
-        189,
-        21,
-        13,
-        141,
-        3,
-        13,
-        138,
-        72,
-        32,
-        208,
-        32,
-        104,
-        170,
-        188,
-        224,
-        34,
-        173,
-        2,
-        13,
-        153,
-        96,
-        34,
-        173,
-        3,
-        13,
-        153,
-        128,
-        34,
-        169,
-        0,
-        157,
-        224,
-        34,
-        169,
-        26,
-        133,
-        122,
-        189,
-        208,
-        13,
-        56,
-        233,
-        13,
-        133,
-        113,
-        169,
-        74,
-        133,
-        112,
-        138,
-        72,
-        32,
-        0,
-        9,
-        104,
-        170,
-        96,
-        206,
-        3,
-        13,
-        32,
-        252,
-        120,
-        192,
-        0,
-        208,
-        1,
-        96,
-        238,
-        3,
-        13,
-        238,
-        2,
-        13,
-        32,
-        252,
-        120,
-        192,
-        0,
-        208,
-        1,
-        96,
-        206,
-        2,
-        13,
-        238,
-        3,
-        13,
-        32,
-        252,
-        120,
-        192,
-        0,
-        208,
-        1,
-        96,
-        206,
-        3,
-        13,
-        206,
-        2,
-        13,
-        96,
-        1,
-        63
+        31
       ],
       "labels": [
-        "sub_2050"
+        "restore_hero_sprites"
       ],
-      "sub_labels": {
-        "8337": [
-          "sub_2091"
-        ]
-      },
       "xref_summaries": [
-        "&2050 referenced 1 time by &4672",
-        "&2091 referenced 1 time by &4688"
+        "&2050 referenced 1 time by &1f32[1]"
       ],
       "references": [
         {
-          "addr": 18034,
-          "kind": "direct"
+          "addr": 7986,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "byte",
@@ -1003,7 +1555,12 @@
         9,
         76,
         0,
-        31,
+        31
+      ]
+    },
+    {
+      "addr": 8337,
+      "bytes": [
         189,
         16,
         13,
@@ -1066,7 +1623,145 @@
         9,
         104,
         170,
+        96
+      ],
+      "labels": [
+        "drop_key"
+      ],
+      "xref_summaries": [
+        "&2091 referenced 1 time by &1f48[1]"
+      ],
+      "references": [
+        {
+          "addr": 8008,
+          "kind": "direct",
+          "move_id": 1
+        }
+      ],
+      "type": "byte",
+      "values": [
+        189,
+        16,
+        13,
+        141,
+        2,
+        13,
+        189,
+        21,
+        13,
+        141,
+        3,
+        13,
+        138,
+        72,
+        32,
+        208,
+        32,
+        104,
+        170,
+        188,
+        224,
+        34,
+        173,
+        2,
+        13,
+        153,
         96,
+        34,
+        173,
+        3,
+        13,
+        153,
+        128,
+        34,
+        169,
+        0,
+        157,
+        224,
+        34,
+        169,
+        26,
+        133,
+        122,
+        189,
+        208,
+        13,
+        56,
+        233,
+        13,
+        133,
+        113,
+        169,
+        74,
+        133,
+        112,
+        138,
+        72,
+        32,
+        0,
+        9,
+        104,
+        170,
+        96
+      ]
+    },
+    {
+      "addr": 8400,
+      "bytes": [
+        206,
+        3,
+        13,
+        32,
+        252,
+        120,
+        192,
+        0,
+        208,
+        1,
+        96,
+        238,
+        3,
+        13,
+        238,
+        2,
+        13,
+        32,
+        252,
+        120,
+        192,
+        0,
+        208,
+        1,
+        96,
+        206,
+        2,
+        13,
+        238,
+        3,
+        13,
+        32,
+        252,
+        120,
+        192,
+        0,
+        208,
+        1,
+        96,
+        206,
+        3,
+        13,
+        206,
+        2,
+        13,
+        96,
+        1,
+        63
+      ],
+      "labels": [
+        "find_open_neighbour"
+      ],
+      "type": "byte",
+      "values": [
         206,
         3,
         13,
@@ -12403,7 +13098,7 @@
         ]
       },
       "xref_summaries": [
-        "&326a referenced 3 times by &7421, &742b, &7432; also used as index base 5 times by &06ec[2], &06ec[3], &159c[1], &7256, &725f",
+        "&326a referenced 3 times by &7421, &742b, &7432; also used as index base 7 times by &06ec[2], &06ec[3], &159c[1], &16b4[1], &16bb[1], &7256, &725f",
         "&326b referenced 2 times by &742f, &7438",
         "&326c referenced 2 times by &7435, &743e",
         "&326d referenced 2 times by &743b, &7441"
@@ -12421,6 +13116,16 @@
         },
         {
           "addr": 5532,
+          "kind": "indexed",
+          "move_id": 1
+        },
+        {
+          "addr": 5812,
+          "kind": "indexed",
+          "move_id": 1
+        },
+        {
+          "addr": 5819,
           "kind": "indexed",
           "move_id": 1
         },
@@ -17047,9 +17752,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0ecf",
+      "operand": "reset_hero",
       "target": 3791,
-      "target_label": "sub_0ecf"
+      "target_label": "reset_hero"
     },
     {
       "addr": 3596,
@@ -17094,9 +17799,9 @@
       "binary_addr": 13649,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "data_0500",
+      "operand": "hero_menu",
       "target": 1280,
-      "target_label": "data_0500"
+      "target_label": "hero_menu"
     },
     {
       "addr": 3604,
@@ -17367,9 +18072,9 @@
       "binary_addr": 13722,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0ef7",
+      "operand": "draw_status_panel",
       "target": 3831,
-      "target_label": "sub_0ef7"
+      "target_label": "draw_status_panel"
     },
     {
       "addr": 3677,
@@ -17381,9 +18086,9 @@
       "binary_addr": 13725,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "data_06b0",
+      "operand": "remove_absent_heroes",
       "target": 1712,
-      "target_label": "data_06b0"
+      "target_label": "remove_absent_heroes"
     },
     {
       "addr": 3680,
@@ -17509,9 +18214,9 @@
       "binary_addr": 13748,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0ecf",
+      "operand": "reset_hero",
       "target": 3791,
-      "target_label": "sub_0ecf"
+      "target_label": "reset_hero"
     },
     {
       "addr": 3703,
@@ -18052,19 +18757,21 @@
       ],
       "binary_addr": 13839,
       "labels": [
-        "sub_0ecf"
+        "reset_hero"
       ],
       "xref_summaries": [
-        "&360f referenced 2 times by &3549, &35b4"
+        "&360f referenced 2 times by &0e09[1], &0e74[1]"
       ],
       "references": [
         {
-          "addr": 13641,
-          "kind": "direct"
+          "addr": 3593,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 13748,
-          "kind": "direct"
+          "addr": 3700,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -18263,15 +18970,16 @@
       ],
       "binary_addr": 13879,
       "labels": [
-        "sub_0ef7"
+        "draw_status_panel"
       ],
       "xref_summaries": [
-        "&3637 referenced 1 time by &359a"
+        "&3637 referenced 1 time by &0e5a[1]"
       ],
       "references": [
         {
-          "addr": 13722,
-          "kind": "direct"
+          "addr": 3674,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -18328,9 +19036,9 @@
       "binary_addr": 13887,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7221",
+      "operand": "lose_health_point",
       "target": 29217,
-      "target_label": "sub_7221"
+      "target_label": "lose_health_point"
     },
     {
       "addr": 3842,
@@ -18342,9 +19050,9 @@
       "binary_addr": 13890,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_728c",
+      "operand": "add_point",
       "target": 29324,
-      "target_label": "sub_728c"
+      "target_label": "add_point"
     },
     {
       "addr": 3845,
@@ -18392,9 +19100,9 @@
       "binary_addr": 13900,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0f68",
+      "operand": "plot_panel_sprite",
       "target": 3944,
-      "target_label": "sub_0f68"
+      "target_label": "plot_panel_sprite"
     },
     {
       "addr": 3855,
@@ -18439,9 +19147,9 @@
       "binary_addr": 13909,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0f68",
+      "operand": "plot_panel_sprite",
       "target": 3944,
-      "target_label": "sub_0f68"
+      "target_label": "plot_panel_sprite"
     },
     {
       "addr": 3864,
@@ -18523,9 +19231,9 @@
       "binary_addr": 13925,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0f68",
+      "operand": "plot_panel_sprite",
       "target": 3944,
-      "target_label": "sub_0f68"
+      "target_label": "plot_panel_sprite"
     },
     {
       "addr": 3880,
@@ -18685,9 +19393,9 @@
       "binary_addr": 13952,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0f68",
+      "operand": "plot_panel_sprite",
       "target": 3944,
-      "target_label": "sub_0f68"
+      "target_label": "plot_panel_sprite"
     },
     {
       "addr": 3907,
@@ -18834,9 +19542,9 @@
       "binary_addr": 13978,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0f68",
+      "operand": "plot_panel_sprite",
       "target": 3944,
-      "target_label": "sub_0f68"
+      "target_label": "plot_panel_sprite"
     },
     {
       "addr": 3933,
@@ -18907,31 +19615,36 @@
       ],
       "binary_addr": 13992,
       "labels": [
-        "sub_0f68"
+        "plot_panel_sprite"
       ],
       "xref_summaries": [
-        "&36a8 referenced 5 times by &364c, &3655, &3665, &3680, &369a"
+        "&36a8 referenced 5 times by &0f0c[1], &0f15[1], &0f25[1], &0f40[1], &0f5a[1]"
       ],
       "references": [
         {
-          "addr": 13900,
-          "kind": "direct"
+          "addr": 3852,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 13909,
-          "kind": "direct"
+          "addr": 3861,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 13925,
-          "kind": "direct"
+          "addr": 3877,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 13952,
-          "kind": "direct"
+          "addr": 3904,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 13978,
-          "kind": "direct"
+          "addr": 3930,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -19628,15 +20341,16 @@
       ],
       "binary_addr": 14256,
       "labels": [
-        "sub_1070"
+        "check_for_victory"
       ],
       "xref_summaries": [
-        "&37b0 referenced 1 time by &464a"
+        "&37b0 referenced 1 time by &1f0a[1]"
       ],
       "references": [
         {
-          "addr": 17994,
-          "kind": "direct"
+          "addr": 7946,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -19937,9 +20651,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_10e9",
+      "operand": "victory_sequence",
       "target": 4329,
-      "target_label": "sub_10e9"
+      "target_label": "victory_sequence"
     },
     {
       "addr": 4250,
@@ -20398,15 +21112,16 @@
       ],
       "binary_addr": 14377,
       "labels": [
-        "sub_10e9"
+        "victory_sequence"
       ],
       "xref_summaries": [
-        "&3829 referenced 1 time by &37d7"
+        "&3829 referenced 1 time by &1097[1]"
       ],
       "references": [
         {
-          "addr": 14295,
-          "kind": "direct"
+          "addr": 4247,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -20886,9 +21601,9 @@
       "binary_addr": 14448,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_1149",
+      "operand": "draw_victory_ring",
       "target": 4425,
-      "target_label": "sub_1149"
+      "target_label": "draw_victory_ring"
     },
     {
       "addr": 4403,
@@ -20937,9 +21652,9 @@
       "binary_addr": 14457,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_11be",
+      "operand": "dissolve_chalice",
       "target": 4542,
-      "target_label": "sub_11be"
+      "target_label": "dissolve_chalice"
     },
     {
       "addr": 4412,
@@ -21067,19 +21782,21 @@
       ],
       "binary_addr": 14473,
       "labels": [
-        "sub_1149"
+        "draw_victory_ring"
       ],
       "xref_summaries": [
-        "&3889 referenced 2 times by &3870, &3917"
+        "&3889 referenced 2 times by &1130[1], &11d7[1]"
       ],
       "references": [
         {
-          "addr": 14448,
-          "kind": "direct"
+          "addr": 4400,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 14615,
-          "kind": "direct"
+          "addr": 4567,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -21133,9 +21850,9 @@
       "binary_addr": 14481,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_119a",
+      "operand": "plot_victory_sprite",
       "target": 4506,
-      "target_label": "sub_119a"
+      "target_label": "plot_victory_sprite"
     },
     {
       "addr": 4436,
@@ -21160,9 +21877,9 @@
       "binary_addr": 14486,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_119a",
+      "operand": "plot_victory_sprite",
       "target": 4506,
-      "target_label": "sub_119a"
+      "target_label": "plot_victory_sprite"
     },
     {
       "addr": 4441,
@@ -21187,9 +21904,9 @@
       "binary_addr": 14491,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_119a",
+      "operand": "plot_victory_sprite",
       "target": 4506,
-      "target_label": "sub_119a"
+      "target_label": "plot_victory_sprite"
     },
     {
       "addr": 4446,
@@ -21228,9 +21945,9 @@
       "binary_addr": 14499,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_11ac",
+      "operand": "next_victory_sprite",
       "target": 4524,
-      "target_label": "sub_11ac"
+      "target_label": "next_victory_sprite"
     },
     {
       "addr": 4454,
@@ -21255,9 +21972,9 @@
       "binary_addr": 14504,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_119a",
+      "operand": "plot_victory_sprite",
       "target": 4506,
-      "target_label": "sub_119a"
+      "target_label": "plot_victory_sprite"
     },
     {
       "addr": 4459,
@@ -21282,9 +21999,9 @@
       "binary_addr": 14509,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_119a",
+      "operand": "plot_victory_sprite",
       "target": 4506,
-      "target_label": "sub_119a"
+      "target_label": "plot_victory_sprite"
     },
     {
       "addr": 4464,
@@ -21309,9 +22026,9 @@
       "binary_addr": 14514,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_119a",
+      "operand": "plot_victory_sprite",
       "target": 4506,
-      "target_label": "sub_119a"
+      "target_label": "plot_victory_sprite"
     },
     {
       "addr": 4469,
@@ -21323,9 +22040,9 @@
       "binary_addr": 14517,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_11ac",
+      "operand": "next_victory_sprite",
       "target": 4524,
-      "target_label": "sub_11ac"
+      "target_label": "next_victory_sprite"
     },
     {
       "addr": 4472,
@@ -21350,9 +22067,9 @@
       "binary_addr": 14522,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_119a",
+      "operand": "plot_victory_sprite",
       "target": 4506,
-      "target_label": "sub_119a"
+      "target_label": "plot_victory_sprite"
     },
     {
       "addr": 4477,
@@ -21377,9 +22094,9 @@
       "binary_addr": 14527,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_119a",
+      "operand": "plot_victory_sprite",
       "target": 4506,
-      "target_label": "sub_119a"
+      "target_label": "plot_victory_sprite"
     },
     {
       "addr": 4482,
@@ -21404,9 +22121,9 @@
       "binary_addr": 14532,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_119a",
+      "operand": "plot_victory_sprite",
       "target": 4506,
-      "target_label": "sub_119a"
+      "target_label": "plot_victory_sprite"
     },
     {
       "addr": 4487,
@@ -21418,9 +22135,9 @@
       "binary_addr": 14535,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_11ac",
+      "operand": "next_victory_sprite",
       "target": 4524,
-      "target_label": "sub_11ac"
+      "target_label": "next_victory_sprite"
     },
     {
       "addr": 4490,
@@ -21445,9 +22162,9 @@
       "binary_addr": 14540,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_119a",
+      "operand": "plot_victory_sprite",
       "target": 4506,
-      "target_label": "sub_119a"
+      "target_label": "plot_victory_sprite"
     },
     {
       "addr": 4495,
@@ -21472,9 +22189,9 @@
       "binary_addr": 14545,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_119a",
+      "operand": "plot_victory_sprite",
       "target": 4506,
-      "target_label": "sub_119a"
+      "target_label": "plot_victory_sprite"
     },
     {
       "addr": 4500,
@@ -21499,9 +22216,9 @@
       "binary_addr": 14550,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_119a",
+      "operand": "plot_victory_sprite",
       "target": 4506,
-      "target_label": "sub_119a"
+      "target_label": "plot_victory_sprite"
     },
     {
       "addr": 4505,
@@ -21520,59 +22237,71 @@
       ],
       "binary_addr": 14554,
       "labels": [
-        "sub_119a"
+        "plot_victory_sprite"
       ],
       "xref_summaries": [
-        "&38da referenced 12 times by &3891, &3896, &389b, &38a8, &38ad, &38b2, &38ba, &38bf, &38c4, &38cc, &38d1, &38d6"
+        "&38da referenced 12 times by &1151[1], &1156[1], &115b[1], &1168[1], &116d[1], &1172[1], &117a[1], &117f[1], &1184[1], &118c[1], &1191[1], &1196[1]"
       ],
       "references": [
         {
-          "addr": 14481,
-          "kind": "direct"
+          "addr": 4433,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 14486,
-          "kind": "direct"
+          "addr": 4438,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 14491,
-          "kind": "direct"
+          "addr": 4443,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 14504,
-          "kind": "direct"
+          "addr": 4456,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 14509,
-          "kind": "direct"
+          "addr": 4461,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 14514,
-          "kind": "direct"
+          "addr": 4466,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 14522,
-          "kind": "direct"
+          "addr": 4474,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 14527,
-          "kind": "direct"
+          "addr": 4479,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 14532,
-          "kind": "direct"
+          "addr": 4484,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 14540,
-          "kind": "direct"
+          "addr": 4492,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 14545,
-          "kind": "direct"
+          "addr": 4497,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 14550,
-          "kind": "direct"
+          "addr": 4502,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -21658,9 +22387,9 @@
       "binary_addr": 14568,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7852",
+      "operand": "plot_at_cell",
       "target": 30802,
-      "target_label": "sub_7852"
+      "target_label": "plot_at_cell"
     },
     {
       "addr": 4523,
@@ -21679,23 +22408,26 @@
       ],
       "binary_addr": 14572,
       "labels": [
-        "sub_11ac"
+        "next_victory_sprite"
       ],
       "xref_summaries": [
-        "&38ec referenced 3 times by &38a3, &38b5, &38c7"
+        "&38ec referenced 3 times by &1163[1], &1175[1], &1187[1]"
       ],
       "references": [
         {
-          "addr": 14499,
-          "kind": "direct"
+          "addr": 4451,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 14517,
-          "kind": "direct"
+          "addr": 4469,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 14535,
-          "kind": "direct"
+          "addr": 4487,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -21830,15 +22562,16 @@
       ],
       "binary_addr": 14590,
       "labels": [
-        "sub_11be"
+        "dissolve_chalice"
       ],
       "xref_summaries": [
-        "&38fe referenced 1 time by &3879"
+        "&38fe referenced 1 time by &1139[1]"
       ],
       "references": [
         {
-          "addr": 14457,
-          "kind": "direct"
+          "addr": 4409,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -21941,9 +22674,9 @@
       "binary_addr": 14607,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_11f2",
+      "operand": "plot_chalice",
       "target": 4594,
-      "target_label": "sub_11f2"
+      "target_label": "plot_chalice"
     },
     {
       "addr": 4562,
@@ -22012,9 +22745,9 @@
       "binary_addr": 14615,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_1149",
+      "operand": "draw_victory_ring",
       "target": 4425,
-      "target_label": "sub_1149"
+      "target_label": "draw_victory_ring"
     },
     {
       "addr": 4570,
@@ -22096,9 +22829,9 @@
       "binary_addr": 14628,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_11f2",
+      "operand": "plot_chalice",
       "target": 4594,
-      "target_label": "sub_11f2"
+      "target_label": "plot_chalice"
     },
     {
       "addr": 4583,
@@ -22181,19 +22914,21 @@
       ],
       "binary_addr": 14642,
       "labels": [
-        "sub_11f2"
+        "plot_chalice"
       ],
       "xref_summaries": [
-        "&3932 referenced 2 times by &390f, &3924"
+        "&3932 referenced 2 times by &11cf[1], &11e4[1]"
       ],
       "references": [
         {
-          "addr": 14607,
-          "kind": "direct"
+          "addr": 4559,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 14628,
-          "kind": "direct"
+          "addr": 4580,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -22273,9 +23008,9 @@
       "binary_addr": 14656,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7852",
+      "operand": "plot_at_cell",
       "target": 30802,
-      "target_label": "sub_7852"
+      "target_label": "plot_at_cell"
     },
     {
       "addr": 4611,
@@ -23742,9 +24477,9 @@
       "binary_addr": 15174,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_1510",
+      "operand": "unpack_level",
       "target": 5392,
-      "target_label": "sub_1510"
+      "target_label": "unpack_level"
     },
     {
       "addr": 5129,
@@ -23756,9 +24491,9 @@
       "binary_addr": 15177,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_14a0",
+      "operand": "reset_workspace",
       "target": 5280,
-      "target_label": "sub_14a0"
+      "target_label": "reset_workspace"
     },
     {
       "addr": 5132,
@@ -23770,9 +24505,9 @@
       "binary_addr": 15180,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_1583",
+      "operand": "reset_monsters",
       "target": 5507,
-      "target_label": "sub_1583"
+      "target_label": "reset_monsters"
     },
     {
       "addr": 5135,
@@ -23784,9 +24519,9 @@
       "binary_addr": 15183,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_161a",
+      "operand": "clear_text_area",
       "target": 5658,
-      "target_label": "sub_161a"
+      "target_label": "clear_text_area"
     },
     {
       "addr": 5138,
@@ -24041,9 +24776,9 @@
       "binary_addr": 15234,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_14d7",
+      "operand": "draw_view_frames",
       "target": 5335,
-      "target_label": "sub_14d7"
+      "target_label": "draw_view_frames"
     },
     {
       "addr": 5189,
@@ -24471,15 +25206,16 @@
       ],
       "binary_addr": 15328,
       "labels": [
-        "sub_14a0"
+        "reset_workspace"
       ],
       "xref_summaries": [
-        "&3be0 referenced 1 time by &3b49"
+        "&3be0 referenced 1 time by &1409[1]"
       ],
       "references": [
         {
-          "addr": 15177,
-          "kind": "direct"
+          "addr": 5129,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -24775,15 +25511,16 @@
       ],
       "binary_addr": 15383,
       "labels": [
-        "sub_14d7"
+        "draw_view_frames"
       ],
       "xref_summaries": [
-        "&3c17 referenced 1 time by &3b82"
+        "&3c17 referenced 1 time by &1442[1]"
       ],
       "references": [
         {
-          "addr": 15234,
-          "kind": "direct"
+          "addr": 5186,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -25053,9 +25790,9 @@
       "binary_addr": 15426,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7788",
+      "operand": "draw_all_views",
       "target": 30600,
-      "target_label": "sub_7788"
+      "target_label": "draw_all_views"
     },
     {
       "addr": 5381,
@@ -25123,15 +25860,16 @@
       ],
       "binary_addr": 15440,
       "labels": [
-        "sub_1510"
+        "unpack_level"
       ],
       "xref_summaries": [
-        "&3c50 referenced 1 time by &3b46"
+        "&3c50 referenced 1 time by &1406[1]"
       ],
       "references": [
         {
-          "addr": 15174,
-          "kind": "direct"
+          "addr": 5126,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -25811,15 +26549,16 @@
       ],
       "binary_addr": 15555,
       "labels": [
-        "sub_1583"
+        "reset_monsters"
       ],
       "xref_summaries": [
-        "&3cc3 referenced 1 time by &3b4c"
+        "&3cc3 referenced 1 time by &140c[1]"
       ],
       "references": [
         {
-          "addr": 15180,
-          "kind": "direct"
+          "addr": 5132,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -26106,9 +26845,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_161a",
+      "operand": "clear_text_area",
       "target": 5658,
-      "target_label": "sub_161a"
+      "target_label": "clear_text_area"
     },
     {
       "addr": 5556,
@@ -26385,19 +27124,21 @@
       ],
       "binary_addr": 15706,
       "labels": [
-        "sub_161a"
+        "clear_text_area"
       ],
       "xref_summaries": [
-        "&3d5a referenced 2 times by &3b4f, &3cf1"
+        "&3d5a referenced 2 times by &140f[1], &15b1[1]"
       ],
       "references": [
         {
-          "addr": 15183,
-          "kind": "direct"
+          "addr": 5135,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 15601,
-          "kind": "direct"
+          "addr": 5553,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -26668,55 +27409,7 @@
         102,
         2,
         8,
-        1,
-        162,
-        88,
-        160,
-        25,
-        169,
-        8,
-        32,
-        241,
-        255,
-        162,
-        102,
-        160,
-        25,
-        169,
-        7,
-        32,
-        241,
-        255,
-        162,
-        0,
-        189,
-        42,
-        11,
-        208,
-        6,
-        169,
-        100,
-        157,
-        42,
-        11,
-        96,
-        232,
-        208,
-        242,
-        2,
-        2,
-        0,
-        0,
-        131,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        49,
-        0,
-        141
+        1
       ],
       "binary_addr": 15737,
       "labels": [
@@ -26834,41 +27527,259 @@
         102,
         2,
         8,
-        1,
+        1
+      ]
+    },
+    {
+      "addr": 5792,
+      "bytes": [
         162,
-        88,
+        88
+      ],
+      "binary_addr": 15840,
+      "labels": [
+        "queue_exit_marker"
+      ],
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#&58"
+    },
+    {
+      "addr": 5794,
+      "bytes": [
         160,
-        25,
+        25
+      ],
+      "binary_addr": 15842,
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#&19"
+    },
+    {
+      "addr": 5796,
+      "bytes": [
         169,
-        8,
+        8
+      ],
+      "binary_addr": 15844,
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#osword_envelope",
+      "expr": {
+        "text": "osword_envelope",
+        "tree": {
+          "sym": "osword_envelope"
+        }
+      }
+    },
+    {
+      "addr": 5798,
+      "bytes": [
         32,
         241,
-        255,
+        255
+      ],
+      "binary_addr": 15846,
+      "comment_inline": "ENVELOPE command",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "osword",
+      "target": 65521,
+      "target_label": "osword"
+    },
+    {
+      "addr": 5801,
+      "bytes": [
         162,
-        102,
+        102
+      ],
+      "binary_addr": 15849,
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#&66"
+    },
+    {
+      "addr": 5803,
+      "bytes": [
         160,
-        25,
+        25
+      ],
+      "binary_addr": 15851,
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#&19"
+    },
+    {
+      "addr": 5805,
+      "bytes": [
         169,
-        7,
+        7
+      ],
+      "binary_addr": 15853,
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#osword_sound",
+      "expr": {
+        "text": "osword_sound",
+        "tree": {
+          "sym": "osword_sound"
+        }
+      }
+    },
+    {
+      "addr": 5807,
+      "bytes": [
         32,
         241,
-        255,
+        255
+      ],
+      "binary_addr": 15855,
+      "comment_inline": "SOUND command",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "osword",
+      "target": 65521,
+      "target_label": "osword"
+    },
+    {
+      "addr": 5810,
+      "bytes": [
         162,
-        0,
+        0
+      ],
+      "binary_addr": 15858,
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#0"
+    },
+    {
+      "addr": 5812,
+      "bytes": [
         189,
         42,
-        11,
+        11
+      ],
+      "binary_addr": 15860,
+      "labels": [
+        "code_16b4"
+      ],
+      "xref_summaries": [
+        "&3df4 referenced 1 time by &3e00"
+      ],
+      "references": [
+        {
+          "addr": 15872,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "returning_hero_queue,x",
+      "target": 2858,
+      "target_label": "returning_hero_queue"
+    },
+    {
+      "addr": 5815,
+      "bytes": [
         208,
-        6,
+        6
+      ],
+      "binary_addr": 15863,
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "code_16bf",
+      "target": 5823,
+      "target_label": "code_16bf"
+    },
+    {
+      "addr": 5817,
+      "bytes": [
         169,
-        100,
+        100
+      ],
+      "binary_addr": 15865,
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&64"
+    },
+    {
+      "addr": 5819,
+      "bytes": [
         157,
         42,
-        11,
-        96,
-        232,
+        11
+      ],
+      "binary_addr": 15867,
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "returning_hero_queue,x",
+      "target": 2858,
+      "target_label": "returning_hero_queue"
+    },
+    {
+      "addr": 5822,
+      "bytes": [
+        96
+      ],
+      "binary_addr": 15870,
+      "type": "code",
+      "mnemonic": "rts"
+    },
+    {
+      "addr": 5823,
+      "bytes": [
+        232
+      ],
+      "binary_addr": 15871,
+      "labels": [
+        "code_16bf"
+      ],
+      "xref_summaries": [
+        "&3dff referenced 1 time by &3df7"
+      ],
+      "references": [
+        {
+          "addr": 15863,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "inx"
+    },
+    {
+      "addr": 5824,
+      "bytes": [
         208,
-        242,
+        242
+      ],
+      "binary_addr": 15872,
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "code_16b4",
+      "target": 5812,
+      "target_label": "code_16b4"
+    },
+    {
+      "addr": 5826,
+      "bytes": [
+        2,
+        2,
+        0,
+        0,
+        131,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        49,
+        0,
+        141
+      ],
+      "binary_addr": 15874,
+      "type": "byte",
+      "values": [
         2,
         2,
         0,
@@ -30423,22 +31334,23 @@
       ],
       "binary_addr": 17408,
       "labels": [
-        "sub_1cc0"
+        "update_game"
       ],
       "xref_summaries": [
-        "&4400 referenced 1 time by &464d"
+        "&4400 referenced 1 time by &1f0d[1]"
       ],
       "references": [
         {
-          "addr": 17997,
-          "kind": "direct"
+          "addr": 7949,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_6e80",
+      "operand": "move_heroes",
       "target": 28288,
-      "target_label": "sub_6e80"
+      "target_label": "move_heroes"
     },
     {
       "addr": 7363,
@@ -30898,9 +31810,9 @@
       "binary_addr": 17477,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_728c",
+      "operand": "add_point",
       "target": 29324,
-      "target_label": "sub_728c"
+      "target_label": "add_point"
     },
     {
       "addr": 7432,
@@ -31173,9 +32085,9 @@
       "binary_addr": 17526,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7852",
+      "operand": "plot_at_cell",
       "target": 30802,
-      "target_label": "sub_7852"
+      "target_label": "plot_at_cell"
     },
     {
       "addr": 7481,
@@ -32196,9 +33108,9 @@
       "binary_addr": 17692,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7852",
+      "operand": "plot_at_cell",
       "target": 30802,
-      "target_label": "sub_7852"
+      "target_label": "plot_at_cell"
     },
     {
       "addr": 7647,
@@ -32997,9 +33909,9 @@
       "binary_addr": 17825,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7852",
+      "operand": "plot_at_cell",
       "target": 30802,
-      "target_label": "sub_7852"
+      "target_label": "plot_at_cell"
     },
     {
       "addr": 7780,
@@ -33740,9 +34652,9 @@
       "binary_addr": 17937,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_70ca",
+      "operand": "move_missiles",
       "target": 28874,
-      "target_label": "sub_70ca"
+      "target_label": "move_missiles"
     },
     {
       "addr": 7892,
@@ -33754,9 +34666,9 @@
       "binary_addr": 17940,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_79c1",
+      "operand": "update_monsters",
       "target": 31169,
-      "target_label": "sub_79c1"
+      "target_label": "update_monsters"
     },
     {
       "addr": 7895,
@@ -34085,9 +34997,9 @@
       "binary_addr": 17994,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_1070",
+      "operand": "check_for_victory",
       "target": 4208,
-      "target_label": "sub_1070"
+      "target_label": "check_for_victory"
     },
     {
       "addr": 7949,
@@ -34099,9 +35011,9 @@
       "binary_addr": 17997,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_1cc0",
+      "operand": "update_game",
       "target": 7360,
-      "target_label": "sub_1cc0"
+      "target_label": "update_game"
     },
     {
       "addr": 7952,
@@ -34327,9 +35239,9 @@
       "binary_addr": 18034,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_2050",
+      "operand": "restore_hero_sprites",
       "target": 8272,
-      "target_label": "sub_2050"
+      "target_label": "restore_hero_sprites"
     },
     {
       "addr": 7989,
@@ -34487,9 +35399,9 @@
       "binary_addr": 18056,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_2091",
+      "operand": "drop_key",
       "target": 8337,
-      "target_label": "sub_2091"
+      "target_label": "drop_key"
     },
     {
       "addr": 8011,
@@ -34686,9 +35598,9 @@
       "binary_addr": 18093,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7852",
+      "operand": "plot_at_cell",
       "target": 30802,
-      "target_label": "sub_7852"
+      "target_label": "plot_at_cell"
     },
     {
       "addr": 8048,
@@ -34838,9 +35750,9 @@
       "binary_addr": 18123,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_203a",
+      "operand": "hero_enters_exit",
       "target": 8250,
-      "target_label": "sub_203a"
+      "target_label": "hero_enters_exit"
     },
     {
       "addr": 8078,
@@ -35111,9 +36023,9 @@
       "binary_addr": 18167,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7852",
+      "operand": "plot_at_cell",
       "target": 30802,
-      "target_label": "sub_7852"
+      "target_label": "plot_at_cell"
     },
     {
       "addr": 8122,
@@ -35385,9 +36297,9 @@
       "binary_addr": 18220,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7852",
+      "operand": "plot_at_cell",
       "target": 30802,
-      "target_label": "sub_7852"
+      "target_label": "plot_at_cell"
     },
     {
       "addr": 8175,
@@ -35657,15 +36569,16 @@
       ],
       "binary_addr": 18298,
       "labels": [
-        "sub_203a"
+        "hero_enters_exit"
       ],
       "xref_summaries": [
-        "&477a referenced 1 time by &46cb"
+        "&477a referenced 1 time by &1f8b[1]"
       ],
       "references": [
         {
-          "addr": 18123,
-          "kind": "direct"
+          "addr": 8075,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -35729,15 +36642,16 @@
       ],
       "binary_addr": 18320,
       "labels": [
-        "sub_2050"
+        "restore_hero_sprites"
       ],
       "xref_summaries": [
-        "&4790 referenced 1 time by &4672"
+        "&4790 referenced 1 time by &1f32[1]"
       ],
       "references": [
         {
-          "addr": 18034,
-          "kind": "direct"
+          "addr": 7986,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -35887,15 +36801,16 @@
       ],
       "binary_addr": 18385,
       "labels": [
-        "sub_2091"
+        "drop_key"
       ],
       "xref_summaries": [
-        "&47d1 referenced 1 time by &4688"
+        "&47d1 referenced 1 time by &1f48[1]"
       ],
       "references": [
         {
-          "addr": 18056,
-          "kind": "direct"
+          "addr": 8008,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -35904,54 +36819,6 @@
     {
       "addr": 8338,
       "bytes": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         0,
         0,
         0,
@@ -36079,8 +36946,75 @@
         0,
         0,
         0,
+        0
+      ]
+    },
+    {
+      "addr": 8400,
+      "bytes": [
+        0
+      ],
+      "binary_addr": 18448,
+      "labels": [
+        "find_open_neighbour"
+      ],
+      "type": "code",
+      "mnemonic": "brk"
+    },
+    {
+      "addr": 8401,
+      "bytes": [
         0,
         0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "binary_addr": 18449,
+      "type": "byte",
+      "values": [
         0,
         0,
         0,
@@ -42321,7 +43255,8 @@
       ],
       "binary_addr": 20912,
       "labels": [
-        "data_0400"
+        "add_thousand_points",
+        "add_thousand_points_joy"
       ],
       "xref_summaries": [
         "&51b0 referenced 1 time by &72b9"
@@ -43526,15 +44461,17 @@
       ],
       "binary_addr": 21168,
       "labels": [
-        "data_0500"
+        "hero_menu",
+        "hero_menu_joy"
       ],
       "xref_summaries": [
-        "&52b0 referenced 1 time by &3551"
+        "&52b0 referenced 1 time by &0e11[1]"
       ],
       "references": [
         {
-          "addr": 13649,
-          "kind": "direct"
+          "addr": 3601,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -43690,9 +44627,9 @@
       "binary_addr": 21198,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "data_0524",
+      "operand": "print_menu",
       "target": 1316,
-      "target_label": "data_0524"
+      "target_label": "print_menu"
     },
     {
       "addr": 1313,
@@ -43716,35 +44653,42 @@
       ],
       "binary_addr": 21204,
       "labels": [
-        "data_0524"
+        "print_menu",
+        "print_menu_joy"
       ],
       "xref_summaries": [
-        "&52d4 referenced 6 times by &52ce, &5373, &53a0, &56ce, &5773, &57a0"
+        "&52d4 referenced 6 times by &051e[2], &051e[3], &05c3[2], &05c3[3], &05f0[2], &05f0[3]"
       ],
       "references": [
         {
-          "addr": 21198,
-          "kind": "direct"
+          "addr": 1310,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 21363,
-          "kind": "direct"
+          "addr": 1310,
+          "kind": "direct",
+          "move_id": 3
         },
         {
-          "addr": 21408,
-          "kind": "direct"
+          "addr": 1475,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 22222,
-          "kind": "direct"
+          "addr": 1475,
+          "kind": "direct",
+          "move_id": 3
         },
         {
-          "addr": 22387,
-          "kind": "direct"
+          "addr": 1520,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 22432,
-          "kind": "direct"
+          "addr": 1520,
+          "kind": "direct",
+          "move_id": 3
         }
       ],
       "type": "code",
@@ -43788,9 +44732,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "data_052e",
+      "operand": "print_menu_string",
       "target": 1326,
-      "target_label": "data_052e"
+      "target_label": "print_menu_string"
     },
     {
       "addr": 1323,
@@ -43822,19 +44766,22 @@
       ],
       "binary_addr": 21214,
       "labels": [
-        "data_052e"
+        "print_menu_string",
+        "print_menu_string_joy"
       ],
       "xref_summaries": [
-        "&52de referenced 2 times by &52d8, &56d8"
+        "&52de referenced 2 times by &0528[2], &0528[3]"
       ],
       "references": [
         {
-          "addr": 21208,
-          "kind": "direct"
+          "addr": 1320,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 22232,
-          "kind": "direct"
+          "addr": 1320,
+          "kind": "direct",
+          "move_id": 3
         }
       ],
       "type": "code",
@@ -44023,19 +44970,22 @@
       ],
       "binary_addr": 21245,
       "labels": [
-        "data_054d"
+        "set_menu_no",
+        "set_menu_no_joy"
       ],
       "xref_summaries": [
-        "&52fd referenced 2 times by &5370, &5770"
+        "&52fd referenced 2 times by &05c0[2], &05c0[3]"
       ],
       "references": [
         {
-          "addr": 21360,
-          "kind": "direct"
+          "addr": 1472,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 22384,
-          "kind": "direct"
+          "addr": 1472,
+          "kind": "direct",
+          "move_id": 3
         }
       ],
       "type": "code",
@@ -44123,19 +45073,22 @@
       ],
       "binary_addr": 21261,
       "labels": [
-        "data_055d"
+        "set_menu_yes",
+        "set_menu_yes_joy"
       ],
       "xref_summaries": [
-        "&530d referenced 2 times by &536a, &576a"
+        "&530d referenced 2 times by &05ba[2], &05ba[3]"
       ],
       "references": [
         {
-          "addr": 21354,
-          "kind": "direct"
+          "addr": 1466,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 22378,
-          "kind": "direct"
+          "addr": 1466,
+          "kind": "direct",
+          "move_id": 3
         }
       ],
       "type": "code",
@@ -44223,19 +45176,22 @@
       ],
       "binary_addr": 21277,
       "labels": [
-        "data_056d"
+        "set_menu_off",
+        "set_menu_off_joy"
       ],
       "xref_summaries": [
-        "&531d referenced 2 times by &5394, &5794"
+        "&531d referenced 2 times by &05e4[2], &05e4[3]"
       ],
       "references": [
         {
-          "addr": 21396,
-          "kind": "direct"
+          "addr": 1508,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 22420,
-          "kind": "direct"
+          "addr": 1508,
+          "kind": "direct",
+          "move_id": 3
         }
       ],
       "type": "code",
@@ -44287,19 +45243,22 @@
       ],
       "binary_addr": 21286,
       "labels": [
-        "data_0576"
+        "set_menu_on",
+        "set_menu_on_joy"
       ],
       "xref_summaries": [
-        "&5326 referenced 2 times by &538d, &578d"
+        "&5326 referenced 2 times by &05dd[2], &05dd[3]"
       ],
       "references": [
         {
-          "addr": 21389,
-          "kind": "direct"
+          "addr": 1501,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 22413,
-          "kind": "direct"
+          "addr": 1501,
+          "kind": "direct",
+          "move_id": 3
         }
       ],
       "type": "code",
@@ -44770,9 +45729,9 @@
       "binary_addr": 21354,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "data_055d",
+      "operand": "set_menu_yes",
       "target": 1373,
-      "target_label": "data_055d"
+      "target_label": "set_menu_yes"
     },
     {
       "addr": 1469,
@@ -44814,9 +45773,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "data_054d",
+      "operand": "set_menu_no",
       "target": 1357,
-      "target_label": "data_054d"
+      "target_label": "set_menu_no"
     },
     {
       "addr": 1475,
@@ -44844,9 +45803,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "data_0524",
+      "operand": "print_menu",
       "target": 1316,
-      "target_label": "data_0524"
+      "target_label": "print_menu"
     },
     {
       "addr": 1478,
@@ -45054,9 +46013,9 @@
       "binary_addr": 21389,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "data_0576",
+      "operand": "set_menu_on",
       "target": 1398,
-      "target_label": "data_0576"
+      "target_label": "set_menu_on"
     },
     {
       "addr": 1504,
@@ -45108,9 +46067,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "data_056d",
+      "operand": "set_menu_off",
       "target": 1389,
-      "target_label": "data_056d"
+      "target_label": "set_menu_off"
     },
     {
       "addr": 1511,
@@ -45192,9 +46151,9 @@
       "binary_addr": 21408,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "data_0524",
+      "operand": "print_menu",
       "target": 1316,
-      "target_label": "data_0524"
+      "target_label": "print_menu"
     },
     {
       "addr": 1523,
@@ -45783,15 +46742,17 @@
       ],
       "binary_addr": 21600,
       "labels": [
-        "data_06b0"
+        "remove_absent_heroes",
+        "remove_absent_heroes_joy"
       ],
       "xref_summaries": [
-        "&5460 referenced 1 time by &359d"
+        "&5460 referenced 1 time by &0e5d[1]"
       ],
       "references": [
         {
-          "addr": 13725,
-          "kind": "direct"
+          "addr": 3677,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -46874,7 +47835,8 @@
       ],
       "binary_addr": 21936,
       "labels": [
-        "data_0400"
+        "add_thousand_points",
+        "add_thousand_points_joy"
       ],
       "xref_summaries": [
         "&55b0 referenced 1 time by &72b9"
@@ -48079,15 +49041,17 @@
       ],
       "binary_addr": 22192,
       "labels": [
-        "data_0500"
+        "hero_menu",
+        "hero_menu_joy"
       ],
       "xref_summaries": [
-        "&56b0 referenced 1 time by &3551"
+        "&56b0 referenced 1 time by &0e11[1]"
       ],
       "references": [
         {
-          "addr": 13649,
-          "kind": "direct"
+          "addr": 3601,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -48243,9 +49207,9 @@
       "binary_addr": 22222,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "data_0524",
+      "operand": "print_menu",
       "target": 1316,
-      "target_label": "data_0524"
+      "target_label": "print_menu"
     },
     {
       "addr": 1313,
@@ -48269,35 +49233,42 @@
       ],
       "binary_addr": 22228,
       "labels": [
-        "data_0524"
+        "print_menu",
+        "print_menu_joy"
       ],
       "xref_summaries": [
-        "&56d4 referenced 6 times by &52ce, &5373, &53a0, &56ce, &5773, &57a0"
+        "&56d4 referenced 6 times by &051e[2], &051e[3], &05c3[2], &05c3[3], &05f0[2], &05f0[3]"
       ],
       "references": [
         {
-          "addr": 21198,
-          "kind": "direct"
+          "addr": 1310,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 21363,
-          "kind": "direct"
+          "addr": 1310,
+          "kind": "direct",
+          "move_id": 3
         },
         {
-          "addr": 21408,
-          "kind": "direct"
+          "addr": 1475,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 22222,
-          "kind": "direct"
+          "addr": 1475,
+          "kind": "direct",
+          "move_id": 3
         },
         {
-          "addr": 22387,
-          "kind": "direct"
+          "addr": 1520,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 22432,
-          "kind": "direct"
+          "addr": 1520,
+          "kind": "direct",
+          "move_id": 3
         }
       ],
       "type": "code",
@@ -48341,9 +49312,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "data_052e",
+      "operand": "print_menu_string",
       "target": 1326,
-      "target_label": "data_052e"
+      "target_label": "print_menu_string"
     },
     {
       "addr": 1323,
@@ -48375,19 +49346,22 @@
       ],
       "binary_addr": 22238,
       "labels": [
-        "data_052e"
+        "print_menu_string",
+        "print_menu_string_joy"
       ],
       "xref_summaries": [
-        "&56de referenced 2 times by &52d8, &56d8"
+        "&56de referenced 2 times by &0528[2], &0528[3]"
       ],
       "references": [
         {
-          "addr": 21208,
-          "kind": "direct"
+          "addr": 1320,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 22232,
-          "kind": "direct"
+          "addr": 1320,
+          "kind": "direct",
+          "move_id": 3
         }
       ],
       "type": "code",
@@ -48576,19 +49550,22 @@
       ],
       "binary_addr": 22269,
       "labels": [
-        "data_054d"
+        "set_menu_no",
+        "set_menu_no_joy"
       ],
       "xref_summaries": [
-        "&56fd referenced 2 times by &5370, &5770"
+        "&56fd referenced 2 times by &05c0[2], &05c0[3]"
       ],
       "references": [
         {
-          "addr": 21360,
-          "kind": "direct"
+          "addr": 1472,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 22384,
-          "kind": "direct"
+          "addr": 1472,
+          "kind": "direct",
+          "move_id": 3
         }
       ],
       "type": "code",
@@ -48676,19 +49653,22 @@
       ],
       "binary_addr": 22285,
       "labels": [
-        "data_055d"
+        "set_menu_yes",
+        "set_menu_yes_joy"
       ],
       "xref_summaries": [
-        "&570d referenced 2 times by &536a, &576a"
+        "&570d referenced 2 times by &05ba[2], &05ba[3]"
       ],
       "references": [
         {
-          "addr": 21354,
-          "kind": "direct"
+          "addr": 1466,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 22378,
-          "kind": "direct"
+          "addr": 1466,
+          "kind": "direct",
+          "move_id": 3
         }
       ],
       "type": "code",
@@ -48776,19 +49756,22 @@
       ],
       "binary_addr": 22301,
       "labels": [
-        "data_056d"
+        "set_menu_off",
+        "set_menu_off_joy"
       ],
       "xref_summaries": [
-        "&571d referenced 2 times by &5394, &5794"
+        "&571d referenced 2 times by &05e4[2], &05e4[3]"
       ],
       "references": [
         {
-          "addr": 21396,
-          "kind": "direct"
+          "addr": 1508,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 22420,
-          "kind": "direct"
+          "addr": 1508,
+          "kind": "direct",
+          "move_id": 3
         }
       ],
       "type": "code",
@@ -48840,19 +49823,22 @@
       ],
       "binary_addr": 22310,
       "labels": [
-        "data_0576"
+        "set_menu_on",
+        "set_menu_on_joy"
       ],
       "xref_summaries": [
-        "&5726 referenced 2 times by &538d, &578d"
+        "&5726 referenced 2 times by &05dd[2], &05dd[3]"
       ],
       "references": [
         {
-          "addr": 21389,
-          "kind": "direct"
+          "addr": 1501,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 22413,
-          "kind": "direct"
+          "addr": 1501,
+          "kind": "direct",
+          "move_id": 3
         }
       ],
       "type": "code",
@@ -49323,9 +50309,9 @@
       "binary_addr": 22378,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "data_055d",
+      "operand": "set_menu_yes",
       "target": 1373,
-      "target_label": "data_055d"
+      "target_label": "set_menu_yes"
     },
     {
       "addr": 1469,
@@ -49367,9 +50353,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "data_054d",
+      "operand": "set_menu_no",
       "target": 1357,
-      "target_label": "data_054d"
+      "target_label": "set_menu_no"
     },
     {
       "addr": 1475,
@@ -49397,9 +50383,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "data_0524",
+      "operand": "print_menu",
       "target": 1316,
-      "target_label": "data_0524"
+      "target_label": "print_menu"
     },
     {
       "addr": 1478,
@@ -49607,9 +50593,9 @@
       "binary_addr": 22413,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "data_0576",
+      "operand": "set_menu_on",
       "target": 1398,
-      "target_label": "data_0576"
+      "target_label": "set_menu_on"
     },
     {
       "addr": 1504,
@@ -49661,9 +50647,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "data_056d",
+      "operand": "set_menu_off",
       "target": 1389,
-      "target_label": "data_056d"
+      "target_label": "set_menu_off"
     },
     {
       "addr": 1511,
@@ -49745,9 +50731,9 @@
       "binary_addr": 22432,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "data_0524",
+      "operand": "print_menu",
       "target": 1316,
-      "target_label": "data_0524"
+      "target_label": "print_menu"
     },
     {
       "addr": 1523,
@@ -50336,15 +51322,17 @@
       ],
       "binary_addr": 22624,
       "labels": [
-        "data_06b0"
+        "remove_absent_heroes",
+        "remove_absent_heroes_joy"
       ],
       "xref_summaries": [
-        "&5860 referenced 1 time by &359d"
+        "&5860 referenced 1 time by &0e5d[1]"
       ],
       "references": [
         {
-          "addr": 13725,
-          "kind": "direct"
+          "addr": 3677,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -62675,15 +63663,16 @@
         0
       ],
       "labels": [
-        "sub_6e80"
+        "move_heroes"
       ],
       "xref_summaries": [
-        "&6e80 referenced 1 time by &4400"
+        "&6e80 referenced 1 time by &1cc0[1]"
       ],
       "references": [
         {
-          "addr": 17408,
-          "kind": "direct"
+          "addr": 7360,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -62796,9 +63785,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_76da",
+      "operand": "hero_arrives",
       "target": 30426,
-      "target_label": "sub_76da"
+      "target_label": "hero_arrives"
     },
     {
       "addr": 28308,
@@ -62963,9 +63952,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7ba2",
+      "operand": "continue_hero_step",
       "target": 31650,
-      "target_label": "sub_7ba2"
+      "target_label": "continue_hero_step"
     },
     {
       "addr": 28343,
@@ -63065,9 +64054,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7c95",
+      "operand": "test_key",
       "target": 31893,
-      "target_label": "sub_7c95"
+      "target_label": "test_key"
     },
     {
       "addr": 28359,
@@ -63113,9 +64102,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7b62",
+      "operand": "start_hero_step",
       "target": 31586,
-      "target_label": "sub_7b62"
+      "target_label": "start_hero_step"
     },
     {
       "addr": 28369,
@@ -63164,9 +64153,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7c95",
+      "operand": "test_key",
       "target": 31893,
-      "target_label": "sub_7c95"
+      "target_label": "test_key"
     },
     {
       "addr": 28378,
@@ -63212,9 +64201,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7b62",
+      "operand": "start_hero_step",
       "target": 31586,
-      "target_label": "sub_7b62"
+      "target_label": "start_hero_step"
     },
     {
       "addr": 28388,
@@ -63263,9 +64252,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7c95",
+      "operand": "test_key",
       "target": 31893,
-      "target_label": "sub_7c95"
+      "target_label": "test_key"
     },
     {
       "addr": 28397,
@@ -63311,9 +64300,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7b62",
+      "operand": "start_hero_step",
       "target": 31586,
-      "target_label": "sub_7b62"
+      "target_label": "start_hero_step"
     },
     {
       "addr": 28407,
@@ -63362,9 +64351,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7c95",
+      "operand": "test_key",
       "target": 31893,
-      "target_label": "sub_7c95"
+      "target_label": "test_key"
     },
     {
       "addr": 28416,
@@ -63410,9 +64399,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7b62",
+      "operand": "start_hero_step",
       "target": 31586,
-      "target_label": "sub_7b62"
+      "target_label": "start_hero_step"
     },
     {
       "addr": 28426,
@@ -63461,9 +64450,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7c95",
+      "operand": "test_key",
       "target": 31893,
-      "target_label": "sub_7c95"
+      "target_label": "test_key"
     },
     {
       "addr": 28435,
@@ -64339,9 +65328,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_78fc",
+      "operand": "test_wall",
       "target": 30972,
-      "target_label": "sub_78fc"
+      "target_label": "test_wall"
     },
     {
       "addr": 28597,
@@ -64567,9 +65556,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7974",
+      "operand": "find_creature",
       "target": 31092,
-      "target_label": "sub_7974"
+      "target_label": "find_creature"
     },
     {
       "addr": 28639,
@@ -64719,9 +65708,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7221",
+      "operand": "lose_health_point",
       "target": 29217,
-      "target_label": "sub_7221"
+      "target_label": "lose_health_point"
     },
     {
       "addr": 28671,
@@ -65552,9 +66541,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7852",
+      "operand": "plot_at_cell",
       "target": 30802,
-      "target_label": "sub_7852"
+      "target_label": "plot_at_cell"
     },
     {
       "addr": 28820,
@@ -65676,9 +66665,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7732",
+      "operand": "draw_hero",
       "target": 30514,
-      "target_label": "sub_7732"
+      "target_label": "draw_hero"
     },
     {
       "addr": 28839,
@@ -65757,9 +66746,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7938",
+      "operand": "test_object_map",
       "target": 31032,
-      "target_label": "sub_7938"
+      "target_label": "test_object_map"
     },
     {
       "addr": 28856,
@@ -65808,9 +66797,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7329",
+      "operand": "collect_objects",
       "target": 29481,
-      "target_label": "sub_7329"
+      "target_label": "collect_objects"
     },
     {
       "addr": 28865,
@@ -65906,15 +66895,16 @@
         0
       ],
       "labels": [
-        "sub_70ca"
+        "move_missiles"
       ],
       "xref_summaries": [
-        "&70ca referenced 1 time by &4611"
+        "&70ca referenced 1 time by &1ed1[1]"
       ],
       "references": [
         {
-          "addr": 17937,
-          "kind": "direct"
+          "addr": 7889,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -66061,9 +67051,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7747",
+      "operand": "flip_firer_frame",
       "target": 30535,
-      "target_label": "sub_7747"
+      "target_label": "flip_firer_frame"
     },
     {
       "addr": 28900,
@@ -66189,9 +67179,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7852",
+      "operand": "plot_at_cell",
       "target": 30802,
-      "target_label": "sub_7852"
+      "target_label": "plot_at_cell"
     },
     {
       "addr": 28924,
@@ -66499,9 +67489,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_78fc",
+      "operand": "test_wall",
       "target": 30972,
-      "target_label": "sub_78fc"
+      "target_label": "test_wall"
     },
     {
       "addr": 28974,
@@ -66639,9 +67629,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7974",
+      "operand": "find_creature",
       "target": 31092,
-      "target_label": "sub_7974"
+      "target_label": "find_creature"
     },
     {
       "addr": 28994,
@@ -66740,9 +67730,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_76b1",
+      "operand": "credit_missile_owner",
       "target": 30385,
-      "target_label": "sub_76b1"
+      "target_label": "credit_missile_owner"
     },
     {
       "addr": 29011,
@@ -66866,9 +67856,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7938",
+      "operand": "test_object_map",
       "target": 31032,
-      "target_label": "sub_7938"
+      "target_label": "test_object_map"
     },
     {
       "addr": 29033,
@@ -67200,9 +68190,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_76b1",
+      "operand": "credit_missile_owner",
       "target": 30385,
-      "target_label": "sub_76b1"
+      "target_label": "credit_missile_owner"
     },
     {
       "addr": 29093,
@@ -67755,9 +68745,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7221",
+      "operand": "lose_health_point",
       "target": 29217,
-      "target_label": "sub_7221"
+      "target_label": "lose_health_point"
     },
     {
       "addr": 29177,
@@ -67941,9 +68931,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7852",
+      "operand": "plot_at_cell",
       "target": 30802,
-      "target_label": "sub_7852"
+      "target_label": "plot_at_cell"
     },
     {
       "addr": 29206,
@@ -68048,15 +69038,16 @@
         13
       ],
       "labels": [
-        "sub_7221"
+        "lose_health_point"
       ],
       "xref_summaries": [
-        "&7221 referenced 8 times by &363f, &6ffc, &71f6, &749a, &7512, &7654, &772a, &79ac"
+        "&7221 referenced 8 times by &0eff[1], &6ffc, &71f6, &749a, &7512, &7654, &772a, &79ac"
       ],
       "references": [
         {
-          "addr": 13887,
-          "kind": "direct"
+          "addr": 3839,
+          "kind": "direct",
+          "move_id": 1
         },
         {
           "addr": 28668,
@@ -68275,9 +69266,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7732",
+      "operand": "draw_hero",
       "target": 30514,
-      "target_label": "sub_7732"
+      "target_label": "draw_hero"
     },
     {
       "addr": 29255,
@@ -68709,19 +69700,21 @@
         11
       ],
       "labels": [
-        "sub_728c"
+        "add_point"
       ],
       "xref_summaries": [
-        "&728c referenced 5 times by &3642, &4445, &73a9, &76a2, &76d4"
+        "&728c referenced 5 times by &0f02[1], &1d05[1], &73a9, &76a2, &76d4"
       ],
       "references": [
         {
-          "addr": 13890,
-          "kind": "direct"
+          "addr": 3842,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 17477,
-          "kind": "direct"
+          "addr": 7429,
+          "kind": "direct",
+          "move_id": 1
         },
         {
           "addr": 29609,
@@ -68808,7 +69801,7 @@
         11
       ],
       "labels": [
-        "sub_729b"
+        "add_ten_points"
       ],
       "xref_summaries": [
         "&729b referenced 4 times by &737f, &7382, &7419, &74d5"
@@ -68975,9 +69968,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "data_0400",
+      "operand": "add_thousand_points",
       "target": 1024,
-      "target_label": "data_0400"
+      "target_label": "add_thousand_points"
     },
     {
       "addr": 29372,
@@ -69588,9 +70581,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7852",
+      "operand": "plot_at_cell",
       "target": 30802,
-      "target_label": "sub_7852"
+      "target_label": "plot_at_cell"
     },
     {
       "addr": 29475,
@@ -69644,7 +70637,7 @@
         13
       ],
       "labels": [
-        "sub_7329"
+        "collect_objects"
       ],
       "xref_summaries": [
         "&7329 referenced 1 time by &70be"
@@ -69896,9 +70889,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_75f9",
+      "operand": "point_at_boots_icon",
       "target": 30201,
-      "target_label": "sub_75f9"
+      "target_label": "point_at_boots_icon"
     },
     {
       "addr": 29527,
@@ -69909,9 +70902,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_760d",
+      "operand": "erase_boots_icon",
       "target": 30221,
-      "target_label": "sub_760d"
+      "target_label": "erase_boots_icon"
     },
     {
       "addr": 29530,
@@ -70153,9 +71146,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_729b",
+      "operand": "add_ten_points",
       "target": 29339,
-      "target_label": "sub_729b"
+      "target_label": "add_ten_points"
     },
     {
       "addr": 29570,
@@ -70166,9 +71159,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_729b",
+      "operand": "add_ten_points",
       "target": 29339,
-      "target_label": "sub_729b"
+      "target_label": "add_ten_points"
     },
     {
       "addr": 29573,
@@ -70405,9 +71398,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_728c",
+      "operand": "add_point",
       "target": 29324,
-      "target_label": "sub_728c"
+      "target_label": "add_point"
     },
     {
       "addr": 29612,
@@ -71060,9 +72053,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_729b",
+      "operand": "add_ten_points",
       "target": 29339,
-      "target_label": "sub_729b"
+      "target_label": "add_ten_points"
     },
     {
       "addr": 29724,
@@ -71089,9 +72082,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_74a3",
+      "operand": "play_pickup_sound",
       "target": 29859,
-      "target_label": "sub_74a3"
+      "target_label": "play_pickup_sound"
     },
     {
       "addr": 29729,
@@ -71858,9 +72851,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7221",
+      "operand": "lose_health_point",
       "target": 29217,
-      "target_label": "sub_7221"
+      "target_label": "lose_health_point"
     },
     {
       "addr": 29853,
@@ -71913,7 +72906,7 @@
         44
       ],
       "labels": [
-        "sub_74a3"
+        "play_pickup_sound"
       ],
       "xref_summaries": [
         "&74a3 referenced 2 times by &741e, &74ca"
@@ -72155,9 +73148,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_74a3",
+      "operand": "play_pickup_sound",
       "target": 29859,
-      "target_label": "sub_74a3"
+      "target_label": "play_pickup_sound"
     },
     {
       "addr": 29901,
@@ -72210,9 +73203,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_729b",
+      "operand": "add_ten_points",
       "target": 29339,
-      "target_label": "sub_729b"
+      "target_label": "add_ten_points"
     },
     {
       "addr": 29912,
@@ -72258,9 +73251,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_75f9",
+      "operand": "point_at_boots_icon",
       "target": 30201,
-      "target_label": "sub_75f9"
+      "target_label": "point_at_boots_icon"
     },
     {
       "addr": 29922,
@@ -72271,9 +73264,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7606",
+      "operand": "plot_boots_icon",
       "target": 30214,
-      "target_label": "sub_7606"
+      "target_label": "plot_boots_icon"
     },
     {
       "addr": 29925,
@@ -72534,9 +73527,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7221",
+      "operand": "lose_health_point",
       "target": 29217,
-      "target_label": "sub_7221"
+      "target_label": "lose_health_point"
     },
     {
       "addr": 29973,
@@ -72769,9 +73762,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_78fc",
+      "operand": "test_wall",
       "target": 30972,
-      "target_label": "sub_78fc"
+      "target_label": "test_wall"
     },
     {
       "addr": 30013,
@@ -72869,9 +73862,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7795",
+      "operand": "draw_view_0",
       "target": 30613,
-      "target_label": "sub_7795"
+      "target_label": "draw_view_0"
     },
     {
       "addr": 30030,
@@ -72940,9 +73933,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_77a7",
+      "operand": "draw_view_1",
       "target": 30631,
-      "target_label": "sub_77a7"
+      "target_label": "draw_view_1"
     },
     {
       "addr": 30040,
@@ -73011,9 +74004,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_77b9",
+      "operand": "draw_view_2",
       "target": 30649,
-      "target_label": "sub_77b9"
+      "target_label": "draw_view_2"
     },
     {
       "addr": 30050,
@@ -73060,9 +74053,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_77cb",
+      "operand": "draw_view_3",
       "target": 30667,
-      "target_label": "sub_77cb"
+      "target_label": "draw_view_3"
     },
     {
       "addr": 30056,
@@ -73928,7 +74921,7 @@
         74
       ],
       "labels": [
-        "sub_75f9"
+        "point_at_boots_icon"
       ],
       "xref_summaries": [
         "&75f9 referenced 2 times by &7354, &74df"
@@ -74017,7 +75010,7 @@
         117
       ],
       "labels": [
-        "sub_7606"
+        "plot_boots_icon"
       ],
       "xref_summaries": [
         "&7606 referenced 1 time by &74e2"
@@ -74064,7 +75057,7 @@
         119
       ],
       "labels": [
-        "sub_760d"
+        "erase_boots_icon"
       ],
       "xref_summaries": [
         "&760d referenced 1 time by &7357"
@@ -74270,9 +75263,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7c95",
+      "operand": "test_key",
       "target": 31893,
-      "target_label": "sub_7c95"
+      "target_label": "test_key"
     },
     {
       "addr": 30250,
@@ -74549,9 +75542,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7221",
+      "operand": "lose_health_point",
       "target": 29217,
-      "target_label": "sub_7221"
+      "target_label": "lose_health_point"
     },
     {
       "addr": 30295,
@@ -74739,9 +75732,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_78fc",
+      "operand": "test_wall",
       "target": 30972,
-      "target_label": "sub_78fc"
+      "target_label": "test_wall"
     },
     {
       "addr": 30328,
@@ -75015,9 +76008,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_728c",
+      "operand": "add_point",
       "target": 29324,
-      "target_label": "sub_728c"
+      "target_label": "add_point"
     },
     {
       "addr": 30373,
@@ -75114,7 +76107,7 @@
         13
       ],
       "labels": [
-        "sub_76b1"
+        "credit_missile_owner"
       ],
       "xref_summaries": [
         "&76b1 referenced 2 times by &7150, &71a2"
@@ -75369,9 +76362,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_728c",
+      "operand": "add_point",
       "target": 29324,
-      "target_label": "sub_728c"
+      "target_label": "add_point"
     },
     {
       "addr": 30423,
@@ -75405,7 +76398,7 @@
         13
       ],
       "labels": [
-        "sub_76da"
+        "hero_arrives"
       ],
       "xref_summaries": [
         "&76da referenced 1 time by &6e91"
@@ -75486,9 +76479,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_777a",
+      "operand": "get_hero_cell",
       "target": 30586,
-      "target_label": "sub_777a"
+      "target_label": "get_hero_cell"
     },
     {
       "addr": 30440,
@@ -75595,9 +76588,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7852",
+      "operand": "plot_at_cell",
       "target": 30802,
-      "target_label": "sub_7852"
+      "target_label": "plot_at_cell"
     },
     {
       "addr": 30460,
@@ -75845,9 +76838,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7221",
+      "operand": "lose_health_point",
       "target": 29217,
-      "target_label": "sub_7221"
+      "target_label": "lose_health_point"
     },
     {
       "addr": 30509,
@@ -75898,7 +76891,7 @@
         119
       ],
       "labels": [
-        "sub_7732"
+        "draw_hero"
       ],
       "xref_summaries": [
         "&7732 referenced 2 times by &70a4, &7244"
@@ -75915,9 +76908,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_777a",
+      "operand": "get_hero_cell",
       "target": 30586,
-      "target_label": "sub_777a"
+      "target_label": "get_hero_cell"
     },
     {
       "addr": 30517,
@@ -75994,9 +76987,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7852",
+      "operand": "plot_at_cell",
       "target": 30802,
-      "target_label": "sub_7852"
+      "target_label": "plot_at_cell"
     },
     {
       "addr": 30532,
@@ -76030,7 +77023,7 @@
         13
       ],
       "labels": [
-        "sub_7747"
+        "flip_firer_frame"
       ],
       "xref_summaries": [
         "&7747 referenced 1 time by &70e1"
@@ -76333,7 +77326,7 @@
         13
       ],
       "labels": [
-        "sub_777a"
+        "get_hero_cell"
       ],
       "xref_summaries": [
         "&777a referenced 2 times by &76e5, &7732"
@@ -76419,22 +77412,23 @@
         119
       ],
       "labels": [
-        "sub_7788"
+        "draw_all_views"
       ],
       "xref_summaries": [
-        "&7788 referenced 1 time by &3c42"
+        "&7788 referenced 1 time by &1502[1]"
       ],
       "references": [
         {
-          "addr": 15426,
-          "kind": "direct"
+          "addr": 5378,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7795",
+      "operand": "draw_view_0",
       "target": 30613,
-      "target_label": "sub_7795"
+      "target_label": "draw_view_0"
     },
     {
       "addr": 30603,
@@ -76445,9 +77439,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_77a7",
+      "operand": "draw_view_1",
       "target": 30631,
-      "target_label": "sub_77a7"
+      "target_label": "draw_view_1"
     },
     {
       "addr": 30606,
@@ -76458,9 +77452,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_77b9",
+      "operand": "draw_view_2",
       "target": 30649,
-      "target_label": "sub_77b9"
+      "target_label": "draw_view_2"
     },
     {
       "addr": 30609,
@@ -76471,9 +77465,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_77cb",
+      "operand": "draw_view_3",
       "target": 30667,
-      "target_label": "sub_77cb"
+      "target_label": "draw_view_3"
     },
     {
       "addr": 30612,
@@ -76490,7 +77484,7 @@
         1
       ],
       "labels": [
-        "sub_7795"
+        "draw_view_0"
       ],
       "xref_summaries": [
         "&7795 referenced 2 times by &754b, &7788"
@@ -76578,9 +77572,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_77de",
+      "operand": "draw_room",
       "target": 30686,
-      "target_label": "sub_77de"
+      "target_label": "draw_room"
     },
     {
       "addr": 30630,
@@ -76597,7 +77591,7 @@
         1
       ],
       "labels": [
-        "sub_77a7"
+        "draw_view_1"
       ],
       "xref_summaries": [
         "&77a7 referenced 2 times by &7555, &778b"
@@ -76685,9 +77679,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_77de",
+      "operand": "draw_room",
       "target": 30686,
-      "target_label": "sub_77de"
+      "target_label": "draw_room"
     },
     {
       "addr": 30648,
@@ -76704,7 +77698,7 @@
         103
       ],
       "labels": [
-        "sub_77b9"
+        "draw_view_2"
       ],
       "xref_summaries": [
         "&77b9 referenced 2 times by &755f, &778e"
@@ -76792,9 +77786,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_77de",
+      "operand": "draw_room",
       "target": 30686,
-      "target_label": "sub_77de"
+      "target_label": "draw_room"
     },
     {
       "addr": 30666,
@@ -76811,7 +77805,7 @@
         103
       ],
       "labels": [
-        "sub_77cb"
+        "draw_view_3"
       ],
       "xref_summaries": [
         "&77cb referenced 2 times by &7565, &7791"
@@ -76899,9 +77893,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_77de",
+      "operand": "draw_room",
       "target": 30686,
-      "target_label": "sub_77de"
+      "target_label": "draw_room"
     },
     {
       "addr": 30684,
@@ -76928,7 +77922,7 @@
         12
       ],
       "labels": [
-        "sub_77de"
+        "draw_room"
       ],
       "xref_summaries": [
         "&77de referenced 4 times by &77a3, &77b5, &77c7, &77d9"
@@ -77039,9 +78033,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7820",
+      "operand": "draw_room_row",
       "target": 30752,
-      "target_label": "sub_7820"
+      "target_label": "draw_room_row"
     },
     {
       "addr": 30702,
@@ -77289,9 +78283,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7852",
+      "operand": "plot_at_cell",
       "target": 30802,
-      "target_label": "sub_7852"
+      "target_label": "plot_at_cell"
     },
     {
       "addr": 30746,
@@ -77345,7 +78339,7 @@
         13
       ],
       "labels": [
-        "sub_7820"
+        "draw_room_row"
       ],
       "xref_summaries": [
         "&7820 referenced 1 time by &77eb"
@@ -77664,43 +78658,51 @@
         13
       ],
       "labels": [
-        "sub_7852"
+        "plot_at_cell"
       ],
       "xref_summaries": [
-        "&7852 referenced 19 times by &38e8, &3940, &4476, &451c, &45a1, &46ad, &46f7, &472c, &7091, &70f9, &7213, &7320, &76f9, &7741, &7817, &79db, &7a07, &7b25, &7b5c"
+        "&7852 referenced 19 times by &11a8[1], &1200[1], &1d36[1], &1ddc[1], &1e61[1], &1f6d[1], &1fb7[1], &1fec[1], &7091, &70f9, &7213, &7320, &76f9, &7741, &7817, &79db, &7a07, &7b25, &7b5c"
       ],
       "references": [
         {
-          "addr": 14568,
-          "kind": "direct"
+          "addr": 4520,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 14656,
-          "kind": "direct"
+          "addr": 4608,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 17526,
-          "kind": "direct"
+          "addr": 7478,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 17692,
-          "kind": "direct"
+          "addr": 7644,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 17825,
-          "kind": "direct"
+          "addr": 7777,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 18093,
-          "kind": "direct"
+          "addr": 8045,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 18167,
-          "kind": "direct"
+          "addr": 8119,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 18220,
-          "kind": "direct"
+          "addr": 8172,
+          "kind": "direct",
+          "move_id": 1
         },
         {
           "addr": 28817,
@@ -78643,7 +79645,7 @@
         13
       ],
       "labels": [
-        "sub_78fc"
+        "test_wall"
       ],
       "xref_summaries": [
         "&78fc referenced 5 times by &6fb2, &712b, &753a, &7675, &7a51"
@@ -78976,7 +79978,7 @@
         13
       ],
       "labels": [
-        "sub_7938"
+        "test_object_map"
       ],
       "xref_summaries": [
         "&7938 referenced 2 times by &70b5, &7166"
@@ -79296,7 +80298,7 @@
         30
       ],
       "labels": [
-        "sub_7974"
+        "find_creature"
       ],
       "xref_summaries": [
         "&7974 referenced 4 times by &6fdc, &713f, &7a8c, &7ce6"
@@ -79665,9 +80667,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7221",
+      "operand": "lose_health_point",
       "target": 29217,
-      "target_label": "sub_7221"
+      "target_label": "lose_health_point"
     },
     {
       "addr": 31151,
@@ -79816,15 +80818,16 @@
         8
       ],
       "labels": [
-        "sub_79c1"
+        "update_monsters"
       ],
       "xref_summaries": [
-        "&79c1 referenced 1 time by &4614"
+        "&79c1 referenced 1 time by &1ed4[1]"
       ],
       "references": [
         {
-          "addr": 17940,
-          "kind": "direct"
+          "addr": 7892,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -79976,9 +80979,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7852",
+      "operand": "plot_at_cell",
       "target": 30802,
-      "target_label": "sub_7852"
+      "target_label": "plot_at_cell"
     },
     {
       "addr": 31198,
@@ -80213,9 +81216,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7852",
+      "operand": "plot_at_cell",
       "target": 30802,
-      "target_label": "sub_7852"
+      "target_label": "plot_at_cell"
     },
     {
       "addr": 31242,
@@ -80335,9 +81338,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7c2b",
+      "operand": "continue_monster_step",
       "target": 31787,
-      "target_label": "sub_7c2b"
+      "target_label": "continue_monster_step"
     },
     {
       "addr": 31263,
@@ -80582,9 +81585,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7beb",
+      "operand": "start_monster_step",
       "target": 31723,
-      "target_label": "sub_7beb"
+      "target_label": "start_monster_step"
     },
     {
       "addr": 31301,
@@ -80647,9 +81650,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_78fc",
+      "operand": "test_wall",
       "target": 30972,
-      "target_label": "sub_78fc"
+      "target_label": "test_wall"
     },
     {
       "addr": 31316,
@@ -80957,9 +81960,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7974",
+      "operand": "find_creature",
       "target": 31092,
-      "target_label": "sub_7974"
+      "target_label": "find_creature"
     },
     {
       "addr": 31375,
@@ -81802,9 +82805,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7852",
+      "operand": "plot_at_cell",
       "target": 30802,
-      "target_label": "sub_7852"
+      "target_label": "plot_at_cell"
     },
     {
       "addr": 31528,
@@ -82140,9 +83143,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7852",
+      "operand": "plot_at_cell",
       "target": 30802,
-      "target_label": "sub_7852"
+      "target_label": "plot_at_cell"
     },
     {
       "addr": 31583,
@@ -82164,7 +83167,7 @@
         1
       ],
       "labels": [
-        "sub_7b62"
+        "start_hero_step"
       ],
       "xref_summaries": [
         "&7b62 referenced 4 times by &6ece, &6ee1, &6ef4, &6f07"
@@ -82543,7 +83546,7 @@
         13
       ],
       "labels": [
-        "sub_7ba2"
+        "continue_hero_step"
       ],
       "xref_summaries": [
         "&7ba2 referenced 1 time by &6eb4"
@@ -82966,7 +83969,7 @@
         3
       ],
       "labels": [
-        "sub_7beb"
+        "start_monster_step"
       ],
       "xref_summaries": [
         "&7beb referenced 1 time by &7a42"
@@ -83333,7 +84336,7 @@
         126
       ],
       "labels": [
-        "sub_7c2b"
+        "continue_monster_step"
       ],
       "xref_summaries": [
         "&7c2b referenced 1 time by &7a1c"
@@ -83957,7 +84960,7 @@
         168
       ],
       "labels": [
-        "sub_7c95"
+        "test_key"
       ],
       "xref_summaries": [
         "&7c95 referenced 6 times by &6ec4, &6ed7, &6eea, &6efd, &6f10, &7627"
@@ -84462,9 +85465,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7974",
+      "operand": "find_creature",
       "target": 31092,
-      "target_label": "sub_7974"
+      "target_label": "find_creature"
     },
     {
       "addr": 31977,
