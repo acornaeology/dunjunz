@@ -9,7 +9,16 @@ fixes can be made, and to publish a buildable, annotated reassembly via the
 sibling `acornaeology.github.io` site, like the other acornaeology projects.
 Follow the `disassembly-skills:6502-disassembly` skill's method.
 
-## Source artefact
+## Source artefacts and history
+
+Three releases live under `versions/` (see `versions/README.md`): Ole's
+crack of the cassette, an archive of the 1987 flippy disc, and the
+unofficial sideways RAM hack. None is a pristine original. How they
+relate is written up in `docs/history-and-provenance.md`; keep it current
+as evidence accumulates, tagging statements [confirmed], [reported] or
+[inference].
+
+The first version disassembled:
 
 `versions/cbbcga-dunjunz/Disc060-DunjunzRx2.ssd` — the BBC Micro Games
 Archive "Sideways RAM version". See `docs/disc-contents-and-loading.md` for
