@@ -854,10 +854,10 @@
     "sprite_data_ptr": 120,
     "sprite_data_ptr_hi": 121,
     "sprite_number": 122,
-    "data_007b": 123,
-    "data_007c": 124,
-    "data_007d": 125,
-    "data_007e": 126,
+    "map_ptr": 123,
+    "map_ptr_hi": 124,
+    "plot_offset_x": 125,
+    "plot_offset_y": 126,
     "ring_x": 128,
     "ring_y": 129,
     "victory_sprite": 130,
@@ -1121,6 +1121,46 @@
         "w"
       ],
       "description": "Sprite to plot: an index into the sprite tables at sprite_addr_lo, sprite_addr_hi, sprite_widths and sprite_heights."
+    },
+    {
+      "addr": 123,
+      "name": "map_ptr",
+      "group": "zero_page",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "Pointer into room_walls or object_free_map at a cell's room, low byte; set by test_wall and test_object_free."
+    },
+    {
+      "addr": 124,
+      "name": "map_ptr_hi",
+      "group": "zero_page",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "Pointer into a map, high byte."
+    },
+    {
+      "addr": 125,
+      "name": "plot_offset_x",
+      "group": "zero_page",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "Horizontal pixel offset added by plot_at_cell (in byte columns)."
+    },
+    {
+      "addr": 126,
+      "name": "plot_offset_y",
+      "group": "zero_page",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "Vertical pixel offset added by plot_at_cell (in pixel rows)."
     },
     {
       "addr": 128,
@@ -7926,30 +7966,13 @@
     {
       "addr": 2550,
       "bytes": [
-        4,
-        1,
-        1,
-        0
+        4
       ],
       "labels": [
         "exit_offsets_x"
       ],
-      "sub_labels": {
-        "2551": [
-          "data_09f7"
-        ],
-        "2552": [
-          "data_09f8"
-        ],
-        "2553": [
-          "data_09f9"
-        ]
-      },
       "xref_summaries": [
-        "&09f6 referenced 1 time by &2042; also used as index base 1 time by &1fe2",
-        "&09f7 referenced 1 time by &14be",
-        "&09f8 referenced 1 time by &14c1",
-        "&09f9 referenced 1 time by &14b0"
+        "&09f6 referenced 1 time by &2042; also used as index base 1 time by &1fe2"
       ],
       "references": [
         {
@@ -7963,44 +7986,85 @@
       ],
       "type": "byte",
       "values": [
-        4,
-        1,
-        1,
+        4
+      ]
+    },
+    {
+      "addr": 2551,
+      "bytes": [
+        1
+      ],
+      "labels": [
+        "exit_offset_x_1"
+      ],
+      "xref_summaries": [
+        "&09f7 referenced 1 time by &14be"
+      ],
+      "references": [
+        {
+          "addr": 5310,
+          "kind": "direct"
+        }
+      ],
+      "type": "byte",
+      "values": [
+        1
+      ]
+    },
+    {
+      "addr": 2552,
+      "bytes": [
+        1
+      ],
+      "labels": [
+        "exit_offset_x_2"
+      ],
+      "xref_summaries": [
+        "&09f8 referenced 1 time by &14c1"
+      ],
+      "references": [
+        {
+          "addr": 5313,
+          "kind": "direct"
+        }
+      ],
+      "type": "byte",
+      "values": [
+        1
+      ]
+    },
+    {
+      "addr": 2553,
+      "bytes": [
+        0
+      ],
+      "labels": [
+        "exit_offset_x_3"
+      ],
+      "xref_summaries": [
+        "&09f9 referenced 1 time by &14b0"
+      ],
+      "references": [
+        {
+          "addr": 5296,
+          "kind": "direct"
+        }
+      ],
+      "type": "byte",
+      "values": [
         0
       ]
     },
     {
       "addr": 2554,
       "bytes": [
-        0,
-        5,
-        3,
-        1,
         0
       ],
       "labels": [
         "exit_offsets_y"
       ],
-      "sub_labels": {
-        "2555": [
-          "data_09fb"
-        ],
-        "2556": [
-          "data_09fc"
-        ],
-        "2557": [
-          "data_09fd"
-        ],
-        "2558": [
-          "data_09fe"
-        ]
-      },
       "xref_summaries": [
-        "&09fa referenced 1 time by &14b3; also used as index base 1 time by &1fe7",
-        "&09fb referenced 1 time by &14ce",
-        "&09fc referenced 1 time by &14d3",
-        "&09fd referenced 1 time by &14c4",
-        "&09fe referenced 1 time by &14b6"
+        "&09fa referenced 1 time by &14b3; also used as index base 1 time by &1fe7"
       ],
       "references": [
         {
@@ -8014,10 +8078,94 @@
       ],
       "type": "byte",
       "values": [
-        0,
-        5,
-        3,
-        1,
+        0
+      ]
+    },
+    {
+      "addr": 2555,
+      "bytes": [
+        5
+      ],
+      "labels": [
+        "exit_offset_y_1"
+      ],
+      "xref_summaries": [
+        "&09fb referenced 1 time by &14ce"
+      ],
+      "references": [
+        {
+          "addr": 5326,
+          "kind": "direct"
+        }
+      ],
+      "type": "byte",
+      "values": [
+        5
+      ]
+    },
+    {
+      "addr": 2556,
+      "bytes": [
+        3
+      ],
+      "labels": [
+        "exit_offset_y_2"
+      ],
+      "xref_summaries": [
+        "&09fc referenced 1 time by &14d3"
+      ],
+      "references": [
+        {
+          "addr": 5331,
+          "kind": "direct"
+        }
+      ],
+      "type": "byte",
+      "values": [
+        3
+      ]
+    },
+    {
+      "addr": 2557,
+      "bytes": [
+        1
+      ],
+      "labels": [
+        "exit_offset_y_3"
+      ],
+      "xref_summaries": [
+        "&09fd referenced 1 time by &14c4"
+      ],
+      "references": [
+        {
+          "addr": 5316,
+          "kind": "direct"
+        }
+      ],
+      "type": "byte",
+      "values": [
+        1
+      ]
+    },
+    {
+      "addr": 2558,
+      "bytes": [
+        0
+      ],
+      "labels": [
+        "exit_offset_y_4"
+      ],
+      "xref_summaries": [
+        "&09fe referenced 1 time by &14b6"
+      ],
+      "references": [
+        {
+          "addr": 5302,
+          "kind": "direct"
+        }
+      ],
+      "type": "byte",
+      "values": [
         0
       ]
     },
@@ -12157,6 +12305,7 @@
         160,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -12209,6 +12358,7 @@
         160,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -12293,6 +12443,7 @@
         160,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -12377,6 +12528,7 @@
         160,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -12573,6 +12725,7 @@
         0,
         14
       ],
+      "comment_inline": "Start a new game",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_0e00",
@@ -13411,6 +13564,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "Give each hero their starting attributes",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -13424,6 +13578,7 @@
       "labels": [
         "loop_0e09"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&0e09 referenced 1 time by &0e0f"
       ],
@@ -13444,6 +13599,7 @@
       "bytes": [
         232
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inx"
     },
@@ -13453,6 +13609,7 @@
         224,
         4
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#4"
@@ -13463,6 +13620,7 @@
         208,
         248
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_0e09",
@@ -13476,6 +13634,7 @@
         0,
         5
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "hero_menu",
@@ -13675,6 +13834,7 @@
         240,
         2
       ],
+      "comment_inline": "...(always branches)",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_0e36",
@@ -13827,6 +13987,7 @@
       "bytes": [
         74
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lsr"
     },
@@ -13835,6 +13996,7 @@
       "bytes": [
         74
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lsr"
     },
@@ -13843,6 +14005,7 @@
       "bytes": [
         74
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lsr"
     },
@@ -14202,6 +14365,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -14214,6 +14378,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -14225,6 +14390,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -14237,6 +14403,7 @@
         169,
         24
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&18"
@@ -14248,6 +14415,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -14260,6 +14428,7 @@
         169,
         16
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&10"
@@ -14271,6 +14440,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -14283,6 +14453,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -14294,6 +14465,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -14318,6 +14490,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -16561,6 +16734,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -16573,6 +16747,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -16584,6 +16759,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -16596,6 +16772,7 @@
         169,
         24
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&18"
@@ -16607,6 +16784,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -16619,6 +16797,7 @@
         169,
         16
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&10"
@@ -16630,6 +16809,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -16642,6 +16822,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -16653,6 +16834,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -16677,6 +16859,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -17055,9 +17238,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007d",
+      "operand": "plot_offset_x",
       "target": 125,
-      "target_label": "data_007d"
+      "target_label": "plot_offset_x"
     },
     {
       "addr": 4340,
@@ -17068,9 +17251,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007e",
+      "operand": "plot_offset_y",
       "target": 126,
-      "target_label": "data_007e"
+      "target_label": "plot_offset_y"
     },
     {
       "addr": 4342,
@@ -20383,6 +20566,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -20407,6 +20591,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -20431,6 +20616,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -20455,6 +20641,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -20468,6 +20655,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -20481,6 +20669,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -20494,6 +20683,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -20507,6 +20697,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -20520,6 +20711,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -20543,6 +20735,7 @@
         133,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -20566,6 +20759,7 @@
         133,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -21178,6 +21372,7 @@
         242,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "exit_busy",
@@ -21191,11 +21386,12 @@
         249,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_09f9",
+      "operand": "exit_offset_x_3",
       "target": 2553,
-      "target_label": "data_09f9"
+      "target_label": "exit_offset_x_3"
     },
     {
       "addr": 5299,
@@ -21204,6 +21400,7 @@
         250,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "exit_offsets_y",
@@ -21217,11 +21414,12 @@
         254,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_09fe",
+      "operand": "exit_offset_y_4",
       "target": 2558,
-      "target_label": "data_09fe"
+      "target_label": "exit_offset_y_4"
     },
     {
       "addr": 5305,
@@ -21243,6 +21441,7 @@
         169,
         1
       ],
+      "comment_inline": "Offsets for the exit animation, and no hero shrunk",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#1"
@@ -21254,11 +21453,12 @@
         247,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_09f7",
+      "operand": "exit_offset_x_1",
       "target": 2551,
-      "target_label": "data_09f7"
+      "target_label": "exit_offset_x_1"
     },
     {
       "addr": 5313,
@@ -21267,11 +21467,12 @@
         248,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_09f8",
+      "operand": "exit_offset_x_2",
       "target": 2552,
-      "target_label": "data_09f8"
+      "target_label": "exit_offset_x_2"
     },
     {
       "addr": 5316,
@@ -21280,11 +21481,12 @@
         253,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_09fd",
+      "operand": "exit_offset_y_3",
       "target": 2557,
-      "target_label": "data_09fd"
+      "target_label": "exit_offset_y_3"
     },
     {
       "addr": 5319,
@@ -21292,6 +21494,7 @@
         169,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&ff"
@@ -21303,6 +21506,7 @@
         255,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "shrunk_hero",
@@ -21315,6 +21519,7 @@
         169,
         5
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#5"
@@ -21326,11 +21531,12 @@
         251,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_09fb",
+      "operand": "exit_offset_y_1",
       "target": 2555,
-      "target_label": "data_09fb"
+      "target_label": "exit_offset_y_1"
     },
     {
       "addr": 5329,
@@ -21338,6 +21544,7 @@
         169,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#3"
@@ -21349,11 +21556,12 @@
         252,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_09fc",
+      "operand": "exit_offset_y_2",
       "target": 2556,
-      "target_label": "data_09fc"
+      "target_label": "exit_offset_y_2"
     },
     {
       "addr": 5334,
@@ -21746,6 +21954,7 @@
       "labels": [
         "loop_1512"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&1512 referenced 1 time by &1525"
       ],
@@ -21768,6 +21977,7 @@
         32,
         127
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "object_x,x",
@@ -21781,6 +21991,7 @@
         32,
         107
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "level_object_y,x",
@@ -21794,6 +22005,7 @@
         63,
         127
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "object_y,x",
@@ -21807,6 +22019,7 @@
         64,
         107
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "level_object_type,x",
@@ -21820,6 +22033,7 @@
         94,
         127
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "object_type,x",
@@ -21869,6 +22083,7 @@
       "labels": [
         "loop_1529"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&1529 referenced 1 time by &153c"
       ],
@@ -21891,6 +22106,7 @@
         0,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "door_x,x",
@@ -21904,6 +22120,7 @@
         117,
         107
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "level_door_y,x",
@@ -21917,6 +22134,7 @@
         32,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "door_y,x",
@@ -21930,6 +22148,7 @@
         138,
         107
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "level_door_sprite,x",
@@ -21943,6 +22162,7 @@
         64,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "door_sprite,x",
@@ -21992,6 +22212,7 @@
       "labels": [
         "loop_1540"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&1540 referenced 1 time by &154d"
       ],
@@ -22014,6 +22235,7 @@
         96,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "key_x,x",
@@ -22027,6 +22249,7 @@
         181,
         107
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "level_key_y,x",
@@ -22040,6 +22263,7 @@
         128,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "key_y,x",
@@ -22089,6 +22313,7 @@
       "labels": [
         "loop_1551"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&1551 referenced 1 time by &1560"
       ],
@@ -22111,6 +22336,7 @@
         144,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "trapdoor_x,x",
@@ -22124,6 +22350,7 @@
         216,
         107
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "level_trapdoor_y,x",
@@ -22137,6 +22364,7 @@
         152,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "trapdoor_y,x",
@@ -22197,6 +22425,7 @@
       "labels": [
         "loop_1564"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&1564 referenced 1 time by &1573"
       ],
@@ -22219,6 +22448,7 @@
         0,
         12
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "room_walls,x",
@@ -22232,6 +22462,7 @@
         176,
         108
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "level_object_free_map,x",
@@ -22245,6 +22476,7 @@
         0,
         33
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "object_free_map,x",
@@ -22305,6 +22537,7 @@
       "labels": [
         "loop_1577"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&1577 referenced 1 time by &1580"
       ],
@@ -22327,6 +22560,7 @@
         0,
         45
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "wall_sprite,x",
@@ -22527,6 +22761,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -22541,6 +22776,7 @@
       "labels": [
         "loop_159c"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&159c referenced 1 time by &15ae"
       ],
@@ -22563,6 +22799,7 @@
         224,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_key,x",
@@ -22576,6 +22813,7 @@
         229,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_key_dropped,x",
@@ -22589,6 +22827,7 @@
         240,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_door_x,x",
@@ -22602,6 +22841,7 @@
         245,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_door_y,x",
@@ -22694,6 +22934,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -22718,6 +22959,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -22755,6 +22997,7 @@
         133,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -22778,6 +23021,7 @@
         133,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -22801,6 +23045,7 @@
         133,
         122
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -22839,6 +23084,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -22863,6 +23109,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -22887,6 +23134,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -22930,6 +23178,7 @@
       "bytes": [
         74
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lsr"
     },
@@ -22938,6 +23187,7 @@
       "bytes": [
         74
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lsr"
     },
@@ -22946,6 +23196,7 @@
       "bytes": [
         74
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lsr"
     },
@@ -22954,6 +23205,7 @@
       "bytes": [
         24
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -23007,6 +23259,7 @@
       "bytes": [
         24
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -23053,6 +23306,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -23065,6 +23319,7 @@
         169,
         1
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#1"
@@ -23076,6 +23331,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -23088,6 +23344,7 @@
         169,
         22
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&16"
@@ -23099,6 +23356,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -23123,6 +23381,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -23147,6 +23406,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -23159,6 +23419,7 @@
         169,
         17
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&11"
@@ -23170,6 +23431,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -23194,6 +23456,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -23218,6 +23481,7 @@
       "labels": [
         "clear_text_area"
       ],
+      "comment_inline": "VDU 28: a text window over the whole of the left of the screen...",
       "xref_summaries": [
         "&161a referenced 2 times by &140f, &15b1"
       ],
@@ -23242,6 +23506,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -23254,6 +23519,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -23265,6 +23531,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -23277,6 +23544,7 @@
         169,
         24
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&18"
@@ -23288,6 +23556,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -23300,6 +23569,7 @@
         169,
         19
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&13"
@@ -23311,6 +23581,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -23323,6 +23594,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -23334,6 +23606,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -23346,6 +23619,7 @@
         169,
         12
       ],
+      "comment_inline": "...VDU 12 to clear it",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&0c"
@@ -23357,6 +23631,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -23368,6 +23643,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -23649,6 +23925,7 @@
       "labels": [
         "queue_exit_marker"
       ],
+      "comment_inline": "Define the exit envelope...",
       "xref_summaries": [
         "&16a0 referenced 1 time by &203d"
       ],
@@ -23677,6 +23954,7 @@
         160,
         25
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(exit_envelope)",
@@ -23696,6 +23974,7 @@
         169,
         8
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osword_envelope",
@@ -23726,6 +24005,7 @@
         162,
         102
       ],
+      "comment_inline": "...and play the exit sound",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#<(exit_sound)",
@@ -23745,6 +24025,7 @@
         160,
         25
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(exit_sound)",
@@ -23764,6 +24045,7 @@
         169,
         7
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osword_sound",
@@ -23794,6 +24076,7 @@
         162,
         0
       ],
+      "comment_inline": "Find the end of returning_hero_queue...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#0"
@@ -23808,6 +24091,7 @@
       "labels": [
         "loop_16b4"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&16b4 referenced 1 time by &16c0"
       ],
@@ -23829,6 +24113,7 @@
         208,
         6
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_16bf",
@@ -23841,6 +24126,7 @@
         169,
         100
       ],
+      "comment_inline": "...and add a &64 marker there",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&64"
@@ -23852,6 +24138,7 @@
         42,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "returning_hero_queue,x",
@@ -23863,6 +24150,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -23874,6 +24162,7 @@
       "labels": [
         "code_16bf"
       ],
+      "comment_inline": "Next entry",
       "xref_summaries": [
         "&16bf referenced 1 time by &16b7"
       ],
@@ -23892,6 +24181,7 @@
         208,
         242
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_16b4",
@@ -28352,9 +28642,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007d",
+      "operand": "plot_offset_x",
       "target": 125,
-      "target_label": "data_007d"
+      "target_label": "plot_offset_x"
     },
     {
       "addr": 7476,
@@ -28365,9 +28655,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007e",
+      "operand": "plot_offset_y",
       "target": 126,
-      "target_label": "data_007e"
+      "target_label": "plot_offset_y"
     },
     {
       "addr": 7478,
@@ -28574,9 +28864,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007b",
+      "operand": "map_ptr",
       "target": 123,
-      "target_label": "data_007b"
+      "target_label": "map_ptr"
     },
     {
       "addr": 7517,
@@ -28612,9 +28902,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
-      "operand": "data_007b",
+      "operand": "map_ptr",
       "target": 123,
-      "target_label": "data_007b"
+      "target_label": "map_ptr"
     },
     {
       "addr": 7524,
@@ -28625,9 +28915,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007b",
+      "operand": "map_ptr",
       "target": 123,
-      "target_label": "data_007b"
+      "target_label": "map_ptr"
     },
     {
       "addr": 7526,
@@ -28649,9 +28939,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007c",
+      "operand": "map_ptr_hi",
       "target": 124,
-      "target_label": "data_007c"
+      "target_label": "map_ptr_hi"
     },
     {
       "addr": 7530,
@@ -28787,9 +29077,9 @@
       "comment_inline": "...clear the bit",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "(data_007b),y",
+      "operand": "(map_ptr),y",
       "target": 123,
-      "target_label": "data_007b"
+      "target_label": "map_ptr"
     },
     {
       "addr": 7554,
@@ -28814,9 +29104,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "(data_007b),y",
+      "operand": "(map_ptr),y",
       "target": 123,
-      "target_label": "data_007b"
+      "target_label": "map_ptr"
     },
     {
       "addr": 7559,
@@ -29254,9 +29544,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007d",
+      "operand": "plot_offset_x",
       "target": 125,
-      "target_label": "data_007d"
+      "target_label": "plot_offset_x"
     },
     {
       "addr": 7622,
@@ -29267,9 +29557,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007e",
+      "operand": "plot_offset_y",
       "target": 126,
-      "target_label": "data_007e"
+      "target_label": "plot_offset_y"
     },
     {
       "addr": 7624,
@@ -29699,6 +29989,7 @@
         133,
         122
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -29712,6 +30003,7 @@
         208,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_panel_y,x",
@@ -29723,6 +30015,7 @@
       "bytes": [
         56
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sec"
     },
@@ -29732,6 +30025,7 @@
         233,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "#&0d"
@@ -29742,6 +30036,7 @@
         133,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -29754,6 +30049,7 @@
         169,
         74
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&4a"
@@ -29764,6 +30060,7 @@
         133,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -29775,6 +30072,7 @@
       "bytes": [
         138
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -29783,6 +30081,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -29793,6 +30092,7 @@
         0,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_sprite",
@@ -29804,6 +30104,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -29812,6 +30113,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -30146,9 +30448,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007d",
+      "operand": "plot_offset_x",
       "target": 125,
-      "target_label": "data_007d"
+      "target_label": "plot_offset_x"
     },
     {
       "addr": 7773,
@@ -30159,9 +30461,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007e",
+      "operand": "plot_offset_y",
       "target": 126,
-      "target_label": "data_007e"
+      "target_label": "plot_offset_y"
     },
     {
       "addr": 7775,
@@ -31199,6 +31501,7 @@
       "labels": [
         "return_6"
       ],
+      "comment_inline": "Return",
       "xref_summaries": [
         "&1ef5 referenced 1 time by &1ede"
       ],
@@ -31872,9 +32175,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007d",
+      "operand": "plot_offset_x",
       "target": 125,
-      "target_label": "data_007d"
+      "target_label": "plot_offset_x"
     },
     {
       "addr": 8037,
@@ -31885,9 +32188,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007e",
+      "operand": "plot_offset_y",
       "target": 126,
-      "target_label": "data_007e"
+      "target_label": "plot_offset_y"
     },
     {
       "addr": 8039,
@@ -32259,9 +32562,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007d",
+      "operand": "plot_offset_x",
       "target": 125,
-      "target_label": "data_007d"
+      "target_label": "plot_offset_x"
     },
     {
       "addr": 8101,
@@ -32272,9 +32575,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007e",
+      "operand": "plot_offset_y",
       "target": 126,
-      "target_label": "data_007e"
+      "target_label": "plot_offset_y"
     },
     {
       "addr": 8103,
@@ -32599,9 +32902,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007d",
+      "operand": "plot_offset_x",
       "target": 125,
-      "target_label": "data_007d"
+      "target_label": "plot_offset_x"
     },
     {
       "addr": 8167,
@@ -32626,9 +32929,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007e",
+      "operand": "plot_offset_y",
       "target": 126,
-      "target_label": "data_007e"
+      "target_label": "plot_offset_y"
     },
     {
       "addr": 8172,
@@ -32738,6 +33041,7 @@
         181,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_sprites,x",
@@ -32750,6 +33054,7 @@
         105,
         1
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#1"
@@ -32759,6 +33064,7 @@
       "bytes": [
         168
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -32767,6 +33073,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -32776,6 +33083,7 @@
         105,
         7
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#7"
@@ -32787,6 +33095,7 @@
         0,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "scratch",
@@ -32803,6 +33112,7 @@
       "labels": [
         "loop_2009"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&2009 referenced 1 time by &2010"
       ],
@@ -32823,6 +33133,7 @@
       "bytes": [
         232
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inx"
     },
@@ -32833,6 +33144,7 @@
         0,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "scratch",
@@ -32845,6 +33157,7 @@
         208,
         247
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_2009",
@@ -32856,6 +33169,7 @@
       "bytes": [
         152
       ],
+      "comment_inline": "Three rows shorter...",
       "type": "code",
       "mnemonic": "tya"
     },
@@ -32864,6 +33178,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -32875,6 +33190,7 @@
       "labels": [
         "loop_2014"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&2014 referenced 1 time by &2021"
       ],
@@ -32894,6 +33210,7 @@
         72,
         28
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "sprite_heights,x",
@@ -32906,6 +33223,7 @@
         233,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "#3"
@@ -32917,6 +33235,7 @@
         72,
         28
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_heights,x",
@@ -32928,6 +33247,7 @@
       "bytes": [
         232
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inx"
     },
@@ -32938,6 +33258,7 @@
         0,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "scratch",
@@ -32950,6 +33271,7 @@
         208,
         241
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_2014",
@@ -45885,6 +46207,7 @@
         16,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_x,x",
@@ -45898,6 +46221,7 @@
         7,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "previous_y",
@@ -45911,6 +46235,7 @@
         21,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_y,x",
@@ -45923,6 +46248,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -45934,6 +46260,7 @@
         37,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_step,x",
@@ -45947,6 +46274,7 @@
         42,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_offset_x,x",
@@ -45960,6 +46288,7 @@
         48,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_offset_y,x",
@@ -46200,6 +46529,7 @@
         16,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_x,x",
@@ -46213,6 +46543,7 @@
         7,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "previous_y",
@@ -46226,6 +46557,7 @@
         21,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_y,x",
@@ -46238,6 +46570,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -46249,6 +46582,7 @@
         37,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_step,x",
@@ -46262,6 +46596,7 @@
         42,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_offset_x,x",
@@ -46275,6 +46610,7 @@
         48,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_offset_y,x",
@@ -46288,6 +46624,7 @@
         117,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "erase_hero",
@@ -46401,9 +46738,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "data_007b",
+      "operand": "map_ptr",
       "target": 123,
-      "target_label": "data_007b"
+      "target_label": "map_ptr"
     },
     {
       "addr": 28744,
@@ -46805,9 +47142,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007d",
+      "operand": "plot_offset_x",
       "target": 125,
-      "target_label": "data_007d"
+      "target_label": "plot_offset_x"
     },
     {
       "addr": 28810,
@@ -46832,9 +47169,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007e",
+      "operand": "plot_offset_y",
       "target": 126,
-      "target_label": "data_007e"
+      "target_label": "plot_offset_y"
     },
     {
       "addr": 28815,
@@ -47269,9 +47606,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007d",
+      "operand": "plot_offset_x",
       "target": 125,
-      "target_label": "data_007d"
+      "target_label": "plot_offset_x"
     },
     {
       "addr": 28878,
@@ -47282,9 +47619,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007e",
+      "operand": "plot_offset_y",
       "target": 126,
-      "target_label": "data_007e"
+      "target_label": "plot_offset_y"
     },
     {
       "addr": 28880,
@@ -50586,6 +50923,7 @@
         208,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_panel_y,x",
@@ -50598,6 +50936,7 @@
         105,
         12
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#&0c"
@@ -50608,6 +50947,7 @@
         133,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -50620,6 +50960,7 @@
         169,
         69
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&45"
@@ -50630,6 +50971,7 @@
         133,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -50643,6 +50985,7 @@
         172,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_score_thousands,x",
@@ -50655,6 +50998,7 @@
         133,
         122
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -50666,6 +51010,7 @@
       "bytes": [
         138
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -50674,6 +51019,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -50684,6 +51030,7 @@
         0,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_sprite",
@@ -50695,6 +51042,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -50703,6 +51051,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -50726,6 +51075,7 @@
         133,
         122
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -50738,6 +51088,7 @@
         169,
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&48"
@@ -50748,6 +51099,7 @@
         133,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -50759,6 +51111,7 @@
       "bytes": [
         138
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -50767,6 +51120,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -50777,6 +51131,7 @@
         0,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_sprite",
@@ -50788,6 +51143,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -50796,6 +51152,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -50819,6 +51176,7 @@
         133,
         122
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -50831,6 +51189,7 @@
         169,
         75
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&4b"
@@ -50841,6 +51200,7 @@
         133,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -50852,6 +51212,7 @@
       "bytes": [
         138
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -50860,6 +51221,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -50870,6 +51232,7 @@
         0,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_sprite",
@@ -50881,6 +51244,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -50889,6 +51253,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -50912,6 +51277,7 @@
         133,
         122
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -50924,6 +51290,7 @@
         169,
         78
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&4e"
@@ -50934,6 +51301,7 @@
         133,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -50945,6 +51313,7 @@
       "bytes": [
         138
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -50953,6 +51322,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -50963,6 +51333,7 @@
         0,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_sprite",
@@ -50974,6 +51345,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -50982,6 +51354,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -51026,9 +51399,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007d",
+      "operand": "plot_offset_x",
       "target": 125,
-      "target_label": "data_007d"
+      "target_label": "plot_offset_x"
     },
     {
       "addr": 29449,
@@ -51039,9 +51412,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007e",
+      "operand": "plot_offset_y",
       "target": 126,
-      "target_label": "data_007e"
+      "target_label": "plot_offset_y"
     },
     {
       "addr": 29451,
@@ -51596,6 +51969,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -51604,6 +51978,7 @@
       "bytes": [
         152
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tya"
     },
@@ -51612,6 +51987,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -51621,6 +51997,7 @@
         162,
         22
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#<(treasure_envelope)",
@@ -51640,6 +52017,7 @@
         160,
         25
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(treasure_envelope)",
@@ -51659,6 +52037,7 @@
         169,
         8
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osword_envelope",
@@ -51689,6 +52068,7 @@
         162,
         36
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#<(treasure_sound)",
@@ -51708,6 +52088,7 @@
         160,
         25
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(treasure_sound)",
@@ -51727,6 +52108,7 @@
         169,
         7
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osword_sound",
@@ -51756,6 +52138,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -51764,6 +52147,7 @@
       "bytes": [
         168
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -51772,6 +52156,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -51780,6 +52165,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -52141,6 +52527,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -52150,6 +52537,7 @@
         162,
         248
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#<(food_sound)",
@@ -52169,6 +52557,7 @@
         160,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(food_sound)",
@@ -52188,6 +52577,7 @@
         169,
         7
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osword_sound",
@@ -52217,6 +52607,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -52225,6 +52616,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -52233,6 +52625,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -52241,6 +52634,7 @@
       "bytes": [
         168
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -52435,6 +52829,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -52443,6 +52838,7 @@
       "bytes": [
         152
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tya"
     },
@@ -52451,6 +52847,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -52460,6 +52857,7 @@
         162,
         240
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#<(teleport_sound)",
@@ -52479,6 +52877,7 @@
         160,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(teleport_sound)",
@@ -52498,6 +52897,7 @@
         169,
         7
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osword_sound",
@@ -52527,6 +52927,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -52535,6 +52936,7 @@
       "bytes": [
         168
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -52543,6 +52945,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -52551,6 +52954,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -53987,6 +54391,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -53997,6 +54402,7 @@
         0,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "scratch",
@@ -54009,6 +54415,7 @@
         41,
         7
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "and",
       "operand": "#7"
@@ -54018,6 +54425,7 @@
       "bytes": [
         10
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -54026,6 +54434,7 @@
       "bytes": [
         10
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -54036,6 +54445,7 @@
         163,
         116
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "play_pickup_sound",
@@ -54047,6 +54457,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -54055,6 +54466,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -54633,6 +55045,7 @@
         2,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_x",
@@ -54646,6 +55059,7 @@
         21,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_y,x",
@@ -54659,6 +55073,7 @@
         3,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_y",
@@ -54670,6 +55085,7 @@
       "bytes": [
         138
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -54678,6 +55094,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -54688,6 +55105,7 @@
         252,
         120
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "test_wall",
@@ -54699,6 +55117,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -54707,6 +55126,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -54746,9 +55166,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_007b",
+      "operand": "map_ptr",
       "target": 123,
-      "target_label": "data_007b"
+      "target_label": "map_ptr"
     },
     {
       "addr": 30020,
@@ -54781,6 +55201,7 @@
         208,
         6
       ],
+      "comment_inline": "Top-left view?",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_7551",
@@ -54794,6 +55215,7 @@
         149,
         119
       ],
+      "comment_inline": "Yes: draw it",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "draw_view_0",
@@ -54805,6 +55227,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -54813,6 +55236,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -54821,6 +55245,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -54833,6 +55258,7 @@
       "labels": [
         "code_7551"
       ],
+      "comment_inline": "Top-right view?",
       "xref_summaries": [
         "&7551 referenced 1 time by &7549"
       ],
@@ -54852,6 +55278,7 @@
         208,
         6
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_755b",
@@ -54865,6 +55292,7 @@
         167,
         119
       ],
+      "comment_inline": "Yes: draw it",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "draw_view_1",
@@ -54876,6 +55304,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -54884,6 +55313,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -54892,6 +55322,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -54904,6 +55335,7 @@
       "labels": [
         "code_755b"
       ],
+      "comment_inline": "Bottom-left view?",
       "xref_summaries": [
         "&755b referenced 1 time by &7553"
       ],
@@ -54923,6 +55355,7 @@
         208,
         6
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_7565",
@@ -54936,6 +55369,7 @@
         185,
         119
       ],
+      "comment_inline": "Yes: draw it",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "draw_view_2",
@@ -54947,6 +55381,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -54955,6 +55390,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -54963,6 +55399,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -54976,6 +55413,7 @@
       "labels": [
         "code_7565"
       ],
+      "comment_inline": "Otherwise the bottom-right view",
       "xref_summaries": [
         "&7565 referenced 1 time by &755d"
       ],
@@ -54996,6 +55434,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -55004,6 +55443,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -55012,6 +55452,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -55143,6 +55584,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -55151,6 +55593,7 @@
       "bytes": [
         152
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tya"
     },
@@ -55159,6 +55602,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -55168,6 +55612,7 @@
         162,
         240
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#<(hit_sound)",
@@ -55187,6 +55632,7 @@
         160,
         12
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(hit_sound)",
@@ -55206,6 +55652,7 @@
         169,
         7
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osword_sound",
@@ -55235,6 +55682,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -55243,6 +55691,7 @@
       "bytes": [
         168
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -55251,6 +55700,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -55259,6 +55709,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -56330,6 +56781,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -56339,6 +56791,7 @@
         162,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#<(magic_envelope)",
@@ -56358,6 +56811,7 @@
         160,
         25
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(magic_envelope)",
@@ -56377,6 +56831,7 @@
         169,
         8
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osword_envelope",
@@ -56407,6 +56862,7 @@
         162,
         14
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#<(magic_sound)",
@@ -56426,6 +56882,7 @@
         160,
         25
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(magic_sound)",
@@ -56445,6 +56902,7 @@
         169,
         7
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osword_sound",
@@ -56474,6 +56932,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -56482,6 +56941,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -56552,6 +57012,7 @@
         82,
         118
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_7652",
@@ -56890,9 +57351,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "data_007b",
+      "operand": "map_ptr",
       "target": 123,
-      "target_label": "data_007b"
+      "target_label": "map_ptr"
     },
     {
       "addr": 30337,
@@ -57659,9 +58120,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007d",
+      "operand": "plot_offset_x",
       "target": 125,
-      "target_label": "data_007d"
+      "target_label": "plot_offset_x"
     },
     {
       "addr": 30444,
@@ -57672,9 +58133,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007e",
+      "operand": "plot_offset_y",
       "target": 126,
-      "target_label": "data_007e"
+      "target_label": "plot_offset_y"
     },
     {
       "addr": 30446,
@@ -58126,9 +58587,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007d",
+      "operand": "plot_offset_x",
       "target": 125,
-      "target_label": "data_007d"
+      "target_label": "plot_offset_x"
     },
     {
       "addr": 30522,
@@ -58153,9 +58614,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007e",
+      "operand": "plot_offset_y",
       "target": 126,
-      "target_label": "data_007e"
+      "target_label": "plot_offset_y"
     },
     {
       "addr": 30527,
@@ -58643,6 +59104,7 @@
       "labels": [
         "draw_all_views"
       ],
+      "comment_inline": "Top-left view",
       "xref_summaries": [
         "&7788 referenced 1 time by &1502"
       ],
@@ -58665,6 +59127,7 @@
         167,
         119
       ],
+      "comment_inline": "Top-right view",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "draw_view_1",
@@ -58678,6 +59141,7 @@
         185,
         119
       ],
+      "comment_inline": "Bottom-left view",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "draw_view_2",
@@ -58691,6 +59155,7 @@
         203,
         119
       ],
+      "comment_inline": "Bottom-right view",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "draw_view_3",
@@ -58702,6 +59167,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -58793,9 +59259,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007b",
+      "operand": "map_ptr",
       "target": 123,
-      "target_label": "data_007b"
+      "target_label": "map_ptr"
     },
     {
       "addr": 30627,
@@ -58853,6 +59319,7 @@
         133,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -58877,6 +59344,7 @@
         2,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_x",
@@ -58903,11 +59371,12 @@
         133,
         123
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007b",
+      "operand": "map_ptr",
       "target": 123,
-      "target_label": "data_007b"
+      "target_label": "map_ptr"
     },
     {
       "addr": 30645,
@@ -58965,6 +59434,7 @@
         133,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -58989,6 +59459,7 @@
         2,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_x",
@@ -59015,11 +59486,12 @@
         133,
         123
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007b",
+      "operand": "map_ptr",
       "target": 123,
-      "target_label": "data_007b"
+      "target_label": "map_ptr"
     },
     {
       "addr": 30663,
@@ -59077,6 +59549,7 @@
         133,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -59101,6 +59574,7 @@
         2,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_x",
@@ -59127,11 +59601,12 @@
         133,
         123
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007b",
+      "operand": "map_ptr",
       "target": 123,
-      "target_label": "data_007b"
+      "target_label": "map_ptr"
     },
     {
       "addr": 30681,
@@ -59210,9 +59685,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007c",
+      "operand": "map_ptr_hi",
       "target": 124,
-      "target_label": "data_007c"
+      "target_label": "map_ptr_hi"
     },
     {
       "addr": 30690,
@@ -59246,9 +59721,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "(data_007b),y",
+      "operand": "(map_ptr),y",
       "target": 123,
-      "target_label": "data_007b"
+      "target_label": "map_ptr"
     },
     {
       "addr": 30694,
@@ -59414,6 +59889,7 @@
       "labels": [
         "loop_77fe"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&77fe referenced 1 time by &781d"
       ],
@@ -59436,6 +59912,7 @@
         2,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_x",
@@ -59449,6 +59926,7 @@
         32,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "door_y,x",
@@ -59462,6 +59940,7 @@
         3,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_y",
@@ -59474,6 +59953,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -59484,11 +59964,12 @@
         133,
         125
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007d",
+      "operand": "plot_offset_x",
       "target": 125,
-      "target_label": "data_007d"
+      "target_label": "plot_offset_x"
     },
     {
       "addr": 30734,
@@ -59496,11 +59977,12 @@
         133,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007e",
+      "operand": "plot_offset_y",
       "target": 126,
-      "target_label": "data_007e"
+      "target_label": "plot_offset_y"
     },
     {
       "addr": 30736,
@@ -59509,6 +59991,7 @@
         64,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "door_sprite,x",
@@ -59521,6 +60004,7 @@
         133,
         122
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -59532,6 +60016,7 @@
       "bytes": [
         138
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -59540,6 +60025,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -59550,6 +60036,7 @@
         82,
         120
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_at_cell",
@@ -59561,6 +60048,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -59569,6 +60057,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -60249,9 +60738,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
-      "operand": "data_007d",
+      "operand": "plot_offset_x",
       "target": 125,
-      "target_label": "data_007d"
+      "target_label": "plot_offset_x"
     },
     {
       "addr": 30844,
@@ -60365,9 +60854,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
-      "operand": "data_007e",
+      "operand": "plot_offset_y",
       "target": 126,
-      "target_label": "data_007e"
+      "target_label": "plot_offset_y"
     },
     {
       "addr": 30864,
@@ -60591,6 +61080,7 @@
         169,
         35
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&23"
@@ -60602,6 +61092,7 @@
         2,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "cell_x",
@@ -60614,6 +61105,7 @@
         133,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -60626,6 +61118,7 @@
         169,
         1
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#1"
@@ -60637,6 +61130,7 @@
         3,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "cell_y",
@@ -60649,6 +61143,7 @@
         133,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -60662,6 +61157,7 @@
         0,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_sprite",
@@ -60736,6 +61232,7 @@
         169,
         1
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#1"
@@ -60747,6 +61244,7 @@
         2,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "cell_x",
@@ -60759,6 +61257,7 @@
         133,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -60771,6 +61270,7 @@
         169,
         103
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&67"
@@ -60782,6 +61282,7 @@
         3,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "cell_y",
@@ -60794,6 +61295,7 @@
         133,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -60807,6 +61309,7 @@
         0,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_sprite",
@@ -60881,6 +61384,7 @@
         169,
         35
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&23"
@@ -60892,6 +61396,7 @@
         2,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "cell_x",
@@ -60904,6 +61409,7 @@
         133,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -60916,6 +61422,7 @@
         169,
         103
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&67"
@@ -60927,6 +61434,7 @@
         3,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "cell_y",
@@ -60939,6 +61447,7 @@
         133,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -60952,6 +61461,7 @@
         0,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_sprite",
@@ -61039,6 +61549,7 @@
         41,
         248
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "and",
       "operand": "#&f8"
@@ -61050,6 +61561,7 @@
         0,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "scratch",
@@ -61061,6 +61573,7 @@
       "bytes": [
         24
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -61071,6 +61584,7 @@
         0,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "scratch",
@@ -61084,6 +61598,7 @@
         0,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "scratch",
@@ -61097,6 +61612,7 @@
         0,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "scratch",
@@ -61112,9 +61628,9 @@
       "comment_inline": "...low byte of the pointer",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007b",
+      "operand": "map_ptr",
       "target": 123,
-      "target_label": "data_007b"
+      "target_label": "map_ptr"
     },
     {
       "addr": 30992,
@@ -61123,6 +61639,7 @@
         2,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "cell_x",
@@ -61135,6 +61652,7 @@
         41,
         248
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "and",
       "operand": "#&f8"
@@ -61145,11 +61663,12 @@
         101,
         123
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
-      "operand": "data_007b",
+      "operand": "map_ptr",
       "target": 123,
-      "target_label": "data_007b"
+      "target_label": "map_ptr"
     },
     {
       "addr": 30999,
@@ -61157,11 +61676,12 @@
         133,
         123
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007b",
+      "operand": "map_ptr",
       "target": 123,
-      "target_label": "data_007b"
+      "target_label": "map_ptr"
     },
     {
       "addr": 31001,
@@ -61183,9 +61703,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007c",
+      "operand": "map_ptr_hi",
       "target": 124,
-      "target_label": "data_007c"
+      "target_label": "map_ptr_hi"
     },
     {
       "addr": 31005,
@@ -61292,9 +61812,9 @@
       "comment_inline": "Isolate the cell's bit...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "(data_007b),y",
+      "operand": "(map_ptr),y",
       "target": 123,
-      "target_label": "data_007b"
+      "target_label": "map_ptr"
     },
     {
       "addr": 31025,
@@ -61377,6 +61897,7 @@
         41,
         248
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "and",
       "operand": "#&f8"
@@ -61388,6 +61909,7 @@
         0,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "scratch",
@@ -61399,6 +61921,7 @@
       "bytes": [
         24
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -61409,6 +61932,7 @@
         0,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "scratch",
@@ -61422,6 +61946,7 @@
         0,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "scratch",
@@ -61435,6 +61960,7 @@
         0,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "scratch",
@@ -61450,9 +61976,9 @@
       "comment_inline": "...low byte of the pointer",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007b",
+      "operand": "map_ptr",
       "target": 123,
-      "target_label": "data_007b"
+      "target_label": "map_ptr"
     },
     {
       "addr": 31052,
@@ -61461,6 +61987,7 @@
         2,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "cell_x",
@@ -61473,6 +62000,7 @@
         41,
         248
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "and",
       "operand": "#&f8"
@@ -61483,11 +62011,12 @@
         101,
         123
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
-      "operand": "data_007b",
+      "operand": "map_ptr",
       "target": 123,
-      "target_label": "data_007b"
+      "target_label": "map_ptr"
     },
     {
       "addr": 31059,
@@ -61495,11 +62024,12 @@
         133,
         123
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007b",
+      "operand": "map_ptr",
       "target": 123,
-      "target_label": "data_007b"
+      "target_label": "map_ptr"
     },
     {
       "addr": 31061,
@@ -61521,9 +62051,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007c",
+      "operand": "map_ptr_hi",
       "target": 124,
-      "target_label": "data_007c"
+      "target_label": "map_ptr_hi"
     },
     {
       "addr": 31065,
@@ -61545,6 +62075,7 @@
         41,
         7
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "and",
       "operand": "#7"
@@ -61554,6 +62085,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -61564,6 +62096,7 @@
         192,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "bit_masks,x",
@@ -61577,6 +62110,7 @@
         0,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "scratch",
@@ -61603,6 +62137,7 @@
         41,
         7
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "and",
       "operand": "#7"
@@ -61612,6 +62147,7 @@
       "bytes": [
         168
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -61624,9 +62160,9 @@
       "comment_inline": "Isolate the cell's bit...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "(data_007b),y",
+      "operand": "(map_ptr),y",
       "target": 123,
-      "target_label": "data_007b"
+      "target_label": "map_ptr"
     },
     {
       "addr": 31085,
@@ -61635,6 +62171,7 @@
         0,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "and",
       "operand": "scratch",
@@ -62273,9 +62810,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007d",
+      "operand": "plot_offset_x",
       "target": 125,
-      "target_label": "data_007d"
+      "target_label": "plot_offset_x"
     },
     {
       "addr": 31175,
@@ -62286,9 +62823,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007e",
+      "operand": "plot_offset_y",
       "target": 126,
-      "target_label": "data_007e"
+      "target_label": "plot_offset_y"
     },
     {
       "addr": 31177,
@@ -62626,9 +63163,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007d",
+      "operand": "plot_offset_x",
       "target": 125,
-      "target_label": "data_007d"
+      "target_label": "plot_offset_x"
     },
     {
       "addr": 31234,
@@ -62653,9 +63190,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007e",
+      "operand": "plot_offset_y",
       "target": 126,
-      "target_label": "data_007e"
+      "target_label": "plot_offset_y"
     },
     {
       "addr": 31239,
@@ -64317,9 +64854,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007d",
+      "operand": "plot_offset_x",
       "target": 125,
-      "target_label": "data_007d"
+      "target_label": "plot_offset_x"
     },
     {
       "addr": 31518,
@@ -64344,9 +64881,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007e",
+      "operand": "plot_offset_y",
       "target": 126,
-      "target_label": "data_007e"
+      "target_label": "plot_offset_y"
     },
     {
       "addr": 31523,
@@ -64698,9 +65235,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007d",
+      "operand": "plot_offset_x",
       "target": 125,
-      "target_label": "data_007d"
+      "target_label": "plot_offset_x"
     },
     {
       "addr": 31575,
@@ -64725,9 +65262,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007e",
+      "operand": "plot_offset_y",
       "target": 126,
-      "target_label": "data_007e"
+      "target_label": "plot_offset_y"
     },
     {
       "addr": 31580,
