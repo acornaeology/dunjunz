@@ -86,6 +86,22 @@ Key *n* opens door *n*. A hero carries one key at a time (`hero_key`); in
 walking into the matching door opens it. The level's monsters emerge, in
 turn, from its eight trapdoors.
 
+## Level 25 carries the ending message
+
+When a hero reaches the Chalice on level 25, `check_for_victory` prints
+140 bytes from &0C3A (`room_walls` + &3A) and then a zero-terminated
+string from &213A (`object_free_map` + &3A). On level 25 those bytes are
+the end of the game's text, stored in the level's two maps:
+
+> THE SPELL HIDING THE CHALICE HAS  BEEN BROKEN AND  IT IS NOW BACK INTHE
+> GODS HANDS.  FOR THE TIME THE WORLD IS A SAFE  PLACE AGAIN,AND  YOU ARE
+> HAILED ASTHE WORLDS GREAT HEROES.          BUT MACKSCRANE   STILL LIVES ...
+
+That is why level 25's lower rooms (map offsets &3A onwards) show an
+irregular wall pattern and no objects, and why its object-free map has
+many clear bits that are not objects. Editing those rooms of level 25
+changes the ending text.
+
 ## Cross-check
 
 David Boddie's DunjunzMaps tools
@@ -98,7 +114,6 @@ level pass the check by adjusting the level's last byte.
 
 ## Open questions
 
-- Level 25's lower rooms have an irregular wall pattern unlike the other
-  levels' rooms, and no objects.
 - How the win check's cells (x &1A–&1B, y 4–5 on level 25) relate to the
   objects placed there.
+- Whether the map rows below the ending message on level 25 are reachable.

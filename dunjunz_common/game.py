@@ -599,8 +599,11 @@ def annotate_routines(a: Annotator) -> None:
     # Winning
     a.sub(0x1070, "check_for_victory", "Check whether the Chalice has been found",
           "On level 25, if a hero stands on the cell where the Chalice is, "
-          "play the victory sequence, print the closing message, wait for a "
-          "key and reset the machine through the RESET vector.")
+          "play the victory sequence, print the ending message, wait for a "
+          "key and reset the machine through the RESET vector. The message "
+          "is not part of the program: it is the 140 bytes at room_walls + "
+          "&3A followed by the string at object_free_map + &3A, which on "
+          "level 25 hold the ending text instead of map data.")
     a.sub(0x10E9, "victory_sequence", "Play the victory sequence",
           "Spin sprites round the Chalice with a rising tone, then dissolve "
           "it.")

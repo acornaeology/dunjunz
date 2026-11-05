@@ -1459,8 +1459,10 @@ data_0ff0 = sub_0fea+6
 ; Check whether the Chalice has been found
 ;
 ; On level 25, if a hero stands on the cell where the Chalice is, play the victory
-; sequence, print the closing message, wait for a key and reset the machine through the
-; RESET vector.
+; sequence, print the ending message, wait for a key and reset the machine through the
+; RESET vector. The message is not part of the program: it is the 140 bytes at room_walls
+; + &3A followed by the string at object_free_map + &3A, which on level 25 hold the
+; ending text instead of map data.
 ; &1070 referenced 1 time by &1f0a
 .check_for_victory
     lda level_number
