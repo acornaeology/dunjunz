@@ -4571,7 +4571,7 @@ data_213a = sub_212f+11
     txa                                 ; Yes: change this hero's view to the new room...
     lsr a                               ; ...
     tax                                 ; ...
-    jsr code_752c                       ; ...
+    jsr show_hero_room                  ; ...
     jmp code_6fc7                       ; ...and cancel the step
 ; &7053 referenced 1 time by &7048
 .code_7053
@@ -4645,220 +4645,220 @@ data_213a = sub_212f+11
 ; or hero it meets, and bounces back off an energy drainer, wearing it down.
 ; &70ca referenced 1 time by &1ed1
 .move_missiles
-    lda #0
-    sta data_007d
-    sta data_007e
-    ldx #0
+    lda #0                              ; No pixel offsets for missiles
+    sta data_007d                       ; ...
+    sta data_007e                       ; ...
+    ldx #0                              ; For each of the twelve missile slots...
 ; &70d2 referenced 1 time by &721d
 .code_70d2
-    lda missile_direction,x
-    bne code_70da
-    jmp code_7218
+    lda missile_direction,x             ; In flight?
+    bne code_70da                       ; Yes
+    jmp next_missile                    ; No: next slot
 ; &70da referenced 1 time by &70d5
 .code_70da
-    bpl code_70e7
-    and #&7f
-    sta missile_direction,x
-    jsr flip_firer_frame
-    jmp code_70fe
+    bpl code_70e7                       ; Just fired (bit 7 set)?
+    and #&7f                            ; Yes: clear the flag...
+    sta missile_direction,x             ; ...
+    jsr flip_firer_frame                ; ...animate the hero who fired it...
+    jmp code_70fe                       ; ...and move it without erasing (it is on the hero)
 ; &70e7 referenced 1 time by &70da
 .code_70e7
-    lda #&15
-    sta sprite_number
-    lda missile_x,x
-    sta cell_x
-    lda missile_y,x
-    sta cell_y
-    txa
-    pha
-    jsr plot_at_cell
-    pla
-    tax
+    lda #&15                            ; Erase the missile at its old cell
+    sta sprite_number                   ; ...
+    lda missile_x,x                     ; ...
+    sta cell_x                          ; ...
+    lda missile_y,x                     ; ...
+    sta cell_y                          ; ...
+    txa                                 ; ...
+    pha                                 ; ...
+    jsr plot_at_cell                    ; ...
+    pla                                 ; ...
+    tax                                 ; ...
 ; &70fe referenced 1 time by &70e4
 .code_70fe
-    lda missile_direction,x
-    cmp #1
-    bne code_7108
-    dec missile_y,x
+    lda missile_direction,x             ; Move it one cell: up...
+    cmp #1                              ; ...
+    bne code_7108                       ; ...
+    dec missile_y,x                     ; ...
 ; &7108 referenced 1 time by &7103
 .code_7108
-    cmp #2
-    bne code_710f
-    inc missile_x,x
+    cmp #2                              ; ...right...
+    bne code_710f                       ; ...
+    inc missile_x,x                     ; ...
 ; &710f referenced 1 time by &710a
 .code_710f
-    cmp #3
-    bne code_7116
-    inc missile_y,x
+    cmp #3                              ; ...down...
+    bne code_7116                       ; ...
+    inc missile_y,x                     ; ...
 ; &7116 referenced 1 time by &7111
 .code_7116
-    cmp #4
-    bne code_711d
-    dec missile_x,x
+    cmp #4                              ; ...left
+    bne code_711d                       ; ...
+    dec missile_x,x                     ; ...
 ; &711d referenced 1 time by &7118
 .code_711d
-    lda missile_x,x
-    sta cell_x
-    lda missile_y,x
-    sta cell_y
-    txa
-    pha
-    jsr test_wall
-    beq code_713a
+    lda missile_x,x                     ; Wall in the new cell?
+    sta cell_x                          ; ...
+    lda missile_y,x                     ; ...
+    sta cell_y                          ; ...
+    txa                                 ; ...
+    pha                                 ; ...
+    jsr test_wall                       ; ...
+    beq code_713a                       ; No
 ; &7130 referenced 2 times by &71fe, &75ab
-.code_7130
-    pla
-    tax
+.missile_spent_pop
+    pla                                 ; Yes: the missile is spent
+    tax                                 ; ...
 ; &7132 referenced 1 time by &7153
-.code_7132
-    lda #0
-    sta missile_direction,x
-    jmp code_7218
+.missile_spent
+    lda #0                              ; Free the slot
+    sta missile_direction,x             ; ...
+    jmp next_missile                    ; Next slot
 ; &713a referenced 1 time by &712e
 .code_713a
-    lda #0
-    sta scratch
-    jsr find_creature
-    beq code_7156
-    lda monster_sprite,x
-    cmp #&16
-    bcs code_7156
-    pla
-    tay
-    jmp code_757c
+    lda #0                              ; Monster in the new cell (not checking heroes)?
+    sta scratch                         ; ...
+    jsr find_creature                   ; ...
+    beq code_7156                       ; No
+    lda monster_sprite,x                ; Yes, but is it alive?
+    cmp #&16                            ; ...
+    bcs code_7156                       ; No: fly on
+    pla                                 ; Alive: hit it
+    tay                                 ; ...
+    jmp code_757c                       ; ...
 ; &7150 referenced 1 time by &75a3
 .code_7150
-    jsr credit_missile_owner
-    jmp code_7132
+    jsr credit_missile_owner            ; Monster killed: a point to the hero who fired...
+    jmp missile_spent                   ; ...and the missile is spent
 ; &7156 referenced 2 times by &7142, &7149
 .code_7156
-    pla
-    tax
-    lda missile_x,x
-    sta cell_x
-    lda missile_y,x
-    sta cell_y
-    txa
-    pha
-    jsr test_object_free
-    pla
-    tax
-    cpy #0
-    bne code_71d9
-    txa
-    pha
-    ldx #&1e
+    pla                                 ; Can the new cell hold an object?
+    tax                                 ; ...
+    lda missile_x,x                     ; ...
+    sta cell_x                          ; ...
+    lda missile_y,x                     ; ...
+    sta cell_y                          ; ...
+    txa                                 ; ...
+    pha                                 ; ...
+    jsr test_object_free                ; ...
+    pla                                 ; ...
+    tax                                 ; ...
+    cpy #0                              ; ...
+    bne code_71d9                       ; No: check for heroes
+    txa                                 ; Look for an energy drainer at the cell...
+    pha                                 ; ...
+    ldx #&1e                            ; ...objects 30 to 1
 ; &7173 referenced 1 time by &71d5
 .loop_7173
-    lda object_x,x
-    cmp cell_x
-    bne code_71d4
-    lda object_y,x
-    cmp cell_y
-    bne code_71d4
-    lda object_type,x
-    cmp #&53 ; 'S'
-    bcc code_71d7
-    cmp #&5f ; '_'
-    bcs code_71d7
-    inc object_type,x
-    lda object_type,x
-    cmp #&5f ; '_'
-    bne code_71a0
-    lda #&ff
-    sta object_x,x
-    sta object_y,x
+    lda object_x,x                      ; ...
+    cmp cell_x                          ; ...
+    bne code_71d4                       ; ...
+    lda object_y,x                      ; ...
+    cmp cell_y                          ; ...
+    bne code_71d4                       ; ...
+    lda object_type,x                   ; Is it a drainer (&53-&5E)?
+    cmp #&53 ; 'S'                      ; ...
+    bcc code_71d7                       ; No
+    cmp #&5f ; '_'                      ; ...
+    bcs code_71d7                       ; No
+    inc object_type,x                   ; Yes: wear it down a stage
+    lda object_type,x                   ; ...
+    cmp #&5f ; '_'                      ; Worn away?
+    bne code_71a0                       ; No
+    lda #&ff                            ; Yes: remove it from the level
+    sta object_x,x                      ; ...
+    sta object_y,x                      ; ...
 ; &71a0 referenced 1 time by &7196
 .code_71a0
-    pla
-    tax
-    jsr credit_missile_owner
-    lda missile_direction,x
-    cmp #1
-    bne code_71b4
-    lda #3
-    sta missile_direction,x
-    jmp code_71d9
+    pla                                 ; A point to the hero who fired
+    tax                                 ; ...
+    jsr credit_missile_owner            ; ...
+    lda missile_direction,x             ; Bounce the missile back: up becomes down...
+    cmp #1                              ; ...
+    bne code_71b4                       ; ...
+    lda #3                              ; ...
+    sta missile_direction,x             ; ...
+    jmp code_71d9                       ; ...
 ; &71b4 referenced 1 time by &71aa
 .code_71b4
-    cmp #2
-    bne code_71c0
-    lda #4
-    sta missile_direction,x
-    jmp code_71d9
+    cmp #2                              ; ...right becomes left...
+    bne code_71c0                       ; ...
+    lda #4                              ; ...
+    sta missile_direction,x             ; ...
+    jmp code_71d9                       ; ...
 ; &71c0 referenced 1 time by &71b6
 .code_71c0
-    cmp #3
-    bne code_71cc
-    lda #1
-    sta missile_direction,x
-    jmp code_71d9
+    cmp #3                              ; ...down becomes up...
+    bne code_71cc                       ; ...
+    lda #1                              ; ...
+    sta missile_direction,x             ; ...
+    jmp code_71d9                       ; ...
 ; &71cc referenced 1 time by &71c2
 .code_71cc
-    lda #2
-    sta missile_direction,x
-    jmp code_71d9
+    lda #2                              ; ...and left becomes right
+    sta missile_direction,x             ; ...
+    jmp code_71d9                       ; ...
 ; &71d4 referenced 2 times by &7179, &7181
 .code_71d4
-    dex
-    bne loop_7173
+    dex                                 ; Next object
+    bne loop_7173                       ; ...
 ; &71d7 referenced 2 times by &7188, &718c
 .code_71d7
-    pla
-    tax
+    pla                                 ; No drainer here
+    tax                                 ; ...
 ; &71d9 referenced 5 times by &716d, &71b1, &71bd, &71c9, &71d1
 .code_71d9
-    txa
-    pha
-    ldx #0
+    txa                                 ; Is a hero in the new cell?
+    pha                                 ; ...
+    ldx #0                              ; ...
 ; &71dd referenced 1 time by &7204
 .loop_71dd
-    pla
-    tay
-    pha
-    lda hero_x,x
-    cmp cell_x
-    bne code_7201
-    lda hero_y,x
-    cmp cell_y
-    bne code_7201
-    lda missile_damage,y
-    tay
+    pla                                 ; ...
+    tay                                 ; ...
+    pha                                 ; ...
+    lda hero_x,x                        ; ...
+    cmp cell_x                          ; ...
+    bne code_7201                       ; ...
+    lda hero_y,x                        ; ...
+    cmp cell_y                          ; ...
+    bne code_7201                       ; ...
+    lda missile_damage,y                ; Yes: they lose the missile's damage in health...
+    tay                                 ; ...
 ; &71f4 referenced 1 time by &71fc
 .loop_71f4
-    tya
-    pha
-    jsr lose_health_point
-    pla
-    tay
-    dey
-    bne loop_71f4
-    jmp code_7130
+    tya                                 ; ...
+    pha                                 ; ...
+    jsr lose_health_point               ; ...
+    pla                                 ; ...
+    tay                                 ; ...
+    dey                                 ; ...
+    bne loop_71f4                       ; ...
+    jmp missile_spent_pop               ; ...and the missile is spent
 ; &7201 referenced 2 times by &71e6, &71ee
 .code_7201
-    inx
-    cpx #4
-    bne loop_71dd
-    pla
-    tax
-    clc
-    lda missile_sprite_base,x
-    adc missile_direction,x
-    sta sprite_number
-    txa
-    pha
-    jsr plot_at_cell
-    pla
-    tax
+    inx                                 ; Next hero
+    cpx #4                              ; ...
+    bne loop_71dd                       ; ...
+    pla                                 ; Nothing hit: draw the missile in its new cell
+    tax                                 ; ...
+    clc                                 ; ...
+    lda missile_sprite_base,x           ; ...
+    adc missile_direction,x             ; ...
+    sta sprite_number                   ; ...
+    txa                                 ; ...
+    pha                                 ; ...
+    jsr plot_at_cell                    ; ...
+    pla                                 ; ...
+    tax                                 ; ...
 ; &7218 referenced 2 times by &70d7, &7137
-.code_7218
-    inx
-    cpx #&0c
-    beq return_10
-    jmp code_70d2
+.next_missile
+    inx                                 ; Next slot
+    cpx #&0c                            ; ...
+    beq return_10                       ; ...
+    jmp code_70d2                       ; ...
 ; &7220 referenced 1 time by &721b
 .return_10
-    rts
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Take one health point from a hero
 ;
@@ -5051,37 +5051,37 @@ data_213a = sub_212f+11
 ;     X: hero number (0-3)
 ; &7329 referenced 1 time by &70be
 .collect_objects
-    lda hero_x,x
-    sta cell_x
-    lda hero_y,x
-    sta cell_y
-    ldy #&1e
+    lda hero_x,x                        ; Look for an object at the hero's cell
+    sta cell_x                          ; ...
+    lda hero_y,x                        ; ...
+    sta cell_y                          ; ...
+    ldy #&1e                            ; ...objects 30 to 1
 ; &7337 referenced 1 time by &7473
 .code_7337
-    lda object_x,y
-    cmp cell_x
-    beq code_7342
-    jmp code_7470
+    lda object_x,y                      ; ...
+    cmp cell_x                          ; ...
+    beq code_7342                       ; ...
+    jmp code_7470                       ; ...
 ; &7342 referenced 1 time by &733d
 .code_7342
-    lda object_y,y
-    cmp cell_y
-    beq code_734d
-    jmp code_7470
+    lda object_y,y                      ; ...
+    cmp cell_y                          ; ...
+    beq code_734d                       ; ...
+    jmp code_7470                       ; ...
 ; &734d referenced 1 time by &7348
 .code_734d
-    tya
-    pha
-    lda #0
-    sta hero_has_boots,x
-    jsr point_at_boots_icon
-    jsr erase_boots_icon
-    pla
-    tay
-    lda object_type,y
-    cmp #&28 ; '('
-    bne code_738a
-    txa
+    tya                                 ; Found: picking up anything loses Boots of Speed
+    pha                                 ; ...
+    lda #0                              ; ...
+    sta hero_has_boots,x                ; ...
+    jsr point_at_boots_icon             ; ...remove the bolt from the panel
+    jsr erase_boots_icon                ; ...
+    pla                                 ; ...
+    tay                                 ; ...
+    lda object_type,y                   ; Treasure?
+    cmp #&28 ; '('                      ; ...
+    bne code_738a                       ; No
+    txa                                 ; Yes: play the treasure sound
     pha
     tya
     pha
@@ -5097,40 +5097,40 @@ data_213a = sub_212f+11
     tay
     pla
     tax
-    tya
-    pha
-    jsr add_ten_points
-    jsr add_ten_points
-    pla
-    tay
-    jmp code_7467
+    tya                                 ; 20 points
+    pha                                 ; ...
+    jsr add_ten_points                  ; ...
+    jsr add_ten_points                  ; ...
+    pla                                 ; ...
+    tay                                 ; ...
+    jmp code_7467                       ; Remove it
 ; &738a referenced 1 time by &7361
 .code_738a
-    cmp #&29 ; ')'
-    bne code_73c3
-    inc hero_health_tens,x
-    lda hero_health_tens,x
-    cmp #&28 ; '('
-    bne code_73a0
-    lda #&27
-    sta hero_health_tens,x
-    sta hero_health_units,x
+    cmp #&29 ; ')'                      ; Food?
+    bne code_73c3                       ; No
+    inc hero_health_tens,x              ; Yes: 10 health...
+    lda hero_health_tens,x              ; ...
+    cmp #&28 ; '('                      ; ...to at most 99
+    bne code_73a0                       ; ...
+    lda #&27                            ; ...
+    sta hero_health_tens,x              ; ...
+    sta hero_health_units,x             ; ...
 ; &73a0 referenced 1 time by &7396
 .code_73a0
-    tya
-    pha
-    jsr code_7266
-    ldy #5
+    tya                                 ; Redraw the health
+    pha                                 ; ...
+    jsr code_7266                       ; ...
+    ldy #5                              ; 5 points
 ; &73a7 referenced 1 time by &73af
 .loop_73a7
-    tya
-    pha
-    jsr add_point
-    pla
-    tay
-    dey
-    bne loop_73a7
-    txa
+    tya                                 ; ...
+    pha                                 ; ...
+    jsr add_point                       ; ...
+    pla                                 ; ...
+    tay                                 ; ...
+    dey                                 ; ...
+    bne loop_73a7                       ; ...
+    txa                                 ; Play the food sound
     pha
     ldx #<(food_sound)
     ldy #>(food_sound)
@@ -5140,24 +5140,24 @@ data_213a = sub_212f+11
     tax
     pla
     tay
-    jmp code_7467
+    jmp code_7467                       ; Remove it
 ; &73c3 referenced 1 time by &738c
 .code_73c3
-    cmp #&2b ; '+'
-    bne code_740d
+    cmp #&2b ; '+'                      ; Teleporter?
+    bne code_740d                       ; No
 ; &73c7 referenced 2 times by &73d1, &73d6
 .code_73c7
-    dey
-    lda object_type,y
-    cmp #&2b ; '+'
-    beq code_73d9
-    cpy #0
-    bne code_73c7
-    ldy data_0dfd
-    jmp code_73c7
+    dey                                 ; Yes: find the previous teleporter in the list...
+    lda object_type,y                   ; ...
+    cmp #&2b ; '+'                      ; ...
+    beq code_73d9                       ; ...
+    cpy #0                              ; ...
+    bne code_73c7                       ; ...
+    ldy data_0dfd                       ; ...wrapping round to the end
+    jmp code_73c7                       ; ...
 ; &73d9 referenced 1 time by &73cd
 .code_73d9
-    txa
+    txa                                 ; Play the teleport sound
     pha
     tya
     pha
@@ -5169,113 +5169,113 @@ data_213a = sub_212f+11
     tay
     pla
     tax
-    lda object_x,y
-    sta hero_x,x
-    sta cell_x
-    lda object_y,y
-    sec
-    sbc #1
-    sta hero_y,x
-    sta cell_y
-    lda #0
-    sta hero_step,x
-    sta hero_offset_x,x
-    sta hero_offset_y,x
-    jmp code_752c
+    lda object_x,y                      ; Move the hero to the cell above it
+    sta hero_x,x                        ; ...
+    sta cell_x                          ; ...
+    lda object_y,y                      ; ...
+    sec                                 ; ...
+    sbc #1                              ; ...
+    sta hero_y,x                        ; ...
+    sta cell_y                          ; ...
+    lda #0                              ; ...with no step in progress
+    sta hero_step,x                     ; ...
+    sta hero_offset_x,x                 ; ...
+    sta hero_offset_y,x                 ; ...
+    jmp show_hero_room                  ; Show the room they arrive in
 ; &740d referenced 1 time by &73c5
 .code_740d
-    cmp #&2a ; '*'
-    bne code_7477
-    lda #&ff
-    sta object_x,y
-    sta object_y,y
-    jsr add_ten_points
-    txa
-    pha
-    jsr play_pickup_sound
-    lda returning_hero_queue
-    bne code_7429
-    pla
-    tax
-    rts
+    cmp #&2a ; '*'                      ; Cross of Resurrection?
+    bne code_7477                       ; No
+    lda #&ff                            ; Yes: remove it
+    sta object_x,y                      ; ...
+    sta object_y,y                      ; ...
+    jsr add_ten_points                  ; 10 points
+    txa                                 ; ...
+    pha                                 ; ...
+    jsr play_pickup_sound               ; Play the pickup sound
+    lda returning_hero_queue            ; Anyone waiting to return?
+    bne code_7429                       ; Yes
+    pla                                 ; No: return
+    tax                                 ; ...
+    rts                                 ; ...
 ; &7429 referenced 1 time by &7424
 .code_7429
-    ldy #0
+    ldy #0                              ; Take the first entry off the queue, appending 0...
 ; &742b referenced 1 time by &744a
 .loop_742b
-    ldx returning_hero_queue
-    dex
-    lda data_0b2b
-    sta returning_hero_queue
-    lda data_0b2c
-    sta data_0b2b
-    lda data_0b2d
-    sta data_0b2c
-    sty data_0b2d
-    cpx #&63 ; 'c'
-    bne code_744c
-    ldy #&64 ; 'd'
-    bne loop_742b
+    ldx returning_hero_queue            ; ...
+    dex                                 ; ...
+    lda data_0b2b                       ; ...
+    sta returning_hero_queue            ; ...
+    lda data_0b2c                       ; ...
+    sta data_0b2b                       ; ...
+    lda data_0b2d                       ; ...
+    sta data_0b2c                       ; ...
+    sty data_0b2d                       ; ...
+    cpx #&63 ; 'c'                      ; A &64 marker?
+    bne code_744c                       ; No
+    ldy #&64 ; 'd'                      ; Yes: move it to the back and take the next entry
+    bne loop_742b                       ; ...
 ; &744c referenced 1 time by &7446
 .code_744c
-    cpx #&ff
-    beq code_7464
-    lda #0
-    sta hero_direction,x
-    lda #8
-    sta hero_frame,x
-    lda #&ff
-    sta hero_offset_x,x
-    lda #1
-    sta hero_offset_y,x
+    cpx #&ff                            ; Queue empty?
+    beq code_7464                       ; Yes: nobody returns
+    lda #0                              ; Start hero X returning: out of play...
+    sta hero_direction,x                ; ...
+    lda #8                              ; ...from the last appearance sprite...
+    sta hero_frame,x                    ; ...
+    lda #&ff                            ; ...stepping backwards...
+    sta hero_offset_x,x                 ; ...
+    lda #1                              ; ...every other frame
+    sta hero_offset_y,x                 ; ...
 ; &7464 referenced 1 time by &744e
 .code_7464
-    pla
-    tax
-    rts
+    pla                                 ; Return
+    tax                                 ; ...
+    rts                                 ; ...
 ; &7467 referenced 2 times by &7387, &73c0
 .code_7467
-    lda #&ff
-    sta object_x,y
-    sta object_y,y
-    rts
+    lda #&ff                            ; Remove object Y from the level
+    sta object_x,y                      ; ...
+    sta object_y,y                      ; ...
+    rts                                 ; Return
 ; &7470 referenced 3 times by &733f, &734a, &747d
 .code_7470
-    dey
-    beq return_11
-    jmp code_7337
+    dey                                 ; Next object
+    beq return_11                       ; ...
+    jmp code_7337                       ; ...
 ; &7476 referenced 1 time by &7471
 .return_11
-    rts
+    rts                                 ; Return
 ; &7477 referenced 1 time by &740f
 .code_7477
-    cmp #&5f ; '_'
-    bcs code_74b6
-    cmp #&51 ; 'Q'
-    beq code_7470
-    lda #&32 ; '2'
-    sta data_0cf4
-    txa
-    pha
-    ldx #<(hit_sound)
-    ldy #>(hit_sound)
-    lda #osword_sound
-    jsr osword                          ; SOUND command
-    lda #6
-    sta data_0cf4
-    pla
-    tax
-    ldy #&0a
+    cmp #&5f ; '_'                      ; One of the magic items (&5F and up)?
+    bcs code_74b6                       ; Yes
+    cmp #&51 ; 'Q'                      ; The exit? Nothing to do here
+    beq code_7470                       ; ...
+    lda #&32 ; '2'                      ; An energy drainer: play the hit sound louder...
+    sta data_0cf4                       ; ...
+    txa                                 ; ...
+    pha                                 ; ...
+    ldx #<(hit_sound)                   ; ...
+    ldy #>(hit_sound)                   ; ...
+    lda #osword_sound                   ; ...
+    jsr osword                          ; ...  SOUND command
+    lda #6                              ; ...then put the volume back
+    sta data_0cf4                       ; ...
+    pla                                 ; ...
+    tax                                 ; ...
+    ldy #&0a                            ; ...and take 10 health
 ; &7498 referenced 1 time by &74a0
 .loop_7498
-    tya
-    pha
-    jsr lose_health_point
-    pla
-    tay
-    dey
-    bne loop_7498
-    rts
+    tya                                 ; ...
+    pha                                 ; ...
+    jsr lose_health_point               ; ...
+    pla                                 ; ...
+    tay                                 ; ...
+    dey                                 ; ...
+    bne loop_7498                       ; ...
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Play the pickup sound
 ;
@@ -5283,22 +5283,22 @@ data_213a = sub_212f+11
 ; at &192C and &193A.
 ; &74a3 referenced 2 times by &741e, &74ca
 .play_pickup_sound
-    ldx #<(pickup_envelope)
-    ldy #>(pickup_envelope)
-    lda #osword_envelope
-    jsr osword                          ; ENVELOPE command
-    ldx #<(pickup_sound)
-    ldy #>(pickup_sound)
-    lda #osword_sound
-    jsr osword                          ; SOUND command
-    rts
+    ldx #<(pickup_envelope)             ; Define the envelope...
+    ldy #>(pickup_envelope)             ; ...
+    lda #osword_envelope                ; ...
+    jsr osword                          ; ...  ENVELOPE command
+    ldx #<(pickup_sound)                ; ...and play the sound
+    ldy #>(pickup_sound)                ; ...
+    lda #osword_sound                   ; ...
+    jsr osword                          ; ...  SOUND command
+    rts                                 ; Return
 ; &74b6 referenced 1 time by &7479
 .code_74b6
-    sta scratch
-    lda #&ff
-    sta object_x,y
-    sta object_y,y
-    txa
+    sta scratch                         ; A magic item: keep its type
+    lda #&ff                            ; Remove it from the level
+    sta object_x,y                      ; ...
+    sta object_y,y                      ; ...
+    txa                                 ; Play the pickup sound
     pha
     lda scratch
     and #7
@@ -5307,56 +5307,66 @@ data_213a = sub_212f+11
     jsr play_pickup_sound
     pla
     tax
-    lda hero_score_units,x
-    sta scratch2
-    jsr add_ten_points
-    lda scratch
-    cmp #&5f ; '_'
-    bne code_74eb
-    jsr point_at_boots_icon
-    jsr plot_boots_icon
-    lda #1
-    sta hero_has_boots,x
-    rts
+    lda hero_score_units,x              ; Keep the score's units digit, for a potion
+    sta scratch2                        ; ...
+    jsr add_ten_points                  ; 10 points
+    lda scratch                         ; Boots of Speed?
+    cmp #&5f ; '_'                      ; ...
+    bne code_74eb                       ; No
+    jsr point_at_boots_icon             ; Yes: show the bolt in the panel...
+    jsr plot_boots_icon                 ; ...
+    lda #1                              ; ...and wear them
+    sta hero_has_boots,x                ; ...
+    rts                                 ; Return
 ; &74eb referenced 1 time by &74dd
 .code_74eb
-    cmp #&60 ; '`'
-    bne code_74ff
-    dec hero_damage_taken,x
-    lda hero_damage_taken,x
-    cmp #3
-    bcs code_74fc
-    inc hero_damage_taken,x
+    cmp #&60 ; '`'                      ; Magic helmet?
+    bne code_74ff                       ; No
+    dec hero_damage_taken,x             ; Yes: lose one less health per hit...
+    lda hero_damage_taken,x             ; ...
+    cmp #3                              ; ...but never fewer than 3
+    bcs code_74fc                       ; ...
+    inc hero_damage_taken,x             ; ...
 ; &74fc referenced 1 time by &74f7
 .code_74fc
-    jmp code_75ae
+    jmp code_75ae                       ; Redraw the armour rating
 ; &74ff referenced 1 time by &74ed
 .code_74ff
-    cmp #&61 ; 'a'
-    bne code_7516
-    lda scratch2
-    sta hero_health_tens,x
-    inc scratch2
-    lda scratch2
-    sta hero_health_units,x
-    jsr lose_health_point
-    rts
+    cmp #&61 ; 'a'                      ; Potion of healing?
+    bne code_7516                       ; No
+    lda scratch2                        ; Yes: health tens = the score's units digit...
+    sta hero_health_tens,x              ; ...
+    inc scratch2                        ; ...units one more, then take a point to draw it
+    lda scratch2                        ; ...
+    sta hero_health_units,x             ; ...
+    jsr lose_health_point               ; ...
+    rts                                 ; Return
 ; &7516 referenced 1 time by &7501
 .code_7516
-    cmp #&62 ; 'b'
-    bne code_756b
-    inc hero_max_missiles,x
-    lda hero_max_missiles,x
-    cmp #4
-    bne code_7529
-    lda #3
-    sta hero_max_missiles,x
+    cmp #&62 ; 'b'                      ; Pile of weapons?
+    bne code_756b                       ; No: a magic sword
+    inc hero_max_missiles,x             ; Yes: one more missile in flight...
+    lda hero_max_missiles,x             ; ...
+    cmp #4                              ; ...to at most 3
+    bne code_7529                       ; ...
+    lda #3                              ; ...
+    sta hero_max_missiles,x             ; ...
 ; &7529 referenced 1 time by &7522
 .code_7529
-    jmp code_75c5
+    jmp code_75c5                       ; Draw the new missile icon
+; ***************************************************************************************
+; Show the room a hero has moved into
+;
+; Set hero X's view to the room containing their cell and redraw that view.
+;
+; On Entry:
+;     X: hero number (0-3)
+;
+; On Exit:
+;     X: preserved
 ; &752c referenced 2 times by &704d, &740a
-.code_752c
-    lda hero_x,x
+.show_hero_room
+    lda hero_x,x                        ; Find the room of the hero's cell (test_wall leaves it in &7B)
     sta cell_x
     lda hero_y,x
     sta cell_y
@@ -5365,12 +5375,12 @@ data_213a = sub_212f+11
     jsr test_wall
     pla
     tax
-    pha
-    asl a
-    tay
-    lda data_007b
-    sta view_room,y
-    cpx #0
+    pha                                 ; Keep X
+    asl a                               ; view_room entry for this hero...
+    tay                                 ; ...
+    lda data_007b                       ; ...
+    sta view_room,y                     ; ...now this room
+    cpx #0                              ; Redraw this hero's view
     bne code_7551
     jsr draw_view_0
     pla
@@ -5400,16 +5410,16 @@ data_213a = sub_212f+11
     rts
 ; &756b referenced 1 time by &7518
 .code_756b
-    inc hero_missile_damage,x
-    lda hero_missile_damage,x
-    cmp #&0a
-    bne code_75e2
-    lda #9
-    sta hero_missile_damage,x
-    bne code_75e2
+    inc hero_missile_damage,x           ; A magic sword: more missile damage...
+    lda hero_missile_damage,x           ; ...
+    cmp #&0a                            ; ...to at most 9
+    bne code_75e2                       ; ...
+    lda #9                              ; ...
+    sta hero_missile_damage,x           ; ...
+    bne code_75e2                       ; ...
 ; &757c referenced 1 time by &714d
 .code_757c
-    txa
+    txa                                 ; Play the hit sound
     pha
     tya
     pha
@@ -5421,23 +5431,23 @@ data_213a = sub_212f+11
     tay
     pla
     tax
-    lda monster_hit_points,x
-    sec
-    sbc missile_damage,y
-    bpl code_75a6
-    lda #&15
-    sta monster_sprite,x
-    lda monster_start_hit_points
-    sta monster_hit_points,x
-    tya
-    tax
-    jmp code_7150
+    lda monster_hit_points,x            ; Take the missile's damage from the monster's hit points
+    sec                                 ; ...
+    sbc missile_damage,y                ; ...
+    bpl code_75a6                       ; Still alive?
+    lda #&15                            ; No: start it dying...
+    sta monster_sprite,x                ; ...
+    lda monster_start_hit_points        ; ...and give the slot fresh hit points for its next appearance
+    sta monster_hit_points,x            ; ...
+    tya                                 ; Missile slot back in X...
+    tax                                 ; ...
+    jmp code_7150                       ; ...a point to its hero, and the missile is spent
 ; &75a6 referenced 1 time by &7594
 .code_75a6
-    sta monster_hit_points,x
-    tya
-    pha
-    jmp code_7130
+    sta monster_hit_points,x            ; Alive: store the hit points left
+    tya                                 ; ...
+    pha                                 ; ...
+    jmp missile_spent_pop               ; The missile is spent
 ; &75ae referenced 1 time by &74fc
 .code_75ae
     sec
@@ -5632,35 +5642,35 @@ data_213a = sub_212f+11
 ;     X: preserved
 ; &76b1 referenced 2 times by &7150, &71a2
 .credit_missile_owner
-    ldy missile_sprite_base,x
-    txa
-    pha
-    tya
-    cmp #&10
-    bne code_76c0
-    ldx #0
-    jmp code_76d4
+    ldy missile_sprite_base,x           ; Which hero fired it? Its sprite base says
+    txa                                 ; ...
+    pha                                 ; ...
+    tya                                 ; ...
+    cmp #&10                            ; Arrows: the Ranger
+    bne code_76c0                       ; ...
+    ldx #0                              ; ...
+    jmp code_76d4                       ; ...
 ; &76c0 referenced 1 time by &76b9
 .code_76c0
-    cmp #&44 ; 'D'
-    bne code_76c9
-    ldx #1
-    jmp code_76d4
+    cmp #&44 ; 'D'                      ; Fireballs: the Magic-User
+    bne code_76c9                       ; ...
+    ldx #1                              ; ...
+    jmp code_76d4                       ; ...
 ; &76c9 referenced 1 time by &76c2
 .code_76c9
-    cmp #&4c ; 'L'
-    bne code_76d2
-    ldx #2
-    jmp code_76d4
+    cmp #&4c ; 'L'                      ; Axes: the Barbarian
+    bne code_76d2                       ; ...
+    ldx #2                              ; ...
+    jmp code_76d4                       ; ...
 ; &76d2 referenced 1 time by &76cb
 .code_76d2
-    ldx #3
+    ldx #3                              ; Otherwise swords: the Fighter
 ; &76d4 referenced 3 times by &76bd, &76c6, &76cf
 .code_76d4
-    jsr add_point
-    pla
-    tax
-    rts
+    jsr add_point                       ; One point to that hero
+    pla                                 ; ...
+    tax                                 ; ...
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Animate a hero who is out of play
 ;
@@ -5752,35 +5762,35 @@ data_213a = sub_212f+11
 ;     X: missile slot
 ; &7747 referenced 1 time by &70e1
 .flip_firer_frame
-    lda missile_sprite_base,x
-    cmp #&10
-    bne code_7757
-    lda hero_frame
-    eor #1
-    sta hero_frame
-    rts
+    lda missile_sprite_base,x           ; Which hero fired it? Arrows: toggle the Ranger's frame
+    cmp #&10                            ; ...
+    bne code_7757                       ; ...
+    lda hero_frame                      ; ...
+    eor #1                              ; ...
+    sta hero_frame                      ; ...
+    rts                                 ; Return
 ; &7757 referenced 1 time by &774c
 .code_7757
-    cmp #&44 ; 'D'
-    bne code_7764
-    lda data_0d21
-    eor #1
-    sta data_0d21
-    rts
+    cmp #&44 ; 'D'                      ; Fireballs: the Magic-User's
+    bne code_7764                       ; ...
+    lda data_0d21                       ; ...
+    eor #1                              ; ...
+    sta data_0d21                       ; ...
+    rts                                 ; Return
 ; &7764 referenced 1 time by &7759
 .code_7764
-    cmp #&4c ; 'L'
-    bne code_7771
-    lda data_0d22
-    eor #1
-    sta data_0d22
-    rts
+    cmp #&4c ; 'L'                      ; Axes: the Barbarian's
+    bne code_7771                       ; ...
+    lda data_0d22                       ; ...
+    eor #1                              ; ...
+    sta data_0d22                       ; ...
+    rts                                 ; Return
 ; &7771 referenced 1 time by &7766
 .code_7771
-    lda data_0d23
-    eor #1
-    sta data_0d23
-    rts
+    lda data_0d23                       ; Otherwise swords: the Fighter's
+    eor #1                              ; ...
+    sta data_0d23                       ; ...
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Copy a hero's position to cell_x, cell_y
 ;
@@ -7101,15 +7111,12 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     code_1ebe:                   2
 ;     code_1f91:                   2
 ;     code_2076:                   2
-;     code_7130:                   2
 ;     code_7156:                   2
 ;     code_71d4:                   2
 ;     code_71d7:                   2
 ;     code_7201:                   2
-;     code_7218:                   2
 ;     code_73c7:                   2
 ;     code_7467:                   2
-;     code_752c:                   2
 ;     code_75e2:                   2
 ;     code_7652:                   2
 ;     code_7692:                   2
@@ -7147,7 +7154,9 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     exit_offsets_y:              2
 ;     get_hero_cell:               2
 ;     level_filename_digits:       2
+;     missile_spent_pop:           2
 ;     mos_oswrch_default:          2
+;     next_missile:                2
 ;     osrdch:                      2
 ;     play_pickup_sound:           2
 ;     plot_chalice:                2
@@ -7161,6 +7170,7 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     row_start_ptr:               2
 ;     row_start_ptr_hi:            2
 ;     saved_wrchv:                 2
+;     show_hero_room:              2
 ;     sprite_data_ptr_hi:          2
 ;     sprite_height:               2
 ;     test_object_free:            2
@@ -7239,7 +7249,6 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     code_710f:                   1
 ;     code_7116:                   1
 ;     code_711d:                   1
-;     code_7132:                   1
 ;     code_713a:                   1
 ;     code_7150:                   1
 ;     code_71a0:                   1
@@ -7482,6 +7491,7 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     loop_7fc5:                   1
 ;     loop_7fd1:                   1
 ;     loop_7fe8:                   1
+;     missile_spent:               1
 ;     mos_reset_entry:             1
 ;     mos_row_offsets:             1
 ;     mos_row_offsets_lo:          1
@@ -7612,8 +7622,6 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     code_710f
 ;     code_7116
 ;     code_711d
-;     code_7130
-;     code_7132
 ;     code_713a
 ;     code_7150
 ;     code_7156
@@ -7625,7 +7633,6 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     code_71d7
 ;     code_71d9
 ;     code_7201
-;     code_7218
 ;     code_7227
 ;     code_7263
 ;     code_7266
@@ -7651,7 +7658,6 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     code_74ff
 ;     code_7516
 ;     code_7529
-;     code_752c
 ;     code_7551
 ;     code_755b
 ;     code_7565
