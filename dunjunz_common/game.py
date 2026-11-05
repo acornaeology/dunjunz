@@ -16,6 +16,7 @@ def annotate(a: Annotator) -> None:
     _text_output(a)
     annotate_state(a)
     annotate_routines(a)
+    annotate_level_file(a)
 
 
 # ---------------------------------------------------------------------------
@@ -59,11 +60,6 @@ def _os_workspace(a: Annotator) -> None:
                 "MOS 1.20 counter decremented on every vertical sync "
                 "interrupt. The game sets it and waits for it to run out to "
                 "pace itself."))
-    a.label(0x0C00, "user_char_128", group="os_workspace", access="w",
-            length=8, description=(
-                "MOS 1.20 storage for the definition of character 128 (eight "
-                "bytes, one per pixel row). The WRCHV handler copies each "
-                "letter or digit glyph here and prints character 128."))
     a.label(0xC375, "mos_row_offsets", group="mos_internals", access="r",
             description=(
                 "MOS 1.20 table of screen row offsets for 640-byte rows "
@@ -374,8 +370,8 @@ def annotate_state(a: Annotator) -> None:
         "one per row of cells, one bit per cell (bit 7 at the left). Rooms "
         "are 8x8 cells and run four to a row of the map. The first eight "
         "bytes are also the MOS 1.20 definition of character 128, which the "
-        "WRCHV handler overwrites; the level is unpacked after the level "
-        "number has been printed."))
+        "WRCHV handler overwrites with each glyph it prints; the level is "
+        "unpacked only after the level number has been printed."))
 
     # Page &0D: refreshed from workspace_template at the start of each level
     a.label(0x0D00, "scratch", description="General-purpose scratch byte.")
@@ -996,3 +992,128 @@ def annotate_menu_tables(a: Annotator, base: int) -> None:
         "(&69 for none, &6A-&72 for 1-9)."))
     a.label(base + 4, "hero_absent", length=4, group="game_state", description=(
         "Non-zero for each hero switched off on the menu."))
+
+
+def annotate_level_file(a: Annotator) -> None:
+    """The level file as loaded at &6B00, and the routines that use it."""
+    g = dict(group="level_file")
+    for addr, name, length, what in [
+        (0x6B00, "level_object_x", 0x20, "Objects' map x (entries 1-30, entry 30 the exit)"),
+        (0x6B20, "level_object_y", 0x20, "Objects' map y"),
+        (0x6B40, "level_object_type", 0x20, "Objects' types"),
+        (0x6B60, "level_door_x", 0x15, "Doors' map x (entries 1-20)"),
+        (0x6B75, "level_door_y", 0x15, "Doors' map y"),
+        (0x6B8A, "level_door_sprite", 0x16, "Doors' sprites"),
+        (0x6BA0, "level_key_x", 0x15, "Keys' map x (entries 1-20)"),
+        (0x6BB5, "level_key_y", 0x1B, "Keys' map y"),
+        (0x6BD0, "level_trapdoor_x", 8, "Trapdoors' map x (entries 0-7)"),
+        (0x6BD8, "level_trapdoor_y", 8, "Trapdoors' map y"),
+        (0x6BE0, "level_walls", 0xD0, "Wall map (&C9 bytes used)"),
+        (0x6CB0, "level_object_map", 0xD0, "Object map (&C9 bytes used)"),
+        (0x6D80, "level_tail_data", 0x30, "Last &30 bytes, copied to level_tail"),
+    ]:
+        a.label(addr, name, length=length, description=f"Level file: {what}.", **g)
+
+    a.label(0x0F80, "hero_start_max_missiles", length=4, description=(
+        "Starting hero_max_missiles for each hero: 3, 2, 1, 2."))
+    a.label(0x0F84, "hero_start_missile_damage", length=4, description=(
+        "Starting hero_missile_damage for each hero: 2, 3, 9, 5."))
+    a.label(0x0F88, "hero_start_damage_taken", length=4, description=(
+        "Starting hero_damage_taken for each hero: 7, 9, 6, 4 (armour "
+        "ratings 3, 1, 4, 6)."))
+    a.label(0x0F8C, "hero_faces", length=4, description=(
+        "Sprite shown for each hero in the status panel."))
+    for base in (0x0F80, 0x0F84, 0x0F88, 0x0F8C):
+        a.byte(base, 4)
+    a.banner(0x0F80, "Heroes' starting attributes",
+             "Four tables of one byte per hero (Ranger, Magic-User, "
+             "Barbarian, Fighter): missiles in flight, missile damage, "
+             "health lost per hit, and the face sprite for the panel.")
+
+    for addr, text in [
+        (0x0ECF, "Starting missile limit..."), (0x0ED2, "..."),
+        (0x0ED5, "...missile damage..."), (0x0ED8, "..."),
+        (0x0EDB, "...and health lost per hit"), (0x0EDE, "..."),
+        (0x0EE1, "Score 000..."), (0x0EE3, "..."), (0x0EE6, "..."), (0x0EE9, "..."),
+        (0x0EEC, "...with the units one below 0, for draw_status_panel to "
+                 "add a point"),
+        (0x0EEE, "..."),
+        (0x0EF1, "No ten-thousands digit"), (0x0EF3, "..."), (0x0EF6, "Return"),
+
+        (0x0EF7, "For each hero..."), (0x0EF9, "..."),
+        (0x0EFC, "..."),
+        (0x0EFF, "Draw the health (from the template's 99+1)"),
+        (0x0F02, "Draw the score (from its starting 000 and one below 0)"),
+        (0x0F05, "Face, at column &45, row 0 of the section"),
+        (0x0F08, "..."), (0x0F0A, "..."), (0x0F0C, "..."),
+        (0x0F0F, "Shield, at column &4D, row 0"),
+        (0x0F11, "..."), (0x0F13, "..."), (0x0F15, "..."),
+        (0x0F18, "Armour rating 10 - health lost per hit, as a small "
+                 "digit on the shield"),
+        (0x0F1B, "..."), (0x0F1C, "..."), (0x0F1E, "..."),
+        (0x0F21, "..."), (0x0F23, "..."), (0x0F25, "..."),
+        (0x0F28, "One missile icon every three rows from row &10, for each "
+                 "missile allowed..."),
+        (0x0F2B, "..."), (0x0F2E, "..."), (0x0F2F, "..."), (0x0F30, "..."),
+        (0x0F33, "..."), (0x0F35, "...(end row in count)"),
+        (0x0F38, "..."), (0x0F3A, "..."), (0x0F3B, "..."),
+        (0x0F3C, "...at column &4B"), (0x0F3E, "..."), (0x0F40, "..."),
+        (0x0F43, "..."), (0x0F44, "..."), (0x0F45, "..."), (0x0F47, "..."),
+        (0x0F48, "..."), (0x0F4B, "..."),
+        (0x0F4D, "Missile damage, as a small digit at column &4C, row &0A"),
+        (0x0F50, "..."), (0x0F53, "..."), (0x0F54, "..."),
+        (0x0F56, "..."), (0x0F58, "..."), (0x0F5A, "..."),
+        (0x0F5D, "Next hero"), (0x0F60, "..."), (0x0F63, "..."),
+        (0x0F65, "..."), (0x0F67, "Return"),
+
+        (0x0F68, "Column"), (0x0F6A, "Sprite"),
+        (0x0F6C, "Row = Y + this hero's panel row - 14..."),
+        (0x0F6D, "..."), (0x0F70, "..."),
+        (0x0F71, "...(read from workspace_template, which page &0D copies)"),
+        (0x0F74, "..."), (0x0F75, "..."), (0x0F77, "..."),
+        (0x0F79, "Plot it"), (0x0F7C, "Return"),
+
+        (0x14A0, "Copy workspace_template to page &0D"),
+        (0x14A2, "..."), (0x14A5, "..."), (0x14A8, "..."), (0x14A9, "..."),
+        (0x14AB, "Reset the exit and other per-level state"),
+        (0x14B9, "First monster emerges from trapdoor 0"),
+        (0x14D6, "Return"),
+
+        (0x14D7, "Restore the MOS's own WRCHV for the PLOT commands..."),
+        (0x14DA, "..."), (0x14DD, "..."), (0x14E0, "..."),
+        (0x14E3, "Twenty PLOT commands"),
+        (0x14E5, "VDU 25..."), (0x14E7, "..."),
+        (0x14EA, "...then the five bytes of the command"),
+        (0x14EC, "..."), (0x14EE, "..."), (0x14F1, "..."), (0x14F2, "..."),
+        (0x14F4, "..."),
+        (0x14F6, "Next command"), (0x14F7, "..."), (0x14F9, "..."),
+        (0x14FB, "..."), (0x14FD, "..."),
+        (0x14FF, "..."), (0x1500, "..."),
+        (0x1502, "Draw the four views"),
+        (0x1505, "Point WRCHV back at wrch_handler..."),
+        (0x1507, "..."), (0x150A, "..."), (0x150C, "..."), (0x150F, "Return"),
+
+        (0x1510, "Objects 30 to 1: position and type"),
+        (0x1524, "..."), (0x1525, "..."),
+        (0x1527, "Doors 20 to 1: position and sprite"),
+        (0x153B, "..."), (0x153C, "..."),
+        (0x153E, "Keys 20 to 1: position"),
+        (0x154C, "..."), (0x154D, "..."),
+        (0x154F, "Trapdoors 0 to 7: position"),
+        (0x155D, "..."), (0x155E, "..."), (0x1560, "..."),
+        (0x1562, "Wall map and object map, &C9 bytes each"),
+        (0x1570, "..."), (0x1571, "..."), (0x1573, "..."),
+        (0x1575, "The last &30 bytes"),
+        (0x157D, "..."), (0x157E, "..."), (0x1580, "..."), (0x1582, "Return"),
+
+        (0x1583, "Monsters 30 to 1..."),
+        (0x1585, "...dying, so that they emerge from the trapdoors..."),
+        (0x1587, "..."),
+        (0x158A, "...off the map..."), (0x158C, "..."),
+        (0x158F, "...with this level's hit points"), (0x1592, "..."),
+        (0x1595, "..."), (0x1596, "..."),
+        (0x1598, "For each hero: clear the returning queue, the key carried "
+                 "and the door-check position"),
+        (0x15AB, "..."), (0x15AC, "..."), (0x15AE, "..."), (0x15B0, "Return"),
+    ]:
+        a.c(addr, text)

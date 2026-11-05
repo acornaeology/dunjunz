@@ -767,6 +767,13 @@
   ],
   "banners": [
     {
+      "addr": 3968,
+      "name": "hero_start_max_missiles",
+      "title": "Heroes' starting attributes",
+      "description": "Four tables of one byte per hero (Ranger, Magic-User, Barbarian, Fighter): missiles in flight, missile damage, health lost per hit, and the face sprite for the panel.",
+      "align": "before_label"
+    },
+    {
       "addr": 4823,
       "name": "font_letters",
       "title": "Font: letters A-Z",
@@ -853,19 +860,19 @@
     "data_5478": 21624,
     "data_549a": 21658,
     "data_549b": 21659,
-    "data_6b00": 27392,
-    "data_6b20": 27424,
-    "data_6b40": 27456,
-    "data_6b60": 27488,
-    "data_6b75": 27509,
-    "data_6b8a": 27530,
-    "data_6ba0": 27552,
-    "data_6bb5": 27573,
-    "data_6bd0": 27600,
-    "data_6bd8": 27608,
-    "data_6be0": 27616,
-    "data_6cb0": 27824,
-    "data_6d80": 28032,
+    "level_object_x": 27392,
+    "level_object_y": 27424,
+    "level_object_type": 27456,
+    "level_door_x": 27488,
+    "level_door_y": 27509,
+    "level_door_sprite": 27530,
+    "level_key_x": 27552,
+    "level_key_y": 27573,
+    "level_trapdoor_x": 27600,
+    "level_trapdoor_y": 27608,
+    "level_walls": 27616,
+    "level_object_map": 27824,
+    "level_tail_data": 28032,
     "mos_row_offsets": 50037,
     "mos_row_offsets_lo": 50038,
     "mos_reset_entry": 55757,
@@ -1078,6 +1085,136 @@
         "w"
       ],
       "description": "MOS 1.20 counter decremented on every vertical sync interrupt. The game sets it and waits for it to run out to pace itself."
+    },
+    {
+      "addr": 27392,
+      "name": "level_object_x",
+      "length": 32,
+      "group": "level_file",
+      "access": [
+        "b"
+      ],
+      "description": "Level file: Objects' map x (entries 1-30, entry 30 the exit)."
+    },
+    {
+      "addr": 27424,
+      "name": "level_object_y",
+      "length": 32,
+      "group": "level_file",
+      "access": [
+        "b"
+      ],
+      "description": "Level file: Objects' map y."
+    },
+    {
+      "addr": 27456,
+      "name": "level_object_type",
+      "length": 32,
+      "group": "level_file",
+      "access": [
+        "b"
+      ],
+      "description": "Level file: Objects' types."
+    },
+    {
+      "addr": 27488,
+      "name": "level_door_x",
+      "length": 21,
+      "group": "level_file",
+      "access": [
+        "b"
+      ],
+      "description": "Level file: Doors' map x (entries 1-20)."
+    },
+    {
+      "addr": 27509,
+      "name": "level_door_y",
+      "length": 21,
+      "group": "level_file",
+      "access": [
+        "b"
+      ],
+      "description": "Level file: Doors' map y."
+    },
+    {
+      "addr": 27530,
+      "name": "level_door_sprite",
+      "length": 22,
+      "group": "level_file",
+      "access": [
+        "b"
+      ],
+      "description": "Level file: Doors' sprites."
+    },
+    {
+      "addr": 27552,
+      "name": "level_key_x",
+      "length": 21,
+      "group": "level_file",
+      "access": [
+        "b"
+      ],
+      "description": "Level file: Keys' map x (entries 1-20)."
+    },
+    {
+      "addr": 27573,
+      "name": "level_key_y",
+      "length": 27,
+      "group": "level_file",
+      "access": [
+        "b"
+      ],
+      "description": "Level file: Keys' map y."
+    },
+    {
+      "addr": 27600,
+      "name": "level_trapdoor_x",
+      "length": 8,
+      "group": "level_file",
+      "access": [
+        "b"
+      ],
+      "description": "Level file: Trapdoors' map x (entries 0-7)."
+    },
+    {
+      "addr": 27608,
+      "name": "level_trapdoor_y",
+      "length": 8,
+      "group": "level_file",
+      "access": [
+        "b"
+      ],
+      "description": "Level file: Trapdoors' map y."
+    },
+    {
+      "addr": 27616,
+      "name": "level_walls",
+      "length": 208,
+      "group": "level_file",
+      "access": [
+        "b"
+      ],
+      "description": "Level file: Wall map (&C9 bytes used)."
+    },
+    {
+      "addr": 27824,
+      "name": "level_object_map",
+      "length": 208,
+      "group": "level_file",
+      "access": [
+        "b"
+      ],
+      "description": "Level file: Object map (&C9 bytes used)."
+    },
+    {
+      "addr": 28032,
+      "name": "level_tail_data",
+      "length": 48,
+      "group": "level_file",
+      "access": [
+        "b"
+      ],
+      "description": "Level file: Last &30 bytes, copied to level_tail."
     },
     {
       "addr": 50037,
@@ -8883,7 +9020,6 @@
         111
       ],
       "labels": [
-        "user_char_128",
         "room_walls"
       ],
       "xref_summaries": [
@@ -13684,6 +13820,7 @@
       "labels": [
         "reset_hero"
       ],
+      "comment_inline": "Starting missile limit...",
       "xref_summaries": [
         "&0ecf referenced 2 times by &0e09, &0e74"
       ],
@@ -13699,9 +13836,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0f80,x",
+      "operand": "hero_start_max_missiles,x",
       "target": 3968,
-      "target_label": "data_0f80"
+      "target_label": "hero_start_max_missiles"
     },
     {
       "addr": 3794,
@@ -13710,6 +13847,7 @@
         32,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_max_missiles,x",
@@ -13723,11 +13861,12 @@
         132,
         15
       ],
+      "comment_inline": "...missile damage...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0f84,x",
+      "operand": "hero_start_missile_damage,x",
       "target": 3972,
-      "target_label": "data_0f84"
+      "target_label": "hero_start_missile_damage"
     },
     {
       "addr": 3800,
@@ -13736,6 +13875,7 @@
         112,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_missile_damage,x",
@@ -13749,11 +13889,12 @@
         136,
         15
       ],
+      "comment_inline": "...and health lost per hit",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0f88,x",
+      "operand": "hero_start_damage_taken,x",
       "target": 3976,
-      "target_label": "data_0f88"
+      "target_label": "hero_start_damage_taken"
     },
     {
       "addr": 3806,
@@ -13762,6 +13903,7 @@
         208,
         12
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_damage_taken,x",
@@ -13774,6 +13916,7 @@
         169,
         30
       ],
+      "comment_inline": "Score 000...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&1e"
@@ -13785,6 +13928,7 @@
         172,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_score_thousands,x",
@@ -13798,6 +13942,7 @@
         160,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_score_hundreds,x",
@@ -13811,6 +13956,7 @@
         164,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_score_tens,x",
@@ -13823,6 +13969,7 @@
         169,
         29
       ],
+      "comment_inline": "...with the units one below 0, for draw_status_panel to add a point",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&1d"
@@ -13834,6 +13981,7 @@
         168,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_score_units,x",
@@ -13846,6 +13994,7 @@
         169,
         105
       ],
+      "comment_inline": "No ten-thousands digit",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&69"
@@ -13857,6 +14006,7 @@
         248,
         6
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_score_ten_thousands,x",
@@ -13868,6 +14018,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -13880,6 +14031,7 @@
       "labels": [
         "draw_status_panel"
       ],
+      "comment_inline": "For each hero...",
       "xref_summaries": [
         "&0ef7 referenced 1 time by &0e5a"
       ],
@@ -13900,6 +14052,7 @@
         241,
         15
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "panel_hero",
@@ -13916,6 +14069,7 @@
       "labels": [
         "loop_0efc"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&0efc referenced 1 time by &0f65"
       ],
@@ -13938,6 +14092,7 @@
         33,
         114
       ],
+      "comment_inline": "Draw the health (from the template's 99+1)",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "lose_health_point",
@@ -13951,6 +14106,7 @@
         140,
         114
       ],
+      "comment_inline": "Draw the score (from its starting 000 and one below 0)",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "add_point",
@@ -13964,11 +14120,12 @@
         140,
         15
       ],
+      "comment_inline": "Face, at column &45, row 0 of the section",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0f8c,x",
+      "operand": "hero_faces,x",
       "target": 3980,
-      "target_label": "data_0f8c"
+      "target_label": "hero_faces"
     },
     {
       "addr": 3848,
@@ -13976,6 +14133,7 @@
         162,
         69
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&45"
@@ -13986,6 +14144,7 @@
         160,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -13997,6 +14156,7 @@
         104,
         15
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_panel_sprite",
@@ -14009,6 +14169,7 @@
         162,
         77
       ],
+      "comment_inline": "Shield, at column &4D, row 0",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&4d"
@@ -14019,6 +14180,7 @@
         160,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -14029,6 +14191,7 @@
         169,
         105
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&69"
@@ -14040,6 +14203,7 @@
         104,
         15
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_panel_sprite",
@@ -14053,6 +14217,7 @@
         241,
         15
       ],
+      "comment_inline": "Armour rating 10 - health lost per hit, as a small digit on the shield",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "panel_hero",
@@ -14064,6 +14229,7 @@
       "bytes": [
         56
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sec"
     },
@@ -14073,6 +14239,7 @@
         169,
         115
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&73"
@@ -14084,6 +14251,7 @@
         208,
         12
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "hero_damage_taken,x",
@@ -14096,6 +14264,7 @@
         162,
         78
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&4e"
@@ -14106,6 +14275,7 @@
         160,
         2
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#2"
@@ -14117,6 +14287,7 @@
         104,
         15
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_panel_sprite",
@@ -14130,6 +14301,7 @@
         241,
         15
       ],
+      "comment_inline": "One missile icon every three rows from row &10, for each missile allowed...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "panel_hero",
@@ -14143,6 +14315,7 @@
         32,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_max_missiles,x",
@@ -14154,6 +14327,7 @@
       "bytes": [
         10
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -14162,6 +14336,7 @@
       "bytes": [
         24
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -14172,6 +14347,7 @@
         32,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "hero_max_missiles,x",
@@ -14184,6 +14360,7 @@
         105,
         16
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#&10"
@@ -14195,6 +14372,7 @@
         242,
         15
       ],
+      "comment_inline": "...(end row in count)",
       "type": "code",
       "mnemonic": "sta",
       "operand": "count",
@@ -14207,6 +14385,7 @@
         160,
         16
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#&10"
@@ -14219,6 +14398,7 @@
       "labels": [
         "loop_0f3a"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&0f3a referenced 1 time by &0f4b"
       ],
@@ -14236,6 +14416,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -14245,6 +14426,7 @@
         162,
         75
       ],
+      "comment_inline": "...at column &4B",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&4b"
@@ -14255,6 +14437,7 @@
         169,
         116
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&74"
@@ -14266,6 +14449,7 @@
         104,
         15
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_panel_sprite",
@@ -14277,6 +14461,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -14285,6 +14470,7 @@
       "bytes": [
         24
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -14294,6 +14480,7 @@
         105,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#3"
@@ -14303,6 +14490,7 @@
       "bytes": [
         168
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -14313,6 +14501,7 @@
         242,
         15
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpy",
       "operand": "count",
@@ -14325,6 +14514,7 @@
         144,
         237
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcc",
       "operand": "loop_0f3a",
@@ -14338,6 +14528,7 @@
         241,
         15
       ],
+      "comment_inline": "Missile damage, as a small digit at column &4C, row &0A",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "panel_hero",
@@ -14351,6 +14542,7 @@
         112,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_missile_damage,x",
@@ -14362,6 +14554,7 @@
       "bytes": [
         24
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -14371,6 +14564,7 @@
         105,
         105
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#&69"
@@ -14381,6 +14575,7 @@
         162,
         76
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&4c"
@@ -14391,6 +14586,7 @@
         160,
         10
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#&0a"
@@ -14402,6 +14598,7 @@
         104,
         15
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_panel_sprite",
@@ -14415,6 +14612,7 @@
         241,
         15
       ],
+      "comment_inline": "Next hero",
       "type": "code",
       "mnemonic": "inc",
       "operand": "panel_hero",
@@ -14428,6 +14626,7 @@
         241,
         15
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "panel_hero",
@@ -14440,6 +14639,7 @@
         201,
         4
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#4"
@@ -14450,6 +14650,7 @@
         208,
         149
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_0efc",
@@ -14461,6 +14662,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -14473,6 +14675,7 @@
       "labels": [
         "plot_panel_sprite"
       ],
+      "comment_inline": "Column",
       "xref_summaries": [
         "&0f68 referenced 5 times by &0f0c, &0f15, &0f25, &0f40, &0f5a"
       ],
@@ -14510,6 +14713,7 @@
         133,
         122
       ],
+      "comment_inline": "Sprite",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -14521,6 +14725,7 @@
       "bytes": [
         152
       ],
+      "comment_inline": "Row = Y + this hero's panel row - 14...",
       "type": "code",
       "mnemonic": "tya"
     },
@@ -14531,6 +14736,7 @@
         241,
         15
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "panel_hero",
@@ -14542,6 +14748,7 @@
       "bytes": [
         24
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -14552,6 +14759,7 @@
         208,
         125
       ],
+      "comment_inline": "...(read from workspace_template, which page &0D copies)",
       "type": "code",
       "mnemonic": "adc",
       "operand": "data_7dd0,x",
@@ -14563,6 +14771,7 @@
       "bytes": [
         56
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sec"
     },
@@ -14572,6 +14781,7 @@
         233,
         14
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "#&0e"
@@ -14582,6 +14792,7 @@
         133,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -14595,6 +14806,7 @@
         0,
         9
       ],
+      "comment_inline": "Plot it",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_sprite",
@@ -14606,6 +14818,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -14614,73 +14827,126 @@
       "bytes": [
         0,
         9,
-        96,
-        3,
-        2,
-        1,
-        2,
-        2,
-        3,
-        9,
-        5,
-        7,
-        9,
-        6,
-        4,
-        5
-      ],
-      "labels": [
-        "sub_0f7d"
-      ],
-      "sub_labels": {
-        "3968": [
-          "data_0f80"
-        ],
-        "3972": [
-          "data_0f84"
-        ],
-        "3976": [
-          "data_0f88"
-        ],
-        "3980": [
-          "data_0f8c"
-        ]
-      },
-      "xref_summaries": [
-        "&0f80 used as index base 1 time by &0ecf",
-        "&0f84 used as index base 1 time by &0ed5",
-        "&0f88 used as index base 1 time by &0edb",
-        "&0f8c used as index base 1 time by &0f05"
+        96
       ],
       "type": "byte",
       "values": [
         0,
         9,
-        96,
+        96
+      ]
+    },
+    {
+      "addr": 3968,
+      "bytes": [
         3,
         2,
         1,
+        2
+      ],
+      "labels": [
+        "hero_start_max_missiles"
+      ],
+      "xref_summaries": [
+        "&0f80 used as index base 1 time by &0ecf"
+      ],
+      "references": [
+        {
+          "addr": 3791,
+          "kind": "indexed"
+        }
+      ],
+      "type": "byte",
+      "values": [
+        3,
         2,
+        1,
+        2
+      ]
+    },
+    {
+      "addr": 3972,
+      "bytes": [
         2,
         3,
         9,
-        5,
-        7,
+        5
+      ],
+      "labels": [
+        "hero_start_missile_damage"
+      ],
+      "xref_summaries": [
+        "&0f84 used as index base 1 time by &0ed5"
+      ],
+      "references": [
+        {
+          "addr": 3797,
+          "kind": "indexed"
+        }
+      ],
+      "type": "byte",
+      "values": [
+        2,
+        3,
         9,
-        6,
-        4,
         5
       ]
     },
     {
-      "addr": 3981,
+      "addr": 3976,
       "bytes": [
+        7,
+        9,
+        6,
+        4
+      ],
+      "labels": [
+        "hero_start_damage_taken"
+      ],
+      "xref_summaries": [
+        "&0f88 used as index base 1 time by &0edb"
+      ],
+      "references": [
+        {
+          "addr": 3803,
+          "kind": "indexed"
+        }
+      ],
+      "type": "byte",
+      "values": [
+        7,
+        9,
+        6,
+        4
+      ]
+    },
+    {
+      "addr": 3980,
+      "bytes": [
+        5,
         49,
         57,
         65
       ],
-      "type": "string",
-      "string": "19A"
+      "labels": [
+        "hero_faces"
+      ],
+      "xref_summaries": [
+        "&0f8c used as index base 1 time by &0f05"
+      ],
+      "references": [
+        {
+          "addr": 3845,
+          "kind": "indexed"
+        }
+      ],
+      "type": "byte",
+      "values": [
+        5,
+        49,
+        57,
+        65
+      ]
     },
     {
       "addr": 3984,
@@ -19916,6 +20182,7 @@
       "labels": [
         "reset_workspace"
       ],
+      "comment_inline": "Copy workspace_template to page &0D",
       "xref_summaries": [
         "&14a0 referenced 1 time by &1409"
       ],
@@ -19939,6 +20206,7 @@
       "labels": [
         "loop_14a2"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&14a2 referenced 1 time by &14a9"
       ],
@@ -19961,6 +20229,7 @@
         0,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "scratch,x",
@@ -19972,6 +20241,7 @@
       "bytes": [
         232
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inx"
     },
@@ -19981,6 +20251,7 @@
         208,
         247
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_14a2",
@@ -19993,6 +20264,7 @@
         169,
         0
       ],
+      "comment_inline": "Reset the exit and other per-level state",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -20056,6 +20328,7 @@
         47,
         11
       ],
+      "comment_inline": "First monster emerges from trapdoor 0",
       "type": "code",
       "mnemonic": "sta",
       "operand": "next_trapdoor",
@@ -20185,6 +20458,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -20198,6 +20472,7 @@
       "labels": [
         "draw_view_frames"
       ],
+      "comment_inline": "Restore the MOS's own WRCHV for the PLOT commands...",
       "xref_summaries": [
         "&14d7 referenced 1 time by &1442"
       ],
@@ -20220,6 +20495,7 @@
         14,
         2
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "wrchv",
@@ -20233,6 +20509,7 @@
         212,
         18
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "data_12d4",
@@ -20246,6 +20523,7 @@
         15,
         2
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "wrchv + 1",
@@ -20257,6 +20535,7 @@
         162,
         20
       ],
+      "comment_inline": "Twenty PLOT commands",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&14"
@@ -20270,6 +20549,7 @@
       "labels": [
         "loop_14e5"
       ],
+      "comment_inline": "VDU 25...",
       "xref_summaries": [
         "&14e5 referenced 1 time by &1500"
       ],
@@ -20290,6 +20570,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -20302,6 +20583,7 @@
         160,
         0
       ],
+      "comment_inline": "...then the five bytes of the command",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -20315,6 +20597,7 @@
       "labels": [
         "loop_14ec"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&14ec referenced 1 time by &14f4"
       ],
@@ -20337,6 +20620,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -20348,6 +20632,7 @@
       "bytes": [
         200
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "iny"
     },
@@ -20357,6 +20642,7 @@
         192,
         5
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpy",
       "operand": "#5"
@@ -20367,6 +20653,7 @@
         208,
         246
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_14ec",
@@ -20378,6 +20665,7 @@
       "bytes": [
         24
       ],
+      "comment_inline": "Next command",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -20387,6 +20675,7 @@
         165,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "plot_x",
@@ -20399,6 +20688,7 @@
         105,
         5
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#5"
@@ -20409,6 +20699,7 @@
         133,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -20421,6 +20712,7 @@
         160,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -20430,6 +20722,7 @@
       "bytes": [
         202
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "dex"
     },
@@ -20439,6 +20732,7 @@
         208,
         227
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_14e5",
@@ -20452,6 +20746,7 @@
         136,
         119
       ],
+      "comment_inline": "Draw the four views",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "draw_all_views",
@@ -20464,6 +20759,7 @@
         169,
         143
       ],
+      "comment_inline": "Point WRCHV back at wrch_handler...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&8f"
@@ -20475,6 +20771,7 @@
         14,
         2
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "wrchv",
@@ -20487,6 +20784,7 @@
         169,
         127
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&7f"
@@ -20498,6 +20796,7 @@
         15,
         2
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "wrchv + 1",
@@ -20508,6 +20807,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -20520,6 +20820,7 @@
       "labels": [
         "unpack_level"
       ],
+      "comment_inline": "Objects 30 to 1: position and type",
       "xref_summaries": [
         "&1510 referenced 1 time by &1406"
       ],
@@ -20554,9 +20855,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_6b00,x",
+      "operand": "level_object_x,x",
       "target": 27392,
-      "target_label": "data_6b00"
+      "target_label": "level_object_x"
     },
     {
       "addr": 5397,
@@ -20580,9 +20881,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_6b20,x",
+      "operand": "level_object_y,x",
       "target": 27424,
-      "target_label": "data_6b20"
+      "target_label": "level_object_y"
     },
     {
       "addr": 5403,
@@ -20606,9 +20907,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_6b40,x",
+      "operand": "level_object_type,x",
       "target": 27456,
-      "target_label": "data_6b40"
+      "target_label": "level_object_type"
     },
     {
       "addr": 5409,
@@ -20628,6 +20929,7 @@
       "bytes": [
         202
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "dex"
     },
@@ -20637,6 +20939,7 @@
         208,
         235
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_1512",
@@ -20649,6 +20952,7 @@
         162,
         20
       ],
+      "comment_inline": "Doors 20 to 1: position and sprite",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&14"
@@ -20674,9 +20978,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_6b60,x",
+      "operand": "level_door_x,x",
       "target": 27488,
-      "target_label": "data_6b60"
+      "target_label": "level_door_x"
     },
     {
       "addr": 5420,
@@ -20700,9 +21004,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_6b75,x",
+      "operand": "level_door_y,x",
       "target": 27509,
-      "target_label": "data_6b75"
+      "target_label": "level_door_y"
     },
     {
       "addr": 5426,
@@ -20726,9 +21030,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_6b8a,x",
+      "operand": "level_door_sprite,x",
       "target": 27530,
-      "target_label": "data_6b8a"
+      "target_label": "level_door_sprite"
     },
     {
       "addr": 5432,
@@ -20748,6 +21052,7 @@
       "bytes": [
         202
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "dex"
     },
@@ -20757,6 +21062,7 @@
         208,
         235
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_1529",
@@ -20769,6 +21075,7 @@
         162,
         20
       ],
+      "comment_inline": "Keys 20 to 1: position",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&14"
@@ -20794,9 +21101,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_6ba0,x",
+      "operand": "level_key_x,x",
       "target": 27552,
-      "target_label": "data_6ba0"
+      "target_label": "level_key_x"
     },
     {
       "addr": 5443,
@@ -20820,9 +21127,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_6bb5,x",
+      "operand": "level_key_y,x",
       "target": 27573,
-      "target_label": "data_6bb5"
+      "target_label": "level_key_y"
     },
     {
       "addr": 5449,
@@ -20842,6 +21149,7 @@
       "bytes": [
         202
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "dex"
     },
@@ -20851,6 +21159,7 @@
         208,
         241
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_1540",
@@ -20863,6 +21172,7 @@
         162,
         0
       ],
+      "comment_inline": "Trapdoors 0 to 7: position",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#0"
@@ -20888,9 +21198,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_6bd0,x",
+      "operand": "level_trapdoor_x,x",
       "target": 27600,
-      "target_label": "data_6bd0"
+      "target_label": "level_trapdoor_x"
     },
     {
       "addr": 5460,
@@ -20914,9 +21224,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_6bd8,x",
+      "operand": "level_trapdoor_y,x",
       "target": 27608,
-      "target_label": "data_6bd8"
+      "target_label": "level_trapdoor_y"
     },
     {
       "addr": 5466,
@@ -20936,6 +21246,7 @@
       "bytes": [
         232
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inx"
     },
@@ -20945,6 +21256,7 @@
         224,
         8
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#8"
@@ -20955,6 +21267,7 @@
         208,
         239
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_1551",
@@ -20967,6 +21280,7 @@
         162,
         0
       ],
+      "comment_inline": "Wall map and object map, &C9 bytes each",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#0"
@@ -20992,9 +21306,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_6be0,x",
+      "operand": "level_walls,x",
       "target": 27616,
-      "target_label": "data_6be0"
+      "target_label": "level_walls"
     },
     {
       "addr": 5479,
@@ -21005,9 +21319,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "user_char_128,x",
+      "operand": "room_walls,x",
       "target": 3072,
-      "target_label": "user_char_128"
+      "target_label": "room_walls"
     },
     {
       "addr": 5482,
@@ -21018,9 +21332,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_6cb0,x",
+      "operand": "level_object_map,x",
       "target": 27824,
-      "target_label": "data_6cb0"
+      "target_label": "level_object_map"
     },
     {
       "addr": 5485,
@@ -21040,6 +21354,7 @@
       "bytes": [
         232
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inx"
     },
@@ -21049,6 +21364,7 @@
         224,
         201
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#&c9"
@@ -21059,6 +21375,7 @@
         208,
         239
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_1564",
@@ -21071,6 +21388,7 @@
         162,
         0
       ],
+      "comment_inline": "The last &30 bytes",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#0"
@@ -21096,9 +21414,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_6d80,x",
+      "operand": "level_tail_data,x",
       "target": 28032,
-      "target_label": "data_6d80"
+      "target_label": "level_tail_data"
     },
     {
       "addr": 5498,
@@ -21118,6 +21436,7 @@
       "bytes": [
         232
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inx"
     },
@@ -21127,6 +21446,7 @@
         224,
         48
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#&30"
@@ -21137,6 +21457,7 @@
         208,
         245
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_1577",
@@ -21148,6 +21469,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -21160,6 +21482,7 @@
       "labels": [
         "reset_monsters"
       ],
+      "comment_inline": "Monsters 30 to 1...",
       "xref_summaries": [
         "&1583 referenced 1 time by &140c"
       ],
@@ -21182,6 +21505,7 @@
       "labels": [
         "loop_1585"
       ],
+      "comment_inline": "...dying, so that they emerge from the trapdoors...",
       "xref_summaries": [
         "&1585 referenced 1 time by &1596"
       ],
@@ -21202,6 +21526,7 @@
         82,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_sprite,x",
@@ -21214,6 +21539,7 @@
         169,
         255
       ],
+      "comment_inline": "...off the map...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&ff"
@@ -21225,6 +21551,7 @@
         0,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_x,x",
@@ -21238,6 +21565,7 @@
         255,
         124
       ],
+      "comment_inline": "...with this level's hit points",
       "type": "code",
       "mnemonic": "lda",
       "operand": "monster_start_hit_points",
@@ -21251,6 +21579,7 @@
         64,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_hit_points,x",
@@ -21262,6 +21591,7 @@
       "bytes": [
         202
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "dex"
     },
@@ -21271,6 +21601,7 @@
         208,
         237
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_1585",
@@ -21283,6 +21614,7 @@
         162,
         0
       ],
+      "comment_inline": "For each hero: clear the returning queue, the key carried and the door-check position",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#0"
@@ -21379,6 +21711,7 @@
       "bytes": [
         232
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inx"
     },
@@ -21388,6 +21721,7 @@
         224,
         4
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#4"
@@ -21398,6 +21732,7 @@
         208,
         236
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_159c",
@@ -21409,6 +21744,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -66118,9 +66454,9 @@
       "comment_inline": "...into the character 128 definition",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "user_char_128,y",
+      "operand": "room_walls,y",
       "target": 3072,
-      "target_label": "user_char_128"
+      "target_label": "room_walls"
     },
     {
       "addr": 32715,
@@ -66387,9 +66723,9 @@
       "comment_inline": "...into the character 128 definition",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "user_char_128,y",
+      "operand": "room_walls,y",
       "target": 3072,
-      "target_label": "user_char_128"
+      "target_label": "room_walls"
     },
     {
       "addr": 32750,
