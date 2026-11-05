@@ -44,3 +44,22 @@ driver = "versions/cbbcga-dunjunz/disassemble/disasm_dunjunz_game.py"
 asm = "versions/cbbcga-dunjunz/output/dunjunz-game.asm"
 json = "versions/cbbcga-dunjunz/output/dunjunz-game.json"
 verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunjun6" }
+
+# Ole's crack of the cassette: DUNJ4 (the &0400-&2FFF image stored at &2400,
+# plus start-up code at &5000) and DUNJ3 (&6E80 onwards).
+
+[[targets]]
+id = "tape-dunj4"
+binary = "versions/nvg-dunjunz-tape/binary/DUNJ4"
+driver = "versions/nvg-dunjunz-tape/disassemble/disasm_dunjunz_tape.py"
+asm = "versions/nvg-dunjunz-tape/output/dunjunz-tape.asm"
+json = "versions/nvg-dunjunz-tape/output/dunjunz-tape.json"
+verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "DUNJ4" }
+
+[[targets]]
+id = "tape-dunj3"
+binary = "versions/nvg-dunjunz-tape/binary/DUNJ3"
+driver = "versions/nvg-dunjunz-tape/disassemble/disasm_dunjunz_tape.py"
+asm = "versions/nvg-dunjunz-tape/output/dunjunz-tape.asm"
+json = "versions/nvg-dunjunz-tape/output/dunjunz-tape.json"
+verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "DUNJ3" }

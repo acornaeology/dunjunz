@@ -75,10 +75,17 @@ fixes) in `docs/findings.md` as it is found, with the evidence.
 We own beebium, dasmos and fantasm: file a GitHub issue for any missing
 feature or defect met along the way, and note the workaround here.
 
-- Multi-file output: `GameFilesRenderer` overrides the beebasm renderer's
-  private `_save_directive` to save each game file
-  (acornaeology/dasmos#49), and `fantasm.toml` declares one target per
-  file sharing one driver and listing (acornaeology/fantasm#25).
+- Multi-file output: `dunjunz_common.rendering.MultiFileBeebasmRenderer`
+  overrides the beebasm renderer's private `_save_directive` to save each
+  original file (acornaeology/dasmos#49), and `fantasm.toml` declares one
+  target per file sharing one driver and listing
+  (acornaeology/fantasm#25). fantasm's version graph (annotation porting)
+  also assumes one binary per version, so annotations shared between
+  releases live in `dunjunz_common/`, keyed by runtime address.
+- Overlapping moves: the crack's `DUNJ4` stores &0400-&2FFF at &2400. A
+  dasmos move over that overlap breaks reassembly (acornaeology/dasmos#51,
+  #52), so the tape driver loads the image at its run address and emits a
+  `copyblock` before saving.
 - Synthesised offset bases inside data are named `sub_XXXX`; they are not
   subroutines (acornaeology/dasmos#50). Declaring the data removes them.
 - No execution coverage in beebium: `tools/coverage.py` uses range
