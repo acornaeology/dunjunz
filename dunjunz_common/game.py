@@ -439,9 +439,11 @@ def annotate_state(a: Annotator) -> None:
                "Pixel row of each hero's section of the status panel.")
 
     # Level data unpacked into the game's own tables
-    a.label(0x2100, "object_map", length=0xC9, description=(
-        "Map of the cells that hold an object, in the same layout as "
-        "room_walls; from the level file."))
+    a.label(0x2100, "object_free_map", length=0xC9, description=(
+        "Map of the cells that cannot hold an object, in the same layout as "
+        "room_walls, from the level file: a bit is clear where an object "
+        "lies (and on a few other cells), so the object list need only be "
+        "searched when a hero steps onto a clear bit."))
     a.label(0x2200, "door_x", length=21, description="Map x of each door (entries 1-20).")
     a.label(0x2220, "door_y", length=21, description="Map y of each door.")
     a.label(0x2240, "door_sprite", length=21, description="Sprite of each door.")
@@ -705,10 +707,11 @@ def annotate_routines(a: Annotator) -> None:
           "Return the room_walls bit for cell cell_x, cell_y: non-zero if "
           "there is a wall. Also leaves &7B, &7C pointing at the cell's room.",
           on_exit={"A": "wall bit", "Y": "wall bit", "Z": "set if no wall"})
-    a.sub(0x7938, "test_object_map", "Test for an object at a map cell",
-          "Return the object_map bit for cell cell_x, cell_y: non-zero if an "
-          "object may lie there.",
-          on_exit={"A": "object bit", "Y": "object bit", "Z": "set if none"})
+    a.sub(0x7938, "test_object_free", "Test whether a map cell can hold an object",
+          "Return the object_free_map bit for cell cell_x, cell_y: zero if "
+          "an object may lie there.",
+          on_exit={"A": "map bit", "Y": "map bit",
+                   "Z": "set if an object may lie there"})
     a.sub(0x7974, "find_creature", "Look for a monster or hero at a cell",
           "Look for a monster, other than monster number scratch, at cell_x, "
           "cell_y. If scratch is non-zero, also look for a hero there, and "
@@ -1009,7 +1012,7 @@ def annotate_level_file(a: Annotator) -> None:
         (0x6BD0, "level_trapdoor_x", 8, "Trapdoors' map x (entries 0-7)"),
         (0x6BD8, "level_trapdoor_y", 8, "Trapdoors' map y"),
         (0x6BE0, "level_walls", 0xD0, "Wall map (&C9 bytes used)"),
-        (0x6CB0, "level_object_map", 0xD0, "Object map (&C9 bytes used)"),
+        (0x6CB0, "level_object_free_map", 0xD0, "Map of cells without objects (&C9 bytes used)"),
         (0x6D80, "level_tail_data", 0x30, "Last &30 bytes, copied to level_tail"),
     ]:
         a.label(addr, name, length=length, description=f"Level file: {what}.", **g)
@@ -1101,7 +1104,7 @@ def annotate_level_file(a: Annotator) -> None:
         (0x154C, "..."), (0x154D, "..."),
         (0x154F, "Trapdoors 0 to 7: position"),
         (0x155D, "..."), (0x155E, "..."), (0x1560, "..."),
-        (0x1562, "Wall map and object map, &C9 bytes each"),
+        (0x1562, "Wall map and object-free map, &C9 bytes each"),
         (0x1570, "..."), (0x1571, "..."), (0x1573, "..."),
         (0x1575, "The last &30 bytes"),
         (0x157D, "..."), (0x157E, "..."), (0x1580, "..."), (0x1582, "Return"),

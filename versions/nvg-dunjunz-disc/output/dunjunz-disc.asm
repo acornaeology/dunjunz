@@ -1509,13 +1509,13 @@ data_12d4 = saved_wrchv+1
     inx                                 ; ...
     cpx #8                              ; ...
     bne code_1551                       ; ...
-    ldx #0                              ; Wall map and object map, &C9 bytes each
+    ldx #0                              ; Wall map and object-free map, &C9 bytes each
 ; &1564 referenced 1 time by &3cb3
 .code_1564
     lda level_walls,x
     sta room_walls,x
-    lda level_object_map,x
-    sta object_map,x
+    lda level_object_free_map,x
+    sta object_free_map,x
     inx                                 ; ...
     cpx #&c9                            ; ...
     bne code_1564                       ; ...
@@ -2436,9 +2436,9 @@ data_1625 = sub_1624+1
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00
 ; &2100 used as index base 1 time by &3cad
-.object_map
+.object_free_map
 ; &487a used as index base 1 time by &3807
-data_213a = object_map+58
+data_213a = object_free_map+58
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -5082,7 +5082,7 @@ data_518e = sub_5178+22
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
 ; &6cb0 used as index base 1 time by &3caa
-.level_object_map
+.level_object_free_map
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -5432,7 +5432,7 @@ data_518e = sub_5178+22
     sta cell_y
     txa
     pha
-    jsr test_object_map
+    jsr test_object_free
     pla
     tax
     cpy #0
@@ -5549,7 +5549,7 @@ data_518e = sub_5178+22
     sta cell_y
     txa
     pha
-    jsr test_object_map
+    jsr test_object_free
     pla
     tax
     cpy #0
@@ -6890,16 +6890,17 @@ data_518e = sub_5178+22
     tay
     rts
 ; ***************************************************************************************
-; Test for an object at a map cell
+; Test whether a map cell can hold an object
 ;
-; Return the object_map bit for cell cell_x, cell_y: non-zero if an object may lie there.
+; Return the object_free_map bit for cell cell_x, cell_y: zero if an object may lie
+; there.
 ;
 ; On Exit:
-;     A: object bit
-;     Y: object bit
-;     Z: set if none
+;     A: map bit
+;     Y: map bit
+;     Z: set if an object may lie there
 ; &7938 referenced 2 times by &70b5, &7166
-.test_object_map
+.test_object_free
     lda cell_y
     and #&f8
     sta scratch
@@ -7993,7 +7994,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     set_menu_yes:                2
 ;     set_menu_yes_joy:            2
 ;     sprite_data_ptr_hi:          2
-;     test_object_map:             2
+;     test_object_free:            2
 ;     trapdoor_x:                  2
 ;     trapdoor_y:                  2
 ;     add_thousand_points:         1
@@ -8280,7 +8281,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     level_key_x:                 1
 ;     level_key_y:                 1
 ;     level_loop:                  1
-;     level_object_map:            1
+;     level_object_free_map:       1
 ;     level_object_type:           1
 ;     level_object_x:              1
 ;     level_object_y:              1
@@ -8318,7 +8319,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     move_heroes:                 1
 ;     move_missiles:               1
 ;     next_level_by_reset:         1
-;     object_map:                  1
+;     object_free_map:             1
 ;     plot_boots_icon:             1
 ;     remove_absent_heroes:        1
 ;     remove_absent_heroes_joy:    1

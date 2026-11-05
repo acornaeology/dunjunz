@@ -13,126 +13,126 @@ osword_sound                 = &07
 osbyte_scan_keyboard_from_16 = &7a
 
 ; Memory locations
-data_0000          = &00
+data_0000             = &00
 ; &00 referenced 1 time by &10e6
-plot_x             = &70  ; Sprite position: screen byte column, 0-79 (two MODE 2 pixels per byte). Also used as a scratch byte and pointer low byte by other routines.
+plot_x                = &70  ; Sprite position: screen byte column, 0-79 (two MODE 2 pixels per byte). Also used as a scratch byte and pointer low byte by other routines.
 ; &70 referenced 43 times by &0422, &0439, &043b, &05a7, &05ab, &0984, &0991, &0f68, &143c, &14ec, &14f7, &14fb, &15c3, &1da6, &1e1c, &1e77, &20c6, &5010, &5047, &726d, &7282, &72c6, &72db, &72eb, &72fb, &75b8, &75d9, &75e4, &75fb, &7823, &7846, &784a, &78a1, &78bb, &78d5, &78ef, &7f8f, &7f95, &7fc1, &7fcd, &7fe4, &7ff0, &7ffa
-plot_y             = &71  ; Sprite position: pixel row from the top of the screen. Also used as a pointer high byte by other routines.
+plot_y                = &71  ; Sprite position: pixel row from the top of the screen. Also used as a pointer high byte by other routines.
 ; &71 referenced 28 times by &042a, &0967, &097b, &0f77, &1440, &15c7, &1da2, &1e18, &1e73, &20c2, &5006, &5015, &7269, &72c2, &75b4, &75d5, &75ec, &7603, &7797, &77a9, &77bb, &77cd, &77ef, &77f3, &78a8, &78c2, &78dc, &78f6
-sprite_width       = &72  ; Width of the sprite being plotted, in screen bytes.
+sprite_width          = &72  ; Width of the sprite being plotted, in screen bytes.
 ; &72 referenced 4 times by &090f, &0927, &500c, &500e
-sprite_height      = &73  ; Height of the sprite being plotted, in pixel rows.
+sprite_height         = &73  ; Height of the sprite being plotted, in pixel rows.
 ; &73 referenced 5 times by &0914, &091b, &500a, &5017, &501b
-screen_ptr         = &74  ; Screen address being written, low byte.
+screen_ptr            = &74  ; Screen address being written, low byte.
 ; &74 referenced 13 times by &091d, &092b, &092e, &0932, &0946, &094e, &0955, &0959, &0979, &097f, &0981, &0997, &0999
-screen_ptr_hi      = &75  ; Screen address being written, high byte.
+screen_ptr_hi         = &75  ; Screen address being written, high byte.
 ; &75 referenced 9 times by &0921, &0936, &094c, &095b, &095f, &0974, &098d, &098f, &099d
-row_start_ptr      = &76  ; Screen address of the first byte of the sprite row being plotted, low byte.
+row_start_ptr         = &76  ; Screen address of the first byte of the sprite row being plotted, low byte.
 ; &76 referenced 2 times by &091f, &0942
-row_start_ptr_hi   = &77  ; Screen address of the first byte of the sprite row being plotted, high byte.
+row_start_ptr_hi      = &77  ; Screen address of the first byte of the sprite row being plotted, high byte.
 ; &77 referenced 2 times by &0923, &0948
-sprite_data_ptr    = &78  ; Address of the next sprite data byte to plot, low byte.
+sprite_data_ptr       = &78  ; Address of the next sprite data byte to plot, low byte.
 ; &78 referenced 3 times by &0905, &0929, &0938
-sprite_data_ptr_hi = &79  ; Address of the next sprite data byte to plot, high byte.
+sprite_data_ptr_hi    = &79  ; Address of the next sprite data byte to plot, high byte.
 ; &79 referenced 2 times by &090a, &093c
-sprite_number      = &7a  ; Sprite to plot: an index into the sprite tables at sprite_addr_lo, sprite_addr_hi, sprite_widths and sprite_heights.
+sprite_number         = &7a  ; Sprite to plot: an index into the sprite tables at sprite_addr_lo, sprite_addr_hi, sprite_widths and sprite_heights.
 ; &7a referenced 45 times by &041e, &0433, &0900, &0f6a, &11a6, &11fe, &15cb, &1d2e, &1d9a, &1dca, &1e10, &1e57, &1e6b, &1f69, &1fb5, &1fd1, &20ba, &7077, &70a2, &70e9, &720f, &7242, &7272, &727e, &72cb, &72d7, &72e7, &72f7, &731c, &75c0, &75dd, &75f4, &7608, &760f, &7663, &767a, &7695, &76f5, &7813, &7836, &7840, &79cb, &79fb, &7b17, &7b50
-data_007b          = &7b
+data_007b             = &7b
 ; &7b referenced 21 times by &1d5b, &1d62, &1d64, &1d80, &1d85, &7046, &7542, &767f, &77a1, &77b3, &77c5, &77d7, &77e4, &790e, &7915, &7917, &792f, &794a, &7951, &7953, &796b
-data_007c          = &7c
+data_007c             = &7c
 ; &7c referenced 4 times by &1d68, &77e0, &791b, &7957
-data_007d          = &7d
+data_007d             = &7d
 ; &7d referenced 18 times by &10f2, &1d32, &1dc4, &1e5b, &1f63, &1fa3, &1fe5, &7088, &70cc, &7307, &76ea, &7738, &780c, &787a, &79c5, &7a00, &7b1c, &7b55
-data_007e          = &7e
+data_007e             = &7e
 ; &7e referenced 18 times by &10f4, &1d34, &1dc6, &1e5d, &1f65, &1fa5, &1fea, &708d, &70ce, &7309, &76ec, &773d, &780e, &788e, &79c7, &7a05, &7b21, &7b5a
-data_0080          = &80
+data_0080             = &80
 ; &80 referenced 8 times by &114b, &1154, &1159, &1166, &117d, &1182, &118a, &119a
-data_0081          = &81
+data_0081             = &81
 ; &81 referenced 7 times by &114f, &116b, &1170, &1178, &118f, &1194, &119f
-data_0082          = &82
+data_0082             = &82
 ; &82 referenced 6 times by &10f8, &115e, &11a4, &11ac, &11bb, &11d5
-data_0084          = &84
+data_0084             = &84
 ; &84 referenced 5 times by &1100, &111c, &1122, &1133, &113c
-data_008d          = &8d
+data_008d             = &8d
 ; &8d referenced 3 times by &1108, &110d, &1113
-data_008e          = &8e
+data_008e             = &8e
 ; &8e referenced 2 times by &1104, &1115
-data_008f          = &8f
+data_008f             = &8f
 ; &8f referenced 6 times by &10fc, &110b, &110f, &1124, &7934, &7970
-data_00fa          = &fa
+data_00fa             = &fa
 ; &fa referenced 1 time by &11c3
-data_00fc          = &fc
+data_00fc             = &fc
 ; &fc referenced 1 time by &11c1
-wrchv              = &020e
+wrchv                 = &020e
 ; &020e referenced 6 times by &0d55, &0d63, &14da, &1507, &501f, &502d
-os_vsync_counter   = &0240  ; MOS 1.20 counter decremented on every vertical sync interrupt. The game sets it and waits for it to run out to pace itself.
+os_vsync_counter      = &0240  ; MOS 1.20 counter decremented on every vertical sync interrupt. The game sets it and waits for it to run out to pace itself.
 ; &0240 referenced 6 times by &0e62, &0eb9, &11e9, &11ec, &1f00, &1f07
-data_348c          = &348c
+data_348c             = &348c
 ; &348c referenced 1 time by &5042
-data_4e00          = &4e00
+data_4e00             = &4e00
 ; &4e00 used as index base 2 times by &0464, &1473
-data_5100          = &5100
+data_5100             = &5100
 ; &5100 referenced 1 time by &503f
-data_545c          = &545c
+data_545c             = &545c
 ; &545c referenced 1 time by &0482
-data_5475          = &5475
+data_5475             = &5475
 ; &5475 referenced 1 time by &147c
-data_5478          = &5478
+data_5478             = &5478
 ; &5478 referenced 2 times by &147f, &1482
-data_549a          = &549a
+data_549a             = &549a
 ; &549a referenced 1 time by &047f
-data_549b          = &549b
+data_549b             = &549b
 ; &549b referenced 1 time by &047b
-level_object_x     = &6b00  ; Level file: Objects' map x (entries 1-30, entry 30 the exit).
+level_object_x        = &6b00  ; Level file: Objects' map x (entries 1-30, entry 30 the exit).
 ; &6b00 used as index base 1 time by &1512
-level_object_y     = &6b20  ; Level file: Objects' map y.
+level_object_y        = &6b20  ; Level file: Objects' map y.
 ; &6b20 used as index base 1 time by &1518
-level_object_type  = &6b40  ; Level file: Objects' types.
+level_object_type     = &6b40  ; Level file: Objects' types.
 ; &6b40 used as index base 1 time by &151e
-level_door_x       = &6b60  ; Level file: Doors' map x (entries 1-20).
+level_door_x          = &6b60  ; Level file: Doors' map x (entries 1-20).
 ; &6b60 used as index base 1 time by &1529
-level_door_y       = &6b75  ; Level file: Doors' map y.
+level_door_y          = &6b75  ; Level file: Doors' map y.
 ; &6b75 used as index base 1 time by &152f
-level_door_sprite  = &6b8a  ; Level file: Doors' sprites.
+level_door_sprite     = &6b8a  ; Level file: Doors' sprites.
 ; &6b8a used as index base 1 time by &1535
-level_key_x        = &6ba0  ; Level file: Keys' map x (entries 1-20).
+level_key_x           = &6ba0  ; Level file: Keys' map x (entries 1-20).
 ; &6ba0 used as index base 1 time by &1540
-level_key_y        = &6bb5  ; Level file: Keys' map y.
+level_key_y           = &6bb5  ; Level file: Keys' map y.
 ; &6bb5 used as index base 1 time by &1546
-level_trapdoor_x   = &6bd0  ; Level file: Trapdoors' map x (entries 0-7).
+level_trapdoor_x      = &6bd0  ; Level file: Trapdoors' map x (entries 0-7).
 ; &6bd0 used as index base 1 time by &1551
-level_trapdoor_y   = &6bd8  ; Level file: Trapdoors' map y.
+level_trapdoor_y      = &6bd8  ; Level file: Trapdoors' map y.
 ; &6bd8 used as index base 1 time by &1557
-level_walls        = &6be0  ; Level file: Wall map (&C9 bytes used).
+level_walls           = &6be0  ; Level file: Wall map (&C9 bytes used).
 ; &6be0 used as index base 1 time by &1564
-level_object_map   = &6cb0  ; Level file: Object map (&C9 bytes used).
+level_object_free_map = &6cb0  ; Level file: Map of cells without objects (&C9 bytes used).
 ; &6cb0 used as index base 1 time by &156a
-level_tail_data    = &6d80  ; Level file: Last &30 bytes, copied to level_tail.
+level_tail_data       = &6d80  ; Level file: Last &30 bytes, copied to level_tail.
 ; &6d80 used as index base 1 time by &1577
-mos_row_offsets    = &c375  ; MOS 1.20 table of screen row offsets for 640-byte rows (row x 640, high byte then low byte, one pair per character row). Read directly by screen_address; it is not part of any documented interface.
+mos_row_offsets       = &c375  ; MOS 1.20 table of screen row offsets for 640-byte rows (row x 640, high byte then low byte, one pair per character row). Read directly by screen_address; it is not part of any documented interface.
 ; &c375 used as index base 1 time by &096e
-mos_row_offsets_lo = &c376  ; Low bytes of mos_row_offsets.
+mos_row_offsets_lo    = &c376  ; Low bytes of mos_row_offsets.
 ; &c376 used as index base 1 time by &0976
-mos_reset_entry    = &d9cd  ; MOS 1.20 reset entry, the target of the RESET vector. Called directly to reset the machine.
-mos_oswrch_default = &e0a4  ; MOS 1.20 default OSWRCH routine, WRCHV's initial value. The WRCHV handler jumps here directly instead of through the saved vector.
+mos_reset_entry       = &d9cd  ; MOS 1.20 reset entry, the target of the RESET vector. Called directly to reset the machine.
+mos_oswrch_default    = &e0a4  ; MOS 1.20 default OSWRCH routine, WRCHV's initial value. The WRCHV handler jumps here directly instead of through the saved vector.
 ; &e0a4 referenced 2 times by &7fd7, &7ffc
-system_via_t1c_l   = &fe44
+system_via_t1c_l      = &fe44
 ; &fe44 referenced 3 times by &11be, &7a6f, &7aac
-osrdch             = &ffe0
+osrdch                = &ffe0
 ; &ffe0 referenced 2 times by &058f, &10d7
-osasci             = &ffe3
+osasci                = &ffe3
 ; &ffe3 referenced 3 times by &0eb1, &10bd, &10ca
-oswrch             = &ffee
+oswrch                = &ffee
 ; &ffee referenced 56 times by &0502, &0507, &050c, &0511, &0516, &051b, &0530, &0536, &053d, &0544, &0e88, &0e8d, &0e92, &0e97, &0e9c, &0ea1, &109c, &10a1, &10a6, &10ab, &10b0, &10b5, &112d, &1414, &1419, &141e, &1423, &1428, &142b, &142e, &1431, &1434, &1437, &14e7, &14ee, &15b6, &15bb, &15d2, &15d7, &15dc, &15ea, &15f3, &15f8, &15fd, &1602, &1607, &160c, &1611, &1616, &161c, &1621, &1626, &162b, &1630, &1635, &6f47
-osword             = &fff1
+osword                = &fff1
 ; &fff1 referenced 15 times by &16a6, &16af, &1d18, &1ead, &1eb6, &736d, &7376, &73b9, &73e3, &748c, &74a9, &74b2, &7586, &7634, &763d
-osbyte             = &fff4
+osbyte                = &fff4
 ; &fff4 referenced 19 times by &0583, &058c, &05ed, &0d37, &0d40, &0d49, &0d52, &0ec0, &0ec9, &10d4, &10ed, &1128, &146e, &1ed9, &1ee0, &1ee7, &1eee, &503c, &7c9e
-oscli              = &fff7
+oscli                 = &fff7
 ; &fff7 referenced 2 times by &1460, &1467
-data_fffc          = &fffc
+data_fffc             = &fffc
 ; &fffc referenced 1 time by &10da
-data_fffd          = &fffd
+data_fffd             = &fffd
 ; &fffd referenced 1 time by &10e0
 
 
@@ -2000,13 +2000,13 @@ data_1478 = sub_1476+2
     inx                                 ; ...
     cpx #8                              ; ...
     bne loop_1551                       ; ...
-    ldx #0                              ; Wall map and object map, &C9 bytes each
+    ldx #0                              ; Wall map and object-free map, &C9 bytes each
 ; &1564 referenced 1 time by &1573
 .loop_1564
     lda level_walls,x
     sta room_walls,x
-    lda level_object_map,x
-    sta object_map,x
+    lda level_object_free_map,x
+    sta object_free_map,x
     inx                                 ; ...
     cpx #&c9                            ; ...
     bne loop_1564                       ; ...
@@ -3040,7 +3040,7 @@ data_16d6 = level_filename_digits+1
     rts
     equb &01, &3f
 ; &2100 used as index base 1 time by &156d
-.object_map
+.object_free_map
     equb &00, &02, &07, &07, &1f, &3f, &7d, &7f
     equb &00, &30, &78, &fd, &7f, &ff, &80, &00
     equb &00, &60, &e0, &c0, &df, &c0, &1f, &0f
@@ -3957,7 +3957,7 @@ data_213a = sub_212f+11
     sta cell_y
     txa
     pha
-    jsr test_object_map
+    jsr test_object_free
     pla
     tax
     cpy #0
@@ -4074,7 +4074,7 @@ data_213a = sub_212f+11
     sta cell_y
     txa
     pha
-    jsr test_object_map
+    jsr test_object_free
     pla
     tax
     cpy #0
@@ -5415,16 +5415,17 @@ data_213a = sub_212f+11
     tay
     rts
 ; ***************************************************************************************
-; Test for an object at a map cell
+; Test whether a map cell can hold an object
 ;
-; Return the object_map bit for cell cell_x, cell_y: non-zero if an object may lie there.
+; Return the object_free_map bit for cell cell_x, cell_y: zero if an object may lie
+; there.
 ;
 ; On Exit:
-;     A: object bit
-;     Y: object bit
-;     Z: set if none
+;     A: map bit
+;     Y: map bit
+;     Z: set if an object may lie there
 ; &7938 referenced 2 times by &70b5, &7166
-.test_object_map
+.test_object_free
     lda cell_y
     and #&f8
     sta scratch
@@ -7521,7 +7522,7 @@ save "DUNJ3", &6e80, &9d00, &0000, &6e80
 ;     row_start_ptr:               2
 ;     row_start_ptr_hi:            2
 ;     sprite_data_ptr_hi:          2
-;     test_object_map:             2
+;     test_object_free:            2
 ;     trapdoor_x:                  2
 ;     trapdoor_y:                  2
 ;     add_thousand_points:         1
@@ -7760,7 +7761,7 @@ save "DUNJ3", &6e80, &9d00, &0000, &6e80
 ;     level_key_x:                 1
 ;     level_key_y:                 1
 ;     level_loop:                  1
-;     level_object_map:            1
+;     level_object_free_map:       1
 ;     level_object_type:           1
 ;     level_object_x:              1
 ;     level_object_y:              1
@@ -7840,7 +7841,7 @@ save "DUNJ3", &6e80, &9d00, &0000, &6e80
 ;     mos_row_offsets_lo:          1
 ;     move_heroes:                 1
 ;     move_missiles:               1
-;     object_map:                  1
+;     object_free_map:             1
 ;     plot_boots_icon:             1
 ;     print_menu_string:           1
 ;     queue_exit_marker:           1

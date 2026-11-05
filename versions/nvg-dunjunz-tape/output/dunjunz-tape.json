@@ -653,13 +653,13 @@
     },
     {
       "addr": 31032,
-      "name": "test_object_map",
-      "title": "Test for an object at a map cell",
-      "description": "Return the object_map bit for cell cell_x, cell_y: non-zero if an object may lie there.",
+      "name": "test_object_free",
+      "title": "Test whether a map cell can hold an object",
+      "description": "Return the object_free_map bit for cell cell_x, cell_y: zero if an object may lie there.",
       "on_exit": {
-        "A": "object bit",
-        "Y": "object bit",
-        "Z": "set if none"
+        "A": "map bit",
+        "Y": "map bit",
+        "Z": "set if an object may lie there"
       }
     },
     {
@@ -871,7 +871,7 @@
     "level_trapdoor_x": 27600,
     "level_trapdoor_y": 27608,
     "level_walls": 27616,
-    "level_object_map": 27824,
+    "level_object_free_map": 27824,
     "level_tail_data": 28032,
     "mos_row_offsets": 50037,
     "mos_row_offsets_lo": 50038,
@@ -1198,13 +1198,13 @@
     },
     {
       "addr": 27824,
-      "name": "level_object_map",
+      "name": "level_object_free_map",
       "length": 208,
       "group": "level_file",
       "access": [
         "b"
       ],
-      "description": "Level file: Object map (&C9 bytes used)."
+      "description": "Level file: Map of cells without objects (&C9 bytes used)."
     },
     {
       "addr": 28032,
@@ -21280,7 +21280,7 @@
         162,
         0
       ],
-      "comment_inline": "Wall map and object map, &C9 bytes each",
+      "comment_inline": "Wall map and object-free map, &C9 bytes each",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#0"
@@ -21332,9 +21332,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "level_object_map,x",
+      "operand": "level_object_free_map,x",
       "target": 27824,
-      "target_label": "level_object_map"
+      "target_label": "level_object_free_map"
     },
     {
       "addr": 5485,
@@ -21345,9 +21345,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "object_map,x",
+      "operand": "object_free_map,x",
       "target": 8448,
-      "target_label": "object_map"
+      "target_label": "object_free_map"
     },
     {
       "addr": 5488,
@@ -32726,7 +32726,7 @@
         0
       ],
       "labels": [
-        "object_map"
+        "object_free_map"
       ],
       "xref_summaries": [
         "&2100 used as index base 1 time by &156d"
@@ -45003,9 +45003,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "test_object_map",
+      "operand": "test_object_free",
       "target": 31032,
-      "target_label": "test_object_map"
+      "target_label": "test_object_free"
     },
     {
       "addr": 28856,
@@ -46112,9 +46112,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "test_object_map",
+      "operand": "test_object_free",
       "target": 31032,
-      "target_label": "test_object_map"
+      "target_label": "test_object_free"
     },
     {
       "addr": 29033,
@@ -58234,7 +58234,7 @@
         13
       ],
       "labels": [
-        "test_object_map"
+        "test_object_free"
       ],
       "xref_summaries": [
         "&7938 referenced 2 times by &70b5, &7166"
