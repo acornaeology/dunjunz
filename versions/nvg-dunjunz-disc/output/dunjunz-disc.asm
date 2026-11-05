@@ -380,7 +380,7 @@ data_0b2d = returning_hero_queue+3
 .next_trapdoor
     equb &04
 ; &0b30 used as index base 1 time by &76f2
-.hero_arrival_sprites
+.hero_appearance_sprites
     equb &16, &17, &18, &19
     equs "defgh"
     equb &10, &10, &10, &10, &10, &10, &10
@@ -5164,7 +5164,7 @@ data_518e = sub_5178+22
     jmp code_70c1
 ; &6e91 referenced 1 time by &6e8c
 .code_6e91
-    jsr hero_arrives
+    jsr animate_absent_hero
     jmp code_70c1
 ; &6e97 referenced 1 time by &6e85
 .code_6e97
@@ -5683,66 +5683,66 @@ data_518e = sub_5178+22
 ;     X: preserved
 ; &7221 referenced 8 times by &363f, &6ffc, &71f6, &749a, &7512, &7654, &772a, &79ac
 .lose_health_point
-    lda hero_direction,x
-    bne code_7227
-    rts
+    lda hero_direction,x                ; Is the hero in play?
+    bne code_7227                       ; Yes
+    rts                                 ; No: return
 ; &7227 referenced 1 time by &7224
 .code_7227
-    dec hero_health_units,x
-    lda hero_health_units,x
-    cmp #&1d
-    bne code_7266
-    lda #&27
-    sta hero_health_units,x
-    dec hero_health_tens,x
-    lda hero_health_tens,x
-    cmp #&1d
-    bne code_7266
-    lda #&15
-    sta sprite_number
-    jsr draw_hero
-    lda #0
-    sta hero_direction,x
-    lda #1
-    sta hero_offset_x,x
-    sta hero_offset_y,x
-    ldy #0
+    dec hero_health_units,x             ; Take one from the units digit
+    lda hero_health_units,x             ; ...
+    cmp #&1d                            ; Below 0?
+    bne code_7266                       ; No: redraw
+    lda #&27                            ; Yes: units 9...
+    sta hero_health_units,x             ; ...
+    dec hero_health_tens,x              ; ...and take one from the tens
+    lda hero_health_tens,x              ; ...
+    cmp #&1d                            ; Below 0: the hero has died
+    bne code_7266                       ; No: redraw
+    lda #&15                            ; Erase the hero...
+    sta sprite_number                   ; ...
+    jsr draw_hero                       ; ...
+    lda #0                              ; ...take them out of play...
+    sta hero_direction,x                ; ...
+    lda #1                              ; ...and start the death animation: step +1 through hero_appearance_sprites, every other frame
+    sta hero_offset_x,x                 ; ...
+    sta hero_offset_y,x                 ; ...
+    ldy #0                              ; Add hero number + 1 at the end of returning_hero_queue
 ; &7256 referenced 1 time by &7264
 .loop_7256
-    lda returning_hero_queue,y
-    bne code_7263
-    txa
-    clc
-    adc #1
-    sta returning_hero_queue,y
-    rts
+    lda returning_hero_queue,y          ; ...
+    bne code_7263                       ; ...
+    txa                                 ; ...
+    clc                                 ; ...
+    adc #1                              ; ...
+    sta returning_hero_queue,y          ; ...
+    rts                                 ; Return
 ; &7263 referenced 1 time by &7259
 .code_7263
-    iny
-    bne loop_7256
+    iny                                 ; ...
+    bne loop_7256                       ; ...
 ; &7266 referenced 3 times by &722f, &723e, &73a2
 .code_7266
-    lda hero_panel_y,x
-    sta plot_y
-    lda #&45 ; 'E'
-    sta plot_x
-    lda hero_health_tens,x
-    sta sprite_number
-    txa
-    pha
-    jsr plot_sprite
-    pla
-    tax
-    lda hero_health_units,x
-    sta sprite_number
-    lda #&48 ; 'H'
-    sta plot_x
-    txa
-    pha
-    jsr plot_sprite
-    pla
-    tax
-    rts
+    lda hero_panel_y,x                  ; Draw the health: tens digit at column &45...
+    sta plot_y                          ; ...
+    lda #&45 ; 'E'                      ; ...
+    sta plot_x                          ; ...
+    lda hero_health_tens,x              ; ...
+    sta sprite_number                   ; ...
+    txa                                 ; ...
+    pha                                 ; ...
+    jsr plot_sprite                     ; ...
+    pla                                 ; ...
+    tax                                 ; ...
+    lda hero_health_units,x             ; ...units digit at column &48
+    sta sprite_number                   ; ...
+    lda #&48 ; 'H'                      ; ...
+    sta plot_x                          ; ...
+    txa                                 ; ...
+    pha                                 ; ...
+    jsr plot_sprite                     ; ...
+    pla                                 ; ...
+    tax                                 ; ...
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Add one point to a hero's score
 ;
@@ -5755,12 +5755,12 @@ data_518e = sub_5178+22
 ;     X: preserved
 ; &728c referenced 5 times by &3642, &4445, &73a9, &76a2, &76d4
 .add_point
-    inc hero_score_units,x
-    lda hero_score_units,x
-    cmp #&28 ; '('
-    bne code_72bc
-    lda #&1e
-    sta hero_score_units,x
+    inc hero_score_units,x              ; Add one to the units digit
+    lda hero_score_units,x              ; ...
+    cmp #&28 ; '('                      ; Past 9?
+    bne code_72bc                       ; No: redraw
+    lda #&1e                            ; Yes: units 0, and carry into the tens
+    sta hero_score_units,x              ; ...
 ; ***************************************************************************************
 ; Add ten points to a hero's score
 ;
@@ -5773,22 +5773,22 @@ data_518e = sub_5178+22
 ;     X: preserved
 ; &729b referenced 4 times by &737f, &7382, &7419, &74d5
 .add_ten_points
-    inc hero_score_tens,x
-    lda hero_score_tens,x
-    cmp #&28 ; '('
-    bne code_72bc
-    lda #&1e
-    sta hero_score_tens,x
-    inc hero_score_hundreds,x
-    lda hero_score_hundreds,x
-    cmp #&28 ; '('
-    bne code_72bc
-    lda #&1e
-    sta hero_score_hundreds,x
-    jsr add_thousand_points
+    inc hero_score_tens,x               ; Add one to the tens digit
+    lda hero_score_tens,x               ; ...
+    cmp #&28 ; '('                      ; Past 9?
+    bne code_72bc                       ; No: redraw
+    lda #&1e                            ; Yes: tens 0...
+    sta hero_score_tens,x               ; ...
+    inc hero_score_hundreds,x           ; ...and add one to the hundreds
+    lda hero_score_hundreds,x           ; ...
+    cmp #&28 ; '('                      ; Past 9?
+    bne code_72bc                       ; No: redraw
+    lda #&1e                            ; Yes: hundreds 0...
+    sta hero_score_hundreds,x           ; ...
+    jsr add_thousand_points             ; ...and add a thousand
 ; &72bc referenced 3 times by &7294, &72a3, &72b2
 .code_72bc
-    clc
+    clc                                 ; Draw the score twelve rows below the health: thousands at column &45...
     lda hero_panel_y,x
     adc #&0c
     sta plot_y
@@ -5801,7 +5801,7 @@ data_518e = sub_5178+22
     jsr plot_sprite
     pla
     tax
-    lda hero_score_hundreds,x
+    lda hero_score_hundreds,x           ; ...hundreds at &48...
     sta sprite_number
     lda #&48 ; 'H'
     sta plot_x
@@ -5810,7 +5810,7 @@ data_518e = sub_5178+22
     jsr plot_sprite
     pla
     tax
-    lda hero_score_tens,x
+    lda hero_score_tens,x               ; ...tens at &4B...
     sta sprite_number
     lda #&4b ; 'K'
     sta plot_x
@@ -5819,7 +5819,7 @@ data_518e = sub_5178+22
     jsr plot_sprite
     pla
     tax
-    lda hero_score_units,x
+    lda hero_score_units,x              ; ...units at &4E
     sta sprite_number
     lda #&4e ; 'N'
     sta plot_x
@@ -5828,7 +5828,7 @@ data_518e = sub_5178+22
     jsr plot_sprite
     pla
     tax
-    rts
+    rts                                 ; Return
 ; &7305 referenced 1 time by &460e
 .sub_7305
     lda #0
@@ -6472,15 +6472,18 @@ data_518e = sub_5178+22
     tax
     rts
 ; ***************************************************************************************
-; Bring a returning hero into play
+; Animate a hero who is out of play
 ;
-; Every other frame, show the next of the hero's arrival sprites. After the last, put the
-; hero in play facing down with health 32 (set to 33 and drawn by taking a point).
+; Every other frame, step hero_frame by hero_offset_x through hero_appearance_sprites and
+; plot the sprite at the hero's cell: forwards (+1) for a hero dying, stopping at the
+; skull; backwards (-1) for a hero returning through a Cross of Resurrection. When a
+; returning hero reaches the first sprite, put them in play facing down with health 32
+; (set to 33 and drawn by taking a point).
 ;
 ; On Entry:
 ;     X: hero number (0-3)
 ; &76da referenced 1 time by &6e91
-.hero_arrives
+.animate_absent_hero
     dec hero_offset_y,x
     beq code_76e0
     rts
@@ -6494,7 +6497,7 @@ data_518e = sub_5178+22
     sta data_007e
     lda hero_frame,x
     tay
-    lda hero_arrival_sprites,y
+    lda hero_appearance_sprites,y
     sta sprite_number
     txa
     pha
@@ -6539,17 +6542,17 @@ data_518e = sub_5178+22
 ;     X: preserved
 ; &7732 referenced 2 times by &70a4, &7244
 .draw_hero
-    jsr get_hero_cell
-    lda hero_offset_x,x
-    sta data_007d
-    lda hero_offset_y,x
-    sta data_007e
-    txa
-    pha
-    jsr plot_at_cell
-    pla
-    tax
-    rts
+    jsr get_hero_cell                   ; Hero's cell
+    lda hero_offset_x,x                 ; ...and pixel offsets
+    sta data_007d                       ; ...
+    lda hero_offset_y,x                 ; ...
+    sta data_007e                       ; ...
+    txa                                 ; Plot in every view showing it, preserving X
+    pha                                 ; ...
+    jsr plot_at_cell                    ; ...
+    pla                                 ; ...
+    tax                                 ; ...
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Animate the hero who fired a missile
 ;
@@ -6598,11 +6601,11 @@ data_518e = sub_5178+22
 ;     X: preserved
 ; &777a referenced 2 times by &76e5, &7732
 .get_hero_cell
-    lda hero_x,x
-    sta cell_x
-    lda hero_y,x
-    sta cell_y
-    rts
+    lda hero_x,x                        ; cell_x = hero_x
+    sta cell_x                          ; ...
+    lda hero_y,x                        ; cell_y = hero_y
+    sta cell_y                          ; ...
+    rts                                 ; Return
     equb &73
 ; ***************************************************************************************
 ; Draw all four views
@@ -6621,56 +6624,56 @@ data_518e = sub_5178+22
 ; Draw the room in hero 0's view.
 ; &7795 referenced 2 times by &754b, &7788
 .draw_view_0
-    lda #1
-    sta plot_y
-    lda #1
-    sta cell_x
-    lda view_room
-    sta data_007b
-    jsr draw_room
-    rts
+    lda #1                              ; Top-left view: row 1...
+    sta plot_y                          ; ...
+    lda #1                              ; ...column 1...
+    sta cell_x                          ; ...
+    lda view_room                       ; ...hero 0's room
+    sta data_007b                       ; ...
+    jsr draw_room                       ; Draw it
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Draw the top-right view
 ;
 ; Draw the room in hero 1's view.
 ; &77a7 referenced 2 times by &7555, &778b
 .draw_view_1
-    lda #1
+    lda #1                              ; Top-right view: row 1...
     sta plot_y
-    lda #&23 ; '#'
+    lda #&23 ; '#'                      ; ...column &23...
     sta cell_x
-    lda data_0da2
+    lda data_0da2                       ; ...hero 1's room
     sta data_007b
-    jsr draw_room
-    rts
+    jsr draw_room                       ; Draw it
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Draw the bottom-left view
 ;
 ; Draw the room in hero 2's view.
 ; &77b9 referenced 2 times by &755f, &778e
 .draw_view_2
-    lda #&67 ; 'g'
+    lda #&67 ; 'g'                      ; Bottom-left view: row &67...
     sta plot_y
-    lda #1
+    lda #1                              ; ...column 1...
     sta cell_x
-    lda data_0da4
+    lda data_0da4                       ; ...hero 2's room
     sta data_007b
-    jsr draw_room
-    rts
+    jsr draw_room                       ; Draw it
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Draw the bottom-right view
 ;
 ; Draw the room in hero 3's view.
 ; &77cb referenced 2 times by &7565, &7791
 .draw_view_3
-    lda #&67 ; 'g'
+    lda #&67 ; 'g'                      ; Bottom-right view: row &67...
     sta plot_y
-    lda #&23 ; '#'
+    lda #&23 ; '#'                      ; ...column &23...
     sta cell_x
-    lda data_0da6
+    lda data_0da6                       ; ...hero 3's room
     sta data_007b
-    jsr draw_room
-    rts
+    jsr draw_room                       ; Draw it
+    rts                                 ; Return
     equb &60
 ; ***************************************************************************************
 ; Draw a room
@@ -6679,26 +6682,26 @@ data_518e = sub_5178+22
 ; its top-left at plot_y and the column in cell_x, then draw the doors.
 ; &77de referenced 4 times by &77a3, &77b5, &77c7, &77d9
 .draw_room
-    lda #&0c
-    sta data_007c
-    ldy #0
+    lda #&0c                            ; The room's walls are in page &0C
+    sta data_007c                       ; ...
+    ldy #0                              ; For each of the eight rows...
 ; &77e4 referenced 1 time by &77fa
 .loop_77e4
-    lda (data_007b),y
-    sta scratch
-    tya
-    pha
-    jsr draw_room_row
-    clc
-    lda plot_y
-    adc #&0c
-    sta plot_y
-    pla
-    tay
-    iny
-    cpy #8
-    bne loop_77e4
-    ldx #&14
+    lda (data_007b),y                   ; ...take its eight wall bits...
+    sta scratch                         ; ...
+    tya                                 ; ...
+    pha                                 ; ...
+    jsr draw_room_row                   ; ...and draw them
+    clc                                 ; Twelve pixel rows down
+    lda plot_y                          ; ...
+    adc #&0c                            ; ...
+    sta plot_y                          ; ...
+    pla                                 ; ...
+    tay                                 ; ...
+    iny                                 ; ...
+    cpy #8                              ; ...
+    bne loop_77e4                       ; ...
+    ldx #&14                            ; Then the doors 20 to 1, in every view showing them
 ; &77fe referenced 1 time by &781d
 .loop_77fe
     lda door_x,x
@@ -6715,9 +6718,9 @@ data_518e = sub_5178+22
     jsr plot_at_cell
     pla
     tax
-    dex
-    bne loop_77fe
-    rts
+    dex                                 ; ...
+    bne loop_77fe                       ; ...
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Draw one row of a room
 ;
@@ -6725,37 +6728,37 @@ data_518e = sub_5178+22
 ; starting at byte column cell_x.
 ; &7820 referenced 1 time by &77eb
 .draw_room_row
-    lda cell_x
-    sta plot_x
-    ldx #&80
+    lda cell_x                          ; Start at the room's left edge
+    sta plot_x                          ; ...
+    ldx #&80                            ; Bit mask, starting with the leftmost cell
 ; &7827 referenced 1 time by &784f
 .loop_7827
-    txa
-    pha
-    sta scratch2
-    lda scratch
-    and scratch2
-    beq code_783e
-    lda #0
-    sta sprite_number
-    jsr plot_sprite
-    jmp code_7845
+    txa                                 ; ...
+    pha                                 ; ...
+    sta scratch2                        ; ...
+    lda scratch                         ; Wall here?
+    and scratch2                        ; ...
+    beq code_783e                       ; No: plot the blank
+    lda #0                              ; Yes: plot the wall block (sprite 0)
+    sta sprite_number                   ; ...
+    jsr plot_sprite                     ; ...
+    jmp code_7845                       ; ...
 ; &783e referenced 1 time by &7832
 .code_783e
-    lda #&15
-    sta sprite_number
-    jsr plot_sprite
+    lda #&15                            ; Plot the blank (sprite &15)
+    sta sprite_number                   ; ...
+    jsr plot_sprite                     ; ...
 ; &7845 referenced 1 time by &783b
 .code_7845
-    clc
-    lda plot_x
-    adc #4
-    sta plot_x
-    pla
-    lsr a
-    tax
-    bne loop_7827
-    rts
+    clc                                 ; Four byte columns right
+    lda plot_x                          ; ...
+    adc #4                              ; ...
+    sta plot_x                          ; ...
+    pla                                 ; Next bit...
+    lsr a                               ; ...
+    tax                                 ; ...
+    bne loop_7827                       ; ...until all eight are done
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Plot a sprite at a map cell in every view
 ;
@@ -6769,52 +6772,52 @@ data_518e = sub_5178+22
 ;     SPRITE_NUMBER: sprite to plot
 ; &7852 referenced 19 times by &38e8, &3940, &4476, &451c, &45a1, &46ad, &46f7, &472c, &7091, &70f9, &7213, &7320, &76f9, &7741, &7817, &79db, &7a07, &7b25, &7b5c
 .plot_at_cell
-    lda cell_y
-    and #&f8
-    sta scratch
-    clc
-    adc scratch
-    adc scratch
-    adc scratch
-    sta cell_room
-    lda cell_x
-    and #&f8
-    adc cell_room
-    sta cell_room
-    lda cell_x
-    and #7
-    asl a
-    asl a
-    clc
-    adc data_007d
-    sta cell_x
-    lda cell_y
-    and #7
-    asl a
-    asl a
-    sta scratch
-    asl a
-    clc
-    adc scratch
-    adc data_007e
-    sta cell_y
-    lda view_room
-    cmp cell_room
-    bne code_78ad
-    clc
-    lda #1
-    adc cell_x
-    sta plot_x
-    lda #1
-    adc cell_y
-    sta plot_y
-    jsr plot_sprite
+    lda cell_y                          ; Room = (cell_y AND &F8) x 4 + (cell_x AND &F8)...
+    and #&f8                            ; ...
+    sta scratch                         ; ...
+    clc                                 ; ...
+    adc scratch                         ; ...
+    adc scratch                         ; ...
+    adc scratch                         ; ...
+    sta cell_room                       ; ...
+    lda cell_x                          ; ...
+    and #&f8                            ; ...
+    adc cell_room                       ; ...
+    sta cell_room                       ; ...in cell_room
+    lda cell_x                          ; Column within the view = (cell_x AND 7) x 4 + offset_x
+    and #7                              ; ...
+    asl a                               ; ...
+    asl a                               ; ...
+    clc                                 ; ...
+    adc data_007d                       ; ...
+    sta cell_x                          ; ...
+    lda cell_y                          ; Row within the view = (cell_y AND 7) x 12 + offset_y
+    and #7                              ; ...
+    asl a                               ; ...
+    asl a                               ; ...
+    sta scratch                         ; ...
+    asl a                               ; ...
+    clc                                 ; ...
+    adc scratch                         ; ...
+    adc data_007e                       ; ...
+    sta cell_y                          ; ...
+    lda view_room                       ; Does the top-left view show this room?
+    cmp cell_room                       ; ...
+    bne code_78ad                       ; No
+    clc                                 ; Yes: plot at column 1, row 1 of the screen, plus the position in the room
+    lda #1                              ; ...
+    adc cell_x                          ; ...
+    sta plot_x                          ; ...
+    lda #1                              ; ...
+    adc cell_y                          ; ...
+    sta plot_y                          ; ...
+    jsr plot_sprite                     ; ...
 ; &78ad referenced 1 time by &7899
 .code_78ad
-    lda data_0da2
-    cmp cell_room
-    bne code_78c7
-    clc
+    lda data_0da2                       ; Does the top-right view show it?
+    cmp cell_room                       ; ...
+    bne code_78c7                       ; No
+    clc                                 ; Yes: plot at column &23, row 1
     lda #&23 ; '#'
     adc cell_x
     sta plot_x
@@ -6824,10 +6827,10 @@ data_518e = sub_5178+22
     jsr plot_sprite
 ; &78c7 referenced 1 time by &78b3
 .code_78c7
-    lda data_0da4
-    cmp cell_room
-    bne code_78e1
-    clc
+    lda data_0da4                       ; Does the bottom-left view show it?
+    cmp cell_room                       ; ...
+    bne code_78e1                       ; No
+    clc                                 ; Yes: plot at column 1, row &67
     lda #1
     adc cell_x
     sta plot_x
@@ -6837,10 +6840,10 @@ data_518e = sub_5178+22
     jsr plot_sprite
 ; &78e1 referenced 1 time by &78cd
 .code_78e1
-    lda data_0da6
-    cmp cell_room
-    bne return_11
-    clc
+    lda data_0da6                       ; Does the bottom-right view show it?
+    cmp cell_room                       ; ...
+    bne return_11                       ; No
+    clc                                 ; Yes: plot at column &23, row &67
     lda #&23 ; '#'
     adc cell_x
     sta plot_x
@@ -6850,7 +6853,7 @@ data_518e = sub_5178+22
     jsr plot_sprite
 ; &78fb referenced 1 time by &78e7
 .return_11
-    rts
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Test for a wall at a map cell
 ;
@@ -6863,33 +6866,33 @@ data_518e = sub_5178+22
 ;     Z: set if no wall
 ; &78fc referenced 5 times by &6fb2, &712b, &753a, &7675, &7a51
 .test_wall
-    lda cell_y
+    lda cell_y                          ; Room offset = (cell_y AND &F8) x 4 + (cell_x AND &F8)...
     and #&f8
     sta scratch
     clc
     adc scratch
     adc scratch
     adc scratch
-    sta data_007b
+    sta data_007b                       ; ...low byte of the pointer
     lda cell_x
     and #&f8
     adc data_007b
     sta data_007b
-    lda #&0c
-    sta data_007c
-    lda cell_x
-    and #7
-    tax
-    lda bit_masks,x
-    sta scratch
-    lda cell_y
-    and #7
-    tay
-    lda (data_007b),y
-    and scratch
-    sta data_008f
-    tay
-    rts
+    lda #&0c                            ; ...into room_walls at &0C00
+    sta data_007c                       ; ...
+    lda cell_x                          ; Bit for the column within the room
+    and #7                              ; ...
+    tax                                 ; ...
+    lda bit_masks,x                     ; ...
+    sta scratch                         ; ...
+    lda cell_y                          ; Byte for the row within the room
+    and #7                              ; ...
+    tay                                 ; ...
+    lda (data_007b),y                   ; Isolate the cell's bit...
+    and scratch                         ; ...
+    sta data_008f                       ; ...keep it in &8F...
+    tay                                 ; ...and Y
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Test whether a map cell can hold an object
 ;
@@ -6902,33 +6905,33 @@ data_518e = sub_5178+22
 ;     Z: set if an object may lie there
 ; &7938 referenced 2 times by &70b5, &7166
 .test_object_free
-    lda cell_y
+    lda cell_y                          ; Room offset = (cell_y AND &F8) x 4 + (cell_x AND &F8)...
     and #&f8
     sta scratch
     clc
     adc scratch
     adc scratch
     adc scratch
-    sta data_007b
+    sta data_007b                       ; ...low byte of the pointer
     lda cell_x
     and #&f8
     adc data_007b
     sta data_007b
-    lda #&21 ; '!'
-    sta data_007c
-    lda cell_x
+    lda #&21 ; '!'                      ; ...into object_free_map at &2100
+    sta data_007c                       ; ...
+    lda cell_x                          ; Bit for the column within the room
     and #7
     tax
     lda bit_masks,x
     sta scratch
-    lda cell_y
+    lda cell_y                          ; Byte for the row within the room
     and #7
     tay
-    lda (data_007b),y
+    lda (data_007b),y                   ; Isolate the cell's bit...
     and scratch
-    sta data_008f
-    tay
-    rts
+    sta data_008f                       ; ...keep it in &8F...
+    tay                                 ; ...and Y
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Look for a monster or hero at a cell
 ;
@@ -6941,56 +6944,56 @@ data_518e = sub_5178+22
 ;     Y: non-zero if a monster was found
 ; &7974 referenced 4 times by &6fdc, &713f, &7a8c, &7ce6
 .find_creature
-    ldx #&1e
+    ldx #&1e                            ; Monsters 30 to 1...
 ; &7976 referenced 1 time by &798e
 .loop_7976
-    cpx scratch
-    beq code_798d
-    lda cell_x
-    cmp monster_x,x
-    bne code_798d
-    lda cell_y
-    cmp monster_y,x
-    bne code_798d
-    tay
-    rts
+    cpx scratch                         ; ...except the one being moved
+    beq code_798d                       ; ...
+    lda cell_x                          ; At cell_x...
+    cmp monster_x,x                     ; ...
+    bne code_798d                       ; ...
+    lda cell_y                          ; ...and cell_y?
+    cmp monster_y,x                     ; ...
+    bne code_798d                       ; ...
+    tay                                 ; Yes: return with Y and A non-zero
+    rts                                 ; ...
 ; &798d referenced 3 times by &7979, &7981, &7989
 .code_798d
-    dex
-    bne loop_7976
-    lda scratch
-    beq code_79bc
-    ldx #0
+    dex                                 ; Next monster
+    bne loop_7976                       ; ...
+    lda scratch                         ; No monster. Check for heroes too?
+    beq code_79bc                       ; No: return 0
+    ldx #0                              ; For each hero...
 ; &7997 referenced 1 time by &79ba
 .loop_7997
-    lda cell_x
-    cmp hero_x,x
-    bne code_79b7
-    lda cell_y
-    cmp hero_y,x
-    bne code_79b7
-    ldy hero_damage_taken,x
+    lda cell_x                          ; ...at cell_x...
+    cmp hero_x,x                        ; ...
+    bne code_79b7                       ; ...
+    lda cell_y                          ; ...and cell_y?
+    cmp hero_y,x                        ; ...
+    bne code_79b7                       ; ...
+    ldy hero_damage_taken,x             ; Yes: take hero_damage_taken health points
 ; &79aa referenced 1 time by &79b2
 .loop_79aa
-    tya
-    pha
-    jsr lose_health_point
-    pla
-    tay
-    dey
-    bne loop_79aa
-    lda #1
-    rts
+    tya                                 ; ...
+    pha                                 ; ...
+    jsr lose_health_point               ; ...
+    pla                                 ; ...
+    tay                                 ; ...
+    dey                                 ; ...
+    bne loop_79aa                       ; ...
+    lda #1                              ; Return A = 1: a hero was there
+    rts                                 ; ...
 ; &79b7 referenced 2 times by &799d, &79a5
 .code_79b7
-    inx
-    cpx #4
-    bne loop_7997
+    inx                                 ; Next hero
+    cpx #4                              ; ...
+    bne loop_7997                       ; ...
 ; &79bc referenced 1 time by &7993
 .code_79bc
-    lda #0
-    ldy #0
-    rts
+    lda #0                              ; Nothing there: return A = Y = 0
+    ldy #0                              ; ...
+    rts                                 ; ...
 ; ***************************************************************************************
 ; Draw the trapdoors and move the monsters
 ;
@@ -7446,28 +7449,28 @@ data_518e = sub_5178+22
 ;     X: preserved
 ; &7c95 referenced 6 times by &6ec4, &6ed7, &6eea, &6efd, &6f10, &7627
 .test_key
-    tay
-    txa
-    pha
-    tya
-    tax
-    lda #osbyte_inkey
-    ldy #&ff
-    jsr osbyte                          ; INKEY: Scan for a key with positive X, or read internal key number EOR 128 for negative X
-    cpy #&ff                            ; X=ASCII code typed (positive timeout) or internal key number EOR 128 (negative scan) / Y=0 if a key was pressed, Y=&FF on time-out, Y=&1B on Escape
-    bne code_7cae
-    cpx #&ff
-    bne code_7cae
-    pla
-    tax
-    lda #0
-    rts
+    tay                                 ; Key number to X, keeping X on the stack
+    txa                                 ; ...
+    pha                                 ; ...
+    tya                                 ; ...
+    tax                                 ; ...
+    lda #osbyte_inkey                   ; OSBYTE &81 with Y = &FF: scan the key
+    ldy #&ff                            ; ...
+    jsr osbyte                          ; ...  INKEY: Scan for a key with positive X, or read internal key number EOR 128 for negative X
+    cpy #&ff                            ; X = Y = &FF if it is pressed
+    bne code_7cae                       ; ...
+    cpx #&ff                            ; ...
+    bne code_7cae                       ; ...
+    pla                                 ; Pressed: restore X and return A = 0, Z set
+    tax                                 ; ...
+    lda #0                              ; ...
+    rts                                 ; ...
 ; &7cae referenced 2 times by &7ca3, &7ca7
 .code_7cae
-    pla
-    tax
-    lda #1
-    rts
+    pla                                 ; Not pressed: restore X and return A = 1
+    tax                                 ; ...
+    lda #1                              ; ...
+    rts                                 ; ...
 ; &7cb3 referenced 1 time by &7b3c
 .code_7cb3
     inc next_trapdoor
@@ -8000,6 +8003,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     trapdoor_y:                  2
 ;     add_thousand_points:         1
 ;     add_thousand_points_joy:     1
+;     animate_absent_hero:         1
 ;     bytev:                       1
 ;     bytev + 1:                   1
 ;     check_for_victory:           1
@@ -8258,8 +8262,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     font_letters:                1
 ;     game_entry:                  1
 ;     game_over_message:           1
-;     hero_arrival_sprites:        1
-;     hero_arrives:                1
+;     hero_appearance_sprites:     1
 ;     hero_enters_exit:            1
 ;     hero_faces:                  1
 ;     hero_key_down:               1

@@ -17,6 +17,7 @@ def annotate(a: Annotator) -> None:
     annotate_state(a)
     annotate_routines(a)
     annotate_level_file(a)
+    annotate_core_comments(a)
 
 
 # ---------------------------------------------------------------------------
@@ -340,8 +341,10 @@ def annotate_state(a: Annotator) -> None:
         "queue. A Cross of Resurrection takes the first entry."))
     a.label(0x0B2F, "next_trapdoor", description=(
         "Index (0-7) of the trapdoor from which the next monster emerges."))
-    a.label(0x0B30, "hero_arrival_sprites", length=9, description=(
-        "Sprites shown, in turn, while a hero materialises."))
+    a.label(0x0B30, "hero_appearance_sprites", length=9, description=(
+        "Sprites of a hero dying, in order (sparkles &16-&19, then skulls "
+        "&64-&68, ending as the skull left where the hero fell), or "
+        "returning, in reverse."))
     a.label(0x0B40, "monster_hit_points", length=31, description=(
         "Hit points left for each monster (entries 1-30); a hit subtracts "
         "the missile's damage."))
@@ -652,10 +655,14 @@ def annotate_routines(a: Annotator) -> None:
           "it ends, move the hero one cell in the direction they face and "
           "clear the pixel offsets. The offsets are then doubled.",
           on_entry=X_HERO, on_exit=X_KEPT)
-    a.sub(0x76DA, "hero_arrives", "Bring a returning hero into play",
-          "Every other frame, show the next of the hero's arrival sprites. "
-          "After the last, put the hero in play facing down with health 32 "
-          "(set to 33 and drawn by taking a point).", on_entry=X_HERO)
+    a.sub(0x76DA, "animate_absent_hero", "Animate a hero who is out of play",
+          "Every other frame, step hero_frame by hero_offset_x through "
+          "hero_appearance_sprites and plot the sprite at the hero's cell: "
+          "forwards (+1) for a hero dying, stopping at the skull; backwards "
+          "(-1) for a hero returning through a Cross of Resurrection. When a "
+          "returning hero reaches the first sprite, put them in play facing "
+          "down with health 32 (set to 33 and drawn by taking a point).",
+          on_entry=X_HERO)
     a.sub(0x7732, "draw_hero", "Draw a hero",
           "Plot sprite_number at hero X's cell and pixel offset in every view "
           "that shows it.", on_entry=X_HERO, on_exit=X_KEPT)
@@ -1121,3 +1128,197 @@ def annotate_level_file(a: Annotator) -> None:
         (0x15AB, "..."), (0x15AC, "..."), (0x15AE, "..."), (0x15B0, "Return"),
     ]:
         a.c(addr, text)
+
+
+def annotate_core_comments(a: Annotator) -> None:
+    """Inline comments for the core primitives."""
+    C = a.c
+    # plot_at_cell
+    for addr, text in [
+        (0x7852, "Room = (cell_y AND &F8) x 4 + (cell_x AND &F8)..."),
+        (0x7855, "..."), (0x7857, "..."), (0x785A, "..."), (0x785B, "..."),
+        (0x785E, "..."), (0x7861, "..."), (0x7864, "..."),
+        (0x7867, "..."), (0x786A, "..."), (0x786C, "..."),
+        (0x786F, "...in cell_room"),
+        (0x7872, "Column within the view = (cell_x AND 7) x 4 + offset_x"),
+        (0x7875, "..."), (0x7877, "..."), (0x7878, "..."), (0x7879, "..."),
+        (0x787A, "..."), (0x787C, "..."),
+        (0x787F, "Row within the view = (cell_y AND 7) x 12 + offset_y"),
+        (0x7882, "..."), (0x7884, "..."), (0x7885, "..."), (0x7886, "..."),
+        (0x7889, "..."), (0x788A, "..."), (0x788B, "..."), (0x788E, "..."),
+        (0x7890, "..."),
+        (0x7893, "Does the top-left view show this room?"),
+        (0x7896, "..."), (0x7899, "No"),
+        (0x789B, "Yes: plot at column 1, row 1 of the screen, plus the "
+                 "position in the room"),
+        (0x789C, "..."), (0x789E, "..."), (0x78A1, "..."), (0x78A3, "..."),
+        (0x78A5, "..."), (0x78A8, "..."), (0x78AA, "..."),
+        (0x78AD, "Does the top-right view show it?"),
+        (0x78B0, "..."), (0x78B3, "No"),
+        (0x78B5, "Yes: plot at column &23, row 1"),
+        (0x78C7, "Does the bottom-left view show it?"),
+        (0x78CA, "..."), (0x78CD, "No"),
+        (0x78CF, "Yes: plot at column 1, row &67"),
+        (0x78E1, "Does the bottom-right view show it?"),
+        (0x78E4, "..."), (0x78E7, "No"),
+        (0x78E9, "Yes: plot at column &23, row &67"),
+        (0x78FB, "Return"),
+        # test_wall
+        (0x78FC, "Room offset = (cell_y AND &F8) x 4 + (cell_x AND &F8)..."),
+        (0x790E, "...low byte of the pointer"),
+        (0x7919, "...into room_walls at &0C00"),
+        (0x791B, "..."),
+        (0x791D, "Bit for the column within the room"),
+        (0x7920, "..."), (0x7922, "..."), (0x7923, "..."), (0x7926, "..."),
+        (0x7929, "Byte for the row within the room"),
+        (0x792C, "..."), (0x792E, "..."),
+        (0x792F, "Isolate the cell's bit..."),
+        (0x7931, "..."),
+        (0x7934, "...keep it in &8F..."),
+        (0x7936, "...and Y"),
+        (0x7937, "Return"),
+        # test_object_free
+        (0x7938, "Room offset = (cell_y AND &F8) x 4 + (cell_x AND &F8)..."),
+        (0x794A, "...low byte of the pointer"),
+        (0x7955, "...into object_free_map at &2100"),
+        (0x7957, "..."),
+        (0x7959, "Bit for the column within the room"),
+        (0x7965, "Byte for the row within the room"),
+        (0x796B, "Isolate the cell's bit..."),
+        (0x7970, "...keep it in &8F..."),
+        (0x7972, "...and Y"),
+        (0x7973, "Return"),
+        # find_creature
+        (0x7974, "Monsters 30 to 1..."),
+        (0x7976, "...except the one being moved"),
+        (0x7979, "..."),
+        (0x797B, "At cell_x..."), (0x797E, "..."), (0x7981, "..."),
+        (0x7983, "...and cell_y?"), (0x7986, "..."), (0x7989, "..."),
+        (0x798B, "Yes: return with Y and A non-zero"),
+        (0x798C, "..."),
+        (0x798D, "Next monster"), (0x798E, "..."),
+        (0x7990, "No monster. Check for heroes too?"),
+        (0x7993, "No: return 0"),
+        (0x7995, "For each hero..."),
+        (0x7997, "...at cell_x..."), (0x799A, "..."), (0x799D, "..."),
+        (0x799F, "...and cell_y?"), (0x79A2, "..."), (0x79A5, "..."),
+        (0x79A7, "Yes: take hero_damage_taken health points"),
+        (0x79AA, "..."), (0x79AB, "..."), (0x79AC, "..."), (0x79AF, "..."),
+        (0x79B0, "..."), (0x79B1, "..."), (0x79B2, "..."),
+        (0x79B4, "Return A = 1: a hero was there"),
+        (0x79B6, "..."),
+        (0x79B7, "Next hero"), (0x79B8, "..."), (0x79BA, "..."),
+        (0x79BC, "Nothing there: return A = Y = 0"),
+        (0x79BE, "..."), (0x79C0, "..."),
+        # lose_health_point
+        (0x7221, "Is the hero in play?"),
+        (0x7224, "Yes"),
+        (0x7226, "No: return"),
+        (0x7227, "Take one from the units digit"),
+        (0x722A, "..."),
+        (0x722D, "Below 0?"),
+        (0x722F, "No: redraw"),
+        (0x7231, "Yes: units 9..."),
+        (0x7233, "..."),
+        (0x7236, "...and take one from the tens"),
+        (0x7239, "..."),
+        (0x723C, "Below 0: the hero has died"),
+        (0x723E, "No: redraw"),
+        (0x7240, "Erase the hero..."),
+        (0x7242, "..."),
+        (0x7244, "..."),
+        (0x7247, "...take them out of play..."),
+        (0x7249, "..."),
+        (0x724C, "...and start the death animation: step +1 through "
+                 "hero_appearance_sprites, every other frame"),
+        (0x724E, "..."), (0x7251, "..."),
+        (0x7254, "Add hero number + 1 at the end of returning_hero_queue"),
+        (0x7256, "..."), (0x7259, "..."), (0x725B, "..."), (0x725C, "..."),
+        (0x725D, "..."), (0x725F, "..."), (0x7262, "Return"),
+        (0x7263, "..."), (0x7264, "..."),
+        (0x7266, "Draw the health: tens digit at column &45..."),
+        (0x7269, "..."), (0x726B, "..."), (0x726D, "..."), (0x726F, "..."),
+        (0x7272, "..."), (0x7274, "..."), (0x7275, "..."), (0x7276, "..."),
+        (0x7279, "..."), (0x727A, "..."),
+        (0x727B, "...units digit at column &48"),
+        (0x727E, "..."), (0x7280, "..."), (0x7282, "..."), (0x7284, "..."),
+        (0x7285, "..."), (0x7286, "..."), (0x7289, "..."), (0x728A, "..."),
+        (0x728B, "Return"),
+        # add_point, add_ten_points
+        (0x728C, "Add one to the units digit"),
+        (0x728F, "..."), (0x7292, "Past 9?"), (0x7294, "No: redraw"),
+        (0x7296, "Yes: units 0, and carry into the tens"),
+        (0x7298, "..."),
+        (0x729B, "Add one to the tens digit"),
+        (0x729E, "..."), (0x72A1, "Past 9?"), (0x72A3, "No: redraw"),
+        (0x72A5, "Yes: tens 0..."), (0x72A7, "..."),
+        (0x72AA, "...and add one to the hundreds"),
+        (0x72AD, "..."), (0x72B0, "Past 9?"), (0x72B2, "No: redraw"),
+        (0x72B4, "Yes: hundreds 0..."), (0x72B6, "..."),
+        (0x72B9, "...and add a thousand"),
+        (0x72BC, "Draw the score twelve rows below the health: thousands "
+                 "at column &45..."),
+        (0x72D4, "...hundreds at &48..."),
+        (0x72E4, "...tens at &4B..."),
+        (0x72F4, "...units at &4E"),
+        (0x7304, "Return"),
+        # test_key
+        (0x7C95, "Key number to X, keeping X on the stack"),
+        (0x7C96, "..."), (0x7C97, "..."), (0x7C98, "..."), (0x7C99, "..."),
+        (0x7C9A, "OSBYTE &81 with Y = &FF: scan the key"),
+        (0x7C9C, "..."), (0x7C9E, "..."),
+        (0x7CA1, "X = Y = &FF if it is pressed"),
+        (0x7CA3, "..."), (0x7CA5, "..."), (0x7CA7, "..."),
+        (0x7CA9, "Pressed: restore X and return A = 0, Z set"),
+        (0x7CAA, "..."), (0x7CAB, "..."), (0x7CAD, "..."),
+        (0x7CAE, "Not pressed: restore X and return A = 1"),
+        (0x7CAF, "..."), (0x7CB0, "..."), (0x7CB2, "..."),
+        # draw_hero, get_hero_cell
+        (0x7732, "Hero's cell"),
+        (0x7735, "...and pixel offsets"),
+        (0x7738, "..."), (0x773A, "..."), (0x773D, "..."),
+        (0x773F, "Plot in every view showing it, preserving X"),
+        (0x7740, "..."), (0x7741, "..."), (0x7744, "..."), (0x7745, "..."),
+        (0x7746, "Return"),
+        (0x777A, "cell_x = hero_x"), (0x777D, "..."),
+        (0x7780, "cell_y = hero_y"), (0x7783, "..."), (0x7786, "Return"),
+        # draw views
+        (0x7795, "Top-left view: row 1..."), (0x7797, "..."),
+        (0x7799, "...column 1..."), (0x779B, "..."),
+        (0x779E, "...hero 0's room"), (0x77A1, "..."),
+        (0x77A3, "Draw it"), (0x77A6, "Return"),
+        (0x77A7, "Top-right view: row 1..."), (0x77AB, "...column &23..."),
+        (0x77B0, "...hero 1's room"), (0x77B5, "Draw it"), (0x77B8, "Return"),
+        (0x77B9, "Bottom-left view: row &67..."), (0x77BD, "...column 1..."),
+        (0x77C2, "...hero 2's room"), (0x77C7, "Draw it"), (0x77CA, "Return"),
+        (0x77CB, "Bottom-right view: row &67..."), (0x77CF, "...column &23..."),
+        (0x77D4, "...hero 3's room"), (0x77D9, "Draw it"), (0x77DC, "Return"),
+        (0x77DE, "The room's walls are in page &0C"),
+        (0x77E0, "..."),
+        (0x77E2, "For each of the eight rows..."),
+        (0x77E4, "...take its eight wall bits..."),
+        (0x77E6, "..."), (0x77E9, "..."), (0x77EA, "..."),
+        (0x77EB, "...and draw them"),
+        (0x77EE, "Twelve pixel rows down"),
+        (0x77EF, "..."), (0x77F1, "..."), (0x77F3, "..."),
+        (0x77F5, "..."), (0x77F6, "..."), (0x77F7, "..."), (0x77F8, "..."),
+        (0x77FA, "..."),
+        (0x77FC, "Then the doors 20 to 1, in every view showing them"),
+        (0x781C, "..."), (0x781D, "..."), (0x781F, "Return"),
+        (0x7820, "Start at the room's left edge"),
+        (0x7823, "..."),
+        (0x7825, "Bit mask, starting with the leftmost cell"),
+        (0x7827, "..."), (0x7828, "..."), (0x7829, "..."),
+        (0x782C, "Wall here?"), (0x782F, "..."),
+        (0x7832, "No: plot the blank"),
+        (0x7834, "Yes: plot the wall block (sprite 0)"),
+        (0x7836, "..."), (0x7838, "..."), (0x783B, "..."),
+        (0x783E, "Plot the blank (sprite &15)"),
+        (0x7840, "..."), (0x7842, "..."),
+        (0x7845, "Four byte columns right"),
+        (0x7846, "..."), (0x7848, "..."), (0x784A, "..."),
+        (0x784C, "Next bit..."), (0x784D, "..."), (0x784E, "..."),
+        (0x784F, "...until all eight are done"),
+        (0x7851, "Return"),
+    ]:
+        C(addr, text)
