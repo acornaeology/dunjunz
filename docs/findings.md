@@ -172,8 +172,10 @@ contents of BYTEV. On any other MOS, or with anything else hooked into
 BYTEV, joystick mode breaks every OSBYTE call. Neither the crack nor the
 sideways RAM hack has this code.
 
-Which player the joystick replaces, and whether the &80 test detects a
-joystick reliably, are to be confirmed.
+The key numbers it answers are exactly the third player's keys in the
+workspace template (&B9 up K, &99 down `<`, &97 right `?`, &98 left `>`,
+&9D fire SPACE), so the joystick replaces the Barbarian's keys. Whether
+the &80 test detects a joystick reliably is to be confirmed.
 
 ## Dependence on MOS 1.20
 

@@ -427,8 +427,9 @@ def annotate_state(a: Annotator) -> None:
                "hero is dead.")
     hero_table(0x0D95, "hero_health_units", "Health units digit, as a digit sprite.")
     a.label(0x0DA0, "view_room", length=8, description=(
-        "The room each hero's view shows, as an offset into room_walls: one "
-        "entry per hero at even addresses (hero x at view_room + 2x)."))
+        "The room each hero's view shows: a pointer into room_walls, low "
+        "byte then high byte, for each hero in turn (hero x at "
+        "view_room + 2x)."))
     hero_table(0x0DB0, "hero_missile_sprites",
                "Sprite base of each hero's missiles: arrows, fireballs, axes, "
                "swords.")
