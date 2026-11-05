@@ -18,8 +18,8 @@
       "value": 210
     },
     {
-      "name": "osbyte_inkey",
-      "value": 129
+      "name": "osbyte_bell_channel",
+      "value": 211
     },
     {
       "name": "osbyte_bell_envelope",
@@ -28,6 +28,14 @@
     {
       "name": "osbyte_bell_frequency",
       "value": 213
+    },
+    {
+      "name": "osbyte_bell_duration",
+      "value": 214
+    },
+    {
+      "name": "osbyte_inkey",
+      "value": 129
     },
     {
       "name": "osword_envelope",
@@ -701,6 +709,24 @@
         "Z": "set if the key is pressed",
         "X": "preserved"
       }
+    },
+    {
+      "addr": 3377,
+      "name": "game_entry",
+      "title": "Start the game",
+      "description": "Set the bell sound (the BEL character's channel, envelope, pitch and duration), save WRCHV in saved_wrchv and point WRCHV at wrch_handler. The code here is run once only: from &0D40 its bytes are then reused as the missile tables and other workspace in page &0D, which reset_workspace refreshes for each level."
+    },
+    {
+      "addr": 5120,
+      "name": "start_level",
+      "title": "Set up and draw a new level",
+      "description": "Show the level number, load and unpack the level, reset the workspace and monsters, then clear the text area, set the screen to its full 25-row height and draw the view frames and views."
+    },
+    {
+      "addr": 5553,
+      "name": "show_level_number",
+      "title": "Show the number of the level about to start",
+      "description": "Clear the text area, count the level, plot the word LEVEL and print the number in the game's font, then set a text window and colour for later messages."
     }
   ],
   "banners": [
@@ -716,6 +742,13 @@
       "name": "font_digits",
       "title": "Font: digits 0-9",
       "description": "Eight bytes per digit, copied into the definition of character 128 by the WRCHV handler.",
+      "align": "before_label"
+    },
+    {
+      "addr": 5690,
+      "name": "view_frame_plots",
+      "title": "View frame PLOT commands",
+      "description": "Twenty five-byte VDU 25 commands (plot code, x, y) sent by draw_view_frames.",
       "align": "before_label"
     }
   ],
@@ -797,6 +830,7 @@
     "data_6d80": 28032,
     "mos_row_offsets": 50037,
     "mos_row_offsets_lo": 50038,
+    "mos_reset_entry": 55757,
     "mos_oswrch_default": 57508,
     "scsi_data": 64576,
     "scsi_status": 64577,
@@ -1025,6 +1059,12 @@
         "b"
       ],
       "description": "Low bytes of mos_row_offsets."
+    },
+    {
+      "addr": 55757,
+      "name": "mos_reset_entry",
+      "group": "mos_internals",
+      "description": "MOS 1.20 reset entry, the target of the RESET vector. Called directly to reset the machine."
     },
     {
       "addr": 57508,
@@ -1525,9 +1565,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_16d5",
+      "operand": "level_filename_digits",
       "target": 5845,
-      "target_label": "data_16d5"
+      "target_label": "level_filename_digits"
     },
     {
       "addr": 1107,
@@ -11017,22 +11057,7 @@
     {
       "addr": 3376,
       "bytes": [
-        48,
-        169,
-        211,
-        162,
-        17,
-        160,
-        0,
-        32,
-        244,
-        255,
-        169,
-        212,
-        162,
-        0,
-        160,
-        0
+        48
       ],
       "labels": [
         "hero_offset_y"
@@ -11124,36 +11149,105 @@
       ],
       "type": "byte",
       "values": [
-        48,
+        48
+      ]
+    },
+    {
+      "addr": 3377,
+      "bytes": [
         169,
-        211,
+        211
+      ],
+      "labels": [
+        "game_entry"
+      ],
+      "comment_inline": "OSBYTE &D3: bell channel...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#osbyte_bell_channel",
+      "expr": {
+        "text": "osbyte_bell_channel",
+        "tree": {
+          "sym": "osbyte_bell_channel"
+        }
+      }
+    },
+    {
+      "addr": 3379,
+      "bytes": [
         162,
-        17,
-        160,
-        0,
-        32,
-        244,
-        255,
-        169,
-        212,
-        162,
-        0,
+        17
+      ],
+      "comment_inline": "...channel &11",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#&11"
+    },
+    {
+      "addr": 3381,
+      "bytes": [
         160,
         0
-      ]
+      ],
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#0"
+    },
+    {
+      "addr": 3383,
+      "bytes": [
+        32,
+        244,
+        255
+      ],
+      "comment_inline": "... osbyte: bell channel",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "osbyte",
+      "target": 65524,
+      "target_label": "osbyte"
+    },
+    {
+      "addr": 3386,
+      "bytes": [
+        169,
+        212
+      ],
+      "comment_inline": "OSBYTE &D4: bell envelope...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#osbyte_bell_envelope",
+      "expr": {
+        "text": "osbyte_bell_envelope",
+        "tree": {
+          "sym": "osbyte_bell_envelope"
+        }
+      }
+    },
+    {
+      "addr": 3388,
+      "bytes": [
+        162,
+        0
+      ],
+      "comment_inline": "...0, a fixed amplitude",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#0"
+    },
+    {
+      "addr": 3390,
+      "bytes": [
+        160,
+        0
+      ],
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#0"
     },
     {
       "addr": 3392,
       "bytes": [
-        32,
-        244,
-        255,
-        169,
-        213,
-        162,
-        100,
-        160,
-        0,
         32,
         244,
         255
@@ -11161,6 +11255,7 @@
       "labels": [
         "missile_x"
       ],
+      "comment_inline": "... osbyte: bell envelope",
       "xref_summaries": [
         "&0d40 used as index base 6 times by &6f3c, &70eb, &710c, &711a, &711d, &7158"
       ],
@@ -11190,41 +11285,74 @@
           "kind": "indexed"
         }
       ],
-      "type": "byte",
-      "values": [
-        32,
-        244,
-        255,
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "osbyte",
+      "target": 65524,
+      "target_label": "osbyte"
+    },
+    {
+      "addr": 3395,
+      "bytes": [
         169,
-        213,
+        213
+      ],
+      "comment_inline": "OSBYTE &D5: bell pitch...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#osbyte_bell_frequency",
+      "expr": {
+        "text": "osbyte_bell_frequency",
+        "tree": {
+          "sym": "osbyte_bell_frequency"
+        }
+      }
+    },
+    {
+      "addr": 3397,
+      "bytes": [
         162,
-        100,
+        100
+      ],
+      "comment_inline": "...&64",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#&64"
+    },
+    {
+      "addr": 3399,
+      "bytes": [
         160,
-        0,
+        0
+      ],
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#0"
+    },
+    {
+      "addr": 3401,
+      "bytes": [
         32,
         244,
         255
-      ]
+      ],
+      "comment_inline": "... osbyte: bell frequency",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "osbyte",
+      "target": 65524,
+      "target_label": "osbyte"
     },
     {
       "addr": 3404,
       "bytes": [
         169,
-        214,
-        162,
-        1,
-        160,
-        0,
-        32,
-        244,
-        255,
-        173,
-        14,
-        2
+        214
       ],
       "labels": [
         "missile_y"
       ],
+      "comment_inline": "OSBYTE &D6: bell duration...",
       "xref_summaries": [
         "&0d4c used as index base 6 times by &6f42, &70f1, &7105, &7113, &7123, &715e"
       ],
@@ -11254,41 +11382,76 @@
           "kind": "indexed"
         }
       ],
-      "type": "byte",
-      "values": [
-        169,
-        214,
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#osbyte_bell_duration",
+      "expr": {
+        "text": "osbyte_bell_duration",
+        "tree": {
+          "sym": "osbyte_bell_duration"
+        }
+      }
+    },
+    {
+      "addr": 3406,
+      "bytes": [
         162,
-        1,
+        1
+      ],
+      "comment_inline": "...1",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#1"
+    },
+    {
+      "addr": 3408,
+      "bytes": [
         160,
-        0,
+        0
+      ],
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#0"
+    },
+    {
+      "addr": 3410,
+      "bytes": [
         32,
         244,
-        255,
+        255
+      ],
+      "comment_inline": "... osbyte: bell duration",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "osbyte",
+      "target": 65524,
+      "target_label": "osbyte"
+    },
+    {
+      "addr": 3413,
+      "bytes": [
         173,
         14,
         2
-      ]
+      ],
+      "comment_inline": "Save WRCHV...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "wrchv",
+      "target": 526,
+      "target_label": "wrchv"
     },
     {
       "addr": 3416,
       "bytes": [
         141,
         211,
-        18,
-        173,
-        15,
-        2,
-        141,
-        212,
-        18,
-        169,
-        143,
-        141
+        18
       ],
       "labels": [
         "missile_direction"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&0d58 used as index base 12 times by &6f28, &6f36, &70d2, &70de, &70fe, &7134, &71a5, &71ae, &71ba, &71c6, &71ce, &720c"
       ],
@@ -11342,74 +11505,120 @@
           "kind": "indexed"
         }
       ],
-      "type": "byte",
-      "values": [
-        141,
-        211,
-        18,
-        173,
-        15,
-        2,
-        141,
-        212,
-        18,
-        169,
-        143,
-        141
-      ]
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "saved_wrchv",
+      "target": 4819,
+      "target_label": "saved_wrchv"
     },
     {
-      "addr": 3428,
+      "addr": 3419,
       "bytes": [
-        14,
-        2,
-        169,
-        127,
-        141,
+        173,
         15,
-        2,
-        76,
-        0,
+        2
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "wrchv + 1",
+      "target": 527
+    },
+    {
+      "addr": 3422,
+      "bytes": [
+        141,
+        212,
+        18
+      ],
+      "comment_inline": "...in saved_wrchv",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "data_12d4",
+      "target": 4820,
+      "target_label": "data_12d4"
+    },
+    {
+      "addr": 3425,
+      "bytes": [
+        169,
+        143
+      ],
+      "comment_inline": "Point WRCHV at wrch_handler...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&8f"
+    },
+    {
+      "addr": 3427,
+      "bytes": [
+        141,
         14,
-        0,
-        0
+        2
       ],
       "labels": [
-        "missile_sprite_base"
+        "sub_0d63"
       ],
+      "sub_labels": {
+        "3428": [
+          "missile_sprite_base"
+        ]
+      },
+      "comment_inline": "...",
       "xref_summaries": [
         "&0d64 used as index base 4 times by &6f53, &7209, &76b1, &7747"
       ],
-      "references": [
-        {
-          "addr": 28499,
-          "kind": "indexed"
-        },
-        {
-          "addr": 29193,
-          "kind": "indexed"
-        },
-        {
-          "addr": 30385,
-          "kind": "indexed"
-        },
-        {
-          "addr": 30535,
-          "kind": "indexed"
-        }
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "wrchv",
+      "target": 526,
+      "target_label": "wrchv"
+    },
+    {
+      "addr": 3430,
+      "bytes": [
+        169,
+        127
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&7f"
+    },
+    {
+      "addr": 3432,
+      "bytes": [
+        141,
+        15,
+        2
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "wrchv + 1",
+      "target": 527
+    },
+    {
+      "addr": 3435,
+      "bytes": [
+        76,
+        0,
+        14
+      ],
+      "type": "code",
+      "mnemonic": "jmp",
+      "operand": "code_0e00",
+      "target": 3584,
+      "target_label": "code_0e00"
+    },
+    {
+      "addr": 3438,
+      "bytes": [
+        0,
+        0
       ],
       "type": "byte",
       "values": [
-        14,
-        2,
-        169,
-        127,
-        141,
-        15,
-        2,
-        76,
-        0,
-        14,
         0,
         0
       ]
@@ -12172,7 +12381,7 @@
         "code_0e00"
       ],
       "xref_summaries": [
-        "&0e00 referenced 2 times by &0ecc, &5035; also used as index base 2 times by &045a, &0460"
+        "&0e00 referenced 3 times by &0d6b, &0ecc, &5035; also used as index base 2 times by &045a, &0460"
       ],
       "references": [
         {
@@ -12182,6 +12391,10 @@
         {
           "addr": 1120,
           "kind": "indexed"
+        },
+        {
+          "addr": 3435,
+          "kind": "direct"
         },
         {
           "addr": 3788,
@@ -12217,9 +12430,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_169f",
+      "operand": "level_number",
       "target": 5791,
-      "target_label": "data_169f"
+      "target_label": "level_number"
     },
     {
       "addr": 3592,
@@ -12305,8 +12518,12 @@
         22
       ],
       "labels": [
-        "loop_0e14"
+        "level_loop"
       ],
+      "comments_before_label": [
+        "Play each level in turn until every hero is dead."
+      ],
+      "comment_inline": "Monster hit points = 8 + 2 x (levels played)...",
       "xref_summaries": [
         "&0e14 referenced 1 time by &0e84"
       ],
@@ -12318,15 +12535,16 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_169f",
+      "operand": "level_number",
       "target": 5791,
-      "target_label": "data_169f"
+      "target_label": "level_number"
     },
     {
       "addr": 3607,
       "bytes": [
         10
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -12335,6 +12553,7 @@
       "bytes": [
         24
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -12344,6 +12563,7 @@
         105,
         8
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#8"
@@ -12355,6 +12575,7 @@
         255,
         124
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_start_hit_points",
@@ -12366,6 +12587,7 @@
       "bytes": [
         248
       ],
+      "comment_inline": "Add 1 to the level number in decimal...",
       "type": "code",
       "mnemonic": "sed"
     },
@@ -12374,6 +12596,7 @@
       "bytes": [
         24
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -12384,11 +12607,12 @@
         255,
         22
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_16ff",
+      "operand": "level_bcd",
       "target": 5887,
-      "target_label": "data_16ff"
+      "target_label": "level_bcd"
     },
     {
       "addr": 3619,
@@ -12396,6 +12620,7 @@
         105,
         1
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#1"
@@ -12407,17 +12632,19 @@
         255,
         22
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_16ff",
+      "operand": "level_bcd",
       "target": 5887,
-      "target_label": "data_16ff"
+      "target_label": "level_bcd"
     },
     {
       "addr": 3624,
       "bytes": [
         216
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cld"
     },
@@ -12428,11 +12655,12 @@
         159,
         22
       ],
+      "comment_inline": "One digit for levels 1-9, two from 10 (the count is incremented later, in show_level_number)",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_169f",
+      "operand": "level_number",
       "target": 5791,
-      "target_label": "data_169f"
+      "target_label": "level_number"
     },
     {
       "addr": 3628,
@@ -12440,6 +12668,7 @@
         201,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#9"
@@ -12450,6 +12679,7 @@
         176,
         4
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcs",
       "operand": "code_0e34",
@@ -12462,6 +12692,7 @@
         162,
         0
       ],
+      "comment_inline": "X = 0: one digit",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#0"
@@ -12487,6 +12718,7 @@
       "labels": [
         "code_0e34"
       ],
+      "comment_inline": "X = 1: two digits",
       "xref_summaries": [
         "&0e34 referenced 1 time by &0e2e"
       ],
@@ -12510,6 +12742,7 @@
       "labels": [
         "code_0e36"
       ],
+      "comment_inline": "Units digit...",
       "xref_summaries": [
         "&0e36 referenced 1 time by &0e32"
       ],
@@ -12521,9 +12754,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_16ff",
+      "operand": "level_bcd",
       "target": 5887,
-      "target_label": "data_16ff"
+      "target_label": "level_bcd"
     },
     {
       "addr": 3641,
@@ -12531,6 +12764,7 @@
         41,
         15
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "and",
       "operand": "#&0f"
@@ -12540,6 +12774,7 @@
       "bytes": [
         24
       ],
+      "comment_inline": "...as ASCII...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -12549,6 +12784,7 @@
         105,
         48
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#&30"
@@ -12560,11 +12796,12 @@
         213,
         22
       ],
+      "comment_inline": "...into the filename",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_16d5,x",
+      "operand": "level_filename_digits,x",
       "target": 5845,
-      "target_label": "data_16d5"
+      "target_label": "level_filename_digits"
     },
     {
       "addr": 3649,
@@ -12572,6 +12809,7 @@
         224,
         0
       ],
+      "comment_inline": "Two digits?",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#0"
@@ -12582,6 +12820,7 @@
         240,
         13
       ],
+      "comment_inline": "No",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_0e52",
@@ -12595,17 +12834,19 @@
         255,
         22
       ],
+      "comment_inline": "Yes: the tens digit...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_16ff",
+      "operand": "level_bcd",
       "target": 5887,
-      "target_label": "data_16ff"
+      "target_label": "level_bcd"
     },
     {
       "addr": 3656,
       "bytes": [
         74
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lsr"
     },
@@ -12638,6 +12879,7 @@
       "bytes": [
         24
       ],
+      "comment_inline": "...as ASCII...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -12647,6 +12889,7 @@
         105,
         48
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#&30"
@@ -12658,11 +12901,12 @@
         213,
         22
       ],
+      "comment_inline": "...goes first",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_16d5",
+      "operand": "level_filename_digits",
       "target": 5845,
-      "target_label": "data_16d5"
+      "target_label": "level_filename_digits"
     },
     {
       "addr": 3666,
@@ -12673,6 +12917,7 @@
       "labels": [
         "code_0e52"
       ],
+      "comment_inline": "Terminate the filename with a carriage return",
       "xref_summaries": [
         "&0e52 referenced 1 time by &0e43"
       ],
@@ -12693,6 +12938,7 @@
         214,
         22
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_16d6,x",
@@ -12706,11 +12952,12 @@
         0,
         20
       ],
+      "comment_inline": "Load and draw the level",
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_1400",
+      "operand": "start_level",
       "target": 5120,
-      "target_label": "sub_1400"
+      "target_label": "start_level"
     },
     {
       "addr": 3674,
@@ -12719,6 +12966,7 @@
         247,
         14
       ],
+      "comment_inline": "Draw the status panel",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "draw_status_panel",
@@ -12732,6 +12980,7 @@
         176,
         6
       ],
+      "comment_inline": "Take out the heroes nobody plays",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "remove_absent_heroes",
@@ -12744,6 +12993,7 @@
         169,
         1
       ],
+      "comment_inline": "Let one vertical sync pass before play starts",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#1"
@@ -12755,6 +13005,7 @@
         64,
         2
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "os_vsync_counter",
@@ -12768,6 +13019,7 @@
         0,
         31
       ],
+      "comment_inline": "Play the level until it ends",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "code_1f00",
@@ -12780,6 +13032,7 @@
         162,
         0
       ],
+      "comment_inline": "Count the heroes who died, giving each back their starting attributes",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#0"
@@ -12791,11 +13044,12 @@
         242,
         15
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "stx",
-      "operand": "data_0ff2",
+      "operand": "count",
       "target": 4082,
-      "target_label": "data_0ff2"
+      "target_label": "count"
     },
     {
       "addr": 3693,
@@ -12807,6 +13061,7 @@
       "labels": [
         "loop_0e6d"
       ],
+      "comment_inline": "Dead?",
       "xref_summaries": [
         "&0e6d referenced 1 time by &0e7d"
       ],
@@ -12828,6 +13083,7 @@
         201,
         29
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&1d"
@@ -12838,6 +13094,7 @@
         208,
         6
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_0e7a",
@@ -12851,6 +13108,7 @@
         207,
         14
       ],
+      "comment_inline": "Yes: reset them",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "reset_hero",
@@ -12864,11 +13122,12 @@
         242,
         15
       ],
+      "comment_inline": "...and count them",
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_0ff2",
+      "operand": "count",
       "target": 4082,
-      "target_label": "data_0ff2"
+      "target_label": "count"
     },
     {
       "addr": 3706,
@@ -12878,6 +13137,7 @@
       "labels": [
         "code_0e7a"
       ],
+      "comment_inline": "Next hero",
       "xref_summaries": [
         "&0e7a referenced 1 time by &0e72"
       ],
@@ -12896,6 +13156,7 @@
         224,
         4
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#4"
@@ -12906,6 +13167,7 @@
         208,
         238
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_0e6d",
@@ -12919,11 +13181,12 @@
         242,
         15
       ],
+      "comment_inline": "Any hero alive?",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0ff2",
+      "operand": "count",
       "target": 4082,
-      "target_label": "data_0ff2"
+      "target_label": "count"
     },
     {
       "addr": 3714,
@@ -12931,6 +13194,7 @@
         201,
         4
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#4"
@@ -12941,11 +13205,12 @@
         208,
         142
       ],
+      "comment_inline": "Yes: on to the next level",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_0e14",
+      "operand": "level_loop",
       "target": 3604,
-      "target_label": "loop_0e14"
+      "target_label": "level_loop"
     },
     {
       "addr": 3718,
@@ -12953,6 +13218,7 @@
         169,
         28
       ],
+      "comment_inline": "All dead: VDU 28,0,24,16,0, a text window on the left...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&1c"
@@ -13068,6 +13334,7 @@
         169,
         12
       ],
+      "comment_inline": "...VDU 12 to clear it",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&0c"
@@ -13091,6 +13358,7 @@
         162,
         4
       ],
+      "comment_inline": "Put spaces back over the four message bytes used as counters",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#4"
@@ -13101,6 +13369,7 @@
         169,
         32
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&20"
@@ -13115,6 +13384,7 @@
       "labels": [
         "loop_0ea8"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&0ea8 referenced 1 time by &0eac"
       ],
@@ -13135,6 +13405,7 @@
       "bytes": [
         202
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "dex"
     },
@@ -13144,6 +13415,7 @@
         208,
         250
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_0ea8",
@@ -13160,6 +13432,7 @@
       "labels": [
         "loop_0eae"
       ],
+      "comment_inline": "Print game_over_message...",
       "xref_summaries": [
         "&0eae referenced 1 time by &0eb7"
       ],
@@ -13171,9 +13444,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0f90,x",
+      "operand": "game_over_message,x",
       "target": 3984,
-      "target_label": "data_0f90"
+      "target_label": "game_over_message"
     },
     {
       "addr": 3761,
@@ -13182,6 +13455,7 @@
         227,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osasci",
@@ -13193,6 +13467,7 @@
       "bytes": [
         232
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inx"
     },
@@ -13202,6 +13477,7 @@
         201,
         0
       ],
+      "comment_inline": "...up to its zero byte",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#0"
@@ -13212,6 +13488,7 @@
         208,
         245
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_0eae",
@@ -13228,6 +13505,7 @@
       "labels": [
         "loop_0eb9"
       ],
+      "comment_inline": "Wait for the vertical sync counter to run out",
       "xref_summaries": [
         "&0eb9 referenced 1 time by &0ebc"
       ],
@@ -13249,6 +13527,7 @@
         208,
         251
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_0eb9",
@@ -13261,6 +13540,7 @@
         169,
         15
       ],
+      "comment_inline": "Flush the input buffers",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osbyte_flush_buffer_class",
@@ -13278,7 +13558,7 @@
         244,
         255
       ],
-      "comment_inline": "Flush selected class of buffer",
+      "comment_inline": "... Flush selected class of buffer",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -13291,6 +13571,7 @@
         162,
         112
       ],
+      "comment_inline": "Wait up to 6000 centiseconds (60 s) for a key...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&70"
@@ -13301,6 +13582,7 @@
         160,
         23
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#&17"
@@ -13311,6 +13593,7 @@
         169,
         129
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osbyte_inkey",
@@ -13328,7 +13611,7 @@
         244,
         255
       ],
-      "comment_inline": "INKEY: Scan for a key with positive X, or read internal key number EOR 128 for negative X",
+      "comment_inline": "... INKEY: Scan for a key with positive X, or read internal key number EOR 128 for negative X",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -13342,7 +13625,7 @@
         0,
         14
       ],
-      "comment_inline": "X=ASCII code typed (positive timeout) or internal key number EOR 128 (negative scan) / Y=0 if a key was pressed, Y=&FF on time-out, Y=&1B on Escape",
+      "comment_inline": "...then start a new game",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_0e00",
@@ -13577,9 +13860,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0ff1",
+      "operand": "panel_hero",
       "target": 4081,
-      "target_label": "data_0ff1"
+      "target_label": "panel_hero"
     },
     {
       "addr": 3836,
@@ -13602,9 +13885,9 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "data_0ff1",
+      "operand": "panel_hero",
       "target": 4081,
-      "target_label": "data_0ff1"
+      "target_label": "panel_hero"
     },
     {
       "addr": 3839,
@@ -13730,9 +14013,9 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "data_0ff1",
+      "operand": "panel_hero",
       "target": 4081,
-      "target_label": "data_0ff1"
+      "target_label": "panel_hero"
     },
     {
       "addr": 3867,
@@ -13807,9 +14090,9 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "data_0ff1",
+      "operand": "panel_hero",
       "target": 4081,
-      "target_label": "data_0ff1"
+      "target_label": "panel_hero"
     },
     {
       "addr": 3883,
@@ -13872,9 +14155,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0ff2",
+      "operand": "count",
       "target": 4082,
-      "target_label": "data_0ff2"
+      "target_label": "count"
     },
     {
       "addr": 3896,
@@ -13990,9 +14273,9 @@
       ],
       "type": "code",
       "mnemonic": "cpy",
-      "operand": "data_0ff2",
+      "operand": "count",
       "target": 4082,
-      "target_label": "data_0ff2"
+      "target_label": "count"
     },
     {
       "addr": 3915,
@@ -14015,9 +14298,9 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "data_0ff1",
+      "operand": "panel_hero",
       "target": 4081,
-      "target_label": "data_0ff1"
+      "target_label": "panel_hero"
     },
     {
       "addr": 3920,
@@ -14092,9 +14375,9 @@
       ],
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_0ff1",
+      "operand": "panel_hero",
       "target": 4081,
-      "target_label": "data_0ff1"
+      "target_label": "panel_hero"
     },
     {
       "addr": 3936,
@@ -14105,9 +14388,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0ff1",
+      "operand": "panel_hero",
       "target": 4081,
-      "target_label": "data_0ff1"
+      "target_label": "panel_hero"
     },
     {
       "addr": 3939,
@@ -14208,9 +14491,9 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "data_0ff1",
+      "operand": "panel_hero",
       "target": 4081,
-      "target_label": "data_0ff1"
+      "target_label": "panel_hero"
     },
     {
       "addr": 3952,
@@ -14352,7 +14635,14 @@
       "bytes": [
         49,
         57,
-        65,
+        65
+      ],
+      "type": "string",
+      "string": "19A"
+    },
+    {
+      "addr": 3984,
+      "bytes": [
         70,
         65,
         82,
@@ -14372,18 +14662,19 @@
         32
       ],
       "labels": [
-        "sub_0f8d"
+        "game_over_message"
       ],
-      "sub_labels": {
-        "3984": [
-          "data_0f90"
-        ]
-      },
       "xref_summaries": [
         "&0f90 used as index base 1 time by &0eae"
       ],
+      "references": [
+        {
+          "addr": 3758,
+          "kind": "indexed"
+        }
+      ],
       "type": "string",
-      "string": "19AFAREWELL!        "
+      "string": "FAREWELL!        "
     },
     {
       "addr": 4001,
@@ -14540,8 +14831,75 @@
         32,
         65,
         76,
-        76,
-        46,
+        76
+      ],
+      "labels": [
+        "sub_0fea"
+      ],
+      "sub_labels": {
+        "4080": [
+          "data_0ff0"
+        ]
+      },
+      "xref_summaries": [
+        "&0ff0 used as index base 1 time by &0ea8"
+      ],
+      "type": "string",
+      "string": "YOU ALL"
+    },
+    {
+      "addr": 4081,
+      "bytes": [
+        46
+      ],
+      "labels": [
+        "panel_hero"
+      ],
+      "xref_summaries": [
+        "&0ff1 referenced 8 times by &0ef9, &0efc, &0f18, &0f28, &0f4d, &0f5d, &0f60, &0f6d"
+      ],
+      "references": [
+        {
+          "addr": 3833,
+          "kind": "direct"
+        },
+        {
+          "addr": 3836,
+          "kind": "direct"
+        },
+        {
+          "addr": 3864,
+          "kind": "direct"
+        },
+        {
+          "addr": 3880,
+          "kind": "direct"
+        },
+        {
+          "addr": 3917,
+          "kind": "direct"
+        },
+        {
+          "addr": 3933,
+          "kind": "direct"
+        },
+        {
+          "addr": 3936,
+          "kind": "direct"
+        },
+        {
+          "addr": 3949,
+          "kind": "direct"
+        }
+      ],
+      "type": "byte",
+      "values": [
+        46
+      ]
+    },
+    {
+      "addr": 4082,
+      "bytes": [
         32,
         32,
         32,
@@ -14553,26 +14911,35 @@
         32
       ],
       "labels": [
-        "sub_0fea"
+        "count"
       ],
-      "sub_labels": {
-        "4080": [
-          "data_0ff0"
-        ],
-        "4081": [
-          "data_0ff1"
-        ],
-        "4082": [
-          "data_0ff2"
-        ]
-      },
       "xref_summaries": [
-        "&0ff0 used as index base 1 time by &0ea8",
-        "&0ff1 referenced 8 times by &0ef9, &0efc, &0f18, &0f28, &0f4d, &0f5d, &0f60, &0f6d",
         "&0ff2 referenced 5 times by &0e6a, &0e77, &0e7f, &0f35, &0f48"
       ],
+      "references": [
+        {
+          "addr": 3690,
+          "kind": "direct"
+        },
+        {
+          "addr": 3703,
+          "kind": "direct"
+        },
+        {
+          "addr": 3711,
+          "kind": "direct"
+        },
+        {
+          "addr": 3893,
+          "kind": "direct"
+        },
+        {
+          "addr": 3912,
+          "kind": "direct"
+        }
+      ],
       "type": "string",
-      "string": "YOU ALL.         "
+      "string": "         "
     },
     {
       "addr": 4091,
@@ -14841,9 +15208,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_169f",
+      "operand": "level_number",
       "target": 5791,
-      "target_label": "data_169f"
+      "target_label": "level_number"
     },
     {
       "addr": 4211,
@@ -17763,10 +18130,14 @@
         ]
       },
       "xref_summaries": [
-        "&12d3 referenced 2 times by &14d7, &5022",
-        "&12d4 referenced 2 times by &14dd, &5028"
+        "&12d3 referenced 3 times by &0d58, &14d7, &5022",
+        "&12d4 referenced 3 times by &0d5e, &14dd, &5028"
       ],
       "references": [
+        {
+          "addr": 3416,
+          "kind": "direct"
+        },
         {
           "addr": 5335,
           "kind": "direct"
@@ -18671,8 +19042,9 @@
         21
       ],
       "labels": [
-        "sub_1400"
+        "start_level"
       ],
+      "comment_inline": "Show the level number",
       "xref_summaries": [
         "&1400 referenced 1 time by &0e57"
       ],
@@ -18684,9 +19056,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_15b1",
+      "operand": "show_level_number",
       "target": 5553,
-      "target_label": "sub_15b1"
+      "target_label": "show_level_number"
     },
     {
       "addr": 5123,
@@ -18695,6 +19067,7 @@
         70,
         20
       ],
+      "comment_inline": "Load the level",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "sub_1446",
@@ -18708,6 +19081,7 @@
         16,
         21
       ],
+      "comment_inline": "Copy it into the game's tables",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "unpack_level",
@@ -18721,6 +19095,7 @@
         160,
         20
       ],
+      "comment_inline": "Reset page &0D",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "reset_workspace",
@@ -18734,6 +19109,7 @@
         131,
         21
       ],
+      "comment_inline": "Reset the monsters and keys",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "reset_monsters",
@@ -18747,6 +19123,7 @@
         26,
         22
       ],
+      "comment_inline": "Clear the text area",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "clear_text_area",
@@ -18759,6 +19136,7 @@
         169,
         23
       ],
+      "comment_inline": "VDU 23,0,6,25,0,0,0,0,0,0: set 6845 register 6...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&17"
@@ -18770,6 +19148,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -18782,6 +19161,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -18805,6 +19185,7 @@
         169,
         6
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#6"
@@ -18828,6 +19209,7 @@
         169,
         25
       ],
+      "comment_inline": "...to 25 character rows displayed",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&19"
@@ -18851,6 +19233,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -18939,6 +19322,7 @@
         169,
         58
       ],
+      "comment_inline": "Point at view_frame_plots...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&3a"
@@ -18961,6 +19345,7 @@
         169,
         22
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&16"
@@ -18984,6 +19369,7 @@
         215,
         20
       ],
+      "comment_inline": "...and draw the frames and the views",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "draw_view_frames",
@@ -18995,6 +19381,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -19256,9 +19643,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_16ff",
+      "operand": "level_bcd",
       "target": 5887,
-      "target_label": "data_16ff"
+      "target_label": "level_bcd"
     },
     {
       "addr": 5264,
@@ -20828,8 +21215,9 @@
         22
       ],
       "labels": [
-        "sub_15b1"
+        "show_level_number"
       ],
+      "comment_inline": "Clear the text area",
       "xref_summaries": [
         "&15b1 referenced 1 time by &1400"
       ],
@@ -20851,6 +21239,7 @@
         169,
         17
       ],
+      "comment_inline": "COLOUR 6...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&11"
@@ -20874,6 +21263,7 @@
         169,
         6
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#6"
@@ -20898,11 +21288,12 @@
         159,
         22
       ],
+      "comment_inline": "Count the level",
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_169f",
+      "operand": "level_number",
       "target": 5791,
-      "target_label": "data_169f"
+      "target_label": "level_number"
     },
     {
       "addr": 5569,
@@ -20910,6 +21301,7 @@
         169,
         27
       ],
+      "comment_inline": "Plot the word LEVEL...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&1b"
@@ -20932,6 +21324,7 @@
         169,
         40
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&28"
@@ -20954,6 +21347,7 @@
         169,
         118
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&76"
@@ -20977,6 +21371,7 @@
         0,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_sprite",
@@ -20989,6 +21384,7 @@
         169,
         31
       ],
+      "comment_inline": "TAB(10,5)...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&1f"
@@ -21012,6 +21408,7 @@
         169,
         10
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&0a"
@@ -21035,6 +21432,7 @@
         169,
         5
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#5"
@@ -21059,17 +21457,19 @@
         255,
         22
       ],
+      "comment_inline": "Print the tens digit...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_16ff",
+      "operand": "level_bcd",
       "target": 5887,
-      "target_label": "data_16ff"
+      "target_label": "level_bcd"
     },
     {
       "addr": 5602,
       "bytes": [
         168
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -21078,6 +21478,7 @@
       "bytes": [
         74
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lsr"
     },
@@ -21119,6 +21520,7 @@
         105,
         48
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#&30"
@@ -21130,6 +21532,7 @@
         238,
         255
       ],
+      "comment_inline": "...in the game's font",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -21141,6 +21544,7 @@
       "bytes": [
         152
       ],
+      "comment_inline": "Print the units digit...",
       "type": "code",
       "mnemonic": "tya"
     },
@@ -21150,6 +21554,7 @@
         41,
         15
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "and",
       "operand": "#&0f"
@@ -21168,6 +21573,7 @@
         105,
         48
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#&30"
@@ -21179,6 +21585,7 @@
         238,
         255
       ],
+      "comment_inline": "...in the game's font",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -21191,6 +21598,7 @@
         169,
         28
       ],
+      "comment_inline": "VDU 28,1,22,14,17: a text window...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&1c"
@@ -21260,6 +21668,7 @@
         169,
         14
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&0e"
@@ -21283,6 +21692,7 @@
         169,
         17
       ],
+      "comment_inline": "COLOUR 2...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&11"
@@ -21329,6 +21739,7 @@
         169,
         2
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#2"
@@ -21351,6 +21762,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -21519,124 +21931,16 @@
     {
       "addr": 5689,
       "bytes": [
-        96,
-        4,
-        8,
-        0,
-        254,
-        3,
-        1,
-        0,
-        0,
-        124,
-        254,
-        1,
-        8,
-        2,
-        0,
-        0,
-        1,
-        0,
-        0,
-        132,
-        1,
-        5,
-        8,
-        0,
-        254,
-        3,
-        4,
-        40,
-        2,
-        254,
-        3,
-        1,
-        0,
-        0,
-        123,
-        254,
-        1,
-        8,
-        2,
-        0,
-        0,
-        1,
-        0,
-        0,
-        132,
-        1,
-        5,
-        40,
-        2,
-        254,
-        3,
-        4,
-        8,
-        0,
-        102,
-        2,
-        1,
-        0,
-        0,
-        124,
-        254,
-        1,
-        8,
-        2,
-        0,
-        0,
-        1,
-        0,
-        0,
-        132,
-        1,
-        5,
-        8,
-        0,
-        102,
-        2,
-        4,
-        40,
-        2,
-        102,
-        2,
-        1,
-        0,
-        0,
-        124,
-        254,
-        1,
-        8,
-        2,
-        0,
-        0,
-        1,
-        0,
-        0,
-        132,
-        1,
-        5,
-        40,
-        2,
-        102,
-        2,
-        8,
-        1
-      ],
-      "labels": [
-        "sub_1639"
-      ],
-      "sub_labels": {
-        "5791": [
-          "data_169f"
-        ]
-      },
-      "xref_summaries": [
-        "&169f referenced 5 times by &0e05, &0e14, &0e29, &1070, &15be"
+        96
       ],
       "type": "byte",
       "values": [
-        96,
+        96
+      ]
+    },
+    {
+      "addr": 5690,
+      "bytes": [
         4,
         8,
         0,
@@ -21736,8 +22040,160 @@
         40,
         2,
         102,
-        2,
+        2
+      ],
+      "labels": [
+        "view_frame_plots"
+      ],
+      "type": "byte",
+      "values": [
+        4,
         8,
+        0,
+        254,
+        3,
+        1,
+        0,
+        0,
+        124,
+        254,
+        1,
+        8,
+        2,
+        0,
+        0,
+        1,
+        0,
+        0,
+        132,
+        1,
+        5,
+        8,
+        0,
+        254,
+        3,
+        4,
+        40,
+        2,
+        254,
+        3,
+        1,
+        0,
+        0,
+        123,
+        254,
+        1,
+        8,
+        2,
+        0,
+        0,
+        1,
+        0,
+        0,
+        132,
+        1,
+        5,
+        40,
+        2,
+        254,
+        3,
+        4,
+        8,
+        0,
+        102,
+        2,
+        1,
+        0,
+        0,
+        124,
+        254,
+        1,
+        8,
+        2,
+        0,
+        0,
+        1,
+        0,
+        0,
+        132,
+        1,
+        5,
+        8,
+        0,
+        102,
+        2,
+        4,
+        40,
+        2,
+        102,
+        2,
+        1,
+        0,
+        0,
+        124,
+        254,
+        1,
+        8,
+        2,
+        0,
+        0,
+        1,
+        0,
+        0,
+        132,
+        1,
+        5,
+        40,
+        2,
+        102,
+        2
+      ]
+    },
+    {
+      "addr": 5790,
+      "bytes": [
+        8
+      ],
+      "type": "byte",
+      "values": [
+        8
+      ]
+    },
+    {
+      "addr": 5791,
+      "bytes": [
+        1
+      ],
+      "labels": [
+        "level_number"
+      ],
+      "xref_summaries": [
+        "&169f referenced 5 times by &0e05, &0e14, &0e29, &1070, &15be"
+      ],
+      "references": [
+        {
+          "addr": 3589,
+          "kind": "direct"
+        },
+        {
+          "addr": 3604,
+          "kind": "direct"
+        },
+        {
+          "addr": 3625,
+          "kind": "direct"
+        },
+        {
+          "addr": 4208,
+          "kind": "direct"
+        },
+        {
+          "addr": 5566,
+          "kind": "direct"
+        }
+      ],
+      "type": "byte",
+      "values": [
         1
       ]
     },
@@ -22006,26 +22462,15 @@
         46,
         36,
         46,
-        76,
-        49
-      ],
-      "labels": [
-        "sub_16d0"
-      ],
-      "sub_labels": {
-        "5845": [
-          "data_16d5"
-        ]
-      },
-      "xref_summaries": [
-        "&16d5 referenced 2 times by &0450, &0e4f; also used as index base 1 time by &0e3e"
+        76
       ],
       "type": "string",
-      "string": "L.$.L1"
+      "string": "L.$.L"
     },
     {
-      "addr": 5846,
+      "addr": 5845,
       "bytes": [
+        49,
         13,
         13,
         112,
@@ -22039,23 +22484,34 @@
         0
       ],
       "labels": [
-        "data_16d6"
+        "level_filename_digits"
       ],
+      "sub_labels": {
+        "5846": [
+          "data_16d6"
+        ]
+      },
       "xref_summaries": [
+        "&16d5 referenced 2 times by &0450, &0e4f; also used as index base 1 time by &0e3e",
         "&16d6 referenced 1 time by &0454; also used as index base 1 time by &0e54"
       ],
       "references": [
         {
-          "addr": 1108,
+          "addr": 1104,
           "kind": "direct"
         },
         {
-          "addr": 3668,
+          "addr": 3646,
           "kind": "indexed"
+        },
+        {
+          "addr": 3663,
+          "kind": "direct"
         }
       ],
       "type": "byte",
       "values": [
+        49,
         13,
         13,
         112,
@@ -22108,7 +22564,41 @@
         0,
         121,
         0,
+        140
+      ],
+      "type": "byte",
+      "values": [
+        0,
+        84,
+        18,
+        3,
+        23,
+        116,
+        0,
         140,
+        80,
+        0,
+        0,
+        0,
+        250,
+        22,
+        120,
+        0,
+        140,
+        80,
+        32,
+        0,
+        0,
+        2,
+        0,
+        121,
+        0,
+        140
+      ]
+    },
+    {
+      "addr": 5887,
+      "bytes": [
         1,
         0,
         0,
@@ -22309,44 +22799,39 @@
         0
       ],
       "labels": [
-        "sub_16e5"
+        "level_bcd"
       ],
-      "sub_labels": {
-        "5887": [
-          "data_16ff"
-        ]
-      },
       "xref_summaries": [
         "&16ff referenced 6 times by &0e20, &0e25, &0e36, &0e45, &148d, &15df"
       ],
+      "references": [
+        {
+          "addr": 3616,
+          "kind": "direct"
+        },
+        {
+          "addr": 3621,
+          "kind": "direct"
+        },
+        {
+          "addr": 3638,
+          "kind": "direct"
+        },
+        {
+          "addr": 3653,
+          "kind": "direct"
+        },
+        {
+          "addr": 5261,
+          "kind": "direct"
+        },
+        {
+          "addr": 5599,
+          "kind": "direct"
+        }
+      ],
       "type": "byte",
       "values": [
-        0,
-        84,
-        18,
-        3,
-        23,
-        116,
-        0,
-        140,
-        80,
-        0,
-        0,
-        0,
-        250,
-        22,
-        120,
-        0,
-        140,
-        80,
-        32,
-        0,
-        0,
-        2,
-        0,
-        121,
-        0,
-        140,
         1,
         0,
         0,

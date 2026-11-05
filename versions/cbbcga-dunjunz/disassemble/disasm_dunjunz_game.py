@@ -55,9 +55,13 @@ for name, addr, length in GAME_FILES:
 d.use_environment("acorn_mos")
 d.use_environment("acorn_model_b_hardware")
 
-d.entry(GAME_ENTRY, "game_entry")
 
-game.annotate(Annotator(d, "swr"))
+annotator = Annotator(d, "swr")
+game.annotate(annotator)
+game.annotate_game_entry(annotator)
+game.annotate_level_check(annotator)
+game.annotate_start_level(annotator)
+game.annotate_cassette_level_loop(annotator)
 
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)

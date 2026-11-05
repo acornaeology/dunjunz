@@ -739,3 +739,244 @@ def annotate_routines(a: Annotator) -> None:
           on_entry={"A": "INKEY key number (negative, as a byte)"},
           on_exit={"A": "0 if the key is pressed, 1 if not",
                    "Z": "set if the key is pressed", "X": "preserved"})
+
+
+# ---------------------------------------------------------------------------
+# Code present in some versions only. Each driver calls the functions that
+# match its bytes (see tools/runtime_images.py).
+
+
+def annotate_game_entry(a: Annotator) -> None:
+    """&0D31-&0D6A: identical in every version. In the crack it is never
+    run (its start-up code at &5000 does the same job)."""
+    a.sub(0x0D31, "game_entry", "Start the game",
+          "Set the bell sound (the BEL character's channel, envelope, pitch "
+          "and duration), save WRCHV in saved_wrchv and point WRCHV at "
+          "wrch_handler. The code here is run once only: from &0D40 its "
+          "bytes are then reused as the missile tables and other workspace "
+          "in page &0D, which reset_workspace refreshes for each level.")
+    a.c(0x0D31, "OSBYTE &D3: bell channel...")
+    a.c(0x0D33, "...channel &11")
+    a.c(0x0D37, "...")
+    a.c(0x0D3A, "OSBYTE &D4: bell envelope...")
+    a.c(0x0D3C, "...0, a fixed amplitude")
+    a.c(0x0D40, "...")
+    a.c(0x0D43, "OSBYTE &D5: bell pitch...")
+    a.c(0x0D45, "...&64")
+    a.c(0x0D49, "...")
+    a.c(0x0D4C, "OSBYTE &D6: bell duration...")
+    a.c(0x0D4E, "...1")
+    a.c(0x0D52, "...")
+    a.c(0x0D55, "Save WRCHV...")
+    a.c(0x0D58, "...")
+    a.c(0x0D5B, "...")
+    a.c(0x0D5E, "...in saved_wrchv")
+    a.c(0x0D61, "Point WRCHV at wrch_handler...")
+    a.c(0x0D63, "...")
+    a.c(0x0D66, "...")
+    a.c(0x0D68, "...")
+    a.label(0xD9CD, "mos_reset_entry", group="mos_internals", description=(
+        "MOS 1.20 reset entry, the target of the RESET vector. Called "
+        "directly to reset the machine."))
+
+
+def annotate_level_check(a: Annotator) -> None:
+    """&0450-&04A9: the level decrypt-and-check routine and its table, in
+    the official disc release and the sideways RAM hack."""
+    a.sub(0x0450, "decrypt_level", "Decrypt and check the level just loaded",
+          "Decrypt the level at &6B00-&6DAF in place, XORing each byte with "
+          "the low byte of its own address, and sum the decrypted bytes. If "
+          "the sum does not match the level's entry in level_checksums, "
+          "reset the machine.",
+          on_entry={"level_number": "level loaded (1-25)"})
+    a.c(0x0450, "Point at &6B00, the start of the level...")
+    a.c(0x0452, "...low byte")
+    a.c(0x0454, "Start the sum at zero")
+    a.c(0x0456, "...")
+    a.c(0x0458, "...high byte")
+    a.c(0x045A, "Fetch a byte...")
+    a.c(0x045C, "...XOR it with the low byte of its address...")
+    a.c(0x045E, "...and store it back decrypted")
+    a.c(0x0460, "Add it to the sum")
+    a.c(0x0461, "...")
+    a.c(0x0463, "...")
+    a.c(0x0465, "Next byte...")
+    a.c(0x0467, "...")
+    a.c(0x0469, "...with carry into the high byte")
+    a.c(0x046B, "Stop at &6DB0, the end of the level...")
+    a.c(0x046D, "...")
+    a.c(0x046F, "...")
+    a.c(0x0471, "...")
+    a.c(0x0473, "...")
+    a.c(0x0475, "...")
+    a.c(0x0477, "X = level number")
+    a.c(0x047A, "Compare the sum...")
+    a.c(0x047C, "...with this level's checksum")
+    a.c(0x047F, "Match: return")
+    a.c(0x0481, "No match: reset the machine (MOS 1.20 only)")
+    a.c(0x0484, "Return")
+    a.index_base(0x0490, "level_checksums", group="game_data", description=(
+        "The expected sum of each decrypted level, for levels 1-25 at "
+        "level_checksums+1 to level_checksums+25."))
+    a.byte(0x0491, 25, cols=5)
+    a.banner(0x0491, "Level checksums",
+             "One byte per level, 1-25: the sum, modulo 256, of the level's "
+             "decrypted bytes.")
+
+
+def annotate_start_level(a: Annotator) -> None:
+    """&1400-&1445: identical in every version (what the routines it calls
+    do differs)."""
+    a.label(0x169F, "level_number", description="The current level, 1-25.")
+    a.label(0x16FF, "level_bcd", description=(
+        "The current level in binary-coded decimal, for printing and for the "
+        "level's filename."))
+    a.label(0x163A, "view_frame_plots", length=100, description=(
+        "Twenty VDU 25 (PLOT) commands, five bytes each, that draw the "
+        "frames round the four views."))
+    a.byte(0x163A, 100, cols=5)
+    a.banner(0x163A, "View frame PLOT commands",
+             "Twenty five-byte VDU 25 commands (plot code, x, y) sent by "
+             "draw_view_frames.")
+    a.sub(0x1400, "start_level", "Set up and draw a new level",
+          "Show the level number, load and unpack the level, reset the "
+          "workspace and monsters, then clear the text area, set the screen "
+          "to its full 25-row height and draw the view frames and views.")
+    a.c(0x1400, "Show the level number")
+    a.c(0x1403, "Load the level")
+    a.c(0x1406, "Copy it into the game's tables")
+    a.c(0x1409, "Reset page &0D")
+    a.c(0x140C, "Reset the monsters and keys")
+    a.c(0x140F, "Clear the text area")
+    a.c(0x1412, "VDU 23,0,6,25,0,0,0,0,0,0: set 6845 register 6...")
+    a.c(0x1414, "...")
+    a.c(0x1417, "...")
+    a.c(0x141C, "...")
+    a.c(0x1421, "...to 25 character rows displayed")
+    a.c(0x1426, "...")
+    a.c(0x143A, "Point at view_frame_plots...")
+    a.c(0x143E, "...")
+    a.c(0x1442, "...and draw the frames and the views")
+    a.c(0x1445, "Return")
+
+
+def annotate_cassette_level_loop(a: Annotator) -> None:
+    """&0E14-&0ECE and &15B1-&1619: the level loop and level display of the
+    crack and the sideways RAM hack, which derive from the cassette."""
+    a.label(0x16D5, "level_filename_digits", description=(
+        "Where the level number's digits are written into the level's "
+        "filename."))
+    a.label(0x0F90, "game_over_message", description=(
+        "The message printed when every hero has died, terminated by a zero "
+        "byte."))
+    a.label(0x0FF1, "panel_hero", description=(
+        "Hero counter for draw_status_panel. It is a byte of "
+        "game_over_message, which is repaired before printing."))
+    a.label(0x0FF2, "count", description=(
+        "Counter, used for the dead heroes at the end of a level and the "
+        "rows of missile icons. It is a byte of game_over_message."))
+    a.label(0x0E14, "level_loop")
+    a.block(0x0E14, "Play each level in turn until every hero is dead.")
+    a.c(0x0E14, "Monster hit points = 8 + 2 x (levels played)...")
+    a.c(0x0E17, "...")
+    a.c(0x0E18, "...")
+    a.c(0x0E19, "...")
+    a.c(0x0E1B, "...")
+    a.c(0x0E1E, "Add 1 to the level number in decimal...")
+    a.c(0x0E1F, "...")
+    a.c(0x0E20, "...")
+    a.c(0x0E23, "...")
+    a.c(0x0E25, "...")
+    a.c(0x0E28, "...")
+    a.c(0x0E29, "One digit for levels 1-9, two from 10 (the count is "
+                "incremented later, in show_level_number)")
+    a.c(0x0E2C, "...")
+    a.c(0x0E2E, "...")
+    a.c(0x0E30, "X = 0: one digit")
+    a.c(0x0E34, "X = 1: two digits")
+    a.c(0x0E36, "Units digit...")
+    a.c(0x0E39, "...")
+    a.c(0x0E3B, "...as ASCII...")
+    a.c(0x0E3C, "...")
+    a.c(0x0E3E, "...into the filename")
+    a.c(0x0E41, "Two digits?")
+    a.c(0x0E43, "No")
+    a.c(0x0E45, "Yes: the tens digit...")
+    a.c(0x0E48, "...")
+    a.c(0x0E4C, "...as ASCII...")
+    a.c(0x0E4D, "...")
+    a.c(0x0E4F, "...goes first")
+    a.c(0x0E52, "Terminate the filename with a carriage return")
+    a.c(0x0E54, "...")
+    a.c(0x0E57, "Load and draw the level")
+    a.c(0x0E5A, "Draw the status panel")
+    a.c(0x0E5D, "Take out the heroes nobody plays")
+    a.c(0x0E60, "Let one vertical sync pass before play starts")
+    a.c(0x0E62, "...")
+    a.c(0x0E65, "Play the level until it ends")
+    a.c(0x0E68, "Count the heroes who died, giving each back their "
+                "starting attributes")
+    a.c(0x0E6A, "...")
+    a.c(0x0E6D, "Dead?")
+    a.c(0x0E70, "...")
+    a.c(0x0E72, "...")
+    a.c(0x0E74, "Yes: reset them")
+    a.c(0x0E77, "...and count them")
+    a.c(0x0E7A, "Next hero")
+    a.c(0x0E7B, "...")
+    a.c(0x0E7D, "...")
+    a.c(0x0E7F, "Any hero alive?")
+    a.c(0x0E82, "...")
+    a.c(0x0E84, "Yes: on to the next level")
+    a.c(0x0E86, "All dead: VDU 28,0,24,16,0, a text window on the left...")
+    a.c(0x0E9F, "...VDU 12 to clear it")
+    a.c(0x0EA4, "Put spaces back over the four message bytes used as "
+                "counters")
+    a.c(0x0EA6, "...")
+    a.c(0x0EA8, "...")
+    a.c(0x0EAB, "...")
+    a.c(0x0EAC, "...")
+    a.c(0x0EAE, "Print game_over_message...")
+    a.c(0x0EB1, "...")
+    a.c(0x0EB4, "...")
+    a.c(0x0EB5, "...up to its zero byte")
+    a.c(0x0EB7, "...")
+    a.c(0x0EB9, "Wait for the vertical sync counter to run out")
+    a.c(0x0EBC, "...")
+    a.c(0x0EBE, "Flush the input buffers")
+    a.c(0x0EC0, "...")
+    a.c(0x0EC3, "Wait up to 6000 centiseconds (60 s) for a key...")
+    a.c(0x0EC5, "...")
+    a.c(0x0EC7, "...")
+    a.c(0x0EC9, "...")
+    a.c(0x0ECC, "...then start a new game")
+
+    a.sub(0x15B1, "show_level_number", "Show the number of the level about to start",
+          "Clear the text area, count the level, plot the word LEVEL and "
+          "print the number in the game's font, then set a text window and "
+          "colour for later messages.")
+    a.c(0x15B1, "Clear the text area")
+    a.c(0x15B4, "COLOUR 6...")
+    a.c(0x15B9, "...")
+    a.c(0x15BE, "Count the level")
+    a.c(0x15C1, "Plot the word LEVEL...")
+    a.c(0x15C5, "...")
+    a.c(0x15C9, "...")
+    a.c(0x15CD, "...")
+    a.c(0x15D0, "TAB(10,5)...")
+    a.c(0x15D5, "...")
+    a.c(0x15DA, "...")
+    a.c(0x15DF, "Print the tens digit...")
+    a.c(0x15E2, "...")
+    a.c(0x15E3, "...")
+    a.c(0x15E8, "...")
+    a.c(0x15EA, "...in the game's font")
+    a.c(0x15ED, "Print the units digit...")
+    a.c(0x15EE, "...")
+    a.c(0x15F1, "...")
+    a.c(0x15F3, "...in the game's font")
+    a.c(0x15F6, "VDU 28,1,22,14,17: a text window...")
+    a.c(0x1605, "...")
+    a.c(0x160A, "COLOUR 2...")
+    a.c(0x1614, "...")
+    a.c(0x1619, "Return")

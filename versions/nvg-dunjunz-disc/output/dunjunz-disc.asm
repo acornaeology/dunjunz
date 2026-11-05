@@ -76,8 +76,6 @@ data_0288          = &0288
 ; &0288 referenced 2 times by &3b91, &3ba7
 data_0289          = &0289
 ; &0289 referenced 2 times by &3b96, &3bac
-data_0490          = &0490
-; &0490 used as index base 2 times by &522c, &562c
 data_0600          = &0600
 ; &0600 used as index base 14 times by &52e3, &52ea, &52f1, &52ff, &530f, &531f, &5328, &56e3, &56ea, &56f1, &56ff, &570f, &571f, &5728
 data_0601          = &0601
@@ -96,7 +94,7 @@ mos_row_offsets    = &c375  ; MOS 1.20 table of screen row offsets for 640-byte 
 ; &c375 used as index base 1 time by &30ae
 mos_row_offsets_lo = &c376  ; Low bytes of mos_row_offsets.
 ; &c376 used as index base 1 time by &30b6
-data_d9cd          = &d9cd
+mos_reset_entry    = &d9cd  ; MOS 1.20 reset entry, the target of the RESET vector. Called directly to reset the machine.
 ; &d9cd referenced 3 times by &3baf, &5231, &5631
 mos_oswrch_default = &e0a4  ; MOS 1.20 default OSWRCH routine, WRCHV's initial value. The WRCHV handler jumps here directly instead of through the saved vector.
 ; &e0a4 referenced 2 times by &7fd7, &7ffc
@@ -534,50 +532,57 @@ data_0d23 = hero_frame+3
 ; &0d30 used as index base 20 times by &6ea9, &6fcf, &6ff9, &7035, &7060, &7251, &7407, &7461, &76da, &76e2, &771c, &773a, &7b75, &7b7f, &7b93, &7b99, &7bd3, &7be1, &7be4, &7be7
 .hero_offset_y
     equb &ff
+; ***************************************************************************************
+; Start the game
+;
+; Set the bell sound (the BEL character's channel, envelope, pitch and duration), save
+; WRCHV in saved_wrchv and point WRCHV at wrch_handler. The code here is run once only:
+; from &0D40 its bytes are then reused as the missile tables and other workspace in page
+; &0D, which reset_workspace refreshes for each level.
 ; &0d31 referenced 1 time by &5149
 .game_entry
-    lda #osbyte_bell_channel
-    ldx #&11
+    lda #osbyte_bell_channel            ; OSBYTE &D3: bell channel...
+    ldx #&11                            ; ...channel &11
     ldy #0
-    jsr osbyte                          ; osbyte: bell channel
-    lda #osbyte_bell_envelope
-    ldx #0
+    jsr osbyte                          ; ...  osbyte: bell channel
+    lda #osbyte_bell_envelope           ; OSBYTE &D4: bell envelope...
+    ldx #0                              ; ...0, a fixed amplitude
     ldy #0
 ; &0d40 used as index base 6 times by &6f3c, &70eb, &710c, &711a, &711d, &7158
 .missile_x
-    jsr osbyte                          ; osbyte: bell envelope
-    lda #osbyte_bell_frequency
-    ldx #&64 ; 'd'
+    jsr osbyte                          ; ...  osbyte: bell envelope
+    lda #osbyte_bell_frequency          ; OSBYTE &D5: bell pitch...
+    ldx #&64 ; 'd'                      ; ...&64
     ldy #0
-    jsr osbyte                          ; osbyte: bell frequency
+    jsr osbyte                          ; ...  osbyte: bell frequency
 ; &0d4c used as index base 6 times by &6f42, &70f1, &7105, &7113, &7123, &715e
 .missile_y
-    lda #osbyte_bell_duration
-    ldx #1
+    lda #osbyte_bell_duration           ; OSBYTE &D6: bell duration...
+    ldx #1                              ; ...1
     ldy #0
-    jsr osbyte                          ; osbyte: bell duration
-    lda wrchv
+    jsr osbyte                          ; ...  osbyte: bell duration
+    lda wrchv                           ; Save WRCHV...
 ; &0d58 used as index base 12 times by &6f28, &6f36, &70d2, &70de, &70fe, &7134, &71a5, &71ae, &71ba, &71c6, &71ce, &720c
 .missile_direction
-    sta saved_wrchv
-    lda wrchv + 1
-    sta data_12d4
-    lda #&8f
+    sta saved_wrchv                     ; ...
+    lda wrchv + 1                       ; ...
+    sta data_12d4                       ; ...in saved_wrchv
+    lda #&8f                            ; Point WRCHV at wrch_handler...
 .sub_0d63
 ; &34a4 used as index base 4 times by &6f53, &7209, &76b1, &7747
 missile_sprite_base = sub_0d63+1
-    sta wrchv
-    lda #&7f
-    sta wrchv + 1
+    sta wrchv                           ; ...
+    lda #&7f                            ; ...
+    sta wrchv + 1                       ; ...
     lda data_008e
-    sta data_169f
+    sta level_number
 ; &0d70 used as index base 1 time by &6ec1
 .hero_key_up
     lda data_008f
 .sub_0d72
 ; &34b4 used as index base 1 time by &6ed4
 hero_key_down = sub_0d72+2
-    sta data_16ff
+    sta level_bcd
     lda data_08bc
 ; &0d78 used as index base 1 time by &6ee7
 .hero_key_right
@@ -677,7 +682,7 @@ data_0dff = sub_0ded+18
     equb &9d, &d6, &16
 ; &0e57 referenced 1 time by &355e
 .code_0e57
-    jsr sub_1400
+    jsr start_level
     jsr draw_status_panel
     jsr remove_absent_heroes
     lda #1
@@ -909,7 +914,7 @@ data_0ff2 = sub_0fea+8
 ; RESET vector.
 ; &1070 referenced 1 time by &464a
 .check_for_victory
-    lda data_169f
+    lda level_number
     cmp #&19
     bne return_2
     ldx #0
@@ -1278,38 +1283,44 @@ data_12d4 = saved_wrchv+1
     equb &02, &04, &18, &00
     equs "<BB>"
     equb &02, &04, &18, &00, &74
+; ***************************************************************************************
+; Set up and draw a new level
+;
+; Show the level number, load and unpack the level, reset the workspace and monsters,
+; then clear the text area, set the screen to its full 25-row height and draw the view
+; frames and views.
 ; &1400 referenced 1 time by &3597
-.sub_1400
-    jsr sub_15b1
-    jsr sub_1446
-    jsr unpack_level
-    jsr reset_workspace
-    jsr reset_monsters
-    jsr clear_text_area
-    lda #&17
+.start_level
+    jsr sub_15b1                        ; Show the level number
+    jsr sub_1446                        ; Load the level
+    jsr unpack_level                    ; Copy it into the game's tables
+    jsr reset_workspace                 ; Reset page &0D
+    jsr reset_monsters                  ; Reset the monsters and keys
+    jsr clear_text_area                 ; Clear the text area
+    lda #&17                            ; VDU 23,0,6,25,0,0,0,0,0,0: set 6845 register 6...
+    jsr oswrch                          ; ...
+    lda #0                              ; ...
     jsr oswrch
-    lda #0
+    lda #6                              ; ...
     jsr oswrch
-    lda #6
+    lda #&19                            ; ...to 25 character rows displayed
     jsr oswrch
-    lda #&19
-    jsr oswrch
-    lda #0
-    jsr oswrch
-    jsr oswrch
+    lda #0                              ; ...
     jsr oswrch
     jsr oswrch
     jsr oswrch
     jsr oswrch
-    lda #&3a ; ':'
+    jsr oswrch
+    jsr oswrch
+    lda #&3a ; ':'                      ; Point at view_frame_plots...
     sta plot_x
-    lda #&16
+    lda #&16                            ; ...
     sta plot_y
-    jsr draw_view_frames
-    rts
+    jsr draw_view_frames                ; ...and draw the frames and the views
+    rts                                 ; Return
 ; &1446 referenced 1 time by &3b43
 .sub_1446
-    jsr data_0450
+    jsr decrypt_level
     lda #&18
     sta data_1625
     rts
@@ -1332,7 +1343,7 @@ data_12d4 = saved_wrchv+1
     sta data_0289
 ; &146f referenced 1 time by &3b9e
 .code_146f
-    jmp data_d9cd
+    jmp mos_reset_entry
     equb &90, &13, &a9, &0c, &20, &ee, &ff, &a2
     equb &89, &a0, &14, &20, &f7, &ff, &a2, &8e
     equb &a0, &14, &20, &f7, &ff
@@ -1553,22 +1564,36 @@ data_1625 = sub_1624+1
     lda #&0c
     jsr oswrch
     rts
-.sub_1639
-; &3ddf referenced 5 times by &34ad, &37b0, &507a, &5227, &5627
-data_169f = sub_1639+102
-    equb &60, &04, &08, &00, &fe, &03, &01, &00
-    equb &00, &7c, &fe, &01, &08, &02, &00, &00
-    equb &01, &00, &00, &84, &01, &05, &08, &00
-    equb &fe, &03, &04, &28, &02, &fe, &03, &01
-    equb &00, &00, &7b, &fe, &01, &08, &02, &00
-    equb &00, &01, &00, &00, &84, &01, &05, &28
-    equb &02, &fe, &03, &04, &08, &00, &66, &02
-    equb &01, &00, &00, &7c, &fe, &01, &08, &02
-    equb &00, &00, &01, &00, &00, &84, &01, &05
-    equb &08, &00, &66, &02, &04, &28, &02, &66
-    equb &02, &01, &00, &00, &7c, &fe, &01, &08
-    equb &02, &00, &00, &01, &00, &00, &84, &01
-    equb &05, &28, &02, &66, &02, &08, &01
+    equb &60
+; ***************************************************************************************
+; View frame PLOT commands
+;
+; Twenty five-byte VDU 25 commands (plot code, x, y) sent by draw_view_frames.
+.view_frame_plots
+    equb &04, &08, &00, &fe, &03
+    equb &01, &00, &00, &7c, &fe
+    equb &01, &08, &02, &00, &00
+    equb &01, &00, &00, &84, &01
+    equb &05, &08, &00, &fe, &03
+    equb &04, &28, &02, &fe, &03
+    equb &01, &00, &00, &7b, &fe
+    equb &01, &08, &02, &00, &00
+    equb &01, &00, &00, &84, &01
+    equb &05, &28, &02, &fe, &03
+    equb &04, &08, &00, &66, &02
+    equb &01, &00, &00, &7c, &fe
+    equb &01, &08, &02, &00, &00
+    equb &01, &00, &00, &84, &01
+    equb &05, &08, &00, &66, &02
+    equb &04, &28, &02, &66, &02
+    equb &01, &00, &00, &7c, &fe
+    equb &01, &08, &02, &00, &00
+    equb &01, &00, &00, &84, &01
+    equb &05, &28, &02, &66, &02
+    equb &08
+; &169f referenced 5 times by &34ad, &37b0, &507a, &5227, &5627
+.level_number
+    equb &01
 ; ***************************************************************************************
 ; Sound the exit and add a queue marker
 ;
@@ -1600,37 +1625,37 @@ data_169f = sub_1639+102
     equb &0d, &0d, &70, &00, &8d, &35, &f8, &00
     equb &00, &00, &00
     equs "code"
-.sub_16e5
-; &3e3f referenced 1 time by &34b2
-data_16ff = sub_16e5+26
     equb &00, &54, &12, &03, &17, &74, &00, &8c
     equb &50, &00, &00, &00, &fa, &16, &78, &00
     equb &8c, &50, &20, &00, &00, &02, &00, &79
-    equb &00, &8c, &01, &00, &00, &00, &00, &00
-    equb &15, &00, &00, &00, &15, &00, &00, &00
-    equb &15, &00, &00, &00, &15, &00, &00, &00
-    equb &15, &00, &00, &00, &15, &00, &00, &00
-    equb &15, &00, &00, &00, &03, &02, &00, &00
-    equb &01, &00, &00, &00, &01, &00, &00, &00
+    equb &00, &8c
+; &16ff referenced 1 time by &34b2
+.level_bcd
+    equb &01, &00, &00, &00, &00, &00, &15, &00
+    equb &00, &00, &15, &00, &00, &00, &15, &00
+    equb &00, &00, &15, &00, &00, &00, &15, &00
+    equb &00, &00, &15, &00, &00, &00, &15, &00
+    equb &00, &00, &03, &02, &00, &00, &01, &00
+    equb &00, &00, &01, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &01, &00, &00, &01, &03, &3f, &3f, &00
-    equb &01, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &02, &00, &00, &00, &02, &00, &00
-    equb &01, &03, &00, &00, &00, &2a, &00, &00
-    equb &00, &2a, &00, &00, &00, &2a, &00, &00
-    equb &00, &2a, &00, &00, &00, &2a, &00, &00
-    equb &00, &2a, &00, &00, &00, &2a, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &01, &00
+    equb &00, &01, &03, &3f, &3f, &00, &01, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &02, &00, &3f
-    equb &3f, &03, &02, &00, &00, &02, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &02
+    equb &00, &00, &00, &02, &00, &00, &01, &03
+    equb &00, &00, &00, &2a, &00, &00, &00, &2a
+    equb &00, &00, &00, &2a, &00, &00, &00, &2a
+    equb &00, &00, &00, &2a, &00, &00, &00, &2a
+    equb &00, &00, &00, &2a, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &80, &00, &00, &32, &00
+    equb &00, &00, &00, &02, &00, &3f, &3f, &03
+    equb &02, &00, &00, &02, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &80, &00, &00, &32, &00
     equs "eco"
     equb &00, &8e, &0b, &94, &00, &00
     equs "?&A66=(rx%-lx%)"
@@ -2443,47 +2468,64 @@ data_213a = object_map+58
 .data_0447
     rts
     equb &00, &00, &00, &00, &00, &00, &00, &00
+; ***************************************************************************************
+; Decrypt and check the level just loaded
+;
+; Decrypt the level at &6B00-&6DAF in place, XORing each byte with the low byte of its
+; own address, and sum the decrypted bytes. If the sum does not match the level's entry
+; in level_checksums, reset the machine.
+;
+; On Entry:
+;     LEVEL_NUMBER: level loaded (1-25)
 ; &0450 referenced 1 time by &3b86
-.data_0450
-    ldy #0
-    sty plot_x
-    sty sprite_width
-    lda #&6b ; 'k'
-    sta plot_y
+.decrypt_level
+.decrypt_level_joy
+    ldy #0                              ; Point at &6B00, the start of the level...
+    sty plot_x                          ; ...low byte
+    sty sprite_width                    ; Start the sum at zero
+    lda #&6b ; 'k'                      ; ...
+    sta plot_y                          ; ...high byte
 ; &045a referenced 4 times by &521f, &5225, &561f, &5625
 .data_045a
-    lda (plot_x),y
-    eor plot_x
-    sta (plot_x),y
-    clc
-    adc sprite_width
-    sta sprite_width
-    inc plot_x
-    bne data_046b
-    inc plot_y
+    lda (plot_x),y                      ; Fetch a byte...
+    eor plot_x                          ; ...XOR it with the low byte of its address...
+    sta (plot_x),y                      ; ...and store it back decrypted
+    clc                                 ; Add it to the sum
+    adc sprite_width                    ; ...
+    sta sprite_width                    ; ...
+    inc plot_x                          ; Next byte...
+    bne data_046b                       ; ...
+    inc plot_y                          ; ...with carry into the high byte
 ; &046b referenced 2 times by &5217, &5617
 .data_046b
-    lda plot_x
-    cmp #&b0
-    bne data_045a
-    lda plot_y
-    cmp #&6d ; 'm'
-    bne data_045a
-    ldx data_169f
-    lda sprite_width
-    cmp data_0490,x
-    beq data_0484
-    jsr data_d9cd
+    lda plot_x                          ; Stop at &6DB0, the end of the level...
+    cmp #&b0                            ; ...
+    bne data_045a                       ; ...
+    lda plot_y                          ; ...
+    cmp #&6d ; 'm'                      ; ...
+    bne data_045a                       ; ...
+    ldx level_number                    ; X = level number
+    lda sprite_width                    ; Compare the sum...
+    cmp level_checksums,x               ; ...with this level's checksum
+    beq data_0484                       ; Match: return
+    jsr mos_reset_entry                 ; No match: reset the machine (MOS 1.20 only)
 ; &0484 referenced 2 times by &522f, &562f
 .data_0484
-    rts
+    rts                                 ; Return
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &62, &cd, &0c
-    equs "DM", &22
-    equb &f6
-    equs "B!}]"
-    equb &d8, &a0, &f1, &0f, &cc, &d3, &53, &3b
-    equb &83, &71, &b2, &6f, &f3, &f1, &00, &00
+    equb &00, &00, &00
+; &0490 used as index base 2 times by &522c, &562c
+.level_checksums
+    equb &00
+; ***************************************************************************************
+; Level checksums
+;
+; One byte per level, 1-25: the sum, modulo 256, of the level's decrypted bytes.
+    equb &62, &cd, &0c, &44, &4d
+    equb &22, &f6, &42, &21, &7d
+    equb &5d, &d8, &a0, &f1, &0f
+    equb &cc, &d3, &53, &3b, &83
+    equb &71, &b2, &6f, &f3, &f1
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -2494,7 +2536,7 @@ data_213a = object_map+58
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00
 ; ***************************************************************************************
 ; Choose the heroes and the sound
 ;
@@ -2887,39 +2929,53 @@ data_213a = object_map+58
     tax
     rts
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    ldy #0
-    sty plot_x
-    sty sprite_width
-    lda #&6b ; 'k'
-    sta plot_y
-    lda (plot_x),y
-    eor plot_x
-    sta (plot_x),y
-    clc
-    adc sprite_width
-    sta sprite_width
-    inc plot_x
-    bne data_046b
-    inc plot_y
-    lda plot_x
-    cmp #&b0
-    bne data_045a
-    lda plot_y
-    cmp #&6d ; 'm'
-    bne data_045a
-    ldx data_169f
-    lda sprite_width
-    cmp data_0490,x
-    beq data_0484
-    jsr data_d9cd
-    rts
+; ***************************************************************************************
+; Decrypt and check the level just loaded
+;
+; Decrypt the level at &6B00-&6DAF in place, XORing each byte with the low byte of its
+; own address, and sum the decrypted bytes. If the sum does not match the level's entry
+; in level_checksums, reset the machine.
+;
+; On Entry:
+;     LEVEL_NUMBER: level loaded (1-25)
+    ldy #0                              ; Point at &6B00, the start of the level...
+    sty plot_x                          ; ...low byte
+    sty sprite_width                    ; Start the sum at zero
+    lda #&6b ; 'k'                      ; ...
+    sta plot_y                          ; ...high byte
+    lda (plot_x),y                      ; Fetch a byte...
+    eor plot_x                          ; ...XOR it with the low byte of its address...
+    sta (plot_x),y                      ; ...and store it back decrypted
+    clc                                 ; Add it to the sum
+    adc sprite_width                    ; ...
+    sta sprite_width                    ; ...
+    inc plot_x                          ; Next byte...
+    bne data_046b                       ; ...
+    inc plot_y                          ; ...with carry into the high byte
+    lda plot_x                          ; Stop at &6DB0, the end of the level...
+    cmp #&b0                            ; ...
+    bne data_045a                       ; ...
+    lda plot_y                          ; ...
+    cmp #&6d ; 'm'                      ; ...
+    bne data_045a                       ; ...
+    ldx level_number                    ; X = level number
+    lda sprite_width                    ; Compare the sum...
+    cmp level_checksums,x               ; ...with this level's checksum
+    beq data_0484                       ; Match: return
+    jsr mos_reset_entry                 ; No match: reset the machine (MOS 1.20 only)
+    rts                                 ; Return
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &62, &cd, &0c
-    equs "DM", &22
-    equb &f6
-    equs "B!}]"
-    equb &d8, &a0, &f1, &0f, &cc, &d3, &53, &3b
-    equb &83, &71, &b2, &6f, &f3, &f1, &00, &00
+    equb &00, &00, &00
+    equb &00
+; ***************************************************************************************
+; Level checksums
+;
+; One byte per level, 1-25: the sum, modulo 256, of the level's decrypted bytes.
+    equb &62, &cd, &0c, &44, &4d
+    equb &22, &f6, &42, &21, &7d
+    equb &5d, &d8, &a0, &f1, &0f
+    equb &cc, &d3, &53, &3b, &83
+    equb &71, &b2, &6f, &f3, &f1
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -2930,7 +2986,7 @@ data_213a = object_map+58
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00
 ; ***************************************************************************************
 ; Choose the heroes and the sound
 ;
@@ -4175,7 +4231,7 @@ data_213a = object_map+58
     lda data_08bc
     sec
     sbc #1
-    sta data_169f
+    sta level_number
     cmp #&18
     bne code_508b
     ldx #&4c ; 'L'
@@ -7704,9 +7760,9 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_08bd:                  5
 ;     data_08be:                  5
 ;     data_0ff2:                  5
-;     data_169f:                  5
 ;     hero_score_hundreds:        5
 ;     hero_score_tens:            5
+;     level_number:               5
 ;     next_trapdoor:              5
 ;     plot_panel_sprite:          5
 ;     test_wall:                  5
@@ -7755,7 +7811,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_09f1:                  3
 ;     data_09f2:                  3
 ;     data_7dd0:                  3
-;     data_d9cd:                  3
 ;     exit_x:                     3
 ;     exit_y:                     3
 ;     hero_has_boots:             3
@@ -7765,6 +7820,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     missile_damage:             3
 ;     monster_frame:              3
 ;     monster_start_hit_points:   3
+;     mos_reset_entry:            3
 ;     next_victory_sprite:        3
 ;     osasci:                     3
 ;     oscli:                      3
@@ -7807,7 +7863,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_0447:                  2
 ;     data_046b:                  2
 ;     data_0484:                  2
-;     data_0490:                  2
 ;     data_0528:                  2
 ;     data_0540:                  2
 ;     data_05c0:                  2
@@ -7848,6 +7903,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     draw_view_2:                2
 ;     draw_view_3:                2
 ;     get_hero_cell:              2
+;     level_checksums:            2
 ;     mos_oswrch_default:         2
 ;     play_pickup_sound:          2
 ;     plot_chalice:               2
@@ -8087,7 +8143,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_0000:                  1
 ;     data_00fa:                  1
 ;     data_00fc:                  1
-;     data_0450:                  1
 ;     data_079b:                  1
 ;     data_07a9:                  1
 ;     data_07b8:                  1
@@ -8121,7 +8176,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_120f:                  1
 ;     data_1210:                  1
 ;     data_1625:                  1
-;     data_16ff:                  1
 ;     data_213a:                  1
 ;     data_5171:                  1
 ;     data_5172:                  1
@@ -8142,6 +8196,8 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_6d80:                  1
 ;     data_fffc:                  1
 ;     data_fffd:                  1
+;     decrypt_level:              1
+;     decrypt_level_joy:          1
 ;     dissolve_chalice:           1
 ;     draw_all_views:             1
 ;     draw_room_row:              1
@@ -8165,6 +8221,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     hero_menu:                  1
 ;     hero_menu_joy:              1
 ;     hero_missile_sprites:       1
+;     level_bcd:                  1
 ;     level_tail:                 1
 ;     loop_504c:                  1
 ;     loop_50ba:                  1
@@ -8216,8 +8273,8 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     sprite_addr_lo:             1
 ;     sprite_heights:             1
 ;     sprite_widths:              1
+;     start_level:                1
 ;     start_monster_step:         1
-;     sub_1400:                   1
 ;     sub_1446:                   1
 ;     sub_15b1:                   1
 ;     sub_7305:                   1
@@ -8498,11 +8555,9 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_041e
 ;     data_0437
 ;     data_0447
-;     data_0450
 ;     data_045a
 ;     data_046b
 ;     data_0484
-;     data_0490
 ;     data_0528
 ;     data_0540
 ;     data_0581
@@ -8582,8 +8637,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_1210
 ;     data_12d4
 ;     data_1625
-;     data_169f
-;     data_16ff
 ;     data_213a
 ;     data_5171
 ;     data_5172
@@ -8605,7 +8658,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_7dd0
 ;     data_7e23
 ;     data_7e4c
-;     data_d9cd
 ;     data_e772
 ;     data_fffc
 ;     data_fffd
@@ -8654,12 +8706,9 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     sub_0fea
 ;     sub_10e6
 ;     sub_1204
-;     sub_1400
 ;     sub_1446
 ;     sub_15b1
 ;     sub_1624
-;     sub_1639
-;     sub_16e5
 ;     sub_5167
 ;     sub_5178
 ;     sub_59b0
@@ -8673,7 +8722,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     Data                     = 17195 bytes (70%)
 ;
 ;     Number of instructions   = 3402
-;     Number of data bytes     = 15677 bytes
+;     Number of data bytes     = 15691 bytes
 ;     Number of data words     = 0 bytes
-;     Number of string bytes   = 1518 bytes
-;     Number of strings        = 226
+;     Number of string bytes   = 1504 bytes
+;     Number of strings        = 222

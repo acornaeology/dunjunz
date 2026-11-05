@@ -59,7 +59,11 @@ d.use_environment("acorn_model_b_hardware")
 
 d.entry(0x5000, "start")
 
-game.annotate(Annotator(d, "tape"))
+annotator = Annotator(d, "tape")
+game.annotate(annotator)
+game.annotate_game_entry(annotator)
+game.annotate_start_level(annotator)
+game.annotate_cassette_level_loop(annotator)
 
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)

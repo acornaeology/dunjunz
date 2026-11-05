@@ -60,7 +60,6 @@ with low_joystick:
     d.entry(0x0780)  # BYTEV handler installed by Coder in joystick mode
 
 d.entry(0x5000, "coder_start")
-d.entry(0x0D31, "game_entry")
 
 
 def placements(addr):
@@ -73,7 +72,11 @@ def placements(addr):
     return [(None, "")]
 
 
-game.annotate(Annotator(d, "disc", placements))
+annotator = Annotator(d, "disc", placements)
+game.annotate(annotator)
+game.annotate_game_entry(annotator)
+game.annotate_level_check(annotator)
+game.annotate_start_level(annotator)
 
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)

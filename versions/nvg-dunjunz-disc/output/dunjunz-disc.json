@@ -833,6 +833,40 @@
         "Z": "set if the key is pressed",
         "X": "preserved"
       }
+    },
+    {
+      "addr": 3377,
+      "binary_addr": 13425,
+      "name": "game_entry",
+      "title": "Start the game",
+      "description": "Set the bell sound (the BEL character's channel, envelope, pitch and duration), save WRCHV in saved_wrchv and point WRCHV at wrch_handler. The code here is run once only: from &0D40 its bytes are then reused as the missile tables and other workspace in page &0D, which reset_workspace refreshes for each level."
+    },
+    {
+      "addr": 1104,
+      "binary_addr": 20992,
+      "name": "decrypt_level",
+      "title": "Decrypt and check the level just loaded",
+      "description": "Decrypt the level at &6B00-&6DAF in place, XORing each byte with the low byte of its own address, and sum the decrypted bytes. If the sum does not match the level's entry in level_checksums, reset the machine.",
+      "on_entry": {
+        "level_number": "level loaded (1-25)"
+      }
+    },
+    {
+      "addr": 1104,
+      "binary_addr": 22016,
+      "name": "decrypt_level_joy",
+      "title": "Decrypt and check the level just loaded",
+      "description": "Decrypt the level at &6B00-&6DAF in place, XORing each byte with the low byte of its own address, and sum the decrypted bytes. If the sum does not match the level's entry in level_checksums, reset the machine.",
+      "on_entry": {
+        "level_number": "level loaded (1-25)"
+      }
+    },
+    {
+      "addr": 5120,
+      "binary_addr": 15168,
+      "name": "start_level",
+      "title": "Set up and draw a new level",
+      "description": "Show the level number, load and unpack the level, reset the workspace and monsters, then clear the text area, set the screen to its full 25-row height and draw the view frames and views."
     }
   ],
   "banners": [
@@ -850,6 +884,28 @@
       "name": "font_digits",
       "title": "Font: digits 0-9",
       "description": "Eight bytes per digit, copied into the definition of character 128 by the WRCHV handler.",
+      "align": "before_label"
+    },
+    {
+      "addr": 5690,
+      "binary_addr": 15738,
+      "name": "view_frame_plots",
+      "title": "View frame PLOT commands",
+      "description": "Twenty five-byte VDU 25 commands (plot code, x, y) sent by draw_view_frames.",
+      "align": "before_label"
+    },
+    {
+      "addr": 1169,
+      "binary_addr": 21057,
+      "title": "Level checksums",
+      "description": "One byte per level, 1-25: the sum, modulo 256, of the level's decrypted bytes.",
+      "align": "before_label"
+    },
+    {
+      "addr": 1169,
+      "binary_addr": 22081,
+      "title": "Level checksums",
+      "description": "One byte per level, 1-25: the sum, modulo 256, of the level's decrypted bytes.",
       "align": "before_label"
     }
   ],
@@ -918,11 +974,12 @@
     "data_041e": 1054,
     "data_0437": 1079,
     "data_0447": 1095,
-    "data_0450": 1104,
+    "decrypt_level": 1104,
+    "decrypt_level_joy": 1104,
     "data_045a": 1114,
     "data_046b": 1131,
     "data_0484": 1156,
-    "data_0490": 1168,
+    "level_checksums": 1168,
     "hero_menu": 1280,
     "hero_menu_joy": 1280,
     "print_menu": 1316,
@@ -971,7 +1028,7 @@
     "data_08be": 2238,
     "mos_row_offsets": 50037,
     "mos_row_offsets_lo": 50038,
-    "data_d9cd": 55757,
+    "mos_reset_entry": 55757,
     "mos_oswrch_default": 57508,
     "data_e772": 59250,
     "scsi_data": 64576,
@@ -1184,6 +1241,15 @@
       "description": "MOS 1.20 counter decremented on every vertical sync interrupt. The game sets it and waits for it to run out to pace itself."
     },
     {
+      "addr": 1168,
+      "name": "level_checksums",
+      "group": "game_data",
+      "access": [
+        "b"
+      ],
+      "description": "The expected sum of each decrypted level, for levels 1-25 at level_checksums+1 to level_checksums+25."
+    },
+    {
       "addr": 50037,
       "name": "mos_row_offsets",
       "group": "mos_internals",
@@ -1201,6 +1267,12 @@
         "b"
       ],
       "description": "Low bytes of mos_row_offsets."
+    },
+    {
+      "addr": 55757,
+      "name": "mos_reset_entry",
+      "group": "mos_internals",
+      "description": "MOS 1.20 reset entry, the target of the RESET vector. Called directly to reset the machine."
     },
     {
       "addr": 57508,
@@ -16394,6 +16466,7 @@
       "labels": [
         "game_entry"
       ],
+      "comment_inline": "OSBYTE &D3: bell channel...",
       "xref_summaries": [
         "&3471 referenced 1 time by &5149"
       ],
@@ -16420,6 +16493,7 @@
         17
       ],
       "binary_addr": 13427,
+      "comment_inline": "...channel &11",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&11"
@@ -16443,7 +16517,7 @@
         255
       ],
       "binary_addr": 13431,
-      "comment_inline": "osbyte: bell channel",
+      "comment_inline": "... osbyte: bell channel",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -16457,6 +16531,7 @@
         212
       ],
       "binary_addr": 13434,
+      "comment_inline": "OSBYTE &D4: bell envelope...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osbyte_bell_envelope",
@@ -16474,6 +16549,7 @@
         0
       ],
       "binary_addr": 13436,
+      "comment_inline": "...0, a fixed amplitude",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#0"
@@ -16500,7 +16576,7 @@
       "labels": [
         "missile_x"
       ],
-      "comment_inline": "osbyte: bell envelope",
+      "comment_inline": "... osbyte: bell envelope",
       "xref_summaries": [
         "&3480 used as index base 6 times by &6f3c, &70eb, &710c, &711a, &711d, &7158"
       ],
@@ -16543,6 +16619,7 @@
         213
       ],
       "binary_addr": 13443,
+      "comment_inline": "OSBYTE &D5: bell pitch...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osbyte_bell_frequency",
@@ -16560,6 +16637,7 @@
         100
       ],
       "binary_addr": 13445,
+      "comment_inline": "...&64",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&64"
@@ -16583,7 +16661,7 @@
         255
       ],
       "binary_addr": 13449,
-      "comment_inline": "osbyte: bell frequency",
+      "comment_inline": "... osbyte: bell frequency",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -16600,6 +16678,7 @@
       "labels": [
         "missile_y"
       ],
+      "comment_inline": "OSBYTE &D6: bell duration...",
       "xref_summaries": [
         "&348c used as index base 6 times by &6f42, &70f1, &7105, &7113, &7123, &715e"
       ],
@@ -16646,6 +16725,7 @@
         1
       ],
       "binary_addr": 13454,
+      "comment_inline": "...1",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#1"
@@ -16669,7 +16749,7 @@
         255
       ],
       "binary_addr": 13458,
-      "comment_inline": "osbyte: bell duration",
+      "comment_inline": "... osbyte: bell duration",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -16684,6 +16764,7 @@
         2
       ],
       "binary_addr": 13461,
+      "comment_inline": "Save WRCHV...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "wrchv",
@@ -16701,6 +16782,7 @@
       "labels": [
         "missile_direction"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&3498 used as index base 12 times by &6f28, &6f36, &70d2, &70de, &70fe, &7134, &71a5, &71ae, &71ba, &71c6, &71ce, &720c"
       ],
@@ -16768,6 +16850,7 @@
         2
       ],
       "binary_addr": 13467,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "wrchv + 1",
@@ -16781,6 +16864,7 @@
         18
       ],
       "binary_addr": 13470,
+      "comment_inline": "...in saved_wrchv",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_12d4",
@@ -16794,6 +16878,7 @@
         143
       ],
       "binary_addr": 13473,
+      "comment_inline": "Point WRCHV at wrch_handler...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&8f"
@@ -16814,6 +16899,7 @@
           "missile_sprite_base"
         ]
       },
+      "comment_inline": "...",
       "xref_summaries": [
         "&34a4 used as index base 4 times by &6f53, &7209, &76b1, &7747"
       ],
@@ -16830,6 +16916,7 @@
         127
       ],
       "binary_addr": 13478,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&7f"
@@ -16842,6 +16929,7 @@
         2
       ],
       "binary_addr": 13480,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "wrchv + 1",
@@ -16870,9 +16958,9 @@
       "binary_addr": 13485,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_169f",
+      "operand": "level_number",
       "target": 5791,
-      "target_label": "data_169f"
+      "target_label": "level_number"
     },
     {
       "addr": 3440,
@@ -16920,9 +17008,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_16ff",
+      "operand": "level_bcd",
       "target": 5887,
-      "target_label": "data_16ff"
+      "target_label": "level_bcd"
     },
     {
       "addr": 3445,
@@ -18058,9 +18146,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_1400",
+      "operand": "start_level",
       "target": 5120,
-      "target_label": "sub_1400"
+      "target_label": "start_level"
     },
     {
       "addr": 3674,
@@ -20355,9 +20443,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_169f",
+      "operand": "level_number",
       "target": 5791,
-      "target_label": "data_169f"
+      "target_label": "level_number"
     },
     {
       "addr": 4211,
@@ -24436,15 +24524,17 @@
       ],
       "binary_addr": 15168,
       "labels": [
-        "sub_1400"
+        "start_level"
       ],
+      "comment_inline": "Show the level number",
       "xref_summaries": [
-        "&3b40 referenced 1 time by &3597"
+        "&3b40 referenced 1 time by &0e57[1]"
       ],
       "references": [
         {
-          "addr": 13719,
-          "kind": "direct"
+          "addr": 3671,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -24461,6 +24551,7 @@
         20
       ],
       "binary_addr": 15171,
+      "comment_inline": "Load the level",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "sub_1446",
@@ -24475,6 +24566,7 @@
         21
       ],
       "binary_addr": 15174,
+      "comment_inline": "Copy it into the game's tables",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "unpack_level",
@@ -24489,6 +24581,7 @@
         20
       ],
       "binary_addr": 15177,
+      "comment_inline": "Reset page &0D",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "reset_workspace",
@@ -24503,6 +24596,7 @@
         21
       ],
       "binary_addr": 15180,
+      "comment_inline": "Reset the monsters and keys",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "reset_monsters",
@@ -24517,6 +24611,7 @@
         22
       ],
       "binary_addr": 15183,
+      "comment_inline": "Clear the text area",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "clear_text_area",
@@ -24530,6 +24625,7 @@
         23
       ],
       "binary_addr": 15186,
+      "comment_inline": "VDU 23,0,6,25,0,0,0,0,0,0: set 6845 register 6...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&17"
@@ -24542,6 +24638,7 @@
         255
       ],
       "binary_addr": 15188,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -24555,6 +24652,7 @@
         0
       ],
       "binary_addr": 15191,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -24580,6 +24678,7 @@
         6
       ],
       "binary_addr": 15196,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#6"
@@ -24605,6 +24704,7 @@
         25
       ],
       "binary_addr": 15201,
+      "comment_inline": "...to 25 character rows displayed",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&19"
@@ -24630,6 +24730,7 @@
         0
       ],
       "binary_addr": 15206,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -24725,6 +24826,7 @@
         58
       ],
       "binary_addr": 15226,
+      "comment_inline": "Point at view_frame_plots...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&3a"
@@ -24749,6 +24851,7 @@
         22
       ],
       "binary_addr": 15230,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&16"
@@ -24774,6 +24877,7 @@
         20
       ],
       "binary_addr": 15234,
+      "comment_inline": "...and draw the frames and the views",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "draw_view_frames",
@@ -24786,6 +24890,7 @@
         96
       ],
       "binary_addr": 15237,
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -24811,9 +24916,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "data_0450",
+      "operand": "decrypt_level",
       "target": 1104,
-      "target_label": "data_0450"
+      "target_label": "decrypt_level"
     },
     {
       "addr": 5193,
@@ -25058,9 +25163,9 @@
       ],
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "data_d9cd",
+      "operand": "mos_reset_entry",
       "target": 55757,
-      "target_label": "data_d9cd"
+      "target_label": "mos_reset_entry"
     },
     {
       "addr": 5234,
@@ -27307,7 +27412,17 @@
     {
       "addr": 5689,
       "bytes": [
-        96,
+        96
+      ],
+      "binary_addr": 15737,
+      "type": "byte",
+      "values": [
+        96
+      ]
+    },
+    {
+      "addr": 5690,
+      "bytes": [
         4,
         8,
         0,
@@ -27407,25 +27522,14 @@
         40,
         2,
         102,
-        2,
-        8,
-        1
+        2
       ],
-      "binary_addr": 15737,
+      "binary_addr": 15738,
       "labels": [
-        "sub_1639"
-      ],
-      "sub_labels": {
-        "5791": [
-          "data_169f"
-        ]
-      },
-      "xref_summaries": [
-        "&3ddf referenced 5 times by &34ad, &37b0, &507a, &5227, &5627"
+        "view_frame_plots"
       ],
       "type": "byte",
       "values": [
-        96,
         4,
         8,
         0,
@@ -27525,8 +27629,60 @@
         40,
         2,
         102,
-        2,
-        8,
+        2
+      ]
+    },
+    {
+      "addr": 5790,
+      "bytes": [
+        8
+      ],
+      "binary_addr": 15838,
+      "type": "byte",
+      "values": [
+        8
+      ]
+    },
+    {
+      "addr": 5791,
+      "bytes": [
+        1
+      ],
+      "binary_addr": 15839,
+      "labels": [
+        "level_number"
+      ],
+      "xref_summaries": [
+        "&3ddf referenced 5 times by &0477[2], &0477[3], &0d6d[1], &1070[1], &507a"
+      ],
+      "references": [
+        {
+          "addr": 1143,
+          "kind": "direct",
+          "move_id": 2
+        },
+        {
+          "addr": 1143,
+          "kind": "direct",
+          "move_id": 3
+        },
+        {
+          "addr": 3437,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 4208,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 20602,
+          "kind": "direct"
+        }
+      ],
+      "type": "byte",
+      "values": [
         1
       ]
     },
@@ -27881,7 +28037,42 @@
         0,
         121,
         0,
+        140
+      ],
+      "binary_addr": 15909,
+      "type": "byte",
+      "values": [
+        0,
+        84,
+        18,
+        3,
+        23,
+        116,
+        0,
         140,
+        80,
+        0,
+        0,
+        0,
+        250,
+        22,
+        120,
+        0,
+        140,
+        80,
+        32,
+        0,
+        0,
+        2,
+        0,
+        121,
+        0,
+        140
+      ]
+    },
+    {
+      "addr": 5887,
+      "bytes": [
         1,
         0,
         0,
@@ -28081,46 +28272,22 @@
         50,
         0
       ],
-      "binary_addr": 15909,
+      "binary_addr": 15935,
       "labels": [
-        "sub_16e5"
+        "level_bcd"
       ],
-      "sub_labels": {
-        "5887": [
-          "data_16ff"
-        ]
-      },
       "xref_summaries": [
-        "&3e3f referenced 1 time by &34b2"
+        "&3e3f referenced 1 time by &0d72[1]"
+      ],
+      "references": [
+        {
+          "addr": 3442,
+          "kind": "direct",
+          "move_id": 1
+        }
       ],
       "type": "byte",
       "values": [
-        0,
-        84,
-        18,
-        3,
-        23,
-        116,
-        0,
-        140,
-        80,
-        0,
-        0,
-        0,
-        250,
-        22,
-        120,
-        0,
-        140,
-        80,
-        32,
-        0,
-        0,
-        2,
-        0,
-        121,
-        0,
-        140,
         1,
         0,
         0,
@@ -41716,9 +41883,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_169f",
+      "operand": "level_number",
       "target": 5791,
-      "target_label": "data_169f"
+      "target_label": "level_number"
     },
     {
       "addr": 20605,
@@ -43778,15 +43945,18 @@
       ],
       "binary_addr": 20992,
       "labels": [
-        "data_0450"
+        "decrypt_level",
+        "decrypt_level_joy"
       ],
+      "comment_inline": "Point at &6B00, the start of the level...",
       "xref_summaries": [
-        "&5200 referenced 1 time by &3b86"
+        "&5200 referenced 1 time by &1446[1]"
       ],
       "references": [
         {
-          "addr": 15238,
-          "kind": "direct"
+          "addr": 5190,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -43800,6 +43970,7 @@
         112
       ],
       "binary_addr": 20994,
+      "comment_inline": "...low byte",
       "type": "code",
       "mnemonic": "sty",
       "operand": "plot_x",
@@ -43813,6 +43984,7 @@
         114
       ],
       "binary_addr": 20996,
+      "comment_inline": "Start the sum at zero",
       "type": "code",
       "mnemonic": "sty",
       "operand": "sprite_width",
@@ -43826,6 +43998,7 @@
         107
       ],
       "binary_addr": 20998,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&6b"
@@ -43837,6 +44010,7 @@
         113
       ],
       "binary_addr": 21000,
+      "comment_inline": "...high byte",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -43853,6 +44027,7 @@
       "labels": [
         "data_045a"
       ],
+      "comment_inline": "Fetch a byte...",
       "xref_summaries": [
         "&520a referenced 4 times by &521f, &5225, &561f, &5625"
       ],
@@ -43887,6 +44062,7 @@
         112
       ],
       "binary_addr": 21004,
+      "comment_inline": "...XOR it with the low byte of its address...",
       "type": "code",
       "mnemonic": "eor",
       "operand": "plot_x",
@@ -43900,6 +44076,7 @@
         112
       ],
       "binary_addr": 21006,
+      "comment_inline": "...and store it back decrypted",
       "type": "code",
       "mnemonic": "sta",
       "operand": "(plot_x),y",
@@ -43912,6 +44089,7 @@
         24
       ],
       "binary_addr": 21008,
+      "comment_inline": "Add it to the sum",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -43922,6 +44100,7 @@
         114
       ],
       "binary_addr": 21009,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "sprite_width",
@@ -43935,6 +44114,7 @@
         114
       ],
       "binary_addr": 21011,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_width",
@@ -43948,6 +44128,7 @@
         112
       ],
       "binary_addr": 21013,
+      "comment_inline": "Next byte...",
       "type": "code",
       "mnemonic": "inc",
       "operand": "plot_x",
@@ -43961,6 +44142,7 @@
         2
       ],
       "binary_addr": 21015,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "data_046b",
@@ -43974,6 +44156,7 @@
         113
       ],
       "binary_addr": 21017,
+      "comment_inline": "...with carry into the high byte",
       "type": "code",
       "mnemonic": "inc",
       "operand": "plot_y",
@@ -43990,6 +44173,7 @@
       "labels": [
         "data_046b"
       ],
+      "comment_inline": "Stop at &6DB0, the end of the level...",
       "xref_summaries": [
         "&521b referenced 2 times by &5217, &5617"
       ],
@@ -44016,6 +44200,7 @@
         176
       ],
       "binary_addr": 21021,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&b0"
@@ -44027,6 +44212,7 @@
         233
       ],
       "binary_addr": 21023,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "data_045a",
@@ -44040,6 +44226,7 @@
         113
       ],
       "binary_addr": 21025,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "plot_y",
@@ -44053,6 +44240,7 @@
         109
       ],
       "binary_addr": 21027,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&6d"
@@ -44064,6 +44252,7 @@
         227
       ],
       "binary_addr": 21029,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "data_045a",
@@ -44078,11 +44267,12 @@
         22
       ],
       "binary_addr": 21031,
+      "comment_inline": "X = level number",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "data_169f",
+      "operand": "level_number",
       "target": 5791,
-      "target_label": "data_169f"
+      "target_label": "level_number"
     },
     {
       "addr": 1146,
@@ -44091,6 +44281,7 @@
         114
       ],
       "binary_addr": 21034,
+      "comment_inline": "Compare the sum...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "sprite_width",
@@ -44105,11 +44296,12 @@
         4
       ],
       "binary_addr": 21036,
+      "comment_inline": "...with this level's checksum",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "data_0490,x",
+      "operand": "level_checksums,x",
       "target": 1168,
-      "target_label": "data_0490"
+      "target_label": "level_checksums"
     },
     {
       "addr": 1151,
@@ -44118,6 +44310,7 @@
         3
       ],
       "binary_addr": 21039,
+      "comment_inline": "Match: return",
       "type": "code",
       "mnemonic": "beq",
       "operand": "data_0484",
@@ -44132,11 +44325,12 @@
         217
       ],
       "binary_addr": 21041,
+      "comment_inline": "No match: reset the machine (MOS 1.20 only)",
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "data_d9cd",
+      "operand": "mos_reset_entry",
       "target": 55757,
-      "target_label": "data_d9cd"
+      "target_label": "mos_reset_entry"
     },
     {
       "addr": 1156,
@@ -44147,6 +44341,7 @@
       "labels": [
         "data_0484"
       ],
+      "comment_inline": "Return",
       "xref_summaries": [
         "&5234 referenced 2 times by &522f, &562f"
       ],
@@ -44176,21 +44371,9 @@
         0,
         0,
         0,
-        0,
-        0,
-        98,
-        205,
-        12
+        0
       ],
       "binary_addr": 21045,
-      "sub_labels": {
-        "1168": [
-          "data_0490"
-        ]
-      },
-      "xref_summaries": [
-        "&5240 used as index base 2 times by &522c, &562c"
-      ],
       "type": "byte",
       "values": [
         0,
@@ -44203,50 +44386,52 @@
         0,
         0,
         0,
-        0,
-        0,
+        0
+      ]
+    },
+    {
+      "addr": 1168,
+      "bytes": [
+        0
+      ],
+      "binary_addr": 21056,
+      "labels": [
+        "level_checksums"
+      ],
+      "xref_summaries": [
+        "&5240 used as index base 2 times by &047c[2], &047c[3]"
+      ],
+      "references": [
+        {
+          "addr": 1148,
+          "kind": "indexed",
+          "move_id": 2
+        },
+        {
+          "addr": 1148,
+          "kind": "indexed",
+          "move_id": 3
+        }
+      ],
+      "type": "byte",
+      "values": [
+        0
+      ]
+    },
+    {
+      "addr": 1169,
+      "bytes": [
         98,
         205,
-        12
-      ]
-    },
-    {
-      "addr": 1172,
-      "bytes": [
+        12,
         68,
         77,
-        34
-      ],
-      "binary_addr": 21060,
-      "type": "string",
-      "string": "DM\""
-    },
-    {
-      "addr": 1175,
-      "bytes": [
-        246
-      ],
-      "binary_addr": 21063,
-      "type": "byte",
-      "values": [
-        246
-      ]
-    },
-    {
-      "addr": 1176,
-      "bytes": [
+        34,
+        246,
         66,
         33,
         125,
-        93
-      ],
-      "binary_addr": 21064,
-      "type": "string",
-      "string": "B!}]"
-    },
-    {
-      "addr": 1180,
-      "bytes": [
+        93,
         216,
         160,
         241,
@@ -44260,7 +44445,41 @@
         178,
         111,
         243,
+        241
+      ],
+      "binary_addr": 21057,
+      "type": "byte",
+      "values": [
+        98,
+        205,
+        12,
+        68,
+        77,
+        34,
+        246,
+        66,
+        33,
+        125,
+        93,
+        216,
+        160,
         241,
+        15,
+        204,
+        211,
+        83,
+        59,
+        131,
+        113,
+        178,
+        111,
+        243,
+        241
+      ]
+    },
+    {
+      "addr": 1194,
+      "bytes": [
         0,
         0,
         0,
@@ -44348,23 +44567,9 @@
         0,
         0
       ],
-      "binary_addr": 21068,
+      "binary_addr": 21082,
       "type": "byte",
       "values": [
-        216,
-        160,
-        241,
-        15,
-        204,
-        211,
-        83,
-        59,
-        131,
-        113,
-        178,
-        111,
-        243,
-        241,
         0,
         0,
         0,
@@ -48358,15 +48563,18 @@
       ],
       "binary_addr": 22016,
       "labels": [
-        "data_0450"
+        "decrypt_level",
+        "decrypt_level_joy"
       ],
+      "comment_inline": "Point at &6B00, the start of the level...",
       "xref_summaries": [
-        "&5600 referenced 1 time by &3b86"
+        "&5600 referenced 1 time by &1446[1]"
       ],
       "references": [
         {
-          "addr": 15238,
-          "kind": "direct"
+          "addr": 5190,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -48380,6 +48588,7 @@
         112
       ],
       "binary_addr": 22018,
+      "comment_inline": "...low byte",
       "type": "code",
       "mnemonic": "sty",
       "operand": "plot_x",
@@ -48393,6 +48602,7 @@
         114
       ],
       "binary_addr": 22020,
+      "comment_inline": "Start the sum at zero",
       "type": "code",
       "mnemonic": "sty",
       "operand": "sprite_width",
@@ -48406,6 +48616,7 @@
         107
       ],
       "binary_addr": 22022,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&6b"
@@ -48417,6 +48628,7 @@
         113
       ],
       "binary_addr": 22024,
+      "comment_inline": "...high byte",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -48433,6 +48645,7 @@
       "labels": [
         "data_045a"
       ],
+      "comment_inline": "Fetch a byte...",
       "xref_summaries": [
         "&560a referenced 4 times by &521f, &5225, &561f, &5625"
       ],
@@ -48467,6 +48680,7 @@
         112
       ],
       "binary_addr": 22028,
+      "comment_inline": "...XOR it with the low byte of its address...",
       "type": "code",
       "mnemonic": "eor",
       "operand": "plot_x",
@@ -48480,6 +48694,7 @@
         112
       ],
       "binary_addr": 22030,
+      "comment_inline": "...and store it back decrypted",
       "type": "code",
       "mnemonic": "sta",
       "operand": "(plot_x),y",
@@ -48492,6 +48707,7 @@
         24
       ],
       "binary_addr": 22032,
+      "comment_inline": "Add it to the sum",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -48502,6 +48718,7 @@
         114
       ],
       "binary_addr": 22033,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "sprite_width",
@@ -48515,6 +48732,7 @@
         114
       ],
       "binary_addr": 22035,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_width",
@@ -48528,6 +48746,7 @@
         112
       ],
       "binary_addr": 22037,
+      "comment_inline": "Next byte...",
       "type": "code",
       "mnemonic": "inc",
       "operand": "plot_x",
@@ -48541,6 +48760,7 @@
         2
       ],
       "binary_addr": 22039,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "data_046b",
@@ -48554,6 +48774,7 @@
         113
       ],
       "binary_addr": 22041,
+      "comment_inline": "...with carry into the high byte",
       "type": "code",
       "mnemonic": "inc",
       "operand": "plot_y",
@@ -48570,6 +48791,7 @@
       "labels": [
         "data_046b"
       ],
+      "comment_inline": "Stop at &6DB0, the end of the level...",
       "xref_summaries": [
         "&561b referenced 2 times by &5217, &5617"
       ],
@@ -48596,6 +48818,7 @@
         176
       ],
       "binary_addr": 22045,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&b0"
@@ -48607,6 +48830,7 @@
         233
       ],
       "binary_addr": 22047,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "data_045a",
@@ -48620,6 +48844,7 @@
         113
       ],
       "binary_addr": 22049,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "plot_y",
@@ -48633,6 +48858,7 @@
         109
       ],
       "binary_addr": 22051,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&6d"
@@ -48644,6 +48870,7 @@
         227
       ],
       "binary_addr": 22053,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "data_045a",
@@ -48658,11 +48885,12 @@
         22
       ],
       "binary_addr": 22055,
+      "comment_inline": "X = level number",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "data_169f",
+      "operand": "level_number",
       "target": 5791,
-      "target_label": "data_169f"
+      "target_label": "level_number"
     },
     {
       "addr": 1146,
@@ -48671,6 +48899,7 @@
         114
       ],
       "binary_addr": 22058,
+      "comment_inline": "Compare the sum...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "sprite_width",
@@ -48685,11 +48914,12 @@
         4
       ],
       "binary_addr": 22060,
+      "comment_inline": "...with this level's checksum",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "data_0490,x",
+      "operand": "level_checksums,x",
       "target": 1168,
-      "target_label": "data_0490"
+      "target_label": "level_checksums"
     },
     {
       "addr": 1151,
@@ -48698,6 +48928,7 @@
         3
       ],
       "binary_addr": 22063,
+      "comment_inline": "Match: return",
       "type": "code",
       "mnemonic": "beq",
       "operand": "data_0484",
@@ -48712,11 +48943,12 @@
         217
       ],
       "binary_addr": 22065,
+      "comment_inline": "No match: reset the machine (MOS 1.20 only)",
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "data_d9cd",
+      "operand": "mos_reset_entry",
       "target": 55757,
-      "target_label": "data_d9cd"
+      "target_label": "mos_reset_entry"
     },
     {
       "addr": 1156,
@@ -48727,6 +48959,7 @@
       "labels": [
         "data_0484"
       ],
+      "comment_inline": "Return",
       "xref_summaries": [
         "&5634 referenced 2 times by &522f, &562f"
       ],
@@ -48756,21 +48989,9 @@
         0,
         0,
         0,
-        0,
-        0,
-        98,
-        205,
-        12
+        0
       ],
       "binary_addr": 22069,
-      "sub_labels": {
-        "1168": [
-          "data_0490"
-        ]
-      },
-      "xref_summaries": [
-        "&5640 used as index base 2 times by &522c, &562c"
-      ],
       "type": "byte",
       "values": [
         0,
@@ -48783,50 +49004,52 @@
         0,
         0,
         0,
-        0,
-        0,
+        0
+      ]
+    },
+    {
+      "addr": 1168,
+      "bytes": [
+        0
+      ],
+      "binary_addr": 22080,
+      "labels": [
+        "level_checksums"
+      ],
+      "xref_summaries": [
+        "&5640 used as index base 2 times by &047c[2], &047c[3]"
+      ],
+      "references": [
+        {
+          "addr": 1148,
+          "kind": "indexed",
+          "move_id": 2
+        },
+        {
+          "addr": 1148,
+          "kind": "indexed",
+          "move_id": 3
+        }
+      ],
+      "type": "byte",
+      "values": [
+        0
+      ]
+    },
+    {
+      "addr": 1169,
+      "bytes": [
         98,
         205,
-        12
-      ]
-    },
-    {
-      "addr": 1172,
-      "bytes": [
+        12,
         68,
         77,
-        34
-      ],
-      "binary_addr": 22084,
-      "type": "string",
-      "string": "DM\""
-    },
-    {
-      "addr": 1175,
-      "bytes": [
-        246
-      ],
-      "binary_addr": 22087,
-      "type": "byte",
-      "values": [
-        246
-      ]
-    },
-    {
-      "addr": 1176,
-      "bytes": [
+        34,
+        246,
         66,
         33,
         125,
-        93
-      ],
-      "binary_addr": 22088,
-      "type": "string",
-      "string": "B!}]"
-    },
-    {
-      "addr": 1180,
-      "bytes": [
+        93,
         216,
         160,
         241,
@@ -48840,7 +49063,41 @@
         178,
         111,
         243,
+        241
+      ],
+      "binary_addr": 22081,
+      "type": "byte",
+      "values": [
+        98,
+        205,
+        12,
+        68,
+        77,
+        34,
+        246,
+        66,
+        33,
+        125,
+        93,
+        216,
+        160,
         241,
+        15,
+        204,
+        211,
+        83,
+        59,
+        131,
+        113,
+        178,
+        111,
+        243,
+        241
+      ]
+    },
+    {
+      "addr": 1194,
+      "bytes": [
         0,
         0,
         0,
@@ -48928,23 +49185,9 @@
         0,
         0
       ],
-      "binary_addr": 22092,
+      "binary_addr": 22106,
       "type": "byte",
       "values": [
-        216,
-        160,
-        241,
-        15,
-        204,
-        211,
-        83,
-        59,
-        131,
-        113,
-        178,
-        111,
-        243,
-        241,
         0,
         0,
         0,
