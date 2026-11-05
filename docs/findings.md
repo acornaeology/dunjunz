@@ -272,5 +272,7 @@ other heroes looks unintended.
 Confirmed in beebium on the sideways RAM hack, with a breakpoint counting
 how often `move_heroes` reaches hero 3 in each frame. It does so once
 every frame, except for the three frames after the Ranger casts (CTRL),
-when it is not reached at all. A fix: make the not-yet branch at &761E
-jump to the next hero (&70C1) instead of returning.
+when it is not reached at all. A fix: while the delay runs, carry on
+with the hero's other keys (`read_hero_keys`, &6EC1) instead of
+returning. The `RTS` at &761E is one byte and &6EC1 is out of branch
+range, so this needs a few bytes elsewhere for a `JMP`.
