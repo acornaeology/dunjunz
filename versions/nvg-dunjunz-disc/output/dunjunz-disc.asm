@@ -46,19 +46,21 @@ data_007d                = &7d
 ; &7d referenced 18 times by &3832, &4472, &4504, &459b, &46a3, &46e3, &4725, &7088, &70cc, &7307, &76ea, &7738, &780c, &787a, &79c5, &7a00, &7b1c, &7b55
 data_007e                = &7e
 ; &7e referenced 18 times by &3834, &4474, &4506, &459d, &46a5, &46e5, &472a, &708d, &70ce, &7309, &76ec, &773d, &780e, &788e, &79c7, &7a05, &7b21, &7b5a
-data_0080                = &80
+ring_x                   = &80  ; Map x of the cell being drawn in the victory ring.
 ; &80 referenced 12 times by &388b, &3894, &3899, &38a6, &38bd, &38c2, &38ca, &38da, &5105, &510d, &5113, &5121
-data_0081                = &81
+ring_y                   = &81  ; Map y of the cell being drawn in the victory ring.
 ; &81 referenced 11 times by &388f, &38ab, &38b0, &38b8, &38cf, &38d4, &38df, &5107, &5111, &511a, &5127
-data_0082                = &82
+victory_sprite           = &82  ; Sprite drawn in the victory ring.
 ; &82 referenced 6 times by &3838, &389e, &38e4, &38ec, &38fb, &3915
-data_0084                = &84
+victory_delay            = &84  ; Delay between frames of the victory sequence.
 ; &84 referenced 5 times by &3840, &385c, &3862, &3873, &387c
-data_008d                = &8d
+victory_pitch_step       = &8d  ; Amount the victory tone rises each frame.
 ; &8d referenced 3 times by &3848, &384d, &3853
 level_count_copy         = &8e  ; Copy of levels_started that Coder leaves for game_entry.
 ; &8e referenced 4 times by &34ab, &3844, &3855, &5072
-data_008f                = &8f
+victory_steps_left       = &8e  ; Copy of levels_started that Coder leaves for game_entry.
+; &8e referenced 4 times by &34ab, &3844, &3855, &5072
+victory_pitch            = &8f  ; Pitch of the victory tone.
 ; &8f referenced 7 times by &34b0, &383c, &384b, &384f, &3864, &7934, &7970
 data_00fa                = &fa
 ; &fa referenced 1 time by &3903
@@ -628,11 +630,11 @@ missile_sprite_base = sub_0d63+1
     sta wrchv                           ; ...
     lda #&7f                            ; ...
     sta wrchv + 1                       ; ...
-    lda level_count_copy                ; Recover the level count Coder left in level_count_copy
+    lda victory_steps_left              ; Recover the level count Coder left in level_count_copy
     sta level_number                    ; ...as level_number
 ; &0d70 used as index base 1 time by &6ec1
 .hero_key_up
-    lda data_008f                       ; ...and level_bcd
+    lda victory_pitch                   ; ...and level_bcd
 .sub_0d72
 ; &34b4 used as index base 1 time by &6ed4
 hero_key_down = sub_0d72+2
@@ -984,37 +986,37 @@ count = sub_0fea+8
 ; ending text instead of map data.
 ; &1070 referenced 1 time by &464a
 .check_for_victory
-    lda level_number
-    cmp #&19
-    bne return_2
-    ldx #0
+    lda level_number                    ; Only on level 25
+    cmp #&19                            ; ...
+    bne return_2                        ; ...
+    ldx #0                              ; Is a hero on one of the Chalice's cells, x &1A or &1B...
 ; &1079 referenced 1 time by &37c7
 .code_1079
-    lda hero_door_x,x
-    cmp #&1a
-    beq code_108a
-    cmp #&1b
-    beq code_108a
+    lda hero_door_x,x                   ; ...
+    cmp #&1a                            ; ...
+    beq code_108a                       ; ...
+    cmp #&1b                            ; ...
+    beq code_108a                       ; ...
 ; &1084 referenced 1 time by &37d5
 .code_1084
-    inx
-    cpx #4
-    bne code_1079
+    inx                                 ; Next hero
+    cpx #4                              ; ...
+    bne code_1079                       ; ...
 ; &1089 referenced 1 time by &37b5
 .return_2
-    rts
+    rts                                 ; Return
 ; &108a referenced 2 times by &37be, &37c2
 .code_108a
-    lda hero_door_y,x
-    cmp #4
-    beq code_1097
-    cmp #5
-    beq code_1097
-    bne code_1084
+    lda hero_door_y,x                   ; ...and y 4 or 5?
+    cmp #4                              ; ...
+    beq code_1097                       ; ...
+    cmp #5                              ; ...
+    beq code_1097                       ; ...
+    bne code_1084                       ; No: next hero
 ; &1097 referenced 2 times by &37cf, &37d3
 .code_1097
-    jsr victory_sequence
-    lda #&1c
+    jsr victory_sequence                ; Yes: play the victory sequence
+    lda #&1c                            ; VDU 28,0,24,16,0: a text window on the left...
     jsr oswrch
     lda #0
     jsr oswrch
@@ -1024,101 +1026,101 @@ count = sub_0fea+8
     jsr oswrch
     lda #0
     jsr oswrch
-    lda #&0c
+    lda #&0c                            ; ...VDU 12 to clear it
     jsr oswrch
-    ldx #0
+    ldx #0                              ; Print 140 bytes from room_walls + &3A...
 ; &10ba referenced 1 time by &3803
 .code_10ba
-    lda data_0c3a,x
-    jsr osasci
-    inx
-    cpx #&8c
-    bne code_10ba
-    ldx #0
+    lda data_0c3a,x                     ; ...
+    jsr osasci                          ; ...
+    inx                                 ; ...
+    cpx #&8c                            ; ...
+    bne code_10ba                       ; ...
+    ldx #0                              ; ...then the string at object_free_map + &3A: on level 25, the ending message
 ; &10c7 referenced 1 time by &3810
 .code_10c7
-    lda data_213a,x
-    jsr osasci
-    inx
-    cmp #0
-    bne code_10c7
-    lda #osbyte_flush_buffer_class
-    jsr osbyte                          ; Flush selected class of buffer
-    jsr osrdch
-    lda data_fffc
-    sta data_10e7
-    lda data_fffd
-    sta data_10e8
-.sub_10e6
+    lda data_213a,x                     ; ...
+    jsr osasci                          ; ...
+    inx                                 ; ...
+    cmp #0                              ; ...
+    bne code_10c7                       ; ...
+    lda #osbyte_flush_buffer_class      ; Flush the input buffers
+    jsr osbyte                          ; ...  Flush selected class of buffer
+    jsr osrdch                          ; Wait for a key
+    lda data_fffc                       ; Copy the RESET vector into the JSR below...
+    sta reset_call_address              ; ...
+    lda data_fffd                       ; ...
+    sta data_10e8                       ; ...
+.reset_call
 ; &3827 referenced 1 time by &381d
-data_10e7 = sub_10e6+1
+reset_call_address = reset_call+1
 ; &3828 referenced 1 time by &3823
-data_10e8 = sub_10e6+2
-    jsr data_0000
+data_10e8 = reset_call+2
+    jsr data_0000                       ; ...and call it: reset the machine
 ; ***************************************************************************************
 ; Play the victory sequence
 ;
 ; Spin sprites round the Chalice with a rising tone, then dissolve it.
 ; &10e9 referenced 1 time by &37d7
 .victory_sequence
-    lda #osbyte_bell_envelope
-    ldx #8
-    jsr osbyte                          ; osbyte: bell envelope
-    lda #0
-    sta data_007d
-    sta data_007e
-    lda #&16
-    sta data_0082
-    lda #0
-    sta data_008f
-    lda #&e6
-    sta data_0084
-    lda #&32 ; '2'
-    sta level_count_copy
-    lda #1
-    sta data_008d
+    lda #osbyte_bell_envelope           ; OSBYTE &D4: the bell's envelope...
+    ldx #8                              ; ...8
+    jsr osbyte                          ; ...  osbyte: bell envelope
+    lda #0                              ; No pixel offsets
+    sta data_007d                       ; ...
+    sta data_007e                       ; ...
+    lda #&16                            ; The ring starts with the first sparkle
+    sta victory_sprite                  ; ...
+    lda #0                              ; Tone starts at pitch 0...
+    sta victory_pitch                   ; ...
+    lda #&e6                            ; ...with the frames &E6 units apart...
+    sta victory_delay                   ; ...
+    lda #&32 ; '2'                      ; ...for &32 rises...
+    sta victory_steps_left              ; ...
+    lda #1                              ; ...each by 1 to begin with
+    sta victory_pitch_step              ; ...
 ; &110a referenced 1 time by &3886
 .code_110a
-    clc
-    lda data_008f
-    adc data_008d
-    sta data_008f
-    bcc code_111c
-    inc data_008d
-    dec level_count_copy
-    bne code_111c
-    jmp code_11d3
+    clc                                 ; Raise the pitch
+    lda victory_pitch                   ; ...
+    adc victory_pitch_step              ; ...
+    sta victory_pitch                   ; ...
+    bcc code_111c                       ; No carry: carry on
+    inc victory_pitch_step              ; Carry: rise faster...
+    dec victory_steps_left              ; ...and count a rise
+    bne code_111c                       ; More to come
+    jmp code_11d3                       ; Done: finish
 ; &111c referenced 2 times by &3851, &3857
 .code_111c
-    dec data_0084
-    bne code_1124
-    lda #1
-    sta data_0084
+    dec victory_delay                   ; Shorten the delay...
+    bne code_1124                       ; ...
+    lda #1                              ; ...to at least 1
+    sta victory_delay                   ; ...
 ; &1124 referenced 1 time by &385e
 .code_1124
-    ldx data_008f
-    lda #osbyte_bell_frequency
-    jsr osbyte                          ; osbyte: bell frequency
-    lda #7
-    jsr oswrch
-    jsr draw_victory_ring
-    lda data_0084
-    cmp #1
-    bne code_113c
-    jsr dissolve_chalice
+    ldx victory_pitch                   ; OSBYTE &D5: the bell's pitch...
+    lda #osbyte_bell_frequency          ; ...
+    jsr osbyte                          ; ...  osbyte: bell frequency
+    lda #7                              ; ...and sound the bell
+    jsr oswrch                          ; ...
+    jsr draw_victory_ring               ; Draw the ring
+    lda victory_delay                   ; At full speed, dissolve the Chalice a byte at a time
+    cmp #1                              ; ...
+    bne code_113c                       ; ...
+    jsr dissolve_chalice                ; ...
 ; &113c referenced 1 time by &3877
 .code_113c
-    ldx data_0084
+    ldx victory_delay                   ; Wait for the delay
 ; &113e referenced 1 time by &3884
 .code_113e
-    ldy #&ff
+    ldy #&ff                            ; ...
 ; &1140 referenced 1 time by &3881
 .code_1140
-    dey
-    bne code_1140
-    dex
-    bne code_113e
-    jmp code_110a
+    dey                                 ; ...
+    bne code_1140                       ; ...
+    dex                                 ; ...
+    bne code_113e                       ; ...
+    jmp code_110a                       ; Next frame
 ; ***************************************************************************************
 ; Draw the ring of sprites round the Chalice
 ;
@@ -1126,71 +1128,71 @@ data_10e8 = sub_10e6+2
 ; as it goes.
 ; &1149 referenced 2 times by &3870, &3917
 .draw_victory_ring
-    lda #&1c
-    sta data_0080
-    lda #3
-    sta data_0081
-    jsr plot_victory_sprite
-    dec data_0080
-    jsr plot_victory_sprite
-    dec data_0080
-    jsr plot_victory_sprite
-    lda data_0082
-    sta data_0dff
-    jsr next_victory_sprite
-    dec data_0080
-    jsr plot_victory_sprite
-    inc data_0081
-    jsr plot_victory_sprite
-    inc data_0081
-    jsr plot_victory_sprite
-    jsr next_victory_sprite
-    inc data_0081
-    jsr plot_victory_sprite
-    inc data_0080
-    jsr plot_victory_sprite
-    inc data_0080
-    jsr plot_victory_sprite
-    jsr next_victory_sprite
-    inc data_0080
-    jsr plot_victory_sprite
-    dec data_0081
-    jsr plot_victory_sprite
-    dec data_0081
-    jsr plot_victory_sprite
-    rts
+    lda #&1c                            ; Start at x &1C, y 3: the ring runs round the Chalice's four cells
+    sta ring_x                          ; ...
+    lda #3                              ; ...
+    sta ring_y                          ; ...
+    jsr plot_victory_sprite             ; ...
+    dec ring_x                          ; Left...
+    jsr plot_victory_sprite             ; ...
+    dec ring_x                          ; Left...
+    jsr plot_victory_sprite             ; ...
+    lda victory_sprite                  ; Keep the sprite...
+    sta data_0dff                       ; ...
+    jsr next_victory_sprite             ; ...and change it
+    dec ring_x                          ; Left...
+    jsr plot_victory_sprite             ; ...
+    inc ring_y                          ; Down...
+    jsr plot_victory_sprite             ; ...
+    inc ring_y                          ; Down...
+    jsr plot_victory_sprite             ; ...
+    jsr next_victory_sprite             ; Change sprite
+    inc ring_y                          ; Down...
+    jsr plot_victory_sprite             ; ...
+    inc ring_x                          ; Right...
+    jsr plot_victory_sprite             ; ...
+    inc ring_x                          ; Right...
+    jsr plot_victory_sprite             ; ...
+    jsr next_victory_sprite             ; Change sprite
+    inc ring_x                          ; Right...
+    jsr plot_victory_sprite             ; ...
+    dec ring_y                          ; Up...
+    jsr plot_victory_sprite             ; ...
+    dec ring_y                          ; Up...
+    jsr plot_victory_sprite             ; ...
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Plot a victory sprite at a cell
 ;
 ; Plot the current victory sprite at the map cell in &80, &81.
 ; &119a referenced 12 times by &3891, &3896, &389b, &38a8, &38ad, &38b2, &38ba, &38bf, &38c4, &38cc, &38d1, &38d6
 .plot_victory_sprite
-    lda data_0080
-    sta cell_x
-    lda data_0081
-    sta cell_y
-    lda data_0082
-    sta sprite_number
-    jsr plot_at_cell
-    rts
+    lda ring_x                          ; Plot the victory sprite at the ring cell
+    sta cell_x                          ; ...
+    lda ring_y                          ; ...
+    sta cell_y                          ; ...
+    lda victory_sprite                  ; ...
+    sta sprite_number                   ; ...
+    jsr plot_at_cell                    ; ...
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Choose the next victory sprite
 ;
 ; Step the victory sprite through &16-&19.
 ; &11ac referenced 3 times by &38a3, &38b5, &38c7
 .next_victory_sprite
-    lda data_0082
-    cmp #&15
-    beq code_11bb
-    clc
-    adc #1
-    cmp #&1a
-    bne code_11bb
-    lda #&16
+    lda victory_sprite                  ; Erasing (sprite &15)? Keep it
+    cmp #&15                            ; ...
+    beq code_11bb                       ; ...
+    clc                                 ; Next sparkle, &16-&19 in turn
+    adc #1                              ; ...
+    cmp #&1a                            ; ...
+    bne code_11bb                       ; ...
+    lda #&16                            ; ...
 ; &11bb referenced 2 times by &38f0, &38f7
 .code_11bb
-    sta data_0082
-    rts
+    sta victory_sprite                  ; ...
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Clear a random byte of the Chalice
 ;
@@ -1198,52 +1200,52 @@ data_10e8 = sub_10e6+2
 ; Chalice.
 ; &11be referenced 1 time by &3879
 .dissolve_chalice
-    lda system_via_t1c_l
-    eor data_00fc
-    eor data_00fa
-    cmp #&c0
-    bcs return_3
-    tax
-    lda #0
-    sta sprite_chalice,x
-    jsr plot_chalice
+    lda system_via_t1c_l                ; Pick a byte of the Chalice at random...
+    eor data_00fc                       ; ...
+    eor data_00fa                       ; ...
+    cmp #&c0                            ; ...if it is within the sprite
+    bcs return_3                        ; ...
+    tax                                 ; Clear it...
+    lda #0                              ; ...
+    sta sprite_chalice,x                ; ...
+    jsr plot_chalice                    ; ...and redraw the Chalice
 ; &11d2 referenced 1 time by &3907
 .return_3
-    rts
+    rts                                 ; Return
 ; &11d3 referenced 1 time by &3859
 .code_11d3
-    lda #&15
-    sta data_0082
-    jsr draw_victory_ring
-    ldx #&c1
-    lda #0
+    lda #&15                            ; Erase the ring
+    sta victory_sprite                  ; ...
+    jsr draw_victory_ring               ; ...
+    ldx #&c1                            ; Clear the whole Chalice sprite...
+    lda #0                              ; ...
 ; &11de referenced 1 time by &3922
 .code_11de
-    sta data_120f,x
-    dex
-    bne code_11de
-    jsr plot_chalice
-    lda #&ff
-    sta os_vsync_counter
+    sta data_120f,x                     ; ...
+    dex                                 ; ...
+    bne code_11de                       ; ...
+    jsr plot_chalice                    ; ...and redraw it, now blank
+    lda #&ff                            ; Wait 255 vertical syncs (about five seconds)
+    sta os_vsync_counter                ; ...
 ; &11ec referenced 1 time by &392f
 .code_11ec
-    lda os_vsync_counter
-    bne code_11ec
-    rts
+    lda os_vsync_counter                ; ...
+    bne code_11ec                       ; ...
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Plot the Chalice
 ;
 ; Plot the Chalice sprite at its place on the map.
 ; &11f2 referenced 2 times by &390f, &3924
 .plot_chalice
-    lda #&1a
-    sta cell_x
-    lda #4
-    sta cell_y
-    lda #&73 ; 's'
-    sta sprite_number
-    jsr plot_at_cell
-    rts
+    lda #&1a                            ; The Chalice's top-left cell, x &1A, y 4...
+    sta cell_x                          ; ...
+    lda #4                              ; ...
+    sta cell_y                          ; ...
+    lda #&73 ; 's'                      ; ...sprite &73...
+    sta sprite_number                   ; ...
+    jsr plot_at_cell                    ; ...plotted in every view showing it
+    rts                                 ; Return
 .sub_1204
 ; &394f used as index base 1 time by &391e
 data_120f = sub_1204+11
@@ -2613,12 +2615,26 @@ data_1625 = sub_1624+1
 ;     X: hero number (0-3)
 ; &2050 referenced 1 time by &4672
 .restore_hero_sprites
-    brk
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00
+    brk                                 ; The hero's eight sprites, from base + 1
+    equb &00, &00, &00                  ; ...
+    equb &00, &00                       ; ...
+    equb &00                            ; ...
+    equb &00                            ; ...
+    equb &00, &00                       ; ...
+    equb &00, &00, &00                  ; ...
+    equb &00, &00                       ; Widths back to 4...
+    equb &00, &00, &00                  ; ...
+    equb &00                            ; ...
+    equb &00, &00, &00                  ; ...
+    equb &00, &00                       ; ...
+    equb &00                            ; ...
+    equb &00                            ; ...
+    equb &00, &00                       ; ...heights back to 12
+    equb &00, &00, &00                  ; ...
+    equb &00                            ; ...
+    equb &00, &00, &00                  ; ...
+    equb &00, &00                       ; ...
+    equb &00                            ; Return
     equb &00, &00                       ; Start the animation for this hero...
     equb &00, &00, &00                  ; ...
     equb &00, &00, &00                  ; ...
@@ -2641,28 +2657,64 @@ data_1625 = sub_1624+1
 ;     X: preserved
 ; &2091 referenced 1 time by &4688
 .drop_key
-    brk
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00
+    brk                                 ; From the hero's cell...
+    equb &00, &00
+    equb &00, &00, &00                  ; ...
+    equb &00, &00, &00                  ; ...
+    equb &00, &00, &00                  ; ...
+    equb &00                            ; ...find a free cell next to it
+    equb &00                            ; ...
+    equb &00, &00, &00                  ; ...
+    equb &00                            ; ...
+    equb &00                            ; ...
+    equb &00, &00, &00                  ; Put the hero's key there
+    equb &00, &00, &00                  ; ...
+    equb &00, &00, &00                  ; ...
+    equb &00, &00, &00                  ; ...
+    equb &00, &00, &00                  ; ...
+    equb &00, &00                       ; The hero carries no key
+    equb &00, &00, &00                  ; ...
+    equb &00, &00                       ; Erase the key icon from the panel
+    equb &00, &00                       ; ...
+    equb &00, &00, &00                  ; ...
+    equb &00                            ; ...
+    equb &00, &00                       ; ...
+    equb &00, &00                       ; ...
+    equb &00, &00                       ; ...
+    equb &00, &00                       ; ...
+    equb &00                            ; ...
+    equb &00                            ; ...
+    equb &00, &00, &00                  ; ...
+    equb &00                            ; ...
+    equb &00                            ; ...
+    equb &00                            ; Return
 ; ***************************************************************************************
 ; Find a free cell next to a cell
 ;
 ; Starting with cell_x, cell_y, try the cells above, to the right, below and to the left,
 ; and leave cell_x, cell_y at the first without a wall.
 .find_open_neighbour
-    brk
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
+    brk                                 ; The cell above
+    equb &00, &00
+    equb &00, &00, &00                  ; ...free?
+    equb &00, &00                       ; ...
+    equb &00, &00                       ; No
+    equb &00                            ; Yes: return
+    equb &00, &00, &00                  ; The cell to the right
+    equb &00, &00, &00                  ; ...
+    equb &00, &00, &00                  ; ...free?
+    equb &00, &00                       ; ...
+    equb &00, &00                       ; No
+    equb &00                            ; Yes: return
+    equb &00, &00, &00                  ; The cell below
+    equb &00, &00, &00                  ; ...
+    equb &00, &00, &00                  ; ...free?
+    equb &00, &00                       ; ...
+    equb &00, &00                       ; No
+    equb &00                            ; Yes: return
+    equb &00, &00, &00                  ; Otherwise the cell to the left
+    equb &00, &00, &00                  ; ...
+    equb &00, &00, &00                  ; Return
 ; &2100 used as index base 1 time by &3cad
 .object_free_map
 ; &487a used as index base 1 time by &3807
@@ -5070,7 +5122,7 @@ data_0601 = menu_text+1
     lda data_08be
     sta data_5172
     lda levels_started                  ; Leave the level count in level_count_copy for game_entry
-    sta level_count_copy
+    sta victory_steps_left
     lda levels_started                  ; level_number = levels started - 1 (game_entry counts it again)
     sec
     sbc #1
@@ -5155,29 +5207,29 @@ data_0601 = menu_text+1
     cmp #2
     bcs code_510b
     lda #0
-    sta data_0080
-    sta data_0081
+    sta ring_x
+    sta ring_y
     beq code_5113
 ; &510b referenced 1 time by &5101
 .code_510b
     lda #&40 ; '@'
-    sta data_0080
+    sta ring_x
     lda #4
-    sta data_0081
+    sta ring_y
 ; &5113 referenced 1 time by &5109
 .code_5113
-    lda data_0080
+    lda ring_x
     sta plot_x
     lda #&30 ; '0'
     clc
-    adc data_0081
+    adc ring_y
     sta plot_y
     lda #&c0
     clc
-    adc data_0080
+    adc ring_x
     sta sprite_width
     lda #8
-    adc data_0081
+    adc ring_y
     sta sprite_height
     ldy #0
 ; &512d referenced 2 times by &5141, &5147
@@ -6608,26 +6660,26 @@ data_518e = sub_5178+22
     rts                                 ; Return
 ; &7305 referenced 1 time by &460e
 .sub_7305
-    lda #0
-    sta data_007d
-    sta data_007e
-    ldx #&1e
+    lda #0                              ; No pixel offsets
+    sta data_007d                       ; ...
+    sta data_007e                       ; ...
+    ldx #&1e                            ; Objects 30 to 1: plot each at its cell
 ; &730d referenced 1 time by &7326
 .loop_730d
-    lda object_x,x
-    sta cell_x
-    lda object_y,x
-    sta cell_y
-    lda object_type,x
-    sta sprite_number
-    txa
-    pha
-    jsr plot_at_cell
-    pla
-    tax
-    dex
-    bne loop_730d
-    rts
+    lda object_x,x                      ; ...
+    sta cell_x                          ; ...
+    lda object_y,x                      ; ...
+    sta cell_y                          ; ...
+    lda object_type,x                   ; ...
+    sta sprite_number                   ; ...
+    txa                                 ; ...
+    pha                                 ; ...
+    jsr plot_at_cell                    ; ...
+    pla                                 ; ...
+    tax                                 ; ...
+    dex                                 ; ...
+    bne loop_730d                       ; ...
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Pick up the object in a hero's cell
 ;
@@ -7677,7 +7729,7 @@ data_518e = sub_5178+22
     tay                                 ; ...
     lda (data_007b),y                   ; Isolate the cell's bit...
     and scratch                         ; ...
-    sta data_008f                       ; ...keep it in &8F...
+    sta victory_pitch                   ; ...keep it in &8F...
     tay                                 ; ...and Y
     rts                                 ; Return
 ; ***************************************************************************************
@@ -7716,7 +7768,7 @@ data_518e = sub_5178+22
     tay
     lda (data_007b),y                   ; Isolate the cell's bit...
     and scratch
-    sta data_008f                       ; ...keep it in &8F...
+    sta victory_pitch                   ; ...keep it in &8F...
     tay                                 ; ...and Y
     rts                                 ; Return
 ; ***************************************************************************************
@@ -7901,24 +7953,24 @@ data_518e = sub_5178+22
     cmp #0                              ; ...
     beq code_7ac1                       ; No
     pla                                 ; Yes: stay put, with no step, and turn a random way
-    tax
-    lda previous_x
-    sta monster_x,x
-    lda previous_y
-    sta monster_y,x
-    lda #0
-    sta monster_step,x
-    sta monster_offset_x,x
-    sta monster_offset_y,x
-    lda system_via_t1c_l
-    and #7
-    clc
-    adc #8
-    sta monster_sprite,x
-    and #1
-    bne draw_monster
-    inc monster_sprite,x
-    jmp draw_monster
+    tax                                 ; Stay in the old cell...
+    lda previous_x                      ; ...
+    sta monster_x,x                     ; ...
+    lda previous_y                      ; ...
+    sta monster_y,x                     ; ...
+    lda #0                              ; ...with no step...
+    sta monster_step,x                  ; ...
+    sta monster_offset_x,x              ; ...
+    sta monster_offset_y,x              ; ...
+    lda system_via_t1c_l                ; ...and turn a random way: 8 + (timer AND 7), made odd
+    and #7                              ; ...
+    clc                                 ; ...
+    adc #8                              ; ...
+    sta monster_sprite,x                ; ...
+    and #1                              ; ...
+    bne draw_monster                    ; ...
+    inc monster_sprite,x                ; ...
+    jmp draw_monster                    ; ...
 ; &7ac1 referenced 1 time by &7a91
 .code_7ac1
     pla                                 ; Moving vertically...
@@ -8579,15 +8631,15 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     menu_text_joy:              14
 ;     hero_step:                  13
 ;     screen_ptr:                 13
-;     data_0080:                  12
 ;     menu_key_loop:              12
 ;     menu_key_loop_joy:          12
 ;     missile_direction:          12
 ;     plot_victory_sprite:        12
-;     data_0081:                  11
+;     ring_x:                     12
 ;     hero_health_tens:           11
 ;     previous_x:                 11
 ;     previous_y:                 11
+;     ring_y:                     11
 ;     returning_hero_queue:       10
 ;     hero_max_missiles:           9
 ;     hero_panel_y:                9
@@ -8602,7 +8654,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     lose_health_point:           8
 ;     panel_hero:                  8
 ;     cell_room:                   7
-;     data_008f:                   7
 ;     hero_damage_taken:           7
 ;     hero_health_units:           7
 ;     hero_missile_damage:         7
@@ -8611,7 +8662,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     os_vsync_counter:            7
 ;     oscli:                       7
 ;     sprite_height:               7
-;     data_0082:                   6
+;     victory_pitch:               7
 ;     data_06f8:                   6
 ;     draw_monster:                6
 ;     key_x:                       6
@@ -8623,10 +8674,10 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     print_menu_joy:              6
 ;     scratch2:                    6
 ;     test_key:                    6
+;     victory_sprite:              6
 ;     add_point:                   5
 ;     code_71d9:                   5
 ;     count:                       5
-;     data_0084:                   5
 ;     data_07e6:                   5
 ;     data_08be:                   5
 ;     erase_hero:                  5
@@ -8638,6 +8689,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     next_trapdoor:               5
 ;     plot_panel_sprite:           5
 ;     test_wall:                   5
+;     victory_delay:               5
 ;     view_room:                   5
 ;     add_ten_points:              4
 ;     code_1ec6:                   4
@@ -8665,6 +8717,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     plot_keeping_x:              4
 ;     start_hero_step:             4
 ;     step_hero:                   4
+;     victory_steps_left:          4
 ;     wrchv:                       4
 ;     wrchv + 1:                   4
 ;     bit_masks:                   3
@@ -8676,7 +8729,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     code_7470:                   3
 ;     code_76d4:                   3
 ;     code_798d:                   3
-;     data_008d:                   3
 ;     data_7dd0:                   3
 ;     exit_busy:                   3
 ;     exit_saved_x:                3
@@ -8699,6 +8751,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     room_walls:                  3
 ;     sprite_data_ptr:             3
 ;     system_via_t1c_l:            3
+;     victory_pitch_step:          3
 ;     clear_text_area:             2
 ;     code_108a:                   2
 ;     code_1097:                   2
@@ -9026,7 +9079,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_0dfd:                   1
 ;     data_0dff:                   1
 ;     data_0ff0:                   1
-;     data_10e7:                   1
 ;     data_10e8:                   1
 ;     data_120f:                   1
 ;     data_1625:                   1
@@ -9122,6 +9174,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     plot_boots_icon:             1
 ;     remove_absent_heroes:        1
 ;     remove_absent_heroes_joy:    1
+;     reset_call_address:          1
 ;     reset_monsters:              1
 ;     reset_workspace:             1
 ;     restart_by_reset:            1
@@ -9385,12 +9438,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_007c
 ;     data_007d
 ;     data_007e
-;     data_0080
-;     data_0081
-;     data_0082
-;     data_0084
-;     data_008d
-;     data_008f
 ;     data_00fa
 ;     data_00fc
 ;     data_0288
@@ -9452,7 +9499,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_0dfd
 ;     data_0dff
 ;     data_0ff0
-;     data_10e7
 ;     data_10e8
 ;     data_120f
 ;     data_12d4
@@ -9509,7 +9555,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     sub_0d88
 ;     sub_0ded
 ;     sub_0fea
-;     sub_10e6
 ;     sub_1204
 ;     sub_15b1
 ;     sub_1624
