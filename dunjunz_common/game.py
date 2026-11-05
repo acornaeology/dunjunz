@@ -18,6 +18,7 @@ def annotate(a: Annotator) -> None:
     annotate_routines(a)
     annotate_level_file(a)
     annotate_core_comments(a)
+    annotate_sprites(a)
 
 
 # ---------------------------------------------------------------------------
@@ -1322,3 +1323,152 @@ def annotate_core_comments(a: Annotator) -> None:
         (0x7851, "Return"),
     ]:
         C(addr, text)
+
+
+# ---------------------------------------------------------------------------
+# Sprites: (number, name, data address, width in bytes, height in rows), as
+# held in the sprite tables when the game starts. The exit animation and the
+# victory sequence change some entries and data while the game runs, and
+# each level replaces the wall sprite's data.
+
+SPRITES = [
+    (0x00, "wall", 0x2D00, 4, 12),
+    (0x01, "ranger_up_0", 0x2D30, 4, 12),
+    (0x02, "ranger_up_1", 0x2D60, 4, 12),
+    (0x03, "ranger_right_0", 0x2D90, 4, 12),
+    (0x04, "ranger_right_1", 0x2DC0, 4, 12),
+    (0x05, "ranger_down_0", 0x2DF0, 4, 12),
+    (0x06, "ranger_down_1", 0x2E20, 4, 12),
+    (0x07, "ranger_left_0", 0x2E50, 4, 12),
+    (0x08, "ranger_left_1", 0x19C0, 4, 12),
+    (0x09, "monster_up_0", 0x2E80, 4, 12),
+    (0x0A, "monster_up_1", 0x2EB0, 4, 12),
+    (0x0B, "monster_right_0", 0x2EE0, 4, 12),
+    (0x0C, "monster_right_1", 0x2F10, 4, 12),
+    (0x0D, "monster_down_0", 0x2F40, 4, 12),
+    (0x0E, "monster_down_1", 0x2F70, 4, 12),
+    (0x0F, "monster_left_0", 0x2FA0, 4, 12),
+    (0x10, "monster_left_1", 0x2FD0, 4, 12),
+    (0x11, "arrow_up", 0x2C00, 4, 12),
+    (0x12, "arrow_right", 0x2C30, 4, 12),
+    (0x13, "arrow_down", 0x2C60, 4, 12),
+    (0x14, "arrow_left", 0x2C90, 4, 12),
+    (0x15, "blank", 0x04CF, 4, 12),
+    (0x16, "sparkle_0", 0x2B00, 4, 12),
+    (0x17, "sparkle_1", 0x2B30, 4, 12),
+    (0x18, "sparkle_2", 0x2B60, 4, 12),
+    (0x19, "sparkle_3", 0x2B90, 4, 12),
+    (0x1A, "blank_key_icon", 0x04CF, 2, 3),
+    (0x1B, "key", 0x2900, 4, 12),
+    (0x1C, "door_vertical", 0x2CC0, 4, 12),
+    (0x1D, "door_horizontal", 0x2AC8, 4, 12),
+    (0x1E, "digit_0", 0x2A00, 2, 10),
+    (0x1F, "digit_1", 0x2A14, 2, 10),
+    (0x20, "digit_2", 0x2A28, 2, 10),
+    (0x21, "digit_3", 0x2A3C, 2, 10),
+    (0x22, "digit_4", 0x2A50, 2, 10),
+    (0x23, "digit_5", 0x2A64, 2, 10),
+    (0x24, "digit_6", 0x2A78, 2, 10),
+    (0x25, "digit_7", 0x2A8C, 2, 10),
+    (0x26, "digit_8", 0x2AA0, 2, 10),
+    (0x27, "digit_9", 0x2AB4, 2, 10),
+    (0x28, "treasure", 0x2930, 4, 12),
+    (0x29, "food", 0x2960, 4, 12),
+    (0x2A, "cross", 0x0AF0, 4, 12),
+    (0x2B, "teleporter", 0x29C0, 4, 12),
+    (0x2C, "trapdoor", 0x2BC0, 4, 12),
+    (0x2D, "magic_user_up_0", 0x2300, 4, 12),
+    (0x2E, "magic_user_up_1", 0x2330, 4, 12),
+    (0x2F, "magic_user_right_0", 0x2360, 4, 12),
+    (0x30, "magic_user_right_1", 0x2390, 4, 12),
+    (0x31, "magic_user_down_0", 0x23C0, 4, 12),
+    (0x32, "magic_user_down_1", 0x23F0, 4, 12),
+    (0x33, "magic_user_left_0", 0x2420, 4, 12),
+    (0x34, "magic_user_left_1", 0x2450, 4, 12),
+    (0x35, "barbarian_up_0", 0x2480, 4, 12),
+    (0x36, "barbarian_up_1", 0x24B0, 4, 12),
+    (0x37, "barbarian_right_0", 0x24E0, 4, 12),
+    (0x38, "barbarian_right_1", 0x2510, 4, 12),
+    (0x39, "barbarian_down_0", 0x2540, 4, 12),
+    (0x3A, "barbarian_down_1", 0x2570, 4, 12),
+    (0x3B, "barbarian_left_0", 0x25A0, 4, 12),
+    (0x3C, "barbarian_left_1", 0x25D0, 4, 12),
+    (0x3D, "fighter_up_0", 0x2600, 4, 12),
+    (0x3E, "fighter_up_1", 0x2630, 4, 12),
+    (0x3F, "fighter_right_0", 0x2660, 4, 12),
+    (0x40, "fighter_right_1", 0x2690, 4, 12),
+    (0x41, "fighter_down_0", 0x26C0, 4, 12),
+    (0x42, "fighter_down_1", 0x26F0, 4, 12),
+    (0x43, "fighter_left_0", 0x2720, 4, 12),
+    (0x44, "fighter_left_1", 0x2750, 4, 12),
+    (0x45, "fireball_up", 0x2780, 4, 12),
+    (0x46, "fireball_right", 0x27B0, 4, 12),
+    (0x47, "fireball_down", 0x27E0, 4, 12),
+    (0x48, "fireball_left", 0x2810, 4, 12),
+    (0x49, "sword_up", 0x1700, 4, 12),
+    (0x4A, "sword_right", 0x1730, 4, 12),
+    (0x4B, "sword_down", 0x1760, 4, 12),
+    (0x4C, "sword_left", 0x1790, 4, 12),
+    (0x4D, "axe_up", 0x2840, 4, 12),
+    (0x4E, "axe_right", 0x2870, 4, 12),
+    (0x4F, "axe_down", 0x28A0, 4, 12),
+    (0x50, "axe_left", 0x28D0, 4, 12),
+    (0x51, "exit", 0x22A0, 4, 12),
+    (0x52, "key_icon", 0x22D0, 2, 3),
+    (0x53, "drainer_0", 0x21D0, 4, 12),
+    (0x54, "drainer_1", 0x21D0, 4, 12),
+    (0x55, "drainer_2", 0x21D0, 4, 12),
+    (0x56, "drainer_3", 0x21D0, 4, 12),
+    (0x57, "drainer_4", 0x21D0, 4, 12),
+    (0x58, "drainer_5", 0x21D0, 4, 12),
+    (0x59, "drainer_6", 0x21D0, 4, 12),
+    (0x5A, "drainer_7", 0x21D0, 4, 12),
+    (0x5B, "drainer_8", 0x21D0, 4, 12),
+    (0x5C, "drainer_9", 0x21D0, 4, 12),
+    (0x5D, "drainer_10", 0x21D0, 4, 12),
+    (0x5E, "drainer_11", 0x21D0, 4, 12),
+    (0x5F, "boots", 0x0A00, 4, 12),
+    (0x60, "helmet", 0x0A30, 4, 12),
+    (0x61, "potion", 0x0A60, 4, 12),
+    (0x62, "weapons", 0x0AC0, 4, 12),
+    (0x63, "magic_sword", 0x0A90, 4, 12),
+    (0x64, "skull_0", 0x19F0, 4, 12),
+    (0x65, "skull_1", 0x1A20, 4, 12),
+    (0x66, "skull_2", 0x1A50, 4, 12),
+    (0x67, "skull_3", 0x1A80, 4, 12),
+    (0x68, "skull_4", 0x1AB0, 4, 12),
+    (0x69, "shield", 0x1800, 3, 12),
+    (0x6A, "small_digit_1", 0x1824, 1, 5),
+    (0x6B, "small_digit_2", 0x1829, 1, 5),
+    (0x6C, "small_digit_3", 0x182E, 1, 5),
+    (0x6D, "small_digit_4", 0x1833, 1, 5),
+    (0x6E, "small_digit_5", 0x1838, 1, 5),
+    (0x6F, "small_digit_6", 0x183D, 1, 5),
+    (0x70, "small_digit_7", 0x1842, 1, 5),
+    (0x71, "small_digit_8", 0x1847, 1, 5),
+    (0x72, "small_digit_9", 0x184C, 1, 5),
+    (0x73, "chalice", 0x1210, 8, 24),
+    (0x74, "missile_icon", 0x1860, 4, 3),
+    (0x75, "boots_icon", 0x186C, 2, 6),
+    (0x76, "level_word", 0x1878, 12, 8),
+    (0x77, "blank_boots_icon", 0x04CF, 2, 6),
+]
+
+
+def annotate_sprites(a: Annotator) -> None:
+    declared = {}
+    for number, name, addr, width, height in SPRITES:
+        size = width * height
+        if addr in declared:
+            continue
+        sharing = [n for n, _, ad, _, _ in SPRITES if ad == addr]
+        label = "wall_sprite" if addr == 0x2D00 else (
+            "sprite_drainer" if name.startswith("drainer") else (
+                "sprite_blank" if addr == 0x04CF else "sprite_" + name))
+        size = max(w * h for n, _, ad, w, h in SPRITES if ad == addr)
+        declared[addr] = size
+        numbers = ", ".join(f"&{n:02X}" for n in sharing)
+        if addr != 0x2D00:
+            a.label(addr, label, length=size, group="sprites", description=(
+                f"Data of sprite {numbers}: {width} bytes x {height} rows."))
+        a.byte(addr, size, cols=width)
