@@ -106,7 +106,8 @@ Micro Games Archive, is an unofficial conversion that keeps all 25 levels
 in two banks of sideways RAM as ROMFS images and loads them through the
 MOS's ROM filing system **[reported as unofficial: billcarr2005,
 stardot]**. Its credits say only "(c) Bug Byte 1986"; whoever made it is
-not named. It descends from Ole's crack, not from either original:
+not named. It is built mostly from Ole's crack, with pieces of the official disc
+release:
 
 - **Intro.** Lines 510–570 of its `DUNJUNZ` are `PLOAD`'s scroller and
   palette effects, with new text and the `PIC` picture (a face, presented
@@ -124,18 +125,15 @@ not named. It descends from Ole's crack, not from either original:
   - bytes in &0800–&08BF, &0D2F–&0D30 and &0D80–&0D85. These look like
     values from a running game, i.e. the files were saved from memory
     **[inference]**.
-- **Code from the official disc.** So the hack also borrows from the
-  disc release, not only from the crack **[confirmed]**.
 - **Levels.** Its 25 `LEVELn` files, in Beebug ROMFS images (`RFS (C)
   BEEBUG`), decrypt with the disc release's scheme, and their sums match
   the disc release's table **[confirmed]**. (The same level data appears,
   decrypted, as the crack's `L1`–`L25`.) Its `LEVEL25` is
   byte-identical to the level 25 data at the end of the disc release's
-  `Stones` **[confirmed]**. So the levels came from the
-  disc release (or its editor) while the code came from the crack, whose
-  table differs for level 5. As a result the hack resets the machine on
-  reaching level 5 **[confirmed in beebium]**; see
-  [findings.md](findings.md).
+  `Stones` **[confirmed]**. The checksum table, however, is the crack's,
+  with &1A for level 5 where the disc's has &4D. With the disc's checksum
+  routine restored, the hack therefore resets the machine on reaching
+  level 5 **[confirmed in beebium]**; see [findings.md](findings.md).
 - **Loading.** It selects `*TAPE` then `*ROM` and reads levels through
   ROMFS, so after start-up it never needs DFS, whose workspace the game
   overwrites. Whether this was the reason for the design is
@@ -152,9 +150,9 @@ not named. It descends from Ole's crack, not from either original:
 ```
 Cassette (Bug-Byte, 1986) ──cracked──> Ole's crack (NVG Dunjunz-tape.zip)
         │                                        │
-        │                                        └─code, intro──┐
-        v                                                       v
-Flippy disc (Bug-Byte, 1987) ──levels (and level 5's sum)──> Sideways RAM hack
+        │                          code, intro, checksum table
+        v                                        v
+Flippy disc (Bug-Byte, 1987) ──levels, checksum routine──> Sideways RAM hack
   (NVG Dunjunz.zip; Master side 2,                           (BBC Micro Games Archive
    Model B side 0, level editor)                              Disc060-DunjunzRx2.ssd)
 ```
