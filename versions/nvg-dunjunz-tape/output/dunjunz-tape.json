@@ -868,8 +868,8 @@
     "os_text_ptr": 242,
     "romsel_copy": 244,
     "osrdsc_ptr": 246,
-    "data_00fa": 250,
-    "data_00fc": 252,
+    "os_zp_fa": 250,
+    "os_irq_a": 252,
     "userv": 512,
     "brkv": 514,
     "irq1v": 516,
@@ -1008,8 +1008,7 @@
     "osword": 65521,
     "osbyte": 65524,
     "oscli": 65527,
-    "data_fffc": 65532,
-    "data_fffd": 65533
+    "reset_vector": 65532
   },
   "memory_map": [
     {
@@ -1233,6 +1232,18 @@
       "description": "Pitch of the victory tone."
     },
     {
+      "addr": 250,
+      "name": "os_zp_fa",
+      "group": "os_workspace",
+      "description": "MOS zero-page workspace, read by dissolve_chalice to vary its random choice."
+    },
+    {
+      "addr": 252,
+      "name": "os_irq_a",
+      "group": "os_workspace",
+      "description": "MOS 1.20: A at the last interrupt, read by dissolve_chalice to vary its random choice."
+    },
+    {
       "addr": 576,
       "name": "os_vsync_counter",
       "group": "os_workspace",
@@ -1402,9 +1413,208 @@
       "name": "mos_oswrch_default",
       "group": "mos_internals",
       "description": "MOS 1.20 default OSWRCH routine, WRCHV's initial value. The WRCHV handler jumps here directly instead of through the saved vector."
+    },
+    {
+      "addr": 65532,
+      "name": "reset_vector",
+      "group": "os_entry_points",
+      "description": "6502 RESET vector, in the MOS ROM."
     }
   ],
-  "regions": [],
+  "regions": [
+    {
+      "anchor": 1536,
+      "name": "menu_text",
+      "window": [
+        0,
+        2
+      ],
+      "named_slots": false
+    },
+    {
+      "anchor": 2858,
+      "name": "returning_hero_queue",
+      "window": [
+        0,
+        4
+      ],
+      "named_slots": false
+    },
+    {
+      "anchor": 2960,
+      "name": "trapdoor_x",
+      "window": [
+        -1,
+        6
+      ],
+      "named_slots": false
+    },
+    {
+      "anchor": 2968,
+      "name": "trapdoor_y",
+      "window": [
+        -1,
+        7
+      ],
+      "named_slots": false
+    },
+    {
+      "anchor": 3064,
+      "name": "food_sound",
+      "window": [
+        0,
+        7
+      ],
+      "named_slots": false
+    },
+    {
+      "anchor": 3312,
+      "name": "hit_sound",
+      "window": [
+        0,
+        7
+      ],
+      "named_slots": false
+    },
+    {
+      "anchor": 3072,
+      "name": "room_walls",
+      "window": [
+        0,
+        200
+      ],
+      "named_slots": false
+    },
+    {
+      "anchor": 3354,
+      "name": "hero_direction",
+      "window": [
+        -1,
+        3
+      ],
+      "named_slots": false
+    },
+    {
+      "anchor": 3360,
+      "name": "hero_frame",
+      "window": [
+        -1,
+        3
+      ],
+      "named_slots": false
+    },
+    {
+      "anchor": 3472,
+      "name": "hero_health_tens",
+      "window": [
+        -1,
+        3
+      ],
+      "named_slots": false
+    },
+    {
+      "anchor": 3488,
+      "name": "view_room",
+      "window": [
+        0,
+        7
+      ],
+      "named_slots": false
+    },
+    {
+      "anchor": 4081,
+      "name": "panel_hero",
+      "window": [
+        -1,
+        0
+      ],
+      "named_slots": false
+    },
+    {
+      "anchor": 4624,
+      "name": "sprite_chalice",
+      "window": [
+        -1,
+        191
+      ],
+      "named_slots": false
+    },
+    {
+      "anchor": 4819,
+      "name": "saved_wrchv",
+      "window": [
+        0,
+        1
+      ],
+      "named_slots": false
+    },
+    {
+      "anchor": 5845,
+      "name": "level_filename_digits",
+      "window": [
+        0,
+        1
+      ],
+      "named_slots": false
+    },
+    {
+      "anchor": 8448,
+      "name": "object_free_map",
+      "window": [
+        0,
+        200
+      ],
+      "named_slots": false
+    },
+    {
+      "anchor": 32000,
+      "name": "workspace_template",
+      "window": [
+        0,
+        255
+      ],
+      "named_slots": false
+    },
+    {
+      "anchor": 32256,
+      "name": "monster_x",
+      "window": [
+        0,
+        40
+      ],
+      "named_slots": false
+    },
+    {
+      "anchor": 32297,
+      "name": "monster_y",
+      "window": [
+        0,
+        40
+      ],
+      "named_slots": false
+    },
+    {
+      "anchor": 65532,
+      "name": "reset_vector",
+      "window": [
+        0,
+        1
+      ],
+      "named_slots": false,
+      "group": "os_entry_points",
+      "description": "6502 RESET vector, in the MOS ROM."
+    },
+    {
+      "anchor": 4327,
+      "name": "reset_call_address",
+      "window": [
+        0,
+        1
+      ],
+      "named_slots": false,
+      "description": "Operand of the JSR at reset_call, set from the RESET vector."
+    }
+  ],
   "items": [
     {
       "addr": 1024,
@@ -1635,9 +1845,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_7dd0,x",
-      "target": 32208,
-      "target_label": "data_7dd0"
+      "operand": "workspace_template + 208,x",
+      "target": 32208
     },
     {
       "addr": 1063,
@@ -1957,9 +2166,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_16d6",
-      "target": 5846,
-      "target_label": "data_16d6"
+      "operand": "level_filename_digits + 1",
+      "target": 5846
     },
     {
       "addr": 1111,
@@ -3073,9 +3281,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0601,y",
-      "target": 1537,
-      "target_label": "data_0601"
+      "operand": "menu_text + 1,y",
+      "target": 1537
     },
     {
       "addr": 1367,
@@ -3098,9 +3305,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0602,y",
-      "target": 1538,
-      "target_label": "data_0602"
+      "operand": "menu_text + 2,y",
+      "target": 1538
     },
     {
       "addr": 1372,
@@ -3169,9 +3375,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0601,y",
-      "target": 1537,
-      "target_label": "data_0601"
+      "operand": "menu_text + 1,y",
+      "target": 1537
     },
     {
       "addr": 1383,
@@ -3194,9 +3399,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0602,y",
-      "target": 1538,
-      "target_label": "data_0602"
+      "operand": "menu_text + 2,y",
+      "target": 1538
     },
     {
       "addr": 1388,
@@ -3254,9 +3458,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0601,y",
-      "target": 1537,
-      "target_label": "data_0601"
+      "operand": "menu_text + 1,y",
+      "target": 1537
     },
     {
       "addr": 1397,
@@ -3325,9 +3528,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0601,y",
-      "target": 1537,
-      "target_label": "data_0601"
+      "operand": "menu_text + 1,y",
+      "target": 1537
     },
     {
       "addr": 1408,
@@ -4172,11 +4374,6 @@
       "labels": [
         "menu_text"
       ],
-      "sub_labels": {
-        "1537": [
-          "data_0601"
-        ]
-      },
       "xref_summaries": [
         "&0600 used as index base 7 times by &0533, &053a, &0541, &054f, &055f, &056f, &0578",
         "&0601 used as index base 4 times by &0554, &0564, &0572, &057d"
@@ -4227,9 +4424,6 @@
         85,
         78,
         90
-      ],
-      "labels": [
-        "data_0602"
       ],
       "xref_summaries": [
         "&0602 used as index base 2 times by &0559, &0569"
@@ -9029,17 +9223,6 @@
       "labels": [
         "returning_hero_queue"
       ],
-      "sub_labels": {
-        "2859": [
-          "data_0b2b"
-        ],
-        "2860": [
-          "data_0b2c"
-        ],
-        "2861": [
-          "data_0b2d"
-        ]
-      },
       "xref_summaries": [
         "&0b2a referenced 3 times by &7421, &742b, &7432; also used as index base 6 times by &06ec, &159c, &16b4, &16bb, &7256, &725f",
         "&0b2b referenced 2 times by &742f, &7438",
@@ -9420,11 +9603,6 @@
       "labels": [
         "missile_damage"
       ],
-      "sub_labels": {
-        "2959": [
-          "data_0b8f"
-        ]
-      },
       "xref_summaries": [
         "&0b80 used as index base 3 times by &6f4d, &71f0, &7591",
         "&0b8f used as index base 1 time by &79cd"
@@ -9478,11 +9656,6 @@
       "labels": [
         "trapdoor_x"
       ],
-      "sub_labels": {
-        "2967": [
-          "data_0b97"
-        ]
-      },
       "xref_summaries": [
         "&0b90 used as index base 2 times by &1554, &7cc5",
         "&0b97 used as index base 1 time by &79d3"
@@ -9906,11 +10079,6 @@
       "labels": [
         "food_sound"
       ],
-      "sub_labels": {
-        "3068": [
-          "data_0bfc"
-        ]
-      },
       "xref_summaries": [
         "&0bfc referenced 2 times by &1d0f, &1d1d"
       ],
@@ -10070,9 +10238,6 @@
         122,
         106,
         120
-      ],
-      "labels": [
-        "data_0c3a"
       ],
       "xref_summaries": [
         "&0c3a used as index base 1 time by &10ba"
@@ -10492,11 +10657,6 @@
       "labels": [
         "hit_sound"
       ],
-      "sub_labels": {
-        "3316": [
-          "data_0cf4"
-        ]
-      },
       "xref_summaries": [
         "&0cf4 referenced 2 times by &7481, &7491"
       ],
@@ -11686,11 +11846,6 @@
       "labels": [
         "hero_y"
       ],
-      "sub_labels": {
-        "3353": [
-          "data_0d19"
-        ]
-      },
       "xref_summaries": [
         "&0d15 used as index base 27 times by &1e03, &1e3b, &1e8f, &1f40, &1f5b, &2097, &6e9d, &6f3f, &6f5f, &6f80, &6f8e, &6f9e, &6faa, &6fc4, &6fee, &7014, &702a, &7072, &70ad, &71e8, &732f, &73f9, &7532, &7780, &79a2, &7bb6, &7bc4",
         "&0d19 used as index base 1 time by &1f17"
@@ -11827,11 +11982,6 @@
       "labels": [
         "hero_direction"
       ],
-      "sub_labels": {
-        "3359": [
-          "data_0d1f"
-        ]
-      },
       "xref_summaries": [
         "&0d1a used as index base 18 times by &06d0, &1de6, &1f52, &6e82, &6ecb, &6ede, &6ef1, &6f04, &6f2d, &6f79, &701c, &7097, &7221, &7249, &7452, &7711, &7b67, &7baf",
         "&0d1f used as index base 1 time by &1f23"
@@ -11932,17 +12082,6 @@
       "labels": [
         "hero_frame"
       ],
-      "sub_labels": {
-        "3361": [
-          "data_0d21"
-        ],
-        "3362": [
-          "data_0d22"
-        ],
-        "3363": [
-          "data_0d23"
-        ]
-      },
       "xref_summaries": [
         "&0d20 referenced 2 times by &774e, &7753; also used as index base 12 times by &06da, &1df3, &6f62, &6f67, &709c, &7457, &76ee, &76ff, &771f, &772e, &7ba2, &7ba7",
         "&0d21 referenced 2 times by &775b, &7760",
@@ -12678,9 +12817,8 @@
       "comment_inline": "...in saved_wrchv",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_12d4",
-      "target": 4820,
-      "target_label": "data_12d4"
+      "operand": "saved_wrchv + 1",
+      "target": 4820
     },
     {
       "addr": 3425,
@@ -12909,14 +13047,6 @@
         3,
         157
       ],
-      "labels": [
-        "sub_0d88"
-      ],
-      "sub_labels": {
-        "3471": [
-          "data_0d8f"
-        ]
-      },
       "xref_summaries": [
         "&0d8f used as index base 1 time by &1f1c"
       ],
@@ -13090,17 +13220,6 @@
       "labels": [
         "view_room"
       ],
-      "sub_labels": {
-        "3490": [
-          "data_0da2"
-        ],
-        "3492": [
-          "data_0da4"
-        ],
-        "3494": [
-          "data_0da6"
-        ]
-      },
       "xref_summaries": [
         "&0da0 referenced 2 times by &779e, &7893; also used as index base 3 times by &7043, &7544, &767c",
         "&0da2 referenced 2 times by &77b0, &78ad",
@@ -13472,25 +13591,7 @@
         246,
         245,
         247,
-        252,
-        30,
-        253,
-        0
-      ],
-      "labels": [
-        "sub_0ded"
-      ],
-      "sub_labels": {
-        "3581": [
-          "data_0dfd"
-        ],
-        "3583": [
-          "data_0dff"
-        ]
-      },
-      "xref_summaries": [
-        "&0dfd referenced 1 time by &73d3",
-        "&0dff referenced 1 time by &1160"
+        252
       ],
       "type": "byte",
       "values": [
@@ -13509,9 +13610,52 @@
         246,
         245,
         247,
-        252,
+        252
+      ]
+    },
+    {
+      "addr": 3581,
+      "bytes": [
         30,
-        253,
+        253
+      ],
+      "labels": [
+        "teleport_last"
+      ],
+      "xref_summaries": [
+        "&0dfd referenced 1 time by &73d3"
+      ],
+      "references": [
+        {
+          "addr": 29651,
+          "kind": "direct"
+        }
+      ],
+      "type": "byte",
+      "values": [
+        30,
+        253
+      ]
+    },
+    {
+      "addr": 3583,
+      "bytes": [
+        0
+      ],
+      "labels": [
+        "victory_sprite_copy"
+      ],
+      "xref_summaries": [
+        "&0dff referenced 1 time by &1160"
+      ],
+      "references": [
+        {
+          "addr": 4448,
+          "kind": "direct"
+        }
+      ],
+      "type": "byte",
+      "values": [
         0
       ]
     },
@@ -14103,9 +14247,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_16d6,x",
-      "target": 5846,
-      "target_label": "data_16d6"
+      "operand": "level_filename_digits + 1,x",
+      "target": 5846
     },
     {
       "addr": 3671,
@@ -14568,9 +14711,8 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0ff0,x",
-      "target": 4080,
-      "target_label": "data_0ff0"
+      "operand": "panel_hero - 1,x",
+      "target": 4080
     },
     {
       "addr": 3755,
@@ -15756,9 +15898,8 @@
       "comment_inline": "...(read from workspace_template, which page &0D copies)",
       "type": "code",
       "mnemonic": "adc",
-      "operand": "data_7dd0,x",
-      "target": 32208,
-      "target_label": "data_7dd0"
+      "operand": "workspace_template + 208,x",
+      "target": 32208
     },
     {
       "addr": 3956,
@@ -16149,9 +16290,6 @@
         "sub_0fea"
       ],
       "sub_labels": {
-        "4080": [
-          "data_0ff0"
-        ],
         "4081": [
           "panel_hero"
         ],
@@ -16926,9 +17064,8 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0c3a,x",
-      "target": 3130,
-      "target_label": "data_0c3a"
+      "operand": "room_walls + 58,x",
+      "target": 3130
     },
     {
       "addr": 4285,
@@ -17010,9 +17147,8 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_213a,x",
-      "target": 8506,
-      "target_label": "data_213a"
+      "operand": "object_free_map + 58,x",
+      "target": 8506
     },
     {
       "addr": 4298,
@@ -17116,9 +17252,9 @@
       "comment_inline": "Copy the RESET vector into the JSR below...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_fffc",
+      "operand": "reset_vector",
       "target": 65532,
-      "target_label": "data_fffc"
+      "target_label": "reset_vector"
     },
     {
       "addr": 4317,
@@ -17144,9 +17280,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_fffd",
-      "target": 65533,
-      "target_label": "data_fffd"
+      "operand": "reset_vector + 1",
+      "target": 65533
     },
     {
       "addr": 4323,
@@ -17158,9 +17293,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_10e8",
-      "target": 4328,
-      "target_label": "data_10e8"
+      "operand": "reset_call_address + 1",
+      "target": 4328
     },
     {
       "addr": 4326,
@@ -17175,9 +17309,6 @@
       "sub_labels": {
         "4327": [
           "reset_call_address"
-        ],
-        "4328": [
-          "data_10e8"
         ]
       },
       "comment_inline": "...and call it: reset the machine",
@@ -18013,9 +18144,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0dff",
+      "operand": "victory_sprite_copy",
       "target": 3583,
-      "target_label": "data_0dff"
+      "target_label": "victory_sprite_copy"
     },
     {
       "addr": 4451,
@@ -18655,9 +18786,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "eor",
-      "operand": "data_00fc",
+      "operand": "os_irq_a",
       "target": 252,
-      "target_label": "data_00fc"
+      "target_label": "os_irq_a"
     },
     {
       "addr": 4547,
@@ -18668,9 +18799,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "eor",
-      "operand": "data_00fa",
+      "operand": "os_zp_fa",
       "target": 250,
-      "target_label": "data_00fa"
+      "target_label": "os_zp_fa"
     },
     {
       "addr": 4549,
@@ -18859,9 +18990,8 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_120f,x",
-      "target": 4623,
-      "target_label": "data_120f"
+      "operand": "sprite_chalice - 1,x",
+      "target": 4623
     },
     {
       "addr": 4577,
@@ -19101,14 +19231,6 @@
         70,
         37
       ],
-      "labels": [
-        "sub_1204"
-      ],
-      "sub_labels": {
-        "4623": [
-          "data_120f"
-        ]
-      },
       "xref_summaries": [
         "&120f used as index base 1 time by &11de"
       ],
@@ -19544,11 +19666,6 @@
       "labels": [
         "saved_wrchv"
       ],
-      "sub_labels": {
-        "4820": [
-          "data_12d4"
-        ]
-      },
       "xref_summaries": [
         "&12d3 referenced 3 times by &0d58, &14d7, &5022",
         "&12d4 referenced 3 times by &0d5e, &14dd, &5028"
@@ -21676,9 +21793,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_12d4",
-      "target": 4820,
-      "target_label": "data_12d4"
+      "operand": "saved_wrchv + 1",
+      "target": 4820
     },
     {
       "addr": 5344,
@@ -24312,11 +24428,6 @@
       "labels": [
         "level_filename_digits"
       ],
-      "sub_labels": {
-        "5846": [
-          "data_16d6"
-        ]
-      },
       "xref_summaries": [
         "&16d5 referenced 2 times by &0450, &0e4f; also used as index base 1 time by &0e3e",
         "&16d6 referenced 1 time by &0454; also used as index base 1 time by &0e54"
@@ -28496,9 +28607,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0bfc",
-      "target": 3068,
-      "target_label": "data_0bfc"
+      "operand": "food_sound + 4",
+      "target": 3068
     },
     {
       "addr": 7442,
@@ -28592,9 +28702,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0bfc",
-      "target": 3068,
-      "target_label": "data_0bfc"
+      "operand": "food_sound + 4",
+      "target": 3068
     },
     {
       "addr": 7456,
@@ -28620,9 +28729,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_7e4c",
-      "target": 32332,
-      "target_label": "data_7e4c"
+      "operand": "monster_y + 35",
+      "target": 32332
     },
     {
       "addr": 7462,
@@ -28648,9 +28756,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_7e23",
-      "target": 32291,
-      "target_label": "data_7e23"
+      "operand": "monster_x + 35",
+      "target": 32291
     },
     {
       "addr": 7468,
@@ -28737,9 +28844,8 @@
       "comment_inline": "...and recover its cell",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_7e23",
-      "target": 32291,
-      "target_label": "data_7e23"
+      "operand": "monster_x + 35",
+      "target": 32291
     },
     {
       "addr": 7484,
@@ -28765,9 +28871,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_7e4c",
-      "target": 32332,
-      "target_label": "data_7e4c"
+      "operand": "monster_y + 35",
+      "target": 32332
     },
     {
       "addr": 7490,
@@ -31775,9 +31880,8 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0d19,x",
-      "target": 3353,
-      "target_label": "data_0d19"
+      "operand": "hero_direction - 1,x",
+      "target": 3353
     },
     {
       "addr": 7962,
@@ -31802,9 +31906,8 @@
       "comment_inline": "Dead...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0d8f,x",
-      "target": 3471,
-      "target_label": "data_0d8f"
+      "operand": "hero_health_tens - 1,x",
+      "target": 3471
     },
     {
       "addr": 7967,
@@ -31840,9 +31943,8 @@
       "comment_inline": "...with the death animation unfinished?",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0d1f,x",
-      "target": 3359,
-      "target_label": "data_0d1f"
+      "operand": "hero_frame - 1,x",
+      "target": 3359
     },
     {
       "addr": 7974,
@@ -34821,14 +34923,6 @@
         127,
         0
       ],
-      "labels": [
-        "sub_212f"
-      ],
-      "sub_labels": {
-        "8506": [
-          "data_213a"
-        ]
-      },
       "xref_summaries": [
         "&213a used as index base 1 time by &10c7"
       ],
@@ -43958,9 +44052,8 @@
       "comment_inline": "...in saved_wrchv",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_12d4",
-      "target": 4820,
-      "target_label": "data_12d4"
+      "operand": "saved_wrchv + 1",
+      "target": 4820
     },
     {
       "addr": 20523,
@@ -52840,9 +52933,9 @@
       "comment_inline": "...wrapping round to the end",
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "data_0dfd",
+      "operand": "teleport_last",
       "target": 3581,
-      "target_label": "data_0dfd"
+      "target_label": "teleport_last"
     },
     {
       "addr": 29654,
@@ -53427,9 +53520,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0b2b",
-      "target": 2859,
-      "target_label": "data_0b2b"
+      "operand": "returning_hero_queue + 1",
+      "target": 2859
     },
     {
       "addr": 29746,
@@ -53455,9 +53547,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0b2c",
-      "target": 2860,
-      "target_label": "data_0b2c"
+      "operand": "returning_hero_queue + 2",
+      "target": 2860
     },
     {
       "addr": 29752,
@@ -53469,9 +53560,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0b2b",
-      "target": 2859,
-      "target_label": "data_0b2b"
+      "operand": "returning_hero_queue + 1",
+      "target": 2859
     },
     {
       "addr": 29755,
@@ -53483,9 +53573,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0b2d",
-      "target": 2861,
-      "target_label": "data_0b2d"
+      "operand": "returning_hero_queue + 3",
+      "target": 2861
     },
     {
       "addr": 29758,
@@ -53497,9 +53586,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0b2c",
-      "target": 2860,
-      "target_label": "data_0b2c"
+      "operand": "returning_hero_queue + 2",
+      "target": 2860
     },
     {
       "addr": 29761,
@@ -53511,9 +53599,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sty",
-      "operand": "data_0b2d",
-      "target": 2861,
-      "target_label": "data_0b2d"
+      "operand": "returning_hero_queue + 3",
+      "target": 2861
     },
     {
       "addr": 29764,
@@ -53960,9 +54047,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0cf4",
-      "target": 3316,
-      "target_label": "data_0cf4"
+      "operand": "hit_sound + 4",
+      "target": 3316
     },
     {
       "addr": 29828,
@@ -54074,9 +54160,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0cf4",
-      "target": 3316,
-      "target_label": "data_0cf4"
+      "operand": "hit_sound + 4",
+      "target": 3316
     },
     {
       "addr": 29844,
@@ -58876,9 +58961,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0d21",
-      "target": 3361,
-      "target_label": "data_0d21"
+      "operand": "hero_frame + 1",
+      "target": 3361
     },
     {
       "addr": 30558,
@@ -58901,9 +58985,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0d21",
-      "target": 3361,
-      "target_label": "data_0d21"
+      "operand": "hero_frame + 1",
+      "target": 3361
     },
     {
       "addr": 30563,
@@ -58960,9 +59043,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0d22",
-      "target": 3362,
-      "target_label": "data_0d22"
+      "operand": "hero_frame + 2",
+      "target": 3362
     },
     {
       "addr": 30571,
@@ -58985,9 +59067,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0d22",
-      "target": 3362,
-      "target_label": "data_0d22"
+      "operand": "hero_frame + 2",
+      "target": 3362
     },
     {
       "addr": 30576,
@@ -59020,9 +59101,8 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0d23",
-      "target": 3363,
-      "target_label": "data_0d23"
+      "operand": "hero_frame + 3",
+      "target": 3363
     },
     {
       "addr": 30580,
@@ -59045,9 +59125,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0d23",
-      "target": 3363,
-      "target_label": "data_0d23"
+      "operand": "hero_frame + 3",
+      "target": 3363
     },
     {
       "addr": 30585,
@@ -59416,9 +59495,8 @@
       "comment_inline": "...hero 1's room",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0da2",
-      "target": 3490,
-      "target_label": "data_0da2"
+      "operand": "view_room + 2",
+      "target": 3490
     },
     {
       "addr": 30643,
@@ -59531,9 +59609,8 @@
       "comment_inline": "...hero 2's room",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0da4",
-      "target": 3492,
-      "target_label": "data_0da4"
+      "operand": "view_room + 4",
+      "target": 3492
     },
     {
       "addr": 30661,
@@ -59646,9 +59723,8 @@
       "comment_inline": "...hero 3's room",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0da6",
-      "target": 3494,
-      "target_label": "data_0da6"
+      "operand": "view_room + 6",
+      "target": 3494
     },
     {
       "addr": 30679,
@@ -61089,9 +61165,8 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0da2",
-      "target": 3490,
-      "target_label": "data_0da2"
+      "operand": "view_room + 2",
+      "target": 3490
     },
     {
       "addr": 30896,
@@ -61241,9 +61316,8 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0da4",
-      "target": 3492,
-      "target_label": "data_0da4"
+      "operand": "view_room + 4",
+      "target": 3492
     },
     {
       "addr": 30922,
@@ -61393,9 +61467,8 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0da6",
-      "target": 3494,
-      "target_label": "data_0da6"
+      "operand": "view_room + 6",
+      "target": 3494
     },
     {
       "addr": 30948,
@@ -62928,9 +63001,8 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0b8f,x",
-      "target": 2959,
-      "target_label": "data_0b8f"
+      "operand": "trapdoor_x - 1,x",
+      "target": 2959
     },
     {
       "addr": 31184,
@@ -62956,9 +63028,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0b97,x",
-      "target": 2967,
-      "target_label": "data_0b97"
+      "operand": "trapdoor_y - 1,x",
+      "target": 2967
     },
     {
       "addr": 31190,
@@ -68495,14 +68566,6 @@
         104,
         170
       ],
-      "labels": [
-        "sub_7db9"
-      ],
-      "sub_labels": {
-        "32208": [
-          "data_7dd0"
-        ]
-      },
       "xref_summaries": [
         "&7dd0 used as index base 2 times by &0424, &0f71"
       ],
@@ -68663,11 +68726,6 @@
       "labels": [
         "monster_x"
       ],
-      "sub_labels": {
-        "32291": [
-          "data_7e23"
-        ]
-      },
       "xref_summaries": [
         "&7e00 used as index base 17 times by &158c, &7667, &797e, &79e7, &7a31, &7a3f, &7a45, &7a5b, &7a98, &7ace, &7afb, &7b04, &7b41, &7c46, &7c54, &7cc8, &7cf2",
         "&7e23 referenced 2 times by &1d29, &1d39"
@@ -68922,14 +68980,6 @@
         0,
         0
       ],
-      "labels": [
-        "sub_7e30"
-      ],
-      "sub_labels": {
-        "32332": [
-          "data_7e4c"
-        ]
-      },
       "xref_summaries": [
         "&7e4c referenced 2 times by &1d23, &1d3f"
       ],

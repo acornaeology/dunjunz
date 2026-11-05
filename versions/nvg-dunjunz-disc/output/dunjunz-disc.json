@@ -1074,8 +1074,8 @@
     "os_text_ptr": 242,
     "romsel_copy": 244,
     "osrdsc_ptr": 246,
-    "data_00fa": 250,
-    "data_00fc": 252,
+    "os_zp_fa": 250,
+    "os_irq_a": 252,
     "userv": 512,
     "brkv": 514,
     "irq1v": 516,
@@ -1245,8 +1245,7 @@
     "osword": 65521,
     "osbyte": 65524,
     "oscli": 65527,
-    "data_fffc": 65532,
-    "data_fffd": 65533
+    "reset_vector": 65532
   },
   "memory_map": [
     {
@@ -1470,6 +1469,18 @@
       "description": "Pitch of the victory tone."
     },
     {
+      "addr": 250,
+      "name": "os_zp_fa",
+      "group": "os_workspace",
+      "description": "MOS zero-page workspace, read by dissolve_chalice to vary its random choice."
+    },
+    {
+      "addr": 252,
+      "name": "os_irq_a",
+      "group": "os_workspace",
+      "description": "MOS 1.20: A at the last interrupt, read by dissolve_chalice to vary its random choice."
+    },
+    {
       "addr": 576,
       "name": "os_vsync_counter",
       "group": "os_workspace",
@@ -1583,9 +1594,63 @@
       "name": "mos_osbyte_default",
       "group": "mos_internals",
       "description": "MOS 1.20 default OSBYTE routine, BYTEV's initial value."
+    },
+    {
+      "addr": 65532,
+      "name": "reset_vector",
+      "group": "os_entry_points",
+      "description": "6502 RESET vector, in the MOS ROM."
     }
   ],
-  "regions": [],
+  "regions": [
+    {
+      "anchor": 8448,
+      "name": "object_free_map",
+      "window": [
+        0,
+        200
+      ],
+      "named_slots": false
+    },
+    {
+      "anchor": 32000,
+      "name": "workspace_template",
+      "window": [
+        0,
+        255
+      ],
+      "named_slots": false
+    },
+    {
+      "anchor": 32256,
+      "name": "monster_x",
+      "window": [
+        0,
+        40
+      ],
+      "named_slots": false
+    },
+    {
+      "anchor": 32297,
+      "name": "monster_y",
+      "window": [
+        0,
+        40
+      ],
+      "named_slots": false
+    },
+    {
+      "anchor": 65532,
+      "name": "reset_vector",
+      "window": [
+        0,
+        1
+      ],
+      "named_slots": false,
+      "group": "os_entry_points",
+      "description": "6502 RESET vector, in the MOS ROM."
+    }
+  ],
   "items": [
     {
       "addr": 8192,
@@ -2349,11 +2414,6 @@
         127,
         0
       ],
-      "sub_labels": {
-        "8506": [
-          "data_213a"
-        ]
-      },
       "xref_summaries": [
         "&213a used as index base 1 time by &3807"
       ],
@@ -18768,35 +18828,9 @@
         246,
         245,
         247,
-        252,
-        30,
-        253,
-        0,
-        169,
-        0,
-        141,
-        159,
-        22,
-        141,
-        255,
-        22
+        252
       ],
       "binary_addr": 13613,
-      "labels": [
-        "sub_0ded"
-      ],
-      "sub_labels": {
-        "3581": [
-          "data_0dfd"
-        ],
-        "3583": [
-          "data_0dff"
-        ]
-      },
-      "xref_summaries": [
-        "&353d referenced 1 time by &73d3",
-        "&353f referenced 1 time by &38a0"
-      ],
       "type": "byte",
       "values": [
         222,
@@ -18814,9 +18848,63 @@
         246,
         245,
         247,
-        252,
+        252
+      ]
+    },
+    {
+      "addr": 3581,
+      "bytes": [
         30,
-        253,
+        253
+      ],
+      "binary_addr": 13629,
+      "labels": [
+        "teleport_last"
+      ],
+      "xref_summaries": [
+        "&353d referenced 1 time by &73d3"
+      ],
+      "references": [
+        {
+          "addr": 29651,
+          "kind": "direct"
+        }
+      ],
+      "type": "byte",
+      "values": [
+        30,
+        253
+      ]
+    },
+    {
+      "addr": 3583,
+      "bytes": [
+        0,
+        169,
+        0,
+        141,
+        159,
+        22,
+        141,
+        255,
+        22
+      ],
+      "binary_addr": 13631,
+      "labels": [
+        "victory_sprite_copy"
+      ],
+      "xref_summaries": [
+        "&353f referenced 1 time by &1160[1]"
+      ],
+      "references": [
+        {
+          "addr": 4448,
+          "kind": "direct",
+          "move_id": 1
+        }
+      ],
+      "type": "byte",
+      "values": [
         0,
         169,
         0,
@@ -20960,9 +21048,8 @@
       "comment_inline": "...(read from workspace_template, which page &0D copies)",
       "type": "code",
       "mnemonic": "adc",
-      "operand": "data_7dd0,x",
-      "target": 32208,
-      "target_label": "data_7dd0"
+      "operand": "workspace_template + 208,x",
+      "target": 32208
     },
     {
       "addr": 3956,
@@ -22298,9 +22385,8 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_213a,x",
-      "target": 8506,
-      "target_label": "data_213a"
+      "operand": "object_free_map + 58,x",
+      "target": 8506
     },
     {
       "addr": 4298,
@@ -22412,9 +22498,9 @@
       "comment_inline": "Copy the RESET vector into the JSR below...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_fffc",
+      "operand": "reset_vector",
       "target": 65532,
-      "target_label": "data_fffc"
+      "target_label": "reset_vector"
     },
     {
       "addr": 4317,
@@ -22442,9 +22528,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_fffd",
-      "target": 65533,
-      "target_label": "data_fffd"
+      "operand": "reset_vector + 1",
+      "target": 65533
     },
     {
       "addr": 4323,
@@ -23373,9 +23458,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0dff",
+      "operand": "victory_sprite_copy",
       "target": 3583,
-      "target_label": "data_0dff"
+      "target_label": "victory_sprite_copy"
     },
     {
       "addr": 4451,
@@ -24073,9 +24158,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "eor",
-      "operand": "data_00fc",
+      "operand": "os_irq_a",
       "target": 252,
-      "target_label": "data_00fc"
+      "target_label": "os_irq_a"
     },
     {
       "addr": 4547,
@@ -24087,9 +24172,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "eor",
-      "operand": "data_00fa",
+      "operand": "os_zp_fa",
       "target": 250,
-      "target_label": "data_00fa"
+      "target_label": "os_zp_fa"
     },
     {
       "addr": 4549,
@@ -29817,16 +29902,16 @@
         69,
         86,
         69,
-        76,
-        49
+        76
       ],
       "binary_addr": 15888,
       "type": "string",
-      "string": "LEVEL1"
+      "string": "LEVEL"
     },
     {
-      "addr": 5846,
+      "addr": 5845,
       "bytes": [
+        49,
         13,
         13,
         112,
@@ -29839,9 +29924,13 @@
         0,
         0
       ],
-      "binary_addr": 15894,
+      "binary_addr": 15893,
+      "labels": [
+        "level_filename_digits"
+      ],
       "type": "byte",
       "values": [
+        49,
         13,
         13,
         112,
@@ -34196,9 +34285,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_7e4c",
-      "target": 32332,
-      "target_label": "data_7e4c"
+      "operand": "monster_y + 35",
+      "target": 32332
     },
     {
       "addr": 7462,
@@ -34226,9 +34314,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_7e23",
-      "target": 32291,
-      "target_label": "data_7e23"
+      "operand": "monster_x + 35",
+      "target": 32291
     },
     {
       "addr": 7468,
@@ -34322,9 +34409,8 @@
       "comment_inline": "...and recover its cell",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_7e23",
-      "target": 32291,
-      "target_label": "data_7e23"
+      "operand": "monster_x + 35",
+      "target": 32291
     },
     {
       "addr": 7484,
@@ -34352,9 +34438,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_7e4c",
-      "target": 32332,
-      "target_label": "data_7e4c"
+      "operand": "monster_y + 35",
+      "target": 32332
     },
     {
       "addr": 7490,
@@ -40792,11 +40877,6 @@
       "labels": [
         "object_free_map"
       ],
-      "sub_labels": {
-        "8506": [
-          "data_213a"
-        ]
-      },
       "xref_summaries": [
         "&4840 used as index base 1 time by &156d[1]",
         "&487a used as index base 1 time by &3807"
@@ -47308,9 +47388,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_7dd0,x",
-      "target": 32208,
-      "target_label": "data_7dd0"
+      "operand": "workspace_template + 208,x",
+      "target": 32208
     },
     {
       "addr": 1063,
@@ -52353,9 +52432,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_7dd0,x",
-      "target": 32208,
-      "target_label": "data_7dd0"
+      "operand": "workspace_template + 208,x",
+      "target": 32208
     },
     {
       "addr": 1063,
@@ -77344,9 +77422,9 @@
       "comment_inline": "...wrapping round to the end",
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "data_0dfd",
+      "operand": "teleport_last",
       "target": 3581,
-      "target_label": "data_0dfd"
+      "target_label": "teleport_last"
     },
     {
       "addr": 29654,
@@ -93000,14 +93078,6 @@
         104,
         170
       ],
-      "labels": [
-        "sub_7db9"
-      ],
-      "sub_labels": {
-        "32208": [
-          "data_7dd0"
-        ]
-      },
       "xref_summaries": [
         "&7dd0 used as index base 3 times by &36b1, &51d4, &55d4"
       ],
@@ -93168,11 +93238,6 @@
       "labels": [
         "monster_x"
       ],
-      "sub_labels": {
-        "32291": [
-          "data_7e23"
-        ]
-      },
       "xref_summaries": [
         "&7e00 used as index base 17 times by &158c[1], &7667, &797e, &79e7, &7a31, &7a3f, &7a45, &7a5b, &7a98, &7ace, &7afb, &7b04, &7b41, &7c46, &7c54, &7cc8, &7cf2",
         "&7e23 referenced 2 times by &4469, &4479"
@@ -93428,14 +93493,6 @@
         0,
         0
       ],
-      "labels": [
-        "sub_7e30"
-      ],
-      "sub_labels": {
-        "32332": [
-          "data_7e4c"
-        ]
-      },
       "xref_summaries": [
         "&7e4c referenced 2 times by &4463, &447f"
       ],

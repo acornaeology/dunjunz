@@ -10,6 +10,7 @@ from dunjunz_common.annotator import Annotator
 
 
 def annotate(a: Annotator) -> None:
+    annotate_regions(a)
     _zero_page(a)
     _os_workspace(a)
     _screen(a)
@@ -2599,8 +2600,6 @@ def annotate_menu_and_panel_comments(a: Annotator) -> None:
 
 def annotate_victory_and_helpers(a: Annotator) -> None:
     a.label(0x10E6, "reset_call")
-    a.label(0x10E7, "reset_call_address", description=(
-        "Operand of the JSR at reset_call, set from the RESET vector."))
     for addr, name, description in [
         (0x0080, "ring_x", "Map x of the cell being drawn in the victory ring."),
         (0x0081, "ring_y", "Map y of the cell being drawn in the victory ring."),
@@ -3189,3 +3188,45 @@ def annotate_hack_continuations(a: Annotator) -> None:
         (0x146B, '...'),
     ]:
         a.c(addr, text)
+
+
+def annotate_regions(a: Annotator) -> None:
+    """Index regions, so that references to table elements read as offsets
+    from the table. Call before the tables' own labels are declared."""
+    for addr, name, window, kw in [
+        (0x0600, "menu_text", (0, 2), {}),
+        (0x0B2A, "returning_hero_queue", (0, 4), {}),
+        (0x0B90, "trapdoor_x", (-1, 6), {}),
+        (0x0B98, "trapdoor_y", (-1, 7), {}),
+        (0x0BF8, "food_sound", (0, 7), {}),
+        (0x0CF0, "hit_sound", (0, 7), {}),
+        (0x0C00, "room_walls", (0, 0xC8), {}),
+        (0x0D1A, "hero_direction", (-1, 3), {}),
+        (0x0D20, "hero_frame", (-1, 3), {}),
+        (0x0D90, "hero_health_tens", (-1, 3), {}),
+        (0x0DA0, "view_room", (0, 7), {}),
+        (0x0FF1, "panel_hero", (-1, 0), {}),
+        (0x120F + 1, "sprite_chalice", (-1, 191), {}),
+        (0x12D3, "saved_wrchv", (0, 1), {}),
+        (0x16D5, "level_filename_digits", (0, 1), {}),
+        (0x2100, "object_free_map", (0, 0xC8), {}),
+        (0x7D00, "workspace_template", (0, 0xFF), {}),
+        (0x7E00, "monster_x", (0, 0x28), {}),
+        (0x7E29, "monster_y", (0, 0x28), {}),
+    ]:
+        a.region(addr, name, window, **kw)
+    a.label(0x0DFD, "teleport_last", description=(
+        "Index of the last object to search when looking backwards for a "
+        "teleporter (&1E, from workspace_template)."))
+    a.label(0x0DFF, "victory_sprite_copy", description=(
+        "Written by draw_victory_ring; not read."))
+    a.label(0x00FA, "os_zp_fa", group="os_workspace", description=(
+        "MOS zero-page workspace, read by dissolve_chalice to vary its "
+        "random choice."))
+    a.label(0x00FC, "os_irq_a", group="os_workspace", description=(
+        "MOS 1.20: A at the last interrupt, read by dissolve_chalice to vary "
+        "its random choice."))
+    a.region(0xFFFC, "reset_vector", (0, 1), group="os_entry_points",
+             description="6502 RESET vector, in the MOS ROM.")
+    a.region(0x10E7, "reset_call_address", (0, 1), description=(
+        "Operand of the JSR at reset_call, set from the RESET vector."))

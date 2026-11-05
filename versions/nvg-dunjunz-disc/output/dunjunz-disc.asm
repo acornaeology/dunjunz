@@ -62,9 +62,9 @@ victory_steps_left       = &8e  ; Copy of levels_started that Coder leaves for g
 ; &8e referenced 4 times by &34ab, &3844, &3855, &5072
 victory_pitch            = &8f  ; Pitch of the victory tone.
 ; &8f referenced 7 times by &34b0, &383c, &384b, &384f, &3864, &7934, &7970
-data_00fa                = &fa
+os_zp_fa                 = &fa  ; MOS zero-page workspace, read by dissolve_chalice to vary its random choice.
 ; &fa referenced 1 time by &3903
-data_00fc                = &fc
+os_irq_a                 = &fc  ; MOS 1.20: A at the last interrupt, read by dissolve_chalice to vary its random choice.
 ; &fc referenced 1 time by &3901
 bytev                    = &020a
 ; &020a referenced 1 time by &50dd
@@ -112,10 +112,8 @@ osbyte                   = &fff4
 ; &fff4 referenced 27 times by &3477, &3480, &3489, &3492, &3600, &3609, &3814, &382d, &3868, &4619, &4620, &4627, &5006, &50a7, &50d4, &5333, &533c, &539d, &5733, &573c, &579d, &594f, &595d, &596c, &597a, &5989, &7c9e
 oscli                    = &fff7
 ; &fff7 referenced 7 times by &3bbd, &3bc4, &3d05, &3d0c, &5060, &5085, &508f
-data_fffc                = &fffc
+reset_vector             = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; &fffc referenced 1 time by &381a
-data_fffd                = &fffd
-; &fffd referenced 1 time by &3820
 
 
     org &3000
@@ -705,15 +703,15 @@ data_0da6 = view_room+6
     equb &8d, &40, &0d, &8e, &ff, &0d, &68, &a8
     equb &68, &aa
     equs "h(`"
-.sub_0ded
-; &353d referenced 1 time by &73d3
-data_0dfd = sub_0ded+16
-; &353f referenced 1 time by &38a0
-data_0dff = sub_0ded+18
     equb &de, &dd, &df, &f0, &f2, &f1, &f3, &f8
     equb &fa, &f9, &fb, &f4, &f6, &f5, &f7, &fc
-    equb &1e, &fd, &00, &a9, &00, &8d, &9f, &16
-    equb &8d, &ff, &16
+; &0dfd referenced 1 time by &73d3
+.teleport_last
+    equb &1e, &fd
+; &0dff referenced 1 time by &38a0
+.victory_sprite_copy
+    equb &00, &a9, &00, &8d, &9f, &16, &8d, &ff
+    equb &16
 ; &0e08 referenced 1 time by &34c1
 .code_0e08
     tax                                 ; Give each hero their starting attributes
@@ -915,7 +913,7 @@ data_0dff = sub_0ded+18
     tya                                 ; Row = Y + this hero's panel row - 14...
     ldx panel_hero                      ; ...
     clc                                 ; ...
-    adc data_7dd0,x                     ; ...(read from workspace_template, which page &0D copies)
+    adc workspace_template + 208,x      ; ...(read from workspace_template, which page &0D copies)
     sec                                 ; ...
     sbc #&0e                            ; ...
     sta plot_y                          ; ...
@@ -1046,7 +1044,7 @@ count = sub_0fea+8
     ldx #0                              ; ...then the string at object_free_map + &3A: on level 25, the ending message
 ; &10c7 referenced 1 time by &3810
 .code_10c7
-    lda data_213a,x                     ; ...
+    lda object_free_map + 58,x          ; ...
     jsr osasci                          ; ...
     inx                                 ; ...
     cmp #0                              ; ...
@@ -1054,9 +1052,9 @@ count = sub_0fea+8
     lda #osbyte_flush_buffer_class      ; Flush the input buffers
     jsr osbyte                          ; ...  Flush selected class of buffer
     jsr osrdch                          ; Wait for a key
-    lda data_fffc                       ; Copy the RESET vector into the JSR below...
+    lda reset_vector                    ; Copy the RESET vector into the JSR below...
     sta reset_call_address              ; ...
-    lda data_fffd                       ; ...
+    lda reset_vector + 1                ; ...
     sta data_10e8                       ; ...
 .reset_call
 ; &3827 referenced 1 time by &381d
@@ -1145,7 +1143,7 @@ data_10e8 = reset_call+2
     dec ring_x                          ; Left...
     jsr plot_victory_sprite             ; ...
     lda victory_sprite                  ; Keep the sprite...
-    sta data_0dff                       ; ...
+    sta victory_sprite_copy             ; ...
     jsr next_victory_sprite             ; ...and change it
     dec ring_x                          ; Left...
     jsr plot_victory_sprite             ; ...
@@ -1208,8 +1206,8 @@ data_10e8 = reset_call+2
 ; &11be referenced 1 time by &3879
 .dissolve_chalice
     lda system_via_t1c_l                ; Pick a byte of the Chalice at random...
-    eor data_00fc                       ; ...
-    eor data_00fa                       ; ...
+    eor os_irq_a                        ; ...
+    eor os_zp_fa                        ; ...
     cmp #&c0                            ; ...if it is within the sprite
     bcs return_3                        ; ...
     tax                                 ; Clear it...
@@ -1752,9 +1750,10 @@ data_1625 = sub_1624+1
     bne code_16b4                       ; ...
     equb &02, &02, &00, &00, &83, &00, &00, &00
     equb &00, &00, &00, &31, &00, &8d
-    equs "LEVEL1"
-    equb &0d, &0d, &70, &00, &8d, &35, &f8, &00
-    equb &00, &00, &00
+    equs "LEVEL"
+.level_filename_digits
+    equb &31, &0d, &0d, &70, &00, &8d, &35, &f8
+    equb &00, &00, &00, &00
     equs "code"
     equb &00, &54, &12, &03, &17, &74, &00, &8c
     equb &50, &00, &00, &00, &fa, &16, &78, &00
@@ -2182,18 +2181,18 @@ data_1625 = sub_1624+1
     lda #&c8                            ; ...and put its pitch back
     sta data_0bfc                       ; ...
     lda cell_y                          ; Keep the door's cell in spare bytes beyond the monster tables, as plot_at_cell changes cell_x and cell_y...
-    sta data_7e4c                       ; ...
+    sta monster_y + 35                  ; ...
     lda cell_x                          ; ...
-    sta data_7e23                       ; ...
+    sta monster_x + 35                  ; ...
     lda #&15                            ; ...erase the door...
     sta sprite_number                   ; ...
     lda #0                              ; ...
     sta plot_offset_x                   ; ...
     sta plot_offset_y                   ; ...
     jsr plot_at_cell                    ; ...
-    lda data_7e23                       ; ...and recover its cell
+    lda monster_x + 35                  ; ...and recover its cell
     sta cell_x                          ; ...
-    lda data_7e4c                       ; ...
+    lda monster_y + 35                  ; ...
     sta cell_y                          ; ...
     pla                                 ; ...
     tay                                 ; ...
@@ -2738,7 +2737,6 @@ data_1625 = sub_1624+1
 ; &2100 used as index base 1 time by &3cad
 .object_free_map
 ; &487a used as index base 1 time by &3807
-data_213a = object_free_map+58
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -2798,7 +2796,7 @@ data_213a = object_free_map+58
     sta sprite_number                   ; Plot it below the score...
     lda #&45 ; 'E'                      ; ...
     sta plot_x                          ; ...
-    lda data_7dd0,x                     ; ...
+    lda workspace_template + 208,x      ; ...
     clc                                 ; ...
     adc #&18                            ; ...
     sta plot_y                          ; ...
@@ -3287,7 +3285,7 @@ data_0601 = menu_text+1
     sta sprite_number                   ; Plot it below the score...
     lda #&45 ; 'E'                      ; ...
     sta plot_x                          ; ...
-    lda data_7dd0,x                     ; ...
+    lda workspace_template + 208,x      ; ...
     clc                                 ; ...
     adc #&18                            ; ...
     sta plot_y                          ; ...
@@ -6814,7 +6812,7 @@ data_518e = sub_5178+22
     beq code_73d9                       ; ...
     cpy #0                              ; ...
     bne code_73c7                       ; ...
-    ldy data_0dfd                       ; ...wrapping round to the end
+    ldy teleport_last                   ; ...wrapping round to the end
     jmp code_73c7                       ; ...
 ; &73d9 referenced 1 time by &73cd
 .code_73d9
@@ -8413,9 +8411,6 @@ data_518e = sub_5178+22
     equs "DLHh"
     equb &00
     equs ",4<"
-.sub_7db9
-; &7dd0 used as index base 3 times by &36b1, &51d4, &55d4
-data_7dd0 = sub_7db9+23
     equb &00, &0d, &d9, &00, &00, &00, &00, &80
     equb &40, &20, &10, &08, &04, &02, &01, &b9
     equb &30, &0d, &9d, &08, &0d, &4c, &d4, &18
@@ -8430,7 +8425,6 @@ data_7dd0 = sub_7db9+23
 ; &7e00 used as index base 17 times by &3ccc, &7667, &797e, &79e7, &7a31, &7a3f, &7a45, &7a5b, &7a98, &7ace, &7afb, &7b04, &7b41, &7c46, &7c54, &7cc8, &7cf2
 .monster_x
 ; &7e23 referenced 2 times by &4469, &4479
-data_7e23 = monster_x+35
     equb &00, &04, &0b, &09, &1d, &08, &01, &06
     equb &07, &0a, &01, &0b, &1a, &06, &0b, &16
     equb &15, &0d, &1b, &14, &1a, &09, &1c, &0f
@@ -8441,9 +8435,6 @@ data_7e23 = monster_x+35
 .monster_y
     equb &00, &24, &17
     equs "% $", &22
-.sub_7e30
-; &7e4c referenced 2 times by &4463, &447f
-data_7e4c = sub_7e30+28
     equb &14, &27, &0d, &20, &01, &26, &0a, &01
     equb &12, &05, &20, &29, &0d, &26, &27, &08
     equb &06, &1a, &14, &03, &1d, &07, &0d, &17
@@ -8748,7 +8739,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     code_7470:                   3
 ;     code_76d4:                   3
 ;     code_798d:                   3
-;     data_7dd0:                   3
 ;     exit_busy:                   3
 ;     exit_saved_x:                3
 ;     exit_saved_y:                3
@@ -8771,6 +8761,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     sprite_data_ptr:             3
 ;     system_via_t1c_l:            3
 ;     victory_pitch_step:          3
+;     workspace_template + 208:    3
 ;     clear_text_area:             2
 ;     code_108a:                   2
 ;     code_1097:                   2
@@ -8825,8 +8816,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_0da4:                   2
 ;     data_0da6:                   2
 ;     data_12d4:                   2
-;     data_7e23:                   2
-;     data_7e4c:                   2
 ;     door_sprite:                 2
 ;     draw_hero:                   2
 ;     draw_missile_damage:         2
@@ -8841,6 +8830,8 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     get_hero_cell:               2
 ;     level_checksums:             2
 ;     missile_spent_pop:           2
+;     monster_x + 35:              2
+;     monster_y + 35:              2
 ;     mos_osbyte_default:          2
 ;     mos_oswrch_default:          2
 ;     next_missile:                2
@@ -9068,8 +9059,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     continue_hero_step:          1
 ;     continue_monster_step:       1
 ;     data_0000:                   1
-;     data_00fa:                   1
-;     data_00fc:                   1
 ;     data_079b:                   1
 ;     data_07a9:                   1
 ;     data_07b8:                   1
@@ -9082,18 +9071,13 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_0d19:                   1
 ;     data_0d1f:                   1
 ;     data_0d8f:                   1
-;     data_0dfd:                   1
-;     data_0dff:                   1
 ;     data_0ff0:                   1
 ;     data_10e8:                   1
 ;     data_120f:                   1
 ;     data_1625:                   1
-;     data_213a:                   1
 ;     data_5172:                   1
 ;     data_5179:                   1
 ;     data_518e:                   1
-;     data_fffc:                   1
-;     data_fffd:                   1
 ;     decrypt_level:               1
 ;     dissolve_chalice:            1
 ;     draw_all_views:              1
@@ -9182,10 +9166,15 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     next_level_by_reset:         1
 ;     next_monster_update:         1
 ;     object_free_map:             1
+;     object_free_map + 58:        1
+;     os_irq_a:                    1
+;     os_zp_fa:                    1
 ;     plot_boots_icon:             1
 ;     remove_absent_heroes:        1
 ;     reset_call_address:          1
 ;     reset_monsters:              1
+;     reset_vector:                1
+;     reset_vector + 1:            1
 ;     reset_workspace:             1
 ;     restart_by_reset:            1
 ;     restore_hero_sprites:        1
@@ -9211,11 +9200,13 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     start_monster_step:          1
 ;     sub_15b1:                    1
 ;     sub_7305:                    1
+;     teleport_last:               1
 ;     unpack_level:                1
 ;     update_game:                 1
 ;     update_monsters:             1
 ;     update_rest:                 1
 ;     victory_sequence:            1
+;     victory_sprite_copy:         1
 ;     wall_sprite:                 1
 ;     workspace_template:          1
 
@@ -9444,8 +9435,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     code_7fda
 ;     code_7ff6
 ;     data_0000
-;     data_00fa
-;     data_00fc
 ;     data_0288
 ;     data_0289
 ;     data_041e
@@ -9495,22 +9484,14 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_0da2
 ;     data_0da4
 ;     data_0da6
-;     data_0dfd
-;     data_0dff
 ;     data_0ff0
 ;     data_10e8
 ;     data_120f
 ;     data_12d4
 ;     data_1625
-;     data_213a
 ;     data_5172
 ;     data_5179
 ;     data_518e
-;     data_7dd0
-;     data_7e23
-;     data_7e4c
-;     data_fffc
-;     data_fffd
 ;     loop_504c
 ;     loop_50ba
 ;     loop_50f1
@@ -9551,15 +9532,12 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     sub_0d63
 ;     sub_0d72
 ;     sub_0d88
-;     sub_0ded
 ;     sub_0fea
 ;     sub_1204
 ;     sub_15b1
 ;     sub_1624
 ;     sub_5178
 ;     sub_7305
-;     sub_7db9
-;     sub_7e30
 
 ; Stats:
 ;     Total size (Code + Data) = 24576 bytes
@@ -9567,7 +9545,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     Data                     = 17146 bytes (70%)
 ;
 ;     Number of instructions   = 3424
-;     Number of data bytes     = 16111 bytes
+;     Number of data bytes     = 16112 bytes
 ;     Number of data words     = 0 bytes
-;     Number of string bytes   = 1035 bytes
+;     Number of string bytes   = 1034 bytes
 ;     Number of strings        = 132

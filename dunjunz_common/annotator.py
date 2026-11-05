@@ -88,6 +88,15 @@ class Annotator:
             if suffix is not None:
                 self.d.label(addr, name + suffix, move=move, **kwargs)
 
+    def region(self, addr, name, window, **kwargs):
+        """Name a table and render references within `window` (inclusive
+        offsets) as name+k / name-k. Where the address lies in a dasmos
+        move, index regions are not available, so only the name is given."""
+        if self._each(addr) == [(None, "")]:
+            self.d.index_region(addr, name, window=window, **kwargs)
+        else:
+            self.label(addr, name, **kwargs)
+
     def optional_label(self, addr, name, **kwargs):
         self.d.optional_label(addr, name, **kwargs)
 

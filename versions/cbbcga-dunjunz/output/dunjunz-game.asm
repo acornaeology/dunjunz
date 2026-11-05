@@ -58,9 +58,9 @@ victory_steps_left    = &8e  ; Rises left in the victory tone.
 ; &8e referenced 2 times by &1104, &1115
 victory_pitch         = &8f  ; Pitch of the victory tone.
 ; &8f referenced 6 times by &10fc, &110b, &110f, &1124, &7934, &7970
-data_00fa             = &fa
+os_zp_fa              = &fa  ; MOS zero-page workspace, read by dissolve_chalice to vary its random choice.
 ; &fa referenced 1 time by &11c3
-data_00fc             = &fc
+os_irq_a              = &fc  ; MOS 1.20: A at the last interrupt, read by dissolve_chalice to vary its random choice.
 ; &fc referenced 1 time by &11c1
 wrchv                 = &020e
 ; &020e referenced 4 times by &0d55, &0d63, &14da, &1507
@@ -98,16 +98,6 @@ level_wall_sprite     = &6d80  ; Level file: The level's wall block, copied to w
 ; &6d80 used as index base 1 time by &1577
 level_osfile_block    = &6e60  ; OSFILE parameter block for loading the level, built in screen memory below Dunjun6.
 ; &6e60 referenced 1 time by &1474
-data_6e61             = &6e61
-; &6e61 referenced 1 time by &1479
-data_6e62             = &6e62
-; &6e62 referenced 1 time by &147e
-data_6e63             = &6e63
-; &6e63 referenced 1 time by &1489
-data_6e64             = &6e64
-; &6e64 referenced 1 time by &1481
-data_6e65             = &6e65
-; &6e65 referenced 1 time by &1484
 mos_row_offsets       = &c375  ; MOS 1.20 table of screen row offsets for 640-byte rows (row x 640, high byte then low byte, one pair per character row). Read directly by screen_address; it is not part of any documented interface.
 ; &c375 used as index base 1 time by &096e
 mos_row_offsets_lo    = &c376  ; Low bytes of mos_row_offsets.
@@ -128,10 +118,8 @@ osword                = &fff1
 ; &fff1 referenced 15 times by &16a6, &16af, &1d18, &1ead, &1eb6, &736d, &7376, &73b9, &73e3, &748c, &74a9, &74b2, &7586, &7634, &763d
 osbyte                = &fff4
 ; &fff4 referenced 17 times by &0583, &058c, &05ed, &0d37, &0d40, &0d49, &0d52, &0ec0, &0ec9, &10d4, &10ed, &1128, &1ed9, &1ee0, &1ee7, &1eee, &7c9e
-data_fffc             = &fffc
+reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; &fffc referenced 1 time by &10da
-data_fffd             = &fffd
-; &fffd referenced 1 time by &10e0
 
 
     org &0400
@@ -169,7 +157,7 @@ data_fffd             = &fffd
     sta sprite_number                   ; Plot it below the score...
     lda #&45 ; 'E'                      ; ...
     sta plot_x                          ; ...
-    lda data_7dd0,x                     ; ...
+    lda workspace_template + 208,x      ; ...
     clc                                 ; ...
     adc #&18                            ; ...
     sta plot_y                          ; ...
@@ -348,9 +336,9 @@ data_fffd             = &fffd
     lda #&4e ; 'N'                      ; "NO "
     sta menu_text,y                     ; ...
     lda #&4f ; 'O'                      ; ...
-    sta data_0601,y                     ; ...
+    sta menu_text + 1,y                 ; ...
     lda #&20 ; ' '                      ; ...
-    sta data_0602,y                     ; ...
+    sta menu_text + 2,y                 ; ...
     rts                                 ; Return
 ; ***************************************************************************************
 ; Change a menu entry to YES
@@ -364,9 +352,9 @@ data_fffd             = &fffd
     lda #&59 ; 'Y'                      ; "YES"
     sta menu_text,y                     ; ...
     lda #&45 ; 'E'                      ; ...
-    sta data_0601,y                     ; ...
+    sta menu_text + 1,y                 ; ...
     lda #&53 ; 'S'                      ; ...
-    sta data_0602,y                     ; ...
+    sta menu_text + 2,y                 ; ...
     rts                                 ; Return
 ; ***************************************************************************************
 ; Change the sound entry to OFF
@@ -379,7 +367,7 @@ data_fffd             = &fffd
 .set_menu_off
     lda #&46 ; 'F'                      ; "FF" after the O
     sta menu_text,y                     ; ...
-    sta data_0601,y                     ; ...
+    sta menu_text + 1,y                 ; ...
     rts                                 ; Return
 ; ***************************************************************************************
 ; Change the sound entry to ON
@@ -393,7 +381,7 @@ data_fffd             = &fffd
     lda #&4e ; 'N'                      ; "N " after the O
     sta menu_text,y                     ; ...
     lda #&20 ; ' '                      ; ...
-    sta data_0601,y                     ; ...
+    sta menu_text + 1,y                 ; ...
     rts                                 ; Return
 ; &0581 referenced 6 times by &0521, &0598, &059c, &05c6, &05d3, &05f3
 .menu_key_loop
@@ -476,10 +464,8 @@ data_fffd             = &fffd
 ; &0600 used as index base 7 times by &0533, &053a, &0541, &054f, &055f, &056f, &0578
 .menu_text
 ; &0601 used as index base 4 times by &0554, &0564, &0572, &057d
-data_0601 = menu_text+1
     equb &06, &00
 ; &0602 used as index base 2 times by &0559, &0569
-.data_0602
     equs "DUNJUNZ"
     equb &0d
     equb &00, &02
@@ -934,11 +920,8 @@ data_0601 = menu_text+1
 ; &0b2a referenced 3 times by &7421, &742b, &7432; also used as index base 6 times by &06ec, &159c, &16b4, &16bb, &7256, &725f
 .returning_hero_queue
 ; &0b2b referenced 2 times by &742f, &7438
-data_0b2b = returning_hero_queue+1
 ; &0b2c referenced 2 times by &7435, &743e
-data_0b2c = returning_hero_queue+2
 ; &0b2d referenced 2 times by &743b, &7441
-data_0b2d = returning_hero_queue+3
     equb &03, &02, &01, &04, &10
 ; &0b2f referenced 5 times by &14b9, &7cb3, &7cb6, &7cbf, &7cc2
 .next_trapdoor
@@ -963,13 +946,11 @@ data_0b2d = returning_hero_queue+3
 ; &0b80 used as index base 3 times by &6f4d, &71f0, &7591
 .missile_damage
 ; &0b8f used as index base 1 time by &79cd
-data_0b8f = missile_damage+15
     equb &02, &02, &02, &03, &03, &04, &09, &09
     equb &10, &03, &03, &03, &10, &10, &10, &10
 ; &0b90 used as index base 2 times by &1554, &7cc5
 .trapdoor_x
 ; &0b97 used as index base 1 time by &79d3
-data_0b97 = trapdoor_x+7
     equb &0b, &15, &17, &10, &03, &17, &0d, &1a
 ; &0b98 used as index base 2 times by &155a, &7ccb
 .trapdoor_y
@@ -1002,7 +983,6 @@ data_0b97 = trapdoor_x+7
     equb &1e, &00
 .food_sound
 ; &0bfc referenced 2 times by &1d0f, &1d1d
-data_0bfc = food_sound+4
     equb &13, &00
     equb &02, &00
     equb &c8, &00
@@ -1017,7 +997,6 @@ data_0bfc = food_sound+4
     equs "pgtafb"
     equb &19, &71, &19
 ; &0c3a used as index base 1 time by &10ba
-.data_0c3a
     equs "rzjx"
     equb &1e, &78, &09, &17, &07, &0d, &64, &0b
     equb &09, &05, &07, &0d, &13, &6b, &1c, &08
@@ -1043,7 +1022,6 @@ data_0bfc = food_sound+4
     equb &c9, &00, &00, &00, &00, &00, &00, &00
 .hit_sound
 ; &0cf4 referenced 2 times by &7481, &7491
-data_0cf4 = hit_sound+4
     equb &10, &00
     equb &01, &00
     equb &06, &00
@@ -1082,21 +1060,16 @@ data_0cf4 = hit_sound+4
 ; &0d15 used as index base 27 times by &1e03, &1e3b, &1e8f, &1f40, &1f5b, &2097, &6e9d, &6f3f, &6f5f, &6f80, &6f8e, &6f9e, &6faa, &6fc4, &6fee, &7014, &702a, &7072, &70ad, &71e8, &732f, &73f9, &7532, &7780, &79a2, &7bb6, &7bc4
 .hero_y
 ; &0d19 used as index base 1 time by &1f17
-data_0d19 = hero_y+4
     equb &80, &a0, &0d, &a9, &00
 ; &0d1a used as index base 18 times by &06d0, &1de6, &1f52, &6e82, &6ecb, &6ede, &6ef1, &6f04, &6f2d, &6f79, &701c, &7097, &7221, &7249, &7452, &7711, &7b67, &7baf
 .hero_direction
 ; &0d1f used as index base 1 time by &1f23
-data_0d1f = hero_direction+5
     equb &8d, &84, &0d, &8d, &85, &0d
 ; &0d20 referenced 2 times by &774e, &7753; also used as index base 12 times by &06da, &1df3, &6f62, &6f67, &709c, &7457, &76ee, &76ff, &771f, &772e, &7ba2, &7ba7
 .hero_frame
 ; &0d21 referenced 2 times by &775b, &7760
-data_0d21 = hero_frame+1
 ; &0d22 referenced 2 times by &7768, &776d
-data_0d22 = hero_frame+2
 ; &0d23 referenced 2 times by &7771, &7776
-data_0d23 = hero_frame+3
     equb &ad, &12, &02, &8d, &2f
 ; &0d25 used as index base 12 times by &06d5, &1f4d, &6e87, &6eaf, &6fc9, &6ff3, &702f, &7063, &7401, &7716, &7b64, &7baa
 .hero_step
@@ -1140,7 +1113,7 @@ data_0d23 = hero_frame+3
 .missile_direction
     sta saved_wrchv                     ; ...
     lda wrchv + 1                       ; ...
-    sta data_12d4                       ; ...in saved_wrchv
+    sta saved_wrchv + 1                 ; ...in saved_wrchv
     lda #&8f                            ; Point WRCHV at wrch_handler...
 .sub_0d63
 ; &0d64 used as index base 4 times by &6f53, &7209, &76b1, &7747
@@ -1165,7 +1138,6 @@ missile_sprite_base = sub_0d63+1
 ; &0d80 used as index base 1 time by &6f0d
 .hero_key_fire
 ; &0d8f used as index base 1 time by &1f1c
-data_0d8f = hero_key_fire+15
     equb &70, &0d, &00, &20, &00, &00, &6e, &35
     equb &0d, &18, &bd, &04, &0d, &69, &03, &9d
 ; &0d90 used as index base 10 times by &06df, &0e6d, &7236, &7239, &726f, &738e, &7391, &739a, &7506, &7724
@@ -1178,11 +1150,8 @@ data_0d8f = hero_key_fire+15
 ; &0da0 referenced 2 times by &779e, &7893; also used as index base 3 times by &7043, &7544, &767c
 .view_room
 ; &0da2 referenced 2 times by &77b0, &78ad
-data_0da2 = view_room+2
 ; &0da4 referenced 2 times by &77c2, &78c7
-data_0da4 = view_room+4
 ; &0da6 referenced 2 times by &77d4, &78e1
-data_0da6 = view_room+6
     equb &18, &0c, &68, &0c, &28, &0c, &30, &0c
     equb &00, &00, &bd, &04, &0d, &85, &71, &8a
 ; &0db0 used as index base 1 time by &6f50
@@ -1208,14 +1177,14 @@ data_0da6 = view_room+6
     equb &8d, &40, &0d, &8e, &ff, &0d, &68, &a8
     equb &68, &aa
     equs "h(`"
-.sub_0ded
-; &0dfd referenced 1 time by &73d3
-data_0dfd = sub_0ded+16
-; &0dff referenced 1 time by &1160
-data_0dff = sub_0ded+18
     equb &de, &dd, &df, &f0, &f2, &f1, &f3, &f8
     equb &fa, &f9, &fb, &f4, &f6, &f5, &f7, &fc
-    equb &1e, &fd, &00
+; &0dfd referenced 1 time by &73d3
+.teleport_last
+    equb &1e, &fd
+; &0dff referenced 1 time by &1160
+.victory_sprite_copy
+    equb &00
 ; &0e00 referenced 2 times by &0d6b, &0ecc
 .code_0e00
     lda #0                              ; New game: level 0...
@@ -1271,7 +1240,7 @@ data_0dff = sub_0ded+18
 ; &0e52 referenced 1 time by &0e43
 .code_0e52
     lda #&0d                            ; Terminate the filename with a carriage return
-    sta data_16d6,x                     ; ...
+    sta level_filename_digits + 1,x     ; ...
     jsr start_level                     ; Load and draw the level
     jsr draw_status_panel               ; Draw the status panel
     jsr remove_absent_heroes            ; Take out the heroes nobody plays
@@ -1311,7 +1280,7 @@ data_0dff = sub_0ded+18
     lda #&20 ; ' '                      ; ...
 ; &0ea8 referenced 1 time by &0eac
 .loop_0ea8
-    sta data_0ff0,x                     ; ...
+    sta panel_hero - 1,x                ; ...
     dex                                 ; ...
     bne loop_0ea8                       ; ...
 ; &0eae referenced 1 time by &0eb7
@@ -1442,7 +1411,7 @@ data_0dff = sub_0ded+18
     tya                                 ; Row = Y + this hero's panel row - 14...
     ldx panel_hero                      ; ...
     clc                                 ; ...
-    adc data_7dd0,x                     ; ...(read from workspace_template, which page &0D copies)
+    adc workspace_template + 208,x      ; ...(read from workspace_template, which page &0D copies)
     sec                                 ; ...
     sbc #&0e                            ; ...
     sta plot_y                          ; ...
@@ -1487,7 +1456,6 @@ data_0dff = sub_0ded+18
     equb &0d
 .sub_0fea
 ; &0ff0 used as index base 1 time by &0ea8
-data_0ff0 = sub_0fea+6
 ; &0ff1 referenced 8 times by &0ef9, &0efc, &0f18, &0f28, &0f4d, &0f5d, &0f60, &0f6d
 panel_hero = sub_0fea+7
 ; &0ff2 referenced 5 times by &0e6a, &0e77, &0e7f, &0f35, &0f48
@@ -1565,7 +1533,7 @@ count = sub_0fea+8
     ldx #0                              ; Print 140 bytes from room_walls + &3A...
 ; &10ba referenced 1 time by &10c3
 .loop_10ba
-    lda data_0c3a,x                     ; ...
+    lda room_walls + 58,x               ; ...
     jsr osasci                          ; ...
     inx                                 ; ...
     cpx #&8c                            ; ...
@@ -1573,7 +1541,7 @@ count = sub_0fea+8
     ldx #0                              ; ...then the string at object_free_map + &3A: on level 25, the ending message
 ; &10c7 referenced 1 time by &10d0
 .loop_10c7
-    lda data_213a,x                     ; ...
+    lda object_free_map + 58,x          ; ...
     jsr osasci                          ; ...
     inx                                 ; ...
     cmp #0                              ; ...
@@ -1581,15 +1549,14 @@ count = sub_0fea+8
     lda #osbyte_flush_buffer_class      ; Flush the input buffers
     jsr osbyte                          ; ...  Flush selected class of buffer
     jsr osrdch                          ; Wait for a key
-    lda data_fffc                       ; Copy the RESET vector into the JSR below...
+    lda reset_vector                    ; Copy the RESET vector into the JSR below...
     sta reset_call_address              ; ...
-    lda data_fffd                       ; ...
-    sta data_10e8                       ; ...
+    lda reset_vector + 1                ; ...
+    sta reset_call_address + 1          ; ...
 .reset_call
 ; &10e7 referenced 1 time by &10dd
 reset_call_address = reset_call+1
 ; &10e8 referenced 1 time by &10e3
-data_10e8 = reset_call+2
     jsr data_0000                       ; ...and call it: reset the machine
 ; ***************************************************************************************
 ; Play the victory sequence
@@ -1672,7 +1639,7 @@ data_10e8 = reset_call+2
     dec ring_x                          ; Left...
     jsr plot_victory_sprite             ; ...
     lda victory_sprite                  ; Keep the sprite...
-    sta data_0dff                       ; ...
+    sta victory_sprite_copy             ; ...
     jsr next_victory_sprite             ; ...and change it
     dec ring_x                          ; Left...
     jsr plot_victory_sprite             ; ...
@@ -1735,8 +1702,8 @@ data_10e8 = reset_call+2
 ; &11be referenced 1 time by &1139
 .dissolve_chalice
     lda system_via_t1c_l                ; Pick a byte of the Chalice at random...
-    eor data_00fc                       ; ...
-    eor data_00fa                       ; ...
+    eor os_irq_a                        ; ...
+    eor os_zp_fa                        ; ...
     cmp #&c0                            ; ...if it is within the sprite
     bcs return_6                        ; ...
     tax                                 ; Clear it...
@@ -1755,7 +1722,7 @@ data_10e8 = reset_call+2
     lda #0                              ; ...
 ; &11de referenced 1 time by &11e2
 .loop_11de
-    sta data_120f,x                     ; ...
+    sta sprite_chalice - 1,x            ; ...
     dex                                 ; ...
     bne loop_11de                       ; ...
     jsr plot_chalice                    ; ...and redraw it, now blank
@@ -1780,9 +1747,6 @@ data_10e8 = reset_call+2
     sta sprite_number                   ; ...
     jsr plot_at_cell                    ; ...plotted in every view showing it
     rts                                 ; Return
-.sub_1204
-; &120f used as index base 1 time by &11de
-data_120f = sub_1204+11
     equs "Rx`(&1900+F%"
 ; &1210 used as index base 1 time by &11cc
 .sprite_chalice
@@ -1814,7 +1778,6 @@ data_120f = sub_1204+11
 ; &12d3 referenced 2 times by &0d58, &14d7
 .saved_wrchv
 ; &12d4 referenced 2 times by &0d5e, &14dd
-data_12d4 = saved_wrchv+1
     equb &a4, &e0, &00, &73
 ; ***************************************************************************************
 ; Font: letters A-Z
@@ -1954,23 +1917,22 @@ data_12d4 = saved_wrchv+1
     lda #&d0                            ; Filename address = level_filename...
     sta level_osfile_block              ; ...
     lda #&16                            ; ...
-    sta data_6e61                       ; ...
+    sta level_osfile_block + 1          ; ...
     lda #0                              ; Load address = &00006B00...
-    sta data_6e62                       ; ...
-    sta data_6e64                       ; ...
-    sta data_6e65                       ; ...
+    sta level_osfile_block + 2          ; ...
+    sta level_osfile_block + 4          ; ...
+    sta level_osfile_block + 5          ; ...
     lda #&6b ; 'k'                      ; ...
-    sta data_6e63                       ; ...
+    sta level_osfile_block + 3          ; ...
     lda filev                           ; Copy FILEV into the operand of the JSR below...
     sta filev_call_address              ; ...
     lda filev + 1                       ; ...
-    sta data_149c                       ; ...
+    sta filev_call_address + 1          ; ...
     lda #&ff                            ; A = &FF: load the file
 .load_level_call
 ; &149b referenced 1 time by &148f
 filev_call_address = load_level_call+1
 ; &149c referenced 1 time by &1495
-data_149c = load_level_call+2
     jsr data_3000                       ; Call the filing system's OSFILE routine directly
     jmp decrypt_level                   ; Decrypt and check the level, and return from there
 ; ***************************************************************************************
@@ -2016,7 +1978,7 @@ data_149c = load_level_call+2
 .draw_view_frames
     lda saved_wrchv                     ; Restore the MOS's own WRCHV for the PLOT commands...
     sta wrchv                           ; ...
-    lda data_12d4                       ; ...
+    lda saved_wrchv + 1                 ; ...
     sta wrchv + 1                       ; ...
     ldx #&14                            ; Twenty PLOT commands
 ; &14e5 referenced 1 time by &1500
@@ -2279,7 +2241,6 @@ data_149c = load_level_call+2
 ; &16d5 referenced 1 time by &0e4f; also used as index base 1 time by &0e3e
 .level_filename_digits
 ; &16d6 used as index base 1 time by &0e54
-data_16d6 = level_filename_digits+1
     equb &31, &0d, &0d, &70, &00, &8d, &35, &f8
     equb &00, &00, &00, &00
     equs "code"
@@ -2701,26 +2662,26 @@ data_16d6 = level_filename_digits+1
     dey                                 ; ...
     bne loop_1d03                       ; ...
     lda #&96                            ; ...play the food sound at a lower pitch...
-    sta data_0bfc                       ; ...
+    sta food_sound + 4                  ; ...
     ldx #<(food_sound)                  ; ...
     ldy #>(food_sound)                  ; ...
     lda #osword_sound                   ; ...
     jsr osword                          ; ...  SOUND command
     lda #&c8                            ; ...and put its pitch back
-    sta data_0bfc                       ; ...
+    sta food_sound + 4                  ; ...
     lda cell_y                          ; Keep the door's cell in spare bytes beyond the monster tables, as plot_at_cell changes cell_x and cell_y...
-    sta data_7e4c                       ; ...
+    sta monster_y + 35                  ; ...
     lda cell_x                          ; ...
-    sta data_7e23                       ; ...
+    sta monster_x + 35                  ; ...
     lda #&15                            ; ...erase the door...
     sta sprite_number                   ; ...
     lda #0                              ; ...
     sta plot_offset_x                   ; ...
     sta plot_offset_y                   ; ...
     jsr plot_at_cell                    ; ...
-    lda data_7e23                       ; ...and recover its cell
+    lda monster_x + 35                  ; ...and recover its cell
     sta cell_x                          ; ...
-    lda data_7e4c                       ; ...
+    lda monster_y + 35                  ; ...
     sta cell_y                          ; ...
     pla                                 ; ...
     tay                                 ; ...
@@ -2993,12 +2954,12 @@ data_16d6 = level_filename_digits+1
     ldx #4                              ; Is any hero in play, or still dying?
 ; &1f17 referenced 1 time by &1f2b
 .loop_1f17
-    lda data_0d19,x                     ; In play?
+    lda hero_direction - 1,x            ; In play?
     bne code_1f36                       ; Yes: carry on
-    lda data_0d8f,x                     ; Dead...
+    lda hero_health_tens - 1,x          ; Dead...
     cmp #&1d                            ; ...
     bne code_1f2a                       ; ...
-    lda data_0d1f,x                     ; ...with the death animation unfinished?
+    lda hero_frame - 1,x                ; ...with the death animation unfinished?
     cmp #8                              ; ...
     bcc code_1f36                       ; Yes: carry on
 ; &1f2a referenced 1 time by &1f21
@@ -3289,9 +3250,6 @@ data_16d6 = level_filename_digits+1
     equs "v>_n~"
     equb &00, &7f, &7f, &00
     equs "ff~~ff"
-.sub_212f
-; &213a used as index base 1 time by &10c7
-data_213a = sub_212f+11
     equb &00, &1f, &1f, &03, &03, &ff, &03, &03
     equb &03, &80, &80, &80, &80, &80, &f6, &fe
     equb &f6, &7f, &00
@@ -5160,7 +5118,7 @@ data_213a = sub_212f+11
     beq code_73d9                       ; ...
     cpy #0                              ; ...
     bne code_73c7                       ; ...
-    ldy data_0dfd                       ; ...wrapping round to the end
+    ldy teleport_last                   ; ...wrapping round to the end
     jmp code_73c7                       ; ...
 ; &73d9 referenced 1 time by &73cd
 .code_73d9
@@ -5212,13 +5170,13 @@ data_213a = sub_212f+11
 .loop_742b
     ldx returning_hero_queue            ; ...
     dex                                 ; ...
-    lda data_0b2b                       ; ...
+    lda returning_hero_queue + 1        ; ...
     sta returning_hero_queue            ; ...
-    lda data_0b2c                       ; ...
-    sta data_0b2b                       ; ...
-    lda data_0b2d                       ; ...
-    sta data_0b2c                       ; ...
-    sty data_0b2d                       ; ...
+    lda returning_hero_queue + 2        ; ...
+    sta returning_hero_queue + 1        ; ...
+    lda returning_hero_queue + 3        ; ...
+    sta returning_hero_queue + 2        ; ...
+    sty returning_hero_queue + 3        ; ...
     cpx #&63 ; 'c'                      ; A &64 marker?
     bne code_744c                       ; No
     ldy #&64 ; 'd'                      ; Yes: move it to the back and take the next entry
@@ -5261,7 +5219,7 @@ data_213a = sub_212f+11
     cmp #&51 ; 'Q'                      ; The exit? Nothing to do here
     beq code_7470                       ; ...
     lda #&32 ; '2'                      ; An energy drainer: play the hit sound louder...
-    sta data_0cf4                       ; ...
+    sta hit_sound + 4                   ; ...
     txa                                 ; ...
     pha                                 ; ...
     ldx #<(hit_sound)                   ; ...
@@ -5269,7 +5227,7 @@ data_213a = sub_212f+11
     lda #osword_sound                   ; ...
     jsr osword                          ; ...  SOUND command
     lda #6                              ; ...then put the volume back
-    sta data_0cf4                       ; ...
+    sta hit_sound + 4                   ; ...
     pla                                 ; ...
     tax                                 ; ...
     ldy #&0a                            ; ...and take 10 health
@@ -5780,23 +5738,23 @@ data_213a = sub_212f+11
 .code_7757
     cmp #&44 ; 'D'                      ; Fireballs: the Magic-User's
     bne code_7764                       ; ...
-    lda data_0d21                       ; ...
+    lda hero_frame + 1                  ; ...
     eor #1                              ; ...
-    sta data_0d21                       ; ...
+    sta hero_frame + 1                  ; ...
     rts                                 ; Return
 ; &7764 referenced 1 time by &7759
 .code_7764
     cmp #&4c ; 'L'                      ; Axes: the Barbarian's
     bne code_7771                       ; ...
-    lda data_0d22                       ; ...
+    lda hero_frame + 2                  ; ...
     eor #1                              ; ...
-    sta data_0d22                       ; ...
+    sta hero_frame + 2                  ; ...
     rts                                 ; Return
 ; &7771 referenced 1 time by &7766
 .code_7771
-    lda data_0d23                       ; Otherwise swords: the Fighter's
+    lda hero_frame + 3                  ; Otherwise swords: the Fighter's
     eor #1                              ; ...
-    sta data_0d23                       ; ...
+    sta hero_frame + 3                  ; ...
     rts                                 ; Return
 ; ***************************************************************************************
 ; Copy a hero's position to cell_x, cell_y
@@ -5849,7 +5807,7 @@ data_213a = sub_212f+11
     sta plot_y                          ; ...
     lda #&23 ; '#'                      ; ...column &23...
     sta cell_x                          ; ...
-    lda data_0da2                       ; ...hero 1's room
+    lda view_room + 2                   ; ...hero 1's room
     sta map_ptr                         ; ...
     jsr draw_room                       ; Draw it
     rts                                 ; Return
@@ -5863,7 +5821,7 @@ data_213a = sub_212f+11
     sta plot_y                          ; ...
     lda #1                              ; ...column 1...
     sta cell_x                          ; ...
-    lda data_0da4                       ; ...hero 2's room
+    lda view_room + 4                   ; ...hero 2's room
     sta map_ptr                         ; ...
     jsr draw_room                       ; Draw it
     rts                                 ; Return
@@ -5877,7 +5835,7 @@ data_213a = sub_212f+11
     sta plot_y                          ; ...
     lda #&23 ; '#'                      ; ...column &23...
     sta cell_x                          ; ...
-    lda data_0da6                       ; ...hero 3's room
+    lda view_room + 6                   ; ...hero 3's room
     sta map_ptr                         ; ...
     jsr draw_room                       ; Draw it
     rts                                 ; Return
@@ -6021,7 +5979,7 @@ data_213a = sub_212f+11
     jsr plot_sprite                     ; ...
 ; &78ad referenced 1 time by &7899
 .code_78ad
-    lda data_0da2                       ; Does the top-right view show it?
+    lda view_room + 2                   ; Does the top-right view show it?
     cmp cell_room                       ; ...
     bne code_78c7                       ; No
     clc                                 ; Yes: plot at column &23, row 1
@@ -6034,7 +5992,7 @@ data_213a = sub_212f+11
     jsr plot_sprite                     ; ...
 ; &78c7 referenced 1 time by &78b3
 .code_78c7
-    lda data_0da4                       ; Does the bottom-left view show it?
+    lda view_room + 4                   ; Does the bottom-left view show it?
     cmp cell_room                       ; ...
     bne code_78e1                       ; No
     clc                                 ; Yes: plot at column 1, row &67
@@ -6047,7 +6005,7 @@ data_213a = sub_212f+11
     jsr plot_sprite                     ; ...
 ; &78e1 referenced 1 time by &78cd
 .code_78e1
-    lda data_0da6                       ; Does the bottom-right view show it?
+    lda view_room + 6                   ; Does the bottom-right view show it?
     cmp cell_room                       ; ...
     bne return_12                       ; No
     clc                                 ; Yes: plot at column &23, row &67
@@ -6217,9 +6175,9 @@ data_213a = sub_212f+11
     sta sprite_number                   ; ...
 ; &79cd referenced 1 time by &79e1
 .loop_79cd
-    lda data_0b8f,x                     ; ...
+    lda trapdoor_x - 1,x                ; ...
     sta cell_x                          ; ...
-    lda data_0b97,x                     ; ...
+    lda trapdoor_y - 1,x                ; ...
     sta cell_y                          ; ...
     txa                                 ; ...
     pha                                 ; ...
@@ -6759,9 +6717,6 @@ data_213a = sub_212f+11
     equs "DLHh"
     equb &00
     equs ",4<"
-.sub_7db9
-; &7dd0 used as index base 2 times by &0424, &0f71
-data_7dd0 = sub_7db9+23
     equb &00, &0d, &d9, &00, &00, &00, &00, &80
     equb &40, &20, &10, &08, &04, &02, &01, &b9
     equb &30, &0d, &9d, &08, &0d, &4c, &d4, &18
@@ -6776,7 +6731,6 @@ data_7dd0 = sub_7db9+23
 ; &7e00 used as index base 17 times by &158c, &7667, &797e, &79e7, &7a31, &7a3f, &7a45, &7a5b, &7a98, &7ace, &7afb, &7b04, &7b41, &7c46, &7c54, &7cc8, &7cf2
 .monster_x
 ; &7e23 referenced 2 times by &1d29, &1d39
-data_7e23 = monster_x+35
     equb &00, &04, &0b, &09, &1d, &08, &01, &06
     equb &07, &0a, &01, &0b, &1a, &06, &0b, &16
     equb &15, &0d, &1b, &14, &1a, &09, &1c, &0f
@@ -6787,9 +6741,6 @@ data_7e23 = monster_x+35
 .monster_y
     equb &00, &24, &17
     equs "% $", &22
-.sub_7e30
-; &7e4c referenced 2 times by &1d23, &1d3f
-data_7e4c = sub_7e30+28
     equb &14, &27, &0d, &20, &01, &26, &0a, &01
     equb &12, &05, &20, &29, &0d, &26, &27, &08
     equb &06, &1a, &14, &03, &1d, &07, &0d, &17
@@ -7057,7 +7008,6 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     code_703b:                   4
 ;     code_7aea:                   4
 ;     code_7ff6:                   4
-;     data_0601:                   4
 ;     door_x:                      4
 ;     door_y:                      4
 ;     draw_moved_hero:             4
@@ -7073,6 +7023,7 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     hero_key_dropped:            4
 ;     hero_sprites:                4
 ;     map_ptr_hi:                  4
+;     menu_text + 1:               4
 ;     missile_sprite_base:         4
 ;     monster_hit_points:          4
 ;     next_hero:                   4
@@ -7134,22 +7085,6 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     code_7c6f:                   2
 ;     code_7cae:                   2
 ;     credit_missile_owner:        2
-;     data_0602:                   2
-;     data_0b2b:                   2
-;     data_0b2c:                   2
-;     data_0b2d:                   2
-;     data_0bfc:                   2
-;     data_0cf4:                   2
-;     data_0d21:                   2
-;     data_0d22:                   2
-;     data_0d23:                   2
-;     data_0da2:                   2
-;     data_0da4:                   2
-;     data_0da6:                   2
-;     data_12d4:                   2
-;     data_7dd0:                   2
-;     data_7e23:                   2
-;     data_7e4c:                   2
 ;     door_sprite:                 2
 ;     draw_hero:                   2
 ;     draw_missile_damage:         2
@@ -7160,9 +7095,17 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     draw_view_3:                 2
 ;     exit_offsets_x:              2
 ;     exit_offsets_y:              2
+;     food_sound + 4:              2
 ;     get_hero_cell:               2
+;     hero_frame + 1:              2
+;     hero_frame + 2:              2
+;     hero_frame + 3:              2
+;     hit_sound + 4:               2
 ;     level_filename_digits:       2
+;     menu_text + 2:               2
 ;     missile_spent_pop:           2
+;     monster_x + 35:              2
+;     monster_y + 35:              2
 ;     mos_oswrch_default:          2
 ;     next_missile:                2
 ;     osrdch:                      2
@@ -7175,9 +7118,13 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     reset_hero:                  2
 ;     restore_hero_sprites:        2
 ;     return_14:                   2
+;     returning_hero_queue + 1:    2
+;     returning_hero_queue + 2:    2
+;     returning_hero_queue + 3:    2
 ;     row_start_ptr:               2
 ;     row_start_ptr_hi:            2
 ;     saved_wrchv:                 2
+;     saved_wrchv + 1:             2
 ;     show_hero_room:              2
 ;     sprite_data_ptr_hi:          2
 ;     sprite_height:               2
@@ -7185,6 +7132,10 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     trapdoor_x:                  2
 ;     trapdoor_y:                  2
 ;     victory_steps_left:          2
+;     view_room + 2:               2
+;     view_room + 4:               2
+;     view_room + 6:               2
+;     workspace_template + 208:    2
 ;     add_thousand_points:         1
 ;     advance_dying_monster:       1
 ;     animate_absent_hero:         1
@@ -7348,30 +7299,7 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     continue_monster_step:       1
 ;     dasmos_start:                1
 ;     data_0000:                   1
-;     data_00fa:                   1
-;     data_00fc:                   1
-;     data_0b8f:                   1
-;     data_0b97:                   1
-;     data_0c3a:                   1
-;     data_0d19:                   1
-;     data_0d1f:                   1
-;     data_0d8f:                   1
-;     data_0dfd:                   1
-;     data_0dff:                   1
-;     data_0ff0:                   1
-;     data_10e8:                   1
-;     data_120f:                   1
-;     data_149c:                   1
-;     data_16d6:                   1
-;     data_213a:                   1
 ;     data_3000:                   1
-;     data_6e61:                   1
-;     data_6e62:                   1
-;     data_6e63:                   1
-;     data_6e64:                   1
-;     data_6e65:                   1
-;     data_fffc:                   1
-;     data_fffd:                   1
 ;     decrypt_level:               1
 ;     dissolve_chalice:            1
 ;     draw_all_views:              1
@@ -7393,6 +7321,7 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     filev:                       1
 ;     filev + 1:                   1
 ;     filev_call_address:          1
+;     filev_call_address + 1:      1
 ;     find_open_neighbour:         1
 ;     fire_missile:                1
 ;     flip_firer_frame:            1
@@ -7400,8 +7329,11 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     font_letters:                1
 ;     game_over_message:           1
 ;     hero_appearance_sprites:     1
+;     hero_direction - 1:          1
 ;     hero_enters_exit:            1
 ;     hero_faces:                  1
+;     hero_frame - 1:              1
+;     hero_health_tens - 1:        1
 ;     hero_key_down:               1
 ;     hero_key_fire:               1
 ;     hero_key_left:               1
@@ -7417,6 +7349,7 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     level_door_sprite:           1
 ;     level_door_x:                1
 ;     level_door_y:                1
+;     level_filename_digits + 1:   1
 ;     level_key_x:                 1
 ;     level_key_y:                 1
 ;     level_loop:                  1
@@ -7425,6 +7358,11 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     level_object_x:              1
 ;     level_object_y:              1
 ;     level_osfile_block:          1
+;     level_osfile_block + 1:      1
+;     level_osfile_block + 2:      1
+;     level_osfile_block + 3:      1
+;     level_osfile_block + 4:      1
+;     level_osfile_block + 5:      1
 ;     level_trapdoor_x:            1
 ;     level_trapdoor_y:            1
 ;     level_wall_sprite:           1
@@ -7505,12 +7443,19 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     move_missiles:               1
 ;     next_monster_update:         1
 ;     object_free_map:             1
+;     object_free_map + 58:        1
+;     os_irq_a:                    1
+;     os_zp_fa:                    1
+;     panel_hero - 1:              1
 ;     plot_boots_icon:             1
 ;     print_menu_string:           1
 ;     queue_exit_marker:           1
 ;     remove_absent_heroes:        1
 ;     reset_call_address:          1
+;     reset_call_address + 1:      1
 ;     reset_monsters:              1
+;     reset_vector:                1
+;     reset_vector + 1:            1
 ;     reset_workspace:             1
 ;     return_1:                    1
 ;     return_10:                   1
@@ -7525,6 +7470,7 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     return_7:                    1
 ;     return_8:                    1
 ;     return_9:                    1
+;     room_walls + 58:             1
 ;     screen_address:              1
 ;     set_menu_no:                 1
 ;     set_menu_off:                1
@@ -7534,14 +7480,19 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     sprite_addr_hi:              1
 ;     sprite_addr_lo:              1
 ;     sprite_chalice:              1
+;     sprite_chalice - 1:          1
 ;     start_level:                 1
 ;     start_monster_step:          1
 ;     sub_7305:                    1
+;     teleport_last:               1
+;     trapdoor_x - 1:              1
+;     trapdoor_y - 1:              1
 ;     unpack_level:                1
 ;     update_game:                 1
 ;     update_monsters:             1
 ;     update_rest:                 1
 ;     victory_sequence:            1
+;     victory_sprite_copy:         1
 ;     wall_sprite:                 1
 ;     workspace_template:          1
 
@@ -7735,47 +7686,7 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     code_7fda
 ;     code_7ff6
 ;     data_0000
-;     data_00fa
-;     data_00fc
-;     data_0601
-;     data_0602
-;     data_0b2b
-;     data_0b2c
-;     data_0b2d
-;     data_0b8f
-;     data_0b97
-;     data_0bfc
-;     data_0c3a
-;     data_0cf4
-;     data_0d19
-;     data_0d1f
-;     data_0d21
-;     data_0d22
-;     data_0d23
-;     data_0d8f
-;     data_0da2
-;     data_0da4
-;     data_0da6
-;     data_0dfd
-;     data_0dff
-;     data_0ff0
-;     data_10e8
-;     data_120f
-;     data_12d4
-;     data_149c
-;     data_16d6
-;     data_213a
 ;     data_3000
-;     data_6e61
-;     data_6e62
-;     data_6e63
-;     data_6e64
-;     data_6e65
-;     data_7dd0
-;     data_7e23
-;     data_7e4c
-;     data_fffc
-;     data_fffd
 ;     loop_0437
 ;     loop_0528
 ;     loop_0540
@@ -7857,13 +7768,8 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     return_8
 ;     return_9
 ;     sub_0d63
-;     sub_0ded
 ;     sub_0fea
-;     sub_1204
-;     sub_212f
 ;     sub_7305
-;     sub_7db9
-;     sub_7e30
 
 ; Stats:
 ;     Total size (Code + Data) = 15744 bytes

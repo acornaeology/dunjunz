@@ -74,11 +74,11 @@ game.annotate_cassette_level_loop(annotator)
 annotator.label(0x16D0, "level_filename", length=8, description=(
     "The level's filename, \"LEVEL\" followed by the level number and a "
     "carriage return, written by level_loop."))
-annotator.label(0x6E60, "level_osfile_block", length=18, group="screen_workspace",
+annotator.region(0x6E60, "level_osfile_block", (0, 17), group="screen_workspace",
                 description=(
                     "OSFILE parameter block for loading the level, built in "
                     "screen memory below Dunjun6."))
-annotator.label(0x149B, "filev_call_address", length=2, description=(
+annotator.region(0x149B, "filev_call_address", (0, 1), description=(
     "Operand of the JSR at load_level_call, set to the contents of FILEV."))
 annotator.sub(0x1446, "load_level", "Load the level file",
               "Show 23 character rows while loading, then load the file named "
