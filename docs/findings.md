@@ -148,7 +148,8 @@ Whether the original cassette had the same mismatch (its table entry
 wrong, or a different level 5) can't be told without an image of the
 original cassette.
 
-Fix: set &0495 in `Dunjun4` to &4D.
+Fix: set &0495 in `Dunjun4` to &4D. Confirmed in beebium: with that byte
+changed, loading level 5 passes the check.
 
 ## Provenance of this disc
 
