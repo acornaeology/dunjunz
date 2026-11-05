@@ -174,3 +174,19 @@ sideways RAM hack has this code.
 
 Which player the joystick replaces, and whether the &80 test detects a
 joystick reliably, are to be confirmed.
+
+## Dependence on MOS 1.20
+
+The game uses three MOS 1.20 internal addresses directly, confirmed
+against the MOS 1.20 ROM in beebium:
+
+| Address | In MOS 1.20 | Used by |
+|---|---|---|
+| &C375 | Table of screen row offsets, row × 640, as high/low byte pairs | The screen address routine at &0967, for every sprite plot (all releases) |
+| &D9CD | The reset entry (the RESET vector's target) | `JSR &D9CD` when a level fails its checksum (official disc, sideways RAM hack) |
+| &E772 | The default OSBYTE handler (BYTEV's initial value) | The joystick BYTEV handler's fall-through (official disc, joystick mode) |
+
+On another MOS, sprites are drawn at wrong addresses, a failed checksum
+jumps into unrelated code, and joystick mode breaks OSBYTE. A portable
+version would need its own 640-byte row table and would chain to the
+previous BYTEV.
