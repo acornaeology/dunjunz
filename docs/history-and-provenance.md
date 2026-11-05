@@ -85,10 +85,15 @@ not the original cassette. It is a crack **[confirmed]**:
   stored &2000 above where it runs **[confirmed by comparison with the
   hack's files]**. The code at &5000 presumably moves it into place; it
   has not yet been examined.
-- The levels `L1`–`L25` (&2B0 bytes each, load &6B00) are encoded
-  differently from the disc release's levels **[confirmed]**. How the
-  crack decodes them has not yet been worked out.
-- The code's level checksum table holds &1A for level 5 **[confirmed]**.
+- The levels `L1`–`L25` (&2B0 bytes each, load &6B00) are stored
+  decrypted. They are the same levels as the disc release's, whose files
+  are encrypted (each byte XORed with the low byte of its address)
+  **[confirmed]**.
+- The code still carries the level checksum table at &0491 (&1A for
+  level 5), but the routine at &0450 that would decrypt and check a level
+  has been replaced by the cracker's own code **[confirmed]**. The
+  cassette presumably had the decrypt-and-check routine that the disc
+  release has at &0450 **[inference]**.
 
 duikkie reports that the tape version works reliably where the disc
 versions do not, because it "uses &A00 rather than &D00"
@@ -109,18 +114,22 @@ not named. It descends from Ole's crack, not from either original:
 - **Game code.** `Dunjun6` is byte-identical to the first &1180 bytes of
   the crack's `DUNJ3` **[confirmed]**. `Dunjun4`, `Dunjun7` and `Dunjun5`
   match the crack's `DUNJ4` except at:
-  - &0450–&0484, which now holds the routine that decrypts a level and
-    checks its checksum;
+  - &0450–&0484, which holds the routine that decrypts a level and checks
+    its checksum, byte-identical to the official disc release's;
   - &1447–&149F, the level loader, rewritten to load `LEVELn` by calling
     the filing system's FILEV handler directly, with an OSFILE block at
     &6E60;
-  - &0E00–&0E06 and the filename at &16D0;
+  - &0E00–&0E06, identical to the official disc release's, and the
+    filename at &16D0;
   - bytes in &0800–&08BF, &0D2F–&0D30 and &0D80–&0D85. These look like
     values from a running game, i.e. the files were saved from memory
     **[inference]**.
+- **Code from the official disc.** So the hack also borrows from the
+  disc release, not only from the crack **[confirmed]**.
 - **Levels.** Its 25 `LEVELn` files, in Beebug ROMFS images (`RFS (C)
   BEEBUG`), decrypt with the disc release's scheme, and their sums match
-  the disc release's table **[confirmed]**. Its `LEVEL25` is
+  the disc release's table **[confirmed]**. (The same level data appears,
+  decrypted, as the crack's `L1`–`L25`.) Its `LEVEL25` is
   byte-identical to the level 25 data at the end of the disc release's
   `Stones` **[confirmed]**. So the levels came from the
   disc release (or its editor) while the code came from the crack, whose

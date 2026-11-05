@@ -101,33 +101,37 @@ Confirmed in beebium: with the level counters set so that the next level
 is 5, the game reaches `JSR &D9CD` at &0481 with &72=&4D. With level 4 it
 returns normally.
 
-Origin, from the archives at
-<https://rk.nvg.ntnu.no/bbc/sw/BugByte/> (`Dunjunz.zip`, a disc release
-with a level editor, and `Dunjunz-tape.zip`):
-- The tape release's `DUNJ4` carries the same table as this disc
-  (&1A for level 5).
-- The disc release's game (`0/Dun1`) and its `Coder` and `Editor`
-  programs carry &4D for level 5. Its `0/Level5` sums to &4D, matching.
-- This disc's level files decrypt with the same scheme as the disc
-  release's levels, and its `LEVEL5` has the same sum (&4D).
+Origin **[confirmed by comparing the archived releases]**:
+- All three releases share the same level data. The crack's `L1`–`L25`
+  are the hack's `LEVELn` files already decrypted, and the official disc's
+  `LevelN` and `Stones` hold the same levels in encrypted form. Level 5
+  sums to &4D in all of them.
+- The checksum table at &0491 is the same in the crack and the hack, with
+  &1A for level 5. The official disc's table has &4D.
+- The crack never checks the sum: Ole replaced the routine at &0450 with
+  his own level loader, so level 5 loads normally there.
+- The hack restored the checksum routine from the official disc release
+  (its &0450–&0484 is byte-identical to the disc's) but kept the crack's
+  table, so it resets at level 5.
 
-So this sideways RAM version appears to combine code derived from the
-tape release with the disc release's level files, whose level 5 does not
-match the table carried by the tape code. (The tape's own level files are
-encoded differently and have not yet been compared.) Fix: set &0495 in `Dunjun4` to &4D (or restore
-the tape's level 5).
+Whether the original cassette had the same mismatch (its table entry
+wrong, or a different level 5) can't be told without an image of the
+original cassette.
+
+Fix: set &0495 in `Dunjun4` to &4D.
 
 ## Provenance of this disc
 
 The sideways RAM version is described on stardot as an unofficial hack
 (<https://stardot.org.uk/forums/viewtopic.php?t=16227>). Its game files
 match the tape release except for:
-- &0450–&0484: the tape release's code here is a different routine; the
-  hack has the level decrypt/checksum routine described above.
+- &0450–&0484: the crack has the cracker's own routine here. The hack has
+  the level decrypt/checksum routine, byte-identical to the official disc
+  release's.
 - &1447–&149F: the level loader, rewritten to load `LEVELn` by calling
   the filing system's FILEV handler with an OSFILE block at &6E60.
-- &0E00–&0E06 and the filename at &16D0: the new-game entry and the
-  level filename.
+- &0E00–&0E06 (the new-game entry; identical to the official disc's) and
+  the filename at &16D0.
 - Workspace and table bytes in &0800–&08BF, &0D2F–&0D30 and &0D80–&0D85,
   where the hack's files differ from the tape's file contents. These look
   like values from a running game, i.e. the files were saved from memory.
