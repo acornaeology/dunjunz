@@ -350,27 +350,6 @@ data_09ff = sub_09a0+95
     equb &01, &05, &00, &15, &02, &05, &00, &15
     equb &02, &00, &15, &15, &00, &02
     equs "*3", &22
-.sub_0ae8
-; &3260 used as index base 9 times by &3612, &366b, &3670, &6f22, &751a, &751d, &7526, &75c5, &75ca
-data_0b20 = sub_0ae8+56
-; &3264 used as index base 1 time by &7624
-data_0b24 = sub_0ae8+60
-; &3266 used as index base 3 times by &7619, &7621, &7644
-data_0b26 = sub_0ae8+62
-; &3268 referenced 3 times by &765e, &768f, &7699
-data_0b28 = sub_0ae8+64
-; &326a referenced 3 times by &7421, &742b, &7432; also used as index base 5 times by &3cdc, &549c, &589c, &7256, &725f
-data_0b2a = sub_0ae8+66
-; &326b referenced 2 times by &742f, &7438
-data_0b2b = sub_0ae8+67
-; &326c referenced 2 times by &7435, &743e
-data_0b2c = sub_0ae8+68
-; &326d referenced 2 times by &743b, &7441
-data_0b2d = sub_0ae8+69
-; &326f referenced 5 times by &3bf9, &7cb3, &7cb6, &7cbf, &7cc2
-data_0b2f = sub_0ae8+71
-; &3270 used as index base 1 time by &76f2
-data_0b30 = sub_0ae8+72
     equb &01, &00, &11, &00, &02, &02, &11, &00
     equb &00, &0f, &02, &00, &00, &0f, &02, &00
     equb &00, &1f, &02, &00, &3f, &1f, &0f, &02
@@ -378,51 +357,76 @@ data_0b30 = sub_0ae8+72
     equb &00, &0f, &02, &00, &00, &0f, &02, &00
     equb &00, &2f, &02, &00, &00, &2f, &02, &00
     equb &00, &0f, &02, &00, &00, &0f, &02, &00
-    equb &03, &02, &01, &03, &fe, &b6, &01, &01
-    equb &00, &10, &03, &02, &01, &04, &10, &04
+; &0b20 used as index base 9 times by &3612, &366b, &3670, &6f22, &751a, &751d, &7526, &75c5, &75ca
+.hero_max_missiles
+    equb &03, &02, &01, &03
+; &0b24 used as index base 1 time by &7624
+.hero_magic_key
+    equb &fe, &b6
+; &0b26 used as index base 3 times by &7619, &7621, &7644
+.hero_magic_delay
+    equb &01, &01
+; &0b28 referenced 3 times by &765e, &768f, &7699
+.magic_kill_count
+    equb &00, &10
+; &0b2a referenced 3 times by &7421, &742b, &7432; also used as index base 5 times by &3cdc, &549c, &589c, &7256, &725f
+.returning_hero_queue
+; &326b referenced 2 times by &742f, &7438
+data_0b2b = returning_hero_queue+1
+; &326c referenced 2 times by &7435, &743e
+data_0b2c = returning_hero_queue+2
+; &326d referenced 2 times by &743b, &7441
+data_0b2d = returning_hero_queue+3
+    equb &03, &02, &01, &04, &10
+; &0b2f referenced 5 times by &3bf9, &7cb3, &7cb6, &7cbf, &7cc2
+.next_trapdoor
+    equb &04
+; &0b30 used as index base 1 time by &76f2
+.hero_arrival_sprites
     equb &16, &17, &18, &19
     equs "defgh"
-.sub_0b39
-; &3280 used as index base 4 times by &3cd2, &758d, &759e, &75a6
-data_0b40 = sub_0b39+7
-; &32b0 used as index base 7 times by &3618, &3690, &6f4a, &756b, &756e, &7577, &75ee
-data_0b70 = sub_0b39+55
-; &32c0 used as index base 3 times by &6f4d, &71f0, &7591
-data_0b80 = sub_0b39+71
+    equb &10, &10, &10, &10, &10, &10, &10
+; &0b40 used as index base 4 times by &3cd2, &758d, &759e, &75a6
+.monster_hit_points
+    equb &10, &08, &08, &08, &08, &08, &08, &08
+    equb &08, &08, &08, &08, &08, &08, &08, &05
+    equb &08, &08, &08, &08, &08, &08, &08, &08
+    equb &08, &08, &08, &08, &08, &08, &08, &10
+    equb &10, &10, &10, &10, &10, &10, &10, &10
+    equb &10, &10, &10, &10, &10, &10, &10, &10
+; &0b70 used as index base 7 times by &3618, &3690, &6f4a, &756b, &756e, &7577, &75ee
+.hero_missile_damage
+    equb &02, &03, &09, &03, &10, &10, &10, &10
+    equb &10, &10, &10, &10, &10, &10, &10, &10
+; &0b80 used as index base 3 times by &6f4d, &71f0, &7591
+.missile_damage
 ; &32cf used as index base 1 time by &79cd
-data_0b8f = sub_0b39+86
-; &32d0 used as index base 2 times by &3c94, &7cc5
-data_0b90 = sub_0b39+87
+data_0b8f = missile_damage+15
+    equb &02, &02, &02, &03, &03, &04, &09, &09
+    equb &10, &03, &03, &03, &10, &10, &10, &10
+; &0b90 used as index base 2 times by &3c94, &7cc5
+.trapdoor_x
 ; &32d7 used as index base 1 time by &79d3
-data_0b97 = sub_0b39+94
-; &32d8 used as index base 2 times by &3c9a, &7ccb
-data_0b98 = sub_0b39+95
-    equb &10, &10, &10, &10, &10, &10, &10, &10
-    equb &08, &08, &08, &08, &08, &08, &08, &08
-    equb &08, &08, &08, &08, &08, &08, &05, &08
-    equb &08, &08, &08, &08, &08, &08, &08, &08
-    equb &08, &08, &08, &08, &08, &08, &10, &10
-    equb &10, &10, &10, &10, &10, &10, &10, &10
-    equb &10, &10, &10, &10, &10, &10, &10, &02
-    equb &03, &09, &03, &10, &10, &10, &10, &10
-    equb &10, &10, &10, &10, &10, &10, &10, &02
-    equb &02, &02, &03, &03, &04, &09, &09, &10
-    equb &03, &03, &03, &10, &10, &10, &10, &0b
-    equb &15, &17, &10, &03, &17, &0d, &1a, &04
-    equb &0c, &14, &1d
+data_0b97 = trapdoor_x+7
+    equb &0b, &15, &17, &10, &03, &17, &0d, &1a
+; &0b98 used as index base 2 times by &3c9a, &7ccb
+.trapdoor_y
+    equb &04, &0c, &14, &1d
     equs "% (,"
 ; &0ba0 used as index base 5 times by &3626, &72aa, &72ad, &72b6, &72d4
-.data_0ba0
-; &32e4 used as index base 5 times by &3629, &729b, &729e, &72a7, &72e4
-data_0ba4 = data_0ba0+4
-; &32e8 used as index base 8 times by &362e, &5492, &5892, &728c, &728f, &7298, &72f4, &74cf
-data_0ba8 = data_0ba0+8
-; &32ec used as index base 8 times by &3623, &51b0, &51b3, &51bc, &55b0, &55b3, &55bc, &72c8
-data_0bac = data_0ba0+12
+.hero_score_hundreds
+    equb &1e, &1e, &1e, &1e
+; &0ba4 used as index base 5 times by &3629, &729b, &729e, &72a7, &72e4
+.hero_score_tens
+    equb &1e, &1e, &1e, &1e
+; &0ba8 used as index base 8 times by &362e, &5492, &5892, &728c, &728f, &7298, &72f4, &74cf
+.hero_score_units
+    equb &1d, &1d, &1d, &1d
+; &0bac used as index base 8 times by &3623, &51b0, &51b3, &51bc, &55b0, &55b3, &55bc, &72c8
+.hero_score_thousands
 ; &333c referenced 2 times by &444f, &445d
-data_0bfc = data_0ba0+92
-    equb &1e, &1e, &1e, &1e, &1e, &1e, &1e, &1e
-    equb &1d, &1d, &1d, &1d, &1e, &1e, &1e, &1e
+data_0bfc = hero_score_thousands+80
+    equb &1e, &1e, &1e, &1e, &10, &10, &10, &10
     equb &10, &10, &10, &10, &10, &10, &10, &10
     equb &10, &10, &10, &10, &10, &10, &10, &10
     equb &10, &10, &10, &10, &10, &10, &10, &10
@@ -430,11 +434,12 @@ data_0bfc = data_0ba0+92
     equb &10, &10, &10, &10, &10, &10, &10, &10
     equb &10, &10, &10, &10, &10, &10, &10, &10
     equb &10, &10, &10, &10, &10, &10, &10, &10
-    equb &10, &10, &10, &10, &10, &10, &10, &10
-    equb &13, &00, &04, &00, &64, &00, &1e, &00
-    equb &13, &00, &02, &00, &c8, &00, &02, &00
+    equb &10, &10, &10, &10, &13, &00, &04, &00
+    equb &64, &00, &1e, &00, &13, &00, &02, &00
+    equb &c8, &00, &02, &00
 ; &0c00 used as index base 3 times by &3ca7, &7fc8, &7feb
 .user_char_128
+.room_walls
     equs "TIKP$UTHO[KF,D]/DYW3CZD\8V\;VHRVao"
     equb &02
     equs "brlu"
@@ -451,53 +456,6 @@ data_0bfc = data_0ba0+92
     equb &76, &03, &17, &79, &17, &1a, &0e, &16
     equb &1b, &0b
     equs "@5**7E!&%,J2)9N.>5R2:,V86<Z)9<:6"
-.sub_0c80
-; &3410 used as index base 7 times by &361e, &365e, &74ef, &74f2, &74f9, &75bd, &79a7
-data_0cd0 = sub_0c80+80
-; &3434 referenced 2 times by &7481, &7491
-data_0cf4 = sub_0c80+116
-; &3440 referenced 43 times by &4405, &4440, &448e, &4492, &4495, &4498, &44b7, &44c2, &6f19, &6f1e, &6f25, &6f71, &6fd7, &7002, &7007, &713c, &74b6, &74c3, &74d8, &77e6, &782c, &7857, &785b, &785e, &7861, &7886, &788b, &7901, &7905, &7908, &790b, &7926, &7931, &793d, &7941, &7944, &7947, &7962, &796d, &7976, &7990, &7a89, &7ce3; also used as index base 1 time by &3be5
-data_0d00 = sub_0c80+128
-; &3441 referenced 6 times by &74d2, &7503, &7509, &750c, &7829, &782f
-data_0d01 = sub_0c80+129
-; &3442 referenced 54 times by &38dc, &3934, &440b, &441b, &4466, &447c, &449d, &44ac, &4511, &4578, &4588, &4698, &46ea, &4716, &6fa7, &700f, &707c, &70aa, &70ee, &7120, &715b, &7176, &71e3, &7310, &732c, &733a, &73f0, &752f, &766a, &777d, &779b, &77ad, &77bf, &77d1, &7801, &7820, &7867, &7872, &787c, &789e, &78b8, &78d2, &78ec, &7910, &791d, &794c, &7959, &797b, &7997, &79d0, &79ea, &7a48, &7b07, &7b44
-data_0d02 = sub_0c80+130
-; &3443 referenced 49 times by &38e1, &3939, &4411, &4426, &4460, &4482, &4489, &44ba, &4517, &457e, &4590, &469e, &46f0, &471c, &6fad, &7017, &7082, &70b0, &70f4, &7126, &7161, &717e, &71eb, &7316, &7332, &7345, &73fc, &7535, &7670, &7783, &7807, &7852, &787f, &7890, &78a5, &78bf, &78d9, &78f3, &78fc, &7929, &7938, &7965, &7983, &799f, &79d6, &79f3, &7a4e, &7b0d, &7b4a
-data_0d03 = sub_0c80+131
-; &3444 referenced 7 times by &7864, &786c, &786f, &7896, &78b0, &78ca, &78e4
-data_0d04 = sub_0c80+132
-; &3446 referenced 11 times by &6e9a, &6f56, &6fbb, &6fe5, &7021, &7069, &7079, &79ed, &7a58, &7a95, &7af8
-data_0d06 = sub_0c80+134
-; &3447 referenced 11 times by &6ea0, &6f5c, &6fc1, &6feb, &7027, &706f, &707f, &79f6, &7a5e, &7a9b, &7afe
-data_0d07 = sub_0c80+135
-; &3448 referenced 2 times by &6ea6, &7085
-data_0d08 = sub_0c80+136
-; &3449 referenced 2 times by &6eac, &708a
-data_0d09 = sub_0c80+137
-; &3450 used as index base 29 times by &453d, &4575, &45c9, &4678, &4695, &46b4, &5497, &5897, &6e97, &6f39, &6f59, &6f87, &6f95, &6f98, &6fa4, &6fbe, &6fe8, &700c, &7024, &706c, &70a7, &71e0, &7329, &73ed, &752c, &777a, &799a, &7bbd, &7bcb
-data_0d10 = sub_0c80+144
-; &3455 used as index base 26 times by &4543, &457b, &45cf, &4680, &469b, &6e9d, &6f3f, &6f5f, &6f80, &6f8e, &6f9e, &6faa, &6fc4, &6fee, &7014, &702a, &7072, &70ad, &71e8, &732f, &73f9, &7532, &7780, &79a2, &7bb6, &7bc4
-data_0d15 = sub_0c80+149
-; &3459 used as index base 1 time by &4657
-data_0d19 = sub_0c80+153
-; &345a used as index base 19 times by &4526, &4692, &5480, &5880, &6e82, &6ecb, &6ede, &6ef1, &6f04, &6f2d, &6f79, &701c, &7097, &7221, &7249, &7452, &7711, &7b67, &7baf
-data_0d1a = sub_0c80+154
-; &345f used as index base 1 time by &4663
-data_0d1f = sub_0c80+159
-; &3460 referenced 2 times by &774e, &7753; also used as index base 13 times by &4533, &548a, &588a, &6f62, &6f67, &709c, &7457, &76ee, &76ff, &771f, &772e, &7ba2, &7ba7
-data_0d20 = sub_0c80+160
-; &3461 referenced 2 times by &775b, &7760
-data_0d21 = sub_0c80+161
-; &3462 referenced 2 times by &7768, &776d
-data_0d22 = sub_0c80+162
-; &3463 referenced 2 times by &7771, &7776
-data_0d23 = sub_0c80+163
-; &3465 used as index base 13 times by &468d, &5485, &5885, &6e87, &6eaf, &6fc9, &6ff3, &702f, &7063, &7401, &7716, &7b64, &7baa
-data_0d25 = sub_0c80+165
-; &346a used as index base 19 times by &6ea3, &6fcc, &6ff6, &7032, &705d, &724e, &7404, &745c, &7702, &7719, &7735, &7b70, &7b84, &7b8e, &7b9e, &7bd0, &7bd7, &7bda, &7bdd
-data_0d2a = sub_0c80+170
-; &3470 used as index base 20 times by &6ea9, &6fcf, &6ff9, &7035, &7060, &7251, &7407, &7461, &76da, &76e2, &771c, &773a, &7b75, &7b7f, &7b93, &7b99, &7bd3, &7be1, &7be4, &7be7
-data_0d30 = sub_0c80+176
     equb &ce, &c6, &a2, &d7, &cc, &cc, &d5, &a7
     equb &c1, &da, &aa, &ca, &ac, &cb, &a4, &a5
     equb &ba, &bb, &b8, &d4, &b4, &d7, &bc, &bd
@@ -508,18 +466,73 @@ data_0d30 = sub_0c80+176
     equb &eb, &f0, &f4, &fc, &9c, &e9, &f6, &f6
     equb &93, &e1, &8f, &86, &97, &96, &87, &80
     equb &8d, &e7, &9e, &83, &8d, &83, &85, &90
+; &0cd0 used as index base 7 times by &361e, &365e, &74ef, &74f2, &74f9, &75bd, &79a7
+.hero_damage_taken
+; &3434 referenced 2 times by &7481, &7491
+data_0cf4 = hero_damage_taken+36
     equb &89, &9e, &87, &f3, &95, &9b, &92, &f7
     equb &90, &98, &8a, &8b, &85, &fd, &9a, &8a
     equb &ae, &a6, &a7, &ac, &aa, &ac, &a8, &a0
     equb &c9, &00, &00, &00, &00, &00, &00, &00
     equb &10, &00, &01, &00, &06, &00, &06, &00
     equb &12, &00, &03, &00, &c8, &00, &0a, &00
-    equb &a9, &30, &8d, &bd, &08, &a9, &20, &8d
-    equb &be, &08, &a9, &00, &8d, &bc, &08, &ea
-    equb &4c, &10, &0d, &0d, &a2, &80, &a0, &0d
-    equb &a9, &00, &8d, &84, &0d, &8d, &85, &0d
-    equb &ad, &12, &02, &8d, &2f, &0d, &ad, &13
-    equb &02, &8d, &30, &0d, &a9, &06, &20, &ee
+; &0d00 referenced 43 times by &4405, &4440, &448e, &4492, &4495, &4498, &44b7, &44c2, &6f19, &6f1e, &6f25, &6f71, &6fd7, &7002, &7007, &713c, &74b6, &74c3, &74d8, &77e6, &782c, &7857, &785b, &785e, &7861, &7886, &788b, &7901, &7905, &7908, &790b, &7926, &7931, &793d, &7941, &7944, &7947, &7962, &796d, &7976, &7990, &7a89, &7ce3; also used as index base 1 time by &3be5
+.scratch
+    equb &a9
+; &0d01 referenced 6 times by &74d2, &7503, &7509, &750c, &7829, &782f
+.scratch2
+    equb &30
+; &0d02 referenced 54 times by &38dc, &3934, &440b, &441b, &4466, &447c, &449d, &44ac, &4511, &4578, &4588, &4698, &46ea, &4716, &6fa7, &700f, &707c, &70aa, &70ee, &7120, &715b, &7176, &71e3, &7310, &732c, &733a, &73f0, &752f, &766a, &777d, &779b, &77ad, &77bf, &77d1, &7801, &7820, &7867, &7872, &787c, &789e, &78b8, &78d2, &78ec, &7910, &791d, &794c, &7959, &797b, &7997, &79d0, &79ea, &7a48, &7b07, &7b44
+.cell_x
+    equb &8d
+; &0d03 referenced 49 times by &38e1, &3939, &4411, &4426, &4460, &4482, &4489, &44ba, &4517, &457e, &4590, &469e, &46f0, &471c, &6fad, &7017, &7082, &70b0, &70f4, &7126, &7161, &717e, &71eb, &7316, &7332, &7345, &73fc, &7535, &7670, &7783, &7807, &7852, &787f, &7890, &78a5, &78bf, &78d9, &78f3, &78fc, &7929, &7938, &7965, &7983, &799f, &79d6, &79f3, &7a4e, &7b0d, &7b4a
+.cell_y
+    equb &bd
+; &0d04 referenced 7 times by &7864, &786c, &786f, &7896, &78b0, &78ca, &78e4
+.cell_room
+    equb &08, &a9
+; &0d06 referenced 11 times by &6e9a, &6f56, &6fbb, &6fe5, &7021, &7069, &7079, &79ed, &7a58, &7a95, &7af8
+.previous_x
+    equb &20
+; &0d07 referenced 11 times by &6ea0, &6f5c, &6fc1, &6feb, &7027, &706f, &707f, &79f6, &7a5e, &7a9b, &7afe
+.previous_y
+    equb &8d
+; &0d08 referenced 2 times by &6ea6, &7085
+.previous_offset_x
+    equb &be
+; &0d09 referenced 2 times by &6eac, &708a
+.previous_offset_y
+    equb &08, &a9, &00, &8d, &bc, &08, &ea
+; &0d10 used as index base 29 times by &453d, &4575, &45c9, &4678, &4695, &46b4, &5497, &5897, &6e97, &6f39, &6f59, &6f87, &6f95, &6f98, &6fa4, &6fbe, &6fe8, &700c, &7024, &706c, &70a7, &71e0, &7329, &73ed, &752c, &777a, &799a, &7bbd, &7bcb
+.hero_x
+    equb &4c, &10, &0d, &0d, &a2
+; &0d15 used as index base 26 times by &4543, &457b, &45cf, &4680, &469b, &6e9d, &6f3f, &6f5f, &6f80, &6f8e, &6f9e, &6faa, &6fc4, &6fee, &7014, &702a, &7072, &70ad, &71e8, &732f, &73f9, &7532, &7780, &79a2, &7bb6, &7bc4
+.hero_y
+; &3459 used as index base 1 time by &4657
+data_0d19 = hero_y+4
+    equb &80, &a0, &0d, &a9, &00
+; &0d1a used as index base 19 times by &4526, &4692, &5480, &5880, &6e82, &6ecb, &6ede, &6ef1, &6f04, &6f2d, &6f79, &701c, &7097, &7221, &7249, &7452, &7711, &7b67, &7baf
+.hero_direction
+; &345f used as index base 1 time by &4663
+data_0d1f = hero_direction+5
+    equb &8d, &84, &0d, &8d, &85, &0d
+; &0d20 referenced 2 times by &774e, &7753; also used as index base 13 times by &4533, &548a, &588a, &6f62, &6f67, &709c, &7457, &76ee, &76ff, &771f, &772e, &7ba2, &7ba7
+.hero_frame
+; &3461 referenced 2 times by &775b, &7760
+data_0d21 = hero_frame+1
+; &3462 referenced 2 times by &7768, &776d
+data_0d22 = hero_frame+2
+; &3463 referenced 2 times by &7771, &7776
+data_0d23 = hero_frame+3
+    equb &ad, &12, &02, &8d, &2f
+; &0d25 used as index base 13 times by &468d, &5485, &5885, &6e87, &6eaf, &6fc9, &6ff3, &702f, &7063, &7401, &7716, &7b64, &7baa
+.hero_step
+    equb &0d, &ad, &13, &02, &8d
+; &0d2a used as index base 19 times by &6ea3, &6fcc, &6ff6, &7032, &705d, &724e, &7404, &745c, &7702, &7719, &7735, &7b70, &7b84, &7b8e, &7b9e, &7bd0, &7bd7, &7bda, &7bdd
+.hero_offset_x
+    equb &30, &0d, &a9, &06, &20, &ee
+; &0d30 used as index base 20 times by &6ea9, &6fcf, &6ff9, &7035, &7060, &7251, &7407, &7461, &76da, &76e2, &771c, &773a, &7b75, &7b7f, &7b93, &7b99, &7bd3, &7be1, &7be4, &7be7
+.hero_offset_y
     equb &ff
 ; &0d31 referenced 1 time by &5149
 .game_entry
@@ -531,98 +544,98 @@ data_0d30 = sub_0c80+176
     ldx #0
     ldy #0
 ; &0d40 used as index base 6 times by &6f3c, &70eb, &710c, &711a, &711d, &7158
-.code_0d40
+.missile_x
     jsr osbyte                          ; osbyte: bell envelope
     lda #osbyte_bell_frequency
     ldx #&64 ; 'd'
     ldy #0
     jsr osbyte                          ; osbyte: bell frequency
 ; &0d4c used as index base 6 times by &6f42, &70f1, &7105, &7113, &7123, &715e
-.code_0d4c
+.missile_y
     lda #osbyte_bell_duration
     ldx #1
     ldy #0
     jsr osbyte                          ; osbyte: bell duration
     lda wrchv
 ; &0d58 used as index base 12 times by &6f28, &6f36, &70d2, &70de, &70fe, &7134, &71a5, &71ae, &71ba, &71c6, &71ce, &720c
-.code_0d58
+.missile_direction
     sta saved_wrchv
     lda wrchv + 1
     sta data_12d4
     lda #&8f
 .sub_0d63
 ; &34a4 used as index base 4 times by &6f53, &7209, &76b1, &7747
-data_0d64 = sub_0d63+1
+missile_sprite_base = sub_0d63+1
     sta wrchv
     lda #&7f
     sta wrchv + 1
     lda data_008e
     sta data_169f
 ; &0d70 used as index base 1 time by &6ec1
-.code_0d70
+.hero_key_up
     lda data_008f
 .sub_0d72
 ; &34b4 used as index base 1 time by &6ed4
-data_0d74 = sub_0d72+2
+hero_key_down = sub_0d72+2
     sta data_16ff
     lda data_08bc
 ; &0d78 used as index base 1 time by &6ee7
-.code_0d78
+.hero_key_right
     cmp #1
     beq code_0d7f
 ; &0d7c used as index base 1 time by &6efa
-.code_0d7c
+.hero_key_left
     jmp code_0e14
 ; &0d7f referenced 1 time by &34ba
 .code_0d7f
 ; &34c0 used as index base 1 time by &6f0d
-data_0d80 = code_0d7f+1
+hero_key_fire = code_0d7f+1
     lda #0
     jmp code_0e08
     equs "eon5"
 .sub_0d88
 ; &34cf used as index base 1 time by &465c
 data_0d8f = sub_0d88+7
-; &34d0 used as index base 11 times by &35ad, &548f, &588f, &7236, &7239, &726f, &738e, &7391, &739a, &7506, &7724
-data_0d90 = sub_0d88+8
     equb &0d, &18, &bd, &04, &0d, &69, &03, &9d
+; &0d90 used as index base 11 times by &35ad, &548f, &588f, &7236, &7239, &726f, &738e, &7391, &739a, &7506, &7724
+.hero_health_tens
     equb &1d, &1d, &1d, &1d, &d0
 ; &0d95 used as index base 7 times by &7227, &722a, &7233, &727b, &739d, &750f, &7727
-.data_0d95
+.hero_health_units
     equs "''''"
-.sub_0d99
-; &34e0 referenced 2 times by &779e, &7893; also used as index base 3 times by &7043, &7544, &767c
-data_0da0 = sub_0d99+7
+    equb &18, &bd, &08, &0d, &6d, &40, &0d
+; &0da0 referenced 2 times by &779e, &7893; also used as index base 3 times by &7043, &7544, &767c
+.view_room
 ; &34e2 referenced 2 times by &77b0, &78ad
-data_0da2 = sub_0d99+9
+data_0da2 = view_room+2
 ; &34e4 referenced 2 times by &77c2, &78c7
-data_0da4 = sub_0d99+11
+data_0da4 = view_room+4
 ; &34e6 referenced 2 times by &77d4, &78e1
-data_0da6 = sub_0d99+13
-; &34f0 used as index base 1 time by &6f50
-data_0db0 = sub_0d99+23
-    equb &18, &bd, &08, &0d, &6d, &40, &0d, &18
-    equb &0c, &68, &0c, &28, &0c, &30, &0c, &00
-    equb &00, &bd, &04, &0d, &85, &71, &8a, &10
+data_0da6 = view_room+6
+    equb &18, &0c, &68, &0c, &28, &0c, &30, &0c
+    equb &00, &00, &bd, &04, &0d, &85, &71, &8a
+; &0db0 used as index base 1 time by &6f50
+.hero_missile_sprites
+    equb &10
     equs "DLHh"
 ; &0db5 used as index base 3 times by &470b, &473d, &709f
-.data_0db5
+.hero_sprites
     equb &00
     equs ",4<"
-.sub_0db9
-; &34fc used as index base 3 times by &7056, &7351, &74e7
-data_0dbc = sub_0db9+3
-; &3500 used as index base 3 times by &44b2, &7923, &795f
-data_0dc0 = sub_0db9+7
-; &3510 used as index base 9 times by &44dc, &4552, &45ad, &7266, &72bd, &75af, &75cf, &75e7, &75fe
-data_0dd0 = sub_0db9+23
-    equb &00, &0d, &d9, &00, &00, &00, &00, &80
-    equb &40, &20, &10, &08, &04, &02, &01, &b9
-    equb &30, &0d, &9d, &08, &0d, &4c, &d4, &0e
-    equb &3c, &6a, &98, &e8, &e0, &04, &d0, &0a
-    equb &a2, &00, &ad, &40, &0d, &49, &01, &8d
-    equb &40, &0d, &8e, &ff, &0d, &68, &a8, &68
-    equb &aa
+    equb &00, &0d, &d9
+; &0dbc used as index base 3 times by &7056, &7351, &74e7
+.hero_has_boots
+    equb &00, &00, &00, &00
+; &0dc0 used as index base 3 times by &44b2, &7923, &795f
+.bit_masks
+    equb &80, &40, &20, &10, &08, &04, &02, &01
+    equb &b9, &30, &0d, &9d, &08, &0d, &4c, &d4
+; &0dd0 used as index base 9 times by &44dc, &4552, &45ad, &7266, &72bd, &75af, &75cf, &75e7, &75fe
+.hero_panel_y
+    equb &0e, &3c, &6a, &98, &e8, &e0, &04, &d0
+    equb &0a, &a2, &00, &ad, &40, &0d, &49, &01
+    equb &8d, &40, &0d, &8e, &ff, &0d, &68, &a8
+    equb &68, &aa
     equs "h(`"
 .sub_0ded
 ; &353d referenced 1 time by &73d3
@@ -649,7 +662,7 @@ data_0dff = sub_0ded+18
     asl a
     clc
     adc #6
-    sta data_7cff
+    sta monster_start_hit_points
     jmp code_0e57
     equb &ff, &16, &69, &01, &8d, &ff, &16, &d8
     equb &ad, &9f, &16, &c9, &09, &b0, &04, &a2
@@ -674,7 +687,7 @@ data_0dff = sub_0ded+18
     stx data_0ff2
 ; &0e6d referenced 1 time by &35bd
 .code_0e6d
-    lda data_0d90,x
+    lda hero_health_tens,x
     cmp #&1d
     bne code_0e7a
     jsr sub_0ecf
@@ -727,17 +740,17 @@ data_0dff = sub_0ded+18
 ; &0ecf referenced 2 times by &3549, &35b4
 .sub_0ecf
     lda data_0f80,x
-    sta data_0b20,x
+    sta hero_max_missiles,x
     lda data_0f84,x
-    sta data_0b70,x
+    sta hero_missile_damage,x
     lda data_0f88,x
-    sta data_0cd0,x
+    sta hero_damage_taken,x
     lda #&1e
-    sta data_0bac,x
-    sta data_0ba0,x
-    sta data_0ba4,x
+    sta hero_score_thousands,x
+    sta hero_score_hundreds,x
+    sta hero_score_tens,x
     lda #&1d
-    sta data_0ba8,x
+    sta hero_score_units,x
     lda #&69 ; 'i'
     sta data_08b0,x
     rts
@@ -761,15 +774,15 @@ data_0dff = sub_0ded+18
     ldx data_0ff1
     sec
     lda #&73 ; 's'
-    sbc data_0cd0,x
+    sbc hero_damage_taken,x
     ldx #&4e ; 'N'
     ldy #2
     jsr sub_0f68
     ldx data_0ff1
-    lda data_0b20,x
+    lda hero_max_missiles,x
     asl a
     clc
-    adc data_0b20,x
+    adc hero_max_missiles,x
     adc #&10
     sta data_0ff2
     ldy #&10
@@ -787,7 +800,7 @@ data_0dff = sub_0ded+18
     cpy data_0ff2
     bcc code_0f3a
     ldx data_0ff1
-    lda data_0b70,x
+    lda hero_missile_damage,x
     clc
     adc #&69 ; 'i'
     ldx #&4c ; 'L'
@@ -867,7 +880,7 @@ data_0ff2 = sub_0fea+8
     ldx #0
 ; &1079 referenced 1 time by &37c7
 .code_1079
-    lda data_22f0,x
+    lda hero_door_x,x
     cmp #&1a
     beq code_108a
     cmp #&1b
@@ -882,7 +895,7 @@ data_0ff2 = sub_0fea+8
     rts
 ; &108a referenced 2 times by &37be, &37c2
 .code_108a
-    lda data_22f5,x
+    lda hero_door_y,x
     cmp #4
     beq code_1097
     cmp #5
@@ -1030,9 +1043,9 @@ data_10e8 = sub_10e6+2
 ; &119a referenced 12 times by &3891, &3896, &389b, &38a8, &38ad, &38b2, &38ba, &38bf, &38c4, &38cc, &38d1, &38d6
 .sub_119a
     lda data_0080
-    sta data_0d02
+    sta cell_x
     lda data_0081
-    sta data_0d03
+    sta cell_y
     lda data_0082
     sta sprite_number
     jsr sub_7852
@@ -1088,9 +1101,9 @@ data_10e8 = sub_10e6+2
 ; &11f2 referenced 2 times by &390f, &3924
 .sub_11f2
     lda #&1a
-    sta data_0d02
+    sta cell_x
     lda #4
-    sta data_0d03
+    sta cell_y
     lda #&73 ; 's'
     sta sprite_number
     jsr sub_7852
@@ -1273,8 +1286,8 @@ data_12d4 = saved_wrchv+1
     ldx #0
 ; &14a2 referenced 1 time by &3be9
 .code_14a2
-    lda data_7d00,x
-    sta data_0d00,x
+    lda workspace_template,x
+    sta scratch,x
     inx
     bne code_14a2
     lda #0
@@ -1282,7 +1295,7 @@ data_12d4 = saved_wrchv+1
     sta data_09f9
     sta data_09fa
     sta data_09fe
-    sta data_0b2f
+    sta next_trapdoor
     lda #1
     sta data_09f7
     sta data_09f8
@@ -1332,40 +1345,40 @@ data_12d4 = saved_wrchv+1
 ; &1512 referenced 1 time by &3c65
 .code_1512
     lda data_6b00,x
-    sta data_7f20,x
+    sta object_x,x
     lda data_6b20,x
-    sta data_7f3f,x
+    sta object_y,x
     lda data_6b40,x
-    sta data_7f5e,x
+    sta object_type,x
     dex
     bne code_1512
     ldx #&14
 ; &1529 referenced 1 time by &3c7c
 .code_1529
     lda data_6b60,x
-    sta data_2200,x
+    sta door_x,x
     lda data_6b75,x
-    sta data_2220,x
+    sta door_y,x
     lda data_6b8a,x
-    sta data_2240,x
+    sta door_sprite,x
     dex
     bne code_1529
     ldx #&14
 ; &1540 referenced 1 time by &3c8d
 .code_1540
     lda data_6ba0,x
-    sta data_2260,x
+    sta key_x,x
     lda data_6bb5,x
-    sta data_2280,x
+    sta key_y,x
     dex
     bne code_1540
     ldx #0
 ; &1551 referenced 1 time by &3ca0
 .code_1551
     lda data_6bd0,x
-    sta data_0b90,x
+    sta trapdoor_x,x
     lda data_6bd8,x
-    sta data_0b98,x
+    sta trapdoor_y,x
     inx
     cpx #8
     bne code_1551
@@ -1375,7 +1388,7 @@ data_12d4 = saved_wrchv+1
     lda data_6be0,x
     sta user_char_128,x
     lda data_6cb0,x
-    sta data_2100,x
+    sta object_map,x
     inx
     cpx #&c9
     bne code_1564
@@ -1383,7 +1396,7 @@ data_12d4 = saved_wrchv+1
 ; &1577 referenced 1 time by &3cc0
 .code_1577
     lda data_6d80,x
-    sta data_2d00,x
+    sta level_tail,x
     inx
     cpx #&30 ; '0'
     bne code_1577
@@ -1394,22 +1407,22 @@ data_12d4 = saved_wrchv+1
 ; &1585 referenced 1 time by &3cd6
 .code_1585
     lda #&15
-    sta data_7e52,x
+    sta monster_sprite,x
     lda #&ff
-    sta data_7e00,x
-    lda data_7cff
-    sta data_0b40,x
+    sta monster_x,x
+    lda monster_start_hit_points
+    sta monster_hit_points,x
     dex
     bne code_1585
     ldx #0
     lda #0
 ; &159c referenced 1 time by &3cee
 .code_159c
-    sta data_0b2a,x
-    sta data_22e0,x
-    sta data_22e5,x
-    sta data_22f0,x
-    sta data_22f5,x
+    sta returning_hero_queue,x
+    sta hero_key,x
+    sta hero_key_dropped,x
+    sta hero_door_x,x
+    sta hero_door_y,x
     inx
     cpx #4
     bne code_159c
@@ -1709,24 +1722,24 @@ data_16ff = sub_16e5+26
     ldx #0
 ; &1cc5 referenced 1 time by &44ff
 .code_1cc5
-    stx data_0d00
-    lda data_22f0,x
-    sta data_0d02
-    lda data_22f5,x
-    sta data_0d03
+    stx scratch
+    lda hero_door_x,x
+    sta cell_x
+    lda hero_door_y,x
+    sta cell_y
     txa
     pha
     ldx #&14
 ; &1cd8 referenced 1 time by &44f5
 .code_1cd8
-    lda data_2200,x
-    cmp data_0d02
+    lda door_x,x
+    cmp cell_x
     beq code_1ce3
     jmp code_1db2
 ; &1ce3 referenced 1 time by &441e
 .code_1ce3
-    lda data_2220,x
-    cmp data_0d03
+    lda door_y,x
+    cmp cell_y
     beq code_1cee
     jmp code_1db2
 ; &1cee referenced 1 time by &4429
@@ -1735,7 +1748,7 @@ data_16ff = sub_16e5+26
     tay
     pha
     txa
-    cmp data_22e0,y
+    cmp hero_key,y
     beq code_1cfa
     jmp code_1db2
 ; &1cfa referenced 1 time by &4435
@@ -1745,7 +1758,7 @@ data_16ff = sub_16e5+26
     tya
     pha
     ldy #7
-    ldx data_0d00
+    ldx scratch
 ; &1d03 referenced 1 time by &444b
 .code_1d03
     tya
@@ -1763,9 +1776,9 @@ data_16ff = sub_16e5+26
     jsr osword                          ; SOUND command
     lda #&c8
     sta data_0bfc
-    lda data_0d03
+    lda cell_y
     sta data_7e4c
-    lda data_0d02
+    lda cell_x
     sta data_7e23
     lda #&15
     sta sprite_number
@@ -1774,22 +1787,22 @@ data_16ff = sub_16e5+26
     sta data_007e
     jsr sub_7852
     lda data_7e23
-    sta data_0d02
+    sta cell_x
     lda data_7e4c
-    sta data_0d03
+    sta cell_y
     pla
     tay
     pla
     tax
-    lda data_0d03
+    lda cell_y
     and #&f8
-    sta data_0d00
+    sta scratch
     clc
-    adc data_0d00
-    adc data_0d00
-    adc data_0d00
+    adc scratch
+    adc scratch
+    adc scratch
     sta data_007b
-    lda data_0d02
+    lda cell_x
     and #&f8
     adc data_007b
     sta data_007b
@@ -1797,30 +1810,30 @@ data_16ff = sub_16e5+26
     sta data_007c
     txa
     pha
-    lda data_0d02
+    lda cell_x
     and #7
     tax
-    lda data_0dc0,x
+    lda bit_masks,x
     eor #&ff
-    sta data_0d00
-    lda data_0d03
+    sta scratch
+    lda cell_y
     and #7
     tay
     lda (data_007b),y
-    and data_0d00
+    and scratch
     sta (data_007b),y
     pla
     tax
     lda #&ff
-    sta data_2200,x
-    sta data_2220,x
+    sta door_x,x
+    sta door_y,x
     pla
     tax
     lda #0
-    sta data_22e0,x
+    sta hero_key,x
     lda #&1a
     sta sprite_number
-    lda data_0dd0,x
+    lda hero_panel_y,x
     sec
     sbc #&0d
     sta plot_y
@@ -1857,10 +1870,10 @@ data_16ff = sub_16e5+26
     ldx #&14
 ; &1dce referenced 1 time by &4522
 .code_1dce
-    lda data_2260,x
-    sta data_0d02
-    lda data_2280,x
-    sta data_0d03
+    lda key_x,x
+    sta cell_x
+    lda key_y,x
+    sta cell_y
     txa
     pha
     jsr sub_7852
@@ -1871,26 +1884,26 @@ data_16ff = sub_16e5+26
     ldx #0
 ; &1de6 referenced 1 time by &460b
 .code_1de6
-    lda data_0d1a,x
+    lda hero_direction,x
     bne code_1e28
-    lda data_22e0,x
+    lda hero_key,x
     bne code_1df3
     jmp code_1ec6
 ; &1df3 referenced 1 time by &452e
 .code_1df3
-    lda data_0d20,x
+    lda hero_frame,x
     cmp #8
     bne code_1e28
-    ldy data_22e0,x
-    lda data_0d10,x
-    sta data_2260,y
-    lda data_0d15,x
-    sta data_2280,y
+    ldy hero_key,x
+    lda hero_x,x
+    sta key_x,y
+    lda hero_y,x
+    sta key_y,y
     lda #0
-    sta data_22e0,x
+    sta hero_key,x
     lda #&1a
     sta sprite_number
-    lda data_0dd0,x
+    lda hero_panel_y,x
     sec
     sbc #&0d
     sta plot_y
@@ -1904,27 +1917,27 @@ data_16ff = sub_16e5+26
     jmp code_1ec6
 ; &1e28 referenced 2 times by &4529, &4538
 .code_1e28
-    lda data_22e5,x
+    lda hero_key_dropped,x
     beq code_1e35
     lda #0
-    sta data_22e5,x
+    sta hero_key_dropped,x
     jmp code_1ec6
 ; &1e35 referenced 1 time by &456b
 .code_1e35
-    lda data_0d10,x
-    sta data_0d02
-    lda data_0d15,x
-    sta data_0d03
+    lda hero_x,x
+    sta cell_x
+    lda hero_y,x
+    sta cell_y
     txa
     pha
     ldx #&14
 ; &1e45 referenced 1 time by &4601
 .code_1e45
-    lda data_2260,x
-    cmp data_0d02
+    lda key_x,x
+    cmp cell_x
     bne code_1ebe
-    lda data_2280,x
-    cmp data_0d03
+    lda key_y,x
+    cmp cell_y
     bne code_1ebe
     lda #&15
     sta sprite_number
@@ -1941,7 +1954,7 @@ data_16ff = sub_16e5+26
     pha
     lda #&52 ; 'R'
     sta sprite_number
-    lda data_0dd0,y
+    lda hero_panel_y,y
     sec
     sbc #&0d
     sta plot_y
@@ -1958,19 +1971,19 @@ data_16ff = sub_16e5+26
     tay
     txa
     pha
-    ldx data_22e0,y
-    lda data_0d10,y
-    sta data_2260,x
-    lda data_0d15,y
-    sta data_2280,x
+    ldx hero_key,y
+    lda hero_x,y
+    sta key_x,x
+    lda hero_y,y
+    sta key_y,x
     pla
     tax
-    sta data_22e0,y
+    sta hero_key,y
     lda #1
-    sta data_22e5,y
+    sta hero_key_dropped,y
     lda #&ff
-    sta data_2260,x
-    sta data_2280,x
+    sta key_x,x
+    sta key_y,x
     ldx #&42 ; 'B'
     ldy #&19
     lda #osword_envelope
@@ -2059,21 +2072,21 @@ data_16ff = sub_16e5+26
     ldx #0
 ; &1f38 referenced 1 time by &46d4
 .code_1f38
-    lda data_0d10,x
-    cmp data_7f3e
+    lda hero_x,x
+    cmp exit_x
     bne code_1f91
-    lda data_0d15,x
-    cmp data_7f5d
+    lda hero_y,x
+    cmp exit_y
     bne code_1f91
     jsr sub_2091
     lda #&63 ; 'c'
-    sta data_0d25,x
+    sta hero_step,x
     lda #0
-    sta data_0d1a,x
-    lda data_0d10,x
-    sta data_0d02
-    lda data_0d15,x
-    sta data_0d03
+    sta hero_direction,x
+    lda hero_x,x
+    sta cell_x
+    lda hero_y,x
+    sta cell_y
     lda #0
     sta data_007d
     sta data_007e
@@ -2085,14 +2098,14 @@ data_16ff = sub_16e5+26
     pla
     tax
     lda #&ff
-    sta data_0d10,x
-    lda data_7f3e
+    sta hero_x,x
+    lda exit_x
     sta data_09f0
-    lda data_7f5d
+    lda exit_y
     sta data_09f1
     lda #&ff
-    sta data_7f3e
-    sta data_7f5d
+    sta exit_x
+    sta exit_y
     jsr sub_203a
     jmp code_1f96
 ; &1f91 referenced 2 times by &467e, &4686
@@ -2112,9 +2125,9 @@ data_16ff = sub_16e5+26
     sta data_007d
     sta data_007e
     lda data_09f0
-    sta data_0d02
+    sta cell_x
     lda data_09f1
-    sta data_0d03
+    sta cell_y
     lda #&51 ; 'Q'
     sta sprite_number
     jsr sub_7852
@@ -2126,13 +2139,13 @@ data_16ff = sub_16e5+26
     cmp #9
     beq code_1ff2
     clc
-    lda data_0db5,x
+    lda hero_sprites,x
     adc data_09f3
     sta sprite_number
     lda data_09f0
-    sta data_0d02
+    sta cell_x
     lda data_09f1
-    sta data_0d03
+    sta cell_y
     ldx data_09f4
     lda data_09f6,x
     sta data_007d
@@ -2147,7 +2160,7 @@ data_16ff = sub_16e5+26
     dec data_09f4
     beq code_2026
     clc
-    lda data_0db5,x
+    lda hero_sprites,x
     brk
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -2180,19 +2193,6 @@ data_16ff = sub_16e5+26
 ; &2091 referenced 1 time by &4688
 .sub_2091
     brk
-.sub_2092
-; &4840 used as index base 1 time by &3cad
-data_2100 = sub_2092+110
-; &487a used as index base 1 time by &3807
-data_213a = sub_2092+168
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -2207,6 +2207,18 @@ data_213a = sub_2092+168
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00
+; &2100 used as index base 1 time by &3cad
+.object_map
+; &487a used as index base 1 time by &3807
+data_213a = object_map+58
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
 
 
     ; Copy the newly assembled block of code back to it's proper place in the binary
@@ -2228,12 +2240,12 @@ data_213a = sub_2092+168
     org &0400
 ; &0400 referenced 1 time by &72b9
 .data_0400
-    inc data_0bac,x
-    lda data_0bac,x
+    inc hero_score_thousands,x
+    lda hero_score_thousands,x
     cmp #&28 ; '('
     bne data_0447
     lda #&1e
-    sta data_0bac,x
+    sta hero_score_thousands,x
     inc data_06f8,x
     lda data_06f8,x
     cmp #&73 ; 's'
@@ -2530,18 +2542,18 @@ data_213a = sub_2092+168
     lda data_08b4,x
     beq data_06f0
     lda #0
-    sta data_0d1a,x
+    sta hero_direction,x
     lda #&63 ; 'c'
-    sta data_0d25,x
+    sta hero_step,x
     lda #8
-    sta data_0d20,x
+    sta hero_frame,x
     lda #&1d
-    sta data_0d90,x
-    dec data_0ba8,x
+    sta hero_health_tens,x
+    dec hero_score_units,x
     lda #&1f
-    sta data_0d10,x
+    sta hero_x,x
     lda #&64 ; 'd'
-    sta data_0b2a,y
+    sta returning_hero_queue,y
     iny
 ; &06f0 referenced 2 times by &547c, &587c
 .data_06f0
@@ -2603,12 +2615,12 @@ data_213a = sub_2092+168
 
 ; Move 3: &55b0 to &0400 for length 1024
     org &0400
-    inc data_0bac,x
-    lda data_0bac,x
+    inc hero_score_thousands,x
+    lda hero_score_thousands,x
     cmp #&28 ; '('
     bne data_0447
     lda #&1e
-    sta data_0bac,x
+    sta hero_score_thousands,x
     inc data_06f8,x
     lda data_06f8,x
     cmp #&73 ; 's'
@@ -2847,18 +2859,18 @@ data_213a = sub_2092+168
     lda data_08b4,x
     beq data_06f0
     lda #0
-    sta data_0d1a,x
+    sta hero_direction,x
     lda #&63 ; 'c'
-    sta data_0d25,x
+    sta hero_step,x
     lda #8
-    sta data_0d20,x
+    sta hero_frame,x
     lda #&1d
-    sta data_0d90,x
-    dec data_0ba8,x
+    sta hero_health_tens,x
+    dec hero_score_units,x
     lda #&1f
-    sta data_0d10,x
+    sta hero_x,x
     lda #&64 ; 'd'
-    sta data_0b2a,y
+    sta returning_hero_queue,y
     iny
     inx
     cpx #4
@@ -3046,63 +3058,63 @@ data_213a = sub_2092+168
     equb &11
     equs "33", &22
 ; &2200 used as index base 4 times by &3c6c, &4418, &44cb, &77fe
-.data_2200
-; &2220 used as index base 4 times by &3c72, &4423, &44ce, &7804
-data_2220 = data_2200+32
+.door_x
     equb &ff, &ff, &ff, &04, &ff, &ff, &06, &ff
     equb &11, &ff, &ff, &ff, &1a, &03, &03, &0b
     equb &ff, &03, &09, &12, &ff, &ff, &ff, &ff
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
+; &2220 used as index base 4 times by &3c72, &4423, &44ce, &7804
+.door_y
     equb &ff, &ff, &ff, &0d, &ff, &ff, &11, &ff
     equb &16, &ff, &ff, &ff, &1a
     equs "#'%"
     equb &ff
     equs "+.+"
-.sub_2234
+    equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
+    equb &ff, &ff, &ff, &ff
 ; &2240 used as index base 2 times by &3c78, &7810
-data_2240 = sub_2234+12
+.door_sprite
+    equb &ff, &1c, &1c, &1d, &1c, &1c, &1d, &1d
+    equb &1d, &1d, &1d, &1c, &1c, &1d, &1d, &1c
+    equb &1d, &1d, &1c, &1c, &ff, &ff, &ff, &ff
+    equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
 ; &2260 used as index base 6 times by &3c83, &450e, &4540, &4585, &45cc, &45e1
-data_2260 = sub_2234+44
+.key_x
+    equb &13, &ff, &ff, &1b, &ff, &ff, &17, &ff
+    equb &1c, &ff, &ff, &ff, &02, &15, &04, &09
+    equb &ff, &04, &19, &17, &ff, &ff, &ff, &ff
+    equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
 ; &2280 used as index base 6 times by &3c89, &4514, &4546, &458d, &45d2, &45e4
-data_2280 = sub_2234+76
+.key_y
+    equb &25, &ff, &ff, &06, &ff, &ff, &09, &ff
+    equb &18, &ff, &ff, &ff, &29, &04, &0c, &14
+    equb &ff, &0f, &03, &04, &ff, &ff, &ff, &ff
+    equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
+    equb &03, &03, &03, &03, &02, &00, &00, &01
+    equb &02, &00, &00, &01, &02, &00, &00, &01
+    equb &02, &00, &00, &01, &02, &00, &00, &01
+    equb &02, &00, &00, &01, &02, &00, &00, &01
+    equb &02, &00, &00, &01, &02, &00, &00, &01
+    equb &02, &00, &00, &01, &03, &03, &03, &03
+    equb &00, &05, &0f, &0f, &0f, &05, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
 ; &22e0 used as index base 8 times by &3cdf, &4432, &44d5, &452b, &453a, &454b, &45c6, &45d7
-data_22e0 = sub_2234+172
+.hero_key
+    equb &00, &00, &00, &00, &00
 ; &22e5 used as index base 4 times by &3ce2, &4568, &456f, &45dc
-data_22e5 = sub_2234+177
+.hero_key_dropped
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00
 ; &22f0 used as index base 4 times by &37b9, &3ce5, &4408, &6f9b
-data_22f0 = sub_2234+188
+.hero_door_x
+    equb &1a, &09, &00, &16, &00
 ; &22f5 used as index base 4 times by &37ca, &3ce8, &440e, &6fa1
-data_22f5 = sub_2234+193
-    equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
-    equb &ff, &ff, &ff, &ff, &ff, &1c, &1c, &1d
-    equb &1c, &1c, &1d, &1d, &1d, &1d, &1d, &1c
-    equb &1c, &1d, &1d, &1c, &1d, &1d, &1c, &1c
-    equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
-    equb &ff, &ff, &ff, &ff, &13, &ff, &ff, &1b
-    equb &ff, &ff, &17, &ff, &1c, &ff, &ff, &ff
-    equb &02, &15, &04, &09, &ff, &04, &19, &17
-    equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
-    equb &ff, &ff, &ff, &ff, &25, &ff, &ff, &06
-    equb &ff, &ff, &09, &ff, &18, &ff, &ff, &ff
-    equb &29, &04, &0c, &14, &ff, &0f, &03, &04
-    equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
-    equb &ff, &ff, &ff, &ff, &03, &03, &03, &03
-    equb &02, &00, &00, &01, &02, &00, &00, &01
-    equb &02, &00, &00, &01, &02, &00, &00, &01
-    equb &02, &00, &00, &01, &02, &00, &00, &01
-    equb &02, &00, &00, &01, &02, &00, &00, &01
-    equb &02, &00, &00, &01, &02, &00, &00, &01
-    equb &03, &03, &03, &03, &00, &05, &0f, &0f
-    equb &0f, &05, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &1a, &09, &00, &16
-    equb &00, &06, &1d, &00, &09, &00, &00, &00
-    equb &00, &00, &00, &00, &01, &0a, &00, &00
-    equb &03, &0a, &0b, &00, &03, &00, &0b, &02
-    equb &03, &00, &00, &03, &03, &00, &0a, &03
-    equb &03, &10, &1a, &01, &01, &27, &0f, &23
-    equb &01
+.hero_door_y
+    equb &06, &1d, &00, &09, &00, &00, &00, &00
+    equb &00, &00, &00, &01, &0a, &00, &00, &03
+    equb &0a, &0b, &00, &03, &00, &0b, &02, &03
+    equb &00, &00, &03, &03, &00, &0a, &03, &03
+    equb &10, &1a, &01, &01, &27, &0f, &23, &01
     equs "33#"
     equb &01, &13, &33, &00, &03, &13, &33, &00
     equb &03, &03, &22, &00, &03, &03, &00, &00
@@ -3429,9 +3441,6 @@ data_22f5 = sub_2234+193
     equb &16, &3f, &03, &03, &16, &29, &21, &12
     equb &16
     equs "<<<<"
-.sub_2bf0
-; &2d00 used as index base 1 time by &3cba
-data_2d00 = sub_2bf0+272
     equb &00, &00, &00, &00, &04, &00, &00, &00
     equb &20, &00, &00, &00, &fd, &14, &93, &00
     equb &00, &00, &00, &00, &00, &15, &00, &00
@@ -3466,6 +3475,8 @@ data_2d00 = sub_2bf0+272
     equb &00, &3e, &38, &00, &00, &30, &30, &00
     equb &01, &00, &00, &00, &17, &00, &00, &90
     equb &17, &00, &00, &00, &00, &00, &00, &00
+; &2d00 used as index base 1 time by &3cba
+.level_tail
     equb &0f, &0b, &0f, &07, &03, &0f, &0f, &0f
     equb &0f, &1f, &2f, &0b, &0f, &2f, &0b, &0f
     equb &1f, &0f, &0f, &07, &1f, &1f, &0f, &07
@@ -4723,9 +4734,9 @@ data_6d80 = sub_59b0+5072
     ldx #0
 ; &6e82 referenced 1 time by &70c6
 .code_6e82
-    lda data_0d1a,x
+    lda hero_direction,x
     bne code_6e97
-    lda data_0d25,x
+    lda hero_step,x
     cmp #&63 ; 'c'
     bne code_6e91
     jmp code_70c1
@@ -4735,15 +4746,15 @@ data_6d80 = sub_59b0+5072
     jmp code_70c1
 ; &6e97 referenced 1 time by &6e85
 .code_6e97
-    lda data_0d10,x
-    sta data_0d06
-    lda data_0d15,x
-    sta data_0d07
-    lda data_0d2a,x
-    sta data_0d08
-    lda data_0d30,x
-    sta data_0d09
-    lda data_0d25,x
+    lda hero_x,x
+    sta previous_x
+    lda hero_y,x
+    sta previous_y
+    lda hero_offset_x,x
+    sta previous_offset_x
+    lda hero_offset_y,x
+    sta previous_offset_y
+    lda hero_step,x
     beq code_6eba
     jsr sub_7ba2
     jmp code_7075
@@ -4754,122 +4765,122 @@ data_6d80 = sub_59b0+5072
     jmp code_7619
 ; &6ec1 referenced 2 times by &6ebc, &76ab
 .code_6ec1
-    lda code_0d70,x
+    lda hero_key_up,x
     jsr sub_7c95
     bne code_6ed4
     lda #1
-    sta data_0d1a,x
+    sta hero_direction,x
     jsr sub_7b62
     jmp code_6f79
 ; &6ed4 referenced 1 time by &6ec7
 .code_6ed4
-    lda data_0d74,x
+    lda hero_key_down,x
     jsr sub_7c95
     bne code_6ee7
     lda #5
-    sta data_0d1a,x
+    sta hero_direction,x
     jsr sub_7b62
     jmp code_6f79
 ; &6ee7 referenced 1 time by &6eda
 .code_6ee7
-    lda code_0d78,x
+    lda hero_key_right,x
     jsr sub_7c95
     bne code_6efa
     lda #3
-    sta data_0d1a,x
+    sta hero_direction,x
     jsr sub_7b62
     jmp code_6f79
 ; &6efa referenced 1 time by &6eed
 .code_6efa
-    lda code_0d7c,x
+    lda hero_key_left,x
     jsr sub_7c95
     bne code_6f0d
     lda #7
-    sta data_0d1a,x
+    sta hero_direction,x
     jsr sub_7b62
     jmp code_6f79
 ; &6f0d referenced 1 time by &6f00
 .code_6f0d
-    lda data_0d80,x
+    lda hero_key_fire,x
     jsr sub_7c95
     beq code_6f18
     jmp code_7096
 ; &6f18 referenced 1 time by &6f13
 .code_6f18
     txa
-    sta data_0d00
+    sta scratch
     asl a
     clc
-    adc data_0d00
+    adc scratch
     tay
-    adc data_0b20,x
-    sta data_0d00
+    adc hero_max_missiles,x
+    sta scratch
 ; &6f28 referenced 1 time by &6f74
 .loop_6f28
-    lda code_0d58,y
+    lda missile_direction,y
     bne code_6f70
-    lda data_0d1a,x
+    lda hero_direction,x
     clc
     adc #1
     lsr a
     ora #&80
-    sta code_0d58,y
-    lda data_0d10,x
-    sta code_0d40,y
-    lda data_0d15,x
-    sta code_0d4c,y
+    sta missile_direction,y
+    lda hero_x,x
+    sta missile_x,y
+    lda hero_y,x
+    sta missile_y,y
     lda #7
     jsr oswrch
-    lda data_0b70,x
-    sta data_0b80,y
-    lda data_0db0,x
-    sta data_0d64,y
-    lda data_0d06
-    sta data_0d10,x
-    lda data_0d07
-    sta data_0d15,x
-    lda data_0d20,x
+    lda hero_missile_damage,x
+    sta missile_damage,y
+    lda hero_missile_sprites,x
+    sta missile_sprite_base,y
+    lda previous_x
+    sta hero_x,x
+    lda previous_y
+    sta hero_y,x
+    lda hero_frame,x
     eor #1
-    sta data_0d20,x
+    sta hero_frame,x
     jmp code_7096
     equb &88, &d0, &b8
 ; &6f70 referenced 1 time by &6f2b
 .code_6f70
     iny
-    cpy data_0d00
+    cpy scratch
     bne loop_6f28
     jmp code_7096
 ; &6f79 referenced 4 times by &6ed1, &6ee4, &6ef7, &6f0a
 .code_6f79
-    lda data_0d1a,x
+    lda hero_direction,x
     cmp #1
     bne code_6f83
-    dec data_0d15,x
+    dec hero_y,x
 ; &6f83 referenced 1 time by &6f7e
 .code_6f83
     cmp #3
     bne code_6f8a
-    inc data_0d10,x
+    inc hero_x,x
 ; &6f8a referenced 1 time by &6f85
 .code_6f8a
     cmp #5
     bne code_6f91
-    inc data_0d15,x
+    inc hero_y,x
 ; &6f91 referenced 1 time by &6f8c
 .code_6f91
     cmp #7
     bne code_6f98
-    dec data_0d10,x
+    dec hero_x,x
 ; &6f98 referenced 1 time by &6f93
 .code_6f98
-    lda data_0d10,x
-    sta data_22f0,x
-    lda data_0d15,x
-    sta data_22f5,x
-    lda data_0d10,x
-    sta data_0d02
-    lda data_0d15,x
-    sta data_0d03
+    lda hero_x,x
+    sta hero_door_x,x
+    lda hero_y,x
+    sta hero_door_y,x
+    lda hero_x,x
+    sta cell_x
+    lda hero_y,x
+    sta cell_y
     txa
     pha
     jsr sub_78fc
@@ -4877,21 +4888,21 @@ data_6d80 = sub_59b0+5072
     tax
     cpy #0
     beq code_6fd5
-    lda data_0d06
-    sta data_0d10,x
-    lda data_0d07
-    sta data_0d15,x
+    lda previous_x
+    sta hero_x,x
+    lda previous_y
+    sta hero_y,x
 ; &6fc7 referenced 1 time by &7050
 .code_6fc7
     lda #0
-    sta data_0d25,x
-    sta data_0d2a,x
-    sta data_0d30,x
+    sta hero_step,x
+    sta hero_offset_x,x
+    sta hero_offset_y,x
     jmp code_7075
 ; &6fd5 referenced 1 time by &6fb9
 .code_6fd5
     lda #0
-    sta data_0d00
+    sta scratch
     txa
     pha
     jsr sub_7974
@@ -4899,40 +4910,40 @@ data_6d80 = sub_59b0+5072
     tax
     cpy #0
     beq code_7002
-    lda data_0d06
-    sta data_0d10,x
-    lda data_0d07
-    sta data_0d15,x
+    lda previous_x
+    sta hero_x,x
+    lda previous_y
+    sta hero_y,x
     lda #0
-    sta data_0d25,x
-    sta data_0d2a,x
-    sta data_0d30,x
+    sta hero_step,x
+    sta hero_offset_x,x
+    sta hero_offset_y,x
     jsr sub_7221
     jmp code_7075
 ; &7002 referenced 1 time by &6fe3
 .code_7002
-    stx data_0d00
+    stx scratch
     ldy #0
 ; &7007 referenced 1 time by &703e
 .loop_7007
-    cpy data_0d00
+    cpy scratch
     beq code_703b
-    lda data_0d10,y
-    cmp data_0d02
+    lda hero_x,y
+    cmp cell_x
     bne code_703b
-    lda data_0d15,y
-    cmp data_0d03
+    lda hero_y,y
+    cmp cell_y
     bne code_703b
-    lda data_0d1a,y
+    lda hero_direction,y
     beq code_703b
-    lda data_0d06
-    sta data_0d10,x
-    lda data_0d07
-    sta data_0d15,x
+    lda previous_x
+    sta hero_x,x
+    lda previous_y
+    sta hero_y,x
     lda #0
-    sta data_0d25,x
-    sta data_0d2a,x
-    sta data_0d30,x
+    sta hero_step,x
+    sta hero_offset_x,x
+    sta hero_offset_y,x
     jmp code_7075
 ; &703b referenced 4 times by &700a, &7012, &701a, &701f
 .code_703b
@@ -4942,7 +4953,7 @@ data_6d80 = sub_59b0+5072
     txa
     asl a
     tax
-    lda data_0da0,x
+    lda view_room,x
     cmp data_007b
     beq code_7053
     txa
@@ -4955,30 +4966,30 @@ data_6d80 = sub_59b0+5072
     txa
     lsr a
     tax
-    lda data_0dbc,x
+    lda hero_has_boots,x
     beq code_7069
     lda #0
-    sta data_0d2a,x
-    sta data_0d30,x
-    sta data_0d25,x
+    sta hero_offset_x,x
+    sta hero_offset_y,x
+    sta hero_step,x
     jmp code_7075
 ; &7069 referenced 1 time by &7059
 .code_7069
-    lda data_0d06
-    sta data_0d10,x
-    lda data_0d07
-    sta data_0d15,x
+    lda previous_x
+    sta hero_x,x
+    lda previous_y
+    sta hero_y,x
 ; &7075 referenced 5 times by &6eb7, &6fd2, &6fff, &7038, &7066
 .code_7075
     lda #&15
     sta sprite_number
-    lda data_0d06
-    sta data_0d02
-    lda data_0d07
-    sta data_0d03
-    lda data_0d08
+    lda previous_x
+    sta cell_x
+    lda previous_y
+    sta cell_y
+    lda previous_offset_x
     sta data_007d
-    lda data_0d09
+    lda previous_offset_y
     sta data_007e
     txa
     pha
@@ -4988,16 +4999,16 @@ data_6d80 = sub_59b0+5072
 ; &7096 referenced 4 times by &6f15, &6f6a, &6f76, &76ae
 .code_7096
     clc
-    lda data_0d1a,x
+    lda hero_direction,x
     beq code_70c1
-    adc data_0d20,x
-    adc data_0db5,x
+    adc hero_frame,x
+    adc hero_sprites,x
     sta sprite_number
     jsr sub_7732
-    lda data_0d10,x
-    sta data_0d02
-    lda data_0d15,x
-    sta data_0d03
+    lda hero_x,x
+    sta cell_x
+    lda hero_y,x
+    sta cell_y
     txa
     pha
     jsr sub_7938
@@ -5023,24 +5034,24 @@ data_6d80 = sub_59b0+5072
     ldx #0
 ; &70d2 referenced 1 time by &721d
 .code_70d2
-    lda code_0d58,x
+    lda missile_direction,x
     bne code_70da
     jmp code_7218
 ; &70da referenced 1 time by &70d5
 .code_70da
     bpl code_70e7
     and #&7f
-    sta code_0d58,x
+    sta missile_direction,x
     jsr sub_7747
     jmp code_70fe
 ; &70e7 referenced 1 time by &70da
 .code_70e7
     lda #&15
     sta sprite_number
-    lda code_0d40,x
-    sta data_0d02
-    lda code_0d4c,x
-    sta data_0d03
+    lda missile_x,x
+    sta cell_x
+    lda missile_y,x
+    sta cell_y
     txa
     pha
     jsr sub_7852
@@ -5048,31 +5059,31 @@ data_6d80 = sub_59b0+5072
     tax
 ; &70fe referenced 1 time by &70e4
 .code_70fe
-    lda code_0d58,x
+    lda missile_direction,x
     cmp #1
     bne code_7108
-    dec code_0d4c,x
+    dec missile_y,x
 ; &7108 referenced 1 time by &7103
 .code_7108
     cmp #2
     bne code_710f
-    inc code_0d40,x
+    inc missile_x,x
 ; &710f referenced 1 time by &710a
 .code_710f
     cmp #3
     bne code_7116
-    inc code_0d4c,x
+    inc missile_y,x
 ; &7116 referenced 1 time by &7111
 .code_7116
     cmp #4
     bne code_711d
-    dec code_0d40,x
+    dec missile_x,x
 ; &711d referenced 1 time by &7118
 .code_711d
-    lda code_0d40,x
-    sta data_0d02
-    lda code_0d4c,x
-    sta data_0d03
+    lda missile_x,x
+    sta cell_x
+    lda missile_y,x
+    sta cell_y
     txa
     pha
     jsr sub_78fc
@@ -5084,15 +5095,15 @@ data_6d80 = sub_59b0+5072
 ; &7132 referenced 1 time by &7153
 .code_7132
     lda #0
-    sta code_0d58,x
+    sta missile_direction,x
     jmp code_7218
 ; &713a referenced 1 time by &712e
 .code_713a
     lda #0
-    sta data_0d00
+    sta scratch
     jsr sub_7974
     beq code_7156
-    lda data_7e52,x
+    lda monster_sprite,x
     cmp #&16
     bcs code_7156
     pla
@@ -5106,10 +5117,10 @@ data_6d80 = sub_59b0+5072
 .code_7156
     pla
     tax
-    lda code_0d40,x
-    sta data_0d02
-    lda code_0d4c,x
-    sta data_0d03
+    lda missile_x,x
+    sta cell_x
+    lda missile_y,x
+    sta cell_y
     txa
     pha
     jsr sub_7938
@@ -5122,53 +5133,53 @@ data_6d80 = sub_59b0+5072
     ldx #&1e
 ; &7173 referenced 1 time by &71d5
 .loop_7173
-    lda data_7f20,x
-    cmp data_0d02
+    lda object_x,x
+    cmp cell_x
     bne code_71d4
-    lda data_7f3f,x
-    cmp data_0d03
+    lda object_y,x
+    cmp cell_y
     bne code_71d4
-    lda data_7f5e,x
+    lda object_type,x
     cmp #&53 ; 'S'
     bcc code_71d7
     cmp #&5f ; '_'
     bcs code_71d7
-    inc data_7f5e,x
-    lda data_7f5e,x
+    inc object_type,x
+    lda object_type,x
     cmp #&5f ; '_'
     bne code_71a0
     lda #&ff
-    sta data_7f20,x
-    sta data_7f3f,x
+    sta object_x,x
+    sta object_y,x
 ; &71a0 referenced 1 time by &7196
 .code_71a0
     pla
     tax
     jsr sub_76b1
-    lda code_0d58,x
+    lda missile_direction,x
     cmp #1
     bne code_71b4
     lda #3
-    sta code_0d58,x
+    sta missile_direction,x
     jmp code_71d9
 ; &71b4 referenced 1 time by &71aa
 .code_71b4
     cmp #2
     bne code_71c0
     lda #4
-    sta code_0d58,x
+    sta missile_direction,x
     jmp code_71d9
 ; &71c0 referenced 1 time by &71b6
 .code_71c0
     cmp #3
     bne code_71cc
     lda #1
-    sta code_0d58,x
+    sta missile_direction,x
     jmp code_71d9
 ; &71cc referenced 1 time by &71c2
 .code_71cc
     lda #2
-    sta code_0d58,x
+    sta missile_direction,x
     jmp code_71d9
 ; &71d4 referenced 2 times by &7179, &7181
 .code_71d4
@@ -5188,13 +5199,13 @@ data_6d80 = sub_59b0+5072
     pla
     tay
     pha
-    lda data_0d10,x
-    cmp data_0d02
+    lda hero_x,x
+    cmp cell_x
     bne code_7201
-    lda data_0d15,x
-    cmp data_0d03
+    lda hero_y,x
+    cmp cell_y
     bne code_7201
-    lda data_0b80,y
+    lda missile_damage,y
     tay
 ; &71f4 referenced 1 time by &71fc
 .loop_71f4
@@ -5214,8 +5225,8 @@ data_6d80 = sub_59b0+5072
     pla
     tax
     clc
-    lda data_0d64,x
-    adc code_0d58,x
+    lda missile_sprite_base,x
+    adc missile_direction,x
     sta sprite_number
     txa
     pha
@@ -5233,38 +5244,38 @@ data_6d80 = sub_59b0+5072
     rts
 ; &7221 referenced 8 times by &363f, &6ffc, &71f6, &749a, &7512, &7654, &772a, &79ac
 .sub_7221
-    lda data_0d1a,x
+    lda hero_direction,x
     bne code_7227
     rts
 ; &7227 referenced 1 time by &7224
 .code_7227
-    dec data_0d95,x
-    lda data_0d95,x
+    dec hero_health_units,x
+    lda hero_health_units,x
     cmp #&1d
     bne code_7266
     lda #&27
-    sta data_0d95,x
-    dec data_0d90,x
-    lda data_0d90,x
+    sta hero_health_units,x
+    dec hero_health_tens,x
+    lda hero_health_tens,x
     cmp #&1d
     bne code_7266
     lda #&15
     sta sprite_number
     jsr sub_7732
     lda #0
-    sta data_0d1a,x
+    sta hero_direction,x
     lda #1
-    sta data_0d2a,x
-    sta data_0d30,x
+    sta hero_offset_x,x
+    sta hero_offset_y,x
     ldy #0
 ; &7256 referenced 1 time by &7264
 .loop_7256
-    lda data_0b2a,y
+    lda returning_hero_queue,y
     bne code_7263
     txa
     clc
     adc #1
-    sta data_0b2a,y
+    sta returning_hero_queue,y
     rts
 ; &7263 referenced 1 time by &7259
 .code_7263
@@ -5272,18 +5283,18 @@ data_6d80 = sub_59b0+5072
     bne loop_7256
 ; &7266 referenced 3 times by &722f, &723e, &73a2
 .code_7266
-    lda data_0dd0,x
+    lda hero_panel_y,x
     sta plot_y
     lda #&45 ; 'E'
     sta plot_x
-    lda data_0d90,x
+    lda hero_health_tens,x
     sta sprite_number
     txa
     pha
     jsr plot_sprite
     pla
     tax
-    lda data_0d95,x
+    lda hero_health_units,x
     sta sprite_number
     lda #&48 ; 'H'
     sta plot_x
@@ -5295,43 +5306,43 @@ data_6d80 = sub_59b0+5072
     rts
 ; &728c referenced 5 times by &3642, &4445, &73a9, &76a2, &76d4
 .sub_728c
-    inc data_0ba8,x
-    lda data_0ba8,x
+    inc hero_score_units,x
+    lda hero_score_units,x
     cmp #&28 ; '('
     bne code_72bc
     lda #&1e
-    sta data_0ba8,x
+    sta hero_score_units,x
 ; &729b referenced 4 times by &737f, &7382, &7419, &74d5
 .sub_729b
-    inc data_0ba4,x
-    lda data_0ba4,x
+    inc hero_score_tens,x
+    lda hero_score_tens,x
     cmp #&28 ; '('
     bne code_72bc
     lda #&1e
-    sta data_0ba4,x
-    inc data_0ba0,x
-    lda data_0ba0,x
+    sta hero_score_tens,x
+    inc hero_score_hundreds,x
+    lda hero_score_hundreds,x
     cmp #&28 ; '('
     bne code_72bc
     lda #&1e
-    sta data_0ba0,x
+    sta hero_score_hundreds,x
     jsr data_0400
 ; &72bc referenced 3 times by &7294, &72a3, &72b2
 .code_72bc
     clc
-    lda data_0dd0,x
+    lda hero_panel_y,x
     adc #&0c
     sta plot_y
     lda #&45 ; 'E'
     sta plot_x
-    lda data_0bac,x
+    lda hero_score_thousands,x
     sta sprite_number
     txa
     pha
     jsr plot_sprite
     pla
     tax
-    lda data_0ba0,x
+    lda hero_score_hundreds,x
     sta sprite_number
     lda #&48 ; 'H'
     sta plot_x
@@ -5340,7 +5351,7 @@ data_6d80 = sub_59b0+5072
     jsr plot_sprite
     pla
     tax
-    lda data_0ba4,x
+    lda hero_score_tens,x
     sta sprite_number
     lda #&4b ; 'K'
     sta plot_x
@@ -5349,7 +5360,7 @@ data_6d80 = sub_59b0+5072
     jsr plot_sprite
     pla
     tax
-    lda data_0ba8,x
+    lda hero_score_units,x
     sta sprite_number
     lda #&4e ; 'N'
     sta plot_x
@@ -5367,11 +5378,11 @@ data_6d80 = sub_59b0+5072
     ldx #&1e
 ; &730d referenced 1 time by &7326
 .loop_730d
-    lda data_7f20,x
-    sta data_0d02
-    lda data_7f3f,x
-    sta data_0d03
-    lda data_7f5e,x
+    lda object_x,x
+    sta cell_x
+    lda object_y,x
+    sta cell_y
+    lda object_type,x
     sta sprite_number
     txa
     pha
@@ -5383,21 +5394,21 @@ data_6d80 = sub_59b0+5072
     rts
 ; &7329 referenced 1 time by &70be
 .sub_7329
-    lda data_0d10,x
-    sta data_0d02
-    lda data_0d15,x
-    sta data_0d03
+    lda hero_x,x
+    sta cell_x
+    lda hero_y,x
+    sta cell_y
     ldy #&1e
 ; &7337 referenced 1 time by &7473
 .code_7337
-    lda data_7f20,y
-    cmp data_0d02
+    lda object_x,y
+    cmp cell_x
     beq code_7342
     jmp code_7470
 ; &7342 referenced 1 time by &733d
 .code_7342
-    lda data_7f3f,y
-    cmp data_0d03
+    lda object_y,y
+    cmp cell_y
     beq code_734d
     jmp code_7470
 ; &734d referenced 1 time by &7348
@@ -5405,12 +5416,12 @@ data_6d80 = sub_59b0+5072
     tya
     pha
     lda #0
-    sta data_0dbc,x
+    sta hero_has_boots,x
     jsr sub_75f9
     jsr sub_760d
     pla
     tay
-    lda data_7f5e,y
+    lda object_type,y
     cmp #&28 ; '('
     bne code_738a
     txa
@@ -5440,13 +5451,13 @@ data_6d80 = sub_59b0+5072
 .code_738a
     cmp #&29 ; ')'
     bne code_73c3
-    inc data_0d90,x
-    lda data_0d90,x
+    inc hero_health_tens,x
+    lda hero_health_tens,x
     cmp #&28 ; '('
     bne code_73a0
     lda #&27
-    sta data_0d90,x
-    sta data_0d95,x
+    sta hero_health_tens,x
+    sta hero_health_units,x
 ; &73a0 referenced 1 time by &7396
 .code_73a0
     tya
@@ -5480,7 +5491,7 @@ data_6d80 = sub_59b0+5072
 ; &73c7 referenced 2 times by &73d1, &73d6
 .code_73c7
     dey
-    lda data_7f5e,y
+    lda object_type,y
     cmp #&2b ; '+'
     beq code_73d9
     cpy #0
@@ -5501,31 +5512,31 @@ data_6d80 = sub_59b0+5072
     tay
     pla
     tax
-    lda data_7f20,y
-    sta data_0d10,x
-    sta data_0d02
-    lda data_7f3f,y
+    lda object_x,y
+    sta hero_x,x
+    sta cell_x
+    lda object_y,y
     sec
     sbc #1
-    sta data_0d15,x
-    sta data_0d03
+    sta hero_y,x
+    sta cell_y
     lda #0
-    sta data_0d25,x
-    sta data_0d2a,x
-    sta data_0d30,x
+    sta hero_step,x
+    sta hero_offset_x,x
+    sta hero_offset_y,x
     jmp code_752c
 ; &740d referenced 1 time by &73c5
 .code_740d
     cmp #&2a ; '*'
     bne code_7477
     lda #&ff
-    sta data_7f20,y
-    sta data_7f3f,y
+    sta object_x,y
+    sta object_y,y
     jsr sub_729b
     txa
     pha
     jsr sub_74a3
-    lda data_0b2a
+    lda returning_hero_queue
     bne code_7429
     pla
     tax
@@ -5535,10 +5546,10 @@ data_6d80 = sub_59b0+5072
     ldy #0
 ; &742b referenced 1 time by &744a
 .loop_742b
-    ldx data_0b2a
+    ldx returning_hero_queue
     dex
     lda data_0b2b
-    sta data_0b2a
+    sta returning_hero_queue
     lda data_0b2c
     sta data_0b2b
     lda data_0b2d
@@ -5553,13 +5564,13 @@ data_6d80 = sub_59b0+5072
     cpx #&ff
     beq code_7464
     lda #0
-    sta data_0d1a,x
+    sta hero_direction,x
     lda #8
-    sta data_0d20,x
+    sta hero_frame,x
     lda #&ff
-    sta data_0d2a,x
+    sta hero_offset_x,x
     lda #1
-    sta data_0d30,x
+    sta hero_offset_y,x
 ; &7464 referenced 1 time by &744e
 .code_7464
     pla
@@ -5568,8 +5579,8 @@ data_6d80 = sub_59b0+5072
 ; &7467 referenced 2 times by &7387, &73c0
 .code_7467
     lda #&ff
-    sta data_7f20,y
-    sta data_7f3f,y
+    sta object_x,y
+    sta object_y,y
     rts
 ; &7470 referenced 3 times by &733f, &734a, &747d
 .code_7470
@@ -5621,39 +5632,39 @@ data_6d80 = sub_59b0+5072
     rts
 ; &74b6 referenced 1 time by &7479
 .code_74b6
-    sta data_0d00
+    sta scratch
     lda #&ff
-    sta data_7f20,y
-    sta data_7f3f,y
+    sta object_x,y
+    sta object_y,y
     txa
     pha
-    lda data_0d00
+    lda scratch
     and #7
     asl a
     asl a
     jsr sub_74a3
     pla
     tax
-    lda data_0ba8,x
-    sta data_0d01
+    lda hero_score_units,x
+    sta scratch2
     jsr sub_729b
-    lda data_0d00
+    lda scratch
     cmp #&5f ; '_'
     bne code_74eb
     jsr sub_75f9
     jsr sub_7606
     lda #1
-    sta data_0dbc,x
+    sta hero_has_boots,x
     rts
 ; &74eb referenced 1 time by &74dd
 .code_74eb
     cmp #&60 ; '`'
     bne code_74ff
-    dec data_0cd0,x
-    lda data_0cd0,x
+    dec hero_damage_taken,x
+    lda hero_damage_taken,x
     cmp #3
     bcs code_74fc
-    inc data_0cd0,x
+    inc hero_damage_taken,x
 ; &74fc referenced 1 time by &74f7
 .code_74fc
     jmp code_75ae
@@ -5661,32 +5672,32 @@ data_6d80 = sub_59b0+5072
 .code_74ff
     cmp #&61 ; 'a'
     bne code_7516
-    lda data_0d01
-    sta data_0d90,x
-    inc data_0d01
-    lda data_0d01
-    sta data_0d95,x
+    lda scratch2
+    sta hero_health_tens,x
+    inc scratch2
+    lda scratch2
+    sta hero_health_units,x
     jsr sub_7221
     rts
 ; &7516 referenced 1 time by &7501
 .code_7516
     cmp #&62 ; 'b'
     bne code_756b
-    inc data_0b20,x
-    lda data_0b20,x
+    inc hero_max_missiles,x
+    lda hero_max_missiles,x
     cmp #4
     bne code_7529
     lda #3
-    sta data_0b20,x
+    sta hero_max_missiles,x
 ; &7529 referenced 1 time by &7522
 .code_7529
     jmp code_75c5
 ; &752c referenced 2 times by &704d, &740a
 .code_752c
-    lda data_0d10,x
-    sta data_0d02
-    lda data_0d15,x
-    sta data_0d03
+    lda hero_x,x
+    sta cell_x
+    lda hero_y,x
+    sta cell_y
     txa
     pha
     jsr sub_78fc
@@ -5696,7 +5707,7 @@ data_6d80 = sub_59b0+5072
     asl a
     tay
     lda data_007b
-    sta data_0da0,y
+    sta view_room,y
     cpx #0
     bne code_7551
     jsr sub_7795
@@ -5727,12 +5738,12 @@ data_6d80 = sub_59b0+5072
     rts
 ; &756b referenced 1 time by &7518
 .code_756b
-    inc data_0b70,x
-    lda data_0b70,x
+    inc hero_missile_damage,x
+    lda hero_missile_damage,x
     cmp #&0a
     bne code_75e2
     lda #9
-    sta data_0b70,x
+    sta hero_missile_damage,x
     bne code_75e2
 ; &757c referenced 1 time by &714d
 .code_757c
@@ -5748,44 +5759,44 @@ data_6d80 = sub_59b0+5072
     tay
     pla
     tax
-    lda data_0b40,x
+    lda monster_hit_points,x
     sec
-    sbc data_0b80,y
+    sbc missile_damage,y
     bpl code_75a6
     lda #&15
-    sta data_7e52,x
-    lda data_7cff
-    sta data_0b40,x
+    sta monster_sprite,x
+    lda monster_start_hit_points
+    sta monster_hit_points,x
     tya
     tax
     jmp code_7150
 ; &75a6 referenced 1 time by &7594
 .code_75a6
-    sta data_0b40,x
+    sta monster_hit_points,x
     tya
     pha
     jmp code_7130
 ; &75ae referenced 1 time by &74fc
 .code_75ae
     sec
-    lda data_0dd0,x
+    lda hero_panel_y,x
     sbc #&0c
     sta plot_y
     lda #&4e ; 'N'
     sta plot_x
     lda #&73 ; 's'
     sec
-    sbc data_0cd0,x
+    sbc hero_damage_taken,x
     sta sprite_number
     jmp code_7611
 ; &75c5 referenced 1 time by &7529
 .code_75c5
-    lda data_0b20,x
+    lda hero_max_missiles,x
     asl a
     clc
-    adc data_0b20,x
+    adc hero_max_missiles,x
     adc #&0d
-    adc data_0dd0,x
+    adc hero_panel_y,x
     sec
     sbc #&0e
     sta plot_y
@@ -5799,10 +5810,10 @@ data_6d80 = sub_59b0+5072
     lda #&4c ; 'L'
     sta plot_x
     sec
-    lda data_0dd0,x
+    lda hero_panel_y,x
     sbc #4
     sta plot_y
-    lda data_0b70,x
+    lda hero_missile_damage,x
     clc
     adc #&69 ; 'i'
     sta sprite_number
@@ -5812,7 +5823,7 @@ data_6d80 = sub_59b0+5072
     lda #&4a ; 'J'
     sta plot_x
     sec
-    lda data_0dd0,x
+    lda hero_panel_y,x
     sbc #8
     sta plot_y
     rts
@@ -5835,14 +5846,14 @@ data_6d80 = sub_59b0+5072
     rts
 ; &7619 referenced 1 time by &6ebe
 .code_7619
-    dec data_0b26,x
+    dec hero_magic_delay,x
     beq code_761f
     rts
 ; &761f referenced 1 time by &761c
 .code_761f
     lda #1
-    sta data_0b26,x
-    lda data_0b24,x
+    sta hero_magic_delay,x
+    lda hero_magic_key,x
     jsr sub_7c95
     bne code_76ab
     txa
@@ -5858,7 +5869,7 @@ data_6d80 = sub_59b0+5072
     pla
     tax
     lda #4
-    sta data_0b26,x
+    sta hero_magic_delay,x
     cpx #1
     beq code_7650
     ldy #6
@@ -5876,32 +5887,32 @@ data_6d80 = sub_59b0+5072
     dey
     bne code_7652
     lda #0
-    sta data_0b28
+    sta magic_kill_count
     txa
     asl a
     sta sprite_number
     ldx #&1e
 ; &7667 referenced 1 time by &7693
 .loop_7667
-    lda data_7e00,x
-    sta data_0d02
-    lda data_7e29,x
-    sta data_0d03
+    lda monster_x,x
+    sta cell_x
+    lda monster_y,x
+    sta cell_y
     txa
     pha
     jsr sub_78fc
     pla
     tax
     ldy sprite_number
-    lda data_0da0,y
+    lda view_room,y
     cmp data_007b
     bne code_7692
-    lda data_7e52,x
+    lda monster_sprite,x
     cmp #&15
     bcs code_7692
     lda #&15
-    sta data_7e52,x
-    inc data_0b28
+    sta monster_sprite,x
+    inc magic_kill_count
 ; &7692 referenced 2 times by &7681, &7688
 .code_7692
     dex
@@ -5909,7 +5920,7 @@ data_6d80 = sub_59b0+5072
     lda sprite_number
     lsr a
     tax
-    ldy data_0b28
+    ldy magic_kill_count
 ; &769c referenced 1 time by &76a8
 .code_769c
     cpy #0
@@ -5929,7 +5940,7 @@ data_6d80 = sub_59b0+5072
     jmp code_7096
 ; &76b1 referenced 2 times by &7150, &71a2
 .sub_76b1
-    ldy data_0d64,x
+    ldy missile_sprite_base,x
     txa
     pha
     tya
@@ -5960,20 +5971,20 @@ data_6d80 = sub_59b0+5072
     rts
 ; &76da referenced 1 time by &6e91
 .sub_76da
-    dec data_0d30,x
+    dec hero_offset_y,x
     beq code_76e0
     rts
 ; &76e0 referenced 1 time by &76dd
 .code_76e0
     lda #2
-    sta data_0d30,x
+    sta hero_offset_y,x
     jsr sub_777a
     lda #0
     sta data_007d
     sta data_007e
-    lda data_0d20,x
+    lda hero_frame,x
     tay
-    lda data_0b30,y
+    lda hero_arrival_sprites,y
     sta sprite_number
     txa
     pha
@@ -5981,8 +5992,8 @@ data_6d80 = sub_59b0+5072
     pla
     tax
     clc
-    lda data_0d20,x
-    adc data_0d2a,x
+    lda hero_frame,x
+    adc hero_offset_x,x
     cmp #9
     bcc code_770b
     lda #8
@@ -5991,27 +6002,27 @@ data_6d80 = sub_59b0+5072
     cmp #0
     bne code_772e
     lda #5
-    sta data_0d1a,x
+    sta hero_direction,x
     lda #0
-    sta data_0d25,x
-    sta data_0d2a,x
-    sta data_0d30,x
-    sta data_0d20,x
+    sta hero_step,x
+    sta hero_offset_x,x
+    sta hero_offset_y,x
+    sta hero_frame,x
     lda #&21 ; '!'
-    sta data_0d90,x
-    sta data_0d95,x
+    sta hero_health_tens,x
+    sta hero_health_units,x
     jsr sub_7221
     rts
 ; &772e referenced 1 time by &770d
 .code_772e
-    sta data_0d20,x
+    sta hero_frame,x
     rts
 ; &7732 referenced 2 times by &70a4, &7244
 .sub_7732
     jsr sub_777a
-    lda data_0d2a,x
+    lda hero_offset_x,x
     sta data_007d
-    lda data_0d30,x
+    lda hero_offset_y,x
     sta data_007e
     txa
     pha
@@ -6021,12 +6032,12 @@ data_6d80 = sub_59b0+5072
     rts
 ; &7747 referenced 1 time by &70e1
 .sub_7747
-    lda data_0d64,x
+    lda missile_sprite_base,x
     cmp #&10
     bne code_7757
-    lda data_0d20
+    lda hero_frame
     eor #1
-    sta data_0d20
+    sta hero_frame
     rts
 ; &7757 referenced 1 time by &774c
 .code_7757
@@ -6052,10 +6063,10 @@ data_6d80 = sub_59b0+5072
     rts
 ; &777a referenced 2 times by &76e5, &7732
 .sub_777a
-    lda data_0d10,x
-    sta data_0d02
-    lda data_0d15,x
-    sta data_0d03
+    lda hero_x,x
+    sta cell_x
+    lda hero_y,x
+    sta cell_y
     rts
     equb &73
 ; &7788 referenced 1 time by &3c42
@@ -6070,8 +6081,8 @@ data_6d80 = sub_59b0+5072
     lda #1
     sta plot_y
     lda #1
-    sta data_0d02
-    lda data_0da0
+    sta cell_x
+    lda view_room
     sta data_007b
     jsr sub_77de
     rts
@@ -6080,7 +6091,7 @@ data_6d80 = sub_59b0+5072
     lda #1
     sta plot_y
     lda #&23 ; '#'
-    sta data_0d02
+    sta cell_x
     lda data_0da2
     sta data_007b
     jsr sub_77de
@@ -6090,7 +6101,7 @@ data_6d80 = sub_59b0+5072
     lda #&67 ; 'g'
     sta plot_y
     lda #1
-    sta data_0d02
+    sta cell_x
     lda data_0da4
     sta data_007b
     jsr sub_77de
@@ -6100,7 +6111,7 @@ data_6d80 = sub_59b0+5072
     lda #&67 ; 'g'
     sta plot_y
     lda #&23 ; '#'
-    sta data_0d02
+    sta cell_x
     lda data_0da6
     sta data_007b
     jsr sub_77de
@@ -6114,7 +6125,7 @@ data_6d80 = sub_59b0+5072
 ; &77e4 referenced 1 time by &77fa
 .loop_77e4
     lda (data_007b),y
-    sta data_0d00
+    sta scratch
     tya
     pha
     jsr sub_7820
@@ -6130,14 +6141,14 @@ data_6d80 = sub_59b0+5072
     ldx #&14
 ; &77fe referenced 1 time by &781d
 .loop_77fe
-    lda data_2200,x
-    sta data_0d02
-    lda data_2220,x
-    sta data_0d03
+    lda door_x,x
+    sta cell_x
+    lda door_y,x
+    sta cell_y
     lda #0
     sta data_007d
     sta data_007e
-    lda data_2240,x
+    lda door_sprite,x
     sta sprite_number
     txa
     pha
@@ -6149,16 +6160,16 @@ data_6d80 = sub_59b0+5072
     rts
 ; &7820 referenced 1 time by &77eb
 .sub_7820
-    lda data_0d02
+    lda cell_x
     sta plot_x
     ldx #&80
 ; &7827 referenced 1 time by &784f
 .loop_7827
     txa
     pha
-    sta data_0d01
-    lda data_0d00
-    and data_0d01
+    sta scratch2
+    lda scratch
+    and scratch2
     beq code_783e
     lda #0
     sta sprite_number
@@ -6182,83 +6193,83 @@ data_6d80 = sub_59b0+5072
     rts
 ; &7852 referenced 19 times by &38e8, &3940, &4476, &451c, &45a1, &46ad, &46f7, &472c, &7091, &70f9, &7213, &7320, &76f9, &7741, &7817, &79db, &7a07, &7b25, &7b5c
 .sub_7852
-    lda data_0d03
+    lda cell_y
     and #&f8
-    sta data_0d00
+    sta scratch
     clc
-    adc data_0d00
-    adc data_0d00
-    adc data_0d00
-    sta data_0d04
-    lda data_0d02
+    adc scratch
+    adc scratch
+    adc scratch
+    sta cell_room
+    lda cell_x
     and #&f8
-    adc data_0d04
-    sta data_0d04
-    lda data_0d02
+    adc cell_room
+    sta cell_room
+    lda cell_x
     and #7
     asl a
     asl a
     clc
     adc data_007d
-    sta data_0d02
-    lda data_0d03
+    sta cell_x
+    lda cell_y
     and #7
     asl a
     asl a
-    sta data_0d00
+    sta scratch
     asl a
     clc
-    adc data_0d00
+    adc scratch
     adc data_007e
-    sta data_0d03
-    lda data_0da0
-    cmp data_0d04
+    sta cell_y
+    lda view_room
+    cmp cell_room
     bne code_78ad
     clc
     lda #1
-    adc data_0d02
+    adc cell_x
     sta plot_x
     lda #1
-    adc data_0d03
+    adc cell_y
     sta plot_y
     jsr plot_sprite
 ; &78ad referenced 1 time by &7899
 .code_78ad
     lda data_0da2
-    cmp data_0d04
+    cmp cell_room
     bne code_78c7
     clc
     lda #&23 ; '#'
-    adc data_0d02
+    adc cell_x
     sta plot_x
     lda #1
-    adc data_0d03
+    adc cell_y
     sta plot_y
     jsr plot_sprite
 ; &78c7 referenced 1 time by &78b3
 .code_78c7
     lda data_0da4
-    cmp data_0d04
+    cmp cell_room
     bne code_78e1
     clc
     lda #1
-    adc data_0d02
+    adc cell_x
     sta plot_x
     lda #&67 ; 'g'
-    adc data_0d03
+    adc cell_y
     sta plot_y
     jsr plot_sprite
 ; &78e1 referenced 1 time by &78cd
 .code_78e1
     lda data_0da6
-    cmp data_0d04
+    cmp cell_room
     bne return_9
     clc
     lda #&23 ; '#'
-    adc data_0d02
+    adc cell_x
     sta plot_x
     lda #&67 ; 'g'
-    adc data_0d03
+    adc cell_y
     sta plot_y
     jsr plot_sprite
 ; &78fb referenced 1 time by &78e7
@@ -6266,59 +6277,59 @@ data_6d80 = sub_59b0+5072
     rts
 ; &78fc referenced 5 times by &6fb2, &712b, &753a, &7675, &7a51
 .sub_78fc
-    lda data_0d03
+    lda cell_y
     and #&f8
-    sta data_0d00
+    sta scratch
     clc
-    adc data_0d00
-    adc data_0d00
-    adc data_0d00
+    adc scratch
+    adc scratch
+    adc scratch
     sta data_007b
-    lda data_0d02
+    lda cell_x
     and #&f8
     adc data_007b
     sta data_007b
     lda #&0c
     sta data_007c
-    lda data_0d02
+    lda cell_x
     and #7
     tax
-    lda data_0dc0,x
-    sta data_0d00
-    lda data_0d03
+    lda bit_masks,x
+    sta scratch
+    lda cell_y
     and #7
     tay
     lda (data_007b),y
-    and data_0d00
+    and scratch
     sta data_008f
     tay
     rts
 ; &7938 referenced 2 times by &70b5, &7166
 .sub_7938
-    lda data_0d03
+    lda cell_y
     and #&f8
-    sta data_0d00
+    sta scratch
     clc
-    adc data_0d00
-    adc data_0d00
-    adc data_0d00
+    adc scratch
+    adc scratch
+    adc scratch
     sta data_007b
-    lda data_0d02
+    lda cell_x
     and #&f8
     adc data_007b
     sta data_007b
     lda #&21 ; '!'
     sta data_007c
-    lda data_0d02
+    lda cell_x
     and #7
     tax
-    lda data_0dc0,x
-    sta data_0d00
-    lda data_0d03
+    lda bit_masks,x
+    sta scratch
+    lda cell_y
     and #7
     tay
     lda (data_007b),y
-    and data_0d00
+    and scratch
     sta data_008f
     tay
     rts
@@ -6327,13 +6338,13 @@ data_6d80 = sub_59b0+5072
     ldx #&1e
 ; &7976 referenced 1 time by &798e
 .loop_7976
-    cpx data_0d00
+    cpx scratch
     beq code_798d
-    lda data_0d02
-    cmp data_7e00,x
+    lda cell_x
+    cmp monster_x,x
     bne code_798d
-    lda data_0d03
-    cmp data_7e29,x
+    lda cell_y
+    cmp monster_y,x
     bne code_798d
     tay
     rts
@@ -6341,18 +6352,18 @@ data_6d80 = sub_59b0+5072
 .code_798d
     dex
     bne loop_7976
-    lda data_0d00
+    lda scratch
     beq code_79bc
     ldx #0
 ; &7997 referenced 1 time by &79ba
 .loop_7997
-    lda data_0d02
-    cmp data_0d10,x
+    lda cell_x
+    cmp hero_x,x
     bne code_79b7
-    lda data_0d03
-    cmp data_0d15,x
+    lda cell_y
+    cmp hero_y,x
     bne code_79b7
-    ldy data_0cd0,x
+    ldy hero_damage_taken,x
 ; &79aa referenced 1 time by &79b2
 .loop_79aa
     tya
@@ -6385,9 +6396,9 @@ data_6d80 = sub_59b0+5072
 ; &79cd referenced 1 time by &79e1
 .loop_79cd
     lda data_0b8f,x
-    sta data_0d02
+    sta cell_x
     lda data_0b97,x
-    sta data_0d03
+    sta cell_y
     txa
     pha
     jsr sub_7852
@@ -6400,122 +6411,122 @@ data_6d80 = sub_59b0+5072
 .code_79e5
     txa
     pha
-    lda data_7e00,x
-    sta data_0d02
-    sta data_0d06
-    lda data_7e29,x
-    sta data_0d03
-    sta data_0d07
+    lda monster_x,x
+    sta cell_x
+    sta previous_x
+    lda monster_y,x
+    sta cell_y
+    sta previous_y
     lda #&15
     sta sprite_number
-    lda data_7ea4,x
+    lda monster_offset_x,x
     sta data_007d
-    lda data_7ecd,x
+    lda monster_offset_y,x
     sta data_007e
     jsr sub_7852
     pla
     pha
     tax
-    lda data_7e52,x
+    lda monster_sprite,x
     cmp #&15
     bcc code_7a17
     jmp code_7b31
 ; &7a17 referenced 1 time by &7a12
 .code_7a17
-    lda data_7ef6,x
+    lda monster_step,x
     beq code_7a23
     jsr sub_7c2b
     pla
     jmp code_7b04
 ; &7a23 referenced 1 time by &7a1a
 .code_7a23
-    lda data_7e52,x
+    lda monster_sprite,x
     cmp #9
     bne code_7a2d
-    dec data_7e29,x
+    dec monster_y,x
 ; &7a2d referenced 1 time by &7a28
 .code_7a2d
     cmp #&0b
     bne code_7a34
-    inc data_7e00,x
+    inc monster_x,x
 ; &7a34 referenced 1 time by &7a2f
 .code_7a34
     cmp #&0d
     bne code_7a3b
-    inc data_7e29,x
+    inc monster_y,x
 ; &7a3b referenced 1 time by &7a36
 .code_7a3b
     cmp #&0f
     bne code_7a42
-    dec data_7e00,x
+    dec monster_x,x
 ; &7a42 referenced 1 time by &7a3d
 .code_7a42
     jsr sub_7beb
-    lda data_7e00,x
-    sta data_0d02
-    lda data_7e29,x
-    sta data_0d03
+    lda monster_x,x
+    sta cell_x
+    lda monster_y,x
+    sta cell_y
     jsr sub_78fc
     beq code_7a87
     pla
     tax
-    lda data_0d06
-    sta data_7e00,x
-    lda data_0d07
-    sta data_7e29,x
+    lda previous_x
+    sta monster_x,x
+    lda previous_y
+    sta monster_y,x
     lda #0
-    sta data_7ef6,x
-    sta data_7ea4,x
-    sta data_7ecd,x
+    sta monster_step,x
+    sta monster_offset_x,x
+    sta monster_offset_y,x
     lda system_via_t1c_l
     and #7
     clc
     adc #8
-    sta data_7e52,x
+    sta monster_sprite,x
     and #1
     beq code_7a81
     jmp code_7b04
 ; &7a81 referenced 1 time by &7a7c
 .code_7a81
-    inc data_7e52,x
+    inc monster_sprite,x
     jmp code_7b04
 ; &7a87 referenced 1 time by &7a54
 .code_7a87
     pla
     pha
-    sta data_0d00
+    sta scratch
     jsr sub_7974
     cmp #0
     beq code_7ac1
     pla
     tax
-    lda data_0d06
-    sta data_7e00,x
-    lda data_0d07
-    sta data_7e29,x
+    lda previous_x
+    sta monster_x,x
+    lda previous_y
+    sta monster_y,x
     lda #0
-    sta data_7ef6,x
-    sta data_7ea4,x
-    sta data_7ecd,x
+    sta monster_step,x
+    sta monster_offset_x,x
+    sta monster_offset_y,x
     lda system_via_t1c_l
     and #7
     clc
     adc #8
-    sta data_7e52,x
+    sta monster_sprite,x
     and #1
     bne code_7b04
-    inc data_7e52,x
+    inc monster_sprite,x
     jmp code_7b04
 ; &7ac1 referenced 1 time by &7a91
 .code_7ac1
     pla
     tax
-    lda data_7e52,x
+    lda monster_sprite,x
     cmp #9
     beq code_7adc
     cmp #&0d
     beq code_7adc
-    lda data_7e00,x
+    lda monster_x,x
     and #7
     beq code_7aea
     cmp #7
@@ -6523,7 +6534,7 @@ data_6d80 = sub_59b0+5072
     jmp code_7af8
 ; &7adc referenced 2 times by &7ac8, &7acc
 .code_7adc
-    lda data_7e29,x
+    lda monster_y,x
     and #7
     beq code_7aea
     cmp #7
@@ -6532,29 +6543,29 @@ data_6d80 = sub_59b0+5072
 ; &7aea referenced 4 times by &7ad3, &7ad7, &7ae1, &7ae5
 .code_7aea
     lda #0
-    sta data_7ef6,x
-    sta data_7ea4,x
-    sta data_7ecd,x
+    sta monster_step,x
+    sta monster_offset_x,x
+    sta monster_offset_y,x
     jmp code_7b04
 ; &7af8 referenced 2 times by &7ad9, &7ae7
 .code_7af8
-    lda data_0d06
-    sta data_7e00,x
-    lda data_0d07
-    sta data_7e29,x
+    lda previous_x
+    sta monster_x,x
+    lda previous_y
+    sta monster_y,x
 ; &7b04 referenced 6 times by &7a20, &7a7e, &7a84, &7ab9, &7abe, &7af5
 .code_7b04
-    lda data_7e00,x
-    sta data_0d02
-    lda data_7e29,x
-    sta data_0d03
+    lda monster_x,x
+    sta cell_x
+    lda monster_y,x
+    sta cell_y
     clc
-    lda data_7e52,x
-    adc data_7e7b,x
+    lda monster_sprite,x
+    adc monster_frame,x
     sta sprite_number
-    lda data_7ea4,x
+    lda monster_offset_x,x
     sta data_007d
-    lda data_7ecd,x
+    lda monster_offset_y,x
     sta data_007e
     txa
     pha
@@ -6572,8 +6583,8 @@ data_6d80 = sub_59b0+5072
 ; &7b31 referenced 1 time by &7a14
 .code_7b31
     pla
-    inc data_7e52,x
-    lda data_7e52,x
+    inc monster_sprite,x
+    lda monster_sprite,x
     cmp #&1a
     bne code_7b3f
     jmp code_7cb3
@@ -6581,191 +6592,191 @@ data_6d80 = sub_59b0+5072
 .code_7b3f
     txa
     pha
-    lda data_7e00,x
-    sta data_0d02
-    lda data_7e29,x
-    sta data_0d03
-    lda data_7e52,x
+    lda monster_x,x
+    sta cell_x
+    lda monster_y,x
+    sta cell_y
+    lda monster_sprite,x
     sta sprite_number
-    lda data_7ea4,x
+    lda monster_offset_x,x
     sta data_007d
-    lda data_7ecd,x
+    lda monster_offset_y,x
     sta data_007e
     jsr sub_7852
     jmp code_7b28
 ; &7b62 referenced 4 times by &6ece, &6ee1, &6ef4, &6f07
 .sub_7b62
     lda #1
-    sta data_0d25,x
-    lda data_0d1a,x
+    sta hero_step,x
+    lda hero_direction,x
     cmp #1
     bne code_7b79
     lda #0
-    sta data_0d2a,x
+    sta hero_offset_x,x
     lda #&fa
-    sta data_0d30,x
+    sta hero_offset_y,x
     rts
 ; &7b79 referenced 1 time by &7b6c
 .code_7b79
     cmp #3
     bne code_7b88
     lda #0
-    sta data_0d30,x
+    sta hero_offset_y,x
     lda #2
-    sta data_0d2a,x
+    sta hero_offset_x,x
     rts
 ; &7b88 referenced 1 time by &7b7b
 .code_7b88
     cmp #5
     bne code_7b97
     lda #0
-    sta data_0d2a,x
+    sta hero_offset_x,x
     lda #6
-    sta data_0d30,x
+    sta hero_offset_y,x
     rts
 ; &7b97 referenced 1 time by &7b8a
 .code_7b97
     lda #0
-    sta data_0d30,x
+    sta hero_offset_y,x
     lda #&fe
-    sta data_0d2a,x
+    sta hero_offset_x,x
     rts
 ; &7ba2 referenced 1 time by &6eb4
 .sub_7ba2
-    lda data_0d20,x
+    lda hero_frame,x
     eor #1
-    sta data_0d20,x
-    dec data_0d25,x
+    sta hero_frame,x
+    dec hero_step,x
     bne code_7bd6
-    lda data_0d1a,x
+    lda hero_direction,x
     cmp #1
     bne code_7bb9
-    dec data_0d15,x
+    dec hero_y,x
 ; &7bb9 referenced 1 time by &7bb4
 .code_7bb9
     cmp #3
     bne code_7bc0
-    inc data_0d10,x
+    inc hero_x,x
 ; &7bc0 referenced 1 time by &7bbb
 .code_7bc0
     cmp #5
     bne code_7bc7
-    inc data_0d15,x
+    inc hero_y,x
 ; &7bc7 referenced 1 time by &7bc2
 .code_7bc7
     cmp #7
     bne code_7bce
-    dec data_0d10,x
+    dec hero_x,x
 ; &7bce referenced 1 time by &7bc9
 .code_7bce
     lda #0
-    sta data_0d2a,x
-    sta data_0d30,x
+    sta hero_offset_x,x
+    sta hero_offset_y,x
 ; &7bd6 referenced 1 time by &7bad
 .code_7bd6
     clc
-    lda data_0d2a,x
-    adc data_0d2a,x
-    sta data_0d2a,x
+    lda hero_offset_x,x
+    adc hero_offset_x,x
+    sta hero_offset_x,x
     clc
-    lda data_0d30,x
-    adc data_0d30,x
-    sta data_0d30,x
+    lda hero_offset_y,x
+    adc hero_offset_y,x
+    sta hero_offset_y,x
     rts
 ; &7beb referenced 1 time by &7a42
 .sub_7beb
     lda #3
-    sta data_7ef6,x
-    lda data_7e52,x
+    sta monster_step,x
+    lda monster_sprite,x
     cmp #9
     bne code_7c02
     lda #0
-    sta data_7ea4,x
+    sta monster_offset_x,x
     lda #&fd
-    sta data_7ecd,x
+    sta monster_offset_y,x
     rts
 ; &7c02 referenced 1 time by &7bf5
 .code_7c02
     cmp #&0b
     bne code_7c11
     lda #0
-    sta data_7ecd,x
+    sta monster_offset_y,x
     lda #1
-    sta data_7ea4,x
+    sta monster_offset_x,x
     rts
 ; &7c11 referenced 1 time by &7c04
 .code_7c11
     cmp #&0d
     bne code_7c20
     lda #0
-    sta data_7ea4,x
+    sta monster_offset_x,x
     lda #3
-    sta data_7ecd,x
+    sta monster_offset_y,x
     rts
 ; &7c20 referenced 1 time by &7c13
 .code_7c20
     lda #0
-    sta data_7ecd,x
+    sta monster_offset_y,x
     lda #&ff
-    sta data_7ea4,x
+    sta monster_offset_x,x
     rts
 ; &7c2b referenced 1 time by &7a1c
 .sub_7c2b
-    lda data_7e7b,x
+    lda monster_frame,x
     eor #1
-    sta data_7e7b,x
-    dec data_7ef6,x
+    sta monster_frame,x
+    dec monster_step,x
     bne code_7c5f
-    lda data_7e52,x
+    lda monster_sprite,x
     cmp #9
     bne code_7c42
-    dec data_7e29,x
+    dec monster_y,x
 ; &7c42 referenced 1 time by &7c3d
 .code_7c42
     cmp #&0b
     bne code_7c49
-    inc data_7e00,x
+    inc monster_x,x
 ; &7c49 referenced 1 time by &7c44
 .code_7c49
     cmp #&0d
     bne code_7c50
-    inc data_7e29,x
+    inc monster_y,x
 ; &7c50 referenced 1 time by &7c4b
 .code_7c50
     cmp #&0f
     bne code_7c57
-    dec data_7e00,x
+    dec monster_x,x
 ; &7c57 referenced 1 time by &7c52
 .code_7c57
     lda #0
-    sta data_7ea4,x
-    sta data_7ecd,x
+    sta monster_offset_x,x
+    sta monster_offset_y,x
 ; &7c5f referenced 1 time by &7c36
 .code_7c5f
-    lda data_7ea4,x
+    lda monster_offset_x,x
     beq code_7c6f
     bpl code_7c6c
-    dec data_7ea4,x
+    dec monster_offset_x,x
     jmp code_7c6f
 ; &7c6c referenced 1 time by &7c64
 .code_7c6c
-    inc data_7ea4,x
+    inc monster_offset_x,x
 ; &7c6f referenced 2 times by &7c62, &7c69
 .code_7c6f
-    lda data_7ecd,x
+    lda monster_offset_y,x
     beq return_11
     bpl code_7c82
     sec
-    lda data_7ecd,x
+    lda monster_offset_y,x
     sbc #3
-    sta data_7ecd,x
+    sta monster_offset_y,x
     jmp return_11
 ; &7c82 referenced 1 time by &7c74
 .code_7c82
     clc
-    lda data_7ecd,x
+    lda monster_offset_y,x
     adc #3
-    sta data_7ecd,x
+    sta monster_offset_y,x
 ; &7c8b referenced 2 times by &7c72, &7c7f
 .return_11
     rts
@@ -6797,28 +6808,28 @@ data_6d80 = sub_59b0+5072
     rts
 ; &7cb3 referenced 1 time by &7b3c
 .code_7cb3
-    inc data_0b2f
-    lda data_0b2f
+    inc next_trapdoor
+    lda next_trapdoor
     cmp #8
     bne code_7cc2
     lda #0
-    sta data_0b2f
+    sta next_trapdoor
 ; &7cc2 referenced 1 time by &7cbb
 .code_7cc2
-    ldy data_0b2f
-    lda data_0b90,y
-    sta data_7e00,x
-    lda data_0b98,y
-    sta data_7e29,x
+    ldy next_trapdoor
+    lda trapdoor_x,y
+    sta monster_x,x
+    lda trapdoor_y,y
+    sta monster_y,x
     lda #9
-    sta data_7e52,x
+    sta monster_sprite,x
     lda #0
-    sta data_7ef6,x
-    sta data_7ea4,x
-    sta data_7ecd,x
+    sta monster_step,x
+    sta monster_offset_x,x
+    sta monster_offset_y,x
     txa
     pha
-    stx data_0d00
+    stx scratch
     jsr sub_7974
     cmp #0
     beq code_7cfb
@@ -6826,19 +6837,20 @@ data_6d80 = sub_59b0+5072
     pha
     tax
     lda #&ff
-    sta data_7e00,x
-    sta data_7e29,x
+    sta monster_x,x
+    sta monster_y,x
     jmp code_7b28
 ; &7cfb referenced 1 time by &7ceb
 .code_7cfb
     jmp code_7b28
-.sub_7cfe
+    equb &00
 ; &7cff referenced 3 times by &355b, &3ccf, &759b
-data_7cff = sub_7cfe+1
+.monster_start_hit_points
+    equb &08
 ; &7d00 used as index base 1 time by &3be2
-data_7d00 = sub_7cfe+2
-    equb &00, &08, &00, &00, &1f, &1f, &d2, &d2
-    equb &cc, &b1, &07, &07, &01, &01, &00
+.workspace_template
+    equb &00, &00, &1f, &1f, &d2, &d2, &cc, &b1
+    equb &07, &07, &01, &01, &00
     equs ",4<"
     equb &0b, &0b, &0c, &0c, &2f, &0b, &0c, &0b
     equb &0c, &26, &01, &03, &05, &07, &2d, &2f
@@ -6877,85 +6889,93 @@ data_7dd0 = sub_7db9+23
     equb &40, &0d, &8e, &ff, &0d, &68, &a8, &68
     equb &aa
     equs "h(`"
-.sub_7ded
-; &7e00 used as index base 17 times by &3ccc, &7667, &797e, &79e7, &7a31, &7a3f, &7a45, &7a5b, &7a98, &7ace, &7afb, &7b04, &7b41, &7c46, &7c54, &7cc8, &7cf2
-data_7e00 = sub_7ded+19
-; &7e23 referenced 2 times by &4469, &4479
-data_7e23 = sub_7ded+54
-; &7e29 used as index base 16 times by &766d, &7986, &79f0, &7a2a, &7a38, &7a4b, &7a61, &7a9e, &7adc, &7b01, &7b0a, &7b47, &7c3f, &7c4d, &7cce, &7cf5
-data_7e29 = sub_7ded+60
     equb &de, &dd, &df, &f0, &f2, &f1, &f3, &f8
     equb &fa, &f9, &fb, &f4, &f6, &f5, &f7, &fc
-    equb &1e, &fd, &00, &00, &04, &0b, &09, &1d
-    equb &08, &01, &06, &07, &0a, &01, &0b, &1a
-    equb &06, &0b, &16, &15, &0d, &1b, &14, &1a
-    equb &09, &1c, &0f, &1e, &02, &1a, &0b, &1c
-    equb &0e, &16, &00, &00, &00, &00, &1a, &00
-    equb &00, &00, &00, &00, &00, &24, &17
+    equb &1e, &fd, &00
+; &7e00 used as index base 17 times by &3ccc, &7667, &797e, &79e7, &7a31, &7a3f, &7a45, &7a5b, &7a98, &7ace, &7afb, &7b04, &7b41, &7c46, &7c54, &7cc8, &7cf2
+.monster_x
+; &7e23 referenced 2 times by &4469, &4479
+data_7e23 = monster_x+35
+    equb &00, &04, &0b, &09, &1d, &08, &01, &06
+    equb &07, &0a, &01, &0b, &1a, &06, &0b, &16
+    equb &15, &0d, &1b, &14, &1a, &09, &1c, &0f
+    equb &1e, &02, &1a, &0b, &1c, &0e, &16, &00
+    equb &00, &00, &00, &1a, &00, &00, &00, &00
+    equb &00
+; &7e29 used as index base 16 times by &766d, &7986, &79f0, &7a2a, &7a38, &7a4b, &7a61, &7a9e, &7adc, &7b01, &7b0a, &7b47, &7c3f, &7c4d, &7cce, &7cf5
+.monster_y
+    equb &00, &24, &17
     equs "% $", &22
 .sub_7e30
 ; &7e4c referenced 2 times by &4463, &447f
 data_7e4c = sub_7e30+28
-; &7e52 used as index base 19 times by &3cc7, &7144, &7598, &7683, &768c, &7a0d, &7a23, &7a77, &7a81, &7ab4, &7abb, &7ac3, &7b11, &7b32, &7b35, &7b4d, &7bf0, &7c38, &7cd3
-data_7e52 = sub_7e30+34
-; &7e7b used as index base 3 times by &7b14, &7c2b, &7c30
-data_7e7b = sub_7e30+75
-; &7ea4 used as index base 15 times by &79fd, &7a69, &7aa6, &7aef, &7b19, &7b52, &7bf9, &7c0d, &7c17, &7c27, &7c59, &7c5f, &7c66, &7c6c, &7cdb
-data_7ea4 = sub_7e30+116
-; &7ecd used as index base 17 times by &7a02, &7a6c, &7aa9, &7af2, &7b1e, &7b57, &7bfe, &7c08, &7c1c, &7c22, &7c5c, &7c6f, &7c77, &7c7c, &7c83, &7c88, &7cde
-data_7ecd = sub_7e30+157
-; &7ef6 used as index base 7 times by &7a17, &7a66, &7aa3, &7aec, &7bed, &7c33, &7cd8
-data_7ef6 = sub_7e30+198
-; &7f20 used as index base 9 times by &3c55, &7173, &719a, &730d, &7337, &73ea, &7413, &7469, &74bb
-data_7f20 = sub_7e30+240
-; &7f3e referenced 3 times by &467b, &46b7, &46c5
-data_7f3e = sub_7e30+270
-; &7f3f used as index base 9 times by &3c5b, &717b, &719d, &7313, &7342, &73f3, &7416, &746c, &74be
-data_7f3f = sub_7e30+271
     equb &14, &27, &0d, &20, &01, &26, &0a, &01
     equb &12, &05, &20, &29, &0d, &26, &27, &08
     equb &06, &1a, &14, &03, &1d, &07, &0d, &17
     equb &00, &00, &00, &00, &1b, &00, &00, &00
-    equb &00, &00, &00, &09, &0d, &0b, &0b, &0b
-    equb &09, &0f, &0f, &0b, &0d, &0b, &0b, &0f
-    equb &0d, &0d, &09, &0f, &0b, &0f, &0b, &0b
-    equb &0f, &09, &0d, &0f, &0b, &09, &0d, &0b
-    equb &09, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &01, &00, &00
-    equb &01, &01, &00, &01, &01, &00, &01, &01
-    equb &01, &00, &01, &00, &01, &00, &01, &01
-    equb &00, &00, &01, &01, &00, &00, &00, &01
-    equb &01, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &02
-    equb &02, &02, &00, &fd, &fe, &01, &00, &02
-    equb &03, &00, &00, &00, &00, &fe, &00, &00
-    equb &01, &00, &00, &00, &00, &00, &03, &00
+    equb &00, &00
+; &7e52 used as index base 19 times by &3cc7, &7144, &7598, &7683, &768c, &7a0d, &7a23, &7a77, &7a81, &7ab4, &7abb, &7ac3, &7b11, &7b32, &7b35, &7b4d, &7bf0, &7c38, &7cd3
+.monster_sprite
+    equb &00, &09, &0d, &0b, &0b, &0b, &09, &0f
+    equb &0f, &0b, &0d, &0b, &0b, &0f, &0d, &0d
+    equb &09, &0f, &0b, &0f, &0b, &0b, &0f, &09
+    equb &0d, &0f, &0b, &09, &0d, &0b, &09, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &fd, &00
-    equb &00, &00, &00, &fa, &00, &00, &00, &03
-    equb &00, &00, &00, &06, &03, &fd, &00, &00
-    equb &00, &00, &00, &00, &00, &06, &00, &00
-    equb &f7, &00, &00, &f7, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &03
-    equb &00, &02, &02, &02, &02, &01, &02, &03
-    equb &03, &02, &01, &00, &02, &03, &03, &02
-    equb &00, &00, &03, &00, &00, &00, &02, &00
-    equb &01, &01, &00, &00, &01, &00, &00, &00
+    equb &00
+; &7e7b used as index base 3 times by &7b14, &7c2b, &7c30
+.monster_frame
+    equb &00, &00, &01, &00, &00, &01, &01, &00
+    equb &01, &01, &00, &01, &01, &01, &00, &01
+    equb &00, &01, &00, &01, &01, &00, &00, &01
+    equb &01, &00, &00, &00, &01, &01, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00
+; &7ea4 used as index base 15 times by &79fd, &7a69, &7aa6, &7aef, &7b19, &7b52, &7bf9, &7c0d, &7c17, &7c27, &7c59, &7c5f, &7c66, &7c6c, &7cdb
+.monster_offset_x
+    equb &00, &00, &00, &02, &02, &02, &00, &fd
+    equb &fe, &01, &00, &02, &03, &00, &00, &00
+    equb &00, &fe, &00, &00, &01, &00, &00, &00
+    equb &00, &00, &03, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00
+; &7ecd used as index base 17 times by &7a02, &7a6c, &7aa9, &7af2, &7b1e, &7b57, &7bfe, &7c08, &7c1c, &7c22, &7c5c, &7c6f, &7c77, &7c7c, &7c83, &7c88, &7cde
+.monster_offset_y
+    equb &00, &fd, &00, &00, &00, &00, &fa, &00
+    equb &00, &00, &03, &00, &00, &00, &06, &03
+    equb &fd, &00, &00, &00, &00, &00, &00, &00
+    equb &06, &00, &00, &f7, &00, &00, &f7, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00
+; &7ef6 used as index base 7 times by &7a17, &7a66, &7aa3, &7aec, &7bed, &7c33, &7cd8
+.monster_step
+    equb &00, &03, &00, &02, &02, &02, &02, &01
+    equb &02, &03, &03, &02, &01, &00, &02, &03
+    equb &03, &02, &00, &00, &03, &00, &00, &00
+    equb &02, &00, &01, &01, &00, &00, &01, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00
+; &7f20 used as index base 9 times by &3c55, &7173, &719a, &730d, &7337, &73ea, &7413, &7469, &74bb
+.object_x
     equb &00, &ff, &ff, &ff, &ff, &ff, &18, &04
     equb &04, &05, &ff, &ff, &ff, &ff, &ff, &ff
     equb &ff, &ff, &ff, &ff, &ff, &01, &07, &04
-    equb &04, &ff, &ff, &ff, &ff, &ff, &04, &00
-    equb &ff, &ff, &ff, &ff, &ff, &15, &18, &19
-    equb &19, &ff, &ff, &ff, &ff, &ff, &ff, &ff
-    equb &ff, &ff, &ff, &ff
+    equb &04, &ff, &ff, &ff, &ff, &ff
+; &7f3e referenced 3 times by &467b, &46b7, &46c5
+.exit_x
+    equb &04
+; &7f3f used as index base 9 times by &3c5b, &717b, &719d, &7313, &7342, &73f3, &7416, &746c, &74be
+.object_y
+    equb &00, &ff, &ff, &ff, &ff, &ff, &15, &18
+    equb &19, &19, &ff, &ff, &ff, &ff, &ff, &ff
+    equb &ff, &ff, &ff, &ff, &ff
     equs "**+."
-.sub_7f58
+    equb &ff, &ff, &ff, &ff, &ff
 ; &7f5d referenced 3 times by &4683, &46bd, &46c8
-data_7f5d = sub_7f58+5
+.exit_y
+    equb &2c
 ; &7f5e used as index base 7 times by &3c61, &7183, &718e, &7191, &7319, &735c, &73c8
-data_7f5e = sub_7f58+6
-    equb &ff, &ff, &ff, &ff, &ff, &2c, &00
+.object_type
+    equb &00
     equs "___)c_S+S((``(*b(()(++++)(()(Q"
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -7068,596 +7088,597 @@ save "Dun1", &2000, &8000, &2000, &2000
 save "Coder", &5000, &59b0, &5000, &5000
 
 ; Label references by decreasing frequency:
-;     plot_x:              63
-;     oswrch:              60
-;     data_0d02:           54
-;     data_0d03:           49
-;     sprite_number:       45
-;     data_0d00:           44
-;     plot_y:              37
-;     data_0d10:           29
-;     osbyte:              27
-;     data_0d15:           26
-;     data_007b:           21
-;     plot_sprite:         21
-;     data_0d30:           20
-;     data_0d1a:           19
-;     data_0d2a:           19
-;     data_7e52:           19
-;     sub_7852:            19
-;     data_007d:           18
-;     data_007e:           18
-;     data_7e00:           17
-;     data_7ecd:           17
-;     data_7e29:           16
-;     sprite_width:        16
-;     data_0d20:           15
-;     data_7ea4:           15
-;     data_0600:           14
-;     data_0d25:           13
-;     osword:              13
-;     screen_ptr:          13
-;     code_0d58:           12
-;     data_0080:           12
-;     data_0581:           12
-;     sub_119a:            12
-;     data_0081:           11
-;     data_0d06:           11
-;     data_0d07:           11
-;     data_0d90:           11
-;     data_0b20:            9
-;     data_0dd0:            9
-;     data_7f20:            9
-;     data_7f3f:            9
-;     screen_ptr_hi:        9
-;     data_0601:            8
-;     data_08b4:            8
-;     data_0b2a:            8
-;     data_0ba8:            8
-;     data_0bac:            8
-;     data_0ff1:            8
-;     data_22e0:            8
-;     sub_7221:             8
-;     data_008f:            7
-;     data_0b70:            7
-;     data_0cd0:            7
-;     data_0d04:            7
-;     data_0d95:            7
-;     data_7ef6:            7
-;     data_7f5e:            7
-;     os_vsync_counter:     7
-;     sprite_height:        7
-;     code_0d40:            6
-;     code_0d4c:            6
-;     code_7b04:            6
-;     data_0082:            6
-;     data_0524:            6
-;     data_06f8:            6
-;     data_08bc:            6
-;     data_0d01:            6
-;     data_2260:            6
-;     data_2280:            6
-;     sub_7c95:             6
-;     code_7075:            5
-;     code_71d9:            5
-;     data_0084:            5
-;     data_07e6:            5
-;     data_08b0:            5
-;     data_08bd:            5
-;     data_08be:            5
-;     data_0b2f:            5
-;     data_0ba0:            5
-;     data_0ba4:            5
-;     data_0da0:            5
-;     data_0ff2:            5
-;     data_169f:            5
-;     sub_0f68:             5
-;     sub_728c:             5
-;     sub_78fc:             5
-;     code_1ec6:            4
-;     code_1f00:            4
-;     code_6f79:            4
-;     code_703b:            4
-;     code_7096:            4
-;     code_70c1:            4
-;     code_7611:            4
-;     code_7aea:            4
-;     code_7ff6:            4
-;     data_007c:            4
-;     data_008e:            4
-;     data_041e:            4
-;     data_045a:            4
-;     data_0602:            4
-;     data_09f3:            4
-;     data_0b40:            4
-;     data_0d64:            4
-;     data_2200:            4
-;     data_2220:            4
-;     data_22e5:            4
-;     data_22f0:            4
-;     data_22f5:            4
-;     sub_729b:             4
-;     sub_77de:             4
-;     sub_7974:             4
-;     sub_7b62:             4
-;     wrchv:                4
-;     wrchv + 1:            4
-;     code_1db2:            3
-;     code_1f36:            3
-;     code_504a:            3
-;     code_7266:            3
-;     code_72bc:            3
-;     code_7470:            3
-;     code_76d4:            3
-;     code_798d:            3
-;     code_7b28:            3
-;     data_008d:            3
-;     data_0287:            3
-;     data_09f0:            3
-;     data_09f1:            3
-;     data_09f2:            3
-;     data_0b26:            3
-;     data_0b28:            3
-;     data_0b80:            3
-;     data_0db5:            3
-;     data_0dbc:            3
-;     data_0dc0:            3
-;     data_7cff:            3
-;     data_7dd0:            3
-;     data_7e7b:            3
-;     data_7f3e:            3
-;     data_7f5d:            3
-;     data_d9cd:            3
-;     osasci:               3
-;     oscli:                3
-;     osrdch:               3
-;     sprite_data_ptr:      3
-;     sub_11ac:             3
-;     system_via_t1c_l:     3
-;     user_char_128:        3
-;     code_108a:            2
-;     code_1097:            2
-;     code_111c:            2
-;     code_11bb:            2
-;     code_1e28:            2
-;     code_1ebe:            2
-;     code_1f91:            2
-;     code_512d:            2
-;     code_6ec1:            2
-;     code_7130:            2
-;     code_7156:            2
-;     code_71d4:            2
-;     code_71d7:            2
-;     code_7201:            2
-;     code_7218:            2
-;     code_73c7:            2
-;     code_7467:            2
-;     code_752c:            2
-;     code_75e2:            2
-;     code_7652:            2
-;     code_7692:            2
-;     code_79b7:            2
-;     code_7adc:            2
-;     code_7af8:            2
-;     code_7c6f:            2
-;     code_7cae:            2
-;     data_0288:            2
-;     data_0289:            2
-;     data_0437:            2
-;     data_0447:            2
-;     data_046b:            2
-;     data_0484:            2
-;     data_0490:            2
-;     data_0528:            2
-;     data_052e:            2
-;     data_0540:            2
-;     data_054d:            2
-;     data_055d:            2
-;     data_056d:            2
-;     data_0576:            2
-;     data_05c0:            2
-;     data_05c3:            2
-;     data_05c9:            2
-;     data_05cb:            2
-;     data_05d6:            2
-;     data_05d7:            2
-;     data_05e4:            2
-;     data_05e9:            2
-;     data_06b4:            2
-;     data_06c9:            2
-;     data_06f0:            2
-;     data_09f4:            2
-;     data_09f5:            2
-;     data_09fa:            2
-;     data_09ff:            2
-;     data_0b2b:            2
-;     data_0b2c:            2
-;     data_0b2d:            2
-;     data_0b90:            2
-;     data_0b98:            2
-;     data_0bfc:            2
-;     data_0cf4:            2
-;     data_0d08:            2
-;     data_0d09:            2
-;     data_0d21:            2
-;     data_0d22:            2
-;     data_0d23:            2
-;     data_0da2:            2
-;     data_0da4:            2
-;     data_0da6:            2
-;     data_12d4:            2
-;     data_2240:            2
-;     data_7e23:            2
-;     data_7e4c:            2
-;     data_e772:            2
-;     mos_oswrch_default:   2
-;     return_11:            2
-;     row_start_ptr:        2
-;     row_start_ptr_hi:     2
-;     saved_wrchv:          2
-;     sprite_data_ptr_hi:   2
-;     sub_0ecf:             2
-;     sub_1149:             2
-;     sub_11f2:             2
-;     sub_161a:             2
-;     sub_74a3:             2
-;     sub_75f9:             2
-;     sub_76b1:             2
-;     sub_7732:             2
-;     sub_777a:             2
-;     sub_7795:             2
-;     sub_77a7:             2
-;     sub_77b9:             2
-;     sub_77cb:             2
-;     sub_7938:             2
-;     bytev:                1
-;     bytev + 1:            1
-;     code_091d:            1
-;     code_0929:            1
-;     code_0938:            1
-;     code_093e:            1
-;     code_0961:            1
-;     code_0d70:            1
-;     code_0d78:            1
-;     code_0d7c:            1
-;     code_0d7f:            1
-;     code_0e08:            1
-;     code_0e09:            1
-;     code_0e14:            1
-;     code_0e45:            1
-;     code_0e57:            1
-;     code_0e6d:            1
-;     code_0e7a:            1
-;     code_0ea8:            1
-;     code_0eae:            1
-;     code_0eb9:            1
-;     code_0efc:            1
-;     code_0f3a:            1
-;     code_1079:            1
-;     code_1084:            1
-;     code_10ba:            1
-;     code_10c7:            1
-;     code_110a:            1
-;     code_1124:            1
-;     code_113c:            1
-;     code_113e:            1
-;     code_1140:            1
-;     code_11d3:            1
-;     code_11de:            1
-;     code_11ec:            1
-;     code_144f:            1
-;     code_1460:            1
-;     code_146f:            1
-;     code_14a2:            1
-;     code_14e5:            1
-;     code_14ec:            1
-;     code_1512:            1
-;     code_1529:            1
-;     code_1540:            1
-;     code_1551:            1
-;     code_1564:            1
-;     code_1577:            1
-;     code_1585:            1
-;     code_159c:            1
-;     code_1cc5:            1
-;     code_1cd8:            1
-;     code_1ce3:            1
-;     code_1cee:            1
-;     code_1cfa:            1
-;     code_1d03:            1
-;     code_1db8:            1
-;     code_1dba:            1
-;     code_1dc2:            1
-;     code_1dce:            1
-;     code_1de6:            1
-;     code_1df3:            1
-;     code_1e35:            1
-;     code_1e45:            1
-;     code_1ec4:            1
-;     code_1ece:            1
-;     code_1ee0:            1
-;     code_1ee7:            1
-;     code_1f17:            1
-;     code_1f2a:            1
-;     code_1f38:            1
-;     code_1f96:            1
-;     code_1f9e:            1
-;     code_1ff2:            1
-;     code_2026:            1
-;     code_5036:            1
-;     code_508b:            1
-;     code_5092:            1
-;     code_50b4:            1
-;     code_50b8:            1
-;     code_50c4:            1
-;     code_50ca:            1
-;     code_50e5:            1
-;     code_510b:            1
-;     code_5113:            1
-;     code_5137:            1
-;     code_513d:            1
-;     code_6e82:            1
-;     code_6e91:            1
-;     code_6e97:            1
-;     code_6eba:            1
-;     code_6ed4:            1
-;     code_6ee7:            1
-;     code_6efa:            1
-;     code_6f0d:            1
-;     code_6f18:            1
-;     code_6f70:            1
-;     code_6f83:            1
-;     code_6f8a:            1
-;     code_6f91:            1
-;     code_6f98:            1
-;     code_6fc7:            1
-;     code_6fd5:            1
-;     code_7002:            1
-;     code_7053:            1
-;     code_7069:            1
-;     code_70d2:            1
-;     code_70da:            1
-;     code_70e7:            1
-;     code_70fe:            1
-;     code_7108:            1
-;     code_710f:            1
-;     code_7116:            1
-;     code_711d:            1
-;     code_7132:            1
-;     code_713a:            1
-;     code_7150:            1
-;     code_71a0:            1
-;     code_71b4:            1
-;     code_71c0:            1
-;     code_71cc:            1
-;     code_7227:            1
-;     code_7263:            1
-;     code_7337:            1
-;     code_7342:            1
-;     code_734d:            1
-;     code_738a:            1
-;     code_73a0:            1
-;     code_73c3:            1
-;     code_73d9:            1
-;     code_740d:            1
-;     code_7429:            1
-;     code_744c:            1
-;     code_7464:            1
-;     code_7477:            1
-;     code_74b6:            1
-;     code_74eb:            1
-;     code_74fc:            1
-;     code_74ff:            1
-;     code_7516:            1
-;     code_7529:            1
-;     code_7551:            1
-;     code_755b:            1
-;     code_7565:            1
-;     code_756b:            1
-;     code_757c:            1
-;     code_75a6:            1
-;     code_75ae:            1
-;     code_75c5:            1
-;     code_7619:            1
-;     code_761f:            1
-;     code_7650:            1
-;     code_769c:            1
-;     code_76ab:            1
-;     code_76ae:            1
-;     code_76c0:            1
-;     code_76c9:            1
-;     code_76d2:            1
-;     code_76e0:            1
-;     code_770b:            1
-;     code_772e:            1
-;     code_7757:            1
-;     code_7764:            1
-;     code_7771:            1
-;     code_783e:            1
-;     code_7845:            1
-;     code_78ad:            1
-;     code_78c7:            1
-;     code_78e1:            1
-;     code_79bc:            1
-;     code_79e5:            1
-;     code_7a17:            1
-;     code_7a23:            1
-;     code_7a2d:            1
-;     code_7a34:            1
-;     code_7a3b:            1
-;     code_7a42:            1
-;     code_7a81:            1
-;     code_7a87:            1
-;     code_7ac1:            1
-;     code_7b31:            1
-;     code_7b3f:            1
-;     code_7b79:            1
-;     code_7b88:            1
-;     code_7b97:            1
-;     code_7bb9:            1
-;     code_7bc0:            1
-;     code_7bc7:            1
-;     code_7bce:            1
-;     code_7bd6:            1
-;     code_7c02:            1
-;     code_7c11:            1
-;     code_7c20:            1
-;     code_7c42:            1
-;     code_7c49:            1
-;     code_7c50:            1
-;     code_7c57:            1
-;     code_7c5f:            1
-;     code_7c6c:            1
-;     code_7c82:            1
-;     code_7cb3:            1
-;     code_7cc2:            1
-;     code_7cfb:            1
-;     code_7fb5:            1
-;     code_7fb8:            1
-;     code_7fbd:            1
-;     code_7fda:            1
-;     data_0000:            1
-;     data_00fa:            1
-;     data_00fc:            1
-;     data_0400:            1
-;     data_0450:            1
-;     data_0500:            1
-;     data_06b0:            1
-;     data_079b:            1
-;     data_07a9:            1
-;     data_07b8:            1
-;     data_07c6:            1
-;     data_07d5:            1
-;     data_07e9:            1
-;     data_09f6:            1
-;     data_09f7:            1
-;     data_09f8:            1
-;     data_09f9:            1
-;     data_09fb:            1
-;     data_09fc:            1
-;     data_09fd:            1
-;     data_09fe:            1
-;     data_0b24:            1
-;     data_0b30:            1
-;     data_0b8f:            1
-;     data_0b97:            1
-;     data_0c3a:            1
-;     data_0d19:            1
-;     data_0d1f:            1
-;     data_0d74:            1
-;     data_0d80:            1
-;     data_0d8f:            1
-;     data_0db0:            1
-;     data_0dfd:            1
-;     data_0dff:            1
-;     data_0f80:            1
-;     data_0f84:            1
-;     data_0f88:            1
-;     data_0f8c:            1
-;     data_0f90:            1
-;     data_0ff0:            1
-;     data_10e7:            1
-;     data_10e8:            1
-;     data_120f:            1
-;     data_1210:            1
-;     data_1625:            1
-;     data_16ff:            1
-;     data_2100:            1
-;     data_213a:            1
-;     data_2d00:            1
-;     data_5171:            1
-;     data_5172:            1
-;     data_5179:            1
-;     data_518e:            1
-;     data_6b00:            1
-;     data_6b20:            1
-;     data_6b40:            1
-;     data_6b60:            1
-;     data_6b75:            1
-;     data_6b8a:            1
-;     data_6ba0:            1
-;     data_6bb5:            1
-;     data_6bd0:            1
-;     data_6bd8:            1
-;     data_6be0:            1
-;     data_6cb0:            1
-;     data_6d80:            1
-;     data_7d00:            1
-;     data_fffc:            1
-;     data_fffd:            1
-;     font_digits:          1
-;     font_letters:         1
-;     game_entry:           1
-;     loop_504c:            1
-;     loop_50ba:            1
-;     loop_50f1:            1
-;     loop_6f28:            1
-;     loop_7007:            1
-;     loop_7173:            1
-;     loop_71dd:            1
-;     loop_71f4:            1
-;     loop_7256:            1
-;     loop_730d:            1
-;     loop_73a7:            1
-;     loop_742b:            1
-;     loop_7498:            1
-;     loop_7667:            1
-;     loop_77e4:            1
-;     loop_77fe:            1
-;     loop_7827:            1
-;     loop_7976:            1
-;     loop_7997:            1
-;     loop_79aa:            1
-;     loop_79cd:            1
-;     loop_7fc5:            1
-;     loop_7fd1:            1
-;     loop_7fe8:            1
-;     mos_row_offsets:      1
-;     mos_row_offsets_lo:   1
-;     return_1:             1
-;     return_10:            1
-;     return_2:             1
-;     return_3:             1
-;     return_4:             1
-;     return_5:             1
-;     return_6:             1
-;     return_7:             1
-;     return_8:             1
-;     return_9:             1
-;     screen_address:       1
-;     sprite_addr_hi:       1
-;     sprite_addr_lo:       1
-;     sprite_heights:       1
-;     sprite_widths:        1
-;     sub_0ef7:             1
-;     sub_1070:             1
-;     sub_10e9:             1
-;     sub_11be:             1
-;     sub_1400:             1
-;     sub_1446:             1
-;     sub_14a0:             1
-;     sub_14d7:             1
-;     sub_1510:             1
-;     sub_1583:             1
-;     sub_15b1:             1
-;     sub_1cc0:             1
-;     sub_203a:             1
-;     sub_2050:             1
-;     sub_2091:             1
-;     sub_6e80:             1
-;     sub_70ca:             1
-;     sub_7305:             1
-;     sub_7329:             1
-;     sub_7606:             1
-;     sub_760d:             1
-;     sub_76da:             1
-;     sub_7747:             1
-;     sub_7788:             1
-;     sub_7820:             1
-;     sub_79c1:             1
-;     sub_7ba2:             1
-;     sub_7beb:             1
-;     sub_7c2b:             1
+;     plot_x:                    63
+;     oswrch:                    60
+;     cell_x:                    54
+;     cell_y:                    49
+;     sprite_number:             45
+;     scratch:                   44
+;     plot_y:                    37
+;     hero_x:                    29
+;     osbyte:                    27
+;     hero_y:                    26
+;     data_007b:                 21
+;     plot_sprite:               21
+;     hero_offset_y:             20
+;     hero_direction:            19
+;     hero_offset_x:             19
+;     monster_sprite:            19
+;     sub_7852:                  19
+;     data_007d:                 18
+;     data_007e:                 18
+;     monster_offset_y:          17
+;     monster_x:                 17
+;     monster_y:                 16
+;     sprite_width:              16
+;     hero_frame:                15
+;     monster_offset_x:          15
+;     data_0600:                 14
+;     hero_step:                 13
+;     osword:                    13
+;     screen_ptr:                13
+;     data_0080:                 12
+;     data_0581:                 12
+;     missile_direction:         12
+;     sub_119a:                  12
+;     data_0081:                 11
+;     hero_health_tens:          11
+;     previous_x:                11
+;     previous_y:                11
+;     hero_max_missiles:          9
+;     hero_panel_y:               9
+;     object_x:                   9
+;     object_y:                   9
+;     screen_ptr_hi:              9
+;     data_0601:                  8
+;     data_08b4:                  8
+;     data_0ff1:                  8
+;     hero_key:                   8
+;     hero_score_thousands:       8
+;     hero_score_units:           8
+;     returning_hero_queue:       8
+;     sub_7221:                   8
+;     cell_room:                  7
+;     data_008f:                  7
+;     hero_damage_taken:          7
+;     hero_health_units:          7
+;     hero_missile_damage:        7
+;     monster_step:               7
+;     object_type:                7
+;     os_vsync_counter:           7
+;     sprite_height:              7
+;     code_7b04:                  6
+;     data_0082:                  6
+;     data_0524:                  6
+;     data_06f8:                  6
+;     data_08bc:                  6
+;     key_x:                      6
+;     key_y:                      6
+;     missile_x:                  6
+;     missile_y:                  6
+;     scratch2:                   6
+;     sub_7c95:                   6
+;     code_7075:                  5
+;     code_71d9:                  5
+;     data_0084:                  5
+;     data_07e6:                  5
+;     data_08b0:                  5
+;     data_08bd:                  5
+;     data_08be:                  5
+;     data_0ff2:                  5
+;     data_169f:                  5
+;     hero_score_hundreds:        5
+;     hero_score_tens:            5
+;     next_trapdoor:              5
+;     sub_0f68:                   5
+;     sub_728c:                   5
+;     sub_78fc:                   5
+;     view_room:                  5
+;     code_1ec6:                  4
+;     code_1f00:                  4
+;     code_6f79:                  4
+;     code_703b:                  4
+;     code_7096:                  4
+;     code_70c1:                  4
+;     code_7611:                  4
+;     code_7aea:                  4
+;     code_7ff6:                  4
+;     data_007c:                  4
+;     data_008e:                  4
+;     data_041e:                  4
+;     data_045a:                  4
+;     data_0602:                  4
+;     data_09f3:                  4
+;     door_x:                     4
+;     door_y:                     4
+;     hero_door_x:                4
+;     hero_door_y:                4
+;     hero_key_dropped:           4
+;     missile_sprite_base:        4
+;     monster_hit_points:         4
+;     sub_729b:                   4
+;     sub_77de:                   4
+;     sub_7974:                   4
+;     sub_7b62:                   4
+;     wrchv:                      4
+;     wrchv + 1:                  4
+;     bit_masks:                  3
+;     code_1db2:                  3
+;     code_1f36:                  3
+;     code_504a:                  3
+;     code_7266:                  3
+;     code_72bc:                  3
+;     code_7470:                  3
+;     code_76d4:                  3
+;     code_798d:                  3
+;     code_7b28:                  3
+;     data_008d:                  3
+;     data_0287:                  3
+;     data_09f0:                  3
+;     data_09f1:                  3
+;     data_09f2:                  3
+;     data_7dd0:                  3
+;     data_d9cd:                  3
+;     exit_x:                     3
+;     exit_y:                     3
+;     hero_has_boots:             3
+;     hero_magic_delay:           3
+;     hero_sprites:               3
+;     magic_kill_count:           3
+;     missile_damage:             3
+;     monster_frame:              3
+;     monster_start_hit_points:   3
+;     osasci:                     3
+;     oscli:                      3
+;     osrdch:                     3
+;     room_walls:                 3
+;     sprite_data_ptr:            3
+;     sub_11ac:                   3
+;     system_via_t1c_l:           3
+;     user_char_128:              3
+;     code_108a:                  2
+;     code_1097:                  2
+;     code_111c:                  2
+;     code_11bb:                  2
+;     code_1e28:                  2
+;     code_1ebe:                  2
+;     code_1f91:                  2
+;     code_512d:                  2
+;     code_6ec1:                  2
+;     code_7130:                  2
+;     code_7156:                  2
+;     code_71d4:                  2
+;     code_71d7:                  2
+;     code_7201:                  2
+;     code_7218:                  2
+;     code_73c7:                  2
+;     code_7467:                  2
+;     code_752c:                  2
+;     code_75e2:                  2
+;     code_7652:                  2
+;     code_7692:                  2
+;     code_79b7:                  2
+;     code_7adc:                  2
+;     code_7af8:                  2
+;     code_7c6f:                  2
+;     code_7cae:                  2
+;     data_0288:                  2
+;     data_0289:                  2
+;     data_0437:                  2
+;     data_0447:                  2
+;     data_046b:                  2
+;     data_0484:                  2
+;     data_0490:                  2
+;     data_0528:                  2
+;     data_052e:                  2
+;     data_0540:                  2
+;     data_054d:                  2
+;     data_055d:                  2
+;     data_056d:                  2
+;     data_0576:                  2
+;     data_05c0:                  2
+;     data_05c3:                  2
+;     data_05c9:                  2
+;     data_05cb:                  2
+;     data_05d6:                  2
+;     data_05d7:                  2
+;     data_05e4:                  2
+;     data_05e9:                  2
+;     data_06b4:                  2
+;     data_06c9:                  2
+;     data_06f0:                  2
+;     data_09f4:                  2
+;     data_09f5:                  2
+;     data_09fa:                  2
+;     data_09ff:                  2
+;     data_0b2b:                  2
+;     data_0b2c:                  2
+;     data_0b2d:                  2
+;     data_0bfc:                  2
+;     data_0cf4:                  2
+;     data_0d21:                  2
+;     data_0d22:                  2
+;     data_0d23:                  2
+;     data_0da2:                  2
+;     data_0da4:                  2
+;     data_0da6:                  2
+;     data_12d4:                  2
+;     data_7e23:                  2
+;     data_7e4c:                  2
+;     data_e772:                  2
+;     door_sprite:                2
+;     mos_oswrch_default:         2
+;     previous_offset_x:          2
+;     previous_offset_y:          2
+;     return_11:                  2
+;     row_start_ptr:              2
+;     row_start_ptr_hi:           2
+;     saved_wrchv:                2
+;     sprite_data_ptr_hi:         2
+;     sub_0ecf:                   2
+;     sub_1149:                   2
+;     sub_11f2:                   2
+;     sub_161a:                   2
+;     sub_74a3:                   2
+;     sub_75f9:                   2
+;     sub_76b1:                   2
+;     sub_7732:                   2
+;     sub_777a:                   2
+;     sub_7795:                   2
+;     sub_77a7:                   2
+;     sub_77b9:                   2
+;     sub_77cb:                   2
+;     sub_7938:                   2
+;     trapdoor_x:                 2
+;     trapdoor_y:                 2
+;     bytev:                      1
+;     bytev + 1:                  1
+;     code_091d:                  1
+;     code_0929:                  1
+;     code_0938:                  1
+;     code_093e:                  1
+;     code_0961:                  1
+;     code_0d7f:                  1
+;     code_0e08:                  1
+;     code_0e09:                  1
+;     code_0e14:                  1
+;     code_0e45:                  1
+;     code_0e57:                  1
+;     code_0e6d:                  1
+;     code_0e7a:                  1
+;     code_0ea8:                  1
+;     code_0eae:                  1
+;     code_0eb9:                  1
+;     code_0efc:                  1
+;     code_0f3a:                  1
+;     code_1079:                  1
+;     code_1084:                  1
+;     code_10ba:                  1
+;     code_10c7:                  1
+;     code_110a:                  1
+;     code_1124:                  1
+;     code_113c:                  1
+;     code_113e:                  1
+;     code_1140:                  1
+;     code_11d3:                  1
+;     code_11de:                  1
+;     code_11ec:                  1
+;     code_144f:                  1
+;     code_1460:                  1
+;     code_146f:                  1
+;     code_14a2:                  1
+;     code_14e5:                  1
+;     code_14ec:                  1
+;     code_1512:                  1
+;     code_1529:                  1
+;     code_1540:                  1
+;     code_1551:                  1
+;     code_1564:                  1
+;     code_1577:                  1
+;     code_1585:                  1
+;     code_159c:                  1
+;     code_1cc5:                  1
+;     code_1cd8:                  1
+;     code_1ce3:                  1
+;     code_1cee:                  1
+;     code_1cfa:                  1
+;     code_1d03:                  1
+;     code_1db8:                  1
+;     code_1dba:                  1
+;     code_1dc2:                  1
+;     code_1dce:                  1
+;     code_1de6:                  1
+;     code_1df3:                  1
+;     code_1e35:                  1
+;     code_1e45:                  1
+;     code_1ec4:                  1
+;     code_1ece:                  1
+;     code_1ee0:                  1
+;     code_1ee7:                  1
+;     code_1f17:                  1
+;     code_1f2a:                  1
+;     code_1f38:                  1
+;     code_1f96:                  1
+;     code_1f9e:                  1
+;     code_1ff2:                  1
+;     code_2026:                  1
+;     code_5036:                  1
+;     code_508b:                  1
+;     code_5092:                  1
+;     code_50b4:                  1
+;     code_50b8:                  1
+;     code_50c4:                  1
+;     code_50ca:                  1
+;     code_50e5:                  1
+;     code_510b:                  1
+;     code_5113:                  1
+;     code_5137:                  1
+;     code_513d:                  1
+;     code_6e82:                  1
+;     code_6e91:                  1
+;     code_6e97:                  1
+;     code_6eba:                  1
+;     code_6ed4:                  1
+;     code_6ee7:                  1
+;     code_6efa:                  1
+;     code_6f0d:                  1
+;     code_6f18:                  1
+;     code_6f70:                  1
+;     code_6f83:                  1
+;     code_6f8a:                  1
+;     code_6f91:                  1
+;     code_6f98:                  1
+;     code_6fc7:                  1
+;     code_6fd5:                  1
+;     code_7002:                  1
+;     code_7053:                  1
+;     code_7069:                  1
+;     code_70d2:                  1
+;     code_70da:                  1
+;     code_70e7:                  1
+;     code_70fe:                  1
+;     code_7108:                  1
+;     code_710f:                  1
+;     code_7116:                  1
+;     code_711d:                  1
+;     code_7132:                  1
+;     code_713a:                  1
+;     code_7150:                  1
+;     code_71a0:                  1
+;     code_71b4:                  1
+;     code_71c0:                  1
+;     code_71cc:                  1
+;     code_7227:                  1
+;     code_7263:                  1
+;     code_7337:                  1
+;     code_7342:                  1
+;     code_734d:                  1
+;     code_738a:                  1
+;     code_73a0:                  1
+;     code_73c3:                  1
+;     code_73d9:                  1
+;     code_740d:                  1
+;     code_7429:                  1
+;     code_744c:                  1
+;     code_7464:                  1
+;     code_7477:                  1
+;     code_74b6:                  1
+;     code_74eb:                  1
+;     code_74fc:                  1
+;     code_74ff:                  1
+;     code_7516:                  1
+;     code_7529:                  1
+;     code_7551:                  1
+;     code_755b:                  1
+;     code_7565:                  1
+;     code_756b:                  1
+;     code_757c:                  1
+;     code_75a6:                  1
+;     code_75ae:                  1
+;     code_75c5:                  1
+;     code_7619:                  1
+;     code_761f:                  1
+;     code_7650:                  1
+;     code_769c:                  1
+;     code_76ab:                  1
+;     code_76ae:                  1
+;     code_76c0:                  1
+;     code_76c9:                  1
+;     code_76d2:                  1
+;     code_76e0:                  1
+;     code_770b:                  1
+;     code_772e:                  1
+;     code_7757:                  1
+;     code_7764:                  1
+;     code_7771:                  1
+;     code_783e:                  1
+;     code_7845:                  1
+;     code_78ad:                  1
+;     code_78c7:                  1
+;     code_78e1:                  1
+;     code_79bc:                  1
+;     code_79e5:                  1
+;     code_7a17:                  1
+;     code_7a23:                  1
+;     code_7a2d:                  1
+;     code_7a34:                  1
+;     code_7a3b:                  1
+;     code_7a42:                  1
+;     code_7a81:                  1
+;     code_7a87:                  1
+;     code_7ac1:                  1
+;     code_7b31:                  1
+;     code_7b3f:                  1
+;     code_7b79:                  1
+;     code_7b88:                  1
+;     code_7b97:                  1
+;     code_7bb9:                  1
+;     code_7bc0:                  1
+;     code_7bc7:                  1
+;     code_7bce:                  1
+;     code_7bd6:                  1
+;     code_7c02:                  1
+;     code_7c11:                  1
+;     code_7c20:                  1
+;     code_7c42:                  1
+;     code_7c49:                  1
+;     code_7c50:                  1
+;     code_7c57:                  1
+;     code_7c5f:                  1
+;     code_7c6c:                  1
+;     code_7c82:                  1
+;     code_7cb3:                  1
+;     code_7cc2:                  1
+;     code_7cfb:                  1
+;     code_7fb5:                  1
+;     code_7fb8:                  1
+;     code_7fbd:                  1
+;     code_7fda:                  1
+;     data_0000:                  1
+;     data_00fa:                  1
+;     data_00fc:                  1
+;     data_0400:                  1
+;     data_0450:                  1
+;     data_0500:                  1
+;     data_06b0:                  1
+;     data_079b:                  1
+;     data_07a9:                  1
+;     data_07b8:                  1
+;     data_07c6:                  1
+;     data_07d5:                  1
+;     data_07e9:                  1
+;     data_09f6:                  1
+;     data_09f7:                  1
+;     data_09f8:                  1
+;     data_09f9:                  1
+;     data_09fb:                  1
+;     data_09fc:                  1
+;     data_09fd:                  1
+;     data_09fe:                  1
+;     data_0b8f:                  1
+;     data_0b97:                  1
+;     data_0c3a:                  1
+;     data_0d19:                  1
+;     data_0d1f:                  1
+;     data_0d8f:                  1
+;     data_0dfd:                  1
+;     data_0dff:                  1
+;     data_0f80:                  1
+;     data_0f84:                  1
+;     data_0f88:                  1
+;     data_0f8c:                  1
+;     data_0f90:                  1
+;     data_0ff0:                  1
+;     data_10e7:                  1
+;     data_10e8:                  1
+;     data_120f:                  1
+;     data_1210:                  1
+;     data_1625:                  1
+;     data_16ff:                  1
+;     data_213a:                  1
+;     data_5171:                  1
+;     data_5172:                  1
+;     data_5179:                  1
+;     data_518e:                  1
+;     data_6b00:                  1
+;     data_6b20:                  1
+;     data_6b40:                  1
+;     data_6b60:                  1
+;     data_6b75:                  1
+;     data_6b8a:                  1
+;     data_6ba0:                  1
+;     data_6bb5:                  1
+;     data_6bd0:                  1
+;     data_6bd8:                  1
+;     data_6be0:                  1
+;     data_6cb0:                  1
+;     data_6d80:                  1
+;     data_fffc:                  1
+;     data_fffd:                  1
+;     font_digits:                1
+;     font_letters:               1
+;     game_entry:                 1
+;     hero_arrival_sprites:       1
+;     hero_key_down:              1
+;     hero_key_fire:              1
+;     hero_key_left:              1
+;     hero_key_right:             1
+;     hero_key_up:                1
+;     hero_magic_key:             1
+;     hero_missile_sprites:       1
+;     level_tail:                 1
+;     loop_504c:                  1
+;     loop_50ba:                  1
+;     loop_50f1:                  1
+;     loop_6f28:                  1
+;     loop_7007:                  1
+;     loop_7173:                  1
+;     loop_71dd:                  1
+;     loop_71f4:                  1
+;     loop_7256:                  1
+;     loop_730d:                  1
+;     loop_73a7:                  1
+;     loop_742b:                  1
+;     loop_7498:                  1
+;     loop_7667:                  1
+;     loop_77e4:                  1
+;     loop_77fe:                  1
+;     loop_7827:                  1
+;     loop_7976:                  1
+;     loop_7997:                  1
+;     loop_79aa:                  1
+;     loop_79cd:                  1
+;     loop_7fc5:                  1
+;     loop_7fd1:                  1
+;     loop_7fe8:                  1
+;     mos_row_offsets:            1
+;     mos_row_offsets_lo:         1
+;     object_map:                 1
+;     return_1:                   1
+;     return_10:                  1
+;     return_2:                   1
+;     return_3:                   1
+;     return_4:                   1
+;     return_5:                   1
+;     return_6:                   1
+;     return_7:                   1
+;     return_8:                   1
+;     return_9:                   1
+;     screen_address:             1
+;     sprite_addr_hi:             1
+;     sprite_addr_lo:             1
+;     sprite_heights:             1
+;     sprite_widths:              1
+;     sub_0ef7:                   1
+;     sub_1070:                   1
+;     sub_10e9:                   1
+;     sub_11be:                   1
+;     sub_1400:                   1
+;     sub_1446:                   1
+;     sub_14a0:                   1
+;     sub_14d7:                   1
+;     sub_1510:                   1
+;     sub_1583:                   1
+;     sub_15b1:                   1
+;     sub_1cc0:                   1
+;     sub_203a:                   1
+;     sub_2050:                   1
+;     sub_2091:                   1
+;     sub_6e80:                   1
+;     sub_70ca:                   1
+;     sub_7305:                   1
+;     sub_7329:                   1
+;     sub_7606:                   1
+;     sub_760d:                   1
+;     sub_76da:                   1
+;     sub_7747:                   1
+;     sub_7788:                   1
+;     sub_7820:                   1
+;     sub_79c1:                   1
+;     sub_7ba2:                   1
+;     sub_7beb:                   1
+;     sub_7c2b:                   1
+;     workspace_template:         1
 
 ; Automatically generated labels:
 ;     code_091d
@@ -7665,12 +7686,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     code_0938
 ;     code_093e
 ;     code_0961
-;     code_0d40
-;     code_0d4c
-;     code_0d58
-;     code_0d70
-;     code_0d78
-;     code_0d7c
 ;     code_0d7f
 ;     code_0e08
 ;     code_0e09
@@ -7994,67 +8009,23 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_09fd
 ;     data_09fe
 ;     data_09ff
-;     data_0b20
-;     data_0b24
-;     data_0b26
-;     data_0b28
-;     data_0b2a
 ;     data_0b2b
 ;     data_0b2c
 ;     data_0b2d
-;     data_0b2f
-;     data_0b30
-;     data_0b40
-;     data_0b70
-;     data_0b80
 ;     data_0b8f
-;     data_0b90
 ;     data_0b97
-;     data_0b98
-;     data_0ba0
-;     data_0ba4
-;     data_0ba8
-;     data_0bac
 ;     data_0bfc
 ;     data_0c3a
-;     data_0cd0
 ;     data_0cf4
-;     data_0d00
-;     data_0d01
-;     data_0d02
-;     data_0d03
-;     data_0d04
-;     data_0d06
-;     data_0d07
-;     data_0d08
-;     data_0d09
-;     data_0d10
-;     data_0d15
 ;     data_0d19
-;     data_0d1a
 ;     data_0d1f
-;     data_0d20
 ;     data_0d21
 ;     data_0d22
 ;     data_0d23
-;     data_0d25
-;     data_0d2a
-;     data_0d30
-;     data_0d64
-;     data_0d74
-;     data_0d80
 ;     data_0d8f
-;     data_0d90
-;     data_0d95
-;     data_0da0
 ;     data_0da2
 ;     data_0da4
 ;     data_0da6
-;     data_0db0
-;     data_0db5
-;     data_0dbc
-;     data_0dc0
-;     data_0dd0
 ;     data_0dfd
 ;     data_0dff
 ;     data_0f80
@@ -8073,18 +8044,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_1625
 ;     data_169f
 ;     data_16ff
-;     data_2100
 ;     data_213a
-;     data_2200
-;     data_2220
-;     data_2240
-;     data_2260
-;     data_2280
-;     data_22e0
-;     data_22e5
-;     data_22f0
-;     data_22f5
-;     data_2d00
 ;     data_5171
 ;     data_5172
 ;     data_5179
@@ -8102,23 +8062,9 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_6be0
 ;     data_6cb0
 ;     data_6d80
-;     data_7cff
-;     data_7d00
 ;     data_7dd0
-;     data_7e00
 ;     data_7e23
-;     data_7e29
 ;     data_7e4c
-;     data_7e52
-;     data_7e7b
-;     data_7ea4
-;     data_7ecd
-;     data_7ef6
-;     data_7f20
-;     data_7f3e
-;     data_7f3f
-;     data_7f5d
-;     data_7f5e
 ;     data_d9cd
 ;     data_e772
 ;     data_fffc
@@ -8159,14 +8105,9 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     return_8
 ;     return_9
 ;     sub_09a0
-;     sub_0ae8
-;     sub_0b39
-;     sub_0c80
 ;     sub_0d63
 ;     sub_0d72
 ;     sub_0d88
-;     sub_0d99
-;     sub_0db9
 ;     sub_0ded
 ;     sub_0ecf
 ;     sub_0ef7
@@ -8198,9 +8139,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     sub_203a
 ;     sub_2050
 ;     sub_2091
-;     sub_2092
-;     sub_2234
-;     sub_2bf0
 ;     sub_5167
 ;     sub_5178
 ;     sub_59b0
@@ -8237,11 +8175,8 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     sub_7beb
 ;     sub_7c2b
 ;     sub_7c95
-;     sub_7cfe
 ;     sub_7db9
-;     sub_7ded
 ;     sub_7e30
-;     sub_7f58
 
 ; Stats:
 ;     Total size (Code + Data) = 24576 bytes

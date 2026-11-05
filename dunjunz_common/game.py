@@ -14,6 +14,7 @@ def annotate(a: Annotator) -> None:
     _os_workspace(a)
     _screen(a)
     _text_output(a)
+    annotate_state(a)
 
 
 # ---------------------------------------------------------------------------
@@ -311,3 +312,181 @@ def _text_output(a: Annotator) -> None:
     a.c(0x7FF9, "...")
     a.c(0x7FFA, "Recover the character")
     a.c(0x7FFC, "...and print it through the MOS 1.20 OSWRCH routine")
+
+
+# ---------------------------------------------------------------------------
+# Workspace and game state
+
+
+def annotate_state(a: Annotator) -> None:
+    """Names for the game's workspace tables. Hero tables have one entry
+    per hero, indexed 0-3 (Ranger, Magic-User, Barbarian, Fighter: the
+    top-left, top-right, bottom-left and bottom-right views)."""
+
+    def hero_table(addr, name, description):
+        a.label(addr, name, length=4, description=description)
+
+    # Page &0B
+    hero_table(0x0B20, "hero_max_missiles",
+               "Number of missiles each hero may have in flight at once, 1-3 "
+               "(raised by a pile of weapons).")
+    a.label(0x0B24, "hero_magic_key", length=2, description=(
+        "INKEY key numbers of the magic keys of heroes 0 and 1, the only "
+        "heroes with magic."))
+    a.label(0x0B26, "hero_magic_delay", length=2, description=(
+        "Frames until heroes 0 and 1 next check their magic key."))
+    a.label(0x0B28, "magic_kill_count", description=(
+        "Monsters killed by the magic being cast, each worth a point."))
+    a.label(0x0B2A, "returning_hero_queue", length=5, description=(
+        "Queue of heroes waiting to come back: each entry is a hero number "
+        "plus 1, or &64 for a slot that brings nobody back; 0 ends the "
+        "queue. A Cross of Resurrection takes the first entry."))
+    a.label(0x0B2F, "next_trapdoor", description=(
+        "Index (0-7) of the trapdoor from which the next monster emerges."))
+    a.label(0x0B30, "hero_arrival_sprites", length=9, description=(
+        "Sprites shown, in turn, while a hero materialises."))
+    a.label(0x0B40, "monster_hit_points", length=31, description=(
+        "Hit points left for each monster (entries 1-30); a hit subtracts "
+        "the missile's damage."))
+    hero_table(0x0B70, "hero_missile_damage",
+               "Damage each hero's missiles do, 1-9 (raised by a magic sword).")
+    a.label(0x0B80, "missile_damage", length=12, description=(
+        "Damage each missile in flight will do (12 slots, three per hero)."))
+    a.label(0x0B90, "trapdoor_x", length=8, description=(
+        "Map x of the level's eight trapdoors, from the level file."))
+    a.label(0x0B98, "trapdoor_y", length=8, description=(
+        "Map y of the level's eight trapdoors, from the level file."))
+    hero_table(0x0BA0, "hero_score_hundreds",
+               "Score hundreds digit, as a digit sprite (&1E-&27 for 0-9).")
+    hero_table(0x0BA4, "hero_score_tens",
+               "Score tens digit, as a digit sprite.")
+    hero_table(0x0BA8, "hero_score_units",
+               "Score units digit, as a digit sprite.")
+    hero_table(0x0BAC, "hero_score_thousands",
+               "Score thousands digit, as a digit sprite.")
+    hero_table(0x0CD0, "hero_damage_taken",
+               "Health each hero loses when a monster touches it, 3-9 "
+               "(lowered by a magic helmet). The status panel shows "
+               "10 minus this as the armour rating.")
+    a.label(0x0C00, "room_walls", length=0xC9, description=(
+        "The level's wall map, from the level file: eight bytes per room, "
+        "one per row of cells, one bit per cell (bit 7 at the left). Rooms "
+        "are 8x8 cells and run four to a row of the map. The first eight "
+        "bytes are also the MOS 1.20 definition of character 128, which the "
+        "WRCHV handler overwrites; the level is unpacked after the level "
+        "number has been printed."))
+
+    # Page &0D: refreshed from workspace_template at the start of each level
+    a.label(0x0D00, "scratch", description="General-purpose scratch byte.")
+    a.label(0x0D01, "scratch2", description="Second scratch byte.")
+    a.label(0x0D02, "cell_x", description=(
+        "Map x of the cell being drawn, tested or moved to. plot_at_cell "
+        "replaces it with the pixel offset within the room."))
+    a.label(0x0D03, "cell_y", description=(
+        "Map y of the cell being drawn, tested or moved to. plot_at_cell "
+        "replaces it with the pixel offset within the room."))
+    a.label(0x0D04, "cell_room", description=(
+        "Room of the cell being drawn, as an offset into room_walls."))
+    a.label(0x0D06, "previous_x", description=(
+        "Map x of the creature being moved, before the move."))
+    a.label(0x0D07, "previous_y", description=(
+        "Map y of the creature being moved, before the move."))
+    a.label(0x0D08, "previous_offset_x", description=(
+        "Pixel offset of the hero being moved, before the move."))
+    a.label(0x0D09, "previous_offset_y", description=(
+        "Pixel offset of the hero being moved, before the move."))
+    hero_table(0x0D10, "hero_x", "Map x of each hero.")
+    hero_table(0x0D15, "hero_y", "Map y of each hero.")
+    hero_table(0x0D1A, "hero_direction",
+               "Direction each hero faces: 1 up, 3 right, 5 down, 7 left; 0 "
+               "when the hero is not in play.")
+    hero_table(0x0D20, "hero_frame",
+               "Animation frame of each hero (0 or 1), added to its sprite.")
+    hero_table(0x0D25, "hero_step",
+               "Frames left in each hero's step between cells.")
+    hero_table(0x0D2A, "hero_offset_x",
+               "Each hero's horizontal pixel offset while between cells.")
+    a.label(0x0D30, "hero_offset_y", length=4, description=(
+        "Each hero's vertical pixel offset while between cells."))
+    a.label(0x0D40, "missile_x", length=12, description=(
+        "Map x of each missile (12 slots, three per hero)."))
+    a.label(0x0D4C, "missile_y", length=12, description="Map y of each missile.")
+    a.label(0x0D58, "missile_direction", length=12, description=(
+        "Direction of each missile: 1 up, 2 right, 3 down, 4 left; bit 7 "
+        "set for a missile just fired; 0 for an empty slot."))
+    a.label(0x0D64, "missile_sprite_base", length=12, description=(
+        "Sprite base of each missile, to which its direction is added; also "
+        "identifies the hero who fired it."))
+    hero_table(0x0D70, "hero_key_up", "INKEY key number of each hero's up key.")
+    hero_table(0x0D74, "hero_key_down", "INKEY key number of each hero's down key.")
+    hero_table(0x0D78, "hero_key_right", "INKEY key number of each hero's right key.")
+    hero_table(0x0D7C, "hero_key_left", "INKEY key number of each hero's left key.")
+    hero_table(0x0D80, "hero_key_fire", "INKEY key number of each hero's fire key.")
+    hero_table(0x0D90, "hero_health_tens",
+               "Health tens digit, as a digit sprite (&1E-&27); &1D when the "
+               "hero is dead.")
+    hero_table(0x0D95, "hero_health_units", "Health units digit, as a digit sprite.")
+    a.label(0x0DA0, "view_room", length=8, description=(
+        "The room each hero's view shows, as an offset into room_walls: one "
+        "entry per hero at even addresses (hero x at view_room + 2x)."))
+    hero_table(0x0DB0, "hero_missile_sprites",
+               "Sprite base of each hero's missiles: arrows, fireballs, axes, "
+               "swords.")
+    hero_table(0x0DB5, "hero_sprites",
+               "Sprite base of each hero, to which direction and frame are added.")
+    hero_table(0x0DBC, "hero_has_boots", "Non-zero while the hero wears Boots of Speed.")
+    a.label(0x0DC0, "bit_masks", length=8, description=(
+        "Bit masks for the cells of a room row, left to right: &80, &40 ... &01."))
+    hero_table(0x0DD0, "hero_panel_y",
+               "Pixel row of each hero's section of the status panel.")
+
+    # Level data unpacked into the game's own tables
+    a.label(0x2100, "object_map", length=0xC9, description=(
+        "Map of the cells that hold an object, in the same layout as "
+        "room_walls; from the level file."))
+    a.label(0x2200, "door_x", length=21, description="Map x of each door (entries 1-20).")
+    a.label(0x2220, "door_y", length=21, description="Map y of each door.")
+    a.label(0x2240, "door_sprite", length=21, description="Sprite of each door.")
+    a.label(0x2260, "key_x", length=21, description=(
+        "Map x of each key lying on the floor (entries 1-20); key n opens "
+        "door n."))
+    a.label(0x2280, "key_y", length=21, description="Map y of each key on the floor.")
+    hero_table(0x22E0, "hero_key", "Number of the key each hero carries, or 0.")
+    hero_table(0x22E5, "hero_key_dropped",
+               "Set when the hero has just swapped keys, so the key dropped "
+               "is not picked straight back up.")
+    hero_table(0x22F0, "hero_door_x", "Hero map x, kept for the door and key checks.")
+    hero_table(0x22F5, "hero_door_y", "Hero map y, kept for the door and key checks.")
+    a.label(0x2D00, "level_tail", length=0x30, description=(
+        "The last &30 bytes of the level file."))
+
+    a.label(0x7CFF, "monster_start_hit_points", description=(
+        "Hit points a monster starts with on this level: 8 + 2 x level."))
+    a.label(0x7D00, "workspace_template", length=0x100, description=(
+        "Initial contents of page &0D, copied there at the start of every "
+        "level."))
+    a.label(0x7E00, "monster_x", length=0x29, description="Map x of each monster (entries 1-30).")
+    a.label(0x7E29, "monster_y", length=0x29, description="Map y of each monster.")
+    a.label(0x7E52, "monster_sprite", length=0x29, description=(
+        "Each monster's state as a sprite number: 9, &0B, &0D or &0F moving "
+        "up, right, down or left; &15-&19 dying; &1A ready to reappear."))
+    a.label(0x7E7B, "monster_frame", length=0x29, description=(
+        "Each monster's animation frame (0 or 1), added to its sprite."))
+    a.label(0x7EA4, "monster_offset_x", length=0x29, description=(
+        "Each monster's horizontal pixel offset while between cells."))
+    a.label(0x7ECD, "monster_offset_y", length=0x29, description=(
+        "Each monster's vertical pixel offset while between cells."))
+    a.label(0x7EF6, "monster_step", length=0x29, description=(
+        "Frames left in each monster's step between cells."))
+    a.label(0x7F20, "object_x", length=0x1F, description=(
+        "Map x of each object on the level (entries 1-30), from the level "
+        "file; &FF once collected. Entry 30 is the exit."))
+    a.label(0x7F3E, "exit_x", description="Map x of the exit (object 30).")
+    a.label(0x7F3F, "object_y", length=0x1F, description="Map y of each object.")
+    a.label(0x7F5D, "exit_y", description="Map y of the exit (object 30).")
+    a.label(0x7F5E, "object_type", length=0x1F, description=(
+        "Each object's type, which is also its sprite: &28 treasure, &29 "
+        "food, &2A Cross of Resurrection, &2B teleporter, &51 exit, &53-&5E "
+        "energy drainer (advancing with each hit), &5F Boots of Speed, &60 "
+        "magic helmet, &61 potion of healing, &62 pile of weapons, &63 "
+        "magic sword."))
