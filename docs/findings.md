@@ -112,8 +112,9 @@ with a level editor, and `Dunjunz-tape.zip`):
   release's levels, and its `LEVEL5` has the same sum (&4D).
 
 So this sideways RAM version appears to combine code derived from the
-tape release with the disc release's level files, of which level 5
-differs from the tape's. Fix: set &0495 in `Dunjun4` to &4D (or restore
+tape release with the disc release's level files, whose level 5 does not
+match the table carried by the tape code. (The tape's own level files are
+encoded differently and have not yet been compared.) Fix: set &0495 in `Dunjun4` to &4D (or restore
 the tape's level 5).
 
 ## Provenance of this disc
