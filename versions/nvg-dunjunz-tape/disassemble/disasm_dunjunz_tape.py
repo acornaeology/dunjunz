@@ -26,6 +26,8 @@ VERSION_DIRPATH = Path(__file__).resolve().parent.parent
 REPO_DIRPATH = VERSION_DIRPATH.parent.parent
 sys.path.insert(0, str(REPO_DIRPATH))
 
+from dunjunz_common import game  # noqa: E402
+from dunjunz_common.annotator import Annotator  # noqa: E402
 from dunjunz_common.rendering import MultiFileBeebasmRenderer, SavedFile  # noqa: E402
 
 BINARY_DIRPATH = VERSION_DIRPATH / "binary"
@@ -56,7 +58,8 @@ d.use_environment("acorn_mos")
 d.use_environment("acorn_model_b_hardware")
 
 d.entry(0x5000, "start")
-d.entry(0x7F8F, "wrch_handler")
+
+game.annotate(Annotator(d, "tape"))
 
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)

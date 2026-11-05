@@ -14,12 +14,19 @@ file separately, and fantasm verifies each one against its original.
 """
 
 import os
+import sys
 from pathlib import Path
 
 import dasmos
-from dasmos.ext.renderers.beebasm.renderer import BeebasmRenderer
 
 VERSION_DIRPATH = Path(__file__).resolve().parent.parent
+REPO_DIRPATH = VERSION_DIRPATH.parent.parent
+sys.path.insert(0, str(REPO_DIRPATH))
+
+from dunjunz_common import game  # noqa: E402
+from dunjunz_common.annotator import Annotator  # noqa: E402
+from dunjunz_common.rendering import MultiFileBeebasmRenderer, SavedFile  # noqa: E402
+
 BINARY_DIRPATH = VERSION_DIRPATH / "binary"
 OUTPUT_DIRPATH = VERSION_DIRPATH / "output"
 
@@ -37,21 +44,10 @@ GAME_FILES = [
 GAME_ENTRY = 0x0D31
 
 
-class GameFilesRenderer(BeebasmRenderer):
-    """beebasm renderer that saves each game file as its own output.
-
-    The loaded image has a gap (&3000-&6E7F, the screen) between Dunjun5
-    and Dunjun6, and each file has its own DFS name and addresses, so a
-    single save of the whole loaded range would not reproduce the files.
-    """
-
-    def _save_directive(self, load_start, load_end, program=None) -> str:
-        return "\n".join(
-            f'save "{name}", {self.hex4(addr)}, {self.hex4(addr + length)}, '
-            f"{self.hex4(addr)}, {self.hex4(addr)}"
-            for name, addr, length in GAME_FILES
-        )
-
+SAVED_FILES = [
+    SavedFile(name, start=addr, end=addr + length, exec_addr=addr, load_addr=addr)
+    for name, addr, length in GAME_FILES
+]
 
 d = dasmos.Disassembler.create(cpu="6502")
 for name, addr, length in GAME_FILES:
@@ -60,10 +56,10 @@ d.use_environment("acorn_mos")
 d.use_environment("acorn_model_b_hardware")
 
 d.entry(GAME_ENTRY, "game_entry")
-# The entry code points WRCHV at &7F8F; the original vector is restored later.
-d.entry(0x7F8F, "wrch_handler")
+
+game.annotate(Annotator(d, "swr"))
 
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)
-asm_filepath.write_text(str(ir.render(GameFilesRenderer())), encoding="utf-8")
+asm_filepath.write_text(str(ir.render(MultiFileBeebasmRenderer(SAVED_FILES))), encoding="utf-8")
 json_filepath.write_text(str(ir.render("json")), encoding="utf-8")

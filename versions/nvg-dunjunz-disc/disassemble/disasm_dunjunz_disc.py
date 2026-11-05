@@ -24,6 +24,8 @@ VERSION_DIRPATH = Path(__file__).resolve().parent.parent
 REPO_DIRPATH = VERSION_DIRPATH.parent.parent
 sys.path.insert(0, str(REPO_DIRPATH))
 
+from dunjunz_common import game  # noqa: E402
+from dunjunz_common.annotator import Annotator  # noqa: E402
 from dunjunz_common.rendering import MultiFileBeebasmRenderer, SavedFile  # noqa: E402
 
 BINARY_DIRPATH = VERSION_DIRPATH / "binary"
@@ -59,7 +61,19 @@ with low_joystick:
 
 d.entry(0x5000, "coder_start")
 d.entry(0x0D31, "game_entry")
-d.entry(0x7F8F, "wrch_handler")
+
+
+def placements(addr):
+    """Where runtime address addr lives in Dun1: which move(s), and the
+    suffix for labels in each (the joystick image's names end _joy)."""
+    if 0x0400 <= addr < 0x0800:
+        return [(low_keyboard, ""), (low_joystick, "_joy")]
+    if 0x08C0 <= addr < 0x2000:
+        return [(game_core, "")]
+    return [(None, "")]
+
+
+game.annotate(Annotator(d, "disc", placements))
 
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)

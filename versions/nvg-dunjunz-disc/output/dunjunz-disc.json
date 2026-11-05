@@ -143,22 +143,87 @@
     {
       "addr": 65527,
       "name": "oscli"
+    },
+    {
+      "addr": 2304,
+      "binary_addr": 12352,
+      "name": "plot_sprite",
+      "title": "Plot a sprite",
+      "description": "Copy sprite sprite_number to the screen with its top-left corner at byte column plot_x, pixel row plot_y. The sprite tables give the address of its data and its size; the data is stored row by row, sprite_width bytes to a row, and is written over the screen contents without masking. The screen is laid out like MODE 2 with 640-byte character rows from &3000, so successive bytes of a sprite row are 8 bytes apart, and each pixel row starts one byte below the last, or 640-7 bytes on when it crosses into the next character row.",
+      "on_entry": {
+        "plot_x": "screen byte column (0-79)",
+        "plot_y": "pixel row",
+        "sprite_number": "sprite to plot"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "0",
+        "Y": "0"
+      }
+    },
+    {
+      "addr": 2407,
+      "binary_addr": 12455,
+      "name": "screen_address",
+      "title": "Calculate a screen address",
+      "description": "Set screen_ptr to the screen address of byte column plot_x on pixel row plot_y: &3000 + 640 x (plot_y DIV 8) + (plot_y MOD 8) + 8 x plot_x. The multiplication by 640 is done with a table inside MOS 1.20 (mos_row_offsets), so this only works with that MOS.",
+      "on_entry": {
+        "plot_x": "screen byte column (0-79)",
+        "plot_y": "pixel row"
+      },
+      "on_exit": {
+        "screen_ptr": "screen address",
+        "A": "corrupted",
+        "Y": "corrupted",
+        "X": "preserved"
+      }
+    },
+    {
+      "addr": 32655,
+      "name": "wrch_handler",
+      "title": "WRCHV handler: print letters and digits in the game font",
+      "description": "Installed on WRCHV while the game runs. A letter (either case) or a digit is printed in the game's own font: its eight-byte glyph is copied over the definition of character 128 (user_char_128) and character 128 is printed instead. Every other character is printed unchanged. Both paths finish in the MOS 1.20 OSWRCH routine at mos_oswrch_default, jumped to directly rather than through the WRCHV value saved at start-up.",
+      "on_entry": {
+        "A": "character to print"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "preserved",
+        "Y": "preserved"
+      }
     }
   ],
-  "banners": [],
+  "banners": [
+    {
+      "addr": 4823,
+      "binary_addr": 14871,
+      "name": "font_letters",
+      "title": "Font: letters A-Z",
+      "description": "Eight bytes per letter, copied into the definition of character 128 by the WRCHV handler.",
+      "align": "before_label"
+    },
+    {
+      "addr": 5031,
+      "binary_addr": 15079,
+      "name": "font_digits",
+      "title": "Font: digits 0-9",
+      "description": "Eight bytes per digit, copied into the definition of character 128 by the WRCHV handler.",
+      "align": "before_label"
+    }
+  ],
   "external_labels": {
     "data_0000": 0,
-    "data_0070": 112,
-    "data_0071": 113,
-    "data_0072": 114,
-    "data_0073": 115,
-    "data_0074": 116,
-    "data_0075": 117,
-    "data_0076": 118,
-    "data_0077": 119,
-    "data_0078": 120,
-    "data_0079": 121,
-    "data_007a": 122,
+    "plot_x": 112,
+    "plot_y": 113,
+    "sprite_width": 114,
+    "sprite_height": 115,
+    "screen_ptr": 116,
+    "screen_ptr_hi": 117,
+    "row_start_ptr": 118,
+    "row_start_ptr_hi": 119,
+    "sprite_data_ptr": 120,
+    "sprite_data_ptr_hi": 121,
+    "sprite_number": 122,
     "data_007b": 123,
     "data_007c": 124,
     "data_007d": 125,
@@ -202,7 +267,7 @@
     "ind1v": 560,
     "ind2v": 562,
     "ind3v": 564,
-    "data_0240": 576,
+    "os_vsync_counter": 576,
     "data_0287": 647,
     "data_0288": 648,
     "data_0289": 649,
@@ -253,10 +318,10 @@
     "data_08bc": 2236,
     "data_08bd": 2237,
     "data_08be": 2238,
-    "data_c375": 50037,
-    "data_c376": 50038,
+    "mos_row_offsets": 50037,
+    "mos_row_offsets_lo": 50038,
     "data_d9cd": 55757,
-    "data_e0a4": 57508,
+    "mos_oswrch_default": 57508,
     "data_e772": 59250,
     "scsi_data": 64576,
     "scsi_status": 64577,
@@ -346,7 +411,153 @@
     "data_fffc": 65532,
     "data_fffd": 65533
   },
-  "memory_map": [],
+  "memory_map": [
+    {
+      "addr": 112,
+      "name": "plot_x",
+      "group": "zero_page",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "Sprite position: screen byte column, 0-79 (two MODE 2 pixels per byte). Also used as a scratch byte and pointer low byte by other routines."
+    },
+    {
+      "addr": 113,
+      "name": "plot_y",
+      "group": "zero_page",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "Sprite position: pixel row from the top of the screen. Also used as a pointer high byte by other routines."
+    },
+    {
+      "addr": 114,
+      "name": "sprite_width",
+      "group": "zero_page",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "Width of the sprite being plotted, in screen bytes."
+    },
+    {
+      "addr": 115,
+      "name": "sprite_height",
+      "group": "zero_page",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "Height of the sprite being plotted, in pixel rows."
+    },
+    {
+      "addr": 116,
+      "name": "screen_ptr",
+      "group": "zero_page",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "Screen address being written, low byte."
+    },
+    {
+      "addr": 117,
+      "name": "screen_ptr_hi",
+      "group": "zero_page",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "Screen address being written, high byte."
+    },
+    {
+      "addr": 118,
+      "name": "row_start_ptr",
+      "group": "zero_page",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "Screen address of the first byte of the sprite row being plotted, low byte."
+    },
+    {
+      "addr": 119,
+      "name": "row_start_ptr_hi",
+      "group": "zero_page",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "Screen address of the first byte of the sprite row being plotted, high byte."
+    },
+    {
+      "addr": 120,
+      "name": "sprite_data_ptr",
+      "group": "zero_page",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "Address of the next sprite data byte to plot, low byte."
+    },
+    {
+      "addr": 121,
+      "name": "sprite_data_ptr_hi",
+      "group": "zero_page",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "Address of the next sprite data byte to plot, high byte."
+    },
+    {
+      "addr": 122,
+      "name": "sprite_number",
+      "group": "zero_page",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "Sprite to plot: an index into the sprite tables at sprite_addr_lo, sprite_addr_hi, sprite_widths and sprite_heights."
+    },
+    {
+      "addr": 576,
+      "name": "os_vsync_counter",
+      "group": "os_workspace",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "MOS 1.20 counter decremented on every vertical sync interrupt. The game sets it and waits for it to run out to pace itself."
+    },
+    {
+      "addr": 50037,
+      "name": "mos_row_offsets",
+      "group": "mos_internals",
+      "access": [
+        "r",
+        "b"
+      ],
+      "description": "MOS 1.20 table of screen row offsets for 640-byte rows (row x 640, high byte then low byte, one pair per character row). Read directly by screen_address; it is not part of any documented interface."
+    },
+    {
+      "addr": 50038,
+      "name": "mos_row_offsets_lo",
+      "group": "mos_internals",
+      "access": [
+        "b"
+      ],
+      "description": "Low bytes of mos_row_offsets."
+    },
+    {
+      "addr": 57508,
+      "name": "mos_oswrch_default",
+      "group": "mos_internals",
+      "description": "MOS 1.20 default OSWRCH routine, WRCHV's initial value. The WRCHV handler jumps here directly instead of through the saved vector."
+    }
+  ],
   "regions": [],
   "items": [
     {
@@ -9523,43 +9734,52 @@
       ],
       "binary_addr": 12352,
       "labels": [
-        "sub_0900"
+        "plot_sprite"
       ],
+      "comment_inline": "X = sprite number",
       "xref_summaries": [
-        "&3040 referenced 21 times by &36b9, &44ea, &4560, &45bd, &51de, &51ed, &55de, &55ed, &7276, &7286, &72cf, &72df, &72ef, &72ff, &7613, &7838, &7842, &78aa, &78c4, &78de, &78f8"
+        "&3040 referenced 21 times by &042e[2], &042e[3], &043d[2], &043d[3], &0f79[1], &1daa[1], &1e20[1], &1e7d[1], &7276, &7286, &72cf, &72df, &72ef, &72ff, &7613, &7838, &7842, &78aa, &78c4, &78de, &78f8"
       ],
       "references": [
         {
-          "addr": 14009,
-          "kind": "direct"
+          "addr": 1070,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 17642,
-          "kind": "direct"
+          "addr": 1070,
+          "kind": "direct",
+          "move_id": 3
         },
         {
-          "addr": 17760,
-          "kind": "direct"
+          "addr": 1085,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 17853,
-          "kind": "direct"
+          "addr": 1085,
+          "kind": "direct",
+          "move_id": 3
         },
         {
-          "addr": 20958,
-          "kind": "direct"
+          "addr": 3961,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 20973,
-          "kind": "direct"
+          "addr": 7594,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 21982,
-          "kind": "direct"
+          "addr": 7712,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 21997,
-          "kind": "direct"
+          "addr": 7805,
+          "kind": "direct",
+          "move_id": 1
         },
         {
           "addr": 29302,
@@ -9616,9 +9836,9 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 2306,
@@ -9628,11 +9848,12 @@
         26
       ],
       "binary_addr": 12354,
+      "comment_inline": "Point sprite_data_ptr at the sprite's data...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_1ae0,x",
+      "operand": "sprite_addr_lo,x",
       "target": 6880,
-      "target_label": "data_1ae0"
+      "target_label": "sprite_addr_lo"
     },
     {
       "addr": 2309,
@@ -9641,11 +9862,12 @@
         120
       ],
       "binary_addr": 12357,
+      "comment_inline": "...low byte",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0078",
+      "operand": "sprite_data_ptr",
       "target": 120,
-      "target_label": "data_0078"
+      "target_label": "sprite_data_ptr"
     },
     {
       "addr": 2311,
@@ -9655,11 +9877,12 @@
         27
       ],
       "binary_addr": 12359,
+      "comment_inline": "...high byte from its own table",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_1b58,x",
+      "operand": "sprite_addr_hi,x",
       "target": 7000,
-      "target_label": "data_1b58"
+      "target_label": "sprite_addr_hi"
     },
     {
       "addr": 2314,
@@ -9668,11 +9891,12 @@
         121
       ],
       "binary_addr": 12362,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0079",
+      "operand": "sprite_data_ptr_hi",
       "target": 121,
-      "target_label": "data_0079"
+      "target_label": "sprite_data_ptr_hi"
     },
     {
       "addr": 2316,
@@ -9682,11 +9906,12 @@
         27
       ],
       "binary_addr": 12364,
+      "comment_inline": "Width in screen bytes",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_1bd0,x",
+      "operand": "sprite_widths,x",
       "target": 7120,
-      "target_label": "data_1bd0"
+      "target_label": "sprite_widths"
     },
     {
       "addr": 2319,
@@ -9695,11 +9920,12 @@
         114
       ],
       "binary_addr": 12367,
+      "comment_inline": "...for the inner loop",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0072",
+      "operand": "sprite_width",
       "target": 114,
-      "target_label": "data_0072"
+      "target_label": "sprite_width"
     },
     {
       "addr": 2321,
@@ -9709,11 +9935,12 @@
         28
       ],
       "binary_addr": 12369,
+      "comment_inline": "Height in pixel rows",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_1c48,x",
+      "operand": "sprite_heights,x",
       "target": 7240,
-      "target_label": "data_1c48"
+      "target_label": "sprite_heights"
     },
     {
       "addr": 2324,
@@ -9722,11 +9949,12 @@
         115
       ],
       "binary_addr": 12372,
+      "comment_inline": "...for the outer loop",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0073",
+      "operand": "sprite_height",
       "target": 115,
-      "target_label": "data_0073"
+      "target_label": "sprite_height"
     },
     {
       "addr": 2326,
@@ -9736,11 +9964,12 @@
         9
       ],
       "binary_addr": 12374,
+      "comment_inline": "screen_ptr = address of the top-left byte",
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0967",
+      "operand": "screen_address",
       "target": 2407,
-      "target_label": "sub_0967"
+      "target_label": "screen_address"
     },
     {
       "addr": 2329,
@@ -9749,6 +9978,7 @@
         0
       ],
       "binary_addr": 12377,
+      "comment_inline": "Index stays 0: the pointers themselves advance",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -9760,11 +9990,12 @@
         115
       ],
       "binary_addr": 12379,
+      "comment_inline": "X counts the pixel rows still to plot",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "data_0073",
+      "operand": "sprite_height",
       "target": 115,
-      "target_label": "data_0073"
+      "target_label": "sprite_height"
     },
     {
       "addr": 2333,
@@ -9776,6 +10007,7 @@
       "labels": [
         "code_091d"
       ],
+      "comment_inline": "Remember where this pixel row starts...",
       "xref_summaries": [
         "&305d referenced 1 time by &30a4"
       ],
@@ -9787,9 +10019,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0074",
+      "operand": "screen_ptr",
       "target": 116,
-      "target_label": "data_0074"
+      "target_label": "screen_ptr"
     },
     {
       "addr": 2335,
@@ -9798,11 +10030,12 @@
         118
       ],
       "binary_addr": 12383,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0076",
+      "operand": "row_start_ptr",
       "target": 118,
-      "target_label": "data_0076"
+      "target_label": "row_start_ptr"
     },
     {
       "addr": 2337,
@@ -9811,11 +10044,12 @@
         117
       ],
       "binary_addr": 12385,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0075",
+      "operand": "screen_ptr_hi",
       "target": 117,
-      "target_label": "data_0075"
+      "target_label": "screen_ptr_hi"
     },
     {
       "addr": 2339,
@@ -9824,11 +10058,12 @@
         119
       ],
       "binary_addr": 12387,
+      "comment_inline": "...in row_start_ptr",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0077",
+      "operand": "row_start_ptr_hi",
       "target": 119,
-      "target_label": "data_0077"
+      "target_label": "row_start_ptr_hi"
     },
     {
       "addr": 2341,
@@ -9836,6 +10071,7 @@
         138
       ],
       "binary_addr": 12389,
+      "comment_inline": "Save the row count",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -9845,6 +10081,7 @@
         72
       ],
       "binary_addr": 12390,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -9855,11 +10092,12 @@
         114
       ],
       "binary_addr": 12391,
+      "comment_inline": "X counts the bytes across this row",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "data_0072",
+      "operand": "sprite_width",
       "target": 114,
-      "target_label": "data_0072"
+      "target_label": "sprite_width"
     },
     {
       "addr": 2345,
@@ -9871,6 +10109,7 @@
       "labels": [
         "code_0929"
       ],
+      "comment_inline": "Copy one sprite byte...",
       "xref_summaries": [
         "&3069 referenced 1 time by &307f"
       ],
@@ -9882,9 +10121,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "(data_0078),y",
+      "operand": "(sprite_data_ptr),y",
       "target": 120,
-      "target_label": "data_0078"
+      "target_label": "sprite_data_ptr"
     },
     {
       "addr": 2347,
@@ -9893,11 +10132,12 @@
         116
       ],
       "binary_addr": 12395,
+      "comment_inline": "...to the screen",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "(data_0074),y",
+      "operand": "(screen_ptr),y",
       "target": 116,
-      "target_label": "data_0074"
+      "target_label": "screen_ptr"
     },
     {
       "addr": 2349,
@@ -9905,6 +10145,7 @@
         24
       ],
       "binary_addr": 12397,
+      "comment_inline": "Step screen_ptr right one byte column: 8 bytes on",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -9915,11 +10156,12 @@
         116
       ],
       "binary_addr": 12398,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0074",
+      "operand": "screen_ptr",
       "target": 116,
-      "target_label": "data_0074"
+      "target_label": "screen_ptr"
     },
     {
       "addr": 2352,
@@ -9928,6 +10170,7 @@
         8
       ],
       "binary_addr": 12400,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#8"
@@ -9939,11 +10182,12 @@
         116
       ],
       "binary_addr": 12402,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0074",
+      "operand": "screen_ptr",
       "target": 116,
-      "target_label": "data_0074"
+      "target_label": "screen_ptr"
     },
     {
       "addr": 2356,
@@ -9952,6 +10196,7 @@
         2
       ],
       "binary_addr": 12404,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcc",
       "operand": "code_0938",
@@ -9965,11 +10210,12 @@
         117
       ],
       "binary_addr": 12406,
+      "comment_inline": "...with carry into the high byte",
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_0075",
+      "operand": "screen_ptr_hi",
       "target": 117,
-      "target_label": "data_0075"
+      "target_label": "screen_ptr_hi"
     },
     {
       "addr": 2360,
@@ -9981,6 +10227,7 @@
       "labels": [
         "code_0938"
       ],
+      "comment_inline": "Next sprite data byte",
       "xref_summaries": [
         "&3078 referenced 1 time by &3074"
       ],
@@ -9992,9 +10239,9 @@
       ],
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_0078",
+      "operand": "sprite_data_ptr",
       "target": 120,
-      "target_label": "data_0078"
+      "target_label": "sprite_data_ptr"
     },
     {
       "addr": 2362,
@@ -10003,6 +10250,7 @@
         2
       ],
       "binary_addr": 12410,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_093e",
@@ -10016,11 +10264,12 @@
         121
       ],
       "binary_addr": 12412,
+      "comment_inline": "...with carry into the high byte",
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_0079",
+      "operand": "sprite_data_ptr_hi",
       "target": 121,
-      "target_label": "data_0079"
+      "target_label": "sprite_data_ptr_hi"
     },
     {
       "addr": 2366,
@@ -10031,6 +10280,7 @@
       "labels": [
         "code_093e"
       ],
+      "comment_inline": "Count the bytes across",
       "xref_summaries": [
         "&307e referenced 1 time by &307a"
       ],
@@ -10050,6 +10300,7 @@
         232
       ],
       "binary_addr": 12415,
+      "comment_inline": "Loop until the row is done",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_0929",
@@ -10062,6 +10313,7 @@
         24
       ],
       "binary_addr": 12417,
+      "comment_inline": "screen_ptr = row start + 1: the next pixel row down",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -10072,11 +10324,12 @@
         118
       ],
       "binary_addr": 12418,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0076",
+      "operand": "row_start_ptr",
       "target": 118,
-      "target_label": "data_0076"
+      "target_label": "row_start_ptr"
     },
     {
       "addr": 2372,
@@ -10085,6 +10338,7 @@
         1
       ],
       "binary_addr": 12420,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#1"
@@ -10096,11 +10350,12 @@
         116
       ],
       "binary_addr": 12422,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0074",
+      "operand": "screen_ptr",
       "target": 116,
-      "target_label": "data_0074"
+      "target_label": "screen_ptr"
     },
     {
       "addr": 2376,
@@ -10109,11 +10364,12 @@
         119
       ],
       "binary_addr": 12424,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0077",
+      "operand": "row_start_ptr_hi",
       "target": 119,
-      "target_label": "data_0077"
+      "target_label": "row_start_ptr_hi"
     },
     {
       "addr": 2378,
@@ -10122,6 +10378,7 @@
         0
       ],
       "binary_addr": 12426,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#0"
@@ -10133,11 +10390,12 @@
         117
       ],
       "binary_addr": 12428,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0075",
+      "operand": "screen_ptr_hi",
       "target": 117,
-      "target_label": "data_0075"
+      "target_label": "screen_ptr_hi"
     },
     {
       "addr": 2382,
@@ -10146,11 +10404,12 @@
         116
       ],
       "binary_addr": 12430,
+      "comment_inline": "Has it crossed into the next character row?",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0074",
+      "operand": "screen_ptr",
       "target": 116,
-      "target_label": "data_0074"
+      "target_label": "screen_ptr"
     },
     {
       "addr": 2384,
@@ -10159,6 +10418,7 @@
         7
       ],
       "binary_addr": 12432,
+      "comment_inline": "...(pixel row within the character now 0)",
       "type": "code",
       "mnemonic": "and",
       "operand": "#7"
@@ -10170,6 +10430,7 @@
         13
       ],
       "binary_addr": 12434,
+      "comment_inline": "No: carry on",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_0961",
@@ -10182,6 +10443,7 @@
         24
       ],
       "binary_addr": 12436,
+      "comment_inline": "Yes: add 640-8 to reach the top pixel row of the...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -10192,11 +10454,12 @@
         116
       ],
       "binary_addr": 12437,
+      "comment_inline": "...character row below",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0074",
+      "operand": "screen_ptr",
       "target": 116,
-      "target_label": "data_0074"
+      "target_label": "screen_ptr"
     },
     {
       "addr": 2391,
@@ -10205,6 +10468,7 @@
         120
       ],
       "binary_addr": 12439,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#&78"
@@ -10216,11 +10480,12 @@
         116
       ],
       "binary_addr": 12441,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0074",
+      "operand": "screen_ptr",
       "target": 116,
-      "target_label": "data_0074"
+      "target_label": "screen_ptr"
     },
     {
       "addr": 2395,
@@ -10229,11 +10494,12 @@
         117
       ],
       "binary_addr": 12443,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0075",
+      "operand": "screen_ptr_hi",
       "target": 117,
-      "target_label": "data_0075"
+      "target_label": "screen_ptr_hi"
     },
     {
       "addr": 2397,
@@ -10242,6 +10508,7 @@
         2
       ],
       "binary_addr": 12445,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#2"
@@ -10253,11 +10520,12 @@
         117
       ],
       "binary_addr": 12447,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0075",
+      "operand": "screen_ptr_hi",
       "target": 117,
-      "target_label": "data_0075"
+      "target_label": "screen_ptr_hi"
     },
     {
       "addr": 2401,
@@ -10268,6 +10536,7 @@
       "labels": [
         "code_0961"
       ],
+      "comment_inline": "Recover the row count",
       "xref_summaries": [
         "&30a1 referenced 1 time by &3092"
       ],
@@ -10286,6 +10555,7 @@
         170
       ],
       "binary_addr": 12450,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -10295,6 +10565,7 @@
         202
       ],
       "binary_addr": 12451,
+      "comment_inline": "Count the pixel rows",
       "type": "code",
       "mnemonic": "dex"
     },
@@ -10305,6 +10576,7 @@
         183
       ],
       "binary_addr": 12452,
+      "comment_inline": "Loop until the sprite is done",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_091d",
@@ -10317,6 +10589,7 @@
         96
       ],
       "binary_addr": 12454,
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -10328,22 +10601,24 @@
       ],
       "binary_addr": 12455,
       "labels": [
-        "sub_0967"
+        "screen_address"
       ],
+      "comment_inline": "Character row = plot_y DIV 8...",
       "xref_summaries": [
-        "&30a7 referenced 1 time by &3056"
+        "&30a7 referenced 1 time by &0916[1]"
       ],
       "references": [
         {
-          "addr": 12374,
-          "kind": "direct"
+          "addr": 2326,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 2409,
@@ -10351,6 +10626,7 @@
         74
       ],
       "binary_addr": 12457,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lsr"
     },
@@ -10360,6 +10636,7 @@
         74
       ],
       "binary_addr": 12458,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lsr"
     },
@@ -10370,6 +10647,7 @@
         254
       ],
       "binary_addr": 12459,
+      "comment_inline": "...times 2 to index the table's byte pairs",
       "type": "code",
       "mnemonic": "and",
       "operand": "#&fe"
@@ -10380,6 +10658,7 @@
         168
       ],
       "binary_addr": 12461,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -10391,11 +10670,12 @@
         195
       ],
       "binary_addr": 12462,
+      "comment_inline": "High byte of row x 640, from the MOS table...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_c375,y",
+      "operand": "mos_row_offsets,y",
       "target": 50037,
-      "target_label": "data_c375"
+      "target_label": "mos_row_offsets"
     },
     {
       "addr": 2417,
@@ -10403,6 +10683,7 @@
         24
       ],
       "binary_addr": 12465,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -10413,6 +10694,7 @@
         48
       ],
       "binary_addr": 12466,
+      "comment_inline": "...plus &30: the screen starts at &3000",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#&30"
@@ -10424,11 +10706,12 @@
         117
       ],
       "binary_addr": 12468,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0075",
+      "operand": "screen_ptr_hi",
       "target": 117,
-      "target_label": "data_0075"
+      "target_label": "screen_ptr_hi"
     },
     {
       "addr": 2422,
@@ -10438,11 +10721,12 @@
         195
       ],
       "binary_addr": 12470,
+      "comment_inline": "Low byte of row x 640",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_c376,y",
+      "operand": "mos_row_offsets_lo,y",
       "target": 50038,
-      "target_label": "data_c376"
+      "target_label": "mos_row_offsets_lo"
     },
     {
       "addr": 2425,
@@ -10451,11 +10735,12 @@
         116
       ],
       "binary_addr": 12473,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0074",
+      "operand": "screen_ptr",
       "target": 116,
-      "target_label": "data_0074"
+      "target_label": "screen_ptr"
     },
     {
       "addr": 2427,
@@ -10464,11 +10749,12 @@
         113
       ],
       "binary_addr": 12475,
+      "comment_inline": "Add the pixel row within the character...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 2429,
@@ -10477,6 +10763,7 @@
         7
       ],
       "binary_addr": 12477,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "and",
       "operand": "#7"
@@ -10488,11 +10775,12 @@
         116
       ],
       "binary_addr": 12479,
+      "comment_inline": "...(no carry: the low byte is &00 or &80)",
       "type": "code",
       "mnemonic": "adc",
-      "operand": "data_0074",
+      "operand": "screen_ptr",
       "target": 116,
-      "target_label": "data_0074"
+      "target_label": "screen_ptr"
     },
     {
       "addr": 2433,
@@ -10501,11 +10789,12 @@
         116
       ],
       "binary_addr": 12481,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0074",
+      "operand": "screen_ptr",
       "target": 116,
-      "target_label": "data_0074"
+      "target_label": "screen_ptr"
     },
     {
       "addr": 2435,
@@ -10513,6 +10802,7 @@
         24
       ],
       "binary_addr": 12483,
+      "comment_inline": "Add 8 x plot_x: first its top three bits...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -10523,11 +10813,12 @@
         112
       ],
       "binary_addr": 12484,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 2438,
@@ -10536,6 +10827,7 @@
         224
       ],
       "binary_addr": 12486,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "and",
       "operand": "#&e0"
@@ -10546,6 +10838,7 @@
         42
       ],
       "binary_addr": 12488,
+      "comment_inline": "...rotated down to bits 0-2...",
       "type": "code",
       "mnemonic": "rol"
     },
@@ -10555,6 +10848,7 @@
         42
       ],
       "binary_addr": 12489,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "rol"
     },
@@ -10564,6 +10858,7 @@
         42
       ],
       "binary_addr": 12490,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "rol"
     },
@@ -10573,6 +10868,7 @@
         42
       ],
       "binary_addr": 12491,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "rol"
     },
@@ -10582,6 +10878,7 @@
         24
       ],
       "binary_addr": 12492,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -10592,11 +10889,12 @@
         117
       ],
       "binary_addr": 12493,
+      "comment_inline": "...into the high byte",
       "type": "code",
       "mnemonic": "adc",
-      "operand": "data_0075",
+      "operand": "screen_ptr_hi",
       "target": 117,
-      "target_label": "data_0075"
+      "target_label": "screen_ptr_hi"
     },
     {
       "addr": 2447,
@@ -10605,11 +10903,12 @@
         117
       ],
       "binary_addr": 12495,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0075",
+      "operand": "screen_ptr_hi",
       "target": 117,
-      "target_label": "data_0075"
+      "target_label": "screen_ptr_hi"
     },
     {
       "addr": 2449,
@@ -10618,11 +10917,12 @@
         112
       ],
       "binary_addr": 12497,
+      "comment_inline": "...then plot_x x 8 into the low byte",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 2451,
@@ -10630,6 +10930,7 @@
         10
       ],
       "binary_addr": 12499,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -10639,6 +10940,7 @@
         10
       ],
       "binary_addr": 12500,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -10648,6 +10950,7 @@
         10
       ],
       "binary_addr": 12501,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -10657,6 +10960,7 @@
         24
       ],
       "binary_addr": 12502,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -10667,11 +10971,12 @@
         116
       ],
       "binary_addr": 12503,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
-      "operand": "data_0074",
+      "operand": "screen_ptr",
       "target": 116,
-      "target_label": "data_0074"
+      "target_label": "screen_ptr"
     },
     {
       "addr": 2457,
@@ -10680,11 +10985,12 @@
         116
       ],
       "binary_addr": 12505,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0074",
+      "operand": "screen_ptr",
       "target": 116,
-      "target_label": "data_0074"
+      "target_label": "screen_ptr"
     },
     {
       "addr": 2459,
@@ -10693,6 +10999,7 @@
         2
       ],
       "binary_addr": 12507,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcc",
       "operand": "return_1",
@@ -10706,11 +11013,12 @@
         117
       ],
       "binary_addr": 12509,
+      "comment_inline": "...with carry into the high byte",
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_0075",
+      "operand": "screen_ptr_hi",
       "target": 117,
-      "target_label": "data_0075"
+      "target_label": "screen_ptr_hi"
     },
     {
       "addr": 2463,
@@ -10721,6 +11029,7 @@
       "labels": [
         "return_1"
       ],
+      "comment_inline": "Return",
       "xref_summaries": [
         "&30df referenced 1 time by &30db"
       ],
@@ -12255,15 +12564,16 @@
       ],
       "binary_addr": 13120,
       "labels": [
-        "data_0c00"
+        "user_char_128"
       ],
       "xref_summaries": [
-        "&3340 used as index base 3 times by &3ca7, &7fc8, &7feb"
+        "&3340 used as index base 3 times by &1567[1], &7fc8, &7feb"
       ],
       "references": [
         {
-          "addr": 15527,
-          "kind": "indexed"
+          "addr": 5479,
+          "kind": "indexed",
+          "move_id": 1
         },
         {
           "addr": 32712,
@@ -13333,9 +13643,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_12d3",
+      "operand": "saved_wrchv",
       "target": 4819,
-      "target_label": "data_12d3"
+      "target_label": "saved_wrchv"
     },
     {
       "addr": 3419,
@@ -14485,9 +14795,9 @@
       "binary_addr": 13730,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0240",
+      "operand": "os_vsync_counter",
       "target": 576,
-      "target_label": "data_0240"
+      "target_label": "os_vsync_counter"
     },
     {
       "addr": 3685,
@@ -15004,9 +15314,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0240",
+      "operand": "os_vsync_counter",
       "target": 576,
-      "target_label": "data_0240"
+      "target_label": "os_vsync_counter"
     },
     {
       "addr": 3772,
@@ -16015,9 +16325,9 @@
       ],
       "type": "code",
       "mnemonic": "stx",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 3946,
@@ -16028,9 +16338,9 @@
       "binary_addr": 13994,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 3948,
@@ -16107,9 +16417,9 @@
       "binary_addr": 14007,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 3961,
@@ -16121,9 +16431,9 @@
       "binary_addr": 14009,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0900",
+      "operand": "plot_sprite",
       "target": 2304,
-      "target_label": "sub_0900"
+      "target_label": "plot_sprite"
     },
     {
       "addr": 3964,
@@ -18723,9 +19033,9 @@
       "binary_addr": 14566,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 4520,
@@ -19200,9 +19510,9 @@
       "binary_addr": 14633,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0240",
+      "operand": "os_vsync_counter",
       "target": 576,
-      "target_label": "data_0240"
+      "target_label": "os_vsync_counter"
     },
     {
       "addr": 4588,
@@ -19226,9 +19536,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0240",
+      "operand": "os_vsync_counter",
       "target": 576,
-      "target_label": "data_0240"
+      "target_label": "os_vsync_counter"
     },
     {
       "addr": 4591,
@@ -19338,9 +19648,9 @@
       "binary_addr": 14654,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 4608,
@@ -19593,27 +19903,14 @@
         0,
         61,
         38,
-        0,
-        164,
-        224,
         0
       ],
       "binary_addr": 14672,
       "labels": [
         "data_1210"
       ],
-      "sub_labels": {
-        "4819": [
-          "data_12d3"
-        ],
-        "4820": [
-          "data_12d4"
-        ]
-      },
       "xref_summaries": [
-        "&3950 used as index base 1 time by &390c",
-        "&3a13 referenced 2 times by &3498, &3c17",
-        "&3a14 referenced 2 times by &349e, &3c1d"
+        "&3950 used as index base 1 time by &390c"
       ],
       "references": [
         {
@@ -19817,34 +20114,72 @@
         0,
         61,
         38,
-        0,
-        164,
-        224,
         0
       ]
     },
     {
-      "addr": 4822,
+      "addr": 4819,
       "bytes": [
-        115,
+        164,
+        224,
+        0,
+        115
+      ],
+      "binary_addr": 14867,
+      "labels": [
+        "saved_wrchv"
+      ],
+      "sub_labels": {
+        "4820": [
+          "data_12d4"
+        ]
+      },
+      "xref_summaries": [
+        "&3a13 referenced 2 times by &0d58[1], &14d7[1]",
+        "&3a14 referenced 2 times by &349e, &3c1d"
+      ],
+      "references": [
+        {
+          "addr": 3416,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 5335,
+          "kind": "direct",
+          "move_id": 1
+        }
+      ],
+      "type": "byte",
+      "values": [
+        164,
+        224,
+        0,
+        115
+      ]
+    },
+    {
+      "addr": 4823,
+      "bytes": [
         60,
         66,
         66
       ],
-      "binary_addr": 14870,
+      "binary_addr": 14871,
       "labels": [
-        "sub_12d6"
+        "font_letters"
       ],
-      "sub_labels": {
-        "4823": [
-          "data_12d7"
-        ]
-      },
       "xref_summaries": [
         "&3a17 used as index base 1 time by &7fc5"
       ],
+      "references": [
+        {
+          "addr": 32709,
+          "kind": "indexed"
+        }
+      ],
       "type": "string",
-      "string": "s<BB"
+      "string": "<BB"
     },
     {
       "addr": 4826,
@@ -20511,7 +20846,7 @@
       ],
       "binary_addr": 15079,
       "labels": [
-        "data_13a7"
+        "font_digits"
       ],
       "xref_summaries": [
         "&3ae7 used as index base 1 time by &7fe8"
@@ -21057,9 +21392,9 @@
       "binary_addr": 15228,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 5182,
@@ -21081,9 +21416,9 @@
       "binary_addr": 15232,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 5186,
@@ -21842,9 +22177,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_12d3",
+      "operand": "saved_wrchv",
       "target": 4819,
-      "target_label": "data_12d3"
+      "target_label": "saved_wrchv"
     },
     {
       "addr": 5338,
@@ -21967,9 +22302,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "(data_0070),y",
+      "operand": "(plot_x),y",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 5358,
@@ -22036,9 +22371,9 @@
       "binary_addr": 15415,
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 5369,
@@ -22060,9 +22395,9 @@
       "binary_addr": 15419,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 5373,
@@ -22699,9 +23034,9 @@
       "binary_addr": 15527,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0c00,x",
+      "operand": "user_char_128,x",
       "target": 3072,
-      "target_label": "data_0c00"
+      "target_label": "user_char_128"
     },
     {
       "addr": 5482,
@@ -26370,7 +26705,19 @@
       "bytes": [
         21,
         42,
+        21
+      ],
+      "binary_addr": 16925,
+      "type": "byte",
+      "values": [
         21,
+        42,
+        21
+      ]
+    },
+    {
+      "addr": 6880,
+      "bytes": [
         0,
         48,
         96,
@@ -26404,23 +26751,22 @@
         0,
         20
       ],
-      "binary_addr": 16925,
+      "binary_addr": 16928,
       "labels": [
-        "sub_1add"
+        "sprite_addr_lo"
       ],
-      "sub_labels": {
-        "6880": [
-          "data_1ae0"
-        ]
-      },
       "xref_summaries": [
-        "&4220 used as index base 1 time by &3042"
+        "&4220 used as index base 1 time by &0902[1]"
+      ],
+      "references": [
+        {
+          "addr": 2306,
+          "kind": "indexed",
+          "move_id": 1
+        }
       ],
       "type": "byte",
       "values": [
-        21,
-        42,
-        21,
         0,
         48,
         96,
@@ -26679,15 +27025,16 @@
       ],
       "binary_addr": 17048,
       "labels": [
-        "data_1b58"
+        "sprite_addr_hi"
       ],
       "xref_summaries": [
-        "&4298 used as index base 1 time by &3047"
+        "&4298 used as index base 1 time by &0907[1]"
       ],
       "references": [
         {
-          "addr": 12359,
-          "kind": "indexed"
+          "addr": 2311,
+          "kind": "indexed",
+          "move_id": 1
         }
       ],
       "type": "string",
@@ -26900,7 +27247,41 @@
         24,
         24,
         24,
-        4,
+        4
+      ],
+      "binary_addr": 17143,
+      "type": "byte",
+      "values": [
+        10,
+        10,
+        10,
+        10,
+        10,
+        25,
+        26,
+        26,
+        26,
+        26,
+        24,
+        24,
+        24,
+        24,
+        24,
+        24,
+        24,
+        24,
+        24,
+        24,
+        18,
+        24,
+        24,
+        24,
+        4
+      ]
+    },
+    {
+      "addr": 7120,
+      "bytes": [
         4,
         4,
         4,
@@ -27020,7 +27401,149 @@
         4,
         2,
         12,
+        2
+      ],
+      "binary_addr": 17168,
+      "labels": [
+        "sprite_widths"
+      ],
+      "xref_summaries": [
+        "&4310 used as index base 1 time by &090c[1]"
+      ],
+      "references": [
+        {
+          "addr": 2316,
+          "kind": "indexed",
+          "move_id": 1
+        }
+      ],
+      "type": "byte",
+      "values": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
         2,
+        4,
+        4,
+        4,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        2,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        8,
+        4,
+        2,
+        12,
+        2
+      ]
+    },
+    {
+      "addr": 7240,
+      "bytes": [
         12,
         12,
         12,
@@ -27142,169 +27665,22 @@
         8,
         6
       ],
-      "binary_addr": 17143,
+      "binary_addr": 17288,
       "labels": [
-        "sub_1bb7"
+        "sprite_heights"
       ],
-      "sub_labels": {
-        "7120": [
-          "data_1bd0"
-        ],
-        "7240": [
-          "data_1c48"
-        ]
-      },
       "xref_summaries": [
-        "&4310 used as index base 1 time by &304c",
-        "&4388 used as index base 1 time by &3051"
+        "&4388 used as index base 1 time by &0911[1]"
+      ],
+      "references": [
+        {
+          "addr": 2321,
+          "kind": "indexed",
+          "move_id": 1
+        }
       ],
       "type": "byte",
       "values": [
-        10,
-        10,
-        10,
-        10,
-        10,
-        25,
-        26,
-        26,
-        26,
-        26,
-        24,
-        24,
-        24,
-        24,
-        24,
-        24,
-        24,
-        24,
-        24,
-        24,
-        18,
-        24,
-        24,
-        24,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        2,
-        4,
-        4,
-        4,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        2,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        3,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        8,
-        4,
-        2,
-        12,
-        2,
         12,
         12,
         12,
@@ -28135,9 +28511,9 @@
       "binary_addr": 17518,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 7472,
@@ -28745,9 +29121,9 @@
       "binary_addr": 17626,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 7580,
@@ -28792,9 +29168,9 @@
       "binary_addr": 17634,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 7588,
@@ -28816,9 +29192,9 @@
       "binary_addr": 17638,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 7592,
@@ -28848,9 +29224,9 @@
       "binary_addr": 17642,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0900",
+      "operand": "plot_sprite",
       "target": 2304,
-      "target_label": "sub_0900"
+      "target_label": "plot_sprite"
     },
     {
       "addr": 7597,
@@ -29098,9 +29474,9 @@
       "binary_addr": 17674,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 7628,
@@ -29509,9 +29885,9 @@
       "binary_addr": 17744,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 7698,
@@ -29556,9 +29932,9 @@
       "binary_addr": 17752,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 7706,
@@ -29580,9 +29956,9 @@
       "binary_addr": 17756,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 7710,
@@ -29612,9 +29988,9 @@
       "binary_addr": 17760,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0900",
+      "operand": "plot_sprite",
       "target": 2304,
-      "target_label": "sub_0900"
+      "target_label": "plot_sprite"
     },
     {
       "addr": 7715,
@@ -29941,9 +30317,9 @@
       "binary_addr": 17815,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 7769,
@@ -30079,9 +30455,9 @@
       "binary_addr": 17835,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 7789,
@@ -30126,9 +30502,9 @@
       "binary_addr": 17843,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 7797,
@@ -30150,9 +30526,9 @@
       "binary_addr": 17847,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 7801,
@@ -30200,9 +30576,9 @@
       "binary_addr": 17853,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0900",
+      "operand": "plot_sprite",
       "target": 2304,
-      "target_label": "sub_0900"
+      "target_label": "plot_sprite"
     },
     {
       "addr": 7808,
@@ -30950,9 +31326,9 @@
       "binary_addr": 17968,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0240",
+      "operand": "os_vsync_counter",
       "target": 576,
-      "target_label": "data_0240"
+      "target_label": "os_vsync_counter"
     },
     {
       "addr": 7923,
@@ -31046,9 +31422,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0240",
+      "operand": "os_vsync_counter",
       "target": 576,
-      "target_label": "data_0240"
+      "target_label": "os_vsync_counter"
     },
     {
       "addr": 7939,
@@ -31084,9 +31460,9 @@
       "binary_addr": 17991,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0240",
+      "operand": "os_vsync_counter",
       "target": 576,
-      "target_label": "data_0240"
+      "target_label": "os_vsync_counter"
     },
     {
       "addr": 7946,
@@ -31667,9 +32043,9 @@
       "binary_addr": 18089,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 8043,
@@ -32110,9 +32486,9 @@
       "binary_addr": 18165,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 8119,
@@ -32260,9 +32636,9 @@
       "binary_addr": 18193,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 8147,
@@ -37952,9 +38328,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0072",
+      "operand": "sprite_width",
       "target": 114,
-      "target_label": "data_0072"
+      "target_label": "sprite_width"
     },
     {
       "addr": 20635,
@@ -37974,9 +38350,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0073",
+      "operand": "sprite_height",
       "target": 115,
-      "target_label": "data_0073"
+      "target_label": "sprite_height"
     },
     {
       "addr": 20639,
@@ -37996,9 +38372,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 20643,
@@ -38080,9 +38456,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 20658,
@@ -38126,9 +38502,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 20664,
@@ -38172,9 +38548,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "(data_0070),y",
+      "operand": "(plot_x),y",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 20668,
@@ -38184,9 +38560,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "(data_0072),y",
+      "operand": "(sprite_width),y",
       "target": 114,
-      "target_label": "data_0072"
+      "target_label": "sprite_width"
     },
     {
       "addr": 20670,
@@ -38196,9 +38572,9 @@
       ],
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_0072",
+      "operand": "sprite_width",
       "target": 114,
-      "target_label": "data_0072"
+      "target_label": "sprite_width"
     },
     {
       "addr": 20672,
@@ -38220,9 +38596,9 @@
       ],
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_0073",
+      "operand": "sprite_height",
       "target": 115,
-      "target_label": "data_0073"
+      "target_label": "sprite_height"
     },
     {
       "addr": 20676,
@@ -38244,9 +38620,9 @@
       ],
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 20678,
@@ -38268,9 +38644,9 @@
       ],
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 20682,
@@ -38292,9 +38668,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0073",
+      "operand": "sprite_height",
       "target": 115,
-      "target_label": "data_0073"
+      "target_label": "sprite_height"
     },
     {
       "addr": 20684,
@@ -38730,9 +39106,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 20759,
@@ -38772,9 +39148,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 20766,
@@ -38814,9 +39190,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0072",
+      "operand": "sprite_width",
       "target": 114,
-      "target_label": "data_0072"
+      "target_label": "sprite_width"
     },
     {
       "addr": 20773,
@@ -38848,9 +39224,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0073",
+      "operand": "sprite_height",
       "target": 115,
-      "target_label": "data_0073"
+      "target_label": "sprite_height"
     },
     {
       "addr": 20779,
@@ -38886,9 +39262,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "(data_0070),y",
+      "operand": "(plot_x),y",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 20783,
@@ -38898,9 +39274,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "(data_0072),y",
+      "operand": "(sprite_width),y",
       "target": 114,
-      "target_label": "data_0072"
+      "target_label": "sprite_width"
     },
     {
       "addr": 20785,
@@ -38910,9 +39286,9 @@
       ],
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 20787,
@@ -38934,9 +39310,9 @@
       ],
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 20791,
@@ -38958,9 +39334,9 @@
       ],
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_0072",
+      "operand": "sprite_width",
       "target": 114,
-      "target_label": "data_0072"
+      "target_label": "sprite_width"
     },
     {
       "addr": 20793,
@@ -38982,9 +39358,9 @@
       ],
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_0073",
+      "operand": "sprite_height",
       "target": 115,
-      "target_label": "data_0073"
+      "target_label": "sprite_height"
     },
     {
       "addr": 20797,
@@ -39006,9 +39382,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 20799,
@@ -39040,9 +39416,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 20805,
@@ -39511,9 +39887,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 1056,
@@ -39535,9 +39911,9 @@
       "binary_addr": 20946,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 1060,
@@ -39582,9 +39958,9 @@
       "binary_addr": 20954,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 1068,
@@ -39614,9 +39990,9 @@
       "binary_addr": 20958,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0900",
+      "operand": "plot_sprite",
       "target": 2304,
-      "target_label": "sub_0900"
+      "target_label": "plot_sprite"
     },
     {
       "addr": 1073,
@@ -39638,9 +40014,9 @@
       "binary_addr": 20963,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 1077,
@@ -39696,9 +40072,9 @@
       "binary_addr": 20969,
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 1083,
@@ -39709,9 +40085,9 @@
       "binary_addr": 20971,
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 1085,
@@ -39723,9 +40099,9 @@
       "binary_addr": 20973,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0900",
+      "operand": "plot_sprite",
       "target": 2304,
-      "target_label": "sub_0900"
+      "target_label": "plot_sprite"
     },
     {
       "addr": 1088,
@@ -39867,9 +40243,9 @@
       "binary_addr": 20994,
       "type": "code",
       "mnemonic": "sty",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 1108,
@@ -39880,9 +40256,9 @@
       "binary_addr": 20996,
       "type": "code",
       "mnemonic": "sty",
-      "operand": "data_0072",
+      "operand": "sprite_width",
       "target": 114,
-      "target_label": "data_0072"
+      "target_label": "sprite_width"
     },
     {
       "addr": 1110,
@@ -39904,9 +40280,9 @@
       "binary_addr": 21000,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 1114,
@@ -39941,9 +40317,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "(data_0070),y",
+      "operand": "(plot_x),y",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 1116,
@@ -39954,9 +40330,9 @@
       "binary_addr": 21004,
       "type": "code",
       "mnemonic": "eor",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 1118,
@@ -39967,9 +40343,9 @@
       "binary_addr": 21006,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "(data_0070),y",
+      "operand": "(plot_x),y",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 1120,
@@ -39989,9 +40365,9 @@
       "binary_addr": 21009,
       "type": "code",
       "mnemonic": "adc",
-      "operand": "data_0072",
+      "operand": "sprite_width",
       "target": 114,
-      "target_label": "data_0072"
+      "target_label": "sprite_width"
     },
     {
       "addr": 1123,
@@ -40002,9 +40378,9 @@
       "binary_addr": 21011,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0072",
+      "operand": "sprite_width",
       "target": 114,
-      "target_label": "data_0072"
+      "target_label": "sprite_width"
     },
     {
       "addr": 1125,
@@ -40015,9 +40391,9 @@
       "binary_addr": 21013,
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 1127,
@@ -40041,9 +40417,9 @@
       "binary_addr": 21017,
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 1131,
@@ -40070,9 +40446,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 1133,
@@ -40107,9 +40483,9 @@
       "binary_addr": 21025,
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 1139,
@@ -40158,9 +40534,9 @@
       "binary_addr": 21034,
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0072",
+      "operand": "sprite_width",
       "target": 114,
-      "target_label": "data_0072"
+      "target_label": "sprite_width"
     },
     {
       "addr": 1148,
@@ -41653,9 +42029,9 @@
       "binary_addr": 21335,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 1449,
@@ -41684,9 +42060,9 @@
       "binary_addr": 21339,
       "type": "code",
       "mnemonic": "adc",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 1453,
@@ -44064,9 +44440,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 1056,
@@ -44088,9 +44464,9 @@
       "binary_addr": 21970,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 1060,
@@ -44135,9 +44511,9 @@
       "binary_addr": 21978,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 1068,
@@ -44167,9 +44543,9 @@
       "binary_addr": 21982,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0900",
+      "operand": "plot_sprite",
       "target": 2304,
-      "target_label": "sub_0900"
+      "target_label": "plot_sprite"
     },
     {
       "addr": 1073,
@@ -44191,9 +44567,9 @@
       "binary_addr": 21987,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 1077,
@@ -44249,9 +44625,9 @@
       "binary_addr": 21993,
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 1083,
@@ -44262,9 +44638,9 @@
       "binary_addr": 21995,
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 1085,
@@ -44276,9 +44652,9 @@
       "binary_addr": 21997,
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0900",
+      "operand": "plot_sprite",
       "target": 2304,
-      "target_label": "sub_0900"
+      "target_label": "plot_sprite"
     },
     {
       "addr": 1088,
@@ -44420,9 +44796,9 @@
       "binary_addr": 22018,
       "type": "code",
       "mnemonic": "sty",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 1108,
@@ -44433,9 +44809,9 @@
       "binary_addr": 22020,
       "type": "code",
       "mnemonic": "sty",
-      "operand": "data_0072",
+      "operand": "sprite_width",
       "target": 114,
-      "target_label": "data_0072"
+      "target_label": "sprite_width"
     },
     {
       "addr": 1110,
@@ -44457,9 +44833,9 @@
       "binary_addr": 22024,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 1114,
@@ -44494,9 +44870,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "(data_0070),y",
+      "operand": "(plot_x),y",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 1116,
@@ -44507,9 +44883,9 @@
       "binary_addr": 22028,
       "type": "code",
       "mnemonic": "eor",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 1118,
@@ -44520,9 +44896,9 @@
       "binary_addr": 22030,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "(data_0070),y",
+      "operand": "(plot_x),y",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 1120,
@@ -44542,9 +44918,9 @@
       "binary_addr": 22033,
       "type": "code",
       "mnemonic": "adc",
-      "operand": "data_0072",
+      "operand": "sprite_width",
       "target": 114,
-      "target_label": "data_0072"
+      "target_label": "sprite_width"
     },
     {
       "addr": 1123,
@@ -44555,9 +44931,9 @@
       "binary_addr": 22035,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0072",
+      "operand": "sprite_width",
       "target": 114,
-      "target_label": "data_0072"
+      "target_label": "sprite_width"
     },
     {
       "addr": 1125,
@@ -44568,9 +44944,9 @@
       "binary_addr": 22037,
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 1127,
@@ -44594,9 +44970,9 @@
       "binary_addr": 22041,
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 1131,
@@ -44623,9 +44999,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 1133,
@@ -44660,9 +45036,9 @@
       "binary_addr": 22049,
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 1139,
@@ -44711,9 +45087,9 @@
       "binary_addr": 22058,
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0072",
+      "operand": "sprite_width",
       "target": 114,
-      "target_label": "data_0072"
+      "target_label": "sprite_width"
     },
     {
       "addr": 1148,
@@ -46206,9 +46582,9 @@
       "binary_addr": 22359,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 1449,
@@ -46237,9 +46613,9 @@
       "binary_addr": 22363,
       "type": "code",
       "mnemonic": "adc",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 1453,
@@ -62421,9 +62797,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 28793,
@@ -62663,9 +63039,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 28836,
@@ -63108,9 +63484,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 28907,
@@ -64912,9 +65288,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 29201,
@@ -65262,9 +65638,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 29252,
@@ -65505,9 +65881,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 29291,
@@ -65527,9 +65903,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 29295,
@@ -65552,9 +65928,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 29300,
@@ -65581,9 +65957,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0900",
+      "operand": "plot_sprite",
       "target": 2304,
-      "target_label": "sub_0900"
+      "target_label": "plot_sprite"
     },
     {
       "addr": 29305,
@@ -65622,9 +65998,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 29312,
@@ -65644,9 +66020,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 29316,
@@ -65673,9 +66049,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0900",
+      "operand": "plot_sprite",
       "target": 2304,
-      "target_label": "sub_0900"
+      "target_label": "plot_sprite"
     },
     {
       "addr": 29321,
@@ -66038,9 +66414,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 29380,
@@ -66060,9 +66436,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 29384,
@@ -66085,9 +66461,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 29389,
@@ -66114,9 +66490,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0900",
+      "operand": "plot_sprite",
       "target": 2304,
-      "target_label": "sub_0900"
+      "target_label": "plot_sprite"
     },
     {
       "addr": 29394,
@@ -66155,9 +66531,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 29401,
@@ -66177,9 +66553,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 29405,
@@ -66206,9 +66582,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0900",
+      "operand": "plot_sprite",
       "target": 2304,
-      "target_label": "sub_0900"
+      "target_label": "plot_sprite"
     },
     {
       "addr": 29410,
@@ -66247,9 +66623,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 29417,
@@ -66269,9 +66645,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 29421,
@@ -66298,9 +66674,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0900",
+      "operand": "plot_sprite",
       "target": 2304,
-      "target_label": "sub_0900"
+      "target_label": "plot_sprite"
     },
     {
       "addr": 29426,
@@ -66339,9 +66715,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 29433,
@@ -66361,9 +66737,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 29437,
@@ -66390,9 +66766,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0900",
+      "operand": "plot_sprite",
       "target": 2304,
-      "target_label": "sub_0900"
+      "target_label": "plot_sprite"
     },
     {
       "addr": 29442,
@@ -66559,9 +66935,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 29470,
@@ -70538,9 +70914,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 30134,
@@ -70560,9 +70936,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 30138,
@@ -70603,9 +70979,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 30146,
@@ -70723,9 +71099,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 30167,
@@ -70745,9 +71121,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 30171,
@@ -70767,9 +71143,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 30175,
@@ -70818,9 +71194,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 30182,
@@ -70861,9 +71237,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 30190,
@@ -70904,9 +71280,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 30198,
@@ -70955,9 +71331,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 30205,
@@ -70998,9 +71374,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 30213,
@@ -71040,9 +71416,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 30218,
@@ -71087,9 +71463,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 30225,
@@ -71140,9 +71516,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0900",
+      "operand": "plot_sprite",
       "target": 2304,
-      "target_label": "sub_0900"
+      "target_label": "plot_sprite"
     },
     {
       "addr": 30230,
@@ -71636,9 +72012,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 30309,
@@ -71767,9 +72143,9 @@
       ],
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 30332,
@@ -71923,9 +72299,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 30359,
@@ -72566,9 +72942,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 30455,
@@ -73517,9 +73893,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 30617,
@@ -73624,9 +74000,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 30635,
@@ -73731,9 +74107,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 30653,
@@ -73838,9 +74214,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 30671,
@@ -74059,9 +74435,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 30705,
@@ -74081,9 +74457,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 30709,
@@ -74260,9 +74636,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 30741,
@@ -74370,9 +74746,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 30757,
@@ -74481,9 +74857,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 30776,
@@ -74494,9 +74870,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0900",
+      "operand": "plot_sprite",
       "target": 2304,
-      "target_label": "sub_0900"
+      "target_label": "plot_sprite"
     },
     {
       "addr": 30779,
@@ -74541,9 +74917,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 30786,
@@ -74554,9 +74930,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0900",
+      "operand": "plot_sprite",
       "target": 2304,
-      "target_label": "sub_0900"
+      "target_label": "plot_sprite"
     },
     {
       "addr": 30789,
@@ -74586,9 +74962,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 30792,
@@ -74608,9 +74984,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 30796,
@@ -75140,9 +75516,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 30883,
@@ -75175,9 +75551,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 30890,
@@ -75188,9 +75564,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0900",
+      "operand": "plot_sprite",
       "target": 2304,
-      "target_label": "sub_0900"
+      "target_label": "plot_sprite"
     },
     {
       "addr": 30893,
@@ -75281,9 +75657,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 30909,
@@ -75316,9 +75692,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 30916,
@@ -75329,9 +75705,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0900",
+      "operand": "plot_sprite",
       "target": 2304,
-      "target_label": "sub_0900"
+      "target_label": "plot_sprite"
     },
     {
       "addr": 30919,
@@ -75422,9 +75798,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 30935,
@@ -75457,9 +75833,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 30942,
@@ -75470,9 +75846,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0900",
+      "operand": "plot_sprite",
       "target": 2304,
-      "target_label": "sub_0900"
+      "target_label": "plot_sprite"
     },
     {
       "addr": 30945,
@@ -75563,9 +75939,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 30961,
@@ -75598,9 +75974,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0071",
+      "operand": "plot_y",
       "target": 113,
-      "target_label": "data_0071"
+      "target_label": "plot_y"
     },
     {
       "addr": 30968,
@@ -75611,9 +75987,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_0900",
+      "operand": "plot_sprite",
       "target": 2304,
-      "target_label": "sub_0900"
+      "target_label": "plot_sprite"
     },
     {
       "addr": 30971,
@@ -76883,9 +77259,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 31181,
@@ -77150,9 +77526,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 31229,
@@ -78723,9 +79099,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 31513,
@@ -79077,9 +79453,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_007a",
+      "operand": "sprite_number",
       "target": 122,
-      "target_label": "data_007a"
+      "target_label": "sprite_number"
     },
     {
       "addr": 31570,
@@ -83104,17 +83480,19 @@
       "labels": [
         "wrch_handler"
       ],
+      "comment_inline": "Keep the character",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 32657,
       "bytes": [
         138
       ],
+      "comment_inline": "Save X...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -83123,6 +83501,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -83131,6 +83510,7 @@
       "bytes": [
         152
       ],
+      "comment_inline": "...and Y",
       "type": "code",
       "mnemonic": "tya"
     },
@@ -83139,6 +83519,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -83148,11 +83529,12 @@
         165,
         112
       ],
+      "comment_inline": "Classify the character",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 32663,
@@ -83160,6 +83542,7 @@
         201,
         48
       ],
+      "comment_inline": "Below '0': print it unchanged",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&30"
@@ -83170,6 +83553,7 @@
         144,
         91
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcc",
       "operand": "code_7ff6",
@@ -83182,6 +83566,7 @@
         201,
         58
       ],
+      "comment_inline": "'0'-'9': a digit",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&3a"
@@ -83192,6 +83577,7 @@
         144,
         59
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcc",
       "operand": "code_7fda",
@@ -83204,6 +83590,7 @@
         201,
         65
       ],
+      "comment_inline": "':'-'@': print it unchanged",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&41"
@@ -83214,6 +83601,7 @@
         144,
         83
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcc",
       "operand": "code_7ff6",
@@ -83226,6 +83614,7 @@
         201,
         91
       ],
+      "comment_inline": "'A'-'Z': a capital letter",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&5b"
@@ -83236,6 +83625,7 @@
         144,
         14
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcc",
       "operand": "code_7fb5",
@@ -83248,6 +83638,7 @@
         201,
         97
       ],
+      "comment_inline": "'['-'`': print it unchanged",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&61"
@@ -83258,6 +83649,7 @@
         144,
         75
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcc",
       "operand": "code_7ff6",
@@ -83270,6 +83662,7 @@
         201,
         123
       ],
+      "comment_inline": "Above 'z': print it unchanged",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&7b"
@@ -83280,6 +83673,7 @@
         176,
         71
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcs",
       "operand": "code_7ff6",
@@ -83291,6 +83685,7 @@
       "bytes": [
         56
       ],
+      "comment_inline": "A lower-case letter: letter number 0-25",
       "type": "code",
       "mnemonic": "sec"
     },
@@ -83300,6 +83695,7 @@
         233,
         97
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "#&61"
@@ -83311,6 +83707,7 @@
         184,
         127
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_7fb8",
@@ -83325,6 +83722,7 @@
       "labels": [
         "code_7fb5"
       ],
+      "comment_inline": "A capital letter: letter number 0-25",
       "xref_summaries": [
         "&7fb5 referenced 1 time by &7fa5"
       ],
@@ -83343,6 +83741,7 @@
         233,
         65
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "#&41"
@@ -83355,6 +83754,7 @@
       "labels": [
         "code_7fb8"
       ],
+      "comment_inline": "x 8: offset of the glyph in font_letters",
       "xref_summaries": [
         "&7fb8 referenced 1 time by &7fb2"
       ],
@@ -83372,6 +83772,7 @@
       "bytes": [
         10
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -83380,6 +83781,7 @@
       "bytes": [
         10
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -83389,6 +83791,7 @@
         208,
         0
       ],
+      "comment_inline": "Branch to the next instruction either way",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_7fbd",
@@ -83403,6 +83806,7 @@
       "labels": [
         "code_7fbd"
       ],
+      "comment_inline": "X = offset of the first glyph byte",
       "xref_summaries": [
         "&7fbd referenced 1 time by &7fbb"
       ],
@@ -83420,6 +83824,7 @@
       "bytes": [
         24
       ],
+      "comment_inline": "Stop after eight bytes",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -83429,6 +83834,7 @@
         105,
         8
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#8"
@@ -83439,11 +83845,12 @@
         133,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 32707,
@@ -83451,6 +83858,7 @@
         160,
         0
       ],
+      "comment_inline": "Y indexes the character 128 definition",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -83465,6 +83873,7 @@
       "labels": [
         "loop_7fc5"
       ],
+      "comment_inline": "Copy a glyph byte...",
       "xref_summaries": [
         "&7fc5 referenced 1 time by &7fcf"
       ],
@@ -83476,9 +83885,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_12d7,x",
+      "operand": "font_letters,x",
       "target": 4823,
-      "target_label": "data_12d7"
+      "target_label": "font_letters"
     },
     {
       "addr": 32712,
@@ -83487,17 +83896,19 @@
         0,
         12
       ],
+      "comment_inline": "...into the character 128 definition",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0c00,y",
+      "operand": "user_char_128,y",
       "target": 3072,
-      "target_label": "data_0c00"
+      "target_label": "user_char_128"
     },
     {
       "addr": 32715,
       "bytes": [
         200
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "iny"
     },
@@ -83506,6 +83917,7 @@
       "bytes": [
         232
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inx"
     },
@@ -83515,11 +83927,12 @@
         228,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 32719,
@@ -83527,6 +83940,7 @@
         208,
         244
       ],
+      "comment_inline": "Loop for eight bytes",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_7fc5",
@@ -83541,6 +83955,7 @@
       "labels": [
         "loop_7fd1"
       ],
+      "comment_inline": "Restore Y...",
       "xref_summaries": [
         "&7fd1 referenced 1 time by &7ff4"
       ],
@@ -83558,6 +83973,7 @@
       "bytes": [
         168
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -83566,6 +83982,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...and X",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -83574,6 +83991,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -83583,6 +84001,7 @@
         169,
         128
       ],
+      "comment_inline": "Print character 128, now showing the glyph...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&80"
@@ -83594,11 +84013,12 @@
         164,
         224
       ],
+      "comment_inline": "...through the MOS 1.20 OSWRCH routine",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "data_e0a4",
+      "operand": "mos_oswrch_default",
       "target": 57508,
-      "target_label": "data_e0a4"
+      "target_label": "mos_oswrch_default"
     },
     {
       "addr": 32730,
@@ -83608,6 +84028,7 @@
       "labels": [
         "code_7fda"
       ],
+      "comment_inline": "A digit: digit number 0-9",
       "xref_summaries": [
         "&7fda referenced 1 time by &7f9d"
       ],
@@ -83626,6 +84047,7 @@
         233,
         48
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "#&30"
@@ -83635,6 +84057,7 @@
       "bytes": [
         10
       ],
+      "comment_inline": "x 8: offset of the glyph in font_digits",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -83643,6 +84066,7 @@
       "bytes": [
         10
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -83651,6 +84075,7 @@
       "bytes": [
         10
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -83659,6 +84084,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "X = offset of the first glyph byte",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -83667,6 +84093,7 @@
       "bytes": [
         24
       ],
+      "comment_inline": "Stop after eight bytes",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -83676,6 +84103,7 @@
         105,
         8
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#8"
@@ -83686,11 +84114,12 @@
         133,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 32742,
@@ -83698,6 +84127,7 @@
         160,
         0
       ],
+      "comment_inline": "Y indexes the character 128 definition",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -83712,6 +84142,7 @@
       "labels": [
         "loop_7fe8"
       ],
+      "comment_inline": "Copy a glyph byte...",
       "xref_summaries": [
         "&7fe8 referenced 1 time by &7ff2"
       ],
@@ -83723,9 +84154,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_13a7,x",
+      "operand": "font_digits,x",
       "target": 5031,
-      "target_label": "data_13a7"
+      "target_label": "font_digits"
     },
     {
       "addr": 32747,
@@ -83734,17 +84165,19 @@
         0,
         12
       ],
+      "comment_inline": "...into the character 128 definition",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0c00,y",
+      "operand": "user_char_128,y",
       "target": 3072,
-      "target_label": "data_0c00"
+      "target_label": "user_char_128"
     },
     {
       "addr": 32750,
       "bytes": [
         200
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "iny"
     },
@@ -83753,6 +84186,7 @@
       "bytes": [
         232
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inx"
     },
@@ -83762,11 +84196,12 @@
         228,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 32754,
@@ -83774,6 +84209,7 @@
         208,
         244
       ],
+      "comment_inline": "Loop for eight bytes",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_7fe8",
@@ -83786,6 +84222,7 @@
         240,
         219
       ],
+      "comment_inline": "Print character 128 (always branches)",
       "type": "code",
       "mnemonic": "beq",
       "operand": "loop_7fd1",
@@ -83800,6 +84237,7 @@
       "labels": [
         "code_7ff6"
       ],
+      "comment_inline": "Any other character: restore Y...",
       "xref_summaries": [
         "&7ff6 referenced 4 times by &7f99, &7fa1, &7fa9, &7fad"
       ],
@@ -83829,6 +84267,7 @@
       "bytes": [
         168
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -83837,6 +84276,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...and X",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -83845,6 +84285,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -83854,11 +84295,12 @@
         165,
         112
       ],
+      "comment_inline": "Recover the character",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0070",
+      "operand": "plot_x",
       "target": 112,
-      "target_label": "data_0070"
+      "target_label": "plot_x"
     },
     {
       "addr": 32764,
@@ -83867,11 +84309,12 @@
         164,
         224
       ],
+      "comment_inline": "...and print it through the MOS 1.20 OSWRCH routine",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "data_e0a4",
+      "operand": "mos_oswrch_default",
       "target": 57508,
-      "target_label": "data_e0a4"
+      "target_label": "mos_oswrch_default"
     },
     {
       "addr": 32767,
