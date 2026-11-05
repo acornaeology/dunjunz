@@ -189,6 +189,26 @@ the reports that only DFS 0.90 works (see
 [stardot-dunjunz-versions-thread.md](stardot-dunjunz-versions-thread.md)).
 How the game uses &0D00 in this version is still to be traced.
 
+### Each new level starts with a reset of the machine
+
+At the end of a level the game does not call `Coder` directly. At &1460
+it sets the MOS 1.20 BREAK intercept (&0287 = `JMP`, &0288–&0289 =
+&15B5) and jumps to &D9CD, the MOS reset entry. During the reset the MOS
+calls the intercept. On its second call (carry set, once the filing
+system has been initialised) the code at &15B5 selects MODE 2 and issues
+`*DISC` and `*RUN CODER`, which loads the next level and the game afresh.
+Game over works the same way, with the intercept at &1472 issuing `*DISC`
+and `*DUNJUNZ` to restart from the loader (the code at &144F sets this up
+after a timed wait at &0EC4).
+
+So moving between levels depends on: the MOS 1.20 reset entry at &D9CD;
+the BREAK intercept at &0287 being honoured; the reset leaving page &08
+(where the level number and hero tables are kept) intact; and the filing
+system coming back up with `*DISC` and `*RUN` working after a reset that
+followed the game's use of &0D00. It is a likely point of failure on
+other filing systems and DFS versions (compare the stardot reports of
+"Bad command" after level 1).
+
 ### Optional joystick support with a hard-coded MOS 1.20 address
 
 `Coder` reads ADC channel 1 with OSBYTE &80. If Y returns &80 (taken to

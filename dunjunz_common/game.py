@@ -463,7 +463,7 @@ def annotate_state(a: Annotator) -> None:
         "The last &30 bytes of the level file."))
 
     a.label(0x7CFF, "monster_start_hit_points", description=(
-        "Hit points a monster starts with on this level: 8 + 2 x level."))
+        "Hit points a monster starts with on this level: 6 + 2 x the level number (8 on level 1)."))
     a.label(0x7D00, "workspace_template", length=0x100, description=(
         "Initial contents of page &0D, copied there at the start of every "
         "level."))
