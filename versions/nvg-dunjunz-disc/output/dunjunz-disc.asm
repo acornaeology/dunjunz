@@ -5895,186 +5895,186 @@ data_518e = sub_5178+22
 ; room, and draw the hero.
 ; &6e80 referenced 1 time by &4400
 .move_heroes
-    ldx #0
+    ldx #0                              ; For each hero...
 ; &6e82 referenced 1 time by &70c6
 .code_6e82
-    lda hero_direction,x
-    bne code_6e97
-    lda hero_step,x
-    cmp #&63 ; 'c'
-    bne code_6e91
-    jmp code_70c1
+    lda hero_direction,x                ; In play?
+    bne code_6e97                       ; Yes
+    lda hero_step,x                     ; Out of play: never playing (step &63)?
+    cmp #&63 ; 'c'                      ; ...
+    bne code_6e91                       ; ...
+    jmp next_hero                       ; Yes: nothing to do
 ; &6e91 referenced 1 time by &6e8c
 .code_6e91
-    jsr animate_absent_hero
-    jmp code_70c1
+    jsr animate_absent_hero             ; No: dying or returning, so animate them
+    jmp next_hero                       ; ...
 ; &6e97 referenced 1 time by &6e85
 .code_6e97
-    lda hero_x,x
-    sta previous_x
-    lda hero_y,x
-    sta previous_y
-    lda hero_offset_x,x
-    sta previous_offset_x
-    lda hero_offset_y,x
-    sta previous_offset_y
-    lda hero_step,x
-    beq code_6eba
-    jsr continue_hero_step
-    jmp code_7075
+    lda hero_x,x                        ; Remember the hero's position and offsets before moving
+    sta previous_x                      ; ...
+    lda hero_y,x                        ; ...
+    sta previous_y                      ; ...
+    lda hero_offset_x,x                 ; ...
+    sta previous_offset_x               ; ...
+    lda hero_offset_y,x                 ; ...
+    sta previous_offset_y               ; ...
+    lda hero_step,x                     ; Part way through a step?
+    beq code_6eba                       ; No: read the keys
+    jsr continue_hero_step              ; Yes: continue it...
+    jmp erase_hero                      ; ...and redraw
 ; &6eba referenced 1 time by &6eb2
 .code_6eba
-    cpx #2
-    bcs code_6ec1
-    jmp code_7619
+    cpx #2                              ; Heroes 0 and 1 check their magic key first
+    bcs read_hero_keys                  ; ...
+    jmp check_magic                     ; ...
 ; &6ec1 referenced 2 times by &6ebc, &76ab
-.code_6ec1
-    lda hero_key_up,x
-    jsr test_key
-    bne code_6ed4
-    lda #1
-    sta hero_direction,x
-    jsr start_hero_step
-    jmp code_6f79
+.read_hero_keys
+    lda hero_key_up,x                   ; Up key?
+    jsr test_key                        ; ...
+    bne code_6ed4                       ; No
+    lda #1                              ; Yes: face up...
+    sta hero_direction,x                ; ...
+    jsr start_hero_step                 ; ...start the step...
+    jmp step_hero                       ; ...and move
 ; &6ed4 referenced 1 time by &6ec7
 .code_6ed4
-    lda hero_key_down,x
-    jsr test_key
-    bne code_6ee7
-    lda #5
-    sta hero_direction,x
-    jsr start_hero_step
-    jmp code_6f79
+    lda hero_key_down,x                 ; Down key?
+    jsr test_key                        ; ...
+    bne code_6ee7                       ; No
+    lda #5                              ; Yes: face down...
+    sta hero_direction,x                ; ...
+    jsr start_hero_step                 ; ...start the step...
+    jmp step_hero                       ; ...and move
 ; &6ee7 referenced 1 time by &6eda
 .code_6ee7
-    lda hero_key_right,x
-    jsr test_key
-    bne code_6efa
-    lda #3
-    sta hero_direction,x
-    jsr start_hero_step
-    jmp code_6f79
+    lda hero_key_right,x                ; Right key?
+    jsr test_key                        ; ...
+    bne code_6efa                       ; No
+    lda #3                              ; Yes: face right...
+    sta hero_direction,x                ; ...
+    jsr start_hero_step                 ; ...start the step...
+    jmp step_hero                       ; ...and move
 ; &6efa referenced 1 time by &6eed
 .code_6efa
-    lda hero_key_left,x
-    jsr test_key
-    bne code_6f0d
-    lda #7
-    sta hero_direction,x
-    jsr start_hero_step
-    jmp code_6f79
+    lda hero_key_left,x                 ; Left key?
+    jsr test_key                        ; ...
+    bne code_6f0d                       ; No
+    lda #7                              ; Yes: face left...
+    sta hero_direction,x                ; ...
+    jsr start_hero_step                 ; ...start the step...
+    jmp step_hero                       ; ...and move
 ; &6f0d referenced 1 time by &6f00
 .code_6f0d
-    lda hero_key_fire,x
-    jsr test_key
-    beq code_6f18
-    jmp code_7096
+    lda hero_key_fire,x                 ; Fire key?
+    jsr test_key                        ; ...
+    beq fire_missile                    ; Yes
+    jmp draw_moved_hero                 ; No key: just redraw the hero
 ; &6f18 referenced 1 time by &6f13
-.code_6f18
-    txa
-    sta scratch
-    asl a
-    clc
-    adc scratch
-    tay
-    adc hero_max_missiles,x
-    sta scratch
+.fire_missile
+    txa                                 ; This hero's missile slots are 3x to 3x + hero_max_missiles - 1
+    sta scratch                         ; ...
+    asl a                               ; ...
+    clc                                 ; ...
+    adc scratch                         ; ...
+    tay                                 ; ...
+    adc hero_max_missiles,x             ; ...
+    sta scratch                         ; ...end of the range
 ; &6f28 referenced 1 time by &6f74
 .loop_6f28
-    lda missile_direction,y
-    bne code_6f70
-    lda hero_direction,x
-    clc
-    adc #1
-    lsr a
-    ora #&80
-    sta missile_direction,y
-    lda hero_x,x
-    sta missile_x,y
-    lda hero_y,x
-    sta missile_y,y
-    lda #7
-    jsr oswrch
-    lda hero_missile_damage,x
-    sta missile_damage,y
-    lda hero_missile_sprites,x
-    sta missile_sprite_base,y
-    lda previous_x
-    sta hero_x,x
-    lda previous_y
-    sta hero_y,x
-    lda hero_frame,x
-    eor #1
-    sta hero_frame,x
-    jmp code_7096
+    lda missile_direction,y             ; Slot free?
+    bne code_6f70                       ; No: try the next
+    lda hero_direction,x                ; Missile direction = (hero direction + 1) / 2, so 1-4, with bit 7 marking it just fired
+    clc                                 ; ...
+    adc #1                              ; ...
+    lsr a                               ; ...
+    ora #&80                            ; ...
+    sta missile_direction,y             ; ...
+    lda hero_x,x                        ; It starts at the hero's cell
+    sta missile_x,y                     ; ...
+    lda hero_y,x                        ; ...
+    sta missile_y,y                     ; ...
+    lda #7                              ; Sound the bell
+    jsr oswrch                          ; ...
+    lda hero_missile_damage,x           ; The missile carries the hero's missile damage...
+    sta missile_damage,y                ; ...
+    lda hero_missile_sprites,x          ; ...and sprites
+    sta missile_sprite_base,y           ; ...
+    lda previous_x                      ; The hero stays where they were
+    sta hero_x,x                        ; ...
+    lda previous_y                      ; ...
+    sta hero_y,x                        ; ...
+    lda hero_frame,x                    ; Toggle the hero's frame
+    eor #1                              ; ...
+    sta hero_frame,x                    ; ...
+    jmp draw_moved_hero                 ; Redraw the hero
     equb &88, &d0, &b8
 ; &6f70 referenced 1 time by &6f2b
 .code_6f70
-    iny
-    cpy scratch
-    bne loop_6f28
-    jmp code_7096
+    iny                                 ; Next slot
+    cpy scratch                         ; ...
+    bne loop_6f28                       ; ...
+    jmp draw_moved_hero                 ; All in flight: just redraw the hero
 ; &6f79 referenced 4 times by &6ed1, &6ee4, &6ef7, &6f0a
-.code_6f79
-    lda hero_direction,x
-    cmp #1
-    bne code_6f83
-    dec hero_y,x
+.step_hero
+    lda hero_direction,x                ; Move the hero's cell in the direction faced: up...
+    cmp #1                              ; ...
+    bne code_6f83                       ; ...
+    dec hero_y,x                        ; ...
 ; &6f83 referenced 1 time by &6f7e
 .code_6f83
-    cmp #3
-    bne code_6f8a
-    inc hero_x,x
+    cmp #3                              ; ...right...
+    bne code_6f8a                       ; ...
+    inc hero_x,x                        ; ...
 ; &6f8a referenced 1 time by &6f85
 .code_6f8a
-    cmp #5
-    bne code_6f91
-    inc hero_y,x
+    cmp #5                              ; ...down...
+    bne code_6f91                       ; ...
+    inc hero_y,x                        ; ...
 ; &6f91 referenced 1 time by &6f8c
 .code_6f91
-    cmp #7
-    bne code_6f98
-    dec hero_x,x
+    cmp #7                              ; ...left
+    bne code_6f98                       ; ...
+    dec hero_x,x                        ; ...
 ; &6f98 referenced 1 time by &6f93
 .code_6f98
-    lda hero_x,x
-    sta hero_door_x,x
-    lda hero_y,x
-    sta hero_door_y,x
-    lda hero_x,x
-    sta cell_x
-    lda hero_y,x
-    sta cell_y
-    txa
-    pha
-    jsr test_wall
-    pla
-    tax
-    cpy #0
-    beq code_6fd5
-    lda previous_x
-    sta hero_x,x
-    lda previous_y
-    sta hero_y,x
+    lda hero_x,x                        ; Note the new cell for the door and key checks
+    sta hero_door_x,x                   ; ...
+    lda hero_y,x                        ; ...
+    sta hero_door_y,x                   ; ...
+    lda hero_x,x                        ; Is there a wall in the new cell?
+    sta cell_x                          ; ...
+    lda hero_y,x                        ; ...
+    sta cell_y                          ; ...
+    txa                                 ; ...
+    pha                                 ; ...
+    jsr test_wall                       ; ...
+    pla                                 ; ...
+    tax                                 ; ...
+    cpy #0                              ; ...
+    beq code_6fd5                       ; No
+    lda previous_x                      ; Yes: stay put...
+    sta hero_x,x                        ; ...
+    lda previous_y                      ; ...
+    sta hero_y,x                        ; ...
 ; &6fc7 referenced 1 time by &7050
 .code_6fc7
-    lda #0
-    sta hero_step,x
-    sta hero_offset_x,x
-    sta hero_offset_y,x
-    jmp code_7075
+    lda #0                              ; Cancel the step
+    sta hero_step,x                     ; ...
+    sta hero_offset_x,x                 ; ...
+    sta hero_offset_y,x                 ; ...
+    jmp erase_hero                      ; ...and redraw
 ; &6fd5 referenced 1 time by &6fb9
 .code_6fd5
-    lda #0
-    sta scratch
-    txa
-    pha
-    jsr find_creature
-    pla
-    tax
-    cpy #0
-    beq code_7002
-    lda previous_x
+    lda #0                              ; Is there a monster in the new cell?
+    sta scratch                         ; ...
+    txa                                 ; ...
+    pha                                 ; ...
+    jsr find_creature                   ; ...
+    pla                                 ; ...
+    tax                                 ; ...
+    cpy #0                              ; ...
+    beq code_7002                       ; No
+    lda previous_x                      ; Yes: stay put, cancel the step...
     sta hero_x,x
     lda previous_y
     sta hero_y,x
@@ -6082,25 +6082,25 @@ data_518e = sub_5178+22
     sta hero_step,x
     sta hero_offset_x,x
     sta hero_offset_y,x
-    jsr lose_health_point
-    jmp code_7075
+    jsr lose_health_point               ; ...and lose a health point for bumping into it
+    jmp erase_hero                      ; Redraw
 ; &7002 referenced 1 time by &6fe3
 .code_7002
-    stx scratch
-    ldy #0
+    stx scratch                         ; Is another hero in play in the new cell?
+    ldy #0                              ; ...
 ; &7007 referenced 1 time by &703e
 .loop_7007
-    cpy scratch
-    beq code_703b
-    lda hero_x,y
-    cmp cell_x
-    bne code_703b
-    lda hero_y,y
-    cmp cell_y
-    bne code_703b
-    lda hero_direction,y
-    beq code_703b
-    lda previous_x
+    cpy scratch                         ; Not this hero
+    beq code_703b                       ; ...
+    lda hero_x,y                        ; ...
+    cmp cell_x                          ; ...
+    bne code_703b                       ; ...
+    lda hero_y,y                        ; ...
+    cmp cell_y                          ; ...
+    bne code_703b                       ; ...
+    lda hero_direction,y                ; ...
+    beq code_703b                       ; ...
+    lda previous_x                      ; Yes: stay put, cancel the step and redraw
     sta hero_x,x
     lda previous_y
     sta hero_y,x
@@ -6108,88 +6108,88 @@ data_518e = sub_5178+22
     sta hero_step,x
     sta hero_offset_x,x
     sta hero_offset_y,x
-    jmp code_7075
+    jmp erase_hero
 ; &703b referenced 4 times by &700a, &7012, &701a, &701f
 .code_703b
-    iny
-    cpy #4
-    bne loop_7007
-    txa
-    asl a
-    tax
-    lda view_room,x
-    cmp data_007b
-    beq code_7053
-    txa
-    lsr a
-    tax
-    jsr code_752c
-    jmp code_6fc7
+    iny                                 ; Next hero
+    cpy #4                              ; ...
+    bne loop_7007                       ; ...
+    txa                                 ; Has the hero moved into another room?
+    asl a                               ; ...
+    tax                                 ; ...
+    lda view_room,x                     ; ...
+    cmp data_007b                       ; ...
+    beq code_7053                       ; No
+    txa                                 ; Yes: change this hero's view to the new room...
+    lsr a                               ; ...
+    tax                                 ; ...
+    jsr code_752c                       ; ...
+    jmp code_6fc7                       ; ...and cancel the step
 ; &7053 referenced 1 time by &7048
 .code_7053
-    txa
-    lsr a
-    tax
-    lda hero_has_boots,x
-    beq code_7069
-    lda #0
-    sta hero_offset_x,x
-    sta hero_offset_y,x
-    sta hero_step,x
-    jmp code_7075
+    txa                                 ; Same room. Wearing Boots of Speed?
+    lsr a                               ; ...
+    tax                                 ; ...
+    lda hero_has_boots,x                ; ...
+    beq code_7069                       ; No
+    lda #0                              ; Yes: arrive in the cell at once, with no step
+    sta hero_offset_x,x                 ; ...
+    sta hero_offset_y,x                 ; ...
+    sta hero_step,x                     ; ...
+    jmp erase_hero                      ; ...
 ; &7069 referenced 1 time by &7059
 .code_7069
-    lda previous_x
-    sta hero_x,x
-    lda previous_y
-    sta hero_y,x
+    lda previous_x                      ; No boots: stay in the old cell for now; continue_hero_step moves on at the end of the step
+    sta hero_x,x                        ; ...
+    lda previous_y                      ; ...
+    sta hero_y,x                        ; ...
 ; &7075 referenced 5 times by &6eb7, &6fd2, &6fff, &7038, &7066
-.code_7075
-    lda #&15
-    sta sprite_number
-    lda previous_x
-    sta cell_x
-    lda previous_y
-    sta cell_y
-    lda previous_offset_x
-    sta data_007d
-    lda previous_offset_y
-    sta data_007e
-    txa
-    pha
-    jsr plot_at_cell
-    pla
-    tax
+.erase_hero
+    lda #&15                            ; Erase the hero at the old position (blank sprite)
+    sta sprite_number                   ; ...
+    lda previous_x                      ; ...
+    sta cell_x                          ; ...
+    lda previous_y                      ; ...
+    sta cell_y                          ; ...
+    lda previous_offset_x               ; ...
+    sta data_007d                       ; ...
+    lda previous_offset_y               ; ...
+    sta data_007e                       ; ...
+    txa                                 ; ...
+    pha                                 ; ...
+    jsr plot_at_cell                    ; ...
+    pla                                 ; ...
+    tax                                 ; ...
 ; &7096 referenced 4 times by &6f15, &6f6a, &6f76, &76ae
-.code_7096
-    clc
-    lda hero_direction,x
-    beq code_70c1
-    adc hero_frame,x
-    adc hero_sprites,x
-    sta sprite_number
-    jsr draw_hero
-    lda hero_x,x
-    sta cell_x
-    lda hero_y,x
-    sta cell_y
-    txa
-    pha
-    jsr test_object_free
-    pla
-    tax
-    cpy #0
-    bne code_70c1
-    jsr collect_objects
+.draw_moved_hero
+    clc                                 ; Still in play?
+    lda hero_direction,x                ; ...
+    beq next_hero                       ; No
+    adc hero_frame,x                    ; Sprite = direction + frame + the hero's sprite base
+    adc hero_sprites,x                  ; ...
+    sta sprite_number                   ; ...
+    jsr draw_hero                       ; Draw the hero
+    lda hero_x,x                        ; Can the hero's cell hold an object?
+    sta cell_x                          ; ...
+    lda hero_y,x                        ; ...
+    sta cell_y                          ; ...
+    txa                                 ; ...
+    pha                                 ; ...
+    jsr test_object_free                ; ...
+    pla                                 ; ...
+    tax                                 ; ...
+    cpy #0                              ; ...
+    bne next_hero                       ; No
+    jsr collect_objects                 ; Yes: pick up whatever is there
 ; &70c1 referenced 4 times by &6e8e, &6e94, &709a, &70bc
-.code_70c1
-    inx
-    cpx #4
-    beq return_8
-    jmp code_6e82
+.next_hero
+    inx                                 ; Next hero
+    cpx #4                              ; ...
+    beq return_8                        ; ...
+    jmp code_6e82                       ; ...
 ; &70c9 referenced 1 time by &70c4
 .return_8
-    rts
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Move the missiles
 ;
@@ -7081,18 +7081,18 @@ data_518e = sub_5178+22
     tax
     rts
 ; &7619 referenced 1 time by &6ebe
-.code_7619
-    dec hero_magic_delay,x
-    beq code_761f
-    rts
+.check_magic
+    dec hero_magic_delay,x              ; Count down the magic key delay
+    beq code_761f                       ; ...
+    rts                                 ; Not yet: return, which leaves move_heroes for this frame
 ; &761f referenced 1 time by &761c
 .code_761f
-    lda #1
-    sta hero_magic_delay,x
-    lda hero_magic_key,x
-    jsr test_key
-    bne code_76ab
-    txa
+    lda #1                              ; Check the key every frame from now on
+    sta hero_magic_delay,x              ; ...
+    lda hero_magic_key,x                ; Magic key pressed?
+    jsr test_key                        ; ...
+    bne code_76ab                       ; No: carry on reading the keys
+    txa                                 ; Yes: play the magic sound
     pha
     ldx #<(magic_envelope)
     ldy #>(magic_envelope)
@@ -7104,76 +7104,76 @@ data_518e = sub_5178+22
     jsr osword                          ; SOUND command
     pla
     tax
-    lda #4
-    sta hero_magic_delay,x
-    cpx #1
-    beq code_7650
-    ldy #6
+    lda #4                              ; Ignore the key for the next three frames
+    sta hero_magic_delay,x              ; ...
+    cpx #1                              ; Health cost: 3 for the Magic-User...
+    beq code_7650                       ; ...
+    ldy #6                              ; ...6 for the Ranger
     jmp code_7652
 ; &7650 referenced 1 time by &7649
 .code_7650
-    ldy #3
+    ldy #3                              ; ...
 ; &7652 referenced 2 times by &764d, &765a
 .code_7652
-    tya
-    pha
-    jsr lose_health_point
-    pla
-    tay
-    dey
-    bne code_7652
-    lda #0
-    sta magic_kill_count
-    txa
-    asl a
-    sta sprite_number
-    ldx #&1e
+    tya                                 ; Take the cost
+    pha                                 ; ...
+    jsr lose_health_point               ; ...
+    pla                                 ; ...
+    tay                                 ; ...
+    dey                                 ; ...
+    bne code_7652                       ; ...
+    lda #0                              ; No monsters killed yet
+    sta magic_kill_count                ; ...
+    txa                                 ; sprite_number = 2 x hero, an index into view_room
+    asl a                               ; ...
+    sta sprite_number                   ; ...
+    ldx #&1e                            ; For each monster...
 ; &7667 referenced 1 time by &7693
 .loop_7667
-    lda monster_x,x
-    sta cell_x
-    lda monster_y,x
-    sta cell_y
-    txa
-    pha
-    jsr test_wall
-    pla
-    tax
-    ldy sprite_number
-    lda view_room,y
-    cmp data_007b
-    bne code_7692
-    lda monster_sprite,x
-    cmp #&15
-    bcs code_7692
-    lda #&15
-    sta monster_sprite,x
-    inc magic_kill_count
+    lda monster_x,x                     ; ...find its room
+    sta cell_x                          ; ...
+    lda monster_y,x                     ; ...
+    sta cell_y                          ; ...
+    txa                                 ; ...
+    pha                                 ; ...
+    jsr test_wall                       ; ...
+    pla                                 ; ...
+    tax                                 ; ...
+    ldy sprite_number                   ; In the room this hero's view shows?
+    lda view_room,y                     ; ...
+    cmp data_007b                       ; ...
+    bne code_7692                       ; No
+    lda monster_sprite,x                ; Alive?
+    cmp #&15                            ; ...
+    bcs code_7692                       ; No
+    lda #&15                            ; Yes: start it dying...
+    sta monster_sprite,x                ; ...
+    inc magic_kill_count                ; ...and count it
 ; &7692 referenced 2 times by &7681, &7688
 .code_7692
-    dex
-    bne loop_7667
-    lda sprite_number
-    lsr a
-    tax
-    ldy magic_kill_count
+    dex                                 ; Next monster
+    bne loop_7667                       ; ...
+    lda sprite_number                   ; One point for each monster killed
+    lsr a                               ; ...
+    tax                                 ; ...
+    ldy magic_kill_count                ; ...
 ; &769c referenced 1 time by &76a8
 .code_769c
-    cpy #0
-    beq code_76ae
-    tya
-    pha
-    jsr add_point
-    pla
-    tay
-    dey
-    jmp code_769c
+    cpy #0                              ; ...
+    beq code_76ae                       ; ...
+    tya                                 ; ...
+    pha                                 ; ...
+    jsr add_point                       ; ...
+    pla                                 ; ...
+    tay                                 ; ...
+    dey                                 ; ...
+    jmp code_769c                       ; ...
 ; &76ab referenced 1 time by &762a
 .code_76ab
-    jmp code_6ec1
+    jmp read_hero_keys                  ; No magic: carry on with the keys
 ; &76ae referenced 1 time by &769e
 .code_76ae
-    jmp code_7096
+    jmp draw_moved_hero                 ; Magic cast: redraw the hero
 ; ***************************************************************************************
 ; Give a point to the hero who fired a missile
 ;
@@ -8576,12 +8576,12 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     scratch2:                    6
 ;     test_key:                    6
 ;     add_point:                   5
-;     code_7075:                   5
 ;     code_71d9:                   5
 ;     count:                       5
 ;     data_0084:                   5
 ;     data_07e6:                   5
 ;     data_08be:                   5
+;     erase_hero:                  5
 ;     hero_score_hundreds:         5
 ;     hero_score_ten_thousands:    5
 ;     hero_score_tens:             5
@@ -8594,10 +8594,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     add_ten_points:              4
 ;     code_1ec6:                   4
 ;     code_1f00:                   4
-;     code_6f79:                   4
 ;     code_703b:                   4
-;     code_7096:                   4
-;     code_70c1:                   4
 ;     code_7611:                   4
 ;     code_7aea:                   4
 ;     code_7ff6:                   4
@@ -8608,6 +8605,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_09f3:                   4
 ;     door_x:                      4
 ;     door_y:                      4
+;     draw_moved_hero:             4
 ;     draw_room:                   4
 ;     find_creature:               4
 ;     hero_door_x:                 4
@@ -8616,7 +8614,9 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     level_count_copy:            4
 ;     missile_sprite_base:         4
 ;     monster_hit_points:          4
+;     next_hero:                   4
 ;     start_hero_step:             4
+;     step_hero:                   4
 ;     wrchv:                       4
 ;     wrchv + 1:                   4
 ;     bit_masks:                   3
@@ -8660,7 +8660,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     code_1ebe:                   2
 ;     code_1f91:                   2
 ;     code_512d:                   2
-;     code_6ec1:                   2
 ;     code_7130:                   2
 ;     code_7156:                   2
 ;     code_71d4:                   2
@@ -8734,6 +8733,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     previous_offset_y:           2
 ;     print_menu_string:           2
 ;     print_menu_string_joy:       2
+;     read_hero_keys:              2
 ;     reset_hero:                  2
 ;     return_13:                   2
 ;     row_start_ptr:               2
@@ -8758,6 +8758,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     bytev + 1:                   1
 ;     check_for_victory:           1
 ;     check_level:                 1
+;     check_magic:                 1
 ;     code_091d:                   1
 ;     code_0929:                   1
 ;     code_0938:                   1
@@ -8846,7 +8847,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     code_6ee7:                   1
 ;     code_6efa:                   1
 ;     code_6f0d:                   1
-;     code_6f18:                   1
 ;     code_6f70:                   1
 ;     code_6f83:                   1
 ;     code_6f8a:                   1
@@ -8900,7 +8900,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     code_75a6:                   1
 ;     code_75ae:                   1
 ;     code_75c5:                   1
-;     code_7619:                   1
 ;     code_761f:                   1
 ;     code_7650:                   1
 ;     code_769c:                   1
@@ -9006,6 +9005,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     draw_view_frames:            1
 ;     drop_key:                    1
 ;     erase_boots_icon:            1
+;     fire_missile:                1
 ;     flip_firer_frame:            1
 ;     font_digits:                 1
 ;     font_letters:                1
@@ -9206,14 +9206,11 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     code_6e91
 ;     code_6e97
 ;     code_6eba
-;     code_6ec1
 ;     code_6ed4
 ;     code_6ee7
 ;     code_6efa
 ;     code_6f0d
-;     code_6f18
 ;     code_6f70
-;     code_6f79
 ;     code_6f83
 ;     code_6f8a
 ;     code_6f91
@@ -9224,9 +9221,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     code_703b
 ;     code_7053
 ;     code_7069
-;     code_7075
-;     code_7096
-;     code_70c1
 ;     code_70d2
 ;     code_70da
 ;     code_70e7
@@ -9285,7 +9279,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     code_75c5
 ;     code_75e2
 ;     code_7611
-;     code_7619
 ;     code_761f
 ;     code_7650
 ;     code_7652

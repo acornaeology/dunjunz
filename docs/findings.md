@@ -255,3 +255,16 @@ The game-over message (&0F90) contains "YOU ALL." with the full stop at
 `draw_status_panel`, and the count of dead heroes), so before printing
 the message the code writes spaces over &0FF1–&0FF4. The message always
 appears as "YOU ALL" with no full stop.
+
+### Casting magic briefly stops the other heroes moving (probable bug)
+
+`move_heroes` handles heroes 0 and 1 (the two with magic) by jumping to
+the magic code at &7619. That code counts down `hero_magic_delay` and,
+while it is not yet zero, executes `RTS`. Because the code was entered by
+`JMP` from `move_heroes`, this returns from `move_heroes` altogether, so
+the heroes after it are not moved on that frame. The delay normally sits
+at 1, so nothing is skipped; after a cast it is set to 4, so for the next
+three frames every hero is frozen when the Ranger (hero 0) cast, and the
+Barbarian and Fighter are frozen when the Magic-User (hero 1) cast. The
+delay seems meant to stop the magic key repeating, and skipping the
+other heroes looks unintended.
