@@ -60,6 +60,8 @@ d.use_environment("acorn_mos")
 d.use_environment("acorn_model_b_hardware")
 
 d.entry(GAME_ENTRY, "game_entry")
+# The entry code points WRCHV at &7F8F; the original vector is restored later.
+d.entry(0x7F8F, "wrch_handler")
 
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)

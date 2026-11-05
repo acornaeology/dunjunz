@@ -218,6 +218,7 @@
     "data_c375": 50037,
     "data_c376": 50038,
     "data_d9cd": 55757,
+    "data_e0a4": 57508,
     "scsi_data": 64576,
     "scsi_status": 64577,
     "scsi_select": 64578,
@@ -7574,11 +7575,19 @@
         "data_0c00"
       ],
       "xref_summaries": [
-        "&0c00 used as index base 1 time by &1567"
+        "&0c00 used as index base 3 times by &1567, &7fc8, &7feb"
       ],
       "references": [
         {
           "addr": 5479,
+          "kind": "indexed"
+        },
+        {
+          "addr": 32712,
+          "kind": "indexed"
+        },
+        {
+          "addr": 32747,
           "kind": "indexed"
         }
       ],
@@ -15040,6 +15049,17 @@
         66,
         66
       ],
+      "labels": [
+        "sub_12d6"
+      ],
+      "sub_labels": {
+        "4823": [
+          "data_12d7"
+        ]
+      },
+      "xref_summaries": [
+        "&12d7 used as index base 1 time by &7fc5"
+      ],
       "type": "string",
       "string": "s<BB"
     },
@@ -15670,6 +15690,18 @@
         60,
         70,
         74
+      ],
+      "labels": [
+        "data_13a7"
+      ],
+      "xref_summaries": [
+        "&13a7 used as index base 1 time by &7fe8"
+      ],
+      "references": [
+        {
+          "addr": 32744,
+          "kind": "indexed"
+        }
       ],
       "type": "string",
       "string": "<FJ"
@@ -60843,119 +60875,6 @@
         0,
         0,
         0,
-        0,
-        133,
-        112,
-        138,
-        72,
-        152,
-        72,
-        165,
-        112,
-        201,
-        48,
-        144,
-        91,
-        201,
-        58,
-        144,
-        59,
-        201,
-        65,
-        144,
-        83,
-        201,
-        91,
-        144,
-        14,
-        201,
-        97,
-        144,
-        75,
-        201,
-        123,
-        176,
-        71,
-        56,
-        233,
-        97,
-        76,
-        184,
-        127,
-        56,
-        233,
-        65,
-        10,
-        10,
-        10,
-        208,
-        0,
-        170,
-        24,
-        105,
-        8,
-        133,
-        112,
-        160,
-        0,
-        189,
-        215,
-        18,
-        153,
-        0,
-        12,
-        200,
-        232,
-        228,
-        112,
-        208,
-        244,
-        104,
-        168,
-        104,
-        170,
-        169,
-        128,
-        76,
-        164,
-        224,
-        56,
-        233,
-        48,
-        10,
-        10,
-        10,
-        170,
-        24,
-        105,
-        8,
-        133,
-        112,
-        160,
-        0,
-        189,
-        167,
-        19,
-        153,
-        0,
-        12,
-        200,
-        232,
-        228,
-        112,
-        208,
-        244,
-        240,
-        219,
-        104,
-        168,
-        104,
-        170,
-        165,
-        112,
-        76,
-        164,
-        224,
         0
       ],
       "type": "byte",
@@ -60977,119 +60896,794 @@
         0,
         0,
         0,
-        0,
+        0
+      ]
+    },
+    {
+      "addr": 32655,
+      "bytes": [
         133,
-        112,
-        138,
-        72,
-        152,
-        72,
+        112
+      ],
+      "labels": [
+        "wrch_handler"
+      ],
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "data_0070",
+      "target": 112,
+      "target_label": "data_0070"
+    },
+    {
+      "addr": 32657,
+      "bytes": [
+        138
+      ],
+      "type": "code",
+      "mnemonic": "txa"
+    },
+    {
+      "addr": 32658,
+      "bytes": [
+        72
+      ],
+      "type": "code",
+      "mnemonic": "pha"
+    },
+    {
+      "addr": 32659,
+      "bytes": [
+        152
+      ],
+      "type": "code",
+      "mnemonic": "tya"
+    },
+    {
+      "addr": 32660,
+      "bytes": [
+        72
+      ],
+      "type": "code",
+      "mnemonic": "pha"
+    },
+    {
+      "addr": 32661,
+      "bytes": [
         165,
-        112,
+        112
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "data_0070",
+      "target": 112,
+      "target_label": "data_0070"
+    },
+    {
+      "addr": 32663,
+      "bytes": [
         201,
-        48,
+        48
+      ],
+      "type": "code",
+      "mnemonic": "cmp",
+      "operand": "#&30"
+    },
+    {
+      "addr": 32665,
+      "bytes": [
         144,
-        91,
+        91
+      ],
+      "type": "code",
+      "mnemonic": "bcc",
+      "operand": "code_7ff6",
+      "target": 32758,
+      "target_label": "code_7ff6"
+    },
+    {
+      "addr": 32667,
+      "bytes": [
         201,
-        58,
+        58
+      ],
+      "type": "code",
+      "mnemonic": "cmp",
+      "operand": "#&3a"
+    },
+    {
+      "addr": 32669,
+      "bytes": [
         144,
-        59,
+        59
+      ],
+      "type": "code",
+      "mnemonic": "bcc",
+      "operand": "code_7fda",
+      "target": 32730,
+      "target_label": "code_7fda"
+    },
+    {
+      "addr": 32671,
+      "bytes": [
         201,
-        65,
+        65
+      ],
+      "type": "code",
+      "mnemonic": "cmp",
+      "operand": "#&41"
+    },
+    {
+      "addr": 32673,
+      "bytes": [
         144,
-        83,
+        83
+      ],
+      "type": "code",
+      "mnemonic": "bcc",
+      "operand": "code_7ff6",
+      "target": 32758,
+      "target_label": "code_7ff6"
+    },
+    {
+      "addr": 32675,
+      "bytes": [
         201,
-        91,
+        91
+      ],
+      "type": "code",
+      "mnemonic": "cmp",
+      "operand": "#&5b"
+    },
+    {
+      "addr": 32677,
+      "bytes": [
         144,
-        14,
+        14
+      ],
+      "type": "code",
+      "mnemonic": "bcc",
+      "operand": "code_7fb5",
+      "target": 32693,
+      "target_label": "code_7fb5"
+    },
+    {
+      "addr": 32679,
+      "bytes": [
         201,
-        97,
+        97
+      ],
+      "type": "code",
+      "mnemonic": "cmp",
+      "operand": "#&61"
+    },
+    {
+      "addr": 32681,
+      "bytes": [
         144,
-        75,
+        75
+      ],
+      "type": "code",
+      "mnemonic": "bcc",
+      "operand": "code_7ff6",
+      "target": 32758,
+      "target_label": "code_7ff6"
+    },
+    {
+      "addr": 32683,
+      "bytes": [
         201,
-        123,
+        123
+      ],
+      "type": "code",
+      "mnemonic": "cmp",
+      "operand": "#&7b"
+    },
+    {
+      "addr": 32685,
+      "bytes": [
         176,
-        71,
-        56,
+        71
+      ],
+      "type": "code",
+      "mnemonic": "bcs",
+      "operand": "code_7ff6",
+      "target": 32758,
+      "target_label": "code_7ff6"
+    },
+    {
+      "addr": 32687,
+      "bytes": [
+        56
+      ],
+      "type": "code",
+      "mnemonic": "sec"
+    },
+    {
+      "addr": 32688,
+      "bytes": [
         233,
-        97,
+        97
+      ],
+      "type": "code",
+      "mnemonic": "sbc",
+      "operand": "#&61"
+    },
+    {
+      "addr": 32690,
+      "bytes": [
         76,
         184,
-        127,
-        56,
+        127
+      ],
+      "type": "code",
+      "mnemonic": "jmp",
+      "operand": "code_7fb8",
+      "target": 32696,
+      "target_label": "code_7fb8"
+    },
+    {
+      "addr": 32693,
+      "bytes": [
+        56
+      ],
+      "labels": [
+        "code_7fb5"
+      ],
+      "xref_summaries": [
+        "&7fb5 referenced 1 time by &7fa5"
+      ],
+      "references": [
+        {
+          "addr": 32677,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "sec"
+    },
+    {
+      "addr": 32694,
+      "bytes": [
         233,
-        65,
-        10,
-        10,
-        10,
+        65
+      ],
+      "type": "code",
+      "mnemonic": "sbc",
+      "operand": "#&41"
+    },
+    {
+      "addr": 32696,
+      "bytes": [
+        10
+      ],
+      "labels": [
+        "code_7fb8"
+      ],
+      "xref_summaries": [
+        "&7fb8 referenced 1 time by &7fb2"
+      ],
+      "references": [
+        {
+          "addr": 32690,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "asl"
+    },
+    {
+      "addr": 32697,
+      "bytes": [
+        10
+      ],
+      "type": "code",
+      "mnemonic": "asl"
+    },
+    {
+      "addr": 32698,
+      "bytes": [
+        10
+      ],
+      "type": "code",
+      "mnemonic": "asl"
+    },
+    {
+      "addr": 32699,
+      "bytes": [
         208,
-        0,
-        170,
-        24,
+        0
+      ],
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "code_7fbd",
+      "target": 32701,
+      "target_label": "code_7fbd"
+    },
+    {
+      "addr": 32701,
+      "bytes": [
+        170
+      ],
+      "labels": [
+        "code_7fbd"
+      ],
+      "xref_summaries": [
+        "&7fbd referenced 1 time by &7fbb"
+      ],
+      "references": [
+        {
+          "addr": 32699,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "tax"
+    },
+    {
+      "addr": 32702,
+      "bytes": [
+        24
+      ],
+      "type": "code",
+      "mnemonic": "clc"
+    },
+    {
+      "addr": 32703,
+      "bytes": [
         105,
-        8,
+        8
+      ],
+      "type": "code",
+      "mnemonic": "adc",
+      "operand": "#8"
+    },
+    {
+      "addr": 32705,
+      "bytes": [
         133,
-        112,
+        112
+      ],
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "data_0070",
+      "target": 112,
+      "target_label": "data_0070"
+    },
+    {
+      "addr": 32707,
+      "bytes": [
         160,
-        0,
+        0
+      ],
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#0"
+    },
+    {
+      "addr": 32709,
+      "bytes": [
         189,
         215,
-        18,
+        18
+      ],
+      "labels": [
+        "loop_7fc5"
+      ],
+      "xref_summaries": [
+        "&7fc5 referenced 1 time by &7fcf"
+      ],
+      "references": [
+        {
+          "addr": 32719,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "data_12d7,x",
+      "target": 4823,
+      "target_label": "data_12d7"
+    },
+    {
+      "addr": 32712,
+      "bytes": [
         153,
         0,
-        12,
-        200,
-        232,
+        12
+      ],
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "data_0c00,y",
+      "target": 3072,
+      "target_label": "data_0c00"
+    },
+    {
+      "addr": 32715,
+      "bytes": [
+        200
+      ],
+      "type": "code",
+      "mnemonic": "iny"
+    },
+    {
+      "addr": 32716,
+      "bytes": [
+        232
+      ],
+      "type": "code",
+      "mnemonic": "inx"
+    },
+    {
+      "addr": 32717,
+      "bytes": [
         228,
-        112,
+        112
+      ],
+      "type": "code",
+      "mnemonic": "cpx",
+      "operand": "data_0070",
+      "target": 112,
+      "target_label": "data_0070"
+    },
+    {
+      "addr": 32719,
+      "bytes": [
         208,
-        244,
-        104,
-        168,
-        104,
-        170,
+        244
+      ],
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "loop_7fc5",
+      "target": 32709,
+      "target_label": "loop_7fc5"
+    },
+    {
+      "addr": 32721,
+      "bytes": [
+        104
+      ],
+      "labels": [
+        "loop_7fd1"
+      ],
+      "xref_summaries": [
+        "&7fd1 referenced 1 time by &7ff4"
+      ],
+      "references": [
+        {
+          "addr": 32756,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 32722,
+      "bytes": [
+        168
+      ],
+      "type": "code",
+      "mnemonic": "tay"
+    },
+    {
+      "addr": 32723,
+      "bytes": [
+        104
+      ],
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 32724,
+      "bytes": [
+        170
+      ],
+      "type": "code",
+      "mnemonic": "tax"
+    },
+    {
+      "addr": 32725,
+      "bytes": [
         169,
-        128,
+        128
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&80"
+    },
+    {
+      "addr": 32727,
+      "bytes": [
         76,
         164,
-        224,
-        56,
+        224
+      ],
+      "type": "code",
+      "mnemonic": "jmp",
+      "operand": "data_e0a4",
+      "target": 57508,
+      "target_label": "data_e0a4"
+    },
+    {
+      "addr": 32730,
+      "bytes": [
+        56
+      ],
+      "labels": [
+        "code_7fda"
+      ],
+      "xref_summaries": [
+        "&7fda referenced 1 time by &7f9d"
+      ],
+      "references": [
+        {
+          "addr": 32669,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "sec"
+    },
+    {
+      "addr": 32731,
+      "bytes": [
         233,
-        48,
-        10,
-        10,
-        10,
-        170,
-        24,
+        48
+      ],
+      "type": "code",
+      "mnemonic": "sbc",
+      "operand": "#&30"
+    },
+    {
+      "addr": 32733,
+      "bytes": [
+        10
+      ],
+      "type": "code",
+      "mnemonic": "asl"
+    },
+    {
+      "addr": 32734,
+      "bytes": [
+        10
+      ],
+      "type": "code",
+      "mnemonic": "asl"
+    },
+    {
+      "addr": 32735,
+      "bytes": [
+        10
+      ],
+      "type": "code",
+      "mnemonic": "asl"
+    },
+    {
+      "addr": 32736,
+      "bytes": [
+        170
+      ],
+      "type": "code",
+      "mnemonic": "tax"
+    },
+    {
+      "addr": 32737,
+      "bytes": [
+        24
+      ],
+      "type": "code",
+      "mnemonic": "clc"
+    },
+    {
+      "addr": 32738,
+      "bytes": [
         105,
-        8,
+        8
+      ],
+      "type": "code",
+      "mnemonic": "adc",
+      "operand": "#8"
+    },
+    {
+      "addr": 32740,
+      "bytes": [
         133,
-        112,
+        112
+      ],
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "data_0070",
+      "target": 112,
+      "target_label": "data_0070"
+    },
+    {
+      "addr": 32742,
+      "bytes": [
         160,
-        0,
+        0
+      ],
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#0"
+    },
+    {
+      "addr": 32744,
+      "bytes": [
         189,
         167,
-        19,
+        19
+      ],
+      "labels": [
+        "loop_7fe8"
+      ],
+      "xref_summaries": [
+        "&7fe8 referenced 1 time by &7ff2"
+      ],
+      "references": [
+        {
+          "addr": 32754,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "data_13a7,x",
+      "target": 5031,
+      "target_label": "data_13a7"
+    },
+    {
+      "addr": 32747,
+      "bytes": [
         153,
         0,
-        12,
-        200,
-        232,
+        12
+      ],
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "data_0c00,y",
+      "target": 3072,
+      "target_label": "data_0c00"
+    },
+    {
+      "addr": 32750,
+      "bytes": [
+        200
+      ],
+      "type": "code",
+      "mnemonic": "iny"
+    },
+    {
+      "addr": 32751,
+      "bytes": [
+        232
+      ],
+      "type": "code",
+      "mnemonic": "inx"
+    },
+    {
+      "addr": 32752,
+      "bytes": [
         228,
-        112,
+        112
+      ],
+      "type": "code",
+      "mnemonic": "cpx",
+      "operand": "data_0070",
+      "target": 112,
+      "target_label": "data_0070"
+    },
+    {
+      "addr": 32754,
+      "bytes": [
         208,
-        244,
+        244
+      ],
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "loop_7fe8",
+      "target": 32744,
+      "target_label": "loop_7fe8"
+    },
+    {
+      "addr": 32756,
+      "bytes": [
         240,
-        219,
-        104,
-        168,
-        104,
-        170,
+        219
+      ],
+      "type": "code",
+      "mnemonic": "beq",
+      "operand": "loop_7fd1",
+      "target": 32721,
+      "target_label": "loop_7fd1"
+    },
+    {
+      "addr": 32758,
+      "bytes": [
+        104
+      ],
+      "labels": [
+        "code_7ff6"
+      ],
+      "xref_summaries": [
+        "&7ff6 referenced 4 times by &7f99, &7fa1, &7fa9, &7fad"
+      ],
+      "references": [
+        {
+          "addr": 32665,
+          "kind": "direct"
+        },
+        {
+          "addr": 32673,
+          "kind": "direct"
+        },
+        {
+          "addr": 32681,
+          "kind": "direct"
+        },
+        {
+          "addr": 32685,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 32759,
+      "bytes": [
+        168
+      ],
+      "type": "code",
+      "mnemonic": "tay"
+    },
+    {
+      "addr": 32760,
+      "bytes": [
+        104
+      ],
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 32761,
+      "bytes": [
+        170
+      ],
+      "type": "code",
+      "mnemonic": "tax"
+    },
+    {
+      "addr": 32762,
+      "bytes": [
         165,
-        112,
+        112
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "data_0070",
+      "target": 112,
+      "target_label": "data_0070"
+    },
+    {
+      "addr": 32764,
+      "bytes": [
         76,
         164,
-        224,
+        224
+      ],
+      "type": "code",
+      "mnemonic": "jmp",
+      "operand": "data_e0a4",
+      "target": 57508,
+      "target_label": "data_e0a4"
+    },
+    {
+      "addr": 32767,
+      "bytes": [
+        0
+      ],
+      "type": "byte",
+      "values": [
         0
       ]
     }

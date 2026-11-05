@@ -15,7 +15,7 @@ osbyte_scan_keyboard_from_16 = &7a
 data_0000        = &00
 ; &00 referenced 1 time by &10e6
 data_0070        = &70
-; &70 referenced 40 times by &0422, &0439, &043b, &0452, &045a, &045c, &045e, &0465, &046b, &05a7, &05ab, &0984, &0991, &0f68, &143c, &14ec, &14f7, &14fb, &15c3, &1da6, &1e1c, &1e77, &20c6, &726d, &7282, &72c6, &72db, &72eb, &72fb, &75b8, &75d9, &75e4, &75fb, &7823, &7846, &784a, &78a1, &78bb, &78d5, &78ef
+; &70 referenced 47 times by &0422, &0439, &043b, &0452, &045a, &045c, &045e, &0465, &046b, &05a7, &05ab, &0984, &0991, &0f68, &143c, &14ec, &14f7, &14fb, &15c3, &1da6, &1e1c, &1e77, &20c6, &726d, &7282, &72c6, &72db, &72eb, &72fb, &75b8, &75d9, &75e4, &75fb, &7823, &7846, &784a, &78a1, &78bb, &78d5, &78ef, &7f8f, &7f95, &7fc1, &7fcd, &7fe4, &7ff0, &7ffa
 data_0071        = &71
 ; &71 referenced 29 times by &042a, &0458, &0469, &0471, &0967, &097b, &0f77, &1440, &15c7, &1da2, &1e18, &1e73, &20c2, &7269, &72c2, &75b4, &75d5, &75ec, &7603, &7797, &77a9, &77bb, &77cd, &77ef, &77f3, &78a8, &78c2, &78dc, &78f6
 data_0072        = &72
@@ -114,6 +114,8 @@ data_c376        = &c376
 ; &c376 used as index base 1 time by &0976
 data_d9cd        = &d9cd
 ; &d9cd referenced 1 time by &0481
+data_e0a4        = &e0a4
+; &e0a4 referenced 2 times by &7fd7, &7ffc
 system_via_t1c_l = &fe44
 ; &fe44 referenced 3 times by &11be, &7a6f, &7aac
 osrdch           = &ffe0
@@ -794,7 +796,7 @@ data_0bfc = data_0ba0+92
     equb &10, &10, &10, &10, &10, &10, &10, &10
     equb &13, &00, &04, &00, &64, &00, &1e, &00
     equb &13, &00, &02, &00, &c8, &00, &02, &00
-; &0c00 used as index base 1 time by &1567
+; &0c00 used as index base 3 times by &1567, &7fc8, &7feb
 .data_0c00
     equs "TIKP$UTHO[KF,D]/DYW3CZD\8V\;VHRVao"
     equb &02
@@ -1503,6 +1505,9 @@ data_12d4 = data_1210+196
     equb &00, &00, &0f, &07, &0b, &0f, &00, &00
     equb &00, &00, &05, &0f, &0f, &0a, &00, &00
     equb &3d, &26, &00, &a4, &e0, &00
+.sub_12d6
+; &12d7 used as index base 1 time by &7fc5
+data_12d7 = sub_12d6+1
     equs "s<BB"
     equb &8e, &f2, &82, &c6, &00
     equs "xDB"
@@ -1547,6 +1552,8 @@ data_12d4 = data_1210+196
     equb &18, &18, &24, &c6, &00, &86, &42, &32
     equb &0c, &08, &10, &70, &00, &7e, &02, &04
     equb &18, &20, &42, &fe, &00
+; &13a7 used as index base 1 time by &7fe8
+.data_13a7
     equs "<FJ"
     equb &92, &a2, &c4, &78, &00, &08, &18, &08
     equb &10, &10, &10, &3c, &00, &3c, &42, &02
@@ -5526,21 +5533,92 @@ data_7f5e = sub_7f58+6
     equs "___)c_S+S((``(*b(()(++++)(()(Q"
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &85, &70, &8a, &48, &98, &48
-    equb &a5, &70, &c9, &30, &90, &5b, &c9, &3a
-    equb &90, &3b, &c9, &41, &90, &53, &c9, &5b
-    equb &90, &0e, &c9, &61, &90, &4b, &c9, &7b
-    equb &b0, &47, &38, &e9, &61, &4c, &b8, &7f
-    equb &38, &e9, &41, &0a, &0a, &0a, &d0, &00
-    equb &aa, &18, &69, &08, &85, &70, &a0, &00
-    equb &bd, &d7, &12, &99, &00, &0c, &c8, &e8
-    equb &e4, &70, &d0, &f4, &68, &a8, &68, &aa
-    equb &a9, &80, &4c, &a4, &e0, &38, &e9, &30
-    equb &0a, &0a, &0a, &aa, &18, &69, &08, &85
-    equb &70, &a0, &00, &bd, &a7, &13, &99, &00
-    equb &0c, &c8, &e8, &e4, &70, &d0, &f4, &f0
-    equb &db, &68, &a8, &68, &aa, &a5, &70, &4c
-    equb &a4, &e0, &00
+    equb &00, &00
+.wrch_handler
+    sta data_0070
+    txa
+    pha
+    tya
+    pha
+    lda data_0070
+    cmp #&30 ; '0'
+    bcc code_7ff6
+    cmp #&3a ; ':'
+    bcc code_7fda
+    cmp #&41 ; 'A'
+    bcc code_7ff6
+    cmp #&5b ; '['
+    bcc code_7fb5
+    cmp #&61 ; 'a'
+    bcc code_7ff6
+    cmp #&7b ; '{'
+    bcs code_7ff6
+    sec
+    sbc #&61 ; 'a'
+    jmp code_7fb8
+; &7fb5 referenced 1 time by &7fa5
+.code_7fb5
+    sec
+    sbc #&41 ; 'A'
+; &7fb8 referenced 1 time by &7fb2
+.code_7fb8
+    asl a
+    asl a
+    asl a
+    bne code_7fbd
+; &7fbd referenced 1 time by &7fbb
+.code_7fbd
+    tax
+    clc
+    adc #8
+    sta data_0070
+    ldy #0
+; &7fc5 referenced 1 time by &7fcf
+.loop_7fc5
+    lda data_12d7,x
+    sta data_0c00,y
+    iny
+    inx
+    cpx data_0070
+    bne loop_7fc5
+; &7fd1 referenced 1 time by &7ff4
+.loop_7fd1
+    pla
+    tay
+    pla
+    tax
+    lda #&80
+    jmp data_e0a4
+; &7fda referenced 1 time by &7f9d
+.code_7fda
+    sec
+    sbc #&30 ; '0'
+    asl a
+    asl a
+    asl a
+    tax
+    clc
+    adc #8
+    sta data_0070
+    ldy #0
+; &7fe8 referenced 1 time by &7ff2
+.loop_7fe8
+    lda data_13a7,x
+    sta data_0c00,y
+    iny
+    inx
+    cpx data_0070
+    bne loop_7fe8
+    beq loop_7fd1
+; &7ff6 referenced 4 times by &7f99, &7fa1, &7fa9, &7fad
+.code_7ff6
+    pla
+    tay
+    pla
+    tax
+    lda data_0070
+    jmp data_e0a4
+    equb &00
 .dasmos_end
 
 save "Dunjun4", &0400, &0d00, &0400, &0400
@@ -5553,8 +5631,8 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     data_0d02:         59
 ;     data_0d03:         55
 ;     data_0d00:         50
+;     data_0070:         47
 ;     data_007a:         45
-;     data_0070:         40
 ;     data_0071:         29
 ;     data_0d10:         29
 ;     data_0d15:         27
@@ -5637,6 +5715,7 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     code_70c1:          4
 ;     code_7611:          4
 ;     code_7aea:          4
+;     code_7ff6:          4
 ;     data_007c:          4
 ;     data_0601:          4
 ;     data_06fc:          4
@@ -5675,6 +5754,7 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     data_0b26:          3
 ;     data_0b28:          3
 ;     data_0b80:          3
+;     data_0c00:          3
 ;     data_0dbc:          3
 ;     data_0dc0:          3
 ;     data_1bd0:          3
@@ -5743,6 +5823,7 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     data_7dd0:          2
 ;     data_7e23:          2
 ;     data_7e4c:          2
+;     data_e0a4:          2
 ;     osrdch:             2
 ;     return_14:          2
 ;     sub_0ecf:           2
@@ -5920,6 +6001,10 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     code_7cb3:          1
 ;     code_7cc2:          1
 ;     code_7cfb:          1
+;     code_7fb5:          1
+;     code_7fb8:          1
+;     code_7fbd:          1
+;     code_7fda:          1
 ;     dasmos_start:       1
 ;     data_0000:          1
 ;     data_00fa:          1
@@ -5936,7 +6021,6 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     data_0b30:          1
 ;     data_0b8f:          1
 ;     data_0b97:          1
-;     data_0c00:          1
 ;     data_0c3a:          1
 ;     data_0d19:          1
 ;     data_0d1f:          1
@@ -5959,6 +6043,8 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     data_10e8:          1
 ;     data_120f:          1
 ;     data_1210:          1
+;     data_12d7:          1
+;     data_13a7:          1
 ;     data_149b:          1
 ;     data_149c:          1
 ;     data_16d6:          1
@@ -6059,6 +6145,9 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     loop_7997:          1
 ;     loop_79aa:          1
 ;     loop_79cd:          1
+;     loop_7fc5:          1
+;     loop_7fd1:          1
+;     loop_7fe8:          1
 ;     return_1:           1
 ;     return_10:          1
 ;     return_11:          1
@@ -6325,6 +6414,11 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     code_7cb3
 ;     code_7cc2
 ;     code_7cfb
+;     code_7fb5
+;     code_7fb8
+;     code_7fbd
+;     code_7fda
+;     code_7ff6
 ;     data_0000
 ;     data_0070
 ;     data_0071
@@ -6454,6 +6548,8 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     data_1210
 ;     data_12d3
 ;     data_12d4
+;     data_12d7
+;     data_13a7
 ;     data_149b
 ;     data_149c
 ;     data_169f
@@ -6516,6 +6612,7 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     data_c375
 ;     data_c376
 ;     data_d9cd
+;     data_e0a4
 ;     data_fffc
 ;     data_fffd
 ;     loop_0437
@@ -6582,6 +6679,9 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     loop_7997
 ;     loop_79aa
 ;     loop_79cd
+;     loop_7fc5
+;     loop_7fd1
+;     loop_7fe8
 ;     return_1
 ;     return_10
 ;     return_11
@@ -6632,6 +6732,7 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     sub_11be
 ;     sub_11f2
 ;     sub_1204
+;     sub_12d6
 ;     sub_1400
 ;     sub_1446
 ;     sub_149a
@@ -6697,11 +6798,11 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 
 ; Stats:
 ;     Total size (Code + Data) = 15744 bytes
-;     Code                     = 6822 bytes (43%)
-;     Data                     = 8922 bytes (57%)
+;     Code                     = 6934 bytes (44%)
+;     Data                     = 8810 bytes (56%)
 ;
-;     Number of instructions   = 3114
-;     Number of data bytes     = 7678 bytes
+;     Number of instructions   = 3181
+;     Number of data bytes     = 7566 bytes
 ;     Number of data words     = 0 bytes
 ;     Number of string bytes   = 1244 bytes
 ;     Number of strings        = 189
