@@ -77,6 +77,122 @@ game.annotate(annotator)
 game.annotate_game_entry(annotator)
 game.annotate_level_check(annotator)
 game.annotate_start_level(annotator)
+game.annotate_level_end(annotator)
+game.annotate_menu_tables(annotator, 0x08B0)
+
+# ---------------------------------------------------------------------------
+# Specific to the official disc release: Coder, and moving between levels
+# by resetting the machine.
+
+annotator.label(0x08BC, "levels_started", group="disc_state", description=(
+    "Number of levels started, kept by Coder in page &08, which survives "
+    "the reset between levels."))
+annotator.label(0x08BD, "level_digits", length=2, group="disc_state",
+                description=(
+                    "The level number as ASCII digits for the level's "
+                    "filename: one digit and a space, or two digits."))
+annotator.label(0x0287, "os_break_intercept", group="os_workspace",
+                length=3, access="w", description=(
+                    "MOS BREAK intercept: if &0287 holds a JMP opcode the "
+                    "MOS jumps to &0287 twice during a reset, before and "
+                    "after the filing system is initialised (carry clear, "
+                    "then set)."))
+annotator.label(0x008E, "level_count_copy", group="zero_page", description=(
+    "Copy of levels_started that Coder leaves for game_entry."))
+
+annotator.label(0x514C, "stones_command", description="\"LOAD STONES 6680\", for level 25.")
+annotator.label(0x515D, "dun1_command", description="\"LOAD DUN1\".")
+annotator.label(0x5167, "level_command", description=(
+    "\"LOAD LEVEL nn 6B00\", with the digits written at level_command+10."))
+annotator.label(0x5171, "level_command_digits", length=2)
+annotator.string(0x514C, 16)
+annotator.byte(0x515C, 1)
+annotator.string(0x515D, 9)
+annotator.byte(0x5166, 1)
+annotator.string(0x5167, 17)
+
+annotator.sub(0x5000, "coder_start", "Coder: load the game and the next level",
+              "Run with *RUN CODER at the start of every level. Count the "
+              "level, reload Dun1 (which contains this code, so the bytes "
+              "being run are rewritten with identical ones), load the level "
+              "file at &6B00 (level 25 comes from the end of Stones), copy "
+              "one of the two &0400-&07FF images and the &08C0-&1FFF image "
+              "into place, and enter the game.")
+for addr, text in [
+    (0x5000, "OSBYTE &C8: set the ESCAPE and BREAK effect..."),
+    (0x5009, "VDU 6, 3: enable the screen, disable the printer"),
+    (0x5013, "Cancel the BREAK intercept"),
+    (0x5015, "..."),
+    (0x5018, "Count the level"),
+    (0x501B, "Advance the ASCII level number..."),
+    (0x504A, "VDU 23 commands that set up the 6845 for loading"),
+    (0x5057, "VDU 21: disable the screen..."),
+    (0x505C, "...and reload Dun1"),
+    (0x5063, "Put the level number's digits in level_command"),
+    (0x506F, "Leave the level count in level_count_copy for game_entry"),
+    (0x5074, "level_number = levels started - 1 (game_entry counts it again)"),
+    (0x507D, "Level 25?"),
+    (0x5081, "Yes: load Stones, which ends with level 25..."),
+    (0x5088, "..."),
+    (0x508B, "No: load LEVELnn"),
+    (0x5092, "VDU 6: enable the screen"),
+    (0x5097, "Copy to &0400..."),
+    (0x509F, "...from &51B0 or &55B0"),
+    (0x50A3, "Read the joystick's horizontal channel"),
+    (0x50AA, "High byte &80 (a joystick at rest?)..."),
+    (0x50AE, "...yes: copy the image with the joystick handler, at &55B0"),
+    (0x50B4, "...no: copy the keyboard-only image at &51B0"),
+]:
+    annotator.c(addr, text)
+annotator.c(0x5002, "...with X = 1: ESCAPE disabled")
+
+annotator.label(0x0E14, "level_loop")
+annotator.c(0x0D6B, "Recover the level count Coder left in level_count_copy")
+annotator.c(0x0D6D, "...as level_number")
+annotator.c(0x0D70, "...and level_bcd")
+annotator.c(0x0D72, "...")
+annotator.c(0x0D75, "First level?")
+annotator.c(0x0D7A, "...")
+annotator.c(0x0D7C, "No: carry on with the heroes as they were")
+annotator.c(0x0D7F, "Yes: start a new game")
+annotator.c(0x0E14, "Monster hit points = 6 + 2 x levels started...")
+annotator.c(0x0E1E, "...and play the level")
+annotator.c(0x0E45, "Next level: reset the machine and run Coder")
+annotator.c(0x0EC3, "Wait up to &246 centiseconds for a key...")
+annotator.c(0x0ECC, "...then restart the game by resetting the machine")
+
+annotator.sub(0x1460, "next_level_by_reset", "Move on to the next level by resetting the machine",
+              "Set the BREAK intercept to next_level_intercept and jump to "
+              "the MOS 1.20 reset entry.")
+annotator.c(0x1460, "BREAK intercept = JMP next_level_intercept...")
+annotator.c(0x146F, "Reset the machine")
+annotator.sub(0x144F, "restart_by_reset", "Restart the game by resetting the machine",
+              "Set the BREAK intercept to restart_intercept and reset the "
+              "machine.")
+annotator.c(0x144F, "BREAK intercept = JMP restart_intercept...")
+annotator.c(0x145E, "...and reset (always branches)")
+annotator.entry(0x1472)
+annotator.sub(0x1472, "restart_intercept", "BREAK intercept: reload the game",
+              "Called by the MOS during the reset. On the second call (carry "
+              "set) clear the screen and issue *DISC and *DUNJUNZ.",
+              on_entry={"C": "set on the second call, after the filing "
+                             "system is initialised"})
+annotator.entry(0x15B5)
+annotator.sub(0x15B5, "next_level_intercept", "BREAK intercept: run Coder for the next level",
+              "Called by the MOS during the reset. On the second call (carry "
+              "set) select MODE 2 and issue *DISC and *RUN CODER.",
+              on_entry={"C": "set on the second call, after the filing "
+                             "system is initialised"})
+annotator.sub(0x1446, "check_level", "Check the level and set the text window",
+              "Decrypt and check the level (Coder has already loaded it), and "
+              "set the bottom row used by clear_text_area.")
+
+annotator.c(0x1ED7, "OSBYTE &7A: is a key pressed?")
+annotator.c(0x1EDC, "P (internal key &37)?")
+annotator.c(0x1EDE, "No: return")
+annotator.c(0x1EE0, "Paused: wait for P to be released...")
+annotator.c(0x1EE7, "...then pressed again")
+annotator.c(0x1EEE, "Restart the frame timing")
 
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)

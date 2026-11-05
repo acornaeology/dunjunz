@@ -866,15 +866,6 @@ def annotate_cassette_level_loop(a: Annotator) -> None:
     a.label(0x16D5, "level_filename_digits", description=(
         "Where the level number's digits are written into the level's "
         "filename."))
-    a.label(0x0F90, "game_over_message", description=(
-        "The message printed when every hero has died, terminated by a zero "
-        "byte."))
-    a.label(0x0FF1, "panel_hero", description=(
-        "Hero counter for draw_status_panel. It is a byte of "
-        "game_over_message, which is repaired before printing."))
-    a.label(0x0FF2, "count", description=(
-        "Counter, used for the dead heroes at the end of a level and the "
-        "rows of missile icons. It is a byte of game_over_message."))
     a.label(0x0E14, "level_loop")
     a.block(0x0E14, "Play each level in turn until every hero is dead.")
     a.c(0x0E14, "Monster hit points = 8 + 2 x (levels played)...")
@@ -908,6 +899,55 @@ def annotate_cassette_level_loop(a: Annotator) -> None:
     a.c(0x0E4F, "...goes first")
     a.c(0x0E52, "Terminate the filename with a carriage return")
     a.c(0x0E54, "...")
+    a.c(0x0EC3, "Wait up to 6000 centiseconds (60 s) for a key...")
+    a.c(0x0EC5, "...")
+    a.c(0x0EC7, "...")
+    a.c(0x0EC9, "...")
+    a.c(0x0ECC, "...then start a new game")
+
+    a.sub(0x15B1, "show_level_number", "Show the number of the level about to start",
+          "Clear the text area, count the level, plot the word LEVEL and "
+          "print the number in the game's font, then set a text window and "
+          "colour for later messages.")
+    a.c(0x15B1, "Clear the text area")
+    a.c(0x15B4, "COLOUR 6...")
+    a.c(0x15B9, "...")
+    a.c(0x15BE, "Count the level")
+    a.c(0x15C1, "Plot the word LEVEL...")
+    a.c(0x15C5, "...")
+    a.c(0x15C9, "...")
+    a.c(0x15CD, "...")
+    a.c(0x15D0, "TAB(10,5)...")
+    a.c(0x15D5, "...")
+    a.c(0x15DA, "...")
+    a.c(0x15DF, "Print the tens digit...")
+    a.c(0x15E2, "...")
+    a.c(0x15E3, "...")
+    a.c(0x15E8, "...")
+    a.c(0x15EA, "...in the game's font")
+    a.c(0x15ED, "Print the units digit...")
+    a.c(0x15EE, "...")
+    a.c(0x15F1, "...")
+    a.c(0x15F3, "...in the game's font")
+    a.c(0x15F6, "VDU 28,1,22,14,17: a text window...")
+    a.c(0x1605, "...")
+    a.c(0x160A, "COLOUR 2...")
+    a.c(0x1614, "...")
+    a.c(0x1619, "Return")
+
+
+def annotate_level_end(a: Annotator) -> None:
+    """&0E57-&0EC2: playing a level and the game-over message, identical in
+    every version apart from where the branches lead."""
+    a.label(0x0F90, "game_over_message", description=(
+        "The message printed when every hero has died, terminated by a zero "
+        "byte."))
+    a.label(0x0FF1, "panel_hero", description=(
+        "Hero counter for draw_status_panel. It is a byte of "
+        "game_over_message, which is repaired before printing."))
+    a.label(0x0FF2, "count", description=(
+        "Counter, used for the dead heroes at the end of a level and the "
+        "rows of missile icons. It is a byte of game_over_message."))
     a.c(0x0E57, "Load and draw the level")
     a.c(0x0E5A, "Draw the status panel")
     a.c(0x0E5D, "Take out the heroes nobody plays")
@@ -945,38 +985,14 @@ def annotate_cassette_level_loop(a: Annotator) -> None:
     a.c(0x0EBC, "...")
     a.c(0x0EBE, "Flush the input buffers")
     a.c(0x0EC0, "...")
-    a.c(0x0EC3, "Wait up to 6000 centiseconds (60 s) for a key...")
-    a.c(0x0EC5, "...")
-    a.c(0x0EC7, "...")
-    a.c(0x0EC9, "...")
-    a.c(0x0ECC, "...then start a new game")
 
-    a.sub(0x15B1, "show_level_number", "Show the number of the level about to start",
-          "Clear the text area, count the level, plot the word LEVEL and "
-          "print the number in the game's font, then set a text window and "
-          "colour for later messages.")
-    a.c(0x15B1, "Clear the text area")
-    a.c(0x15B4, "COLOUR 6...")
-    a.c(0x15B9, "...")
-    a.c(0x15BE, "Count the level")
-    a.c(0x15C1, "Plot the word LEVEL...")
-    a.c(0x15C5, "...")
-    a.c(0x15C9, "...")
-    a.c(0x15CD, "...")
-    a.c(0x15D0, "TAB(10,5)...")
-    a.c(0x15D5, "...")
-    a.c(0x15DA, "...")
-    a.c(0x15DF, "Print the tens digit...")
-    a.c(0x15E2, "...")
-    a.c(0x15E3, "...")
-    a.c(0x15E8, "...")
-    a.c(0x15EA, "...in the game's font")
-    a.c(0x15ED, "Print the units digit...")
-    a.c(0x15EE, "...")
-    a.c(0x15F1, "...")
-    a.c(0x15F3, "...in the game's font")
-    a.c(0x15F6, "VDU 28,1,22,14,17: a text window...")
-    a.c(0x1605, "...")
-    a.c(0x160A, "COLOUR 2...")
-    a.c(0x1614, "...")
-    a.c(0x1619, "Return")
+
+def annotate_menu_tables(a: Annotator, base: int) -> None:
+    """The per-hero table pair the menu and score code use: at &06F8 in the
+    cassette lineage, moved to &08B0 in the official disc release, where
+    page &04-&07 is reloaded for every level."""
+    a.label(base, "hero_score_ten_thousands", length=4, group="game_state", description=(
+        "Each hero's score ten-thousands digit as a small digit sprite "
+        "(&69 for none, &6A-&72 for 1-9)."))
+    a.label(base + 4, "hero_absent", length=4, group="game_state", description=(
+        "Non-zero for each hero switched off on the menu."))

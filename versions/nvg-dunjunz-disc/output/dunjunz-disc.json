@@ -867,6 +867,54 @@
       "name": "start_level",
       "title": "Set up and draw a new level",
       "description": "Show the level number, load and unpack the level, reset the workspace and monsters, then clear the text area, set the screen to its full 25-row height and draw the view frames and views."
+    },
+    {
+      "addr": 20480,
+      "name": "coder_start",
+      "title": "Coder: load the game and the next level",
+      "description": "Run with *RUN CODER at the start of every level. Count the level, reload Dun1 (which contains this code, so the bytes being run are rewritten with identical ones), load the level file at &6B00 (level 25 comes from the end of Stones), copy one of the two &0400-&07FF images and the &08C0-&1FFF image into place, and enter the game."
+    },
+    {
+      "addr": 5216,
+      "binary_addr": 15264,
+      "name": "next_level_by_reset",
+      "title": "Move on to the next level by resetting the machine",
+      "description": "Set the BREAK intercept to next_level_intercept and jump to the MOS 1.20 reset entry."
+    },
+    {
+      "addr": 5199,
+      "binary_addr": 15247,
+      "name": "restart_by_reset",
+      "title": "Restart the game by resetting the machine",
+      "description": "Set the BREAK intercept to restart_intercept and reset the machine.",
+      "fall_through": true
+    },
+    {
+      "addr": 5234,
+      "binary_addr": 15282,
+      "name": "restart_intercept",
+      "title": "BREAK intercept: reload the game",
+      "description": "Called by the MOS during the reset. On the second call (carry set) clear the screen and issue *DISC and *DUNJUNZ.",
+      "on_entry": {
+        "C": "set on the second call, after the filing system is initialised"
+      }
+    },
+    {
+      "addr": 5557,
+      "binary_addr": 15605,
+      "name": "next_level_intercept",
+      "title": "BREAK intercept: run Coder for the next level",
+      "description": "Called by the MOS during the reset. On the second call (carry set) select MODE 2 and issue *DISC and *RUN CODER.",
+      "on_entry": {
+        "C": "set on the second call, after the filing system is initialised"
+      }
+    },
+    {
+      "addr": 5190,
+      "binary_addr": 15238,
+      "name": "check_level",
+      "title": "Check the level and set the text window",
+      "description": "Decrypt and check the level (Coder has already loaded it), and set the bottom row used by clear_text_area."
     }
   ],
   "banners": [
@@ -931,7 +979,7 @@
     "data_0082": 130,
     "data_0084": 132,
     "data_008d": 141,
-    "data_008e": 142,
+    "level_count_copy": 142,
     "data_008f": 143,
     "os_text_ptr": 242,
     "romsel_copy": 244,
@@ -966,7 +1014,7 @@
     "ind2v": 562,
     "ind3v": 564,
     "os_vsync_counter": 576,
-    "data_0287": 647,
+    "os_break_intercept": 647,
     "data_0288": 648,
     "data_0289": 649,
     "add_thousand_points": 1024,
@@ -1021,10 +1069,10 @@
     "data_07d5": 2005,
     "data_07e6": 2022,
     "data_07e9": 2025,
-    "data_08b0": 2224,
-    "data_08b4": 2228,
-    "data_08bc": 2236,
-    "data_08bd": 2237,
+    "hero_score_ten_thousands": 2224,
+    "hero_absent": 2228,
+    "levels_started": 2236,
+    "level_digits": 2237,
     "data_08be": 2238,
     "mos_row_offsets": 50037,
     "mos_row_offsets_lo": 50038,
@@ -1231,6 +1279,12 @@
       "description": "Sprite to plot: an index into the sprite tables at sprite_addr_lo, sprite_addr_hi, sprite_widths and sprite_heights."
     },
     {
+      "addr": 142,
+      "name": "level_count_copy",
+      "group": "zero_page",
+      "description": "Copy of levels_started that Coder leaves for game_entry."
+    },
+    {
       "addr": 576,
       "name": "os_vsync_counter",
       "group": "os_workspace",
@@ -1241,6 +1295,16 @@
       "description": "MOS 1.20 counter decremented on every vertical sync interrupt. The game sets it and waits for it to run out to pace itself."
     },
     {
+      "addr": 647,
+      "name": "os_break_intercept",
+      "length": 3,
+      "group": "os_workspace",
+      "access": [
+        "w"
+      ],
+      "description": "MOS BREAK intercept: if &0287 holds a JMP opcode the MOS jumps to &0287 twice during a reset, before and after the filing system is initialised (carry clear, then set)."
+    },
+    {
       "addr": 1168,
       "name": "level_checksums",
       "group": "game_data",
@@ -1248,6 +1312,39 @@
         "b"
       ],
       "description": "The expected sum of each decrypted level, for levels 1-25 at level_checksums+1 to level_checksums+25."
+    },
+    {
+      "addr": 2224,
+      "name": "hero_score_ten_thousands",
+      "length": 4,
+      "group": "game_state",
+      "access": [
+        "b"
+      ],
+      "description": "Each hero's score ten-thousands digit as a small digit sprite (&69 for none, &6A-&72 for 1-9)."
+    },
+    {
+      "addr": 2228,
+      "name": "hero_absent",
+      "length": 4,
+      "group": "game_state",
+      "access": [
+        "b"
+      ],
+      "description": "Non-zero for each hero switched off on the menu."
+    },
+    {
+      "addr": 2236,
+      "name": "levels_started",
+      "group": "disc_state",
+      "description": "Number of levels started, kept by Coder in page &08, which survives the reset between levels."
+    },
+    {
+      "addr": 2237,
+      "name": "level_digits",
+      "length": 2,
+      "group": "disc_state",
+      "description": "The level number as ASCII digits for the level's filename: one digit and a space, or two digits."
     },
     {
       "addr": 50037,
@@ -16942,11 +17039,12 @@
         142
       ],
       "binary_addr": 13483,
+      "comment_inline": "Recover the level count Coder left in level_count_copy",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_008e",
+      "operand": "level_count_copy",
       "target": 142,
-      "target_label": "data_008e"
+      "target_label": "level_count_copy"
     },
     {
       "addr": 3437,
@@ -16956,6 +17054,7 @@
         22
       ],
       "binary_addr": 13485,
+      "comment_inline": "...as level_number",
       "type": "code",
       "mnemonic": "sta",
       "operand": "level_number",
@@ -16972,6 +17071,7 @@
       "labels": [
         "hero_key_up"
       ],
+      "comment_inline": "...and level_bcd",
       "xref_summaries": [
         "&34b0 used as index base 1 time by &6ec1"
       ],
@@ -17003,6 +17103,7 @@
           "hero_key_down"
         ]
       },
+      "comment_inline": "...",
       "xref_summaries": [
         "&34b4 used as index base 1 time by &6ed4"
       ],
@@ -17020,11 +17121,12 @@
         8
       ],
       "binary_addr": 13493,
+      "comment_inline": "First level?",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_08bc",
+      "operand": "levels_started",
       "target": 2236,
-      "target_label": "data_08bc"
+      "target_label": "levels_started"
     },
     {
       "addr": 3448,
@@ -17056,6 +17158,7 @@
         3
       ],
       "binary_addr": 13498,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_0d7f",
@@ -17073,6 +17176,7 @@
       "labels": [
         "hero_key_left"
       ],
+      "comment_inline": "No: carry on with the heroes as they were",
       "xref_summaries": [
         "&34bc used as index base 1 time by &6efa"
       ],
@@ -17084,9 +17188,9 @@
       ],
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_0e14",
+      "operand": "level_loop",
       "target": 3604,
-      "target_label": "code_0e14"
+      "target_label": "level_loop"
     },
     {
       "addr": 3455,
@@ -17103,6 +17207,7 @@
           "hero_key_fire"
         ]
       },
+      "comment_inline": "Yes: start a new game",
       "xref_summaries": [
         "&34bf referenced 1 time by &34ba",
         "&34c0 used as index base 1 time by &6f0d"
@@ -17900,22 +18005,24 @@
       ],
       "binary_addr": 13652,
       "labels": [
-        "code_0e14"
+        "level_loop"
       ],
+      "comment_inline": "Monster hit points = 6 + 2 x levels started...",
       "xref_summaries": [
-        "&3554 referenced 1 time by &34bc"
+        "&3554 referenced 1 time by &0d7c[1]"
       ],
       "references": [
         {
-          "addr": 13500,
-          "kind": "direct"
+          "addr": 3452,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_08bc",
+      "operand": "levels_started",
       "target": 2236,
-      "target_label": "data_08bc"
+      "target_label": "levels_started"
     },
     {
       "addr": 3607,
@@ -17968,6 +18075,7 @@
         14
       ],
       "binary_addr": 13662,
+      "comment_inline": "...and play the level",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_0e57",
@@ -18066,6 +18174,7 @@
       "labels": [
         "code_0e45"
       ],
+      "comment_inline": "Next level: reset the machine and run Coder",
       "xref_summaries": [
         "&3585 referenced 1 time by &35c4"
       ],
@@ -18077,9 +18186,9 @@
       ],
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_1460",
+      "operand": "next_level_by_reset",
       "target": 5216,
-      "target_label": "code_1460"
+      "target_label": "next_level_by_reset"
     },
     {
       "addr": 3656,
@@ -18135,6 +18244,7 @@
       "labels": [
         "code_0e57"
       ],
+      "comment_inline": "Load and draw the level",
       "xref_summaries": [
         "&3597 referenced 1 time by &355e"
       ],
@@ -18158,6 +18268,7 @@
         14
       ],
       "binary_addr": 13722,
+      "comment_inline": "Draw the status panel",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "draw_status_panel",
@@ -18172,6 +18283,7 @@
         6
       ],
       "binary_addr": 13725,
+      "comment_inline": "Take out the heroes nobody plays",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "remove_absent_heroes",
@@ -18185,6 +18297,7 @@
         1
       ],
       "binary_addr": 13728,
+      "comment_inline": "Let one vertical sync pass before play starts",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#1"
@@ -18197,6 +18310,7 @@
         2
       ],
       "binary_addr": 13730,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "os_vsync_counter",
@@ -18211,6 +18325,7 @@
         31
       ],
       "binary_addr": 13733,
+      "comment_inline": "Play the level until it ends",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "code_1f00",
@@ -18224,6 +18339,7 @@
         0
       ],
       "binary_addr": 13736,
+      "comment_inline": "Count the heroes who died, giving each back their starting attributes",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#0"
@@ -18236,11 +18352,12 @@
         15
       ],
       "binary_addr": 13738,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "stx",
-      "operand": "data_0ff2",
+      "operand": "count",
       "target": 4082,
-      "target_label": "data_0ff2"
+      "target_label": "count"
     },
     {
       "addr": 3693,
@@ -18253,6 +18370,7 @@
       "labels": [
         "code_0e6d"
       ],
+      "comment_inline": "Dead?",
       "xref_summaries": [
         "&35ad referenced 1 time by &35bd"
       ],
@@ -18275,6 +18393,7 @@
         29
       ],
       "binary_addr": 13744,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&1d"
@@ -18286,6 +18405,7 @@
         6
       ],
       "binary_addr": 13746,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_0e7a",
@@ -18300,6 +18420,7 @@
         14
       ],
       "binary_addr": 13748,
+      "comment_inline": "Yes: reset them",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "reset_hero",
@@ -18314,11 +18435,12 @@
         15
       ],
       "binary_addr": 13751,
+      "comment_inline": "...and count them",
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_0ff2",
+      "operand": "count",
       "target": 4082,
-      "target_label": "data_0ff2"
+      "target_label": "count"
     },
     {
       "addr": 3706,
@@ -18329,6 +18451,7 @@
       "labels": [
         "code_0e7a"
       ],
+      "comment_inline": "Next hero",
       "xref_summaries": [
         "&35ba referenced 1 time by &35b2"
       ],
@@ -18348,6 +18471,7 @@
         4
       ],
       "binary_addr": 13755,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#4"
@@ -18359,6 +18483,7 @@
         238
       ],
       "binary_addr": 13757,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_0e6d",
@@ -18373,11 +18498,12 @@
         15
       ],
       "binary_addr": 13759,
+      "comment_inline": "Any hero alive?",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0ff2",
+      "operand": "count",
       "target": 4082,
-      "target_label": "data_0ff2"
+      "target_label": "count"
     },
     {
       "addr": 3714,
@@ -18386,6 +18512,7 @@
         4
       ],
       "binary_addr": 13762,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#4"
@@ -18397,6 +18524,7 @@
         191
       ],
       "binary_addr": 13764,
+      "comment_inline": "Yes: on to the next level",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_0e45",
@@ -18410,6 +18538,7 @@
         28
       ],
       "binary_addr": 13766,
+      "comment_inline": "All dead: VDU 28,0,24,16,0, a text window on the left...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&1c"
@@ -18535,6 +18664,7 @@
         12
       ],
       "binary_addr": 13791,
+      "comment_inline": "...VDU 12 to clear it",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&0c"
@@ -18560,6 +18690,7 @@
         4
       ],
       "binary_addr": 13796,
+      "comment_inline": "Put spaces back over the four message bytes used as counters",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#4"
@@ -18571,6 +18702,7 @@
         32
       ],
       "binary_addr": 13798,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&20"
@@ -18586,6 +18718,7 @@
       "labels": [
         "code_0ea8"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&35e8 referenced 1 time by &35ec"
       ],
@@ -18607,6 +18740,7 @@
         202
       ],
       "binary_addr": 13803,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "dex"
     },
@@ -18617,6 +18751,7 @@
         250
       ],
       "binary_addr": 13804,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_0ea8",
@@ -18634,6 +18769,7 @@
       "labels": [
         "code_0eae"
       ],
+      "comment_inline": "Print game_over_message...",
       "xref_summaries": [
         "&35ee referenced 1 time by &35f7"
       ],
@@ -18645,9 +18781,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0f90,x",
+      "operand": "game_over_message,x",
       "target": 3984,
-      "target_label": "data_0f90"
+      "target_label": "game_over_message"
     },
     {
       "addr": 3761,
@@ -18657,6 +18793,7 @@
         255
       ],
       "binary_addr": 13809,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osasci",
@@ -18669,6 +18806,7 @@
         232
       ],
       "binary_addr": 13812,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inx"
     },
@@ -18679,6 +18817,7 @@
         0
       ],
       "binary_addr": 13813,
+      "comment_inline": "...up to its zero byte",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#0"
@@ -18690,6 +18829,7 @@
         245
       ],
       "binary_addr": 13815,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_0eae",
@@ -18707,6 +18847,7 @@
       "labels": [
         "code_0eb9"
       ],
+      "comment_inline": "Wait for the vertical sync counter to run out",
       "xref_summaries": [
         "&35f9 referenced 1 time by &35fc"
       ],
@@ -18729,6 +18870,7 @@
         251
       ],
       "binary_addr": 13820,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_0eb9",
@@ -18742,6 +18884,7 @@
         15
       ],
       "binary_addr": 13822,
+      "comment_inline": "Flush the input buffers",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osbyte_flush_buffer_class",
@@ -18760,7 +18903,7 @@
         255
       ],
       "binary_addr": 13824,
-      "comment_inline": "Flush selected class of buffer",
+      "comment_inline": "... Flush selected class of buffer",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -18774,6 +18917,7 @@
         70
       ],
       "binary_addr": 13827,
+      "comment_inline": "Wait up to &246 centiseconds for a key...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&46"
@@ -18829,12 +18973,12 @@
         20
       ],
       "binary_addr": 13836,
-      "comment_inline": "X=ASCII code typed (positive timeout) or internal key number EOR 128 (negative scan) / Y=0 if a key was pressed, Y=&FF on time-out, Y=&1B on Escape",
+      "comment_inline": "...then restart the game by resetting the machine",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_144f",
+      "operand": "restart_by_reset",
       "target": 5199,
-      "target_label": "code_144f"
+      "target_label": "restart_by_reset"
     },
     {
       "addr": 3791,
@@ -19037,9 +19181,9 @@
       "binary_addr": 13875,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_08b0,x",
+      "operand": "hero_score_ten_thousands,x",
       "target": 2224,
-      "target_label": "data_08b0"
+      "target_label": "hero_score_ten_thousands"
     },
     {
       "addr": 3830,
@@ -19084,9 +19228,9 @@
       "binary_addr": 13881,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0ff1",
+      "operand": "panel_hero",
       "target": 4081,
-      "target_label": "data_0ff1"
+      "target_label": "panel_hero"
     },
     {
       "addr": 3836,
@@ -19110,9 +19254,9 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "data_0ff1",
+      "operand": "panel_hero",
       "target": 4081,
-      "target_label": "data_0ff1"
+      "target_label": "panel_hero"
     },
     {
       "addr": 3839,
@@ -19249,9 +19393,9 @@
       "binary_addr": 13912,
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "data_0ff1",
+      "operand": "panel_hero",
       "target": 4081,
-      "target_label": "data_0ff1"
+      "target_label": "panel_hero"
     },
     {
       "addr": 3867,
@@ -19333,9 +19477,9 @@
       "binary_addr": 13928,
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "data_0ff1",
+      "operand": "panel_hero",
       "target": 4081,
-      "target_label": "data_0ff1"
+      "target_label": "panel_hero"
     },
     {
       "addr": 3883,
@@ -19404,9 +19548,9 @@
       "binary_addr": 13941,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0ff2",
+      "operand": "count",
       "target": 4082,
-      "target_label": "data_0ff2"
+      "target_label": "count"
     },
     {
       "addr": 3896,
@@ -19533,9 +19677,9 @@
       "binary_addr": 13960,
       "type": "code",
       "mnemonic": "cpy",
-      "operand": "data_0ff2",
+      "operand": "count",
       "target": 4082,
-      "target_label": "data_0ff2"
+      "target_label": "count"
     },
     {
       "addr": 3915,
@@ -19560,9 +19704,9 @@
       "binary_addr": 13965,
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "data_0ff1",
+      "operand": "panel_hero",
       "target": 4081,
-      "target_label": "data_0ff1"
+      "target_label": "panel_hero"
     },
     {
       "addr": 3920,
@@ -19644,9 +19788,9 @@
       "binary_addr": 13981,
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_0ff1",
+      "operand": "panel_hero",
       "target": 4081,
-      "target_label": "data_0ff1"
+      "target_label": "panel_hero"
     },
     {
       "addr": 3936,
@@ -19658,9 +19802,9 @@
       "binary_addr": 13984,
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0ff1",
+      "operand": "panel_hero",
       "target": 4081,
-      "target_label": "data_0ff1"
+      "target_label": "panel_hero"
     },
     {
       "addr": 3939,
@@ -19773,9 +19917,9 @@
       "binary_addr": 13997,
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "data_0ff1",
+      "operand": "panel_hero",
       "target": 4081,
-      "target_label": "data_0ff1"
+      "target_label": "panel_hero"
     },
     {
       "addr": 3952,
@@ -19925,7 +20069,15 @@
       "bytes": [
         49,
         57,
-        65,
+        65
+      ],
+      "binary_addr": 14029,
+      "type": "string",
+      "string": "19A"
+    },
+    {
+      "addr": 3984,
+      "bytes": [
         70,
         65,
         82,
@@ -19944,20 +20096,22 @@
         32,
         32
       ],
-      "binary_addr": 14029,
+      "binary_addr": 14032,
       "labels": [
-        "sub_0f8d"
+        "game_over_message"
       ],
-      "sub_labels": {
-        "3984": [
-          "data_0f90"
-        ]
-      },
       "xref_summaries": [
-        "&36d0 used as index base 1 time by &35ee"
+        "&36d0 used as index base 1 time by &0eae[1]"
+      ],
+      "references": [
+        {
+          "addr": 3758,
+          "kind": "indexed",
+          "move_id": 1
+        }
       ],
       "type": "string",
-      "string": "19AFAREWELL!        "
+      "string": "FAREWELL!        "
     },
     {
       "addr": 4001,
@@ -20123,8 +20277,85 @@
         32,
         65,
         76,
-        76,
-        46,
+        76
+      ],
+      "binary_addr": 14122,
+      "labels": [
+        "sub_0fea"
+      ],
+      "sub_labels": {
+        "4080": [
+          "data_0ff0"
+        ]
+      },
+      "xref_summaries": [
+        "&3730 used as index base 1 time by &35e8"
+      ],
+      "type": "string",
+      "string": "YOU ALL"
+    },
+    {
+      "addr": 4081,
+      "bytes": [
+        46
+      ],
+      "binary_addr": 14129,
+      "labels": [
+        "panel_hero"
+      ],
+      "xref_summaries": [
+        "&3731 referenced 8 times by &0ef9[1], &0efc[1], &0f18[1], &0f28[1], &0f4d[1], &0f5d[1], &0f60[1], &0f6d[1]"
+      ],
+      "references": [
+        {
+          "addr": 3833,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 3836,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 3864,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 3880,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 3917,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 3933,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 3936,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 3949,
+          "kind": "direct",
+          "move_id": 1
+        }
+      ],
+      "type": "byte",
+      "values": [
+        46
+      ]
+    },
+    {
+      "addr": 4082,
+      "bytes": [
         32,
         32,
         32,
@@ -20135,28 +20366,42 @@
         32,
         32
       ],
-      "binary_addr": 14122,
+      "binary_addr": 14130,
       "labels": [
-        "sub_0fea"
+        "count"
       ],
-      "sub_labels": {
-        "4080": [
-          "data_0ff0"
-        ],
-        "4081": [
-          "data_0ff1"
-        ],
-        "4082": [
-          "data_0ff2"
-        ]
-      },
       "xref_summaries": [
-        "&3730 used as index base 1 time by &35e8",
-        "&3731 referenced 8 times by &3639, &363c, &3658, &3668, &368d, &369d, &36a0, &36ad",
-        "&3732 referenced 5 times by &35aa, &35b7, &35bf, &3675, &3688"
+        "&3732 referenced 5 times by &0e6a[1], &0e77[1], &0e7f[1], &0f35[1], &0f48[1]"
+      ],
+      "references": [
+        {
+          "addr": 3690,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 3703,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 3711,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 3893,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 3912,
+          "kind": "direct",
+          "move_id": 1
+        }
       ],
       "type": "string",
-      "string": "YOU ALL.         "
+      "string": "         "
     },
     {
       "addr": 4091,
@@ -21377,9 +21622,9 @@
       "binary_addr": 14404,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_008e",
+      "operand": "level_count_copy",
       "target": 142,
-      "target_label": "data_008e"
+      "target_label": "level_count_copy"
     },
     {
       "addr": 4358,
@@ -21500,9 +21745,9 @@
       "binary_addr": 14421,
       "type": "code",
       "mnemonic": "dec",
-      "operand": "data_008e",
+      "operand": "level_count_copy",
       "target": 142,
-      "target_label": "data_008e"
+      "target_label": "level_count_copy"
     },
     {
       "addr": 4375,
@@ -24554,9 +24799,9 @@
       "comment_inline": "Load the level",
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_1446",
+      "operand": "check_level",
       "target": 5190,
-      "target_label": "sub_1446"
+      "target_label": "check_level"
     },
     {
       "addr": 5126,
@@ -24903,15 +25148,16 @@
       ],
       "binary_addr": 15238,
       "labels": [
-        "sub_1446"
+        "check_level"
       ],
       "xref_summaries": [
-        "&3b86 referenced 1 time by &3b43"
+        "&3b86 referenced 1 time by &1403[1]"
       ],
       "references": [
         {
-          "addr": 15171,
-          "kind": "direct"
+          "addr": 5123,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -24962,15 +25208,17 @@
       ],
       "binary_addr": 15247,
       "labels": [
-        "code_144f"
+        "restart_by_reset"
       ],
+      "comment_inline": "BREAK intercept = JMP restart_intercept...",
       "xref_summaries": [
-        "&3b8f referenced 1 time by &360c"
+        "&3b8f referenced 1 time by &0ecc[1]"
       ],
       "references": [
         {
-          "addr": 13836,
-          "kind": "direct"
+          "addr": 3788,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -25037,9 +25285,9 @@
       "binary_addr": 15259,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0287",
+      "operand": "os_break_intercept",
       "target": 647,
-      "target_label": "data_0287"
+      "target_label": "os_break_intercept"
     },
     {
       "addr": 5214,
@@ -25048,6 +25296,7 @@
         15
       ],
       "binary_addr": 15262,
+      "comment_inline": "...and reset (always branches)",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_146f",
@@ -25062,15 +25311,17 @@
       ],
       "binary_addr": 15264,
       "labels": [
-        "code_1460"
+        "next_level_by_reset"
       ],
+      "comment_inline": "BREAK intercept = JMP next_level_intercept...",
       "xref_summaries": [
-        "&3ba0 referenced 1 time by &3585"
+        "&3ba0 referenced 1 time by &0e45[1]"
       ],
       "references": [
         {
-          "addr": 13701,
-          "kind": "direct"
+          "addr": 3653,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -25087,9 +25338,9 @@
       "binary_addr": 15266,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0287",
+      "operand": "os_break_intercept",
       "target": 647,
-      "target_label": "data_0287"
+      "target_label": "os_break_intercept"
     },
     {
       "addr": 5221,
@@ -25152,6 +25403,7 @@
       "labels": [
         "code_146f"
       ],
+      "comment_inline": "Reset the machine",
       "xref_summaries": [
         "&3baf referenced 1 time by &3b9e"
       ],
@@ -25171,66 +25423,148 @@
       "addr": 5234,
       "bytes": [
         144,
-        19,
+        19
+      ],
+      "binary_addr": 15282,
+      "labels": [
+        "restart_intercept"
+      ],
+      "type": "code",
+      "mnemonic": "bcc",
+      "operand": "return_4",
+      "target": 5255,
+      "target_label": "return_4"
+    },
+    {
+      "addr": 5236,
+      "bytes": [
         169,
-        12,
+        12
+      ],
+      "binary_addr": 15284,
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&0c"
+    },
+    {
+      "addr": 5238,
+      "bytes": [
         32,
         238,
-        255,
+        255
+      ],
+      "binary_addr": 15286,
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 5241,
+      "bytes": [
         162,
-        137,
+        137
+      ],
+      "binary_addr": 15289,
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#&89"
+    },
+    {
+      "addr": 5243,
+      "bytes": [
         160,
-        20,
-        32,
-        247,
-        255,
-        162,
-        142,
-        160,
-        20,
+        20
+      ],
+      "binary_addr": 15291,
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#&14"
+    },
+    {
+      "addr": 5245,
+      "bytes": [
         32,
         247,
         255
       ],
-      "binary_addr": 15282,
-      "type": "byte",
-      "values": [
-        144,
-        19,
-        169,
-        12,
-        32,
-        238,
-        255,
+      "binary_addr": 15293,
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oscli",
+      "target": 65527,
+      "target_label": "oscli"
+    },
+    {
+      "addr": 5248,
+      "bytes": [
         162,
-        137,
+        142
+      ],
+      "binary_addr": 15296,
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#&8e"
+    },
+    {
+      "addr": 5250,
+      "bytes": [
         160,
-        20,
-        32,
-        247,
-        255,
-        162,
-        142,
-        160,
-        20,
+        20
+      ],
+      "binary_addr": 15298,
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#&14"
+    },
+    {
+      "addr": 5252,
+      "bytes": [
         32,
         247,
         255
-      ]
+      ],
+      "binary_addr": 15300,
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oscli",
+      "target": 65527,
+      "target_label": "oscli"
     },
     {
       "addr": 5255,
       "bytes": [
-        96,
+        96
+      ],
+      "binary_addr": 15303,
+      "labels": [
+        "return_4"
+      ],
+      "xref_summaries": [
+        "&3bc7 referenced 1 time by &3bb2"
+      ],
+      "references": [
+        {
+          "addr": 15282,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "rts"
+    },
+    {
+      "addr": 5256,
+      "bytes": [
         67,
         68,
         73,
         83,
         67
       ],
-      "binary_addr": 15303,
+      "binary_addr": 15304,
       "type": "string",
-      "string": "`CDISC"
+      "string": "CDISC"
     },
     {
       "addr": 5261,
@@ -26967,32 +27301,164 @@
       "addr": 5557,
       "bytes": [
         144,
-        24,
+        24
+      ],
+      "binary_addr": 15605,
+      "labels": [
+        "next_level_intercept"
+      ],
+      "type": "code",
+      "mnemonic": "bcc",
+      "operand": "return_5",
+      "target": 5583,
+      "target_label": "return_5"
+    },
+    {
+      "addr": 5559,
+      "bytes": [
         169,
-        22,
+        22
+      ],
+      "binary_addr": 15607,
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&16"
+    },
+    {
+      "addr": 5561,
+      "bytes": [
         32,
         238,
-        255,
+        255
+      ],
+      "binary_addr": 15609,
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 5564,
+      "bytes": [
         169,
-        2,
+        2
+      ],
+      "binary_addr": 15612,
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#2"
+    },
+    {
+      "addr": 5566,
+      "bytes": [
         32,
         238,
-        255,
+        255
+      ],
+      "binary_addr": 15614,
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 5569,
+      "bytes": [
         162,
-        224,
+        224
+      ],
+      "binary_addr": 15617,
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#&e0"
+    },
+    {
+      "addr": 5571,
+      "bytes": [
         160,
-        21,
+        21
+      ],
+      "binary_addr": 15619,
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#&15"
+    },
+    {
+      "addr": 5573,
+      "bytes": [
         32,
         247,
-        255,
+        255
+      ],
+      "binary_addr": 15621,
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oscli",
+      "target": 65527,
+      "target_label": "oscli"
+    },
+    {
+      "addr": 5576,
+      "bytes": [
         162,
-        229,
+        229
+      ],
+      "binary_addr": 15624,
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#&e5"
+    },
+    {
+      "addr": 5578,
+      "bytes": [
         160,
-        21,
+        21
+      ],
+      "binary_addr": 15626,
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#&15"
+    },
+    {
+      "addr": 5580,
+      "bytes": [
         32,
         247,
-        255,
-        96,
+        255
+      ],
+      "binary_addr": 15628,
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oscli",
+      "target": 65527,
+      "target_label": "oscli"
+    },
+    {
+      "addr": 5583,
+      "bytes": [
+        96
+      ],
+      "binary_addr": 15631,
+      "labels": [
+        "return_5"
+      ],
+      "xref_summaries": [
+        "&3d0f referenced 1 time by &3cf5"
+      ],
+      "references": [
+        {
+          "addr": 15605,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "rts"
+    },
+    {
+      "addr": 5584,
+      "bytes": [
         247,
         255,
         162,
@@ -27003,36 +27469,9 @@
         247,
         255
       ],
-      "binary_addr": 15605,
+      "binary_addr": 15632,
       "type": "byte",
       "values": [
-        144,
-        24,
-        169,
-        22,
-        32,
-        238,
-        255,
-        169,
-        2,
-        32,
-        238,
-        255,
-        162,
-        224,
-        160,
-        21,
-        32,
-        247,
-        255,
-        162,
-        229,
-        160,
-        21,
-        32,
-        247,
-        255,
-        96,
         247,
         255,
         162,
@@ -34844,6 +35283,7 @@
         122
       ],
       "binary_addr": 17943,
+      "comment_inline": "OSBYTE &7A: is a key pressed?",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osbyte_scan_keyboard_from_16",
@@ -34876,6 +35316,7 @@
         55
       ],
       "binary_addr": 17948,
+      "comment_inline": "P (internal key &37)?",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#&37"
@@ -34887,11 +35328,12 @@
         19
       ],
       "binary_addr": 17950,
+      "comment_inline": "No: return",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "return_4",
+      "operand": "return_6",
       "target": 7923,
-      "target_label": "return_4"
+      "target_label": "return_6"
     },
     {
       "addr": 7904,
@@ -34904,7 +35346,7 @@
       "labels": [
         "code_1ee0"
       ],
-      "comment_inline": "Scan keyboard from key 16",
+      "comment_inline": "Paused: wait for P to be released... Scan keyboard from key 16",
       "xref_summaries": [
         "&4620 referenced 1 time by &4625"
       ],
@@ -34955,7 +35397,7 @@
       "labels": [
         "code_1ee7"
       ],
-      "comment_inline": "Scan keyboard from key 16",
+      "comment_inline": "...then pressed again Scan keyboard from key 16",
       "xref_summaries": [
         "&4627 referenced 1 time by &462c"
       ],
@@ -35002,6 +35444,7 @@
         16
       ],
       "binary_addr": 17966,
+      "comment_inline": "Restart the frame timing",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&10"
@@ -35027,7 +35470,7 @@
       ],
       "binary_addr": 17971,
       "labels": [
-        "return_4"
+        "return_6"
       ],
       "xref_summaries": [
         "&4633 referenced 1 time by &461e"
@@ -35392,9 +35835,9 @@
       "binary_addr": 18032,
       "type": "code",
       "mnemonic": "bmi",
-      "operand": "return_5",
+      "operand": "return_7",
       "target": 7989,
-      "target_label": "return_5"
+      "target_label": "return_7"
     },
     {
       "addr": 7986,
@@ -35417,7 +35860,7 @@
       ],
       "binary_addr": 18037,
       "labels": [
-        "return_5"
+        "return_7"
       ],
       "xref_summaries": [
         "&4675 referenced 1 time by &4670"
@@ -41244,6 +41687,7 @@
       "labels": [
         "coder_start"
       ],
+      "comment_inline": "OSBYTE &C8: set the ESCAPE and BREAK effect...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osbyte_escape_break_effect",
@@ -41260,6 +41704,7 @@
         162,
         1
       ],
+      "comment_inline": "...with X = 1: ESCAPE disabled",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#1"
@@ -41294,6 +41739,7 @@
         169,
         6
       ],
+      "comment_inline": "VDU 6, 3: enable the screen, disable the printer",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#6"
@@ -41340,6 +41786,7 @@
         169,
         0
       ],
+      "comment_inline": "Cancel the BREAK intercept",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -41351,11 +41798,12 @@
         135,
         2
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0287",
+      "operand": "os_break_intercept",
       "target": 647,
-      "target_label": "data_0287"
+      "target_label": "os_break_intercept"
     },
     {
       "addr": 20504,
@@ -41364,11 +41812,12 @@
         188,
         8
       ],
+      "comment_inline": "Count the level",
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_08bc",
+      "operand": "levels_started",
       "target": 2236,
-      "target_label": "data_08bc"
+      "target_label": "levels_started"
     },
     {
       "addr": 20507,
@@ -41377,6 +41826,7 @@
         190,
         8
       ],
+      "comment_inline": "Advance the ASCII level number...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "data_08be",
@@ -41490,9 +41940,9 @@
       ],
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_08bd",
+      "operand": "level_digits",
       "target": 2237,
-      "target_label": "data_08bd"
+      "target_label": "level_digits"
     },
     {
       "addr": 20532,
@@ -41527,9 +41977,9 @@
       ],
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_08bd",
+      "operand": "level_digits",
       "target": 2237,
-      "target_label": "data_08bd"
+      "target_label": "level_digits"
     },
     {
       "addr": 20537,
@@ -41540,9 +41990,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_08bd",
+      "operand": "level_digits",
       "target": 2237,
-      "target_label": "data_08bd"
+      "target_label": "level_digits"
     },
     {
       "addr": 20540,
@@ -41585,9 +42035,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_08bd",
+      "operand": "level_digits",
       "target": 2237,
-      "target_label": "data_08bd"
+      "target_label": "level_digits"
     },
     {
       "addr": 20549,
@@ -41621,6 +42071,7 @@
       "labels": [
         "code_504a"
       ],
+      "comment_inline": "VDU 23 commands that set up the 6845 for loading",
       "xref_summaries": [
         "&504a referenced 3 times by &502a, &5034, &503e"
       ],
@@ -41716,6 +42167,7 @@
         169,
         21
       ],
+      "comment_inline": "VDU 21: disable the screen...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&15"
@@ -41739,6 +42191,7 @@
         162,
         93
       ],
+      "comment_inline": "...and reload Dun1",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&5d"
@@ -41773,11 +42226,12 @@
         189,
         8
       ],
+      "comment_inline": "Put the level number's digits in level_command",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_08bd",
+      "operand": "level_digits",
       "target": 2237,
-      "target_label": "data_08bd"
+      "target_label": "level_digits"
     },
     {
       "addr": 20582,
@@ -41788,9 +42242,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_5171",
+      "operand": "level_command_digits",
       "target": 20849,
-      "target_label": "data_5171"
+      "target_label": "level_command_digits"
     },
     {
       "addr": 20585,
@@ -41825,11 +42279,12 @@
         188,
         8
       ],
+      "comment_inline": "Leave the level count in level_count_copy for game_entry",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_08bc",
+      "operand": "levels_started",
       "target": 2236,
-      "target_label": "data_08bc"
+      "target_label": "levels_started"
     },
     {
       "addr": 20594,
@@ -41839,9 +42294,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_008e",
+      "operand": "level_count_copy",
       "target": 142,
-      "target_label": "data_008e"
+      "target_label": "level_count_copy"
     },
     {
       "addr": 20596,
@@ -41850,11 +42305,12 @@
         188,
         8
       ],
+      "comment_inline": "level_number = levels started - 1 (game_entry counts it again)",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_08bc",
+      "operand": "levels_started",
       "target": 2236,
-      "target_label": "data_08bc"
+      "target_label": "levels_started"
     },
     {
       "addr": 20599,
@@ -41893,6 +42349,7 @@
         201,
         24
       ],
+      "comment_inline": "Level 25?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&18"
@@ -41915,6 +42372,7 @@
         162,
         76
       ],
+      "comment_inline": "Yes: load Stones, which ends with level 25...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&4c"
@@ -41949,6 +42407,7 @@
         146,
         80
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_5092",
@@ -41964,6 +42423,7 @@
       "labels": [
         "code_508b"
       ],
+      "comment_inline": "No: load LEVELnn",
       "xref_summaries": [
         "&508b referenced 1 time by &507f"
       ],
@@ -42009,6 +42469,7 @@
       "labels": [
         "code_5092"
       ],
+      "comment_inline": "VDU 6: enable the screen",
       "xref_summaries": [
         "&5092 referenced 1 time by &5088"
       ],
@@ -42041,6 +42502,7 @@
         169,
         0
       ],
+      "comment_inline": "Copy to &0400...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -42085,6 +42547,7 @@
         169,
         176
       ],
+      "comment_inline": "...from &51B0 or &55B0",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&b0"
@@ -42107,6 +42570,7 @@
         169,
         128
       ],
+      "comment_inline": "Read the joystick's horizontal channel",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osbyte_read_adc_or_get_buffer_status",
@@ -42147,6 +42611,7 @@
         192,
         128
       ],
+      "comment_inline": "High byte &80 (a joystick at rest?)...",
       "type": "code",
       "mnemonic": "cpy",
       "operand": "#&80"
@@ -42169,6 +42634,7 @@
         169,
         85
       ],
+      "comment_inline": "...yes: copy the image with the joystick handler, at &55B0",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&55"
@@ -42206,6 +42672,7 @@
       "labels": [
         "code_50b4"
       ],
+      "comment_inline": "...no: copy the keyboard-only image at &51B0",
       "xref_summaries": [
         "&50b4 referenced 1 time by &50ac"
       ],
@@ -42671,9 +43138,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_08bc",
+      "operand": "levels_started",
       "target": 2236,
-      "target_label": "data_08bc"
+      "target_label": "levels_started"
     },
     {
       "addr": 20735,
@@ -43200,6 +43667,9 @@
         56,
         48
       ],
+      "labels": [
+        "stones_command"
+      ],
       "type": "string",
       "string": "LOAD STONES 6680"
     },
@@ -43225,6 +43695,9 @@
         85,
         78,
         49
+      ],
+      "labels": [
+        "dun1_command"
       ],
       "type": "string",
       "string": "LOAD DUN1"
@@ -43261,11 +43734,11 @@
         48
       ],
       "labels": [
-        "sub_5167"
+        "level_command"
       ],
       "sub_labels": {
         "20849": [
-          "data_5171"
+          "level_command_digits"
         ],
         "20850": [
           "data_5172"
@@ -45882,9 +46355,9 @@
       "binary_addr": 21344,
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_08b4,x",
+      "operand": "hero_absent,x",
       "target": 2228,
-      "target_label": "data_08b4"
+      "target_label": "hero_absent"
     },
     {
       "addr": 1459,
@@ -45907,9 +46380,9 @@
       "binary_addr": 21349,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_08b4,x",
+      "operand": "hero_absent,x",
       "target": 2228,
-      "target_label": "data_08b4"
+      "target_label": "hero_absent"
     },
     {
       "addr": 1464,
@@ -46079,9 +46552,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_08b4,x",
+      "operand": "hero_absent,x",
       "target": 2228,
-      "target_label": "data_08b4"
+      "target_label": "hero_absent"
     },
     {
       "addr": 1486,
@@ -47001,9 +47474,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_08b0,x",
+      "operand": "hero_score_ten_thousands,x",
       "target": 2224,
-      "target_label": "data_08b0"
+      "target_label": "hero_score_ten_thousands"
     },
     {
       "addr": 1719,
@@ -47075,9 +47548,9 @@
       "binary_addr": 21615,
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_08b0,x",
+      "operand": "hero_score_ten_thousands,x",
       "target": 2224,
-      "target_label": "data_08b0"
+      "target_label": "hero_score_ten_thousands"
     },
     {
       "addr": 1730,
@@ -47155,9 +47628,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_08b4,x",
+      "operand": "hero_absent,x",
       "target": 2228,
-      "target_label": "data_08b4"
+      "target_label": "hero_absent"
     },
     {
       "addr": 1740,
@@ -50500,9 +50973,9 @@
       "binary_addr": 22368,
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_08b4,x",
+      "operand": "hero_absent,x",
       "target": 2228,
-      "target_label": "data_08b4"
+      "target_label": "hero_absent"
     },
     {
       "addr": 1459,
@@ -50525,9 +50998,9 @@
       "binary_addr": 22373,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_08b4,x",
+      "operand": "hero_absent,x",
       "target": 2228,
-      "target_label": "data_08b4"
+      "target_label": "hero_absent"
     },
     {
       "addr": 1464,
@@ -50697,9 +51170,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_08b4,x",
+      "operand": "hero_absent,x",
       "target": 2228,
-      "target_label": "data_08b4"
+      "target_label": "hero_absent"
     },
     {
       "addr": 1486,
@@ -51619,9 +52092,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_08b0,x",
+      "operand": "hero_score_ten_thousands,x",
       "target": 2224,
-      "target_label": "data_08b0"
+      "target_label": "hero_score_ten_thousands"
     },
     {
       "addr": 1719,
@@ -51693,9 +52166,9 @@
       "binary_addr": 22639,
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_08b0,x",
+      "operand": "hero_score_ten_thousands,x",
       "target": 2224,
-      "target_label": "data_08b0"
+      "target_label": "hero_score_ten_thousands"
     },
     {
       "addr": 1730,
@@ -51773,9 +52246,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_08b4,x",
+      "operand": "hero_absent,x",
       "target": 2228,
-      "target_label": "data_08b4"
+      "target_label": "hero_absent"
     },
     {
       "addr": 1740,
@@ -67094,9 +67567,9 @@
       ],
       "type": "code",
       "mnemonic": "beq",
-      "operand": "return_6",
+      "operand": "return_8",
       "target": 28873,
-      "target_label": "return_6"
+      "target_label": "return_8"
     },
     {
       "addr": 28870,
@@ -67117,7 +67590,7 @@
         96
       ],
       "labels": [
-        "return_6"
+        "return_8"
       ],
       "xref_summaries": [
         "&70c9 referenced 1 time by &70c4"
@@ -69236,9 +69709,9 @@
       ],
       "type": "code",
       "mnemonic": "beq",
-      "operand": "return_7",
+      "operand": "return_9",
       "target": 29216,
-      "target_label": "return_7"
+      "target_label": "return_9"
     },
     {
       "addr": 29213,
@@ -69259,7 +69732,7 @@
         96
       ],
       "labels": [
-        "return_7"
+        "return_9"
       ],
       "xref_summaries": [
         "&7220 referenced 1 time by &721b"
@@ -72826,9 +73299,9 @@
       ],
       "type": "code",
       "mnemonic": "beq",
-      "operand": "return_8",
+      "operand": "return_10",
       "target": 29814,
-      "target_label": "return_8"
+      "target_label": "return_10"
     },
     {
       "addr": 29811,
@@ -72849,7 +73322,7 @@
         96
       ],
       "labels": [
-        "return_8"
+        "return_10"
       ],
       "xref_summaries": [
         "&7476 referenced 1 time by &7471"
@@ -79765,9 +80238,9 @@
       ],
       "type": "code",
       "mnemonic": "bne",
-      "operand": "return_9",
+      "operand": "return_11",
       "target": 30971,
-      "target_label": "return_9"
+      "target_label": "return_11"
     },
     {
       "addr": 30953,
@@ -79866,7 +80339,7 @@
         96
       ],
       "labels": [
-        "return_9"
+        "return_11"
       ],
       "xref_summaries": [
         "&78fb referenced 1 time by &78e7"
@@ -83104,9 +83577,9 @@
       ],
       "type": "code",
       "mnemonic": "beq",
-      "operand": "return_10",
+      "operand": "return_12",
       "target": 31536,
-      "target_label": "return_10"
+      "target_label": "return_12"
     },
     {
       "addr": 31533,
@@ -83127,7 +83600,7 @@
         96
       ],
       "labels": [
-        "return_10"
+        "return_12"
       ],
       "xref_summaries": [
         "&7b30 referenced 1 time by &7b2b"
@@ -85018,9 +85491,9 @@
       ],
       "type": "code",
       "mnemonic": "beq",
-      "operand": "return_11",
+      "operand": "return_13",
       "target": 31883,
-      "target_label": "return_11"
+      "target_label": "return_13"
     },
     {
       "addr": 31860,
@@ -85087,9 +85560,9 @@
       ],
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "return_11",
+      "operand": "return_13",
       "target": 31883,
-      "target_label": "return_11"
+      "target_label": "return_13"
     },
     {
       "addr": 31874,
@@ -85153,7 +85626,7 @@
         96
       ],
       "labels": [
-        "return_11"
+        "return_13"
       ],
       "xref_summaries": [
         "&7c8b referenced 2 times by &7c72, &7c7f"

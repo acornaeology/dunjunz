@@ -1192,9 +1192,9 @@
       ],
       "type": "code",
       "mnemonic": "inc",
-      "operand": "data_06f8,x",
+      "operand": "hero_score_ten_thousands,x",
       "target": 1784,
-      "target_label": "data_06f8"
+      "target_label": "hero_score_ten_thousands"
     },
     {
       "addr": 1042,
@@ -1205,9 +1205,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_06f8,x",
+      "operand": "hero_score_ten_thousands,x",
       "target": 1784,
-      "target_label": "data_06f8"
+      "target_label": "hero_score_ten_thousands"
     },
     {
       "addr": 1045,
@@ -1250,9 +1250,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_06f8,x",
+      "operand": "hero_score_ten_thousands,x",
       "target": 1784,
-      "target_label": "data_06f8"
+      "target_label": "hero_score_ten_thousands"
     },
     {
       "addr": 1054,
@@ -3290,9 +3290,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_06fc,x",
+      "operand": "hero_absent,x",
       "target": 1788,
-      "target_label": "data_06fc"
+      "target_label": "hero_absent"
     },
     {
       "addr": 1459,
@@ -3313,9 +3313,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_06fc,x",
+      "operand": "hero_absent,x",
       "target": 1788,
-      "target_label": "data_06fc"
+      "target_label": "hero_absent"
     },
     {
       "addr": 1464,
@@ -3461,9 +3461,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_06fc,x",
+      "operand": "hero_absent,x",
       "target": 1788,
-      "target_label": "data_06fc"
+      "target_label": "hero_absent"
     },
     {
       "addr": 1486,
@@ -4302,9 +4302,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_06f8,x",
+      "operand": "hero_score_ten_thousands,x",
       "target": 1784,
-      "target_label": "data_06f8"
+      "target_label": "hero_score_ten_thousands"
     },
     {
       "addr": 1719,
@@ -4369,9 +4369,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_06f8,x",
+      "operand": "hero_score_ten_thousands,x",
       "target": 1784,
-      "target_label": "data_06f8"
+      "target_label": "hero_score_ten_thousands"
     },
     {
       "addr": 1730,
@@ -4439,9 +4439,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_06fc,x",
+      "operand": "hero_absent,x",
       "target": 1788,
-      "target_label": "data_06fc"
+      "target_label": "hero_absent"
     },
     {
       "addr": 1740,
@@ -4685,7 +4685,7 @@
         105
       ],
       "labels": [
-        "data_06f8"
+        "hero_score_ten_thousands"
       ],
       "xref_summaries": [
         "&06f8 used as index base 6 times by &040f, &0412, &041b, &06b4, &06bf, &0ef3"
@@ -4728,7 +4728,7 @@
         0
       ],
       "labels": [
-        "data_06fc"
+        "hero_absent"
       ],
       "xref_summaries": [
         "&06fc used as index base 4 times by &05b0, &05b5, &05cb, &06c9"
@@ -13883,9 +13883,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_06f8,x",
+      "operand": "hero_score_ten_thousands,x",
       "target": 1784,
-      "target_label": "data_06f8"
+      "target_label": "hero_score_ten_thousands"
     },
     {
       "addr": 3830,

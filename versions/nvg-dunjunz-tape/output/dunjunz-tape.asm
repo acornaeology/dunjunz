@@ -160,12 +160,12 @@ data_fffd          = &fffd
     bne return_1
     lda #&1e
     sta hero_score_thousands,x
-    inc data_06f8,x
-    lda data_06f8,x
+    inc hero_score_ten_thousands,x
+    lda hero_score_ten_thousands,x
     cmp #&73 ; 's'
     bne code_041e
     lda #&72 ; 'r'
-    sta data_06f8,x
+    sta hero_score_ten_thousands,x
 ; &041e referenced 2 times by &0417, &06c2
 .code_041e
     sta sprite_number
@@ -407,9 +407,9 @@ data_0466 = sub_0464+2
     adc plot_x
     adc #&51 ; 'Q'
     tay
-    lda data_06fc,x
+    lda hero_absent,x
     eor #1
-    sta data_06fc,x
+    sta hero_absent,x
     bne code_05c0
     jsr set_menu_yes
     jmp code_05c3
@@ -425,7 +425,7 @@ data_0466 = sub_0464+2
     ldx #3
 ; &05cb referenced 1 time by &05d1
 .loop_05cb
-    lda data_06fc,x
+    lda hero_absent,x
     beq return_2
     dex
     bpl loop_05cb
@@ -504,14 +504,14 @@ data_0601 = sub_05f6+11
     ldy #0
 ; &06b4 referenced 1 time by &06f3
 .loop_06b4
-    lda data_06f8,x
+    lda hero_score_ten_thousands,x
     cmp #&6a ; 'j'
     bcc code_06c9
     txa
     pha
     tya
     pha
-    lda data_06f8,x
+    lda hero_score_ten_thousands,x
     jsr code_041e
     pla
     tay
@@ -519,7 +519,7 @@ data_0601 = sub_05f6+11
     tax
 ; &06c9 referenced 1 time by &06b9
 .code_06c9
-    lda data_06fc,x
+    lda hero_absent,x
     beq code_06f0
     lda #0
     sta hero_direction,x
@@ -543,10 +543,10 @@ data_0601 = sub_05f6+11
     rts
     equb &00, &00
 ; &06f8 used as index base 6 times by &040f, &0412, &041b, &06b4, &06bf, &0ef3
-.data_06f8
+.hero_score_ten_thousands
     equs "iiii"
 ; &06fc used as index base 4 times by &05b0, &05b5, &05cb, &06c9
-.data_06fc
+.hero_absent
     equb &00, &00, &00, &00
     equs "*SAVE Dunjunz.K 400 7FF 740"
     equb &0d, &54, &50, &0d, &0d, &50, &0d
@@ -1262,7 +1262,7 @@ data_0dff = sub_0ded+18
     lda #&1d
     sta hero_score_units,x
     lda #&69 ; 'i'
-    sta data_06f8,x
+    sta hero_score_ten_thousands,x
     rts
 ; ***************************************************************************************
 ; Draw the status panel
@@ -7357,7 +7357,7 @@ save "DUNJ3", &6e80, &9d00, &0000, &6e80
 ;     code_7b04:                  6
 ;     data_0082:                  6
 ;     data_008f:                  6
-;     data_06f8:                  6
+;     hero_score_ten_thousands:   6
 ;     level_bcd:                  6
 ;     missile_x:                  6
 ;     missile_y:                  6
@@ -7391,7 +7391,6 @@ save "DUNJ3", &6e80, &9d00, &0000, &6e80
 ;     code_7ff6:                  4
 ;     data_007c:                  4
 ;     data_0601:                  4
-;     data_06fc:                  4
 ;     data_09f0:                  4
 ;     data_09f1:                  4
 ;     data_09ff:                  4
@@ -7401,6 +7400,7 @@ save "DUNJ3", &6e80, &9d00, &0000, &6e80
 ;     exit_x:                     4
 ;     exit_y:                     4
 ;     find_creature:              4
+;     hero_absent:                4
 ;     hero_door_x:                4
 ;     hero_door_y:                4
 ;     hero_key_dropped:           4
@@ -8109,8 +8109,6 @@ save "DUNJ3", &6e80, &9d00, &0000, &6e80
 ;     data_0600
 ;     data_0601
 ;     data_0602
-;     data_06f8
-;     data_06fc
 ;     data_09f0
 ;     data_09f1
 ;     data_09f2
