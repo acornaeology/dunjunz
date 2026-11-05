@@ -32913,6 +32913,7 @@
       "labels": [
         "update_game"
       ],
+      "comment_inline": "Move the heroes",
       "xref_summaries": [
         "&4400 referenced 1 time by &1f0d[1]"
       ],
@@ -32936,6 +32937,7 @@
         0
       ],
       "binary_addr": 17411,
+      "comment_inline": "For each hero...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#0"
@@ -32951,6 +32953,7 @@
       "labels": [
         "code_1cc5"
       ],
+      "comment_inline": "...look for a door at the cell the hero is moving into",
       "xref_summaries": [
         "&4405 referenced 1 time by &44ff"
       ],
@@ -32974,6 +32977,7 @@
         34
       ],
       "binary_addr": 17416,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_door_x,x",
@@ -32988,6 +32992,7 @@
         13
       ],
       "binary_addr": 17419,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_x",
@@ -33002,6 +33007,7 @@
         34
       ],
       "binary_addr": 17422,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_door_y,x",
@@ -33016,6 +33022,7 @@
         13
       ],
       "binary_addr": 17425,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_y",
@@ -33028,6 +33035,7 @@
         138
       ],
       "binary_addr": 17428,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -33037,6 +33045,7 @@
         72
       ],
       "binary_addr": 17429,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -33047,6 +33056,7 @@
         20
       ],
       "binary_addr": 17430,
+      "comment_inline": "Doors 20 to 1",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&14"
@@ -33062,6 +33072,7 @@
       "labels": [
         "code_1cd8"
       ],
+      "comment_inline": "This door's x?",
       "xref_summaries": [
         "&4418 referenced 1 time by &44f5"
       ],
@@ -33085,6 +33096,7 @@
         13
       ],
       "binary_addr": 17435,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "cell_x",
@@ -33098,6 +33110,7 @@
         3
       ],
       "binary_addr": 17438,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_1ce3",
@@ -33112,6 +33125,7 @@
         29
       ],
       "binary_addr": 17440,
+      "comment_inline": "No: next door",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_1db2",
@@ -33129,6 +33143,7 @@
       "labels": [
         "code_1ce3"
       ],
+      "comment_inline": "...and y?",
       "xref_summaries": [
         "&4423 referenced 1 time by &441e"
       ],
@@ -33152,6 +33167,7 @@
         13
       ],
       "binary_addr": 17446,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "cell_y",
@@ -33165,6 +33181,7 @@
         3
       ],
       "binary_addr": 17449,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_1cee",
@@ -33179,6 +33196,7 @@
         29
       ],
       "binary_addr": 17451,
+      "comment_inline": "No: next door",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_1db2",
@@ -33194,6 +33212,7 @@
       "labels": [
         "code_1cee"
       ],
+      "comment_inline": "Does the hero carry this door's key?",
       "xref_summaries": [
         "&442e referenced 1 time by &4429"
       ],
@@ -33212,6 +33231,7 @@
         168
       ],
       "binary_addr": 17455,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -33221,6 +33241,7 @@
         72
       ],
       "binary_addr": 17456,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -33230,6 +33251,7 @@
         138
       ],
       "binary_addr": 17457,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -33241,6 +33263,7 @@
         34
       ],
       "binary_addr": 17458,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "hero_key,y",
@@ -33254,6 +33277,7 @@
         3
       ],
       "binary_addr": 17461,
+      "comment_inline": "Yes",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_1cfa",
@@ -33268,6 +33292,7 @@
         29
       ],
       "binary_addr": 17463,
+      "comment_inline": "No: next door",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_1db2",
@@ -33283,6 +33308,7 @@
       "labels": [
         "code_1cfa"
       ],
+      "comment_inline": "Open the door: 7 points...",
       "xref_summaries": [
         "&443a referenced 1 time by &4435"
       ],
@@ -33301,6 +33327,7 @@
         72
       ],
       "binary_addr": 17467,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -33310,6 +33337,7 @@
         152
       ],
       "binary_addr": 17468,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tya"
     },
@@ -33319,6 +33347,7 @@
         72
       ],
       "binary_addr": 17469,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -33329,6 +33358,7 @@
         7
       ],
       "binary_addr": 17470,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#7"
@@ -33341,6 +33371,7 @@
         13
       ],
       "binary_addr": 17472,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "scratch",
@@ -33356,6 +33387,7 @@
       "labels": [
         "code_1d03"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&4443 referenced 1 time by &444b"
       ],
@@ -33374,6 +33406,7 @@
         72
       ],
       "binary_addr": 17476,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -33385,6 +33418,7 @@
         114
       ],
       "binary_addr": 17477,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "add_point",
@@ -33397,6 +33431,7 @@
         104
       ],
       "binary_addr": 17480,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -33406,6 +33441,7 @@
         168
       ],
       "binary_addr": 17481,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -33415,6 +33451,7 @@
         136
       ],
       "binary_addr": 17482,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "dey"
     },
@@ -33425,6 +33462,7 @@
         246
       ],
       "binary_addr": 17483,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_1d03",
@@ -33438,6 +33476,7 @@
         150
       ],
       "binary_addr": 17485,
+      "comment_inline": "...play the food sound at a lower pitch...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&96"
@@ -33450,6 +33489,7 @@
         11
       ],
       "binary_addr": 17487,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_0bfc",
@@ -33463,6 +33503,7 @@
         248
       ],
       "binary_addr": 17490,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#<(food_sound)",
@@ -33483,6 +33524,7 @@
         11
       ],
       "binary_addr": 17492,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(food_sound)",
@@ -33503,6 +33545,7 @@
         7
       ],
       "binary_addr": 17494,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osword_sound",
@@ -33521,7 +33564,7 @@
         255
       ],
       "binary_addr": 17496,
-      "comment_inline": "SOUND command",
+      "comment_inline": "... SOUND command",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osword",
@@ -33535,6 +33578,7 @@
         200
       ],
       "binary_addr": 17499,
+      "comment_inline": "...and put its pitch back",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&c8"
@@ -33547,6 +33591,7 @@
         11
       ],
       "binary_addr": 17501,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_0bfc",
@@ -33561,6 +33606,7 @@
         13
       ],
       "binary_addr": 17504,
+      "comment_inline": "Keep the door's cell in spare bytes beyond the monster tables, as plot_at_cell changes cell_x and cell_y...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "cell_y",
@@ -33575,6 +33621,7 @@
         126
       ],
       "binary_addr": 17507,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_7e4c",
@@ -33589,6 +33636,7 @@
         13
       ],
       "binary_addr": 17510,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "cell_x",
@@ -33603,6 +33651,7 @@
         126
       ],
       "binary_addr": 17513,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_7e23",
@@ -33616,6 +33665,7 @@
         21
       ],
       "binary_addr": 17516,
+      "comment_inline": "...erase the door...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&15"
@@ -33627,6 +33677,7 @@
         122
       ],
       "binary_addr": 17518,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -33640,6 +33691,7 @@
         0
       ],
       "binary_addr": 17520,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -33651,6 +33703,7 @@
         125
       ],
       "binary_addr": 17522,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007d",
@@ -33664,6 +33717,7 @@
         126
       ],
       "binary_addr": 17524,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007e",
@@ -33678,6 +33732,7 @@
         120
       ],
       "binary_addr": 17526,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_at_cell",
@@ -33692,6 +33747,7 @@
         126
       ],
       "binary_addr": 17529,
+      "comment_inline": "...and recover its cell",
       "type": "code",
       "mnemonic": "lda",
       "operand": "data_7e23",
@@ -33706,6 +33762,7 @@
         13
       ],
       "binary_addr": 17532,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_x",
@@ -33720,6 +33777,7 @@
         126
       ],
       "binary_addr": 17535,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "data_7e4c",
@@ -33734,6 +33792,7 @@
         13
       ],
       "binary_addr": 17538,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_y",
@@ -33746,6 +33805,7 @@
         104
       ],
       "binary_addr": 17541,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -33755,6 +33815,7 @@
         168
       ],
       "binary_addr": 17542,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -33764,6 +33825,7 @@
         104
       ],
       "binary_addr": 17543,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -33773,6 +33835,7 @@
         170
       ],
       "binary_addr": 17544,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -33784,6 +33847,7 @@
         13
       ],
       "binary_addr": 17545,
+      "comment_inline": "Clear the door's wall bit: room offset...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "cell_y",
@@ -33797,6 +33861,7 @@
         248
       ],
       "binary_addr": 17548,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "and",
       "operand": "#&f8"
@@ -33809,6 +33874,7 @@
         13
       ],
       "binary_addr": 17550,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "scratch",
@@ -33821,6 +33887,7 @@
         24
       ],
       "binary_addr": 17553,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -33832,6 +33899,7 @@
         13
       ],
       "binary_addr": 17554,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "scratch",
@@ -33846,6 +33914,7 @@
         13
       ],
       "binary_addr": 17557,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "scratch",
@@ -33860,6 +33929,7 @@
         13
       ],
       "binary_addr": 17560,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "scratch",
@@ -33873,6 +33943,7 @@
         123
       ],
       "binary_addr": 17563,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007b",
@@ -33887,6 +33958,7 @@
         13
       ],
       "binary_addr": 17565,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "cell_x",
@@ -33900,6 +33972,7 @@
         248
       ],
       "binary_addr": 17568,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "and",
       "operand": "#&f8"
@@ -33911,6 +33984,7 @@
         123
       ],
       "binary_addr": 17570,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "data_007b",
@@ -33924,6 +33998,7 @@
         123
       ],
       "binary_addr": 17572,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007b",
@@ -33937,6 +34012,7 @@
         12
       ],
       "binary_addr": 17574,
+      "comment_inline": "...in room_walls...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&0c"
@@ -33948,6 +34024,7 @@
         124
       ],
       "binary_addr": 17576,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007c",
@@ -33960,6 +34037,7 @@
         138
       ],
       "binary_addr": 17578,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -33969,6 +34047,7 @@
         72
       ],
       "binary_addr": 17579,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -33980,6 +34059,7 @@
         13
       ],
       "binary_addr": 17580,
+      "comment_inline": "...mask for the column...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "cell_x",
@@ -33993,6 +34073,7 @@
         7
       ],
       "binary_addr": 17583,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "and",
       "operand": "#7"
@@ -34003,6 +34084,7 @@
         170
       ],
       "binary_addr": 17585,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -34014,6 +34096,7 @@
         13
       ],
       "binary_addr": 17586,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "bit_masks,x",
@@ -34027,6 +34110,7 @@
         255
       ],
       "binary_addr": 17589,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "eor",
       "operand": "#&ff"
@@ -34039,6 +34123,7 @@
         13
       ],
       "binary_addr": 17591,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "scratch",
@@ -34053,6 +34138,7 @@
         13
       ],
       "binary_addr": 17594,
+      "comment_inline": "...byte for the row...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "cell_y",
@@ -34066,6 +34152,7 @@
         7
       ],
       "binary_addr": 17597,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "and",
       "operand": "#7"
@@ -34076,6 +34163,7 @@
         168
       ],
       "binary_addr": 17599,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -34086,6 +34174,7 @@
         123
       ],
       "binary_addr": 17600,
+      "comment_inline": "...clear the bit",
       "type": "code",
       "mnemonic": "lda",
       "operand": "(data_007b),y",
@@ -34100,6 +34189,7 @@
         13
       ],
       "binary_addr": 17602,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "and",
       "operand": "scratch",
@@ -34113,6 +34203,7 @@
         123
       ],
       "binary_addr": 17605,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "(data_007b),y",
@@ -34125,6 +34216,7 @@
         104
       ],
       "binary_addr": 17607,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -34134,6 +34226,7 @@
         170
       ],
       "binary_addr": 17608,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -34144,6 +34237,7 @@
         255
       ],
       "binary_addr": 17609,
+      "comment_inline": "Remove the door...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&ff"
@@ -34156,6 +34250,7 @@
         34
       ],
       "binary_addr": 17611,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "door_x,x",
@@ -34170,6 +34265,7 @@
         34
       ],
       "binary_addr": 17614,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "door_y,x",
@@ -34182,6 +34278,7 @@
         104
       ],
       "binary_addr": 17617,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -34191,6 +34288,7 @@
         170
       ],
       "binary_addr": 17618,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -34201,6 +34299,7 @@
         0
       ],
       "binary_addr": 17619,
+      "comment_inline": "...and the key, which is used up",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -34213,6 +34312,7 @@
         34
       ],
       "binary_addr": 17621,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_key,x",
@@ -34226,6 +34326,7 @@
         26
       ],
       "binary_addr": 17624,
+      "comment_inline": "Erase the key icon from the panel",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&1a"
@@ -34237,6 +34338,7 @@
         122
       ],
       "binary_addr": 17626,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -34251,6 +34353,7 @@
         13
       ],
       "binary_addr": 17628,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_panel_y,x",
@@ -34263,6 +34366,7 @@
         56
       ],
       "binary_addr": 17631,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sec"
     },
@@ -34273,6 +34377,7 @@
         13
       ],
       "binary_addr": 17632,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "#&0d"
@@ -34284,6 +34389,7 @@
         113
       ],
       "binary_addr": 17634,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -34297,6 +34403,7 @@
         74
       ],
       "binary_addr": 17636,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&4a"
@@ -34308,6 +34415,7 @@
         112
       ],
       "binary_addr": 17638,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -34320,6 +34428,7 @@
         138
       ],
       "binary_addr": 17640,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -34329,6 +34438,7 @@
         72
       ],
       "binary_addr": 17641,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -34340,6 +34450,7 @@
         9
       ],
       "binary_addr": 17642,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_sprite",
@@ -34352,6 +34463,7 @@
         104
       ],
       "binary_addr": 17645,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -34361,6 +34473,7 @@
         170
       ],
       "binary_addr": 17646,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -34372,6 +34485,7 @@
         29
       ],
       "binary_addr": 17647,
+      "comment_inline": "Next hero",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_1dba",
@@ -34387,6 +34501,7 @@
       "labels": [
         "code_1db2"
       ],
+      "comment_inline": "Next door",
       "xref_summaries": [
         "&44f2 referenced 3 times by &4420, &442b, &4437"
       ],
@@ -34414,6 +34529,7 @@
         3
       ],
       "binary_addr": 17651,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_1db8",
@@ -34428,6 +34544,7 @@
         28
       ],
       "binary_addr": 17653,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_1cd8",
@@ -34443,6 +34560,7 @@
       "labels": [
         "code_1db8"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&44f8 referenced 1 time by &44f3"
       ],
@@ -34461,6 +34579,7 @@
         170
       ],
       "binary_addr": 17657,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -34473,6 +34592,7 @@
       "labels": [
         "code_1dba"
       ],
+      "comment_inline": "Next hero",
       "xref_summaries": [
         "&44fa referenced 1 time by &44ef"
       ],
@@ -34492,6 +34612,7 @@
         4
       ],
       "binary_addr": 17659,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#4"
@@ -34503,11 +34624,12 @@
         3
       ],
       "binary_addr": 17661,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_1dc2",
+      "operand": "draw_keys",
       "target": 7618,
-      "target_label": "code_1dc2"
+      "target_label": "draw_keys"
     },
     {
       "addr": 7615,
@@ -34517,6 +34639,7 @@
         28
       ],
       "binary_addr": 17663,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_1cc5",
@@ -34531,15 +34654,17 @@
       ],
       "binary_addr": 17666,
       "labels": [
-        "code_1dc2"
+        "draw_keys"
       ],
+      "comment_inline": "Draw the keys on the floor, 20 to 1",
       "xref_summaries": [
-        "&4502 referenced 1 time by &44fd"
+        "&4502 referenced 1 time by &1dbd[1]"
       ],
       "references": [
         {
-          "addr": 17661,
-          "kind": "direct"
+          "addr": 7613,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -34553,6 +34678,7 @@
         125
       ],
       "binary_addr": 17668,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007d",
@@ -34566,6 +34692,7 @@
         126
       ],
       "binary_addr": 17670,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007e",
@@ -34579,6 +34706,7 @@
         27
       ],
       "binary_addr": 17672,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&1b"
@@ -34590,6 +34718,7 @@
         122
       ],
       "binary_addr": 17674,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -34603,6 +34732,7 @@
         20
       ],
       "binary_addr": 17676,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&14"
@@ -34618,6 +34748,7 @@
       "labels": [
         "code_1dce"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&450e referenced 1 time by &4522"
       ],
@@ -34641,6 +34772,7 @@
         13
       ],
       "binary_addr": 17681,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_x",
@@ -34655,6 +34787,7 @@
         34
       ],
       "binary_addr": 17684,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "key_y,x",
@@ -34669,6 +34802,7 @@
         13
       ],
       "binary_addr": 17687,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_y",
@@ -34681,6 +34815,7 @@
         138
       ],
       "binary_addr": 17690,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -34690,6 +34825,7 @@
         72
       ],
       "binary_addr": 17691,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -34701,6 +34837,7 @@
         120
       ],
       "binary_addr": 17692,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_at_cell",
@@ -34713,6 +34850,7 @@
         104
       ],
       "binary_addr": 17695,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -34722,6 +34860,7 @@
         170
       ],
       "binary_addr": 17696,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -34731,6 +34870,7 @@
         202
       ],
       "binary_addr": 17697,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "dex"
     },
@@ -34741,6 +34881,7 @@
         234
       ],
       "binary_addr": 17698,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_1dce",
@@ -34754,6 +34895,7 @@
         0
       ],
       "binary_addr": 17700,
+      "comment_inline": "For each hero...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#0"
@@ -34767,15 +34909,17 @@
       ],
       "binary_addr": 17702,
       "labels": [
-        "code_1de6"
+        "check_hero_keys"
       ],
+      "comment_inline": "In play?",
       "xref_summaries": [
-        "&4526 referenced 1 time by &460b"
+        "&4526 referenced 1 time by &1ecb[1]"
       ],
       "references": [
         {
-          "addr": 17931,
-          "kind": "direct"
+          "addr": 7883,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -34791,6 +34935,7 @@
         61
       ],
       "binary_addr": 17705,
+      "comment_inline": "Yes",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_1e28",
@@ -34805,6 +34950,7 @@
         34
       ],
       "binary_addr": 17707,
+      "comment_inline": "Out of play: carrying a key?",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_key,x",
@@ -34818,6 +34964,7 @@
         3
       ],
       "binary_addr": 17710,
+      "comment_inline": "Yes",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_1df3",
@@ -34832,6 +34979,7 @@
         30
       ],
       "binary_addr": 17712,
+      "comment_inline": "No: next hero",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_1ec6",
@@ -34849,6 +34997,7 @@
       "labels": [
         "code_1df3"
       ],
+      "comment_inline": "Death animation finished?",
       "xref_summaries": [
         "&4533 referenced 1 time by &452e"
       ],
@@ -34871,6 +35020,7 @@
         8
       ],
       "binary_addr": 17718,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#8"
@@ -34882,6 +35032,7 @@
         46
       ],
       "binary_addr": 17720,
+      "comment_inline": "Not yet",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_1e28",
@@ -34896,6 +35047,7 @@
         34
       ],
       "binary_addr": 17722,
+      "comment_inline": "Yes: drop the key where the hero fell",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "hero_key,x",
@@ -34910,6 +35062,7 @@
         13
       ],
       "binary_addr": 17725,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_x,x",
@@ -34924,6 +35077,7 @@
         34
       ],
       "binary_addr": 17728,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "key_x,y",
@@ -34938,6 +35092,7 @@
         13
       ],
       "binary_addr": 17731,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_y,x",
@@ -34952,6 +35107,7 @@
         34
       ],
       "binary_addr": 17734,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "key_y,y",
@@ -34965,6 +35121,7 @@
         0
       ],
       "binary_addr": 17737,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -34977,6 +35134,7 @@
         34
       ],
       "binary_addr": 17739,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_key,x",
@@ -34990,6 +35148,7 @@
         26
       ],
       "binary_addr": 17742,
+      "comment_inline": "Erase the key icon from the panel",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&1a"
@@ -35136,6 +35295,7 @@
         30
       ],
       "binary_addr": 17765,
+      "comment_inline": "Next hero",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_1ec6",
@@ -35153,6 +35313,7 @@
       "labels": [
         "code_1e28"
       ],
+      "comment_inline": "Just swapped keys?",
       "xref_summaries": [
         "&4568 referenced 2 times by &4529, &4538"
       ],
@@ -35179,6 +35340,7 @@
         8
       ],
       "binary_addr": 17771,
+      "comment_inline": "No",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_1e35",
@@ -35192,6 +35354,7 @@
         0
       ],
       "binary_addr": 17773,
+      "comment_inline": "Yes: not again until the hero moves on",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -35204,6 +35367,7 @@
         34
       ],
       "binary_addr": 17775,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_key_dropped,x",
@@ -35218,6 +35382,7 @@
         30
       ],
       "binary_addr": 17778,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_1ec6",
@@ -35235,6 +35400,7 @@
       "labels": [
         "code_1e35"
       ],
+      "comment_inline": "Is there a key at the hero's cell?",
       "xref_summaries": [
         "&4575 referenced 1 time by &456b"
       ],
@@ -35258,6 +35424,7 @@
         13
       ],
       "binary_addr": 17784,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_x",
@@ -35272,6 +35439,7 @@
         13
       ],
       "binary_addr": 17787,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_y,x",
@@ -35286,6 +35454,7 @@
         13
       ],
       "binary_addr": 17790,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_y",
@@ -35298,6 +35467,7 @@
         138
       ],
       "binary_addr": 17793,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -35307,6 +35477,7 @@
         72
       ],
       "binary_addr": 17794,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -35317,6 +35488,7 @@
         20
       ],
       "binary_addr": 17795,
+      "comment_inline": "...keys 20 to 1",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&14"
@@ -35332,6 +35504,7 @@
       "labels": [
         "code_1e45"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&4585 referenced 1 time by &4601"
       ],
@@ -35355,6 +35528,7 @@
         13
       ],
       "binary_addr": 17800,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "cell_x",
@@ -35368,6 +35542,7 @@
         113
       ],
       "binary_addr": 17803,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_1ebe",
@@ -35382,6 +35557,7 @@
         34
       ],
       "binary_addr": 17805,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "key_y,x",
@@ -35396,6 +35572,7 @@
         13
       ],
       "binary_addr": 17808,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "cell_y",
@@ -35409,6 +35586,7 @@
         105
       ],
       "binary_addr": 17811,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_1ebe",
@@ -35422,6 +35600,7 @@
         21
       ],
       "binary_addr": 17813,
+      "comment_inline": "Yes: erase it from the floor",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&15"
@@ -35433,6 +35612,7 @@
         122
       ],
       "binary_addr": 17815,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -35446,6 +35626,7 @@
         0
       ],
       "binary_addr": 17817,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -35457,6 +35638,7 @@
         125
       ],
       "binary_addr": 17819,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007d",
@@ -35470,6 +35652,7 @@
         126
       ],
       "binary_addr": 17821,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007e",
@@ -35482,6 +35665,7 @@
         138
       ],
       "binary_addr": 17823,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -35491,6 +35675,7 @@
         72
       ],
       "binary_addr": 17824,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -35502,6 +35687,7 @@
         120
       ],
       "binary_addr": 17825,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_at_cell",
@@ -35514,6 +35700,7 @@
         104
       ],
       "binary_addr": 17828,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -35523,6 +35710,7 @@
         170
       ],
       "binary_addr": 17829,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -35532,6 +35720,7 @@
         104
       ],
       "binary_addr": 17830,
+      "comment_inline": "Show the key icon in the hero's panel",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -35541,6 +35730,7 @@
         168
       ],
       "binary_addr": 17831,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -35550,6 +35740,7 @@
         72
       ],
       "binary_addr": 17832,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -35560,6 +35751,7 @@
         82
       ],
       "binary_addr": 17833,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&52"
@@ -35571,6 +35763,7 @@
         122
       ],
       "binary_addr": 17835,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -35585,6 +35778,7 @@
         13
       ],
       "binary_addr": 17837,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_panel_y,y",
@@ -35597,6 +35791,7 @@
         56
       ],
       "binary_addr": 17840,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sec"
     },
@@ -35607,6 +35802,7 @@
         13
       ],
       "binary_addr": 17841,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "#&0d"
@@ -35618,6 +35814,7 @@
         113
       ],
       "binary_addr": 17843,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -35631,6 +35828,7 @@
         74
       ],
       "binary_addr": 17845,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&4a"
@@ -35642,6 +35840,7 @@
         112
       ],
       "binary_addr": 17847,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -35654,6 +35853,7 @@
         152
       ],
       "binary_addr": 17849,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tya"
     },
@@ -35663,6 +35863,7 @@
         72
       ],
       "binary_addr": 17850,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -35672,6 +35873,7 @@
         138
       ],
       "binary_addr": 17851,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -35681,6 +35883,7 @@
         72
       ],
       "binary_addr": 17852,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -35692,6 +35895,7 @@
         9
       ],
       "binary_addr": 17853,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_sprite",
@@ -35704,6 +35908,7 @@
         104
       ],
       "binary_addr": 17856,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -35713,6 +35918,7 @@
         170
       ],
       "binary_addr": 17857,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -35722,6 +35928,7 @@
         104
       ],
       "binary_addr": 17858,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -35731,6 +35938,7 @@
         168
       ],
       "binary_addr": 17859,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -35740,6 +35948,7 @@
         138
       ],
       "binary_addr": 17860,
+      "comment_inline": "Drop the key carried (if any) in this cell...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -35749,6 +35958,7 @@
         72
       ],
       "binary_addr": 17861,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -35760,6 +35970,7 @@
         34
       ],
       "binary_addr": 17862,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "hero_key,y",
@@ -35774,6 +35985,7 @@
         13
       ],
       "binary_addr": 17865,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_x,y",
@@ -35788,6 +36000,7 @@
         34
       ],
       "binary_addr": 17868,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "key_x,x",
@@ -35802,6 +36015,7 @@
         13
       ],
       "binary_addr": 17871,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_y,y",
@@ -35816,6 +36030,7 @@
         34
       ],
       "binary_addr": 17874,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "key_y,x",
@@ -35828,6 +36043,7 @@
         104
       ],
       "binary_addr": 17877,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -35837,6 +36053,7 @@
         170
       ],
       "binary_addr": 17878,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -35848,6 +36065,7 @@
         34
       ],
       "binary_addr": 17879,
+      "comment_inline": "...and carry the new one",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_key,y",
@@ -35861,6 +36079,7 @@
         1
       ],
       "binary_addr": 17882,
+      "comment_inline": "Mark the swap",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#1"
@@ -35873,6 +36092,7 @@
         34
       ],
       "binary_addr": 17884,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_key_dropped,y",
@@ -35886,6 +36106,7 @@
         255
       ],
       "binary_addr": 17887,
+      "comment_inline": "Take the new key off the floor",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&ff"
@@ -35898,6 +36119,7 @@
         34
       ],
       "binary_addr": 17889,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "key_x,x",
@@ -35912,6 +36134,7 @@
         34
       ],
       "binary_addr": 17892,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "key_y,x",
@@ -35925,6 +36148,7 @@
         66
       ],
       "binary_addr": 17895,
+      "comment_inline": "Play the key sound",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#<(key_envelope)",
@@ -35945,6 +36169,7 @@
         25
       ],
       "binary_addr": 17897,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(key_envelope)",
@@ -35965,6 +36190,7 @@
         8
       ],
       "binary_addr": 17899,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osword_envelope",
@@ -35983,7 +36209,7 @@
         255
       ],
       "binary_addr": 17901,
-      "comment_inline": "ENVELOPE command",
+      "comment_inline": "... ENVELOPE command",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osword",
@@ -35997,6 +36223,7 @@
         80
       ],
       "binary_addr": 17904,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#<(key_sound)",
@@ -36017,6 +36244,7 @@
         25
       ],
       "binary_addr": 17906,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(key_sound)",
@@ -36037,6 +36265,7 @@
         7
       ],
       "binary_addr": 17908,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osword_sound",
@@ -36055,7 +36284,7 @@
         255
       ],
       "binary_addr": 17910,
-      "comment_inline": "SOUND command",
+      "comment_inline": "... SOUND command",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osword",
@@ -36068,6 +36297,7 @@
         104
       ],
       "binary_addr": 17913,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -36077,6 +36307,7 @@
         170
       ],
       "binary_addr": 17914,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -36088,6 +36319,7 @@
         30
       ],
       "binary_addr": 17915,
+      "comment_inline": "Next hero",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_1ec6",
@@ -36103,6 +36335,7 @@
       "labels": [
         "code_1ebe"
       ],
+      "comment_inline": "Next key",
       "xref_summaries": [
         "&45fe referenced 2 times by &458b, &4593"
       ],
@@ -36126,6 +36359,7 @@
         3
       ],
       "binary_addr": 17919,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_1ec4",
@@ -36140,6 +36374,7 @@
         30
       ],
       "binary_addr": 17921,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_1e45",
@@ -36155,6 +36390,7 @@
       "labels": [
         "code_1ec4"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&4604 referenced 1 time by &45ff"
       ],
@@ -36173,6 +36409,7 @@
         170
       ],
       "binary_addr": 17925,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -36185,6 +36422,7 @@
       "labels": [
         "code_1ec6"
       ],
+      "comment_inline": "Next hero",
       "xref_summaries": [
         "&4606 referenced 4 times by &4530, &4565, &4572, &45fb"
       ],
@@ -36216,6 +36454,7 @@
         4
       ],
       "binary_addr": 17927,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#4"
@@ -36227,11 +36466,12 @@
         3
       ],
       "binary_addr": 17929,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_1ece",
+      "operand": "update_rest",
       "target": 7886,
-      "target_label": "code_1ece"
+      "target_label": "update_rest"
     },
     {
       "addr": 7883,
@@ -36241,11 +36481,12 @@
         29
       ],
       "binary_addr": 17931,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_1de6",
+      "operand": "check_hero_keys",
       "target": 7654,
-      "target_label": "code_1de6"
+      "target_label": "check_hero_keys"
     },
     {
       "addr": 7886,
@@ -36256,15 +36497,17 @@
       ],
       "binary_addr": 17934,
       "labels": [
-        "code_1ece"
+        "update_rest"
       ],
+      "comment_inline": "Draw the objects",
       "xref_summaries": [
-        "&460e referenced 1 time by &4609"
+        "&460e referenced 1 time by &1ec9[1]"
       ],
       "references": [
         {
-          "addr": 17929,
-          "kind": "direct"
+          "addr": 7881,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -36281,6 +36524,7 @@
         112
       ],
       "binary_addr": 17937,
+      "comment_inline": "Move the missiles",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "move_missiles",
@@ -36295,6 +36539,7 @@
         121
       ],
       "binary_addr": 17940,
+      "comment_inline": "Move the monsters",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "update_monsters",

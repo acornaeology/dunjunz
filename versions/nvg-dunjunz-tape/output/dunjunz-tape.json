@@ -27196,6 +27196,7 @@
       "labels": [
         "update_game"
       ],
+      "comment_inline": "Move the heroes",
       "xref_summaries": [
         "&1cc0 referenced 1 time by &1f0d"
       ],
@@ -27217,6 +27218,7 @@
         162,
         0
       ],
+      "comment_inline": "For each hero...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#0"
@@ -27231,6 +27233,7 @@
       "labels": [
         "code_1cc5"
       ],
+      "comment_inline": "...look for a door at the cell the hero is moving into",
       "xref_summaries": [
         "&1cc5 referenced 1 time by &1dbf"
       ],
@@ -27253,6 +27256,7 @@
         240,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_door_x,x",
@@ -27266,6 +27270,7 @@
         2,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_x",
@@ -27279,6 +27284,7 @@
         245,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_door_y,x",
@@ -27292,6 +27298,7 @@
         3,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_y",
@@ -27303,6 +27310,7 @@
       "bytes": [
         138
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -27311,6 +27319,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -27320,6 +27329,7 @@
         162,
         20
       ],
+      "comment_inline": "Doors 20 to 1",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&14"
@@ -27334,6 +27344,7 @@
       "labels": [
         "code_1cd8"
       ],
+      "comment_inline": "This door's x?",
       "xref_summaries": [
         "&1cd8 referenced 1 time by &1db5"
       ],
@@ -27356,6 +27367,7 @@
         2,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "cell_x",
@@ -27368,6 +27380,7 @@
         240,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_1ce3",
@@ -27381,6 +27394,7 @@
         178,
         29
       ],
+      "comment_inline": "No: next door",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_1db2",
@@ -27397,6 +27411,7 @@
       "labels": [
         "code_1ce3"
       ],
+      "comment_inline": "...and y?",
       "xref_summaries": [
         "&1ce3 referenced 1 time by &1cde"
       ],
@@ -27419,6 +27434,7 @@
         3,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "cell_y",
@@ -27431,6 +27447,7 @@
         240,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_1cee",
@@ -27444,6 +27461,7 @@
         178,
         29
       ],
+      "comment_inline": "No: next door",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_1db2",
@@ -27458,6 +27476,7 @@
       "labels": [
         "code_1cee"
       ],
+      "comment_inline": "Does the hero carry this door's key?",
       "xref_summaries": [
         "&1cee referenced 1 time by &1ce9"
       ],
@@ -27475,6 +27494,7 @@
       "bytes": [
         168
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -27483,6 +27503,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -27491,6 +27512,7 @@
       "bytes": [
         138
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -27501,6 +27523,7 @@
         224,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "hero_key,y",
@@ -27513,6 +27536,7 @@
         240,
         3
       ],
+      "comment_inline": "Yes",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_1cfa",
@@ -27526,6 +27550,7 @@
         178,
         29
       ],
+      "comment_inline": "No: next door",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_1db2",
@@ -27540,6 +27565,7 @@
       "labels": [
         "code_1cfa"
       ],
+      "comment_inline": "Open the door: 7 points...",
       "xref_summaries": [
         "&1cfa referenced 1 time by &1cf5"
       ],
@@ -27557,6 +27583,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -27565,6 +27592,7 @@
       "bytes": [
         152
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tya"
     },
@@ -27573,6 +27601,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -27582,6 +27611,7 @@
         160,
         7
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#7"
@@ -27593,6 +27623,7 @@
         0,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "scratch",
@@ -27607,6 +27638,7 @@
       "labels": [
         "loop_1d03"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&1d03 referenced 1 time by &1d0b"
       ],
@@ -27624,6 +27656,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -27634,6 +27667,7 @@
         140,
         114
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "add_point",
@@ -27645,6 +27679,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -27653,6 +27688,7 @@
       "bytes": [
         168
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -27661,6 +27697,7 @@
       "bytes": [
         136
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "dey"
     },
@@ -27670,6 +27707,7 @@
         208,
         246
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_1d03",
@@ -27682,6 +27720,7 @@
         169,
         150
       ],
+      "comment_inline": "...play the food sound at a lower pitch...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&96"
@@ -27693,6 +27732,7 @@
         252,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_0bfc",
@@ -27705,6 +27745,7 @@
         162,
         248
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#<(food_sound)",
@@ -27724,6 +27765,7 @@
         160,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(food_sound)",
@@ -27743,6 +27785,7 @@
         169,
         7
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osword_sound",
@@ -27760,7 +27803,7 @@
         241,
         255
       ],
-      "comment_inline": "SOUND command",
+      "comment_inline": "... SOUND command",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osword",
@@ -27773,6 +27816,7 @@
         169,
         200
       ],
+      "comment_inline": "...and put its pitch back",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&c8"
@@ -27784,6 +27828,7 @@
         252,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_0bfc",
@@ -27797,6 +27842,7 @@
         3,
         13
       ],
+      "comment_inline": "Keep the door's cell in spare bytes beyond the monster tables, as plot_at_cell changes cell_x and cell_y...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "cell_y",
@@ -27810,6 +27856,7 @@
         76,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_7e4c",
@@ -27823,6 +27870,7 @@
         2,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "cell_x",
@@ -27836,6 +27884,7 @@
         35,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_7e23",
@@ -27848,6 +27897,7 @@
         169,
         21
       ],
+      "comment_inline": "...erase the door...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&15"
@@ -27858,6 +27908,7 @@
         133,
         122
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -27870,6 +27921,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -27880,6 +27932,7 @@
         133,
         125
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007d",
@@ -27892,6 +27945,7 @@
         133,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007e",
@@ -27905,6 +27959,7 @@
         82,
         120
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_at_cell",
@@ -27918,6 +27973,7 @@
         35,
         126
       ],
+      "comment_inline": "...and recover its cell",
       "type": "code",
       "mnemonic": "lda",
       "operand": "data_7e23",
@@ -27931,6 +27987,7 @@
         2,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_x",
@@ -27944,6 +28001,7 @@
         76,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "data_7e4c",
@@ -27957,6 +28015,7 @@
         3,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_y",
@@ -27968,6 +28027,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -27976,6 +28036,7 @@
       "bytes": [
         168
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -27984,6 +28045,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -27992,6 +28054,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -28002,6 +28065,7 @@
         3,
         13
       ],
+      "comment_inline": "Clear the door's wall bit: room offset...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "cell_y",
@@ -28014,6 +28078,7 @@
         41,
         248
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "and",
       "operand": "#&f8"
@@ -28025,6 +28090,7 @@
         0,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "scratch",
@@ -28036,6 +28102,7 @@
       "bytes": [
         24
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -28046,6 +28113,7 @@
         0,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "scratch",
@@ -28059,6 +28127,7 @@
         0,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "scratch",
@@ -28072,6 +28141,7 @@
         0,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "scratch",
@@ -28084,6 +28154,7 @@
         133,
         123
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007b",
@@ -28097,6 +28168,7 @@
         2,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "cell_x",
@@ -28109,6 +28181,7 @@
         41,
         248
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "and",
       "operand": "#&f8"
@@ -28119,6 +28192,7 @@
         101,
         123
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "data_007b",
@@ -28131,6 +28205,7 @@
         133,
         123
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007b",
@@ -28143,6 +28218,7 @@
         169,
         12
       ],
+      "comment_inline": "...in room_walls...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&0c"
@@ -28153,6 +28229,7 @@
         133,
         124
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007c",
@@ -28164,6 +28241,7 @@
       "bytes": [
         138
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -28172,6 +28250,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -28182,6 +28261,7 @@
         2,
         13
       ],
+      "comment_inline": "...mask for the column...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "cell_x",
@@ -28194,6 +28274,7 @@
         41,
         7
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "and",
       "operand": "#7"
@@ -28203,6 +28284,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -28213,6 +28295,7 @@
         192,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "bit_masks,x",
@@ -28225,6 +28308,7 @@
         73,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "eor",
       "operand": "#&ff"
@@ -28236,6 +28320,7 @@
         0,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "scratch",
@@ -28249,6 +28334,7 @@
         3,
         13
       ],
+      "comment_inline": "...byte for the row...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "cell_y",
@@ -28261,6 +28347,7 @@
         41,
         7
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "and",
       "operand": "#7"
@@ -28270,6 +28357,7 @@
       "bytes": [
         168
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -28279,6 +28367,7 @@
         177,
         123
       ],
+      "comment_inline": "...clear the bit",
       "type": "code",
       "mnemonic": "lda",
       "operand": "(data_007b),y",
@@ -28292,6 +28381,7 @@
         0,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "and",
       "operand": "scratch",
@@ -28304,6 +28394,7 @@
         145,
         123
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "(data_007b),y",
@@ -28315,6 +28406,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -28323,6 +28415,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -28332,6 +28425,7 @@
         169,
         255
       ],
+      "comment_inline": "Remove the door...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&ff"
@@ -28343,6 +28437,7 @@
         0,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "door_x,x",
@@ -28356,6 +28451,7 @@
         32,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "door_y,x",
@@ -28367,6 +28463,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -28375,6 +28472,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -28384,6 +28482,7 @@
         169,
         0
       ],
+      "comment_inline": "...and the key, which is used up",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -28395,6 +28494,7 @@
         224,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_key,x",
@@ -28407,6 +28507,7 @@
         169,
         26
       ],
+      "comment_inline": "Erase the key icon from the panel",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&1a"
@@ -28417,6 +28518,7 @@
         133,
         122
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -28430,6 +28532,7 @@
         208,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_panel_y,x",
@@ -28441,6 +28544,7 @@
       "bytes": [
         56
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sec"
     },
@@ -28450,6 +28554,7 @@
         233,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "#&0d"
@@ -28460,6 +28565,7 @@
         133,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -28472,6 +28578,7 @@
         169,
         74
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&4a"
@@ -28482,6 +28589,7 @@
         133,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -28493,6 +28601,7 @@
       "bytes": [
         138
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -28501,6 +28610,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -28511,6 +28621,7 @@
         0,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_sprite",
@@ -28522,6 +28633,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -28530,6 +28642,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -28540,6 +28653,7 @@
         186,
         29
       ],
+      "comment_inline": "Next hero",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_1dba",
@@ -28554,6 +28668,7 @@
       "labels": [
         "code_1db2"
       ],
+      "comment_inline": "Next door",
       "xref_summaries": [
         "&1db2 referenced 3 times by &1ce0, &1ceb, &1cf7"
       ],
@@ -28580,6 +28695,7 @@
         240,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_1db8",
@@ -28593,6 +28709,7 @@
         216,
         28
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_1cd8",
@@ -28607,6 +28724,7 @@
       "labels": [
         "code_1db8"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&1db8 referenced 1 time by &1db3"
       ],
@@ -28624,6 +28742,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -28635,6 +28754,7 @@
       "labels": [
         "code_1dba"
       ],
+      "comment_inline": "Next hero",
       "xref_summaries": [
         "&1dba referenced 1 time by &1daf"
       ],
@@ -28653,6 +28773,7 @@
         224,
         4
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#4"
@@ -28663,11 +28784,12 @@
         240,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_1dc2",
+      "operand": "draw_keys",
       "target": 7618,
-      "target_label": "code_1dc2"
+      "target_label": "draw_keys"
     },
     {
       "addr": 7615,
@@ -28676,6 +28798,7 @@
         197,
         28
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_1cc5",
@@ -28689,8 +28812,9 @@
         0
       ],
       "labels": [
-        "code_1dc2"
+        "draw_keys"
       ],
+      "comment_inline": "Draw the keys on the floor, 20 to 1",
       "xref_summaries": [
         "&1dc2 referenced 1 time by &1dbd"
       ],
@@ -28710,6 +28834,7 @@
         133,
         125
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007d",
@@ -28722,6 +28847,7 @@
         133,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007e",
@@ -28734,6 +28860,7 @@
         169,
         27
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&1b"
@@ -28744,6 +28871,7 @@
         133,
         122
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -28756,6 +28884,7 @@
         162,
         20
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&14"
@@ -28770,6 +28899,7 @@
       "labels": [
         "loop_1dce"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&1dce referenced 1 time by &1de2"
       ],
@@ -28792,6 +28922,7 @@
         2,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_x",
@@ -28805,6 +28936,7 @@
         128,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "key_y,x",
@@ -28818,6 +28950,7 @@
         3,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_y",
@@ -28829,6 +28962,7 @@
       "bytes": [
         138
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -28837,6 +28971,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -28847,6 +28982,7 @@
         82,
         120
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_at_cell",
@@ -28858,6 +28994,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -28866,6 +29003,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -28874,6 +29012,7 @@
       "bytes": [
         202
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "dex"
     },
@@ -28883,6 +29022,7 @@
         208,
         234
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_1dce",
@@ -28895,6 +29035,7 @@
         162,
         0
       ],
+      "comment_inline": "For each hero...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#0"
@@ -28907,8 +29048,9 @@
         13
       ],
       "labels": [
-        "code_1de6"
+        "check_hero_keys"
       ],
+      "comment_inline": "In play?",
       "xref_summaries": [
         "&1de6 referenced 1 time by &1ecb"
       ],
@@ -28930,6 +29072,7 @@
         208,
         61
       ],
+      "comment_inline": "Yes",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_1e28",
@@ -28943,6 +29086,7 @@
         224,
         34
       ],
+      "comment_inline": "Out of play: carrying a key?",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_key,x",
@@ -28955,6 +29099,7 @@
         208,
         3
       ],
+      "comment_inline": "Yes",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_1df3",
@@ -28968,6 +29113,7 @@
         198,
         30
       ],
+      "comment_inline": "No: next hero",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_1ec6",
@@ -28984,6 +29130,7 @@
       "labels": [
         "code_1df3"
       ],
+      "comment_inline": "Death animation finished?",
       "xref_summaries": [
         "&1df3 referenced 1 time by &1dee"
       ],
@@ -29005,6 +29152,7 @@
         201,
         8
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#8"
@@ -29015,6 +29163,7 @@
         208,
         46
       ],
+      "comment_inline": "Not yet",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_1e28",
@@ -29028,6 +29177,7 @@
         224,
         34
       ],
+      "comment_inline": "Yes: drop the key where the hero fell",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "hero_key,x",
@@ -29041,6 +29191,7 @@
         16,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_x,x",
@@ -29054,6 +29205,7 @@
         96,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "key_x,y",
@@ -29067,6 +29219,7 @@
         21,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_y,x",
@@ -29080,6 +29233,7 @@
         128,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "key_y,y",
@@ -29092,6 +29246,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -29103,6 +29258,7 @@
         224,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_key,x",
@@ -29115,6 +29271,7 @@
         169,
         26
       ],
+      "comment_inline": "Erase the key icon from the panel",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&1a"
@@ -29248,6 +29405,7 @@
         198,
         30
       ],
+      "comment_inline": "Next hero",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_1ec6",
@@ -29264,6 +29422,7 @@
       "labels": [
         "code_1e28"
       ],
+      "comment_inline": "Just swapped keys?",
       "xref_summaries": [
         "&1e28 referenced 2 times by &1de9, &1df8"
       ],
@@ -29289,6 +29448,7 @@
         240,
         8
       ],
+      "comment_inline": "No",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_1e35",
@@ -29301,6 +29461,7 @@
         169,
         0
       ],
+      "comment_inline": "Yes: not again until the hero moves on",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -29312,6 +29473,7 @@
         229,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_key_dropped,x",
@@ -29325,6 +29487,7 @@
         198,
         30
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_1ec6",
@@ -29341,6 +29504,7 @@
       "labels": [
         "code_1e35"
       ],
+      "comment_inline": "Is there a key at the hero's cell?",
       "xref_summaries": [
         "&1e35 referenced 1 time by &1e2b"
       ],
@@ -29363,6 +29527,7 @@
         2,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_x",
@@ -29376,6 +29541,7 @@
         21,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_y,x",
@@ -29389,6 +29555,7 @@
         3,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_y",
@@ -29400,6 +29567,7 @@
       "bytes": [
         138
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -29408,6 +29576,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -29417,6 +29586,7 @@
         162,
         20
       ],
+      "comment_inline": "...keys 20 to 1",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&14"
@@ -29431,6 +29601,7 @@
       "labels": [
         "code_1e45"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&1e45 referenced 1 time by &1ec1"
       ],
@@ -29453,6 +29624,7 @@
         2,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "cell_x",
@@ -29465,6 +29637,7 @@
         208,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_1ebe",
@@ -29478,6 +29651,7 @@
         128,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "key_y,x",
@@ -29491,6 +29665,7 @@
         3,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "cell_y",
@@ -29503,6 +29678,7 @@
         208,
         105
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_1ebe",
@@ -29515,6 +29691,7 @@
         169,
         21
       ],
+      "comment_inline": "Yes: erase it from the floor",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&15"
@@ -29525,6 +29702,7 @@
         133,
         122
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -29537,6 +29715,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -29547,6 +29726,7 @@
         133,
         125
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007d",
@@ -29559,6 +29739,7 @@
         133,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007e",
@@ -29570,6 +29751,7 @@
       "bytes": [
         138
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -29578,6 +29760,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -29588,6 +29771,7 @@
         82,
         120
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_at_cell",
@@ -29599,6 +29783,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -29607,6 +29792,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -29615,6 +29801,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "Show the key icon in the hero's panel",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -29623,6 +29810,7 @@
       "bytes": [
         168
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -29631,6 +29819,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -29640,6 +29829,7 @@
         169,
         82
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&52"
@@ -29650,6 +29840,7 @@
         133,
         122
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -29663,6 +29854,7 @@
         208,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_panel_y,y",
@@ -29674,6 +29866,7 @@
       "bytes": [
         56
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sec"
     },
@@ -29683,6 +29876,7 @@
         233,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "#&0d"
@@ -29693,6 +29887,7 @@
         133,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -29705,6 +29900,7 @@
         169,
         74
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&4a"
@@ -29715,6 +29911,7 @@
         133,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -29726,6 +29923,7 @@
       "bytes": [
         152
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tya"
     },
@@ -29734,6 +29932,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -29742,6 +29941,7 @@
       "bytes": [
         138
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -29750,6 +29950,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -29760,6 +29961,7 @@
         0,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_sprite",
@@ -29771,6 +29973,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -29779,6 +29982,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -29787,6 +29991,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -29795,6 +30000,7 @@
       "bytes": [
         168
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -29803,6 +30009,7 @@
       "bytes": [
         138
       ],
+      "comment_inline": "Drop the key carried (if any) in this cell...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -29811,6 +30018,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -29821,6 +30029,7 @@
         224,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "hero_key,y",
@@ -29834,6 +30043,7 @@
         16,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_x,y",
@@ -29847,6 +30057,7 @@
         96,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "key_x,x",
@@ -29860,6 +30071,7 @@
         21,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_y,y",
@@ -29873,6 +30085,7 @@
         128,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "key_y,x",
@@ -29884,6 +30097,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -29892,6 +30106,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -29902,6 +30117,7 @@
         224,
         34
       ],
+      "comment_inline": "...and carry the new one",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_key,y",
@@ -29914,6 +30130,7 @@
         169,
         1
       ],
+      "comment_inline": "Mark the swap",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#1"
@@ -29925,6 +30142,7 @@
         229,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_key_dropped,y",
@@ -29937,6 +30155,7 @@
         169,
         255
       ],
+      "comment_inline": "Take the new key off the floor",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&ff"
@@ -29948,6 +30167,7 @@
         96,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "key_x,x",
@@ -29961,6 +30181,7 @@
         128,
         34
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "key_y,x",
@@ -29973,6 +30194,7 @@
         162,
         66
       ],
+      "comment_inline": "Play the key sound",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#<(key_envelope)",
@@ -29992,6 +30214,7 @@
         160,
         25
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(key_envelope)",
@@ -30011,6 +30234,7 @@
         169,
         8
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osword_envelope",
@@ -30028,7 +30252,7 @@
         241,
         255
       ],
-      "comment_inline": "ENVELOPE command",
+      "comment_inline": "... ENVELOPE command",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osword",
@@ -30041,6 +30265,7 @@
         162,
         80
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#<(key_sound)",
@@ -30060,6 +30285,7 @@
         160,
         25
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(key_sound)",
@@ -30079,6 +30305,7 @@
         169,
         7
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osword_sound",
@@ -30096,7 +30323,7 @@
         241,
         255
       ],
-      "comment_inline": "SOUND command",
+      "comment_inline": "... SOUND command",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osword",
@@ -30108,6 +30335,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -30116,6 +30344,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -30126,6 +30355,7 @@
         198,
         30
       ],
+      "comment_inline": "Next hero",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_1ec6",
@@ -30140,6 +30370,7 @@
       "labels": [
         "code_1ebe"
       ],
+      "comment_inline": "Next key",
       "xref_summaries": [
         "&1ebe referenced 2 times by &1e4b, &1e53"
       ],
@@ -30162,6 +30393,7 @@
         240,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_1ec4",
@@ -30175,6 +30407,7 @@
         69,
         30
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_1e45",
@@ -30189,6 +30422,7 @@
       "labels": [
         "code_1ec4"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&1ec4 referenced 1 time by &1ebf"
       ],
@@ -30206,6 +30440,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -30217,6 +30452,7 @@
       "labels": [
         "code_1ec6"
       ],
+      "comment_inline": "Next hero",
       "xref_summaries": [
         "&1ec6 referenced 4 times by &1df0, &1e25, &1e32, &1ebb"
       ],
@@ -30247,6 +30483,7 @@
         224,
         4
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#4"
@@ -30257,11 +30494,12 @@
         240,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_1ece",
+      "operand": "update_rest",
       "target": 7886,
-      "target_label": "code_1ece"
+      "target_label": "update_rest"
     },
     {
       "addr": 7883,
@@ -30270,11 +30508,12 @@
         230,
         29
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_1de6",
+      "operand": "check_hero_keys",
       "target": 7654,
-      "target_label": "code_1de6"
+      "target_label": "check_hero_keys"
     },
     {
       "addr": 7886,
@@ -30284,8 +30523,9 @@
         115
       ],
       "labels": [
-        "code_1ece"
+        "update_rest"
       ],
+      "comment_inline": "Draw the objects",
       "xref_summaries": [
         "&1ece referenced 1 time by &1ec9"
       ],
@@ -30308,6 +30548,7 @@
         202,
         112
       ],
+      "comment_inline": "Move the missiles",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "move_missiles",
@@ -30321,6 +30562,7 @@
         193,
         121
       ],
+      "comment_inline": "Move the monsters",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "update_monsters",
@@ -30333,6 +30575,7 @@
         169,
         122
       ],
+      "comment_inline": "OSBYTE &7A: which key is pressed?",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osbyte_scan_keyboard_from_16",
@@ -30350,7 +30593,7 @@
         244,
         255
       ],
-      "comment_inline": "Scan keyboard from key 16",
+      "comment_inline": "... Scan keyboard from key 16",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -30363,6 +30606,7 @@
         224,
         113
       ],
+      "comment_inline": "f1 (internal key &71)?",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#&71"
@@ -30373,6 +30617,7 @@
         208,
         21
       ],
+      "comment_inline": "No: return",
       "type": "code",
       "mnemonic": "bne",
       "operand": "return_6",
@@ -30389,7 +30634,7 @@
       "labels": [
         "loop_1ee0"
       ],
-      "comment_inline": "Scan keyboard from key 16",
+      "comment_inline": "Paused: wait for f1 to be released... Scan keyboard from key 16",
       "xref_summaries": [
         "&1ee0 referenced 1 time by &1ee5"
       ],
@@ -30411,6 +30656,7 @@
         224,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#&71"
@@ -30421,6 +30667,7 @@
         240,
         249
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "loop_1ee0",
@@ -30437,7 +30684,7 @@
       "labels": [
         "loop_1ee7"
       ],
-      "comment_inline": "Scan keyboard from key 16",
+      "comment_inline": "...pressed again... Scan keyboard from key 16",
       "xref_summaries": [
         "&1ee7 referenced 1 time by &1eec"
       ],
@@ -30459,6 +30706,7 @@
         224,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#&71"
@@ -30469,6 +30717,7 @@
         208,
         249
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_1ee7",
@@ -30485,7 +30734,7 @@
       "labels": [
         "loop_1eee"
       ],
-      "comment_inline": "Scan keyboard from key 16",
+      "comment_inline": "...and released Scan keyboard from key 16",
       "xref_summaries": [
         "&1eee referenced 1 time by &1ef3"
       ],
@@ -30507,6 +30756,7 @@
         224,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#&71"
@@ -30517,6 +30767,7 @@
         240,
         249
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "loop_1eee",

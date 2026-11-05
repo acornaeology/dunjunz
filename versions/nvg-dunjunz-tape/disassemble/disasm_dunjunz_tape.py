@@ -64,6 +64,7 @@ game.annotate(annotator)
 game.annotate_game_entry(annotator)
 game.annotate_start_level(annotator)
 game.annotate_level_end(annotator)
+game.annotate_cassette_pause(annotator)
 game.annotate_menu_tables(annotator, 0x06F8)
 game.annotate_cassette_level_loop(annotator)
 
