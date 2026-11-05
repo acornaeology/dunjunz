@@ -1,0 +1,24 @@
+[project]
+name = "dunjunz"
+version = "0.1.0"
+description = "Annotated disassembly of Dunjunz (Bug-Byte, 1986) for the BBC Microcomputer"
+license = "MIT"
+authors = [
+    { name = "Robert Smallshire" },
+]
+requires-python = ">=3.12"
+dependencies = [
+    "fantasm>=1.1.0",
+    "dasmos>=4.2.0",
+    "oaknut-basic>=13.5.0",
+]
+
+[dependency-groups]
+dev = [
+    "beebium[imaging]",
+    "beebium-server",
+]
+
+[tool.uv]
+index-url = "https://pypi.org/simple"
+package = false
