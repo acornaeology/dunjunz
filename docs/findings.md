@@ -135,3 +135,38 @@ match the tape release except for:
 
 `Dunjun6` is byte-identical to the first &1180 bytes of the tape's
 `DUNJ3`.
+
+## Official disc release (`Dunjunz.zip`, Model B side 0)
+
+### The game is reloaded from disc for every level
+
+`Coder` (&5000) runs at the start of each level. It advances the level
+number (ASCII digits at &08BD–&08BE, count at &08BC) and does
+`*LOAD DUN1`, reloading the whole of &2000–&7FFF; `Dun1` contains its own
+copy of `Coder` at &5000. It then loads the level: `*LOAD LEVELnn 6B00`,
+or for level 25 `*LOAD STONES 6680`, since `Stones` ends with level 25's
+data at &6B00–&6DAF. Next it copies a &0400–&07FF image from &51B0 or &55B0
+and copies &3000–&473F down to &08C0–&1FFF (from &3440 to &0D00 after the
+first level, leaving &08C0–&0CFF alone). Finally it jumps to &0D31.
+
+So the filing system must survive each level of play. The game uses
+&0D00–&10FF (DFS 1.20's NMI and workspace area), which is consistent with
+the reports that only DFS 0.90 works (see
+[stardot-dunjunz-versions-thread.md](stardot-dunjunz-versions-thread.md)).
+How the game uses &0D00 in this version is still to be traced.
+
+### Optional joystick support with a hard-coded MOS 1.20 address
+
+`Coder` reads ADC channel 1 with OSBYTE &80. If Y returns &80 (taken to
+mean a joystick at rest; inference) it copies the &0400–&07FF image from
+&55B0 instead of &51B0 and points BYTEV at &0780. That handler answers
+INKEY scans (OSBYTE &81) of internal key numbers &97, &98, &99, &B9 and &9D
+from ADC channels 1 and 2 and the fire buttons (OSBYTE &80 with X=0), so
+one player can use a joystick. Every other OSBYTE call is passed on with
+`JMP &E772`, the OSBYTE entry of MOS 1.20, not through the previous
+contents of BYTEV. On any other MOS, or with anything else hooked into
+BYTEV, joystick mode breaks every OSBYTE call. Neither the crack nor the
+sideways RAM hack has this code.
+
+Which player the joystick replaces, and whether the &80 test detects a
+joystick reliably, are to be confirmed.

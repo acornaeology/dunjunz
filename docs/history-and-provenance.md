@@ -47,9 +47,9 @@ holds the two sides as directories `2/` and `0/` **[confirmed]**:
 - **Side 0 is the Model B version.** `Dunjunz` (load &26C0, exec &2700),
   the game `Dun1` (&2000, &6000 bytes, up to &8000), `Screen` (&3280, the
   loading screen), `Stones` (&6E80), `Coder` (&5000), `Editor`,
-  `Default`, and `Level1`–`Level24` at &6B00 **[confirmed]**. `Level25`
-  is not present on this side in the archive **[confirmed]**; where the
-  disc version gets level 25 from is not yet known.
+  `Default`, and `Level1`–`Level24` at &6B00 **[confirmed]**. There is no
+  `Level25`: `Coder` loads level 25 with `*LOAD STONES 6680`, because
+  `Stones` ends with that level's data **[confirmed]**.
 - The README says to turn the disc over after choosing the heroes "in
   order to access the levels of play". It describes `*EDITOR` (a level
   editor) and `*DEFAULT` (restores an edited level to its original form),
@@ -120,7 +120,9 @@ not named. It descends from Ole's crack, not from either original:
     **[inference]**.
 - **Levels.** Its 25 `LEVELn` files, in Beebug ROMFS images (`RFS (C)
   BEEBUG`), decrypt with the disc release's scheme, and their sums match
-  the disc release's table **[confirmed]**. So the levels came from the
+  the disc release's table **[confirmed]**. Its `LEVEL25` is
+  byte-identical to the level 25 data at the end of the disc release's
+  `Stones` **[confirmed]**. So the levels came from the
   disc release (or its editor) while the code came from the crack, whose
   table differs for level 5. As a result the hack resets the machine on
   reaching level 5 **[confirmed in beebium]**; see
