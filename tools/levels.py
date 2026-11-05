@@ -52,7 +52,7 @@ def bit(bitmap, x, y):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("level", type=int)
-    parser.add_argument("--rooms-high", type=int, default=4)
+    parser.add_argument("--rooms-high", type=int, default=6)
     args = parser.parse_args()
     objects, doors, keys, trapdoors, walls, object_free_map = decode(level_bytes(args.level))
     marks = {}
@@ -84,7 +84,7 @@ def main():
     print("trapdoors:", trapdoors)
     object_cells = {(x, y) for x, y, _ in objects}
     print("floor cells marked as possible object cells, with no object:",
-          sum(1 for y in range(32) for x in range(32)
+          sum(1 for y in range(48) for x in range(32)
               if not bit(object_free_map, x, y) and not bit(walls, x, y)
               and (x, y) not in object_cells))
 

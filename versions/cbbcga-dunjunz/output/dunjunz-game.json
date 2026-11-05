@@ -374,7 +374,7 @@
       "addr": 5392,
       "name": "unpack_level",
       "title": "Copy the loaded level into the game's tables",
-      "description": "Distribute the level file at &6B00 into the object, door, key, trapdoor and map tables."
+      "description": "Distribute the level file at &6B00 into the object, door, key, trapdoor and map tables and the wall sprite."
     },
     {
       "addr": 5507,
@@ -846,7 +846,7 @@
     "level_trapdoor_y": 27608,
     "level_walls": 27616,
     "level_object_free_map": 27824,
-    "level_tail_data": 28032,
+    "level_wall_sprite": 28032,
     "level_osfile_block": 28256,
     "data_6e61": 28257,
     "data_6e62": 28258,
@@ -1188,13 +1188,13 @@
     },
     {
       "addr": 28032,
-      "name": "level_tail_data",
+      "name": "level_wall_sprite",
       "length": 48,
       "group": "level_file",
       "access": [
         "b"
       ],
-      "description": "Level file: Last &30 bytes, copied to level_tail."
+      "description": "Level file: The level's wall block, copied to wall_sprite."
     },
     {
       "addr": 28256,
@@ -21383,7 +21383,7 @@
         162,
         0
       ],
-      "comment_inline": "The last &30 bytes",
+      "comment_inline": "The level's wall sprite, &30 bytes",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#0"
@@ -21409,9 +21409,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "level_tail_data,x",
+      "operand": "level_wall_sprite,x",
       "target": 28032,
-      "target_label": "level_tail_data"
+      "target_label": "level_wall_sprite"
     },
     {
       "addr": 5498,
@@ -21422,9 +21422,9 @@
       ],
       "type": "code",
       "mnemonic": "sta",
-      "operand": "level_tail,x",
+      "operand": "wall_sprite,x",
       "target": 11520,
-      "target_label": "level_tail"
+      "target_label": "wall_sprite"
     },
     {
       "addr": 5501,
@@ -40192,7 +40192,7 @@
         15
       ],
       "labels": [
-        "level_tail"
+        "wall_sprite"
       ],
       "xref_summaries": [
         "&2d00 used as index base 1 time by &157a"

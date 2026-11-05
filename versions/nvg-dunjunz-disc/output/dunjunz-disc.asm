@@ -1465,7 +1465,8 @@ data_12d4 = saved_wrchv+1
 ; ***************************************************************************************
 ; Copy the loaded level into the game's tables
 ;
-; Distribute the level file at &6B00 into the object, door, key, trapdoor and map tables.
+; Distribute the level file at &6B00 into the object, door, key, trapdoor and map tables
+; and the wall sprite.
 ; &1510 referenced 1 time by &3b46
 .unpack_level
     ldx #&1e                            ; Objects 30 to 1: position and type
@@ -1519,11 +1520,11 @@ data_12d4 = saved_wrchv+1
     inx                                 ; ...
     cpx #&c9                            ; ...
     bne code_1564                       ; ...
-    ldx #0                              ; The last &30 bytes
+    ldx #0                              ; The level's wall sprite, &30 bytes
 ; &1577 referenced 1 time by &3cc0
 .code_1577
-    lda level_tail_data,x
-    sta level_tail,x
+    lda level_wall_sprite,x
+    sta wall_sprite,x
     inx                                 ; ...
     cpx #&30 ; '0'                      ; ...
     bne code_1577                       ; ...
@@ -3880,7 +3881,7 @@ data_213a = object_free_map+58
     equb &01, &00, &00, &00, &17, &00, &00, &90
     equb &17, &00, &00, &00, &00, &00, &00, &00
 ; &2d00 used as index base 1 time by &3cba
-.level_tail
+.wall_sprite
     equb &0f, &0b, &0f, &07, &03, &0f, &0f, &0f
     equb &0f, &1f, &2f, &0b, &0f, &2f, &0b, &0f
     equb &1f, &0f, &0f, &07, &1f, &1f, &0f, &07
@@ -5110,7 +5111,7 @@ data_518e = sub_5178+22
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
 ; &6d80 used as index base 1 time by &3cb7
-.level_tail_data
+.level_wall_sprite
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -8285,10 +8286,9 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     level_object_type:           1
 ;     level_object_x:              1
 ;     level_object_y:              1
-;     level_tail:                  1
-;     level_tail_data:             1
 ;     level_trapdoor_x:            1
 ;     level_trapdoor_y:            1
+;     level_wall_sprite:           1
 ;     level_walls:                 1
 ;     loop_504c:                   1
 ;     loop_50ba:                   1
@@ -8352,6 +8352,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     update_game:                 1
 ;     update_monsters:             1
 ;     victory_sequence:            1
+;     wall_sprite:                 1
 ;     workspace_template:          1
 
 ; Automatically generated labels:

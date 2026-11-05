@@ -457,8 +457,9 @@ def annotate_state(a: Annotator) -> None:
                "is not picked straight back up.")
     hero_table(0x22F0, "hero_door_x", "Hero map x, kept for the door and key checks.")
     hero_table(0x22F5, "hero_door_y", "Hero map y, kept for the door and key checks.")
-    a.label(0x2D00, "level_tail", length=0x30, description=(
-        "The last &30 bytes of the level file."))
+    a.label(0x2D00, "wall_sprite", length=0x30, description=(
+        "Data of sprite 0, the wall block (4 bytes x 12 rows), replaced by "
+        "each level's own from the level file."))
 
     a.label(0x7CFF, "monster_start_hit_points", description=(
         "Hit points a monster starts with on this level: 6 + 2 x the level number (8 on level 1)."))
@@ -583,7 +584,7 @@ def annotate_routines(a: Annotator) -> None:
                     "plot_y": "address of view_frame_plots, high byte"})
     a.sub(0x1510, "unpack_level", "Copy the loaded level into the game's tables",
           "Distribute the level file at &6B00 into the object, door, key, "
-          "trapdoor and map tables.")
+          "trapdoor and map tables and the wall sprite.")
     a.sub(0x1583, "reset_monsters", "Clear the monsters for a new level",
           "Mark every monster as not yet appeared, give each the level's "
           "starting hit points, and clear the heroes' keys and the "
@@ -1013,7 +1014,7 @@ def annotate_level_file(a: Annotator) -> None:
         (0x6BD8, "level_trapdoor_y", 8, "Trapdoors' map y"),
         (0x6BE0, "level_walls", 0xD0, "Wall map (&C9 bytes used)"),
         (0x6CB0, "level_object_free_map", 0xD0, "Map of cells without objects (&C9 bytes used)"),
-        (0x6D80, "level_tail_data", 0x30, "Last &30 bytes, copied to level_tail"),
+        (0x6D80, "level_wall_sprite", 0x30, "The level's wall block, copied to wall_sprite"),
     ]:
         a.label(addr, name, length=length, description=f"Level file: {what}.", **g)
 
@@ -1106,7 +1107,7 @@ def annotate_level_file(a: Annotator) -> None:
         (0x155D, "..."), (0x155E, "..."), (0x1560, "..."),
         (0x1562, "Wall map and object-free map, &C9 bytes each"),
         (0x1570, "..."), (0x1571, "..."), (0x1573, "..."),
-        (0x1575, "The last &30 bytes"),
+        (0x1575, "The level's wall sprite, &30 bytes"),
         (0x157D, "..."), (0x157E, "..."), (0x1580, "..."), (0x1582, "Return"),
 
         (0x1583, "Monsters 30 to 1..."),

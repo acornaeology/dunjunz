@@ -40,25 +40,25 @@ Tables of positions are 1-based: entry *n* of a table at *T* is at
 | &0D8 | &6BD8 | 8 | Trapdoors' y | `trapdoor_y` &0B98 |
 | &0E0 | &6BE0 | &C9 | Wall map | `room_walls` &0C00 |
 | &1B0 | &6CB0 | &C9 | Object-free map | `object_free_map` &2100 |
-| &280 | &6D80 | &30 | Not yet identified | `level_tail` &2D00 |
+| &280 | &6D80 | &30 | The level's wall block: sprite 0, 4 bytes × 12 rows | `wall_sprite` &2D00 |
 
 Bytes not listed (for example &6B8A+&15 to &6B9F) are not copied.
 
 ## The map
 
-The dungeon is a grid of rooms of 8×8 cells, four rooms across and four
-down (32×32 cells); each hero's view shows one room. A cell (x, y) is in
+The dungeon is a grid of rooms of 8×8 cells, four rooms across and six
+down (32×48 cells); each hero's view shows one room. Level 1 uses only the
+top four rows of rooms. A cell (x, y) is in
 the room whose eight bytes start at (y AND &F8) × 4 + (x AND &F8) in a
 map, and its bit is bit 7 − (x AND 7) of the byte at offset y AND 7 within
-the room. The game copies &C9 bytes of each map, more than the &80 the
-32×32 grid needs.
+the room. The game copies &C9 bytes of each map; the 32×48 grid needs &C0.
 
 - **Wall map**: a set bit is a wall. Doors are walls in this map until
   opened, when `update_game` clears the bit.
 - **Object-free map**: a clear bit marks a cell where an object may lie.
   After each step `move_heroes` searches the object list only when the
   hero's new cell is clear in this map. On every level each object's cell
-  is clear; a few other cells are clear on levels 5, 7, 18, 22–25.
+  is clear, along with a few other cells on some levels.
 
 ## Objects
 
@@ -86,10 +86,19 @@ Key *n* opens door *n*. A hero carries one key at a time (`hero_key`); in
 walking into the matching door opens it. The level's monsters emerge, in
 turn, from its eight trapdoors.
 
+## Cross-check
+
+David Boddie's DunjunzMaps tools
+(<https://github.com/stardot/DunjunzMaps>, `dunjunz.py`) read the same
+offsets for objects, doors, keys, trapdoors and both maps, treat a clear
+bit of the second map as "collectable", read the map as 48 rows, take the
+level's wall sprite from its last bytes, and carry a checksum table with
+&4D for level 5 (the official disc's). Its `add_checksum` makes an edited
+level pass the check by adjusting the level's last byte.
+
 ## Open questions
 
-- What the last &30 bytes (copied to &2D00) are used for.
-- The lower half of level 25's wall map is an irregular pattern unlike
-  the other levels' rooms.
+- Level 25's lower rooms have an irregular wall pattern unlike the other
+  levels' rooms, and no objects.
 - How the win check's cells (x &1A–&1B, y 4–5 on level 25) relate to the
   objects placed there.

@@ -487,7 +487,7 @@
       "binary_addr": 15440,
       "name": "unpack_level",
       "title": "Copy the loaded level into the game's tables",
-      "description": "Distribute the level file at &6B00 into the object, door, key, trapdoor and map tables."
+      "description": "Distribute the level file at &6B00 into the object, door, key, trapdoor and map tables and the wall sprite."
     },
     {
       "addr": 5507,
@@ -9509,7 +9509,7 @@
         15
       ],
       "labels": [
-        "level_tail"
+        "wall_sprite"
       ],
       "xref_summaries": [
         "&2d00 used as index base 1 time by &157a[1]"
@@ -27089,7 +27089,7 @@
         0
       ],
       "binary_addr": 15541,
-      "comment_inline": "The last &30 bytes",
+      "comment_inline": "The level's wall sprite, &30 bytes",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#0"
@@ -27116,9 +27116,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "level_tail_data,x",
+      "operand": "level_wall_sprite,x",
       "target": 28032,
-      "target_label": "level_tail_data"
+      "target_label": "level_wall_sprite"
     },
     {
       "addr": 5498,
@@ -27130,9 +27130,9 @@
       "binary_addr": 15546,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "level_tail,x",
+      "operand": "wall_sprite,x",
       "target": 11520,
-      "target_label": "level_tail"
+      "target_label": "wall_sprite"
     },
     {
       "addr": 5501,
@@ -64528,7 +64528,7 @@
         0
       ],
       "labels": [
-        "level_tail_data"
+        "level_wall_sprite"
       ],
       "xref_summaries": [
         "&6d80 used as index base 1 time by &1577[1]"

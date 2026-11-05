@@ -107,7 +107,7 @@ level_walls           = &6be0  ; Level file: Wall map (&C9 bytes used).
 ; &6be0 used as index base 1 time by &1564
 level_object_free_map = &6cb0  ; Level file: Map of cells without objects (&C9 bytes used).
 ; &6cb0 used as index base 1 time by &156a
-level_tail_data       = &6d80  ; Level file: Last &30 bytes, copied to level_tail.
+level_wall_sprite     = &6d80  ; Level file: The level's wall block, copied to wall_sprite.
 ; &6d80 used as index base 1 time by &1577
 mos_row_offsets       = &c375  ; MOS 1.20 table of screen row offsets for 640-byte rows (row x 640, high byte then low byte, one pair per character row). Read directly by screen_address; it is not part of any documented interface.
 ; &c375 used as index base 1 time by &096e
@@ -1956,7 +1956,8 @@ data_1478 = sub_1476+2
 ; ***************************************************************************************
 ; Copy the loaded level into the game's tables
 ;
-; Distribute the level file at &6B00 into the object, door, key, trapdoor and map tables.
+; Distribute the level file at &6B00 into the object, door, key, trapdoor and map tables
+; and the wall sprite.
 ; &1510 referenced 1 time by &1406
 .unpack_level
     ldx #&1e                            ; Objects 30 to 1: position and type
@@ -2010,11 +2011,11 @@ data_1478 = sub_1476+2
     inx                                 ; ...
     cpx #&c9                            ; ...
     bne loop_1564                       ; ...
-    ldx #0                              ; The last &30 bytes
+    ldx #0                              ; The level's wall sprite, &30 bytes
 ; &1577 referenced 1 time by &1580
 .loop_1577
-    lda level_tail_data,x
-    sta level_tail,x
+    lda level_wall_sprite,x
+    sta wall_sprite,x
     inx                                 ; ...
     cpx #&30 ; '0'                      ; ...
     bne loop_1577                       ; ...
@@ -3505,7 +3506,7 @@ data_213a = sub_212f+11
     equb &01, &00, &00, &00, &17, &00, &00, &90
     equb &17, &00, &00, &00, &00, &00, &00, &00
 ; &2d00 used as index base 1 time by &157a
-.level_tail
+.wall_sprite
     equb &0f, &0b, &0f, &07, &03, &0f, &0f, &0f
     equb &0f, &1f, &2f, &0b, &0f, &2f, &0b, &0f
     equb &1f, &0f, &0f, &07, &1f, &1f, &0f, &07
@@ -7765,10 +7766,9 @@ save "DUNJ3", &6e80, &9d00, &0000, &6e80
 ;     level_object_type:           1
 ;     level_object_x:              1
 ;     level_object_y:              1
-;     level_tail:                  1
-;     level_tail_data:             1
 ;     level_trapdoor_x:            1
 ;     level_trapdoor_y:            1
+;     level_wall_sprite:           1
 ;     level_walls:                 1
 ;     load_level:                  1
 ;     loop_0437:                   1
@@ -7877,6 +7877,7 @@ save "DUNJ3", &6e80, &9d00, &0000, &6e80
 ;     update_game:                 1
 ;     update_monsters:             1
 ;     victory_sequence:            1
+;     wall_sprite:                 1
 ;     workspace_template:          1
 
 ; Automatically generated labels:
