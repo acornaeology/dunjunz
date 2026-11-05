@@ -63,3 +63,22 @@ driver = "versions/nvg-dunjunz-tape/disassemble/disasm_dunjunz_tape.py"
 asm = "versions/nvg-dunjunz-tape/output/dunjunz-tape.asm"
 json = "versions/nvg-dunjunz-tape/output/dunjunz-tape.json"
 verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "DUNJ3" }
+
+# The official disc release, Model B side: Dun1 (the game, reloaded every
+# level) and Coder (its per-level loader, also stored inside Dun1).
+
+[[targets]]
+id = "disc-dun1"
+binary = "versions/nvg-dunjunz-disc/binary/Dun1"
+driver = "versions/nvg-dunjunz-disc/disassemble/disasm_dunjunz_disc.py"
+asm = "versions/nvg-dunjunz-disc/output/dunjunz-disc.asm"
+json = "versions/nvg-dunjunz-disc/output/dunjunz-disc.json"
+verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dun1" }
+
+[[targets]]
+id = "disc-coder"
+binary = "versions/nvg-dunjunz-disc/binary/Coder"
+driver = "versions/nvg-dunjunz-disc/disassemble/disasm_dunjunz_disc.py"
+asm = "versions/nvg-dunjunz-disc/output/dunjunz-disc.asm"
+json = "versions/nvg-dunjunz-disc/output/dunjunz-disc.json"
+verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Coder" }
