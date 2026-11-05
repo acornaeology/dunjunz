@@ -60,3 +60,19 @@ the full catalogue, the boot chain and the confirmed runtime memory map.
 Record anything discovered that matters beyond the disassembly itself
 (emulator-compatibility hazards, bugs, inaccurate instructions, candidate
 fixes) in `docs/findings.md` as it is found, with the evidence.
+
+## Tooling workarounds and upstream requests
+
+We own beebium, dasmos and fantasm: file a GitHub issue for any missing
+feature or defect met along the way, and note the workaround here.
+
+- Multi-file output: `GameFilesRenderer` overrides the beebasm renderer's
+  private `_save_directive` to save each game file
+  (acornaeology/dasmos#49), and `fantasm.toml` declares one target per
+  file sharing one driver and listing (acornaeology/fantasm#25).
+- Synthesised offset bases inside data are named `sub_XXXX`; they are not
+  subroutines (acornaeology/dasmos#50). Declaring the data removes them.
+- No execution coverage in beebium: `tools/coverage.py` uses range
+  breakpoints over data plus single-stepping (rob-smallshire/beebium#268).
+- `Beebium.launch` needs `variant=` repeated alongside `preset=`
+  (rob-smallshire/beebium#269).

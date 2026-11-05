@@ -12,33 +12,15 @@ Usage: uv run python tools/snapshot_game.py OUT_DIRPATH [STOP_ADDRESS_HEX]
 import sys
 from pathlib import Path
 
-from beebium.client import Beebium
-from beebium.client.sideways import SlotType
-
-REPO_DIRPATH = Path(__file__).resolve().parent.parent
-DISC_FILEPATH = REPO_DIRPATH / "versions" / "cbbcga-dunjunz" / "Disc060-DunjunzRx2.ssd"
-GAME_ENTRY = 0x0D31
+from dunjunz_beebium import GAME_ENTRY, boot_to, launched_machine
 
 
 def main() -> None:
     out_dirpath = Path(sys.argv[1])
     stop_address = int(sys.argv[2], 16) if len(sys.argv) > 2 else GAME_ENTRY
     out_dirpath.mkdir(parents=True, exist_ok=True)
-    with Beebium.launch(variant="model-b-romram", preset="model-b-romram-disc") as bbc:
-        bbc.system.set_speed_multiplier(0.0)
-        for slot in (4, 5):
-            bbc.sideways.configure_slot(slot, SlotType.RAM)
-        bbc.boot_disc(DISC_FILEPATH)
-        bp = bbc.debugger.add_breakpoint(stop_address)
-        reached = False
-        for _ in range(400):
-            bbc.run_for_emulated_seconds(0.5)
-            if bbc.cpu.pc == stop_address:
-                reached = True
-                break
-            bbc.debugger.run()
-            bbc.keyboard.press_space()
-        if not reached:
+    with launched_machine() as bbc:
+        if not boot_to(bbc, stop_address):
             print(f"did not reach &{stop_address:04X}; PC=&{bbc.cpu.pc:04X}")
             print(bbc.video.screen_text().text)
         bbc.debugger.stop()
