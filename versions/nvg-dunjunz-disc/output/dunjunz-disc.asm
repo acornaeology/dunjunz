@@ -2710,49 +2710,49 @@ data_213a = object_free_map+58
 ; &0400 referenced 1 time by &72b9
 .add_thousand_points
 .add_thousand_points_joy
-    inc hero_score_thousands,x
-    lda hero_score_thousands,x
-    cmp #&28 ; '('
-    bne data_0447
-    lda #&1e
-    sta hero_score_thousands,x
-    inc data_06f8,x
-    lda data_06f8,x
-    cmp #&73 ; 's'
-    bne data_041e
-    lda #&72 ; 'r'
-    sta data_06f8,x
+    inc hero_score_thousands,x          ; Add one to the thousands digit
+    lda hero_score_thousands,x          ; ...
+    cmp #&28 ; '('                      ; Past 9?
+    bne data_0447                       ; No: return
+    lda #&1e                            ; Yes: thousands 0...
+    sta hero_score_thousands,x          ; ...
+    inc data_06f8,x                     ; ...and add one to the ten-thousands digit
+    lda data_06f8,x                     ; ...
+    cmp #&73 ; 's'                      ; Past 9?
+    bne data_041e                       ; No
+    lda #&72 ; 'r'                      ; Yes: keep it at 9
+    sta data_06f8,x                     ; ...
 ; &041e referenced 4 times by &51c7, &5472, &55c7, &5872
 .data_041e
-    sta sprite_number
-    lda #&45 ; 'E'
-    sta plot_x
-    lda data_7dd0,x
-    clc
-    adc #&18
-    sta plot_y
-    txa
-    pha
-    jsr plot_sprite
-    lda #&71 ; 'q'
-    sta sprite_number
-    ldy #4
+    sta sprite_number                   ; Plot it below the score...
+    lda #&45 ; 'E'                      ; ...
+    sta plot_x                          ; ...
+    lda data_7dd0,x                     ; ...
+    clc                                 ; ...
+    adc #&18                            ; ...
+    sta plot_y                          ; ...
+    txa                                 ; ...
+    pha                                 ; ...
+    jsr plot_sprite                     ; ...
+    lda #&71 ; 'q'                      ; ...with four of sprite &71 beside it
+    sta sprite_number                   ; ...
+    ldy #4                              ; ...
 ; &0437 referenced 2 times by &51f3, &55f3
 .data_0437
-    tya
-    pha
-    inc plot_x
-    inc plot_x
-    jsr plot_sprite
-    pla
-    tay
-    dey
-    bne data_0437
-    pla
-    tax
+    tya                                 ; ...
+    pha                                 ; ...
+    inc plot_x                          ; ...
+    inc plot_x                          ; ...
+    jsr plot_sprite                     ; ...
+    pla                                 ; ...
+    tay                                 ; ...
+    dey                                 ; ...
+    bne data_0437                       ; ...
+    pla                                 ; ...
+    tax                                 ; ...
 ; &0447 referenced 2 times by &51b8, &55b8
 .data_0447
-    rts
+    rts                                 ; Return
     equb &00, &00, &00, &00, &00, &00, &00, &00
 ; ***************************************************************************************
 ; Decrypt and check the level just loaded
@@ -2841,20 +2841,20 @@ data_213a = object_free_map+58
 ; &0500 referenced 1 time by &3551
 .hero_menu
 .hero_menu_joy
-    lda #&1c
-    jsr oswrch
-    lda #0
-    jsr oswrch
-    lda #&16
-    jsr oswrch
-    lda #&13
-    jsr oswrch
-    lda #0
-    jsr oswrch
-    lda #&0c
-    jsr oswrch
-    jsr print_menu
-    jmp data_0581
+    lda #&1c                            ; VDU 28: a text window over the left of the screen...
+    jsr oswrch                          ; ...
+    lda #0                              ; ...
+    jsr oswrch                          ; ...
+    lda #&16                            ; ...
+    jsr oswrch                          ; ...
+    lda #&13                            ; ...
+    jsr oswrch                          ; ...
+    lda #0                              ; ...
+    jsr oswrch                          ; ...
+    lda #&0c                            ; ...VDU 12 to clear it
+    jsr oswrch                          ; ...
+    jsr print_menu                      ; Print the menu
+    jmp menu_key_loop                   ; Read the players' choices
 ; ***************************************************************************************
 ; Print the menu text
 ;
@@ -2862,13 +2862,13 @@ data_213a = object_free_map+58
 ; &0524 referenced 6 times by &52ce, &5373, &53a0, &56ce, &5773, &57a0
 .print_menu
 .print_menu_joy
-    ldx #&0f
-    ldy #0
+    ldx #&0f                            ; Fifteen strings, then one more by falling through
+    ldy #0                              ; ...
 ; &0528 referenced 2 times by &52dc, &56dc
 .data_0528
-    jsr print_menu_string
-    dex
-    bne data_0528
+    jsr print_menu_string               ; ...
+    dex                                 ; ...
+    bne data_0528                       ; ...
 ; ***************************************************************************************
 ; Print one menu string
 ;
@@ -2883,22 +2883,22 @@ data_213a = object_free_map+58
 ; &052e referenced 2 times by &52d8, &56d8
 .print_menu_string
 .print_menu_string_joy
-    lda #&1f
-    jsr oswrch
-    lda menu_text,y
-    jsr oswrch
-    iny
-    lda menu_text,y
-    jsr oswrch
+    lda #&1f                            ; VDU 31: move the text cursor...
+    jsr oswrch                          ; ...
+    lda menu_text,y                     ; ...to the string's column...
+    jsr oswrch                          ; ...
+    iny                                 ; ...
+    lda menu_text,y                     ; ...and row
+    jsr oswrch                          ; ...
 ; &0540 referenced 2 times by &52f9, &56f9
 .data_0540
-    iny
-    lda menu_text,y
-    jsr oswrch
-    cmp #&0d
-    bne data_0540
-    iny
-    rts
+    iny                                 ; Print the characters...
+    lda menu_text,y                     ; ...
+    jsr oswrch                          ; ...
+    cmp #&0d                            ; ...up to and including the carriage return
+    bne data_0540                       ; ...
+    iny                                 ; Point at the next string
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Change a menu entry to NO
 ;
@@ -2909,13 +2909,13 @@ data_213a = object_free_map+58
 ; &054d referenced 2 times by &5370, &5770
 .set_menu_no
 .set_menu_no_joy
-    lda #&4e ; 'N'
-    sta menu_text,y
-    lda #&4f ; 'O'
-    sta data_0601,y
-    lda #&20 ; ' '
-    sta data_0602,y
-    rts
+    lda #&4e ; 'N'                      ; "NO "
+    sta menu_text,y                     ; ...
+    lda #&4f ; 'O'                      ; ...
+    sta data_0601,y                     ; ...
+    lda #&20 ; ' '                      ; ...
+    sta data_0602,y                     ; ...
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Change a menu entry to YES
 ;
@@ -2926,13 +2926,13 @@ data_213a = object_free_map+58
 ; &055d referenced 2 times by &536a, &576a
 .set_menu_yes
 .set_menu_yes_joy
-    lda #&59 ; 'Y'
-    sta menu_text,y
-    lda #&45 ; 'E'
-    sta data_0601,y
-    lda #&53 ; 'S'
-    sta data_0602,y
-    rts
+    lda #&59 ; 'Y'                      ; "YES"
+    sta menu_text,y                     ; ...
+    lda #&45 ; 'E'                      ; ...
+    sta data_0601,y                     ; ...
+    lda #&53 ; 'S'                      ; ...
+    sta data_0602,y                     ; ...
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Change the sound entry to OFF
 ;
@@ -2943,10 +2943,10 @@ data_213a = object_free_map+58
 ; &056d referenced 2 times by &5394, &5794
 .set_menu_off
 .set_menu_off_joy
-    lda #&46 ; 'F'
-    sta menu_text,y
-    sta data_0601,y
-    rts
+    lda #&46 ; 'F'                      ; "FF" after the O
+    sta menu_text,y                     ; ...
+    sta data_0601,y                     ; ...
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Change the sound entry to ON
 ;
@@ -2957,83 +2957,84 @@ data_213a = object_free_map+58
 ; &0576 referenced 2 times by &538d, &578d
 .set_menu_on
 .set_menu_on_joy
-    lda #&4e ; 'N'
-    sta menu_text,y
-    lda #&20 ; ' '
-    sta data_0601,y
-    rts
+    lda #&4e ; 'N'                      ; "N " after the O
+    sta menu_text,y                     ; ...
+    lda #&20 ; ' '                      ; ...
+    sta data_0601,y                     ; ...
+    rts                                 ; Return
 ; &0581 referenced 12 times by &52d1, &5348, &534c, &5376, &5383, &53a3, &56d1, &5748, &574c, &5776, &5783, &57a3
-.data_0581
-    lda #osbyte_flush_buffer_class
-    jsr osbyte                          ; Flush selected class of buffer
-    lda #osbyte_kbd_status
-    ldx #&20 ; ' '
-    ldy #0
-    jsr osbyte                          ; osbyte: kbd status
-    jsr osrdch
-    cmp #&20 ; ' '
-    beq data_05c9
-    cmp #&31 ; '1'
-    bcc data_0581
-    cmp #&37 ; '7'
-    bcs data_0581
-    sec
-    sbc #&31 ; '1'
-    tax
-    cmp #4
-    bcs data_05d7
-    asl a
-    sta plot_x
-    asl a
-    clc
-    adc plot_x
-    adc #&51 ; 'Q'
-    tay
-    lda hero_absent,x
-    eor #1
-    sta hero_absent,x
-    bne data_05c0
-    jsr set_menu_yes
-    jmp data_05c3
+.menu_key_loop
+.menu_key_loop_joy
+    lda #osbyte_flush_buffer_class      ; Flush the input buffers
+    jsr osbyte                          ; ...  Flush selected class of buffer
+    lda #osbyte_kbd_status              ; OSBYTE &CA: keyboard status &20, CAPS LOCK on and SHIFT LOCK off
+    ldx #&20 ; ' '                      ; ...
+    ldy #0                              ; ...
+    jsr osbyte                          ; ...  osbyte: kbd status
+    jsr osrdch                          ; Wait for a key
+    cmp #&20 ; ' '                      ; SPACE?
+    beq data_05c9                       ; Yes: start, if anyone is playing
+    cmp #&31 ; '1'                      ; Ignore anything but 1-6
+    bcc menu_key_loop                   ; ...
+    cmp #&37 ; '7'                      ; ...
+    bcs menu_key_loop                   ; ...
+    sec                                 ; X = 0-5
+    sbc #&31 ; '1'                      ; ...
+    tax                                 ; ...
+    cmp #4                              ; 5 or 6: the sound
+    bcs data_05d7                       ; ...
+    asl a                               ; 1-4: Y = offset of the hero's YES/NO, 6 x X + &51...
+    sta plot_x                          ; ...
+    asl a                               ; ...
+    clc                                 ; ...
+    adc plot_x                          ; ...
+    adc #&51 ; 'Q'                      ; ...
+    tay                                 ; ...
+    lda hero_absent,x                   ; Toggle the hero
+    eor #1                              ; ...
+    sta hero_absent,x                   ; ...
+    bne data_05c0                       ; Now absent?
+    jsr set_menu_yes                    ; No: YES
+    jmp data_05c3                       ; ...
 ; &05c0 referenced 2 times by &5368, &5768
 .data_05c0
-    jsr set_menu_no
+    jsr set_menu_no                     ; Yes: NO
 ; &05c3 referenced 2 times by &536d, &576d
 .data_05c3
-    jsr print_menu
-    jmp data_0581
+    jsr print_menu                      ; Reprint the menu
+    jmp menu_key_loop                   ; Next key
 ; &05c9 referenced 2 times by &5344, &5744
 .data_05c9
-    ldx #3
+    ldx #3                              ; SPACE: is any hero playing?
 ; &05cb referenced 2 times by &5381, &5781
 .data_05cb
-    lda hero_absent,x
-    beq data_05d6
-    dex
-    bpl data_05cb
-    jmp data_0581
+    lda hero_absent,x                   ; ...
+    beq data_05d6                       ; Yes: return and start
+    dex                                 ; ...
+    bpl data_05cb                       ; ...
+    jmp menu_key_loop                   ; No: next key
 ; &05d6 referenced 2 times by &537e, &577e
 .data_05d6
-    rts
+    rts                                 ; Return
 ; &05d7 referenced 2 times by &5354, &5754
 .data_05d7
-    ldy #&99
-    cmp #5
-    beq data_05e4
-    jsr set_menu_on
-    ldx #0
-    beq data_05e9
+    ldy #&99                            ; Sound: Y = offset of the second letter of ON/OFF
+    cmp #5                              ; Key 6 (A = key - "1")?
+    beq data_05e4                       ; Yes
+    jsr set_menu_on                     ; Key 5: ON...
+    ldx #0                              ; ...with X = 0 to enable the sound
+    beq data_05e9                       ; ...
 ; &05e4 referenced 2 times by &538b, &578b
 .data_05e4
-    jsr set_menu_off
-    ldx #1
+    jsr set_menu_off                    ; Key 6: OFF...
+    ldx #1                              ; ...with X = 1 to suppress it
 ; &05e9 referenced 2 times by &5392, &5792
 .data_05e9
-    lda #osbyte_sound_suppression
-    ldy #0
-    jsr osbyte                          ; osbyte: sound suppression
-    jsr print_menu
-    jmp data_0581
+    lda #osbyte_sound_suppression       ; OSBYTE &D2: sound suppression
+    ldy #0                              ; ...
+    jsr osbyte                          ; ...  osbyte: sound suppression
+    jsr print_menu                      ; Reprint the menu
+    jmp menu_key_loop                   ; Next key
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &4f
 ; ***************************************************************************************
@@ -3104,47 +3105,47 @@ data_0601 = menu_text+1
 ; &06b0 referenced 1 time by &359d
 .remove_absent_heroes
 .remove_absent_heroes_joy
-    ldx #0
-    ldy #0
+    ldx #0                              ; For each hero, keeping a count of absent heroes in Y...
+    ldy #0                              ; ...
 ; &06b4 referenced 2 times by &54a3, &58a3
 .data_06b4
-    lda hero_score_ten_thousands,x
-    cmp #&6a ; 'j'
-    bcc data_06c9
-    txa
-    pha
-    tya
-    pha
-    lda hero_score_ten_thousands,x
-    jsr data_041e
-    pla
-    tay
-    pla
-    tax
+    lda hero_score_ten_thousands,x      ; Score of 10000 or more?
+    cmp #&6a ; 'j'                      ; ...
+    bcc data_06c9                       ; No
+    txa                                 ; Yes: draw the ten-thousands digit
+    pha                                 ; ...
+    tya                                 ; ...
+    pha                                 ; ...
+    lda hero_score_ten_thousands,x      ; ...
+    jsr data_041e                       ; ...
+    pla                                 ; ...
+    tay                                 ; ...
+    pla                                 ; ...
+    tax                                 ; ...
 ; &06c9 referenced 2 times by &5469, &5869
 .data_06c9
-    lda hero_absent,x
-    beq data_06f0
-    lda #0
-    sta hero_direction,x
-    lda #&63 ; 'c'
-    sta hero_step,x
-    lda #8
-    sta hero_frame,x
-    lda #&1d
-    sta hero_health_tens,x
-    dec hero_score_units,x
-    lda #&1f
-    sta hero_x,x
-    lda #&64 ; 'd'
-    sta returning_hero_queue,y
-    iny
+    lda hero_absent,x                   ; Switched off on the menu?
+    beq data_06f0                       ; No
+    lda #0                              ; Yes: out of play...
+    sta hero_direction,x                ; ...
+    lda #&63 ; 'c'                      ; ...never to be animated (step &63)...
+    sta hero_step,x                     ; ...
+    lda #8                              ; ...frame 8...
+    sta hero_frame,x                    ; ...
+    lda #&1d                            ; ...dead...
+    sta hero_health_tens,x              ; ...
+    dec hero_score_units,x              ; ...score units digit back one...
+    lda #&1f                            ; ...at x &1F...
+    sta hero_x,x                        ; ...
+    lda #&64 ; 'd'                      ; ...and a &64 marker in the returning queue
+    sta returning_hero_queue,y          ; ...
+    iny                                 ; ...
 ; &06f0 referenced 2 times by &547c, &587c
 .data_06f0
-    inx
-    cpx #4
-    bne data_06b4
-    rts
+    inx                                 ; Next hero
+    cpx #4                              ; ...
+    bne data_06b4                       ; ...
+    rts                                 ; Return
     equb &00, &00
 ; &06f8 used as index base 6 times by &51bf, &51c2, &51cb, &55bf, &55c2, &55cb
 .data_06f8
@@ -3212,43 +3213,43 @@ data_0601 = menu_text+1
 ;
 ; On Exit:
 ;     X: preserved
-    inc hero_score_thousands,x
-    lda hero_score_thousands,x
-    cmp #&28 ; '('
-    bne data_0447
-    lda #&1e
-    sta hero_score_thousands,x
-    inc data_06f8,x
-    lda data_06f8,x
-    cmp #&73 ; 's'
-    bne data_041e
-    lda #&72 ; 'r'
-    sta data_06f8,x
-    sta sprite_number
-    lda #&45 ; 'E'
-    sta plot_x
-    lda data_7dd0,x
-    clc
-    adc #&18
-    sta plot_y
-    txa
-    pha
-    jsr plot_sprite
-    lda #&71 ; 'q'
-    sta sprite_number
-    ldy #4
-    tya
-    pha
-    inc plot_x
-    inc plot_x
-    jsr plot_sprite
-    pla
-    tay
-    dey
-    bne data_0437
-    pla
-    tax
-    rts
+    inc hero_score_thousands,x          ; Add one to the thousands digit
+    lda hero_score_thousands,x          ; ...
+    cmp #&28 ; '('                      ; Past 9?
+    bne data_0447                       ; No: return
+    lda #&1e                            ; Yes: thousands 0...
+    sta hero_score_thousands,x          ; ...
+    inc data_06f8,x                     ; ...and add one to the ten-thousands digit
+    lda data_06f8,x                     ; ...
+    cmp #&73 ; 's'                      ; Past 9?
+    bne data_041e                       ; No
+    lda #&72 ; 'r'                      ; Yes: keep it at 9
+    sta data_06f8,x                     ; ...
+    sta sprite_number                   ; Plot it below the score...
+    lda #&45 ; 'E'                      ; ...
+    sta plot_x                          ; ...
+    lda data_7dd0,x                     ; ...
+    clc                                 ; ...
+    adc #&18                            ; ...
+    sta plot_y                          ; ...
+    txa                                 ; ...
+    pha                                 ; ...
+    jsr plot_sprite                     ; ...
+    lda #&71 ; 'q'                      ; ...with four of sprite &71 beside it
+    sta sprite_number                   ; ...
+    ldy #4                              ; ...
+    tya                                 ; ...
+    pha                                 ; ...
+    inc plot_x                          ; ...
+    inc plot_x                          ; ...
+    jsr plot_sprite                     ; ...
+    pla                                 ; ...
+    tay                                 ; ...
+    dey                                 ; ...
+    bne data_0437                       ; ...
+    pla                                 ; ...
+    tax                                 ; ...
+    rts                                 ; Return
     equb &00, &00, &00, &00, &00, &00, &00, &00
 ; ***************************************************************************************
 ; Decrypt and check the level just loaded
@@ -3321,29 +3322,29 @@ data_0601 = menu_text+1
 ; Clear the left of the screen, print the menu and let the players toggle each hero (keys
 ; 1-4) and the sound (5 on, 6 off). SPACE starts the game if at least one hero is
 ; playing.
-    lda #&1c
-    jsr oswrch
-    lda #0
-    jsr oswrch
-    lda #&16
-    jsr oswrch
-    lda #&13
-    jsr oswrch
-    lda #0
-    jsr oswrch
-    lda #&0c
-    jsr oswrch
-    jsr print_menu
-    jmp data_0581
+    lda #&1c                            ; VDU 28: a text window over the left of the screen...
+    jsr oswrch                          ; ...
+    lda #0                              ; ...
+    jsr oswrch                          ; ...
+    lda #&16                            ; ...
+    jsr oswrch                          ; ...
+    lda #&13                            ; ...
+    jsr oswrch                          ; ...
+    lda #0                              ; ...
+    jsr oswrch                          ; ...
+    lda #&0c                            ; ...VDU 12 to clear it
+    jsr oswrch                          ; ...
+    jsr print_menu                      ; Print the menu
+    jmp menu_key_loop                   ; Read the players' choices
 ; ***************************************************************************************
 ; Print the menu text
 ;
 ; Print the sixteen positioned strings of menu_text.
-    ldx #&0f
-    ldy #0
-    jsr print_menu_string
-    dex
-    bne data_0528
+    ldx #&0f                            ; Fifteen strings, then one more by falling through
+    ldy #0                              ; ...
+    jsr print_menu_string               ; ...
+    dex                                 ; ...
+    bne data_0528                       ; ...
 ; ***************************************************************************************
 ; Print one menu string
 ;
@@ -3355,20 +3356,20 @@ data_0601 = menu_text+1
 ;
 ; On Exit:
 ;     Y: offset of the next string
-    lda #&1f
-    jsr oswrch
-    lda menu_text,y
-    jsr oswrch
-    iny
-    lda menu_text,y
-    jsr oswrch
-    iny
-    lda menu_text,y
-    jsr oswrch
-    cmp #&0d
-    bne data_0540
-    iny
-    rts
+    lda #&1f                            ; VDU 31: move the text cursor...
+    jsr oswrch                          ; ...
+    lda menu_text,y                     ; ...to the string's column...
+    jsr oswrch                          ; ...
+    iny                                 ; ...
+    lda menu_text,y                     ; ...and row
+    jsr oswrch                          ; ...
+    iny                                 ; Print the characters...
+    lda menu_text,y                     ; ...
+    jsr oswrch                          ; ...
+    cmp #&0d                            ; ...up to and including the carriage return
+    bne data_0540                       ; ...
+    iny                                 ; Point at the next string
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Change a menu entry to NO
 ;
@@ -3376,13 +3377,13 @@ data_0601 = menu_text+1
 ;
 ; On Entry:
 ;     Y: offset of the entry
-    lda #&4e ; 'N'
-    sta menu_text,y
-    lda #&4f ; 'O'
-    sta data_0601,y
-    lda #&20 ; ' '
-    sta data_0602,y
-    rts
+    lda #&4e ; 'N'                      ; "NO "
+    sta menu_text,y                     ; ...
+    lda #&4f ; 'O'                      ; ...
+    sta data_0601,y                     ; ...
+    lda #&20 ; ' '                      ; ...
+    sta data_0602,y                     ; ...
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Change a menu entry to YES
 ;
@@ -3390,13 +3391,13 @@ data_0601 = menu_text+1
 ;
 ; On Entry:
 ;     Y: offset of the entry
-    lda #&59 ; 'Y'
-    sta menu_text,y
-    lda #&45 ; 'E'
-    sta data_0601,y
-    lda #&53 ; 'S'
-    sta data_0602,y
-    rts
+    lda #&59 ; 'Y'                      ; "YES"
+    sta menu_text,y                     ; ...
+    lda #&45 ; 'E'                      ; ...
+    sta data_0601,y                     ; ...
+    lda #&53 ; 'S'                      ; ...
+    sta data_0602,y                     ; ...
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Change the sound entry to OFF
 ;
@@ -3404,10 +3405,10 @@ data_0601 = menu_text+1
 ;
 ; On Entry:
 ;     Y: offset of the entry's second character
-    lda #&46 ; 'F'
-    sta menu_text,y
-    sta data_0601,y
-    rts
+    lda #&46 ; 'F'                      ; "FF" after the O
+    sta menu_text,y                     ; ...
+    sta data_0601,y                     ; ...
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Change the sound entry to ON
 ;
@@ -3415,65 +3416,65 @@ data_0601 = menu_text+1
 ;
 ; On Entry:
 ;     Y: offset of the entry's second character
-    lda #&4e ; 'N'
-    sta menu_text,y
-    lda #&20 ; ' '
-    sta data_0601,y
-    rts
-    lda #osbyte_flush_buffer_class
-    jsr osbyte                          ; Flush selected class of buffer
-    lda #osbyte_kbd_status
-    ldx #&20 ; ' '
-    ldy #0
-    jsr osbyte                          ; osbyte: kbd status
-    jsr osrdch
-    cmp #&20 ; ' '
-    beq data_05c9
-    cmp #&31 ; '1'
-    bcc data_0581
-    cmp #&37 ; '7'
-    bcs data_0581
-    sec
-    sbc #&31 ; '1'
-    tax
-    cmp #4
-    bcs data_05d7
-    asl a
-    sta plot_x
-    asl a
-    clc
-    adc plot_x
-    adc #&51 ; 'Q'
-    tay
-    lda hero_absent,x
-    eor #1
-    sta hero_absent,x
-    bne data_05c0
-    jsr set_menu_yes
-    jmp data_05c3
-    jsr set_menu_no
-    jsr print_menu
-    jmp data_0581
-    ldx #3
-    lda hero_absent,x
-    beq data_05d6
-    dex
-    bpl data_05cb
-    jmp data_0581
-    rts
-    ldy #&99
-    cmp #5
-    beq data_05e4
-    jsr set_menu_on
-    ldx #0
-    beq data_05e9
-    jsr set_menu_off
-    ldx #1
-    lda #osbyte_sound_suppression
-    ldy #0
-    jsr osbyte                          ; osbyte: sound suppression
-    jsr print_menu
-    jmp data_0581
+    lda #&4e ; 'N'                      ; "N " after the O
+    sta menu_text,y                     ; ...
+    lda #&20 ; ' '                      ; ...
+    sta data_0601,y                     ; ...
+    rts                                 ; Return
+    lda #osbyte_flush_buffer_class      ; Flush the input buffers
+    jsr osbyte                          ; ...  Flush selected class of buffer
+    lda #osbyte_kbd_status              ; OSBYTE &CA: keyboard status &20, CAPS LOCK on and SHIFT LOCK off
+    ldx #&20 ; ' '                      ; ...
+    ldy #0                              ; ...
+    jsr osbyte                          ; ...  osbyte: kbd status
+    jsr osrdch                          ; Wait for a key
+    cmp #&20 ; ' '                      ; SPACE?
+    beq data_05c9                       ; Yes: start, if anyone is playing
+    cmp #&31 ; '1'                      ; Ignore anything but 1-6
+    bcc menu_key_loop                   ; ...
+    cmp #&37 ; '7'                      ; ...
+    bcs menu_key_loop                   ; ...
+    sec                                 ; X = 0-5
+    sbc #&31 ; '1'                      ; ...
+    tax                                 ; ...
+    cmp #4                              ; 5 or 6: the sound
+    bcs data_05d7                       ; ...
+    asl a                               ; 1-4: Y = offset of the hero's YES/NO, 6 x X + &51...
+    sta plot_x                          ; ...
+    asl a                               ; ...
+    clc                                 ; ...
+    adc plot_x                          ; ...
+    adc #&51 ; 'Q'                      ; ...
+    tay                                 ; ...
+    lda hero_absent,x                   ; Toggle the hero
+    eor #1                              ; ...
+    sta hero_absent,x                   ; ...
+    bne data_05c0                       ; Now absent?
+    jsr set_menu_yes                    ; No: YES
+    jmp data_05c3                       ; ...
+    jsr set_menu_no                     ; Yes: NO
+    jsr print_menu                      ; Reprint the menu
+    jmp menu_key_loop                   ; Next key
+    ldx #3                              ; SPACE: is any hero playing?
+    lda hero_absent,x                   ; ...
+    beq data_05d6                       ; Yes: return and start
+    dex                                 ; ...
+    bpl data_05cb                       ; ...
+    jmp menu_key_loop                   ; No: next key
+    rts                                 ; Return
+    ldy #&99                            ; Sound: Y = offset of the second letter of ON/OFF
+    cmp #5                              ; Key 6 (A = key - "1")?
+    beq data_05e4                       ; Yes
+    jsr set_menu_on                     ; Key 5: ON...
+    ldx #0                              ; ...with X = 0 to enable the sound
+    beq data_05e9                       ; ...
+    jsr set_menu_off                    ; Key 6: OFF...
+    ldx #1                              ; ...with X = 1 to suppress it
+    lda #osbyte_sound_suppression       ; OSBYTE &D2: sound suppression
+    ldy #0                              ; ...
+    jsr osbyte                          ; ...  osbyte: sound suppression
+    jsr print_menu                      ; Reprint the menu
+    jmp menu_key_loop                   ; Next key
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &4f
 ; ***************************************************************************************
@@ -3534,41 +3535,41 @@ data_0601 = menu_text+1
 ;
 ; Draw any ten-thousands score digits, then put every hero switched off on the menu out
 ; of play, with a &64 entry in returning_hero_queue in their place.
-    ldx #0
-    ldy #0
-    lda hero_score_ten_thousands,x
-    cmp #&6a ; 'j'
-    bcc data_06c9
-    txa
-    pha
-    tya
-    pha
-    lda hero_score_ten_thousands,x
-    jsr data_041e
-    pla
-    tay
-    pla
-    tax
-    lda hero_absent,x
-    beq data_06f0
-    lda #0
-    sta hero_direction,x
-    lda #&63 ; 'c'
-    sta hero_step,x
-    lda #8
-    sta hero_frame,x
-    lda #&1d
-    sta hero_health_tens,x
-    dec hero_score_units,x
-    lda #&1f
-    sta hero_x,x
-    lda #&64 ; 'd'
-    sta returning_hero_queue,y
-    iny
-    inx
-    cpx #4
-    bne data_06b4
-    rts
+    ldx #0                              ; For each hero, keeping a count of absent heroes in Y...
+    ldy #0                              ; ...
+    lda hero_score_ten_thousands,x      ; Score of 10000 or more?
+    cmp #&6a ; 'j'                      ; ...
+    bcc data_06c9                       ; No
+    txa                                 ; Yes: draw the ten-thousands digit
+    pha                                 ; ...
+    tya                                 ; ...
+    pha                                 ; ...
+    lda hero_score_ten_thousands,x      ; ...
+    jsr data_041e                       ; ...
+    pla                                 ; ...
+    tay                                 ; ...
+    pla                                 ; ...
+    tax                                 ; ...
+    lda hero_absent,x                   ; Switched off on the menu?
+    beq data_06f0                       ; No
+    lda #0                              ; Yes: out of play...
+    sta hero_direction,x                ; ...
+    lda #&63 ; 'c'                      ; ...never to be animated (step &63)...
+    sta hero_step,x                     ; ...
+    lda #8                              ; ...frame 8...
+    sta hero_frame,x                    ; ...
+    lda #&1d                            ; ...dead...
+    sta hero_health_tens,x              ; ...
+    dec hero_score_units,x              ; ...score units digit back one...
+    lda #&1f                            ; ...at x &1F...
+    sta hero_x,x                        ; ...
+    lda #&64 ; 'd'                      ; ...and a &64 marker in the returning queue
+    sta returning_hero_queue,y          ; ...
+    iny                                 ; ...
+    inx                                 ; Next hero
+    cpx #4                              ; ...
+    bne data_06b4                       ; ...
+    rts                                 ; Return
     equb &00, &00
     equs "iiii"
     equb &00, &00, &00, &00
@@ -6915,7 +6916,7 @@ data_518e = sub_5178+22
     inc hero_damage_taken,x             ; ...
 ; &74fc referenced 1 time by &74f7
 .code_74fc
-    jmp code_75ae                       ; Redraw the armour rating
+    jmp draw_armour_rating              ; Redraw the armour rating
 ; &74ff referenced 1 time by &74ed
 .code_74ff
     cmp #&61 ; 'a'                      ; Potion of healing?
@@ -6939,7 +6940,7 @@ data_518e = sub_5178+22
     sta hero_max_missiles,x             ; ...
 ; &7529 referenced 1 time by &7522
 .code_7529
-    jmp code_75c5                       ; Draw the new missile icon
+    jmp draw_new_missile_icon           ; Draw the new missile icon
 ; ***************************************************************************************
 ; Show the room a hero has moved into
 ;
@@ -6999,10 +7000,10 @@ data_518e = sub_5178+22
     inc hero_missile_damage,x           ; A magic sword: more missile damage...
     lda hero_missile_damage,x           ; ...
     cmp #&0a                            ; ...to at most 9
-    bne code_75e2                       ; ...
+    bne draw_missile_damage             ; ...
     lda #9                              ; ...
     sta hero_missile_damage,x           ; ...
-    bne code_75e2                       ; ...
+    bne draw_missile_damage             ; ...
 ; &757c referenced 1 time by &714d
 .code_757c
     txa                                 ; Play the hit sound
@@ -7035,47 +7036,47 @@ data_518e = sub_5178+22
     pha                                 ; ...
     jmp missile_spent_pop               ; The missile is spent
 ; &75ae referenced 1 time by &74fc
-.code_75ae
-    sec
-    lda hero_panel_y,x
-    sbc #&0c
-    sta plot_y
-    lda #&4e ; 'N'
-    sta plot_x
-    lda #&73 ; 's'
-    sec
-    sbc hero_damage_taken,x
-    sta sprite_number
-    jmp code_7611
+.draw_armour_rating
+    sec                                 ; Armour rating: 10 - health lost per hit, as a small digit on the shield...
+    lda hero_panel_y,x                  ; ...
+    sbc #&0c                            ; ...
+    sta plot_y                          ; ...
+    lda #&4e ; 'N'                      ; ...
+    sta plot_x                          ; ...
+    lda #&73 ; 's'                      ; ...
+    sec                                 ; ...
+    sbc hero_damage_taken,x             ; ...
+    sta sprite_number                   ; ...
+    jmp plot_keeping_x                  ; ...plotted
 ; &75c5 referenced 1 time by &7529
-.code_75c5
-    lda hero_max_missiles,x
-    asl a
-    clc
-    adc hero_max_missiles,x
-    adc #&0d
-    adc hero_panel_y,x
-    sec
-    sbc #&0e
-    sta plot_y
-    lda #&4b ; 'K'
-    sta plot_x
-    lda #&74 ; 't'
-    sta sprite_number
-    jmp code_7611
+.draw_new_missile_icon
+    lda hero_max_missiles,x             ; The newest missile icon: row = 3 x missiles allowed...
+    asl a                               ; ...
+    clc                                 ; ...
+    adc hero_max_missiles,x             ; ...
+    adc #&0d                            ; ...
+    adc hero_panel_y,x                  ; ...
+    sec                                 ; ...
+    sbc #&0e                            ; ...
+    sta plot_y                          ; ...
+    lda #&4b ; 'K'                      ; ...column &4B...
+    sta plot_x                          ; ...
+    lda #&74 ; 't'                      ; ...missile icon...
+    sta sprite_number                   ; ...
+    jmp plot_keeping_x                  ; ...plotted
 ; &75e2 referenced 2 times by &7573, &757a
-.code_75e2
-    lda #&4c ; 'L'
-    sta plot_x
-    sec
-    lda hero_panel_y,x
-    sbc #4
-    sta plot_y
-    lda hero_missile_damage,x
-    clc
-    adc #&69 ; 'i'
-    sta sprite_number
-    jmp code_7611
+.draw_missile_damage
+    lda #&4c ; 'L'                      ; Missile damage: column &4C...
+    sta plot_x                          ; ...
+    sec                                 ; ...
+    lda hero_panel_y,x                  ; ...
+    sbc #4                              ; ...
+    sta plot_y                          ; ...
+    lda hero_missile_damage,x           ; ...as a small digit...
+    clc                                 ; ...
+    adc #&69 ; 'i'                      ; ...
+    sta sprite_number                   ; ...
+    jmp plot_keeping_x                  ; ...plotted
 ; ***************************************************************************************
 ; Set the position of a hero's boots icon
 ;
@@ -7086,13 +7087,13 @@ data_518e = sub_5178+22
 ;     X: hero number (0-3)
 ; &75f9 referenced 2 times by &7354, &74df
 .point_at_boots_icon
-    lda #&4a ; 'J'
-    sta plot_x
-    sec
-    lda hero_panel_y,x
-    sbc #8
-    sta plot_y
-    rts
+    lda #&4a ; 'J'                      ; Column &4A...
+    sta plot_x                          ; ...
+    sec                                 ; ...row 8 above the section's top
+    lda hero_panel_y,x                  ; ...
+    sbc #8                              ; ...
+    sta plot_y                          ; ...
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Show a hero's boots icon
 ;
@@ -7102,9 +7103,9 @@ data_518e = sub_5178+22
 ;     X: preserved
 ; &7606 referenced 1 time by &74e2
 .plot_boots_icon
-    lda #&75 ; 'u'
-    sta sprite_number
-    jmp code_7611
+    lda #&75 ; 'u'                      ; Lightning bolt...
+    sta sprite_number                   ; ...
+    jmp plot_keeping_x                  ; ...plotted
 ; ***************************************************************************************
 ; Remove a hero's boots icon
 ;
@@ -7114,16 +7115,16 @@ data_518e = sub_5178+22
 ;     X: preserved
 ; &760d referenced 1 time by &7357
 .erase_boots_icon
-    lda #&77 ; 'w'
-    sta sprite_number
+    lda #&77 ; 'w'                      ; Blank...
+    sta sprite_number                   ; ...
 ; &7611 referenced 4 times by &75c2, &75df, &75f6, &760a
-.code_7611
-    txa
-    pha
-    jsr plot_sprite
-    pla
-    tax
-    rts
+.plot_keeping_x
+    txa                                 ; Plot, preserving X
+    pha                                 ; ...
+    jsr plot_sprite                     ; ...
+    pla                                 ; ...
+    tax                                 ; ...
+    rts                                 ; Return
 ; &7619 referenced 1 time by &6ebe
 .check_magic
     dec hero_magic_delay,x              ; Count down the magic key delay
@@ -8579,7 +8580,8 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     hero_step:                  13
 ;     screen_ptr:                 13
 ;     data_0080:                  12
-;     data_0581:                  12
+;     menu_key_loop:              12
+;     menu_key_loop_joy:          12
 ;     missile_direction:          12
 ;     plot_victory_sprite:        12
 ;     data_0081:                  11
@@ -8640,7 +8642,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     add_ten_points:              4
 ;     code_1ec6:                   4
 ;     code_703b:                   4
-;     code_7611:                   4
 ;     code_7aea:                   4
 ;     code_7ff6:                   4
 ;     data_007c:                   4
@@ -8661,6 +8662,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     monster_hit_points:          4
 ;     next_hero:                   4
 ;     play_level:                  4
+;     plot_keeping_x:              4
 ;     start_hero_step:             4
 ;     step_hero:                   4
 ;     wrchv:                       4
@@ -8712,7 +8714,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     code_7201:                   2
 ;     code_73c7:                   2
 ;     code_7467:                   2
-;     code_75e2:                   2
 ;     code_7652:                   2
 ;     code_7692:                   2
 ;     code_79b7:                   2
@@ -8757,6 +8758,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_e772:                   2
 ;     door_sprite:                 2
 ;     draw_hero:                   2
+;     draw_missile_damage:         2
 ;     draw_victory_ring:           2
 ;     draw_view_0:                 2
 ;     draw_view_1:                 2
@@ -8942,8 +8944,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     code_756b:                   1
 ;     code_757c:                   1
 ;     code_75a6:                   1
-;     code_75ae:                   1
-;     code_75c5:                   1
 ;     code_761f:                   1
 ;     code_7650:                   1
 ;     code_769c:                   1
@@ -9040,7 +9040,9 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     decrypt_level_joy:           1
 ;     dissolve_chalice:            1
 ;     draw_all_views:              1
+;     draw_armour_rating:          1
 ;     draw_keys:                   1
+;     draw_new_missile_icon:       1
 ;     draw_room_row:               1
 ;     draw_status_panel:           1
 ;     draw_view_frames:            1
@@ -9313,10 +9315,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     code_756b
 ;     code_757c
 ;     code_75a6
-;     code_75ae
-;     code_75c5
-;     code_75e2
-;     code_7611
 ;     code_761f
 ;     code_7650
 ;     code_7652
@@ -9405,7 +9403,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_0484
 ;     data_0528
 ;     data_0540
-;     data_0581
 ;     data_05c0
 ;     data_05c3
 ;     data_05c9

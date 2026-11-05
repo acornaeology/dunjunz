@@ -1112,7 +1112,8 @@
     "set_menu_off_joy": 1389,
     "set_menu_on": 1398,
     "set_menu_on_joy": 1398,
-    "data_0581": 1409,
+    "menu_key_loop": 1409,
+    "menu_key_loop_joy": 1409,
     "data_05c0": 1472,
     "data_05c3": 1475,
     "data_05c9": 1481,
@@ -45518,6 +45519,7 @@
         "add_thousand_points",
         "add_thousand_points_joy"
       ],
+      "comment_inline": "Add one to the thousands digit",
       "xref_summaries": [
         "&51b0 referenced 1 time by &72b9"
       ],
@@ -45541,6 +45543,7 @@
         11
       ],
       "binary_addr": 20915,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_score_thousands,x",
@@ -45554,6 +45557,7 @@
         40
       ],
       "binary_addr": 20918,
+      "comment_inline": "Past 9?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&28"
@@ -45565,6 +45569,7 @@
         61
       ],
       "binary_addr": 20920,
+      "comment_inline": "No: return",
       "type": "code",
       "mnemonic": "bne",
       "operand": "data_0447",
@@ -45578,6 +45583,7 @@
         30
       ],
       "binary_addr": 20922,
+      "comment_inline": "Yes: thousands 0...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&1e"
@@ -45590,6 +45596,7 @@
         11
       ],
       "binary_addr": 20924,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_score_thousands,x",
@@ -45604,6 +45611,7 @@
         6
       ],
       "binary_addr": 20927,
+      "comment_inline": "...and add one to the ten-thousands digit",
       "type": "code",
       "mnemonic": "inc",
       "operand": "data_06f8,x",
@@ -45618,6 +45626,7 @@
         6
       ],
       "binary_addr": 20930,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "data_06f8,x",
@@ -45631,6 +45640,7 @@
         115
       ],
       "binary_addr": 20933,
+      "comment_inline": "Past 9?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&73"
@@ -45642,6 +45652,7 @@
         5
       ],
       "binary_addr": 20935,
+      "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
       "operand": "data_041e",
@@ -45655,6 +45666,7 @@
         114
       ],
       "binary_addr": 20937,
+      "comment_inline": "Yes: keep it at 9",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&72"
@@ -45667,6 +45679,7 @@
         6
       ],
       "binary_addr": 20939,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_06f8,x",
@@ -45683,6 +45696,7 @@
       "labels": [
         "data_041e"
       ],
+      "comment_inline": "Plot it below the score...",
       "xref_summaries": [
         "&51ce referenced 4 times by &51c7, &5472, &55c7, &5872"
       ],
@@ -45717,6 +45731,7 @@
         69
       ],
       "binary_addr": 20944,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&45"
@@ -45728,6 +45743,7 @@
         112
       ],
       "binary_addr": 20946,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -45742,6 +45758,7 @@
         125
       ],
       "binary_addr": 20948,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "data_7dd0,x",
@@ -45754,6 +45771,7 @@
         24
       ],
       "binary_addr": 20951,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -45764,6 +45782,7 @@
         24
       ],
       "binary_addr": 20952,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#&18"
@@ -45775,6 +45794,7 @@
         113
       ],
       "binary_addr": 20954,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -45787,6 +45807,7 @@
         138
       ],
       "binary_addr": 20956,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -45796,6 +45817,7 @@
         72
       ],
       "binary_addr": 20957,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -45807,6 +45829,7 @@
         9
       ],
       "binary_addr": 20958,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_sprite",
@@ -45820,6 +45843,7 @@
         113
       ],
       "binary_addr": 20961,
+      "comment_inline": "...with four of sprite &71 beside it",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&71"
@@ -45831,6 +45855,7 @@
         122
       ],
       "binary_addr": 20963,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -45844,6 +45869,7 @@
         4
       ],
       "binary_addr": 20965,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#4"
@@ -45857,6 +45883,7 @@
       "labels": [
         "data_0437"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&51e7 referenced 2 times by &51f3, &55f3"
       ],
@@ -45879,6 +45906,7 @@
         72
       ],
       "binary_addr": 20968,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -45889,6 +45917,7 @@
         112
       ],
       "binary_addr": 20969,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
       "operand": "plot_x",
@@ -45902,6 +45931,7 @@
         112
       ],
       "binary_addr": 20971,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
       "operand": "plot_x",
@@ -45916,6 +45946,7 @@
         9
       ],
       "binary_addr": 20973,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_sprite",
@@ -45928,6 +45959,7 @@
         104
       ],
       "binary_addr": 20976,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -45937,6 +45969,7 @@
         168
       ],
       "binary_addr": 20977,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -45946,6 +45979,7 @@
         136
       ],
       "binary_addr": 20978,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "dey"
     },
@@ -45956,6 +45990,7 @@
         242
       ],
       "binary_addr": 20979,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "data_0437",
@@ -45968,6 +46003,7 @@
         104
       ],
       "binary_addr": 20981,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -45977,6 +46013,7 @@
         170
       ],
       "binary_addr": 20982,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -45989,6 +46026,7 @@
       "labels": [
         "data_0447"
       ],
+      "comment_inline": "Return",
       "xref_summaries": [
         "&51f7 referenced 2 times by &51b8, &55b8"
       ],
@@ -46784,6 +46822,7 @@
         "hero_menu",
         "hero_menu_joy"
       ],
+      "comment_inline": "VDU 28: a text window over the left of the screen...",
       "xref_summaries": [
         "&52b0 referenced 1 time by &0e11[1]"
       ],
@@ -46806,6 +46845,7 @@
         255
       ],
       "binary_addr": 21170,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -46819,6 +46859,7 @@
         0
       ],
       "binary_addr": 21173,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -46831,6 +46872,7 @@
         255
       ],
       "binary_addr": 21175,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -46844,6 +46886,7 @@
         22
       ],
       "binary_addr": 21178,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&16"
@@ -46856,6 +46899,7 @@
         255
       ],
       "binary_addr": 21180,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -46869,6 +46913,7 @@
         19
       ],
       "binary_addr": 21183,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&13"
@@ -46881,6 +46926,7 @@
         255
       ],
       "binary_addr": 21185,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -46894,6 +46940,7 @@
         0
       ],
       "binary_addr": 21188,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -46906,6 +46953,7 @@
         255
       ],
       "binary_addr": 21190,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -46919,6 +46967,7 @@
         12
       ],
       "binary_addr": 21193,
+      "comment_inline": "...VDU 12 to clear it",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&0c"
@@ -46931,6 +46980,7 @@
         255
       ],
       "binary_addr": 21195,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -46945,6 +46995,7 @@
         5
       ],
       "binary_addr": 21198,
+      "comment_inline": "Print the menu",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "print_menu",
@@ -46959,11 +47010,12 @@
         5
       ],
       "binary_addr": 21201,
+      "comment_inline": "Read the players' choices",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "data_0581",
+      "operand": "menu_key_loop",
       "target": 1409,
-      "target_label": "data_0581"
+      "target_label": "menu_key_loop"
     },
     {
       "addr": 1316,
@@ -46976,6 +47028,7 @@
         "print_menu",
         "print_menu_joy"
       ],
+      "comment_inline": "Fifteen strings, then one more by falling through",
       "xref_summaries": [
         "&52d4 referenced 6 times by &051e[2], &051e[3], &05c3[2], &05c3[3], &05f0[2], &05f0[3]"
       ],
@@ -47022,6 +47075,7 @@
         0
       ],
       "binary_addr": 21206,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -47037,6 +47091,7 @@
       "labels": [
         "data_0528"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&52d8 referenced 2 times by &52dc, &56dc"
       ],
@@ -47062,6 +47117,7 @@
         202
       ],
       "binary_addr": 21211,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "dex"
     },
@@ -47072,6 +47128,7 @@
         250
       ],
       "binary_addr": 21212,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "data_0528",
@@ -47089,6 +47146,7 @@
         "print_menu_string",
         "print_menu_string_joy"
       ],
+      "comment_inline": "VDU 31: move the text cursor...",
       "xref_summaries": [
         "&52de referenced 2 times by &0528[2], &0528[3]"
       ],
@@ -47116,6 +47174,7 @@
         255
       ],
       "binary_addr": 21216,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -47130,6 +47189,7 @@
         6
       ],
       "binary_addr": 21219,
+      "comment_inline": "...to the string's column...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "menu_text,y",
@@ -47144,6 +47204,7 @@
         255
       ],
       "binary_addr": 21222,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -47156,6 +47217,7 @@
         200
       ],
       "binary_addr": 21225,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "iny"
     },
@@ -47167,6 +47229,7 @@
         6
       ],
       "binary_addr": 21226,
+      "comment_inline": "...and row",
       "type": "code",
       "mnemonic": "lda",
       "operand": "menu_text,y",
@@ -47181,6 +47244,7 @@
         255
       ],
       "binary_addr": 21229,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -47196,6 +47260,7 @@
       "labels": [
         "data_0540"
       ],
+      "comment_inline": "Print the characters...",
       "xref_summaries": [
         "&52f0 referenced 2 times by &52f9, &56f9"
       ],
@@ -47220,6 +47285,7 @@
         6
       ],
       "binary_addr": 21233,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "menu_text,y",
@@ -47234,6 +47300,7 @@
         255
       ],
       "binary_addr": 21236,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -47247,6 +47314,7 @@
         13
       ],
       "binary_addr": 21239,
+      "comment_inline": "...up to and including the carriage return",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&0d"
@@ -47258,6 +47326,7 @@
         245
       ],
       "binary_addr": 21241,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "data_0540",
@@ -47270,6 +47339,7 @@
         200
       ],
       "binary_addr": 21243,
+      "comment_inline": "Point at the next string",
       "type": "code",
       "mnemonic": "iny"
     },
@@ -47279,6 +47349,7 @@
         96
       ],
       "binary_addr": 21244,
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -47293,6 +47364,7 @@
         "set_menu_no",
         "set_menu_no_joy"
       ],
+      "comment_inline": "\"NO \"",
       "xref_summaries": [
         "&52fd referenced 2 times by &05c0[2], &05c0[3]"
       ],
@@ -47320,6 +47392,7 @@
         6
       ],
       "binary_addr": 21247,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "menu_text,y",
@@ -47333,6 +47406,7 @@
         79
       ],
       "binary_addr": 21250,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&4f"
@@ -47345,6 +47419,7 @@
         6
       ],
       "binary_addr": 21252,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_0601,y",
@@ -47358,6 +47433,7 @@
         32
       ],
       "binary_addr": 21255,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&20"
@@ -47370,6 +47446,7 @@
         6
       ],
       "binary_addr": 21257,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_0602,y",
@@ -47382,6 +47459,7 @@
         96
       ],
       "binary_addr": 21260,
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -47396,6 +47474,7 @@
         "set_menu_yes",
         "set_menu_yes_joy"
       ],
+      "comment_inline": "\"YES\"",
       "xref_summaries": [
         "&530d referenced 2 times by &05ba[2], &05ba[3]"
       ],
@@ -47423,6 +47502,7 @@
         6
       ],
       "binary_addr": 21263,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "menu_text,y",
@@ -47436,6 +47516,7 @@
         69
       ],
       "binary_addr": 21266,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&45"
@@ -47448,6 +47529,7 @@
         6
       ],
       "binary_addr": 21268,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_0601,y",
@@ -47461,6 +47543,7 @@
         83
       ],
       "binary_addr": 21271,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&53"
@@ -47473,6 +47556,7 @@
         6
       ],
       "binary_addr": 21273,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_0602,y",
@@ -47485,6 +47569,7 @@
         96
       ],
       "binary_addr": 21276,
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -47499,6 +47584,7 @@
         "set_menu_off",
         "set_menu_off_joy"
       ],
+      "comment_inline": "\"FF\" after the O",
       "xref_summaries": [
         "&531d referenced 2 times by &05e4[2], &05e4[3]"
       ],
@@ -47526,6 +47612,7 @@
         6
       ],
       "binary_addr": 21279,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "menu_text,y",
@@ -47540,6 +47627,7 @@
         6
       ],
       "binary_addr": 21282,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_0601,y",
@@ -47552,6 +47640,7 @@
         96
       ],
       "binary_addr": 21285,
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -47566,6 +47655,7 @@
         "set_menu_on",
         "set_menu_on_joy"
       ],
+      "comment_inline": "\"N \" after the O",
       "xref_summaries": [
         "&5326 referenced 2 times by &05dd[2], &05dd[3]"
       ],
@@ -47593,6 +47683,7 @@
         6
       ],
       "binary_addr": 21288,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "menu_text,y",
@@ -47606,6 +47697,7 @@
         32
       ],
       "binary_addr": 21291,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&20"
@@ -47618,6 +47710,7 @@
         6
       ],
       "binary_addr": 21293,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_0601,y",
@@ -47630,6 +47723,7 @@
         96
       ],
       "binary_addr": 21296,
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -47641,59 +47735,73 @@
       ],
       "binary_addr": 21297,
       "labels": [
-        "data_0581"
+        "menu_key_loop",
+        "menu_key_loop_joy"
       ],
+      "comment_inline": "Flush the input buffers",
       "xref_summaries": [
-        "&5331 referenced 12 times by &52d1, &5348, &534c, &5376, &5383, &53a3, &56d1, &5748, &574c, &5776, &5783, &57a3"
+        "&5331 referenced 12 times by &0521[2], &0521[3], &0598[2], &0598[3], &059c[2], &059c[3], &05c6[2], &05c6[3], &05d3[2], &05d3[3], &05f3[2], &05f3[3]"
       ],
       "references": [
         {
-          "addr": 21201,
-          "kind": "direct"
+          "addr": 1313,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 21320,
-          "kind": "direct"
+          "addr": 1313,
+          "kind": "direct",
+          "move_id": 3
         },
         {
-          "addr": 21324,
-          "kind": "direct"
+          "addr": 1432,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 21366,
-          "kind": "direct"
+          "addr": 1432,
+          "kind": "direct",
+          "move_id": 3
         },
         {
-          "addr": 21379,
-          "kind": "direct"
+          "addr": 1436,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 21411,
-          "kind": "direct"
+          "addr": 1436,
+          "kind": "direct",
+          "move_id": 3
         },
         {
-          "addr": 22225,
-          "kind": "direct"
+          "addr": 1478,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 22344,
-          "kind": "direct"
+          "addr": 1478,
+          "kind": "direct",
+          "move_id": 3
         },
         {
-          "addr": 22348,
-          "kind": "direct"
+          "addr": 1491,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 22390,
-          "kind": "direct"
+          "addr": 1491,
+          "kind": "direct",
+          "move_id": 3
         },
         {
-          "addr": 22403,
-          "kind": "direct"
+          "addr": 1523,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 22435,
-          "kind": "direct"
+          "addr": 1523,
+          "kind": "direct",
+          "move_id": 3
         }
       ],
       "type": "code",
@@ -47714,7 +47822,7 @@
         255
       ],
       "binary_addr": 21299,
-      "comment_inline": "Flush selected class of buffer",
+      "comment_inline": "... Flush selected class of buffer",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -47728,6 +47836,7 @@
         202
       ],
       "binary_addr": 21302,
+      "comment_inline": "OSBYTE &CA: keyboard status &20, CAPS LOCK on and SHIFT LOCK off",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osbyte_kbd_status",
@@ -47745,6 +47854,7 @@
         32
       ],
       "binary_addr": 21304,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&20"
@@ -47756,6 +47866,7 @@
         0
       ],
       "binary_addr": 21306,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -47768,7 +47879,7 @@
         255
       ],
       "binary_addr": 21308,
-      "comment_inline": "osbyte: kbd status",
+      "comment_inline": "... osbyte: kbd status",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -47783,6 +47894,7 @@
         255
       ],
       "binary_addr": 21311,
+      "comment_inline": "Wait for a key",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osrdch",
@@ -47796,6 +47908,7 @@
         32
       ],
       "binary_addr": 21314,
+      "comment_inline": "SPACE?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&20"
@@ -47807,6 +47920,7 @@
         51
       ],
       "binary_addr": 21316,
+      "comment_inline": "Yes: start, if anyone is playing",
       "type": "code",
       "mnemonic": "beq",
       "operand": "data_05c9",
@@ -47820,6 +47934,7 @@
         49
       ],
       "binary_addr": 21318,
+      "comment_inline": "Ignore anything but 1-6",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&31"
@@ -47831,11 +47946,12 @@
         231
       ],
       "binary_addr": 21320,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcc",
-      "operand": "data_0581",
+      "operand": "menu_key_loop",
       "target": 1409,
-      "target_label": "data_0581"
+      "target_label": "menu_key_loop"
     },
     {
       "addr": 1434,
@@ -47844,6 +47960,7 @@
         55
       ],
       "binary_addr": 21322,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&37"
@@ -47855,11 +47972,12 @@
         227
       ],
       "binary_addr": 21324,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcs",
-      "operand": "data_0581",
+      "operand": "menu_key_loop",
       "target": 1409,
-      "target_label": "data_0581"
+      "target_label": "menu_key_loop"
     },
     {
       "addr": 1438,
@@ -47867,6 +47985,7 @@
         56
       ],
       "binary_addr": 21326,
+      "comment_inline": "X = 0-5",
       "type": "code",
       "mnemonic": "sec"
     },
@@ -47877,6 +47996,7 @@
         49
       ],
       "binary_addr": 21327,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "#&31"
@@ -47887,6 +48007,7 @@
         170
       ],
       "binary_addr": 21329,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -47897,6 +48018,7 @@
         4
       ],
       "binary_addr": 21330,
+      "comment_inline": "5 or 6: the sound",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#4"
@@ -47908,6 +48030,7 @@
         49
       ],
       "binary_addr": 21332,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcs",
       "operand": "data_05d7",
@@ -47920,6 +48043,7 @@
         10
       ],
       "binary_addr": 21334,
+      "comment_inline": "1-4: Y = offset of the hero's YES/NO, 6 x X + &51...",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -47930,6 +48054,7 @@
         112
       ],
       "binary_addr": 21335,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -47942,6 +48067,7 @@
         10
       ],
       "binary_addr": 21337,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -47951,6 +48077,7 @@
         24
       ],
       "binary_addr": 21338,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -47961,6 +48088,7 @@
         112
       ],
       "binary_addr": 21339,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "plot_x",
@@ -47974,6 +48102,7 @@
         81
       ],
       "binary_addr": 21341,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#&51"
@@ -47984,6 +48113,7 @@
         168
       ],
       "binary_addr": 21343,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -47995,6 +48125,7 @@
         8
       ],
       "binary_addr": 21344,
+      "comment_inline": "Toggle the hero",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_absent,x",
@@ -48008,6 +48139,7 @@
         1
       ],
       "binary_addr": 21347,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "eor",
       "operand": "#1"
@@ -48020,6 +48152,7 @@
         8
       ],
       "binary_addr": 21349,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_absent,x",
@@ -48033,6 +48166,7 @@
         6
       ],
       "binary_addr": 21352,
+      "comment_inline": "Now absent?",
       "type": "code",
       "mnemonic": "bne",
       "operand": "data_05c0",
@@ -48047,6 +48181,7 @@
         5
       ],
       "binary_addr": 21354,
+      "comment_inline": "No: YES",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "set_menu_yes",
@@ -48061,6 +48196,7 @@
         5
       ],
       "binary_addr": 21357,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "data_05c3",
@@ -48078,6 +48214,7 @@
       "labels": [
         "data_05c0"
       ],
+      "comment_inline": "Yes: NO",
       "xref_summaries": [
         "&5370 referenced 2 times by &5368, &5768"
       ],
@@ -48108,6 +48245,7 @@
       "labels": [
         "data_05c3"
       ],
+      "comment_inline": "Reprint the menu",
       "xref_summaries": [
         "&5373 referenced 2 times by &536d, &576d"
       ],
@@ -48135,11 +48273,12 @@
         5
       ],
       "binary_addr": 21366,
+      "comment_inline": "Next key",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "data_0581",
+      "operand": "menu_key_loop",
       "target": 1409,
-      "target_label": "data_0581"
+      "target_label": "menu_key_loop"
     },
     {
       "addr": 1481,
@@ -48151,6 +48290,7 @@
       "labels": [
         "data_05c9"
       ],
+      "comment_inline": "SPACE: is any hero playing?",
       "xref_summaries": [
         "&5379 referenced 2 times by &5344, &5744"
       ],
@@ -48179,6 +48319,7 @@
       "labels": [
         "data_05cb"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&537b referenced 2 times by &5381, &5781"
       ],
@@ -48205,6 +48346,7 @@
         6
       ],
       "binary_addr": 21374,
+      "comment_inline": "Yes: return and start",
       "type": "code",
       "mnemonic": "beq",
       "operand": "data_05d6",
@@ -48217,6 +48359,7 @@
         202
       ],
       "binary_addr": 21376,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "dex"
     },
@@ -48227,6 +48370,7 @@
         248
       ],
       "binary_addr": 21377,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bpl",
       "operand": "data_05cb",
@@ -48241,11 +48385,12 @@
         5
       ],
       "binary_addr": 21379,
+      "comment_inline": "No: next key",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "data_0581",
+      "operand": "menu_key_loop",
       "target": 1409,
-      "target_label": "data_0581"
+      "target_label": "menu_key_loop"
     },
     {
       "addr": 1494,
@@ -48256,6 +48401,7 @@
       "labels": [
         "data_05d6"
       ],
+      "comment_inline": "Return",
       "xref_summaries": [
         "&5386 referenced 2 times by &537e, &577e"
       ],
@@ -48282,6 +48428,7 @@
       "labels": [
         "data_05d7"
       ],
+      "comment_inline": "Sound: Y = offset of the second letter of ON/OFF",
       "xref_summaries": [
         "&5387 referenced 2 times by &5354, &5754"
       ],
@@ -48306,6 +48453,7 @@
         5
       ],
       "binary_addr": 21385,
+      "comment_inline": "Key 6 (A = key - \"1\")?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#5"
@@ -48317,6 +48465,7 @@
         7
       ],
       "binary_addr": 21387,
+      "comment_inline": "Yes",
       "type": "code",
       "mnemonic": "beq",
       "operand": "data_05e4",
@@ -48331,6 +48480,7 @@
         5
       ],
       "binary_addr": 21389,
+      "comment_inline": "Key 5: ON...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "set_menu_on",
@@ -48344,6 +48494,7 @@
         0
       ],
       "binary_addr": 21392,
+      "comment_inline": "...with X = 0 to enable the sound",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#0"
@@ -48355,6 +48506,7 @@
         5
       ],
       "binary_addr": 21394,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "data_05e9",
@@ -48372,6 +48524,7 @@
       "labels": [
         "data_05e4"
       ],
+      "comment_inline": "Key 6: OFF...",
       "xref_summaries": [
         "&5394 referenced 2 times by &538b, &578b"
       ],
@@ -48398,6 +48551,7 @@
         1
       ],
       "binary_addr": 21399,
+      "comment_inline": "...with X = 1 to suppress it",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#1"
@@ -48412,6 +48566,7 @@
       "labels": [
         "data_05e9"
       ],
+      "comment_inline": "OSBYTE &D2: sound suppression",
       "xref_summaries": [
         "&5399 referenced 2 times by &5392, &5792"
       ],
@@ -48442,6 +48597,7 @@
         0
       ],
       "binary_addr": 21403,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -48454,7 +48610,7 @@
         255
       ],
       "binary_addr": 21405,
-      "comment_inline": "osbyte: sound suppression",
+      "comment_inline": "... osbyte: sound suppression",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -48469,6 +48625,7 @@
         5
       ],
       "binary_addr": 21408,
+      "comment_inline": "Reprint the menu",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "print_menu",
@@ -48483,11 +48640,12 @@
         5
       ],
       "binary_addr": 21411,
+      "comment_inline": "Next key",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "data_0581",
+      "operand": "menu_key_loop",
       "target": 1409,
-      "target_label": "data_0581"
+      "target_label": "menu_key_loop"
     },
     {
       "addr": 1526,
@@ -49291,6 +49449,7 @@
         "remove_absent_heroes",
         "remove_absent_heroes_joy"
       ],
+      "comment_inline": "For each hero, keeping a count of absent heroes in Y...",
       "xref_summaries": [
         "&5460 referenced 1 time by &0e5d[1]"
       ],
@@ -49312,6 +49471,7 @@
         0
       ],
       "binary_addr": 21602,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -49327,6 +49487,7 @@
       "labels": [
         "data_06b4"
       ],
+      "comment_inline": "Score of 10000 or more?",
       "xref_summaries": [
         "&5464 referenced 2 times by &54a3, &58a3"
       ],
@@ -49353,6 +49514,7 @@
         106
       ],
       "binary_addr": 21607,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&6a"
@@ -49364,6 +49526,7 @@
         14
       ],
       "binary_addr": 21609,
+      "comment_inline": "No",
       "type": "code",
       "mnemonic": "bcc",
       "operand": "data_06c9",
@@ -49376,6 +49539,7 @@
         138
       ],
       "binary_addr": 21611,
+      "comment_inline": "Yes: draw the ten-thousands digit",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -49385,6 +49549,7 @@
         72
       ],
       "binary_addr": 21612,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -49394,6 +49559,7 @@
         152
       ],
       "binary_addr": 21613,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tya"
     },
@@ -49403,6 +49569,7 @@
         72
       ],
       "binary_addr": 21614,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -49414,6 +49581,7 @@
         8
       ],
       "binary_addr": 21615,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_score_ten_thousands,x",
@@ -49428,6 +49596,7 @@
         4
       ],
       "binary_addr": 21618,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "data_041e",
@@ -49440,6 +49609,7 @@
         104
       ],
       "binary_addr": 21621,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -49449,6 +49619,7 @@
         168
       ],
       "binary_addr": 21622,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -49458,6 +49629,7 @@
         104
       ],
       "binary_addr": 21623,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -49467,6 +49639,7 @@
         170
       ],
       "binary_addr": 21624,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -49481,6 +49654,7 @@
       "labels": [
         "data_06c9"
       ],
+      "comment_inline": "Switched off on the menu?",
       "xref_summaries": [
         "&5479 referenced 2 times by &5469, &5869"
       ],
@@ -49507,6 +49681,7 @@
         34
       ],
       "binary_addr": 21628,
+      "comment_inline": "No",
       "type": "code",
       "mnemonic": "beq",
       "operand": "data_06f0",
@@ -49520,6 +49695,7 @@
         0
       ],
       "binary_addr": 21630,
+      "comment_inline": "Yes: out of play...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -49532,6 +49708,7 @@
         13
       ],
       "binary_addr": 21632,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_direction,x",
@@ -49545,6 +49722,7 @@
         99
       ],
       "binary_addr": 21635,
+      "comment_inline": "...never to be animated (step &63)...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&63"
@@ -49557,6 +49735,7 @@
         13
       ],
       "binary_addr": 21637,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_step,x",
@@ -49570,6 +49749,7 @@
         8
       ],
       "binary_addr": 21640,
+      "comment_inline": "...frame 8...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#8"
@@ -49582,6 +49762,7 @@
         13
       ],
       "binary_addr": 21642,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_frame,x",
@@ -49595,6 +49776,7 @@
         29
       ],
       "binary_addr": 21645,
+      "comment_inline": "...dead...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&1d"
@@ -49607,6 +49789,7 @@
         13
       ],
       "binary_addr": 21647,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_health_tens,x",
@@ -49621,6 +49804,7 @@
         11
       ],
       "binary_addr": 21650,
+      "comment_inline": "...score units digit back one...",
       "type": "code",
       "mnemonic": "dec",
       "operand": "hero_score_units,x",
@@ -49634,6 +49818,7 @@
         31
       ],
       "binary_addr": 21653,
+      "comment_inline": "...at x &1F...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&1f"
@@ -49646,6 +49831,7 @@
         13
       ],
       "binary_addr": 21655,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_x,x",
@@ -49659,6 +49845,7 @@
         100
       ],
       "binary_addr": 21658,
+      "comment_inline": "...and a &64 marker in the returning queue",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&64"
@@ -49671,6 +49858,7 @@
         11
       ],
       "binary_addr": 21660,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "returning_hero_queue,y",
@@ -49683,6 +49871,7 @@
         200
       ],
       "binary_addr": 21663,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "iny"
     },
@@ -49695,6 +49884,7 @@
       "labels": [
         "data_06f0"
       ],
+      "comment_inline": "Next hero",
       "xref_summaries": [
         "&54a0 referenced 2 times by &547c, &587c"
       ],
@@ -49718,6 +49908,7 @@
         4
       ],
       "binary_addr": 21665,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#4"
@@ -49729,6 +49920,7 @@
         191
       ],
       "binary_addr": 21667,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "data_06b4",
@@ -49741,6 +49933,7 @@
         96
       ],
       "binary_addr": 21669,
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -50384,6 +50577,7 @@
         "add_thousand_points",
         "add_thousand_points_joy"
       ],
+      "comment_inline": "Add one to the thousands digit",
       "xref_summaries": [
         "&55b0 referenced 1 time by &72b9"
       ],
@@ -50407,6 +50601,7 @@
         11
       ],
       "binary_addr": 21939,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_score_thousands,x",
@@ -50420,6 +50615,7 @@
         40
       ],
       "binary_addr": 21942,
+      "comment_inline": "Past 9?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&28"
@@ -50431,6 +50627,7 @@
         61
       ],
       "binary_addr": 21944,
+      "comment_inline": "No: return",
       "type": "code",
       "mnemonic": "bne",
       "operand": "data_0447",
@@ -50444,6 +50641,7 @@
         30
       ],
       "binary_addr": 21946,
+      "comment_inline": "Yes: thousands 0...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&1e"
@@ -50456,6 +50654,7 @@
         11
       ],
       "binary_addr": 21948,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_score_thousands,x",
@@ -50470,6 +50669,7 @@
         6
       ],
       "binary_addr": 21951,
+      "comment_inline": "...and add one to the ten-thousands digit",
       "type": "code",
       "mnemonic": "inc",
       "operand": "data_06f8,x",
@@ -50484,6 +50684,7 @@
         6
       ],
       "binary_addr": 21954,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "data_06f8,x",
@@ -50497,6 +50698,7 @@
         115
       ],
       "binary_addr": 21957,
+      "comment_inline": "Past 9?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&73"
@@ -50508,6 +50710,7 @@
         5
       ],
       "binary_addr": 21959,
+      "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
       "operand": "data_041e",
@@ -50521,6 +50724,7 @@
         114
       ],
       "binary_addr": 21961,
+      "comment_inline": "Yes: keep it at 9",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&72"
@@ -50533,6 +50737,7 @@
         6
       ],
       "binary_addr": 21963,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_06f8,x",
@@ -50549,6 +50754,7 @@
       "labels": [
         "data_041e"
       ],
+      "comment_inline": "Plot it below the score...",
       "xref_summaries": [
         "&55ce referenced 4 times by &51c7, &5472, &55c7, &5872"
       ],
@@ -50583,6 +50789,7 @@
         69
       ],
       "binary_addr": 21968,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&45"
@@ -50594,6 +50801,7 @@
         112
       ],
       "binary_addr": 21970,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -50608,6 +50816,7 @@
         125
       ],
       "binary_addr": 21972,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "data_7dd0,x",
@@ -50620,6 +50829,7 @@
         24
       ],
       "binary_addr": 21975,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -50630,6 +50840,7 @@
         24
       ],
       "binary_addr": 21976,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#&18"
@@ -50641,6 +50852,7 @@
         113
       ],
       "binary_addr": 21978,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -50653,6 +50865,7 @@
         138
       ],
       "binary_addr": 21980,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -50662,6 +50875,7 @@
         72
       ],
       "binary_addr": 21981,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -50673,6 +50887,7 @@
         9
       ],
       "binary_addr": 21982,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_sprite",
@@ -50686,6 +50901,7 @@
         113
       ],
       "binary_addr": 21985,
+      "comment_inline": "...with four of sprite &71 beside it",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&71"
@@ -50697,6 +50913,7 @@
         122
       ],
       "binary_addr": 21987,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -50710,6 +50927,7 @@
         4
       ],
       "binary_addr": 21989,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#4"
@@ -50723,6 +50941,7 @@
       "labels": [
         "data_0437"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&55e7 referenced 2 times by &51f3, &55f3"
       ],
@@ -50745,6 +50964,7 @@
         72
       ],
       "binary_addr": 21992,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -50755,6 +50975,7 @@
         112
       ],
       "binary_addr": 21993,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
       "operand": "plot_x",
@@ -50768,6 +50989,7 @@
         112
       ],
       "binary_addr": 21995,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
       "operand": "plot_x",
@@ -50782,6 +51004,7 @@
         9
       ],
       "binary_addr": 21997,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_sprite",
@@ -50794,6 +51017,7 @@
         104
       ],
       "binary_addr": 22000,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -50803,6 +51027,7 @@
         168
       ],
       "binary_addr": 22001,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -50812,6 +51037,7 @@
         136
       ],
       "binary_addr": 22002,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "dey"
     },
@@ -50822,6 +51048,7 @@
         242
       ],
       "binary_addr": 22003,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "data_0437",
@@ -50834,6 +51061,7 @@
         104
       ],
       "binary_addr": 22005,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -50843,6 +51071,7 @@
         170
       ],
       "binary_addr": 22006,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -50855,6 +51084,7 @@
       "labels": [
         "data_0447"
       ],
+      "comment_inline": "Return",
       "xref_summaries": [
         "&55f7 referenced 2 times by &51b8, &55b8"
       ],
@@ -51650,6 +51880,7 @@
         "hero_menu",
         "hero_menu_joy"
       ],
+      "comment_inline": "VDU 28: a text window over the left of the screen...",
       "xref_summaries": [
         "&56b0 referenced 1 time by &0e11[1]"
       ],
@@ -51672,6 +51903,7 @@
         255
       ],
       "binary_addr": 22194,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -51685,6 +51917,7 @@
         0
       ],
       "binary_addr": 22197,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -51697,6 +51930,7 @@
         255
       ],
       "binary_addr": 22199,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -51710,6 +51944,7 @@
         22
       ],
       "binary_addr": 22202,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&16"
@@ -51722,6 +51957,7 @@
         255
       ],
       "binary_addr": 22204,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -51735,6 +51971,7 @@
         19
       ],
       "binary_addr": 22207,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&13"
@@ -51747,6 +51984,7 @@
         255
       ],
       "binary_addr": 22209,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -51760,6 +51998,7 @@
         0
       ],
       "binary_addr": 22212,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -51772,6 +52011,7 @@
         255
       ],
       "binary_addr": 22214,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -51785,6 +52025,7 @@
         12
       ],
       "binary_addr": 22217,
+      "comment_inline": "...VDU 12 to clear it",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&0c"
@@ -51797,6 +52038,7 @@
         255
       ],
       "binary_addr": 22219,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -51811,6 +52053,7 @@
         5
       ],
       "binary_addr": 22222,
+      "comment_inline": "Print the menu",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "print_menu",
@@ -51825,11 +52068,12 @@
         5
       ],
       "binary_addr": 22225,
+      "comment_inline": "Read the players' choices",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "data_0581",
+      "operand": "menu_key_loop",
       "target": 1409,
-      "target_label": "data_0581"
+      "target_label": "menu_key_loop"
     },
     {
       "addr": 1316,
@@ -51842,6 +52086,7 @@
         "print_menu",
         "print_menu_joy"
       ],
+      "comment_inline": "Fifteen strings, then one more by falling through",
       "xref_summaries": [
         "&56d4 referenced 6 times by &051e[2], &051e[3], &05c3[2], &05c3[3], &05f0[2], &05f0[3]"
       ],
@@ -51888,6 +52133,7 @@
         0
       ],
       "binary_addr": 22230,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -51903,6 +52149,7 @@
       "labels": [
         "data_0528"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&56d8 referenced 2 times by &52dc, &56dc"
       ],
@@ -51928,6 +52175,7 @@
         202
       ],
       "binary_addr": 22235,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "dex"
     },
@@ -51938,6 +52186,7 @@
         250
       ],
       "binary_addr": 22236,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "data_0528",
@@ -51955,6 +52204,7 @@
         "print_menu_string",
         "print_menu_string_joy"
       ],
+      "comment_inline": "VDU 31: move the text cursor...",
       "xref_summaries": [
         "&56de referenced 2 times by &0528[2], &0528[3]"
       ],
@@ -51982,6 +52232,7 @@
         255
       ],
       "binary_addr": 22240,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -51996,6 +52247,7 @@
         6
       ],
       "binary_addr": 22243,
+      "comment_inline": "...to the string's column...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "menu_text,y",
@@ -52010,6 +52262,7 @@
         255
       ],
       "binary_addr": 22246,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -52022,6 +52275,7 @@
         200
       ],
       "binary_addr": 22249,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "iny"
     },
@@ -52033,6 +52287,7 @@
         6
       ],
       "binary_addr": 22250,
+      "comment_inline": "...and row",
       "type": "code",
       "mnemonic": "lda",
       "operand": "menu_text,y",
@@ -52047,6 +52302,7 @@
         255
       ],
       "binary_addr": 22253,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -52062,6 +52318,7 @@
       "labels": [
         "data_0540"
       ],
+      "comment_inline": "Print the characters...",
       "xref_summaries": [
         "&56f0 referenced 2 times by &52f9, &56f9"
       ],
@@ -52086,6 +52343,7 @@
         6
       ],
       "binary_addr": 22257,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "menu_text,y",
@@ -52100,6 +52358,7 @@
         255
       ],
       "binary_addr": 22260,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -52113,6 +52372,7 @@
         13
       ],
       "binary_addr": 22263,
+      "comment_inline": "...up to and including the carriage return",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&0d"
@@ -52124,6 +52384,7 @@
         245
       ],
       "binary_addr": 22265,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "data_0540",
@@ -52136,6 +52397,7 @@
         200
       ],
       "binary_addr": 22267,
+      "comment_inline": "Point at the next string",
       "type": "code",
       "mnemonic": "iny"
     },
@@ -52145,6 +52407,7 @@
         96
       ],
       "binary_addr": 22268,
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -52159,6 +52422,7 @@
         "set_menu_no",
         "set_menu_no_joy"
       ],
+      "comment_inline": "\"NO \"",
       "xref_summaries": [
         "&56fd referenced 2 times by &05c0[2], &05c0[3]"
       ],
@@ -52186,6 +52450,7 @@
         6
       ],
       "binary_addr": 22271,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "menu_text,y",
@@ -52199,6 +52464,7 @@
         79
       ],
       "binary_addr": 22274,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&4f"
@@ -52211,6 +52477,7 @@
         6
       ],
       "binary_addr": 22276,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_0601,y",
@@ -52224,6 +52491,7 @@
         32
       ],
       "binary_addr": 22279,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&20"
@@ -52236,6 +52504,7 @@
         6
       ],
       "binary_addr": 22281,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_0602,y",
@@ -52248,6 +52517,7 @@
         96
       ],
       "binary_addr": 22284,
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -52262,6 +52532,7 @@
         "set_menu_yes",
         "set_menu_yes_joy"
       ],
+      "comment_inline": "\"YES\"",
       "xref_summaries": [
         "&570d referenced 2 times by &05ba[2], &05ba[3]"
       ],
@@ -52289,6 +52560,7 @@
         6
       ],
       "binary_addr": 22287,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "menu_text,y",
@@ -52302,6 +52574,7 @@
         69
       ],
       "binary_addr": 22290,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&45"
@@ -52314,6 +52587,7 @@
         6
       ],
       "binary_addr": 22292,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_0601,y",
@@ -52327,6 +52601,7 @@
         83
       ],
       "binary_addr": 22295,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&53"
@@ -52339,6 +52614,7 @@
         6
       ],
       "binary_addr": 22297,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_0602,y",
@@ -52351,6 +52627,7 @@
         96
       ],
       "binary_addr": 22300,
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -52365,6 +52642,7 @@
         "set_menu_off",
         "set_menu_off_joy"
       ],
+      "comment_inline": "\"FF\" after the O",
       "xref_summaries": [
         "&571d referenced 2 times by &05e4[2], &05e4[3]"
       ],
@@ -52392,6 +52670,7 @@
         6
       ],
       "binary_addr": 22303,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "menu_text,y",
@@ -52406,6 +52685,7 @@
         6
       ],
       "binary_addr": 22306,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_0601,y",
@@ -52418,6 +52698,7 @@
         96
       ],
       "binary_addr": 22309,
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -52432,6 +52713,7 @@
         "set_menu_on",
         "set_menu_on_joy"
       ],
+      "comment_inline": "\"N \" after the O",
       "xref_summaries": [
         "&5726 referenced 2 times by &05dd[2], &05dd[3]"
       ],
@@ -52459,6 +52741,7 @@
         6
       ],
       "binary_addr": 22312,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "menu_text,y",
@@ -52472,6 +52755,7 @@
         32
       ],
       "binary_addr": 22315,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&20"
@@ -52484,6 +52768,7 @@
         6
       ],
       "binary_addr": 22317,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_0601,y",
@@ -52496,6 +52781,7 @@
         96
       ],
       "binary_addr": 22320,
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -52507,59 +52793,73 @@
       ],
       "binary_addr": 22321,
       "labels": [
-        "data_0581"
+        "menu_key_loop",
+        "menu_key_loop_joy"
       ],
+      "comment_inline": "Flush the input buffers",
       "xref_summaries": [
-        "&5731 referenced 12 times by &52d1, &5348, &534c, &5376, &5383, &53a3, &56d1, &5748, &574c, &5776, &5783, &57a3"
+        "&5731 referenced 12 times by &0521[2], &0521[3], &0598[2], &0598[3], &059c[2], &059c[3], &05c6[2], &05c6[3], &05d3[2], &05d3[3], &05f3[2], &05f3[3]"
       ],
       "references": [
         {
-          "addr": 21201,
-          "kind": "direct"
+          "addr": 1313,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 21320,
-          "kind": "direct"
+          "addr": 1313,
+          "kind": "direct",
+          "move_id": 3
         },
         {
-          "addr": 21324,
-          "kind": "direct"
+          "addr": 1432,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 21366,
-          "kind": "direct"
+          "addr": 1432,
+          "kind": "direct",
+          "move_id": 3
         },
         {
-          "addr": 21379,
-          "kind": "direct"
+          "addr": 1436,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 21411,
-          "kind": "direct"
+          "addr": 1436,
+          "kind": "direct",
+          "move_id": 3
         },
         {
-          "addr": 22225,
-          "kind": "direct"
+          "addr": 1478,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 22344,
-          "kind": "direct"
+          "addr": 1478,
+          "kind": "direct",
+          "move_id": 3
         },
         {
-          "addr": 22348,
-          "kind": "direct"
+          "addr": 1491,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 22390,
-          "kind": "direct"
+          "addr": 1491,
+          "kind": "direct",
+          "move_id": 3
         },
         {
-          "addr": 22403,
-          "kind": "direct"
+          "addr": 1523,
+          "kind": "direct",
+          "move_id": 2
         },
         {
-          "addr": 22435,
-          "kind": "direct"
+          "addr": 1523,
+          "kind": "direct",
+          "move_id": 3
         }
       ],
       "type": "code",
@@ -52580,7 +52880,7 @@
         255
       ],
       "binary_addr": 22323,
-      "comment_inline": "Flush selected class of buffer",
+      "comment_inline": "... Flush selected class of buffer",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -52594,6 +52894,7 @@
         202
       ],
       "binary_addr": 22326,
+      "comment_inline": "OSBYTE &CA: keyboard status &20, CAPS LOCK on and SHIFT LOCK off",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osbyte_kbd_status",
@@ -52611,6 +52912,7 @@
         32
       ],
       "binary_addr": 22328,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&20"
@@ -52622,6 +52924,7 @@
         0
       ],
       "binary_addr": 22330,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -52634,7 +52937,7 @@
         255
       ],
       "binary_addr": 22332,
-      "comment_inline": "osbyte: kbd status",
+      "comment_inline": "... osbyte: kbd status",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -52649,6 +52952,7 @@
         255
       ],
       "binary_addr": 22335,
+      "comment_inline": "Wait for a key",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osrdch",
@@ -52662,6 +52966,7 @@
         32
       ],
       "binary_addr": 22338,
+      "comment_inline": "SPACE?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&20"
@@ -52673,6 +52978,7 @@
         51
       ],
       "binary_addr": 22340,
+      "comment_inline": "Yes: start, if anyone is playing",
       "type": "code",
       "mnemonic": "beq",
       "operand": "data_05c9",
@@ -52686,6 +52992,7 @@
         49
       ],
       "binary_addr": 22342,
+      "comment_inline": "Ignore anything but 1-6",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&31"
@@ -52697,11 +53004,12 @@
         231
       ],
       "binary_addr": 22344,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcc",
-      "operand": "data_0581",
+      "operand": "menu_key_loop",
       "target": 1409,
-      "target_label": "data_0581"
+      "target_label": "menu_key_loop"
     },
     {
       "addr": 1434,
@@ -52710,6 +53018,7 @@
         55
       ],
       "binary_addr": 22346,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&37"
@@ -52721,11 +53030,12 @@
         227
       ],
       "binary_addr": 22348,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcs",
-      "operand": "data_0581",
+      "operand": "menu_key_loop",
       "target": 1409,
-      "target_label": "data_0581"
+      "target_label": "menu_key_loop"
     },
     {
       "addr": 1438,
@@ -52733,6 +53043,7 @@
         56
       ],
       "binary_addr": 22350,
+      "comment_inline": "X = 0-5",
       "type": "code",
       "mnemonic": "sec"
     },
@@ -52743,6 +53054,7 @@
         49
       ],
       "binary_addr": 22351,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "#&31"
@@ -52753,6 +53065,7 @@
         170
       ],
       "binary_addr": 22353,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -52763,6 +53076,7 @@
         4
       ],
       "binary_addr": 22354,
+      "comment_inline": "5 or 6: the sound",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#4"
@@ -52774,6 +53088,7 @@
         49
       ],
       "binary_addr": 22356,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcs",
       "operand": "data_05d7",
@@ -52786,6 +53101,7 @@
         10
       ],
       "binary_addr": 22358,
+      "comment_inline": "1-4: Y = offset of the hero's YES/NO, 6 x X + &51...",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -52796,6 +53112,7 @@
         112
       ],
       "binary_addr": 22359,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -52808,6 +53125,7 @@
         10
       ],
       "binary_addr": 22361,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -52817,6 +53135,7 @@
         24
       ],
       "binary_addr": 22362,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -52827,6 +53146,7 @@
         112
       ],
       "binary_addr": 22363,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "plot_x",
@@ -52840,6 +53160,7 @@
         81
       ],
       "binary_addr": 22365,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#&51"
@@ -52850,6 +53171,7 @@
         168
       ],
       "binary_addr": 22367,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -52861,6 +53183,7 @@
         8
       ],
       "binary_addr": 22368,
+      "comment_inline": "Toggle the hero",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_absent,x",
@@ -52874,6 +53197,7 @@
         1
       ],
       "binary_addr": 22371,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "eor",
       "operand": "#1"
@@ -52886,6 +53210,7 @@
         8
       ],
       "binary_addr": 22373,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_absent,x",
@@ -52899,6 +53224,7 @@
         6
       ],
       "binary_addr": 22376,
+      "comment_inline": "Now absent?",
       "type": "code",
       "mnemonic": "bne",
       "operand": "data_05c0",
@@ -52913,6 +53239,7 @@
         5
       ],
       "binary_addr": 22378,
+      "comment_inline": "No: YES",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "set_menu_yes",
@@ -52927,6 +53254,7 @@
         5
       ],
       "binary_addr": 22381,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "data_05c3",
@@ -52944,6 +53272,7 @@
       "labels": [
         "data_05c0"
       ],
+      "comment_inline": "Yes: NO",
       "xref_summaries": [
         "&5770 referenced 2 times by &5368, &5768"
       ],
@@ -52974,6 +53303,7 @@
       "labels": [
         "data_05c3"
       ],
+      "comment_inline": "Reprint the menu",
       "xref_summaries": [
         "&5773 referenced 2 times by &536d, &576d"
       ],
@@ -53001,11 +53331,12 @@
         5
       ],
       "binary_addr": 22390,
+      "comment_inline": "Next key",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "data_0581",
+      "operand": "menu_key_loop",
       "target": 1409,
-      "target_label": "data_0581"
+      "target_label": "menu_key_loop"
     },
     {
       "addr": 1481,
@@ -53017,6 +53348,7 @@
       "labels": [
         "data_05c9"
       ],
+      "comment_inline": "SPACE: is any hero playing?",
       "xref_summaries": [
         "&5779 referenced 2 times by &5344, &5744"
       ],
@@ -53045,6 +53377,7 @@
       "labels": [
         "data_05cb"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&577b referenced 2 times by &5381, &5781"
       ],
@@ -53071,6 +53404,7 @@
         6
       ],
       "binary_addr": 22398,
+      "comment_inline": "Yes: return and start",
       "type": "code",
       "mnemonic": "beq",
       "operand": "data_05d6",
@@ -53083,6 +53417,7 @@
         202
       ],
       "binary_addr": 22400,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "dex"
     },
@@ -53093,6 +53428,7 @@
         248
       ],
       "binary_addr": 22401,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bpl",
       "operand": "data_05cb",
@@ -53107,11 +53443,12 @@
         5
       ],
       "binary_addr": 22403,
+      "comment_inline": "No: next key",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "data_0581",
+      "operand": "menu_key_loop",
       "target": 1409,
-      "target_label": "data_0581"
+      "target_label": "menu_key_loop"
     },
     {
       "addr": 1494,
@@ -53122,6 +53459,7 @@
       "labels": [
         "data_05d6"
       ],
+      "comment_inline": "Return",
       "xref_summaries": [
         "&5786 referenced 2 times by &537e, &577e"
       ],
@@ -53148,6 +53486,7 @@
       "labels": [
         "data_05d7"
       ],
+      "comment_inline": "Sound: Y = offset of the second letter of ON/OFF",
       "xref_summaries": [
         "&5787 referenced 2 times by &5354, &5754"
       ],
@@ -53172,6 +53511,7 @@
         5
       ],
       "binary_addr": 22409,
+      "comment_inline": "Key 6 (A = key - \"1\")?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#5"
@@ -53183,6 +53523,7 @@
         7
       ],
       "binary_addr": 22411,
+      "comment_inline": "Yes",
       "type": "code",
       "mnemonic": "beq",
       "operand": "data_05e4",
@@ -53197,6 +53538,7 @@
         5
       ],
       "binary_addr": 22413,
+      "comment_inline": "Key 5: ON...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "set_menu_on",
@@ -53210,6 +53552,7 @@
         0
       ],
       "binary_addr": 22416,
+      "comment_inline": "...with X = 0 to enable the sound",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#0"
@@ -53221,6 +53564,7 @@
         5
       ],
       "binary_addr": 22418,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "data_05e9",
@@ -53238,6 +53582,7 @@
       "labels": [
         "data_05e4"
       ],
+      "comment_inline": "Key 6: OFF...",
       "xref_summaries": [
         "&5794 referenced 2 times by &538b, &578b"
       ],
@@ -53264,6 +53609,7 @@
         1
       ],
       "binary_addr": 22423,
+      "comment_inline": "...with X = 1 to suppress it",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#1"
@@ -53278,6 +53624,7 @@
       "labels": [
         "data_05e9"
       ],
+      "comment_inline": "OSBYTE &D2: sound suppression",
       "xref_summaries": [
         "&5799 referenced 2 times by &5392, &5792"
       ],
@@ -53308,6 +53655,7 @@
         0
       ],
       "binary_addr": 22427,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -53320,7 +53668,7 @@
         255
       ],
       "binary_addr": 22429,
-      "comment_inline": "osbyte: sound suppression",
+      "comment_inline": "... osbyte: sound suppression",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -53335,6 +53683,7 @@
         5
       ],
       "binary_addr": 22432,
+      "comment_inline": "Reprint the menu",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "print_menu",
@@ -53349,11 +53698,12 @@
         5
       ],
       "binary_addr": 22435,
+      "comment_inline": "Next key",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "data_0581",
+      "operand": "menu_key_loop",
       "target": 1409,
-      "target_label": "data_0581"
+      "target_label": "menu_key_loop"
     },
     {
       "addr": 1526,
@@ -54157,6 +54507,7 @@
         "remove_absent_heroes",
         "remove_absent_heroes_joy"
       ],
+      "comment_inline": "For each hero, keeping a count of absent heroes in Y...",
       "xref_summaries": [
         "&5860 referenced 1 time by &0e5d[1]"
       ],
@@ -54178,6 +54529,7 @@
         0
       ],
       "binary_addr": 22626,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -54193,6 +54545,7 @@
       "labels": [
         "data_06b4"
       ],
+      "comment_inline": "Score of 10000 or more?",
       "xref_summaries": [
         "&5864 referenced 2 times by &54a3, &58a3"
       ],
@@ -54219,6 +54572,7 @@
         106
       ],
       "binary_addr": 22631,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&6a"
@@ -54230,6 +54584,7 @@
         14
       ],
       "binary_addr": 22633,
+      "comment_inline": "No",
       "type": "code",
       "mnemonic": "bcc",
       "operand": "data_06c9",
@@ -54242,6 +54597,7 @@
         138
       ],
       "binary_addr": 22635,
+      "comment_inline": "Yes: draw the ten-thousands digit",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -54251,6 +54607,7 @@
         72
       ],
       "binary_addr": 22636,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -54260,6 +54617,7 @@
         152
       ],
       "binary_addr": 22637,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tya"
     },
@@ -54269,6 +54627,7 @@
         72
       ],
       "binary_addr": 22638,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -54280,6 +54639,7 @@
         8
       ],
       "binary_addr": 22639,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_score_ten_thousands,x",
@@ -54294,6 +54654,7 @@
         4
       ],
       "binary_addr": 22642,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "data_041e",
@@ -54306,6 +54667,7 @@
         104
       ],
       "binary_addr": 22645,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -54315,6 +54677,7 @@
         168
       ],
       "binary_addr": 22646,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -54324,6 +54687,7 @@
         104
       ],
       "binary_addr": 22647,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -54333,6 +54697,7 @@
         170
       ],
       "binary_addr": 22648,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -54347,6 +54712,7 @@
       "labels": [
         "data_06c9"
       ],
+      "comment_inline": "Switched off on the menu?",
       "xref_summaries": [
         "&5879 referenced 2 times by &5469, &5869"
       ],
@@ -54373,6 +54739,7 @@
         34
       ],
       "binary_addr": 22652,
+      "comment_inline": "No",
       "type": "code",
       "mnemonic": "beq",
       "operand": "data_06f0",
@@ -54386,6 +54753,7 @@
         0
       ],
       "binary_addr": 22654,
+      "comment_inline": "Yes: out of play...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -54398,6 +54766,7 @@
         13
       ],
       "binary_addr": 22656,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_direction,x",
@@ -54411,6 +54780,7 @@
         99
       ],
       "binary_addr": 22659,
+      "comment_inline": "...never to be animated (step &63)...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&63"
@@ -54423,6 +54793,7 @@
         13
       ],
       "binary_addr": 22661,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_step,x",
@@ -54436,6 +54807,7 @@
         8
       ],
       "binary_addr": 22664,
+      "comment_inline": "...frame 8...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#8"
@@ -54448,6 +54820,7 @@
         13
       ],
       "binary_addr": 22666,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_frame,x",
@@ -54461,6 +54834,7 @@
         29
       ],
       "binary_addr": 22669,
+      "comment_inline": "...dead...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&1d"
@@ -54473,6 +54847,7 @@
         13
       ],
       "binary_addr": 22671,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_health_tens,x",
@@ -54487,6 +54862,7 @@
         11
       ],
       "binary_addr": 22674,
+      "comment_inline": "...score units digit back one...",
       "type": "code",
       "mnemonic": "dec",
       "operand": "hero_score_units,x",
@@ -54500,6 +54876,7 @@
         31
       ],
       "binary_addr": 22677,
+      "comment_inline": "...at x &1F...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&1f"
@@ -54512,6 +54889,7 @@
         13
       ],
       "binary_addr": 22679,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_x,x",
@@ -54525,6 +54903,7 @@
         100
       ],
       "binary_addr": 22682,
+      "comment_inline": "...and a &64 marker in the returning queue",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&64"
@@ -54537,6 +54916,7 @@
         11
       ],
       "binary_addr": 22684,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "returning_hero_queue,y",
@@ -54549,6 +54929,7 @@
         200
       ],
       "binary_addr": 22687,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "iny"
     },
@@ -54561,6 +54942,7 @@
       "labels": [
         "data_06f0"
       ],
+      "comment_inline": "Next hero",
       "xref_summaries": [
         "&58a0 referenced 2 times by &547c, &587c"
       ],
@@ -54584,6 +54966,7 @@
         4
       ],
       "binary_addr": 22689,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#4"
@@ -54595,6 +54978,7 @@
         191
       ],
       "binary_addr": 22691,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "data_06b4",
@@ -54607,6 +54991,7 @@
         96
       ],
       "binary_addr": 22693,
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -77230,9 +77615,9 @@
       ],
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_75ae",
+      "operand": "draw_armour_rating",
       "target": 30126,
-      "target_label": "code_75ae"
+      "target_label": "draw_armour_rating"
     },
     {
       "addr": 29951,
@@ -77498,9 +77883,9 @@
       ],
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_75c5",
+      "operand": "draw_new_missile_icon",
       "target": 30149,
-      "target_label": "code_75c5"
+      "target_label": "draw_new_missile_icon"
     },
     {
       "addr": 29996,
@@ -77981,9 +78366,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_75e2",
+      "operand": "draw_missile_damage",
       "target": 30178,
-      "target_label": "code_75e2"
+      "target_label": "draw_missile_damage"
     },
     {
       "addr": 30069,
@@ -78019,9 +78404,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_75e2",
+      "operand": "draw_missile_damage",
       "target": 30178,
-      "target_label": "code_75e2"
+      "target_label": "draw_missile_damage"
     },
     {
       "addr": 30076,
@@ -78367,8 +78752,9 @@
         56
       ],
       "labels": [
-        "code_75ae"
+        "draw_armour_rating"
       ],
+      "comment_inline": "Armour rating: 10 - health lost per hit, as a small digit on the shield...",
       "xref_summaries": [
         "&75ae referenced 1 time by &74fc"
       ],
@@ -78388,6 +78774,7 @@
         208,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_panel_y,x",
@@ -78400,6 +78787,7 @@
         233,
         12
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "#&0c"
@@ -78410,6 +78798,7 @@
         133,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -78422,6 +78811,7 @@
         169,
         78
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&4e"
@@ -78432,6 +78822,7 @@
         133,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -78444,6 +78835,7 @@
         169,
         115
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&73"
@@ -78453,6 +78845,7 @@
       "bytes": [
         56
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sec"
     },
@@ -78463,6 +78856,7 @@
         208,
         12
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "hero_damage_taken,x",
@@ -78475,6 +78869,7 @@
         133,
         122
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -78488,11 +78883,12 @@
         17,
         118
       ],
+      "comment_inline": "...plotted",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_7611",
+      "operand": "plot_keeping_x",
       "target": 30225,
-      "target_label": "code_7611"
+      "target_label": "plot_keeping_x"
     },
     {
       "addr": 30149,
@@ -78502,8 +78898,9 @@
         11
       ],
       "labels": [
-        "code_75c5"
+        "draw_new_missile_icon"
       ],
+      "comment_inline": "The newest missile icon: row = 3 x missiles allowed...",
       "xref_summaries": [
         "&75c5 referenced 1 time by &7529"
       ],
@@ -78524,6 +78921,7 @@
       "bytes": [
         10
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -78532,6 +78930,7 @@
       "bytes": [
         24
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -78542,6 +78941,7 @@
         32,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "hero_max_missiles,x",
@@ -78554,6 +78954,7 @@
         105,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#&0d"
@@ -78565,6 +78966,7 @@
         208,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "hero_panel_y,x",
@@ -78576,6 +78978,7 @@
       "bytes": [
         56
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sec"
     },
@@ -78585,6 +78988,7 @@
         233,
         14
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "#&0e"
@@ -78595,6 +78999,7 @@
         133,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -78607,6 +79012,7 @@
         169,
         75
       ],
+      "comment_inline": "...column &4B...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&4b"
@@ -78617,6 +79023,7 @@
         133,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -78629,6 +79036,7 @@
         169,
         116
       ],
+      "comment_inline": "...missile icon...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&74"
@@ -78639,6 +79047,7 @@
         133,
         122
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -78652,11 +79061,12 @@
         17,
         118
       ],
+      "comment_inline": "...plotted",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_7611",
+      "operand": "plot_keeping_x",
       "target": 30225,
-      "target_label": "code_7611"
+      "target_label": "plot_keeping_x"
     },
     {
       "addr": 30178,
@@ -78665,8 +79075,9 @@
         76
       ],
       "labels": [
-        "code_75e2"
+        "draw_missile_damage"
       ],
+      "comment_inline": "Missile damage: column &4C...",
       "xref_summaries": [
         "&75e2 referenced 2 times by &7573, &757a"
       ],
@@ -78690,6 +79101,7 @@
         133,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -78701,6 +79113,7 @@
       "bytes": [
         56
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sec"
     },
@@ -78711,6 +79124,7 @@
         208,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_panel_y,x",
@@ -78723,6 +79137,7 @@
         233,
         4
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "#4"
@@ -78733,6 +79148,7 @@
         133,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -78746,6 +79162,7 @@
         112,
         11
       ],
+      "comment_inline": "...as a small digit...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_missile_damage,x",
@@ -78757,6 +79174,7 @@
       "bytes": [
         24
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -78766,6 +79184,7 @@
         105,
         105
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#&69"
@@ -78776,6 +79195,7 @@
         133,
         122
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -78789,11 +79209,12 @@
         17,
         118
       ],
+      "comment_inline": "...plotted",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_7611",
+      "operand": "plot_keeping_x",
       "target": 30225,
-      "target_label": "code_7611"
+      "target_label": "plot_keeping_x"
     },
     {
       "addr": 30201,
@@ -78804,6 +79225,7 @@
       "labels": [
         "point_at_boots_icon"
       ],
+      "comment_inline": "Column &4A...",
       "xref_summaries": [
         "&75f9 referenced 2 times by &7354, &74df"
       ],
@@ -78827,6 +79249,7 @@
         133,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -78838,6 +79261,7 @@
       "bytes": [
         56
       ],
+      "comment_inline": "...row 8 above the section's top",
       "type": "code",
       "mnemonic": "sec"
     },
@@ -78848,6 +79272,7 @@
         208,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_panel_y,x",
@@ -78860,6 +79285,7 @@
         233,
         8
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "#8"
@@ -78870,6 +79296,7 @@
         133,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -78881,6 +79308,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -78893,6 +79321,7 @@
       "labels": [
         "plot_boots_icon"
       ],
+      "comment_inline": "Lightning bolt...",
       "xref_summaries": [
         "&7606 referenced 1 time by &74e2"
       ],
@@ -78912,6 +79341,7 @@
         133,
         122
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -78925,11 +79355,12 @@
         17,
         118
       ],
+      "comment_inline": "...plotted",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_7611",
+      "operand": "plot_keeping_x",
       "target": 30225,
-      "target_label": "code_7611"
+      "target_label": "plot_keeping_x"
     },
     {
       "addr": 30221,
@@ -78940,6 +79371,7 @@
       "labels": [
         "erase_boots_icon"
       ],
+      "comment_inline": "Blank...",
       "xref_summaries": [
         "&760d referenced 1 time by &7357"
       ],
@@ -78959,6 +79391,7 @@
         133,
         122
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -78971,8 +79404,9 @@
         138
       ],
       "labels": [
-        "code_7611"
+        "plot_keeping_x"
       ],
+      "comment_inline": "Plot, preserving X",
       "xref_summaries": [
         "&7611 referenced 4 times by &75c2, &75df, &75f6, &760a"
       ],
@@ -79002,6 +79436,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -79012,6 +79447,7 @@
         0,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_sprite",
@@ -79023,6 +79459,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -79031,6 +79468,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -79039,6 +79477,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
