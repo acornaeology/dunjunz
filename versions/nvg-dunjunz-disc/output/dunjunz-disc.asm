@@ -76,10 +76,6 @@ data_0288                = &0288
 ; &0288 referenced 2 times by &3b91, &3ba7
 data_0289                = &0289
 ; &0289 referenced 2 times by &3b96, &3bac
-data_0600                = &0600
-; &0600 used as index base 14 times by &52e3, &52ea, &52f1, &52ff, &530f, &531f, &5328, &56e3, &56ea, &56f1, &56ff, &570f, &571f, &5728
-data_0601                = &0601
-; &0601 used as index base 8 times by &5304, &5314, &5322, &532d, &5704, &5714, &5722, &572d
 hero_score_ten_thousands = &08b0  ; Each hero's score ten-thousands digit as a small digit sprite (&69 for none, &6A-&72 for 1-9).
 ; &08b0 used as index base 5 times by &3633, &5464, &546f, &5864, &586f
 hero_absent              = &08b4  ; Non-zero for each hero switched off on the menu.
@@ -463,8 +459,6 @@ data_0b97 = trapdoor_x+7
     equb &1d, &1d, &1d, &1d
 ; &0bac used as index base 8 times by &3623, &51b0, &51b3, &51bc, &55b0, &55b3, &55bc, &72c8
 .hero_score_thousands
-; &333c referenced 2 times by &444f, &445d
-data_0bfc = hero_score_thousands+80
     equb &1e, &1e, &1e, &1e, &10, &10, &10, &10
     equb &10, &10, &10, &10, &10, &10, &10, &10
     equb &10, &10, &10, &10, &10, &10, &10, &10
@@ -473,9 +467,19 @@ data_0bfc = hero_score_thousands+80
     equb &10, &10, &10, &10, &10, &10, &10, &10
     equb &10, &10, &10, &10, &10, &10, &10, &10
     equb &10, &10, &10, &10, &10, &10, &10, &10
-    equb &10, &10, &10, &10, &13, &00, &04, &00
-    equb &64, &00, &1e, &00, &13, &00, &02, &00
-    equb &c8, &00, &02, &00
+    equb &10, &10, &10, &10
+.teleport_sound
+    equb &13, &00
+    equb &04, &00
+    equb &64, &00
+    equb &1e, &00
+.food_sound
+; &333c referenced 2 times by &444f, &445d
+data_0bfc = food_sound+4
+    equb &13, &00
+    equb &02, &00
+    equb &c8, &00
+    equb &02, &00
 ; &0c00 used as index base 3 times by &3ca7, &7fc8, &7feb
 .room_walls
     equs "TIKP$UTHO[KF,D]/DYW3CZD\8V\;VHRVao"
@@ -506,13 +510,17 @@ data_0bfc = hero_score_thousands+80
     equb &8d, &e7, &9e, &83, &8d, &83, &85, &90
 ; &0cd0 used as index base 7 times by &361e, &365e, &74ef, &74f2, &74f9, &75bd, &79a7
 .hero_damage_taken
-; &3434 referenced 2 times by &7481, &7491
-data_0cf4 = hero_damage_taken+36
     equb &89, &9e, &87, &f3, &95, &9b, &92, &f7
     equb &90, &98, &8a, &8b, &85, &fd, &9a, &8a
     equb &ae, &a6, &a7, &ac, &aa, &ac, &a8, &a0
     equb &c9, &00, &00, &00, &00, &00, &00, &00
-    equb &10, &00, &01, &00, &06, &00, &06, &00
+.hit_sound
+; &3434 referenced 2 times by &7481, &7491
+data_0cf4 = hit_sound+4
+    equb &10, &00
+    equb &01, &00
+    equb &06, &00
+    equb &06, &00
     equb &12, &00, &03, &00, &c8, &00, &0a, &00
 ; &0d00 referenced 43 times by &4405, &4440, &448e, &4492, &4495, &4498, &44b7, &44c2, &6f19, &6f1e, &6f25, &6f71, &6fd7, &7002, &7007, &713c, &74b6, &74c3, &74d8, &77e6, &782c, &7857, &785b, &785e, &7861, &7886, &788b, &7901, &7905, &7908, &790b, &7926, &7931, &793d, &7941, &7944, &7947, &7962, &796d, &7976, &7990, &7a89, &7ce3; also used as index base 1 time by &3be5
 .scratch
@@ -916,6 +924,13 @@ data_0dff = sub_0ded+18
 ; &0f8c used as index base 1 time by &3645
 .hero_faces
     equb &05, &31, &39, &41
+; ***************************************************************************************
+; Game-over message
+;
+; Eleven lines of seventeen characters, each ended by a carriage return, then a line feed
+; and a last line ended by a zero byte. Two bytes of it (&0FF1, &0FF2) double as
+; counters, and are overwritten with spaces before printing, so the full stop after "YOU
+; ALL" never appears.
 ; &0f90 used as index base 1 time by &35ee
 .game_over_message
     equs "FAREWELL!        "
@@ -931,13 +946,11 @@ data_0dff = sub_0ded+18
 .sub_0fea
 ; &3730 used as index base 1 time by &35e8
 data_0ff0 = sub_0fea+6
-    equs "YOU ALL"
-; &0ff1 referenced 8 times by &3639, &363c, &3658, &3668, &368d, &369d, &36a0, &36ad
-.panel_hero
-    equb &2e
-; &0ff2 referenced 5 times by &35aa, &35b7, &35bf, &3675, &3688
-.count
-    equs "         "
+; &3731 referenced 8 times by &3639, &363c, &3658, &3668, &368d, &369d, &36a0, &36ad
+panel_hero = sub_0fea+7
+; &3732 referenced 5 times by &35aa, &35b7, &35bf, &3675, &3688
+count = sub_0fea+8
+    equs "YOU ALL.         "
     equb &0d
     equs "NEW ADVENTURERS  "
     equb &0d
@@ -948,7 +961,8 @@ data_0ff0 = sub_0fea+6
     equs "BACK ON THE UPPER"
     equb &0d
     equs "MOST LEVEL.      "
-    equb &0d, &0a
+    equb &0d
+    equb &0a
     equs "FIND THE CHALICE!"
     equb &00
     equs "ND!"
@@ -1701,12 +1715,12 @@ data_1625 = sub_1624+1
 ;
 ; Play the exit sound and put a &64 entry in the first free slot of returning_hero_queue.
 .queue_exit_marker
-    ldx #&58 ; 'X'
-    ldy #&19
+    ldx #<(exit_envelope)
+    ldy #>(exit_envelope)
     lda #osword_envelope
     jsr osword                          ; ENVELOPE command
-    ldx #&66 ; 'f'
-    ldy #&19
+    ldx #<(exit_sound)
+    ldy #>(exit_sound)
     lda #osword_sound
     jsr osword                          ; SOUND command
     ldx #0
@@ -1887,21 +1901,42 @@ data_1625 = sub_1624+1
     equb &08, &00, &08, &04, &0c, &08, &0c, &0c
     equb &1a, &35, &03, &8f, &7d, &9a, &82, &03
     equb &00, &00, &00, &6d, &19, &00, &00, &00
-    equb &03, &01, &0a, &0a, &ec, &03, &03, &03
-    equb &80, &00, &00, &ff, &80, &80, &12, &00
-    equb &03, &00, &00, &00, &02, &00, &03, &02
-    equb &01, &01, &01, &01, &01, &01, &80, &00
-    equb &00, &f8, &80, &80, &12, &00, &03, &00
-    equb &c8, &00, &05, &00, &03, &80, &00, &00
-    equb &00, &0a, &0a, &0a, &0a, &00, &00, &fd
-    equb &80, &80, &10, &00, &03, &00, &0a, &00
-    equb &05, &00, &03, &80, &00, &00, &00, &01
-    equb &1e, &1e, &80, &00, &00, &fe, &80, &80
-    equb &12, &00, &03, &00, &f0, &00, &01, &00
-    equb &03, &82, &ff, &ff, &fe, &01, &01, &80
-    equb &80, &00, &00, &ff, &80, &80, &12, &00
-    equb &03, &00, &fa, &00, &01, &00, &00, &00
-    equb &00, &00, &04
+.magic_envelope
+    equb &03, &01, &0a, &0a, &ec, &03, &03, &03, &80, &00, &00, &ff, &80, &80
+.magic_sound
+    equb &12, &00
+    equb &03, &00
+    equb &00, &00
+    equb &02, &00
+.treasure_envelope
+    equb &03, &02, &01, &01, &01, &01, &01, &01, &80, &00, &00, &f8, &80, &80
+.treasure_sound
+    equb &12, &00
+    equb &03, &00
+    equb &c8, &00
+    equb &05, &00
+.pickup_envelope
+    equb &03, &80, &00, &00, &00, &0a, &0a, &0a, &0a, &00, &00, &fd, &80, &80
+.pickup_sound
+    equb &10, &00
+    equb &03, &00
+    equb &0a, &00
+    equb &05, &00
+.key_envelope
+    equb &03, &80, &00, &00, &00, &01, &1e, &1e, &80, &00, &00, &fe, &80, &80
+.key_sound
+    equb &12, &00
+    equb &03, &00
+    equb &f0, &00
+    equb &01, &00
+.exit_envelope
+    equb &03, &82, &ff, &ff, &fe, &01, &01, &80, &80, &00, &00, &ff, &80, &80
+.exit_sound
+    equb &12, &00
+    equb &03, &00
+    equb &fa, &00
+    equb &01, &00
+    equb &00, &00, &00, &00, &04
     equs "50:50:$"
     equb &0c, &0c, &08, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &0a, &00, &00, &00
@@ -1993,43 +2028,45 @@ data_1625 = sub_1624+1
     equb &15, &2a, &2a, &00
     equb &00, &3f, &3f, &2a
     equb &3f, &15, &2a, &15
+; ***************************************************************************************
+; Sprite tables
+;
+; Four tables of 120 entries, indexed by sprite number: data address low bytes, high
+; bytes, widths in bytes and heights in rows.
 ; &1ae0 used as index base 1 time by &3042
 .sprite_addr_lo
     equb &00, &30, &60, &90, &c0, &f0, &20, &50
     equb &c0, &80, &b0, &e0, &10, &40, &70, &a0
     equb &d0, &00, &30, &60, &90, &cf, &00, &30
     equb &60, &90, &cf, &00, &c0, &c8, &00, &14
-    equs "(<Pdx"
-    equb &8c, &a0, &b4, &30, &60, &f0, &c0, &c0
-    equb &00, &30, &60, &90, &c0, &f0, &20, &50
-    equb &80, &b0, &e0, &10, &40, &70, &a0, &d0
-    equb &00, &30, &60, &90, &c0, &f0, &20, &50
-    equb &80, &b0, &e0, &10, &00, &30, &60, &90
-    equb &40, &70, &a0, &d0, &a0, &d0, &d0, &d0
-    equb &d0, &d0, &d0, &d0, &d0, &d0, &d0, &d0
-    equb &d0, &d0, &00, &30, &60, &c0, &90, &f0
-    equb &20, &50, &80, &b0, &00
-    equs "$).38=BGL"
-    equb &10
-    equs "`lx"
-    equb &cf
+    equb &28, &3c, &50, &64, &78, &8c, &a0, &b4
+    equb &30, &60, &f0, &c0, &c0, &00, &30, &60
+    equb &90, &c0, &f0, &20, &50, &80, &b0, &e0
+    equb &10, &40, &70, &a0, &d0, &00, &30, &60
+    equb &90, &c0, &f0, &20, &50, &80, &b0, &e0
+    equb &10, &00, &30, &60, &90, &40, &70, &a0
+    equb &d0, &a0, &d0, &d0, &d0, &d0, &d0, &d0
+    equb &d0, &d0, &d0, &d0, &d0, &d0, &d0, &00
+    equb &30, &60, &c0, &90, &f0, &20, &50, &80
+    equb &b0, &00, &24, &29, &2e, &33, &38, &3d
+    equb &42, &47, &4c, &10, &60, &6c, &78, &cf
 ; &1b58 used as index base 1 time by &3047
 .sprite_addr_hi
-    equs "------.."
-    equb &19
-    equs ".../////,,,,"
-    equb &04
-    equs "++++"
-    equb &04
-    equs "),***********))"
-    equb &0a
-    equs ")+######$$$$$%%%%%&&&&&&'''''("
-    equb &17, &17, &17, &17
-    equs "((((", &22, &22, "!!!!!!!!!!!!"
-    equb &0a, &0a, &0a, &0a, &0a, &19, &1a, &1a
-    equb &1a, &1a, &18, &18, &18, &18, &18, &18
-    equb &18, &18, &18, &18, &12, &18, &18, &18
-    equb &04
+    equb &2d, &2d, &2d, &2d, &2d, &2d, &2e, &2e
+    equb &19, &2e, &2e, &2e, &2f, &2f, &2f, &2f
+    equb &2f, &2c, &2c, &2c, &2c, &04, &2b, &2b
+    equb &2b, &2b, &04, &29, &2c, &2a, &2a, &2a
+    equb &2a, &2a, &2a, &2a, &2a, &2a, &2a, &2a
+    equb &29, &29, &0a, &29, &2b, &23, &23, &23
+    equb &23, &23, &23, &24, &24, &24, &24, &24
+    equb &25, &25, &25, &25, &25, &26, &26, &26
+    equb &26, &26, &26, &27, &27, &27, &27, &27
+    equb &28, &17, &17, &17, &17, &28, &28, &28
+    equb &28, &22, &22, &21, &21, &21, &21, &21
+    equb &21, &21, &21, &21, &21, &21, &21, &0a
+    equb &0a, &0a, &0a, &0a, &19, &1a, &1a, &1a
+    equb &1a, &18, &18, &18, &18, &18, &18, &18
+    equb &18, &18, &18, &12, &18, &18, &18, &04
 ; &1bd0 used as index base 1 time by &304c
 .sprite_widths
     equb &04, &04, &04, &04, &04, &04, &04, &04
@@ -2123,8 +2160,8 @@ data_1625 = sub_1624+1
     bne code_1d03
     lda #&96
     sta data_0bfc
-    ldx #&f8
-    ldy #&0b
+    ldx #<(food_sound)
+    ldy #>(food_sound)
     lda #osword_sound
     jsr osword                          ; SOUND command
     lda #&c8
@@ -2337,12 +2374,12 @@ data_1625 = sub_1624+1
     lda #&ff
     sta key_x,x
     sta key_y,x
-    ldx #&42 ; 'B'
-    ldy #&19
+    ldx #<(key_envelope)
+    ldy #>(key_envelope)
     lda #osword_envelope
     jsr osword                          ; ENVELOPE command
-    ldx #&50 ; 'P'
-    ldy #&19
+    ldx #<(key_sound)
+    ldy #>(key_sound)
     lda #osword_sound
     jsr osword                          ; SOUND command
     pla
@@ -2814,15 +2851,15 @@ data_213a = object_free_map+58
 .print_menu_string_joy
     lda #&1f
     jsr oswrch
-    lda data_0600,y
+    lda menu_text,y
     jsr oswrch
     iny
-    lda data_0600,y
+    lda menu_text,y
     jsr oswrch
 ; &0540 referenced 2 times by &52f9, &56f9
 .data_0540
     iny
-    lda data_0600,y
+    lda menu_text,y
     jsr oswrch
     cmp #&0d
     bne data_0540
@@ -2839,7 +2876,7 @@ data_213a = object_free_map+58
 .set_menu_no
 .set_menu_no_joy
     lda #&4e ; 'N'
-    sta data_0600,y
+    sta menu_text,y
     lda #&4f ; 'O'
     sta data_0601,y
     lda #&20 ; ' '
@@ -2856,7 +2893,7 @@ data_213a = object_free_map+58
 .set_menu_yes
 .set_menu_yes_joy
     lda #&59 ; 'Y'
-    sta data_0600,y
+    sta menu_text,y
     lda #&45 ; 'E'
     sta data_0601,y
     lda #&53 ; 'S'
@@ -2873,7 +2910,7 @@ data_213a = object_free_map+58
 .set_menu_off
 .set_menu_off_joy
     lda #&46 ; 'F'
-    sta data_0600,y
+    sta menu_text,y
     sta data_0601,y
     rts
 ; ***************************************************************************************
@@ -2887,7 +2924,7 @@ data_213a = object_free_map+58
 .set_menu_on
 .set_menu_on_joy
     lda #&4e ; 'N'
-    sta data_0600,y
+    sta menu_text,y
     lda #&20 ; ' '
     sta data_0601,y
     rts
@@ -2964,41 +3001,67 @@ data_213a = object_free_map+58
     jsr print_menu
     jmp data_0581
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &4f, &06, &00
+    equb &00, &4f
+; ***************************************************************************************
+; Hero menu text
+;
+; Sixteen entries of: column, row, text, carriage return; printed by print_menu.
+; &0600 used as index base 14 times by &52e3, &52ea, &52f1, &52ff, &530f, &531f, &5328, &56e3, &56ea, &56f1, &56ff, &570f, &571f, &5728
+.menu_text
+.menu_text_joy
+; &53b1 used as index base 8 times by &5304, &5314, &5322, &532d, &5704, &5714, &5722, &572d
+data_0601 = menu_text+1
+    equb &06, &00
 ; &0602 used as index base 4 times by &5309, &5319, &5709, &5719
 .data_0602
     equs "DUNJUNZ"
-    equb &0d, &00, &02
+    equb &0d
+    equb &00, &02
     equs "HERO"
-    equb &0d, &0c, &02
+    equb &0d
+    equb &0c, &02
     equs "PLAYING"
-    equb &0d, &00, &04
+    equb &0d
+    equb &00, &04
     equs "1 RANGER"
-    equb &0d, &00, &05
+    equb &0d
+    equb &00, &05
     equs "2 MAGIC-USER"
-    equb &0d, &00, &06
+    equb &0d
+    equb &00, &06
     equs "3 BARBARIAN"
-    equb &0d, &00, &07
+    equb &0d
+    equb &00, &07
     equs "4 FIGHTER"
-    equb &0d, &0e, &04
+    equb &0d
+    equb &0e, &04
     equs "YES"
-    equb &0d, &0e, &05
+    equb &0d
+    equb &0e, &05
     equs "YES"
-    equb &0d, &0e, &06
+    equb &0d
+    equb &0e, &06
     equs "YES"
-    equb &0d, &0e, &07
+    equb &0d
+    equb &0e, &07
     equs "YES"
-    equb &0d, &00, &09
+    equb &0d
+    equb &00, &09
     equs "TYPE NUMBER"
-    equb &0d, &00, &0a
+    equb &0d
+    equb &00, &0a
     equs "TO TOGGLE"
-    equb &0d, &00, &0d
+    equb &0d
+    equb &00, &0d
     equs "SOUND ON(5) OFF(6)"
-    equb &0d, &07, &0f
+    equb &0d
+    equb &07, &0f
     equs "ON "
-    equb &0d, &03, &14
+    equb &0d
+    equb &03, &14
     equs "SPACE TO PLAY"
-    equb &0d, &00, &0d, &a9, &63
+    equb &0d
+    equb &00, &0d, &a9, &63
 ; ***************************************************************************************
 ; Take the heroes nobody plays out of the game
 ;
@@ -3260,13 +3323,13 @@ data_213a = object_free_map+58
 ;     Y: offset of the next string
     lda #&1f
     jsr oswrch
-    lda data_0600,y
+    lda menu_text,y
     jsr oswrch
     iny
-    lda data_0600,y
+    lda menu_text,y
     jsr oswrch
     iny
-    lda data_0600,y
+    lda menu_text,y
     jsr oswrch
     cmp #&0d
     bne data_0540
@@ -3280,7 +3343,7 @@ data_213a = object_free_map+58
 ; On Entry:
 ;     Y: offset of the entry
     lda #&4e ; 'N'
-    sta data_0600,y
+    sta menu_text,y
     lda #&4f ; 'O'
     sta data_0601,y
     lda #&20 ; ' '
@@ -3294,7 +3357,7 @@ data_213a = object_free_map+58
 ; On Entry:
 ;     Y: offset of the entry
     lda #&59 ; 'Y'
-    sta data_0600,y
+    sta menu_text,y
     lda #&45 ; 'E'
     sta data_0601,y
     lda #&53 ; 'S'
@@ -3308,7 +3371,7 @@ data_213a = object_free_map+58
 ; On Entry:
 ;     Y: offset of the entry's second character
     lda #&46 ; 'F'
-    sta data_0600,y
+    sta menu_text,y
     sta data_0601,y
     rts
 ; ***************************************************************************************
@@ -3319,7 +3382,7 @@ data_213a = object_free_map+58
 ; On Entry:
 ;     Y: offset of the entry's second character
     lda #&4e ; 'N'
-    sta data_0600,y
+    sta menu_text,y
     lda #&20 ; ' '
     sta data_0601,y
     rts
@@ -3378,39 +3441,60 @@ data_213a = object_free_map+58
     jsr print_menu
     jmp data_0581
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &4f, &06, &00
+    equb &00, &4f
+; ***************************************************************************************
+; Hero menu text
+;
+; Sixteen entries of: column, row, text, carriage return; printed by print_menu.
+    equb &06, &00
     equs "DUNJUNZ"
-    equb &0d, &00, &02
+    equb &0d
+    equb &00, &02
     equs "HERO"
-    equb &0d, &0c, &02
+    equb &0d
+    equb &0c, &02
     equs "PLAYING"
-    equb &0d, &00, &04
+    equb &0d
+    equb &00, &04
     equs "1 RANGER"
-    equb &0d, &00, &05
+    equb &0d
+    equb &00, &05
     equs "2 MAGIC-USER"
-    equb &0d, &00, &06
+    equb &0d
+    equb &00, &06
     equs "3 BARBARIAN"
-    equb &0d, &00, &07
+    equb &0d
+    equb &00, &07
     equs "4 FIGHTER"
-    equb &0d, &0e, &04
+    equb &0d
+    equb &0e, &04
     equs "YES"
-    equb &0d, &0e, &05
+    equb &0d
+    equb &0e, &05
     equs "YES"
-    equb &0d, &0e, &06
+    equb &0d
+    equb &0e, &06
     equs "YES"
-    equb &0d, &0e, &07
+    equb &0d
+    equb &0e, &07
     equs "YES"
-    equb &0d, &00, &09
+    equb &0d
+    equb &00, &09
     equs "TYPE NUMBER"
-    equb &0d, &00, &0a
+    equb &0d
+    equb &00, &0a
     equs "TO TOGGLE"
-    equb &0d, &00, &0d
+    equb &0d
+    equb &00, &0d
     equs "SOUND ON(5) OFF(6)"
-    equb &0d, &07, &0f
+    equb &0d
+    equb &07, &0f
     equs "ON "
-    equb &0d, &03, &14
+    equb &0d
+    equb &03, &14
     equs "SPACE TO PLAY"
-    equb &0d, &00, &0d, &a9, &63
+    equb &0d
+    equb &00, &0d, &a9, &63
 ; ***************************************************************************************
 ; Take the heroes nobody plays out of the game
 ;
@@ -6553,12 +6637,12 @@ data_518e = sub_5178+22
     pha
     tya
     pha
-    ldx #&16
-    ldy #&19
+    ldx #<(treasure_envelope)
+    ldy #>(treasure_envelope)
     lda #osword_envelope
     jsr osword                          ; ENVELOPE command
-    ldx #&24 ; '$'
-    ldy #&19
+    ldx #<(treasure_sound)
+    ldy #>(treasure_sound)
     lda #osword_sound
     jsr osword                          ; SOUND command
     pla
@@ -6600,8 +6684,8 @@ data_518e = sub_5178+22
     bne loop_73a7
     txa
     pha
-    ldx #&f8
-    ldy #&0b
+    ldx #<(food_sound)
+    ldy #>(food_sound)
     lda #osword_sound
     jsr osword                          ; SOUND command
     pla
@@ -6629,8 +6713,8 @@ data_518e = sub_5178+22
     pha
     tya
     pha
-    ldx #&f0
-    ldy #&0b
+    ldx #<(teleport_sound)
+    ldy #>(teleport_sound)
     lda #osword_sound
     jsr osword                          ; SOUND command
     pla
@@ -6725,8 +6809,8 @@ data_518e = sub_5178+22
     sta data_0cf4
     txa
     pha
-    ldx #&f0
-    ldy #&0c
+    ldx #<(hit_sound)
+    ldy #>(hit_sound)
     lda #osword_sound
     jsr osword                          ; SOUND command
     lda #6
@@ -6751,12 +6835,12 @@ data_518e = sub_5178+22
 ; at &192C and &193A.
 ; &74a3 referenced 2 times by &741e, &74ca
 .play_pickup_sound
-    ldx #&2c ; ','
-    ldy #&19
+    ldx #<(pickup_envelope)
+    ldy #>(pickup_envelope)
     lda #osword_envelope
     jsr osword                          ; ENVELOPE command
-    ldx #&3a ; ':'
-    ldy #&19
+    ldx #<(pickup_sound)
+    ldy #>(pickup_sound)
     lda #osword_sound
     jsr osword                          ; SOUND command
     rts
@@ -6881,8 +6965,8 @@ data_518e = sub_5178+22
     pha
     tya
     pha
-    ldx #&f0
-    ldy #&0c
+    ldx #<(hit_sound)
+    ldy #>(hit_sound)
     lda #osword_sound
     jsr osword                          ; SOUND command
     pla
@@ -7010,12 +7094,12 @@ data_518e = sub_5178+22
     bne code_76ab
     txa
     pha
-    ldx #0
-    ldy #&19
+    ldx #<(magic_envelope)
+    ldy #>(magic_envelope)
     lda #osword_envelope
     jsr osword                          ; ENVELOPE command
-    ldx #&0e
-    ldy #&19
+    ldx #<(magic_sound)
+    ldy #>(magic_sound)
     lda #osword_sound
     jsr osword                          ; SOUND command
     pla
@@ -8170,6 +8254,13 @@ data_518e = sub_5178+22
 ; &7cff referenced 3 times by &355b, &3ccf, &759b
 .monster_start_hit_points
     equb &08
+; ***************************************************************************************
+; Workspace template
+;
+; The starting contents of page &0D for each level, copied there by reset_workspace: the
+; heroes' starting positions, directions, keys (hero_key_up etc. at +&70), health of 99 +
+; 1 (at +&90, +&95), the views' rooms (+&A0), sprite bases (+&B0, +&B5), bit masks (+&C0)
+; and panel rows (+&D0).
 ; &7d00 used as index base 1 time by &3be2
 .workspace_template
     equb &00, &00, &1f, &1f, &d2, &d2, &cc, &b1
@@ -8437,7 +8528,8 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     hero_frame:                 15
 ;     monster_offset_x:           15
 ;     osword:                     15
-;     data_0600:                  14
+;     menu_text:                  14
+;     menu_text_joy:              14
 ;     hero_step:                  13
 ;     screen_ptr:                 13
 ;     data_0080:                  12
@@ -9296,7 +9388,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_05d7
 ;     data_05e4
 ;     data_05e9
-;     data_0600
 ;     data_0601
 ;     data_0602
 ;     data_06b4
@@ -9420,7 +9511,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     Data                     = 17146 bytes (70%)
 ;
 ;     Number of instructions   = 3424
-;     Number of data bytes     = 16008 bytes
+;     Number of data bytes     = 16111 bytes
 ;     Number of data words     = 0 bytes
-;     Number of string bytes   = 1138 bytes
-;     Number of strings        = 142
+;     Number of string bytes   = 1035 bytes
+;     Number of strings        = 132

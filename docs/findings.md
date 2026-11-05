@@ -106,6 +106,14 @@ Line 310 says an Energy Drainer makes you "Lose 20 health points".
 one (types &53–&5E). Whether a hero can touch one twice in a single move
 has not been checked in play.
 
+### "YOU ALL" loses its full stop
+
+The game-over message (&0F90) contains "YOU ALL." with the full stop at
+&0FF1. &0FF1 and &0FF2 are also used as counters (the hero being drawn by
+`draw_status_panel`, and the count of dead heroes), so before printing
+the message the code writes spaces over &0FF1–&0FF4. The message always
+appears as "YOU ALL" with no full stop.
+
 ## Level data
 
 ### Levels are encrypted and checksummed; a failed checksum resets the machine

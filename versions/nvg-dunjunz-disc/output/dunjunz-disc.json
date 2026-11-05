@@ -927,6 +927,14 @@
       "align": "before_label"
     },
     {
+      "addr": 3984,
+      "binary_addr": 14032,
+      "name": "game_over_message",
+      "title": "Game-over message",
+      "description": "Eleven lines of seventeen characters, each ended by a carriage return, then a line feed and a last line ended by a zero byte. Two bytes of it (&0FF1, &0FF2) double as counters, and are overwritten with spaces before printing, so the full stop after \"YOU ALL\" never appears.",
+      "align": "before_label"
+    },
+    {
       "addr": 4823,
       "binary_addr": 14871,
       "name": "font_letters",
@@ -951,6 +959,14 @@
       "align": "before_label"
     },
     {
+      "addr": 6880,
+      "binary_addr": 16928,
+      "name": "sprite_addr_lo",
+      "title": "Sprite tables",
+      "description": "Four tables of 120 entries, indexed by sprite number: data address low bytes, high bytes, widths in bytes and heights in rows.",
+      "align": "before_label"
+    },
+    {
       "addr": 1169,
       "binary_addr": 21057,
       "title": "Level checksums",
@@ -958,10 +974,33 @@
       "align": "before_label"
     },
     {
+      "addr": 1536,
+      "binary_addr": 21424,
+      "name": "menu_text",
+      "title": "Hero menu text",
+      "description": "Sixteen entries of: column, row, text, carriage return; printed by print_menu.",
+      "align": "before_label"
+    },
+    {
       "addr": 1169,
       "binary_addr": 22081,
       "title": "Level checksums",
       "description": "One byte per level, 1-25: the sum, modulo 256, of the level's decrypted bytes.",
+      "align": "before_label"
+    },
+    {
+      "addr": 1536,
+      "binary_addr": 22448,
+      "name": "menu_text",
+      "title": "Hero menu text",
+      "description": "Sixteen entries of: column, row, text, carriage return; printed by print_menu.",
+      "align": "before_label"
+    },
+    {
+      "addr": 32000,
+      "name": "workspace_template",
+      "title": "Workspace template",
+      "description": "The starting contents of page &0D for each level, copied there by reset_workspace: the heroes' starting positions, directions, keys (hero_key_up etc. at +&70), health of 99 + 1 (at +&90, +&95), the views' rooms (+&A0), sprite bases (+&B0, +&B5), bit masks (+&C0) and panel rows (+&D0).",
       "align": "before_label"
     }
   ],
@@ -1063,7 +1102,8 @@
     "data_05d7": 1495,
     "data_05e4": 1508,
     "data_05e9": 1513,
-    "data_0600": 1536,
+    "menu_text": 1536,
+    "menu_text_joy": 1536,
     "data_0601": 1537,
     "data_0602": 1538,
     "remove_absent_heroes": 1712,
@@ -1329,6 +1369,15 @@
       "length": 48,
       "group": "sprites",
       "description": "Data of sprite &15, &1A, &77: 4 bytes x 12 rows."
+    },
+    {
+      "addr": 1536,
+      "name": "menu_text",
+      "group": "text",
+      "access": [
+        "b"
+      ],
+      "description": "The hero menu: sixteen strings, each a text column and row followed by the characters and a carriage return. The YES/NO and ON/OFF entries are rewritten as the players toggle them."
     },
     {
       "addr": 2224,
@@ -14361,36 +14410,14 @@
         16,
         16,
         16,
-        16,
-        19,
-        0,
-        4,
-        0,
-        100,
-        0,
-        30,
-        0,
-        19,
-        0,
-        2,
-        0,
-        200,
-        0,
-        2,
-        0
+        16
       ],
       "binary_addr": 13036,
       "labels": [
         "hero_score_thousands"
       ],
-      "sub_labels": {
-        "3068": [
-          "data_0bfc"
-        ]
-      },
       "xref_summaries": [
-        "&32ec used as index base 8 times by &0400[2], &0400[3], &0403[2], &0403[3], &040c[2], &040c[3], &0ee3[1], &72c8",
-        "&333c referenced 2 times by &444f, &445d"
+        "&32ec used as index base 8 times by &0400[2], &0400[3], &0403[2], &0403[3], &040c[2], &040c[3], &0ee3[1], &72c8"
       ],
       "references": [
         {
@@ -14502,7 +14529,12 @@
         16,
         16,
         16,
-        16,
+        16
+      ]
+    },
+    {
+      "addr": 3056,
+      "bytes": [
         19,
         0,
         4,
@@ -14510,7 +14542,50 @@
         100,
         0,
         30,
+        0
+      ],
+      "binary_addr": 13104,
+      "labels": [
+        "teleport_sound"
+      ],
+      "type": "byte",
+      "values": [
+        19,
         0,
+        4,
+        0,
+        100,
+        0,
+        30,
+        0
+      ]
+    },
+    {
+      "addr": 3064,
+      "bytes": [
+        19,
+        0,
+        2,
+        0,
+        200,
+        0,
+        2,
+        0
+      ],
+      "binary_addr": 13112,
+      "labels": [
+        "food_sound"
+      ],
+      "sub_labels": {
+        "3068": [
+          "data_0bfc"
+        ]
+      },
+      "xref_summaries": [
+        "&333c referenced 2 times by &444f, &445d"
+      ],
+      "type": "byte",
+      "values": [
         19,
         0,
         2,
@@ -15009,36 +15084,14 @@
         0,
         0,
         0,
-        0,
-        16,
-        0,
-        1,
-        0,
-        6,
-        0,
-        6,
-        0,
-        18,
-        0,
-        3,
-        0,
-        200,
-        0,
-        10,
         0
       ],
       "binary_addr": 13328,
       "labels": [
         "hero_damage_taken"
       ],
-      "sub_labels": {
-        "3316": [
-          "data_0cf4"
-        ]
-      },
       "xref_summaries": [
-        "&3410 used as index base 7 times by &0ede[1], &0f1e[1], &74ef, &74f2, &74f9, &75bd, &79a7",
-        "&3434 referenced 2 times by &7481, &7491"
+        "&3410 used as index base 7 times by &0ede[1], &0f1e[1], &74ef, &74f2, &74f9, &75bd, &79a7"
       ],
       "references": [
         {
@@ -15105,7 +15158,12 @@
         0,
         0,
         0,
-        0,
+        0
+      ]
+    },
+    {
+      "addr": 3312,
+      "bytes": [
         16,
         0,
         1,
@@ -15113,7 +15171,47 @@
         6,
         0,
         6,
+        0
+      ],
+      "binary_addr": 13360,
+      "labels": [
+        "hit_sound"
+      ],
+      "sub_labels": {
+        "3316": [
+          "data_0cf4"
+        ]
+      },
+      "xref_summaries": [
+        "&3434 referenced 2 times by &7481, &7491"
+      ],
+      "type": "byte",
+      "values": [
+        16,
         0,
+        1,
+        0,
+        6,
+        0,
+        6,
+        0
+      ]
+    },
+    {
+      "addr": 3320,
+      "bytes": [
+        18,
+        0,
+        3,
+        0,
+        200,
+        0,
+        10,
+        0
+      ],
+      "binary_addr": 13368,
+      "type": "byte",
+      "values": [
         18,
         0,
         3,
@@ -20749,85 +20847,8 @@
         32,
         65,
         76,
-        76
-      ],
-      "binary_addr": 14122,
-      "labels": [
-        "sub_0fea"
-      ],
-      "sub_labels": {
-        "4080": [
-          "data_0ff0"
-        ]
-      },
-      "xref_summaries": [
-        "&3730 used as index base 1 time by &35e8"
-      ],
-      "type": "string",
-      "string": "YOU ALL"
-    },
-    {
-      "addr": 4081,
-      "bytes": [
-        46
-      ],
-      "binary_addr": 14129,
-      "labels": [
-        "panel_hero"
-      ],
-      "xref_summaries": [
-        "&3731 referenced 8 times by &0ef9[1], &0efc[1], &0f18[1], &0f28[1], &0f4d[1], &0f5d[1], &0f60[1], &0f6d[1]"
-      ],
-      "references": [
-        {
-          "addr": 3833,
-          "kind": "direct",
-          "move_id": 1
-        },
-        {
-          "addr": 3836,
-          "kind": "direct",
-          "move_id": 1
-        },
-        {
-          "addr": 3864,
-          "kind": "direct",
-          "move_id": 1
-        },
-        {
-          "addr": 3880,
-          "kind": "direct",
-          "move_id": 1
-        },
-        {
-          "addr": 3917,
-          "kind": "direct",
-          "move_id": 1
-        },
-        {
-          "addr": 3933,
-          "kind": "direct",
-          "move_id": 1
-        },
-        {
-          "addr": 3936,
-          "kind": "direct",
-          "move_id": 1
-        },
-        {
-          "addr": 3949,
-          "kind": "direct",
-          "move_id": 1
-        }
-      ],
-      "type": "byte",
-      "values": [
-        46
-      ]
-    },
-    {
-      "addr": 4082,
-      "bytes": [
+        76,
+        46,
         32,
         32,
         32,
@@ -20838,42 +20859,28 @@
         32,
         32
       ],
-      "binary_addr": 14130,
+      "binary_addr": 14122,
       "labels": [
-        "count"
+        "sub_0fea"
       ],
+      "sub_labels": {
+        "4080": [
+          "data_0ff0"
+        ],
+        "4081": [
+          "panel_hero"
+        ],
+        "4082": [
+          "count"
+        ]
+      },
       "xref_summaries": [
+        "&3730 used as index base 1 time by &35e8",
+        "&3731 referenced 8 times by &0ef9[1], &0efc[1], &0f18[1], &0f28[1], &0f4d[1], &0f5d[1], &0f60[1], &0f6d[1]",
         "&3732 referenced 5 times by &0e6a[1], &0e77[1], &0e7f[1], &0f35[1], &0f48[1]"
       ],
-      "references": [
-        {
-          "addr": 3690,
-          "kind": "direct",
-          "move_id": 1
-        },
-        {
-          "addr": 3703,
-          "kind": "direct",
-          "move_id": 1
-        },
-        {
-          "addr": 3711,
-          "kind": "direct",
-          "move_id": 1
-        },
-        {
-          "addr": 3893,
-          "kind": "direct",
-          "move_id": 1
-        },
-        {
-          "addr": 3912,
-          "kind": "direct",
-          "move_id": 1
-        }
-      ],
       "type": "string",
-      "string": "         "
+      "string": "YOU ALL.         "
     },
     {
       "addr": 4091,
@@ -21058,13 +21065,22 @@
     {
       "addr": 4181,
       "bytes": [
-        13,
-        10
+        13
       ],
       "binary_addr": 14229,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 4182,
+      "bytes": [
+        10
+      ],
+      "binary_addr": 14230,
+      "type": "byte",
+      "values": [
         10
       ]
     },
@@ -28689,7 +28705,16 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&58"
+      "operand": "#<(exit_envelope)",
+      "expr": {
+        "text": "<(exit_envelope)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "exit_envelope"
+          }
+        }
+      }
     },
     {
       "addr": 5794,
@@ -28700,7 +28725,16 @@
       "binary_addr": 15842,
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&19"
+      "operand": "#>(exit_envelope)",
+      "expr": {
+        "text": ">(exit_envelope)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "exit_envelope"
+          }
+        }
+      }
     },
     {
       "addr": 5796,
@@ -28743,7 +28777,16 @@
       "binary_addr": 15849,
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&66"
+      "operand": "#<(exit_sound)",
+      "expr": {
+        "text": "<(exit_sound)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "exit_sound"
+          }
+        }
+      }
     },
     {
       "addr": 5803,
@@ -28754,7 +28797,16 @@
       "binary_addr": 15851,
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&19"
+      "operand": "#>(exit_sound)",
+      "expr": {
+        "text": ">(exit_sound)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "exit_sound"
+          }
+        }
+      }
     },
     {
       "addr": 5805,
@@ -30300,122 +30352,7 @@
         25,
         0,
         0,
-        0,
-        3,
-        1,
-        10,
-        10,
-        236,
-        3,
-        3,
-        3,
-        128,
-        0,
-        0,
-        255,
-        128,
-        128,
-        18,
-        0,
-        3,
-        0,
-        0,
-        0,
-        2,
-        0,
-        3,
-        2,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        128,
-        0,
-        0,
-        248,
-        128,
-        128,
-        18,
-        0,
-        3,
-        0,
-        200,
-        0,
-        5,
-        0,
-        3,
-        128,
-        0,
-        0,
-        0,
-        10,
-        10,
-        10,
-        10,
-        0,
-        0,
-        253,
-        128,
-        128,
-        16,
-        0,
-        3,
-        0,
-        10,
-        0,
-        5,
-        0,
-        3,
-        128,
-        0,
-        0,
-        0,
-        1,
-        30,
-        30,
-        128,
-        0,
-        0,
-        254,
-        128,
-        128,
-        18,
-        0,
-        3,
-        0,
-        240,
-        0,
-        1,
-        0,
-        3,
-        130,
-        255,
-        255,
-        254,
-        1,
-        1,
-        128,
-        128,
-        0,
-        0,
-        255,
-        128,
-        128,
-        18,
-        0,
-        3,
-        0,
-        250,
-        0,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0,
-        4
+        0
       ],
       "binary_addr": 16408,
       "type": "byte",
@@ -30459,7 +30396,12 @@
         25,
         0,
         0,
-        0,
+        0
+      ]
+    },
+    {
+      "addr": 6400,
+      "bytes": [
         3,
         1,
         10,
@@ -30473,7 +30415,33 @@
         0,
         255,
         128,
+        128
+      ],
+      "binary_addr": 16448,
+      "labels": [
+        "magic_envelope"
+      ],
+      "type": "byte",
+      "values": [
+        3,
+        1,
+        10,
+        10,
+        236,
+        3,
+        3,
+        3,
         128,
+        0,
+        0,
+        255,
+        128,
+        128
+      ]
+    },
+    {
+      "addr": 6414,
+      "bytes": [
         18,
         0,
         3,
@@ -30481,7 +30449,27 @@
         0,
         0,
         2,
+        0
+      ],
+      "binary_addr": 16462,
+      "labels": [
+        "magic_sound"
+      ],
+      "type": "byte",
+      "values": [
+        18,
         0,
+        3,
+        0,
+        0,
+        0,
+        2,
+        0
+      ]
+    },
+    {
+      "addr": 6422,
+      "bytes": [
         3,
         2,
         1,
@@ -30495,7 +30483,33 @@
         0,
         248,
         128,
+        128
+      ],
+      "binary_addr": 16470,
+      "labels": [
+        "treasure_envelope"
+      ],
+      "type": "byte",
+      "values": [
+        3,
+        2,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
         128,
+        0,
+        0,
+        248,
+        128,
+        128
+      ]
+    },
+    {
+      "addr": 6436,
+      "bytes": [
         18,
         0,
         3,
@@ -30503,7 +30517,27 @@
         200,
         0,
         5,
+        0
+      ],
+      "binary_addr": 16484,
+      "labels": [
+        "treasure_sound"
+      ],
+      "type": "byte",
+      "values": [
+        18,
         0,
+        3,
+        0,
+        200,
+        0,
+        5,
+        0
+      ]
+    },
+    {
+      "addr": 6444,
+      "bytes": [
         3,
         128,
         0,
@@ -30517,7 +30551,33 @@
         0,
         253,
         128,
+        128
+      ],
+      "binary_addr": 16492,
+      "labels": [
+        "pickup_envelope"
+      ],
+      "type": "byte",
+      "values": [
+        3,
         128,
+        0,
+        0,
+        0,
+        10,
+        10,
+        10,
+        10,
+        0,
+        0,
+        253,
+        128,
+        128
+      ]
+    },
+    {
+      "addr": 6458,
+      "bytes": [
         16,
         0,
         3,
@@ -30525,7 +30585,27 @@
         10,
         0,
         5,
+        0
+      ],
+      "binary_addr": 16506,
+      "labels": [
+        "pickup_sound"
+      ],
+      "type": "byte",
+      "values": [
+        16,
         0,
+        3,
+        0,
+        10,
+        0,
+        5,
+        0
+      ]
+    },
+    {
+      "addr": 6466,
+      "bytes": [
         3,
         128,
         0,
@@ -30539,7 +30619,33 @@
         0,
         254,
         128,
+        128
+      ],
+      "binary_addr": 16514,
+      "labels": [
+        "key_envelope"
+      ],
+      "type": "byte",
+      "values": [
+        3,
         128,
+        0,
+        0,
+        0,
+        1,
+        30,
+        30,
+        128,
+        0,
+        0,
+        254,
+        128,
+        128
+      ]
+    },
+    {
+      "addr": 6480,
+      "bytes": [
         18,
         0,
         3,
@@ -30547,7 +30653,27 @@
         240,
         0,
         1,
+        0
+      ],
+      "binary_addr": 16528,
+      "labels": [
+        "key_sound"
+      ],
+      "type": "byte",
+      "values": [
+        18,
         0,
+        3,
+        0,
+        240,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "addr": 6488,
+      "bytes": [
         3,
         130,
         255,
@@ -30561,7 +30687,33 @@
         0,
         255,
         128,
+        128
+      ],
+      "binary_addr": 16536,
+      "labels": [
+        "exit_envelope"
+      ],
+      "type": "byte",
+      "values": [
+        3,
+        130,
+        255,
+        255,
+        254,
+        1,
+        1,
         128,
+        128,
+        0,
+        0,
+        255,
+        128,
+        128
+      ]
+    },
+    {
+      "addr": 6502,
+      "bytes": [
         18,
         0,
         3,
@@ -30569,7 +30721,36 @@
         250,
         0,
         1,
+        0
+      ],
+      "binary_addr": 16550,
+      "labels": [
+        "exit_sound"
+      ],
+      "type": "byte",
+      "values": [
+        18,
         0,
+        3,
+        0,
+        250,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "addr": 6510,
+      "bytes": [
+        0,
+        0,
+        0,
+        0,
+        4
+      ],
+      "binary_addr": 16558,
+      "type": "byte",
+      "values": [
         0,
         0,
         0,
@@ -31464,7 +31645,95 @@
         192,
         200,
         0,
-        20
+        20,
+        40,
+        60,
+        80,
+        100,
+        120,
+        140,
+        160,
+        180,
+        48,
+        96,
+        240,
+        192,
+        192,
+        0,
+        48,
+        96,
+        144,
+        192,
+        240,
+        32,
+        80,
+        128,
+        176,
+        224,
+        16,
+        64,
+        112,
+        160,
+        208,
+        0,
+        48,
+        96,
+        144,
+        192,
+        240,
+        32,
+        80,
+        128,
+        176,
+        224,
+        16,
+        0,
+        48,
+        96,
+        144,
+        64,
+        112,
+        160,
+        208,
+        160,
+        208,
+        208,
+        208,
+        208,
+        208,
+        208,
+        208,
+        208,
+        208,
+        208,
+        208,
+        208,
+        208,
+        0,
+        48,
+        96,
+        192,
+        144,
+        240,
+        32,
+        80,
+        128,
+        176,
+        0,
+        36,
+        41,
+        46,
+        51,
+        56,
+        61,
+        66,
+        71,
+        76,
+        16,
+        96,
+        108,
+        120,
+        207
       ],
       "binary_addr": 16928,
       "labels": [
@@ -31513,25 +31782,12 @@
         192,
         200,
         0,
-        20
-      ]
-    },
-    {
-      "addr": 6912,
-      "bytes": [
+        20,
         40,
         60,
         80,
         100,
-        120
-      ],
-      "binary_addr": 16960,
-      "type": "string",
-      "string": "(<Pdx"
-    },
-    {
-      "addr": 6917,
-      "bytes": [
+        120,
         140,
         160,
         180,
@@ -31600,85 +31856,7 @@
         80,
         128,
         176,
-        0
-      ],
-      "binary_addr": 16965,
-      "type": "byte",
-      "values": [
-        140,
-        160,
-        180,
-        48,
-        96,
-        240,
-        192,
-        192,
         0,
-        48,
-        96,
-        144,
-        192,
-        240,
-        32,
-        80,
-        128,
-        176,
-        224,
-        16,
-        64,
-        112,
-        160,
-        208,
-        0,
-        48,
-        96,
-        144,
-        192,
-        240,
-        32,
-        80,
-        128,
-        176,
-        224,
-        16,
-        0,
-        48,
-        96,
-        144,
-        64,
-        112,
-        160,
-        208,
-        160,
-        208,
-        208,
-        208,
-        208,
-        208,
-        208,
-        208,
-        208,
-        208,
-        208,
-        208,
-        208,
-        208,
-        0,
-        48,
-        96,
-        192,
-        144,
-        240,
-        32,
-        80,
-        128,
-        176,
-        0
-      ]
-    },
-    {
-      "addr": 6986,
-      "bytes": [
         36,
         41,
         46,
@@ -31687,42 +31865,11 @@
         61,
         66,
         71,
-        76
-      ],
-      "binary_addr": 17034,
-      "type": "string",
-      "string": "$).38=BGL"
-    },
-    {
-      "addr": 6995,
-      "bytes": [
-        16
-      ],
-      "binary_addr": 17043,
-      "type": "byte",
-      "values": [
-        16
-      ]
-    },
-    {
-      "addr": 6996,
-      "bytes": [
+        76,
+        16,
         96,
         108,
-        120
-      ],
-      "binary_addr": 17044,
-      "type": "string",
-      "string": "`lx"
-    },
-    {
-      "addr": 6999,
-      "bytes": [
-        207
-      ],
-      "binary_addr": 17047,
-      "type": "byte",
-      "values": [
+        120,
         207
       ]
     },
@@ -31736,39 +31883,8 @@
         45,
         45,
         46,
-        46
-      ],
-      "binary_addr": 17048,
-      "labels": [
-        "sprite_addr_hi"
-      ],
-      "xref_summaries": [
-        "&4298 used as index base 1 time by &0907[1]"
-      ],
-      "references": [
-        {
-          "addr": 2311,
-          "kind": "indexed",
-          "move_id": 1
-        }
-      ],
-      "type": "string",
-      "string": "------.."
-    },
-    {
-      "addr": 7008,
-      "bytes": [
-        25
-      ],
-      "binary_addr": 17056,
-      "type": "byte",
-      "values": [
-        25
-      ]
-    },
-    {
-      "addr": 7009,
-      "bytes": [
+        46,
+        25,
         46,
         46,
         46,
@@ -31780,49 +31896,13 @@
         44,
         44,
         44,
-        44
-      ],
-      "binary_addr": 17057,
-      "type": "string",
-      "string": ".../////,,,,"
-    },
-    {
-      "addr": 7021,
-      "bytes": [
-        4
-      ],
-      "binary_addr": 17069,
-      "type": "byte",
-      "values": [
-        4
-      ]
-    },
-    {
-      "addr": 7022,
-      "bytes": [
+        44,
+        4,
         43,
         43,
         43,
-        43
-      ],
-      "binary_addr": 17070,
-      "type": "string",
-      "string": "++++"
-    },
-    {
-      "addr": 7026,
-      "bytes": [
-        4
-      ],
-      "binary_addr": 17074,
-      "type": "byte",
-      "values": [
-        4
-      ]
-    },
-    {
-      "addr": 7027,
-      "bytes": [
+        43,
+        4,
         41,
         44,
         42,
@@ -31837,26 +31917,8 @@
         42,
         42,
         41,
-        41
-      ],
-      "binary_addr": 17075,
-      "type": "string",
-      "string": "),***********))"
-    },
-    {
-      "addr": 7042,
-      "bytes": [
-        10
-      ],
-      "binary_addr": 17090,
-      "type": "byte",
-      "values": [
-        10
-      ]
-    },
-    {
-      "addr": 7043,
-      "bytes": [
+        41,
+        10,
         41,
         43,
         35,
@@ -31886,32 +31948,11 @@
         39,
         39,
         39,
-        40
-      ],
-      "binary_addr": 17091,
-      "type": "string",
-      "string": ")+######$$$$$%%%%%&&&&&&'''''("
-    },
-    {
-      "addr": 7073,
-      "bytes": [
+        40,
         23,
         23,
         23,
-        23
-      ],
-      "binary_addr": 17121,
-      "type": "byte",
-      "values": [
         23,
-        23,
-        23,
-        23
-      ]
-    },
-    {
-      "addr": 7077,
-      "bytes": [
         40,
         40,
         40,
@@ -31929,15 +31970,7 @@
         33,
         33,
         33,
-        33
-      ],
-      "binary_addr": 17125,
-      "type": "string",
-      "string": "((((\"\"!!!!!!!!!!!!"
-    },
-    {
-      "addr": 7095,
-      "bytes": [
+        33,
         10,
         10,
         10,
@@ -31964,9 +31997,117 @@
         24,
         4
       ],
-      "binary_addr": 17143,
+      "binary_addr": 17048,
+      "labels": [
+        "sprite_addr_hi"
+      ],
+      "xref_summaries": [
+        "&4298 used as index base 1 time by &0907[1]"
+      ],
+      "references": [
+        {
+          "addr": 2311,
+          "kind": "indexed",
+          "move_id": 1
+        }
+      ],
       "type": "byte",
       "values": [
+        45,
+        45,
+        45,
+        45,
+        45,
+        45,
+        46,
+        46,
+        25,
+        46,
+        46,
+        46,
+        47,
+        47,
+        47,
+        47,
+        47,
+        44,
+        44,
+        44,
+        44,
+        4,
+        43,
+        43,
+        43,
+        43,
+        4,
+        41,
+        44,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        41,
+        41,
+        10,
+        41,
+        43,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        36,
+        36,
+        36,
+        36,
+        36,
+        37,
+        37,
+        37,
+        37,
+        37,
+        38,
+        38,
+        38,
+        38,
+        38,
+        38,
+        39,
+        39,
+        39,
+        39,
+        39,
+        40,
+        23,
+        23,
+        23,
+        23,
+        40,
+        40,
+        40,
+        40,
+        34,
+        34,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
         10,
         10,
         10,
@@ -33081,7 +33222,16 @@
       "binary_addr": 17490,
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&f8"
+      "operand": "#<(food_sound)",
+      "expr": {
+        "text": "<(food_sound)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "food_sound"
+          }
+        }
+      }
     },
     {
       "addr": 7444,
@@ -33092,7 +33242,16 @@
       "binary_addr": 17492,
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&0b"
+      "operand": "#>(food_sound)",
+      "expr": {
+        "text": ">(food_sound)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "food_sound"
+          }
+        }
+      }
     },
     {
       "addr": 7446,
@@ -35525,7 +35684,16 @@
       "binary_addr": 17895,
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&42"
+      "operand": "#<(key_envelope)",
+      "expr": {
+        "text": "<(key_envelope)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "key_envelope"
+          }
+        }
+      }
     },
     {
       "addr": 7849,
@@ -35536,7 +35704,16 @@
       "binary_addr": 17897,
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&19"
+      "operand": "#>(key_envelope)",
+      "expr": {
+        "text": ">(key_envelope)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "key_envelope"
+          }
+        }
+      }
     },
     {
       "addr": 7851,
@@ -35579,7 +35756,16 @@
       "binary_addr": 17904,
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&50"
+      "operand": "#<(key_sound)",
+      "expr": {
+        "text": "<(key_sound)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "key_sound"
+          }
+        }
+      }
     },
     {
       "addr": 7858,
@@ -35590,7 +35776,16 @@
       "binary_addr": 17906,
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&19"
+      "operand": "#>(key_sound)",
+      "expr": {
+        "text": ">(key_sound)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "key_sound"
+          }
+        }
+      }
     },
     {
       "addr": 7860,
@@ -46099,9 +46294,9 @@
       "binary_addr": 21219,
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0600,y",
+      "operand": "menu_text,y",
       "target": 1536,
-      "target_label": "data_0600"
+      "target_label": "menu_text"
     },
     {
       "addr": 1334,
@@ -46136,9 +46331,9 @@
       "binary_addr": 21226,
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0600,y",
+      "operand": "menu_text,y",
       "target": 1536,
-      "target_label": "data_0600"
+      "target_label": "menu_text"
     },
     {
       "addr": 1341,
@@ -46189,9 +46384,9 @@
       "binary_addr": 21233,
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0600,y",
+      "operand": "menu_text,y",
       "target": 1536,
-      "target_label": "data_0600"
+      "target_label": "menu_text"
     },
     {
       "addr": 1348,
@@ -46289,9 +46484,9 @@
       "binary_addr": 21247,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0600,y",
+      "operand": "menu_text,y",
       "target": 1536,
-      "target_label": "data_0600"
+      "target_label": "menu_text"
     },
     {
       "addr": 1362,
@@ -46392,9 +46587,9 @@
       "binary_addr": 21263,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0600,y",
+      "operand": "menu_text,y",
       "target": 1536,
-      "target_label": "data_0600"
+      "target_label": "menu_text"
     },
     {
       "addr": 1378,
@@ -46495,9 +46690,9 @@
       "binary_addr": 21279,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0600,y",
+      "operand": "menu_text,y",
       "target": 1536,
-      "target_label": "data_0600"
+      "target_label": "menu_text"
     },
     {
       "addr": 1394,
@@ -46562,9 +46757,9 @@
       "binary_addr": 21288,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0600,y",
+      "operand": "menu_text,y",
       "target": 1536,
-      "target_label": "data_0600"
+      "target_label": "menu_text"
     },
     {
       "addr": 1403,
@@ -47468,23 +47663,9 @@
         0,
         0,
         0,
-        79,
-        6,
-        0
+        79
       ],
       "binary_addr": 21414,
-      "sub_labels": {
-        "1536": [
-          "data_0600"
-        ],
-        "1537": [
-          "data_0601"
-        ]
-      },
-      "xref_summaries": [
-        "&53b0 used as index base 14 times by &52e3, &52ea, &52f1, &52ff, &530f, &531f, &5328, &56e3, &56ea, &56f1, &56ff, &570f, &571f, &5728",
-        "&53b1 used as index base 8 times by &5304, &5314, &5322, &532d, &5704, &5714, &5722, &572d"
-      ],
       "type": "byte",
       "values": [
         0,
@@ -47496,7 +47677,103 @@
         0,
         0,
         0,
-        79,
+        79
+      ]
+    },
+    {
+      "addr": 1536,
+      "bytes": [
+        6,
+        0
+      ],
+      "binary_addr": 21424,
+      "labels": [
+        "menu_text",
+        "menu_text_joy"
+      ],
+      "sub_labels": {
+        "1537": [
+          "data_0601"
+        ]
+      },
+      "xref_summaries": [
+        "&53b0 used as index base 14 times by &0533[2], &0533[3], &053a[2], &053a[3], &0541[2], &0541[3], &054f[2], &054f[3], &055f[2], &055f[3], &056f[2], &056f[3], &0578[2], &0578[3]",
+        "&53b1 used as index base 8 times by &5304, &5314, &5322, &532d, &5704, &5714, &5722, &572d"
+      ],
+      "references": [
+        {
+          "addr": 1331,
+          "kind": "indexed",
+          "move_id": 2
+        },
+        {
+          "addr": 1331,
+          "kind": "indexed",
+          "move_id": 3
+        },
+        {
+          "addr": 1338,
+          "kind": "indexed",
+          "move_id": 2
+        },
+        {
+          "addr": 1338,
+          "kind": "indexed",
+          "move_id": 3
+        },
+        {
+          "addr": 1345,
+          "kind": "indexed",
+          "move_id": 2
+        },
+        {
+          "addr": 1345,
+          "kind": "indexed",
+          "move_id": 3
+        },
+        {
+          "addr": 1359,
+          "kind": "indexed",
+          "move_id": 2
+        },
+        {
+          "addr": 1359,
+          "kind": "indexed",
+          "move_id": 3
+        },
+        {
+          "addr": 1375,
+          "kind": "indexed",
+          "move_id": 2
+        },
+        {
+          "addr": 1375,
+          "kind": "indexed",
+          "move_id": 3
+        },
+        {
+          "addr": 1391,
+          "kind": "indexed",
+          "move_id": 2
+        },
+        {
+          "addr": 1391,
+          "kind": "indexed",
+          "move_id": 3
+        },
+        {
+          "addr": 1400,
+          "kind": "indexed",
+          "move_id": 2
+        },
+        {
+          "addr": 1400,
+          "kind": "indexed",
+          "move_id": 3
+        }
+      ],
+      "type": "byte",
+      "values": [
         6,
         0
       ]
@@ -47543,14 +47820,23 @@
     {
       "addr": 1545,
       "bytes": [
-        13,
-        0,
-        2
+        13
       ],
       "binary_addr": 21433,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1546,
+      "bytes": [
+        0,
+        2
+      ],
+      "binary_addr": 21434,
+      "type": "byte",
+      "values": [
         0,
         2
       ]
@@ -47570,14 +47856,23 @@
     {
       "addr": 1552,
       "bytes": [
-        13,
-        12,
-        2
+        13
       ],
       "binary_addr": 21440,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1553,
+      "bytes": [
+        12,
+        2
+      ],
+      "binary_addr": 21441,
+      "type": "byte",
+      "values": [
         12,
         2
       ]
@@ -47600,14 +47895,23 @@
     {
       "addr": 1562,
       "bytes": [
-        13,
-        0,
-        4
+        13
       ],
       "binary_addr": 21450,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1563,
+      "bytes": [
+        0,
+        4
+      ],
+      "binary_addr": 21451,
+      "type": "byte",
+      "values": [
         0,
         4
       ]
@@ -47631,14 +47935,23 @@
     {
       "addr": 1573,
       "bytes": [
-        13,
-        0,
-        5
+        13
       ],
       "binary_addr": 21461,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1574,
+      "bytes": [
+        0,
+        5
+      ],
+      "binary_addr": 21462,
+      "type": "byte",
+      "values": [
         0,
         5
       ]
@@ -47666,14 +47979,23 @@
     {
       "addr": 1588,
       "bytes": [
-        13,
-        0,
-        6
+        13
       ],
       "binary_addr": 21476,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1589,
+      "bytes": [
+        0,
+        6
+      ],
+      "binary_addr": 21477,
+      "type": "byte",
+      "values": [
         0,
         6
       ]
@@ -47700,14 +48022,23 @@
     {
       "addr": 1602,
       "bytes": [
-        13,
-        0,
-        7
+        13
       ],
       "binary_addr": 21490,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1603,
+      "bytes": [
+        0,
+        7
+      ],
+      "binary_addr": 21491,
+      "type": "byte",
+      "values": [
         0,
         7
       ]
@@ -47732,14 +48063,23 @@
     {
       "addr": 1614,
       "bytes": [
-        13,
-        14,
-        4
+        13
       ],
       "binary_addr": 21502,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1615,
+      "bytes": [
+        14,
+        4
+      ],
+      "binary_addr": 21503,
+      "type": "byte",
+      "values": [
         14,
         4
       ]
@@ -47758,14 +48098,23 @@
     {
       "addr": 1620,
       "bytes": [
-        13,
-        14,
-        5
+        13
       ],
       "binary_addr": 21508,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1621,
+      "bytes": [
+        14,
+        5
+      ],
+      "binary_addr": 21509,
+      "type": "byte",
+      "values": [
         14,
         5
       ]
@@ -47784,14 +48133,23 @@
     {
       "addr": 1626,
       "bytes": [
-        13,
-        14,
-        6
+        13
       ],
       "binary_addr": 21514,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1627,
+      "bytes": [
+        14,
+        6
+      ],
+      "binary_addr": 21515,
+      "type": "byte",
+      "values": [
         14,
         6
       ]
@@ -47810,14 +48168,23 @@
     {
       "addr": 1632,
       "bytes": [
-        13,
-        14,
-        7
+        13
       ],
       "binary_addr": 21520,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1633,
+      "bytes": [
+        14,
+        7
+      ],
+      "binary_addr": 21521,
+      "type": "byte",
+      "values": [
         14,
         7
       ]
@@ -47836,14 +48203,23 @@
     {
       "addr": 1638,
       "bytes": [
-        13,
-        0,
-        9
+        13
       ],
       "binary_addr": 21526,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1639,
+      "bytes": [
+        0,
+        9
+      ],
+      "binary_addr": 21527,
+      "type": "byte",
+      "values": [
         0,
         9
       ]
@@ -47870,14 +48246,23 @@
     {
       "addr": 1652,
       "bytes": [
-        13,
-        0,
-        10
+        13
       ],
       "binary_addr": 21540,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1653,
+      "bytes": [
+        0,
+        10
+      ],
+      "binary_addr": 21541,
+      "type": "byte",
+      "values": [
         0,
         10
       ]
@@ -47902,14 +48287,23 @@
     {
       "addr": 1664,
       "bytes": [
-        13,
-        0,
         13
       ],
       "binary_addr": 21552,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1665,
+      "bytes": [
+        0,
+        13
+      ],
+      "binary_addr": 21553,
+      "type": "byte",
+      "values": [
         0,
         13
       ]
@@ -47943,14 +48337,23 @@
     {
       "addr": 1685,
       "bytes": [
-        13,
-        7,
-        15
+        13
       ],
       "binary_addr": 21573,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1686,
+      "bytes": [
+        7,
+        15
+      ],
+      "binary_addr": 21574,
+      "type": "byte",
+      "values": [
         7,
         15
       ]
@@ -47969,14 +48372,23 @@
     {
       "addr": 1691,
       "bytes": [
-        13,
-        3,
-        20
+        13
       ],
       "binary_addr": 21579,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1692,
+      "bytes": [
+        3,
+        20
+      ],
+      "binary_addr": 21580,
+      "type": "byte",
+      "values": [
         3,
         20
       ]
@@ -48005,16 +48417,25 @@
     {
       "addr": 1707,
       "bytes": [
-        13,
+        13
+      ],
+      "binary_addr": 21595,
+      "type": "byte",
+      "values": [
+        13
+      ]
+    },
+    {
+      "addr": 1708,
+      "bytes": [
         0,
         13,
         169,
         99
       ],
-      "binary_addr": 21595,
+      "binary_addr": 21596,
       "type": "byte",
       "values": [
-        13,
         0,
         13,
         169,
@@ -50739,9 +51160,9 @@
       "binary_addr": 22243,
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0600,y",
+      "operand": "menu_text,y",
       "target": 1536,
-      "target_label": "data_0600"
+      "target_label": "menu_text"
     },
     {
       "addr": 1334,
@@ -50776,9 +51197,9 @@
       "binary_addr": 22250,
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0600,y",
+      "operand": "menu_text,y",
       "target": 1536,
-      "target_label": "data_0600"
+      "target_label": "menu_text"
     },
     {
       "addr": 1341,
@@ -50829,9 +51250,9 @@
       "binary_addr": 22257,
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0600,y",
+      "operand": "menu_text,y",
       "target": 1536,
-      "target_label": "data_0600"
+      "target_label": "menu_text"
     },
     {
       "addr": 1348,
@@ -50929,9 +51350,9 @@
       "binary_addr": 22271,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0600,y",
+      "operand": "menu_text,y",
       "target": 1536,
-      "target_label": "data_0600"
+      "target_label": "menu_text"
     },
     {
       "addr": 1362,
@@ -51032,9 +51453,9 @@
       "binary_addr": 22287,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0600,y",
+      "operand": "menu_text,y",
       "target": 1536,
-      "target_label": "data_0600"
+      "target_label": "menu_text"
     },
     {
       "addr": 1378,
@@ -51135,9 +51556,9 @@
       "binary_addr": 22303,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0600,y",
+      "operand": "menu_text,y",
       "target": 1536,
-      "target_label": "data_0600"
+      "target_label": "menu_text"
     },
     {
       "addr": 1394,
@@ -51202,9 +51623,9 @@
       "binary_addr": 22312,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0600,y",
+      "operand": "menu_text,y",
       "target": 1536,
-      "target_label": "data_0600"
+      "target_label": "menu_text"
     },
     {
       "addr": 1403,
@@ -52108,23 +52529,9 @@
         0,
         0,
         0,
-        79,
-        6,
-        0
+        79
       ],
       "binary_addr": 22438,
-      "sub_labels": {
-        "1536": [
-          "data_0600"
-        ],
-        "1537": [
-          "data_0601"
-        ]
-      },
-      "xref_summaries": [
-        "&57b0 used as index base 14 times by &52e3, &52ea, &52f1, &52ff, &530f, &531f, &5328, &56e3, &56ea, &56f1, &56ff, &570f, &571f, &5728",
-        "&57b1 used as index base 8 times by &5304, &5314, &5322, &532d, &5704, &5714, &5722, &572d"
-      ],
       "type": "byte",
       "values": [
         0,
@@ -52136,7 +52543,103 @@
         0,
         0,
         0,
-        79,
+        79
+      ]
+    },
+    {
+      "addr": 1536,
+      "bytes": [
+        6,
+        0
+      ],
+      "binary_addr": 22448,
+      "labels": [
+        "menu_text",
+        "menu_text_joy"
+      ],
+      "sub_labels": {
+        "1537": [
+          "data_0601"
+        ]
+      },
+      "xref_summaries": [
+        "&57b0 used as index base 14 times by &0533[2], &0533[3], &053a[2], &053a[3], &0541[2], &0541[3], &054f[2], &054f[3], &055f[2], &055f[3], &056f[2], &056f[3], &0578[2], &0578[3]",
+        "&57b1 used as index base 8 times by &5304, &5314, &5322, &532d, &5704, &5714, &5722, &572d"
+      ],
+      "references": [
+        {
+          "addr": 1331,
+          "kind": "indexed",
+          "move_id": 2
+        },
+        {
+          "addr": 1331,
+          "kind": "indexed",
+          "move_id": 3
+        },
+        {
+          "addr": 1338,
+          "kind": "indexed",
+          "move_id": 2
+        },
+        {
+          "addr": 1338,
+          "kind": "indexed",
+          "move_id": 3
+        },
+        {
+          "addr": 1345,
+          "kind": "indexed",
+          "move_id": 2
+        },
+        {
+          "addr": 1345,
+          "kind": "indexed",
+          "move_id": 3
+        },
+        {
+          "addr": 1359,
+          "kind": "indexed",
+          "move_id": 2
+        },
+        {
+          "addr": 1359,
+          "kind": "indexed",
+          "move_id": 3
+        },
+        {
+          "addr": 1375,
+          "kind": "indexed",
+          "move_id": 2
+        },
+        {
+          "addr": 1375,
+          "kind": "indexed",
+          "move_id": 3
+        },
+        {
+          "addr": 1391,
+          "kind": "indexed",
+          "move_id": 2
+        },
+        {
+          "addr": 1391,
+          "kind": "indexed",
+          "move_id": 3
+        },
+        {
+          "addr": 1400,
+          "kind": "indexed",
+          "move_id": 2
+        },
+        {
+          "addr": 1400,
+          "kind": "indexed",
+          "move_id": 3
+        }
+      ],
+      "type": "byte",
+      "values": [
         6,
         0
       ]
@@ -52183,14 +52686,23 @@
     {
       "addr": 1545,
       "bytes": [
-        13,
-        0,
-        2
+        13
       ],
       "binary_addr": 22457,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1546,
+      "bytes": [
+        0,
+        2
+      ],
+      "binary_addr": 22458,
+      "type": "byte",
+      "values": [
         0,
         2
       ]
@@ -52210,14 +52722,23 @@
     {
       "addr": 1552,
       "bytes": [
-        13,
-        12,
-        2
+        13
       ],
       "binary_addr": 22464,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1553,
+      "bytes": [
+        12,
+        2
+      ],
+      "binary_addr": 22465,
+      "type": "byte",
+      "values": [
         12,
         2
       ]
@@ -52240,14 +52761,23 @@
     {
       "addr": 1562,
       "bytes": [
-        13,
-        0,
-        4
+        13
       ],
       "binary_addr": 22474,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1563,
+      "bytes": [
+        0,
+        4
+      ],
+      "binary_addr": 22475,
+      "type": "byte",
+      "values": [
         0,
         4
       ]
@@ -52271,14 +52801,23 @@
     {
       "addr": 1573,
       "bytes": [
-        13,
-        0,
-        5
+        13
       ],
       "binary_addr": 22485,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1574,
+      "bytes": [
+        0,
+        5
+      ],
+      "binary_addr": 22486,
+      "type": "byte",
+      "values": [
         0,
         5
       ]
@@ -52306,14 +52845,23 @@
     {
       "addr": 1588,
       "bytes": [
-        13,
-        0,
-        6
+        13
       ],
       "binary_addr": 22500,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1589,
+      "bytes": [
+        0,
+        6
+      ],
+      "binary_addr": 22501,
+      "type": "byte",
+      "values": [
         0,
         6
       ]
@@ -52340,14 +52888,23 @@
     {
       "addr": 1602,
       "bytes": [
-        13,
-        0,
-        7
+        13
       ],
       "binary_addr": 22514,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1603,
+      "bytes": [
+        0,
+        7
+      ],
+      "binary_addr": 22515,
+      "type": "byte",
+      "values": [
         0,
         7
       ]
@@ -52372,14 +52929,23 @@
     {
       "addr": 1614,
       "bytes": [
-        13,
-        14,
-        4
+        13
       ],
       "binary_addr": 22526,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1615,
+      "bytes": [
+        14,
+        4
+      ],
+      "binary_addr": 22527,
+      "type": "byte",
+      "values": [
         14,
         4
       ]
@@ -52398,14 +52964,23 @@
     {
       "addr": 1620,
       "bytes": [
-        13,
-        14,
-        5
+        13
       ],
       "binary_addr": 22532,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1621,
+      "bytes": [
+        14,
+        5
+      ],
+      "binary_addr": 22533,
+      "type": "byte",
+      "values": [
         14,
         5
       ]
@@ -52424,14 +52999,23 @@
     {
       "addr": 1626,
       "bytes": [
-        13,
-        14,
-        6
+        13
       ],
       "binary_addr": 22538,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1627,
+      "bytes": [
+        14,
+        6
+      ],
+      "binary_addr": 22539,
+      "type": "byte",
+      "values": [
         14,
         6
       ]
@@ -52450,14 +53034,23 @@
     {
       "addr": 1632,
       "bytes": [
-        13,
-        14,
-        7
+        13
       ],
       "binary_addr": 22544,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1633,
+      "bytes": [
+        14,
+        7
+      ],
+      "binary_addr": 22545,
+      "type": "byte",
+      "values": [
         14,
         7
       ]
@@ -52476,14 +53069,23 @@
     {
       "addr": 1638,
       "bytes": [
-        13,
-        0,
-        9
+        13
       ],
       "binary_addr": 22550,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1639,
+      "bytes": [
+        0,
+        9
+      ],
+      "binary_addr": 22551,
+      "type": "byte",
+      "values": [
         0,
         9
       ]
@@ -52510,14 +53112,23 @@
     {
       "addr": 1652,
       "bytes": [
-        13,
-        0,
-        10
+        13
       ],
       "binary_addr": 22564,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1653,
+      "bytes": [
+        0,
+        10
+      ],
+      "binary_addr": 22565,
+      "type": "byte",
+      "values": [
         0,
         10
       ]
@@ -52542,14 +53153,23 @@
     {
       "addr": 1664,
       "bytes": [
-        13,
-        0,
         13
       ],
       "binary_addr": 22576,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1665,
+      "bytes": [
+        0,
+        13
+      ],
+      "binary_addr": 22577,
+      "type": "byte",
+      "values": [
         0,
         13
       ]
@@ -52583,14 +53203,23 @@
     {
       "addr": 1685,
       "bytes": [
-        13,
-        7,
-        15
+        13
       ],
       "binary_addr": 22597,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1686,
+      "bytes": [
+        7,
+        15
+      ],
+      "binary_addr": 22598,
+      "type": "byte",
+      "values": [
         7,
         15
       ]
@@ -52609,14 +53238,23 @@
     {
       "addr": 1691,
       "bytes": [
-        13,
-        3,
-        20
+        13
       ],
       "binary_addr": 22603,
       "type": "byte",
       "values": [
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 1692,
+      "bytes": [
+        3,
+        20
+      ],
+      "binary_addr": 22604,
+      "type": "byte",
+      "values": [
         3,
         20
       ]
@@ -52645,16 +53283,25 @@
     {
       "addr": 1707,
       "bytes": [
-        13,
+        13
+      ],
+      "binary_addr": 22619,
+      "type": "byte",
+      "values": [
+        13
+      ]
+    },
+    {
+      "addr": 1708,
+      "bytes": [
         0,
         13,
         169,
         99
       ],
-      "binary_addr": 22619,
+      "binary_addr": 22620,
       "type": "byte",
       "values": [
-        13,
         0,
         13,
         169,
@@ -72634,7 +73281,16 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&16"
+      "operand": "#<(treasure_envelope)",
+      "expr": {
+        "text": "<(treasure_envelope)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "treasure_envelope"
+          }
+        }
+      }
     },
     {
       "addr": 29545,
@@ -72644,7 +73300,16 @@
       ],
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&19"
+      "operand": "#>(treasure_envelope)",
+      "expr": {
+        "text": ">(treasure_envelope)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "treasure_envelope"
+          }
+        }
+      }
     },
     {
       "addr": 29547,
@@ -72684,7 +73349,16 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&24"
+      "operand": "#<(treasure_sound)",
+      "expr": {
+        "text": "<(treasure_sound)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "treasure_sound"
+          }
+        }
+      }
     },
     {
       "addr": 29554,
@@ -72694,7 +73368,16 @@
       ],
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&19"
+      "operand": "#>(treasure_sound)",
+      "expr": {
+        "text": ">(treasure_sound)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "treasure_sound"
+          }
+        }
+      }
     },
     {
       "addr": 29556,
@@ -73099,7 +73782,16 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&f8"
+      "operand": "#<(food_sound)",
+      "expr": {
+        "text": "<(food_sound)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "food_sound"
+          }
+        }
+      }
     },
     {
       "addr": 29621,
@@ -73109,7 +73801,16 @@
       ],
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&0b"
+      "operand": "#>(food_sound)",
+      "expr": {
+        "text": ">(food_sound)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "food_sound"
+          }
+        }
+      }
     },
     {
       "addr": 29623,
@@ -73379,7 +74080,16 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&f0"
+      "operand": "#<(teleport_sound)",
+      "expr": {
+        "text": "<(teleport_sound)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "teleport_sound"
+          }
+        }
+      }
     },
     {
       "addr": 29663,
@@ -73389,7 +74099,16 @@
       ],
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&0b"
+      "operand": "#>(teleport_sound)",
+      "expr": {
+        "text": ">(teleport_sound)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "teleport_sound"
+          }
+        }
+      }
     },
     {
       "addr": 29665,
@@ -74360,7 +75079,16 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&f0"
+      "operand": "#<(hit_sound)",
+      "expr": {
+        "text": "<(hit_sound)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "hit_sound"
+          }
+        }
+      }
     },
     {
       "addr": 29832,
@@ -74370,7 +75098,16 @@
       ],
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&0c"
+      "operand": "#>(hit_sound)",
+      "expr": {
+        "text": ">(hit_sound)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "hit_sound"
+          }
+        }
+      }
     },
     {
       "addr": 29834,
@@ -74560,7 +75297,16 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&2c"
+      "operand": "#<(pickup_envelope)",
+      "expr": {
+        "text": "<(pickup_envelope)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "pickup_envelope"
+          }
+        }
+      }
     },
     {
       "addr": 29861,
@@ -74570,7 +75316,16 @@
       ],
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&19"
+      "operand": "#>(pickup_envelope)",
+      "expr": {
+        "text": ">(pickup_envelope)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "pickup_envelope"
+          }
+        }
+      }
     },
     {
       "addr": 29863,
@@ -74610,7 +75365,16 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&3a"
+      "operand": "#<(pickup_sound)",
+      "expr": {
+        "text": "<(pickup_sound)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "pickup_sound"
+          }
+        }
+      }
     },
     {
       "addr": 29870,
@@ -74620,7 +75384,16 @@
       ],
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&19"
+      "operand": "#>(pickup_sound)",
+      "expr": {
+        "text": ">(pickup_sound)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "pickup_sound"
+          }
+        }
+      }
     },
     {
       "addr": 29872,
@@ -75865,7 +76638,16 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&f0"
+      "operand": "#<(hit_sound)",
+      "expr": {
+        "text": "<(hit_sound)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "hit_sound"
+          }
+        }
+      }
     },
     {
       "addr": 30082,
@@ -75875,7 +76657,16 @@
       ],
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&0c"
+      "operand": "#>(hit_sound)",
+      "expr": {
+        "text": ">(hit_sound)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "hit_sound"
+          }
+        }
+      }
     },
     {
       "addr": 30084,
@@ -76940,7 +77731,16 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#0"
+      "operand": "#<(magic_envelope)",
+      "expr": {
+        "text": "<(magic_envelope)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "magic_envelope"
+          }
+        }
+      }
     },
     {
       "addr": 30256,
@@ -76950,7 +77750,16 @@
       ],
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&19"
+      "operand": "#>(magic_envelope)",
+      "expr": {
+        "text": ">(magic_envelope)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "magic_envelope"
+          }
+        }
+      }
     },
     {
       "addr": 30258,
@@ -76990,7 +77799,16 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&0e"
+      "operand": "#<(magic_sound)",
+      "expr": {
+        "text": "<(magic_sound)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "magic_sound"
+          }
+        }
+      }
     },
     {
       "addr": 30265,
@@ -77000,7 +77818,16 @@
       ],
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&19"
+      "operand": "#>(magic_sound)",
+      "expr": {
+        "text": ">(magic_sound)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "magic_sound"
+          }
+        }
+      }
     },
     {
       "addr": 30267,

@@ -19,6 +19,7 @@ def annotate(a: Annotator) -> None:
     annotate_level_file(a)
     annotate_core_comments(a)
     annotate_sprites(a)
+    annotate_data(a)
 
 
 # ---------------------------------------------------------------------------
@@ -1475,3 +1476,85 @@ def annotate_sprites(a: Annotator) -> None:
             a.label(addr, label, length=size, group="sprites", description=(
                 f"Data of sprite {numbers}: {width} bytes x {height} rows."))
         a.byte(addr, size, cols=width)
+
+
+MENU_STRINGS = [
+    (0x0600, 7), (0x060A, 4), (0x0611, 7), (0x061B, 8), (0x0626, 12),
+    (0x0635, 11), (0x0643, 9), (0x064F, 3), (0x0655, 3), (0x065B, 3),
+    (0x0661, 3), (0x0667, 11), (0x0675, 9), (0x0681, 18), (0x0696, 3),
+    (0x069C, 13),
+]
+
+SOUND_BLOCKS = [
+    # (address, name, is_envelope, use)
+    (0x1900, "magic_envelope", True, "casting magic"),
+    (0x190E, "magic_sound", False, "casting magic"),
+    (0x1916, "treasure_envelope", True, "collecting treasure"),
+    (0x1924, "treasure_sound", False, "collecting treasure"),
+    (0x192C, "pickup_envelope", True, "collecting an item"),
+    (0x193A, "pickup_sound", False, "collecting an item"),
+    (0x1942, "key_envelope", True, "picking up a key"),
+    (0x1950, "key_sound", False, "picking up a key"),
+    (0x1958, "exit_envelope", True, "a hero going down the exit"),
+    (0x1966, "exit_sound", False, "a hero going down the exit"),
+    (0x0BF0, "teleport_sound", False, "teleporting"),
+    (0x0BF8, "food_sound", False, "eating food, and (with its pitch changed) "
+                                  "opening a door"),
+    (0x0CF0, "hit_sound", False, "a monster hit, and (louder) touching an "
+                                 "energy drainer"),
+]
+
+
+def annotate_data(a: Annotator) -> None:
+    # Menu text
+    a.label(0x0600, "menu_text", group="text", description=(
+        "The hero menu: sixteen strings, each a text column and row followed "
+        "by the characters and a carriage return. The YES/NO and ON/OFF "
+        "entries are rewritten as the players toggle them."))
+    a.banner(0x0600, "Hero menu text",
+             "Sixteen entries of: column, row, text, carriage return; printed "
+             "by print_menu.")
+    for addr, length in MENU_STRINGS:
+        a.byte(addr, 2)
+        a.string(addr + 2, length)
+        a.byte(addr + 2 + length, 1)
+
+    # The game-over message
+    a.banner(0x0F90, "Game-over message",
+             "Eleven lines of seventeen characters, each ended by a carriage "
+             "return, then a line feed and a last line ended by a zero byte. "
+             "Two bytes of it (&0FF1, &0FF2) double as counters, and are "
+             "overwritten with spaces before printing, so the full stop after "
+             "\"YOU ALL\" never appears.")
+    addr = 0x0F90
+    for _ in range(11):
+        a.string(addr, 17)
+        a.byte(addr + 17, 1)
+        addr += 18
+    a.byte(addr, 1)
+    a.string(addr + 1, 17)
+    a.byte(addr + 18, 1)
+
+    # Sound blocks
+    for addr, name, is_envelope, use in SOUND_BLOCKS:
+        kind = "OSWORD 8 (ENVELOPE)" if is_envelope else "OSWORD 7 (SOUND)"
+        length = 14 if is_envelope else 8
+        a.label(addr, name, length=length, group="sound", description=(
+            f"{kind} parameter block for {use}."))
+        a.byte(addr, length, cols=length if is_envelope else 2)
+
+    # Sprite tables
+    for addr in (0x1AE0, 0x1B58, 0x1BD0, 0x1C48):
+        a.byte(addr, 120, cols=8)
+    a.banner(0x1AE0, "Sprite tables",
+             "Four tables of 120 entries, indexed by sprite number: data "
+             "address low bytes, high bytes, widths in bytes and heights in "
+             "rows.")
+
+    # Workspace template
+    a.banner(0x7D00, "Workspace template",
+             "The starting contents of page &0D for each level, copied there "
+             "by reset_workspace: the heroes' starting positions, directions, "
+             "keys (hero_key_up etc. at +&70), health of 99 + 1 (at +&90, "
+             "+&95), the views' rooms (+&A0), sprite bases (+&B0, +&B5), bit "
+             "masks (+&C0) and panel rows (+&D0).")
