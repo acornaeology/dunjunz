@@ -1,0 +1,46 @@
+# fantasm project configuration. See https://acornaeology.github.io/fantasm/
+
+[project]
+name = "dunjunz"
+default_target = "dunjun7"
+
+[binary]
+cpu = "6502"
+
+# The resident game is four DFS files disassembled together by one driver
+# into one listing, which saves each file under its DFS name. Each file is a
+# target so that `fantasm verify --all` checks every one; the targets share
+# the driver, listing and JSON, and beebasm runs in fantasm's temporary
+# directory so the saved files never land in the repository.
+
+[[targets]]
+id = "dunjun4"
+binary = "versions/cbbcga-dunjunz/binary/Dunjun4"
+driver = "versions/cbbcga-dunjunz/disassemble/disasm_dunjunz_game.py"
+asm = "versions/cbbcga-dunjunz/output/dunjunz-game.asm"
+json = "versions/cbbcga-dunjunz/output/dunjunz-game.json"
+verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunjun4" }
+
+[[targets]]
+id = "dunjun7"
+binary = "versions/cbbcga-dunjunz/binary/Dunjun7"
+driver = "versions/cbbcga-dunjunz/disassemble/disasm_dunjunz_game.py"
+asm = "versions/cbbcga-dunjunz/output/dunjunz-game.asm"
+json = "versions/cbbcga-dunjunz/output/dunjunz-game.json"
+verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunjun7" }
+
+[[targets]]
+id = "dunjun5"
+binary = "versions/cbbcga-dunjunz/binary/Dunjun5"
+driver = "versions/cbbcga-dunjunz/disassemble/disasm_dunjunz_game.py"
+asm = "versions/cbbcga-dunjunz/output/dunjunz-game.asm"
+json = "versions/cbbcga-dunjunz/output/dunjunz-game.json"
+verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunjun5" }
+
+[[targets]]
+id = "dunjun6"
+binary = "versions/cbbcga-dunjunz/binary/Dunjun6"
+driver = "versions/cbbcga-dunjunz/disassemble/disasm_dunjunz_game.py"
+asm = "versions/cbbcga-dunjunz/output/dunjunz-game.asm"
+json = "versions/cbbcga-dunjunz/output/dunjunz-game.json"
+verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunjun6" }
