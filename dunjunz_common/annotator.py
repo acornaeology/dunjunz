@@ -17,8 +17,9 @@ import dasmos
 
 INLINE = dasmos.Align.INLINE
 
-# A placement is (move or None, label suffix).
-Placement = tuple[object, str]
+# A placement is (move or None, label suffix). A suffix of None places
+# comments, banners and entry points in that move but no labels.
+Placement = tuple[object, str | None]
 
 
 def identity_placements(addr: int) -> list[Placement]:
@@ -43,7 +44,7 @@ class Annotator:
 
     def entry(self, addr, name=None):
         for move, suffix in self._each(addr):
-            label = name + suffix if name else None
+            label = name + suffix if name and suffix is not None else None
             if move is None:
                 self.d.entry(addr, label)
             else:
@@ -53,6 +54,12 @@ class Annotator:
     def sub(self, addr, name, title, description="", on_entry=None, on_exit=None):
         """A routine: label, banner and code entry point."""
         for move, suffix in self._each(addr):
+            if suffix is None:
+                self.d.banner(addr, title=title, description=description,
+                              on_entry=on_entry, on_exit=on_exit, move=move)
+                with move:
+                    self.d.entry(addr)
+                continue
             self.d.subroutine(
                 addr, name + suffix, title=title, description=description,
                 on_entry=on_entry, on_exit=on_exit, move=move,
@@ -78,7 +85,8 @@ class Annotator:
             self.d.label(addr, name, **kwargs)
             return
         for move, suffix in self._each(addr):
-            self.d.label(addr, name + suffix, move=move, **kwargs)
+            if suffix is not None:
+                self.d.label(addr, name + suffix, move=move, **kwargs)
 
     def optional_label(self, addr, name, **kwargs):
         self.d.optional_label(addr, name, **kwargs)

@@ -56,17 +56,19 @@ for move in (low_keyboard, low_joystick):
     with move:
         for addr in LOW_ENTRIES:
             d.entry(addr)
-with low_joystick:
-    d.entry(0x0780)  # BYTEV handler installed by Coder in joystick mode
 
 d.entry(0x5000, "coder_start")
 
 
 def placements(addr):
     """Where runtime address addr lives in Dun1: which move(s), and the
-    suffix for labels in each (the joystick image's names end _joy)."""
+    suffix for labels in each (None for no labels)."""
     if 0x0400 <= addr < 0x0800:
-        return [(low_keyboard, ""), (low_joystick, "_joy")]
+        # Labels go in the keyboard image only: dasmos renders every label
+        # at a run address shared by two moves in the first move's section
+        # (acornaeology/dasmos#53). The joystick image gets the comments,
+        # banners and entry points.
+        return [(low_keyboard, ""), (low_joystick, None)]
     if 0x08C0 <= addr < 0x2000:
         return [(game_core, "")]
     return [(None, "")]
@@ -193,6 +195,135 @@ annotator.c(0x1EDE, "No: return")
 annotator.c(0x1EE0, "Paused: wait for P to be released...")
 annotator.c(0x1EE7, "...then pressed again")
 annotator.c(0x1EEE, "Restart the frame timing")
+
+for addr, text in [
+    (0x0D78, "..."), (0x0D81, "...from new_game's second instruction"),
+    (0x0E17, "..."), (0x0E18, "..."), (0x0E19, "..."), (0x0E1B, "..."),
+    (0x0EC5, "..."), (0x0EC7, "..."),
+    (0x1446, "Decrypt and check the level Coder loaded"),
+    (0x1449, "Bottom row &18 for clear_text_area's window"),
+    (0x144B, "..."), (0x144E, "Return"),
+    (0x1451, "..."), (0x1454, "..."), (0x1456, "..."), (0x1459, "..."),
+    (0x145B, "..."),
+    (0x1462, "..."), (0x1465, "..."), (0x1467, "..."), (0x146A, "..."),
+    (0x146C, "..."),
+    (0x1472, "First call (before the filing system): nothing to do"),
+    (0x1474, "Clear the screen"), (0x1476, "..."),
+    (0x1479, "*DISC"), (0x147B, "..."), (0x147D, "..."),
+    (0x1480, "*DUNJUNZ: run the loader again"), (0x1482, "..."),
+    (0x1484, "..."), (0x1487, "Return to the MOS"),
+    (0x15B1, "Clear the text area (Coder has shown the level number)"),
+    (0x15B4, "Return"),
+    (0x15B5, "First call (before the filing system): nothing to do"),
+    (0x15B7, "MODE 2"), (0x15B9, "..."), (0x15BC, "..."), (0x15BE, "..."),
+    (0x15C1, "*DISC"), (0x15C3, "..."), (0x15C5, "..."),
+    (0x15C8, "*RUN CODER"), (0x15CA, "..."), (0x15CC, "..."),
+    (0x15CF, "Return to the MOS"),
+    (0x1EE3, "..."), (0x1EE5, "..."), (0x1EEA, "..."), (0x1EEC, "..."),
+    (0x1EF0, "..."), (0x1EF3, "Return"),
+    (0x5004, "..."),
+    (0x500B, "..."), (0x500E, "..."), (0x5010, "..."),
+    (0x501E, "Units digit a space (levels 1-9)?"),
+    (0x5020, "Yes: advance the single digit"),
+    (0x5022, "No: advance the units digit..."), (0x5023, "..."),
+    (0x5025, "..."), (0x5028, "...past 9?"), (0x502A, "..."),
+    (0x502C, "Yes: units 0 and carry into the tens"), (0x502E, "..."),
+    (0x5031, "..."), (0x5034, "..."),
+    (0x5036, "Advance the single digit..."), (0x5039, "..."),
+    (0x503C, "...past 9?"), (0x503E, "..."),
+    (0x5040, "Yes: level 10, \"10\""), (0x5042, "..."), (0x5045, "..."),
+    (0x5047, "..."),
+    (0x504C, "..."), (0x504F, "..."), (0x5052, "..."), (0x5053, "..."),
+    (0x5055, "..."),
+    (0x5059, "..."), (0x505E, "..."), (0x5060, "..."),
+    (0x5066, "..."), (0x5069, "..."), (0x506C, "..."),
+    (0x5072, "...in &8E"),
+    (0x5077, "..."), (0x5078, "..."), (0x507A, "..."),
+    (0x507F, "..."), (0x5083, "..."), (0x5085, "..."),
+    (0x508D, "..."), (0x508F, "..."),
+    (0x5094, "..."),
+    (0x5099, "...destination pointer in sprite_width, sprite_height..."),
+    (0x509B, "..."), (0x509D, "..."),
+    (0x50A1, "...source pointer in plot_x, plot_y"),
+    (0x50A5, "..."),
+    (0x50AC, "..."), (0x50B0, "..."), (0x50B2, "..."), (0x50B6, "..."),
+    (0x50B8, "Copy a kilobyte, up to &0800..."),
+    (0x50BA, "..."), (0x50BC, "..."), (0x50BE, "..."), (0x50C0, "..."),
+    (0x50C2, "..."), (0x50C4, "..."), (0x50C6, "..."), (0x50C8, "..."),
+    (0x50CA, "..."), (0x50CC, "..."), (0x50CE, "..."),
+    (0x50D0, "Joystick at rest again?"),
+    (0x50D2, "..."), (0x50D7, "..."), (0x50D9, "No"),
+    (0x50DB, "Yes: point BYTEV at the joystick handler at &0780"),
+    (0x50DD, "..."), (0x50E0, "..."), (0x50E2, "..."),
+    (0x50E5, "COLOUR 2"), (0x50E7, "..."), (0x50EA, "..."), (0x50EC, "..."),
+    (0x50EF, "VDU commands to set up the screen for play"),
+    (0x50F1, "..."), (0x50F4, "..."), (0x50F7, "..."), (0x50F8, "..."),
+    (0x50FA, "..."),
+    (0x50FC, "First level?"),
+    (0x50FF, "..."), (0x5101, "No"),
+    (0x5103, "Yes: copy all of &3000-&473F to &08C0-&1FFF"),
+    (0x5105, "..."), (0x5107, "..."), (0x5109, "..."),
+    (0x510B, "No: copy only &3440-&473F to &0D00-&1FFF, keeping the "
+             "heroes' state in &08C0-&0CFF"),
+    (0x510D, "..."), (0x510F, "..."), (0x5111, "..."),
+    (0x5113, "Source = &3000 + offset..."), (0x5115, "..."),
+    (0x5117, "..."), (0x5119, "..."), (0x511A, "..."), (0x511C, "..."),
+    (0x511E, "...destination = &08C0 + offset"), (0x5120, "..."),
+    (0x5121, "..."), (0x5123, "..."), (0x5125, "..."), (0x5127, "..."),
+    (0x5129, "..."),
+    (0x512B, "Copy bytes up to &4740"),
+    (0x512D, "..."), (0x512F, "..."), (0x5131, "..."), (0x5133, "..."),
+    (0x5135, "..."), (0x5137, "..."), (0x5139, "..."), (0x513B, "..."),
+    (0x513D, "..."), (0x513F, "..."), (0x5141, "..."), (0x5143, "..."),
+    (0x5145, "..."), (0x5147, "..."),
+    (0x5149, "Start the game"),
+]:
+    annotator.c(addr, text)
+
+# The handler exists only in the joystick image. It is given a banner but no
+# label: dasmos renders every label at a run address shared by two moves in
+# the first move's section (acornaeology/dasmos#53).
+joystick_only = Annotator(d, "disc", lambda addr: [(low_joystick, None)])
+joystick_only.sub(
+    0x0780, "joystick_bytev", "BYTEV handler: read a joystick for the third player's keys",
+    "Installed by Coder, in the joystick image of &0400-&07FF only. Answers "
+    "OSBYTE &81 scans of the third player's keys from the analogue port: left "
+    "(&98) and right (&97) from channel 1 at its extremes, up (&B9) and down "
+    "(&99) from channel 2, and fire (&9D) from the fire buttons. Every other "
+    "call goes to the MOS 1.20 OSBYTE routine at &E772 directly.",
+    on_entry={"A": "OSBYTE number", "X": "OSBYTE X"},
+    on_exit={"X": "&FF if the key is pressed, 0 if not"})
+annotator.label(0xE772, "mos_osbyte_default", group="mos_internals",
+                description="MOS 1.20 default OSBYTE routine, BYTEV's initial value.")
+for addr, text in [
+    (0x0780, "OSBYTE &81 (INKEY)?"),
+    (0x0782, "No: pass it on"),
+    (0x0784, "Left key (>)?"), (0x0786, "..."),
+    (0x0788, "Down key (<)?"), (0x078A, "..."),
+    (0x078C, "Up key (K)?"), (0x078E, "..."),
+    (0x0790, "Right key (?)?"), (0x0792, "..."),
+    (0x0794, "Fire key (SPACE)?"), (0x0796, "..."),
+    (0x0798, "Another key: pass it on"),
+    (0x079B, "Left: channel 1 high byte &FF?"),
+    (0x079D, "..."), (0x07A2, "..."), (0x07A4, "No: not pressed"),
+    (0x07A6, "Yes: pressed"), (0x07A8, "Return"),
+    (0x07A9, "Right: channel 1 high byte 0?"),
+    (0x07AB, "..."), (0x07B0, "..."), (0x07B2, "No: not pressed"),
+    (0x07B4, "Yes: pressed (Y = &FF)"), (0x07B5, "..."), (0x07B7, "Return"),
+    (0x07B8, "Up: channel 2 high byte &FF?"),
+    (0x07BA, "..."), (0x07BF, "..."), (0x07C1, "No: not pressed"),
+    (0x07C3, "Yes: pressed"), (0x07C5, "Return"),
+    (0x07C6, "Down: channel 2 high byte 0?"),
+    (0x07C8, "..."), (0x07CD, "..."), (0x07CF, "No: not pressed"),
+    (0x07D1, "Yes: pressed (Y = &FF)"), (0x07D2, "..."), (0x07D4, "Return"),
+    (0x07D5, "Fire: either fire button?"),
+    (0x07D7, "..."), (0x07DC, "..."), (0x07DD, "..."),
+    (0x07DF, "No: not pressed"),
+    (0x07E1, "Yes: pressed"), (0x07E3, "..."), (0x07E5, "Return"),
+    (0x07E6, "Not pressed"), (0x07E8, "Return"),
+    (0x07E9, "Pass the call on to the MOS 1.20 OSBYTE routine"),
+]:
+    joystick_only.c(addr, text)
 
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)

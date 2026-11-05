@@ -96,7 +96,7 @@ mos_reset_entry          = &d9cd  ; MOS 1.20 reset entry, the target of the RESE
 ; &d9cd referenced 3 times by &3baf, &5231, &5631
 mos_oswrch_default       = &e0a4  ; MOS 1.20 default OSWRCH routine, WRCHV's initial value. The WRCHV handler jumps here directly instead of through the saved vector.
 ; &e0a4 referenced 2 times by &7fd7, &7ffc
-data_e772                = &e772
+mos_osbyte_default       = &e772  ; MOS 1.20 default OSBYTE routine, BYTEV's initial value.
 ; &e772 referenced 2 times by &5948, &5999
 system_via_t1c_l         = &fe44
 ; &fe44 referenced 3 times by &38fe, &7a6f, &7aac
@@ -649,7 +649,7 @@ hero_key_down = sub_0d72+2
     lda levels_started                  ; First level?
 ; &0d78 used as index base 1 time by &6ee7
 .hero_key_right
-    cmp #1
+    cmp #1                              ; ...
     beq code_0d7f                       ; ...
 ; &0d7c used as index base 1 time by &6efa
 .hero_key_left
@@ -659,7 +659,7 @@ hero_key_down = sub_0d72+2
 ; &34c0 used as index base 1 time by &6f0d
 hero_key_fire = code_0d7f+1
     lda #0                              ; Yes: start a new game
-    jmp code_0e08
+    jmp code_0e08                       ; ...from new_game's second instruction
     equs "eon5"
 .sub_0d88
 ; &34cf used as index base 1 time by &465c
@@ -727,10 +727,10 @@ data_0dff = sub_0ded+18
 ; &0e14 referenced 1 time by &34bc
 .level_loop
     lda levels_started                  ; Monster hit points = 6 + 2 x levels started...
-    asl a
-    clc
-    adc #6
-    sta monster_start_hit_points
+    asl a                               ; ...
+    clc                                 ; ...
+    adc #6                              ; ...
+    sta monster_start_hit_points        ; ...
     jmp code_0e57                       ; ...and play the level
     equb &ff, &16, &69, &01, &8d, &ff, &16, &d8
     equb &ad, &9f, &16, &c9, &09, &b0, &04, &a2
@@ -801,8 +801,8 @@ data_0dff = sub_0ded+18
     lda #osbyte_flush_buffer_class      ; Flush the input buffers
     jsr osbyte                          ; ...  Flush selected class of buffer
     ldx #&46 ; 'F'                      ; Wait up to &246 centiseconds for a key...
-    ldy #2
-    lda #osbyte_inkey
+    ldy #2                              ; ...
+    lda #osbyte_inkey                   ; ...
     jsr osbyte                          ; INKEY: Scan for a key with positive X, or read internal key number EOR 128 for negative X
     jmp restart_by_reset                ; ...then restart the game by resetting the machine
 ; ***************************************************************************************
@@ -1404,10 +1404,10 @@ data_12d4 = saved_wrchv+1
 ; by clear_text_area.
 ; &1446 referenced 1 time by &3b43
 .check_level
-    jsr decrypt_level
-    lda #&18
-    sta data_1625
-    rts
+    jsr decrypt_level                   ; Decrypt and check the level Coder loaded
+    lda #&18                            ; Bottom row &18 for clear_text_area's window
+    sta data_1625                       ; ...
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Restart the game by resetting the machine
 ;
@@ -1415,11 +1415,11 @@ data_12d4 = saved_wrchv+1
 ; &144f referenced 1 time by &360c
 .restart_by_reset
     lda #&72 ; 'r'                      ; BREAK intercept = JMP restart_intercept...
-    sta data_0288
-    lda #&14
-    sta data_0289
-    lda #&4c ; 'L'
-    sta os_break_intercept
+    sta data_0288                       ; ...
+    lda #&14                            ; ...
+    sta data_0289                       ; ...
+    lda #&4c ; 'L'                      ; ...
+    sta os_break_intercept              ; ...
     bne code_146f                       ; ...and reset (always branches)
 ; ***************************************************************************************
 ; Move on to the next level by resetting the machine
@@ -1428,11 +1428,11 @@ data_12d4 = saved_wrchv+1
 ; &1460 referenced 1 time by &3585
 .next_level_by_reset
     lda #&4c ; 'L'                      ; BREAK intercept = JMP next_level_intercept...
-    sta os_break_intercept
-    lda #&b5
-    sta data_0288
-    lda #&15
-    sta data_0289
+    sta os_break_intercept              ; ...
+    lda #&b5                            ; ...
+    sta data_0288                       ; ...
+    lda #&15                            ; ...
+    sta data_0289                       ; ...
 ; &146f referenced 1 time by &3b9e
 .code_146f
     jmp mos_reset_entry                 ; Reset the machine
@@ -1445,18 +1445,18 @@ data_12d4 = saved_wrchv+1
 ; On Entry:
 ;     C: set on the second call, after the filing system is initialised
 .restart_intercept
-    bcc return_4
-    lda #&0c
-    jsr oswrch
-    ldx #&89
-    ldy #&14
-    jsr oscli
-    ldx #&8e
-    ldy #&14
-    jsr oscli
+    bcc return_4                        ; First call (before the filing system): nothing to do
+    lda #&0c                            ; Clear the screen
+    jsr oswrch                          ; ...
+    ldx #&89                            ; *DISC
+    ldy #&14                            ; ...
+    jsr oscli                           ; ...
+    ldx #&8e                            ; *DUNJUNZ: run the loader again
+    ldy #&14                            ; ...
+    jsr oscli                           ; ...
 ; &1487 referenced 1 time by &3bb2
 .return_4
-    rts
+    rts                                 ; Return to the MOS
     equs "CDISC"
     equb &0d
     equs "DUNJUNZ"
@@ -1634,8 +1634,8 @@ data_12d4 = saved_wrchv+1
     rts                                 ; Return
 ; &15b1 referenced 1 time by &3b40
 .sub_15b1
-    jsr clear_text_area
-    rts
+    jsr clear_text_area                 ; Clear the text area (Coder has shown the level number)
+    rts                                 ; Return
 ; ***************************************************************************************
 ; BREAK intercept: run Coder for the next level
 ;
@@ -1645,20 +1645,20 @@ data_12d4 = saved_wrchv+1
 ; On Entry:
 ;     C: set on the second call, after the filing system is initialised
 .next_level_intercept
-    bcc return_5
-    lda #&16
-    jsr oswrch
-    lda #2
-    jsr oswrch
-    ldx #&e0
-    ldy #&15
-    jsr oscli
-    ldx #&e5
-    ldy #&15
-    jsr oscli
+    bcc return_5                        ; First call (before the filing system): nothing to do
+    lda #&16                            ; MODE 2
+    jsr oswrch                          ; ...
+    lda #2                              ; ...
+    jsr oswrch                          ; ...
+    ldx #&e0                            ; *DISC
+    ldy #&15                            ; ...
+    jsr oscli                           ; ...
+    ldx #&e5                            ; *RUN CODER
+    ldy #&15                            ; ...
+    jsr oscli                           ; ...
 ; &15cf referenced 1 time by &3cf5
 .return_5
-    rts
+    rts                                 ; Return to the MOS
     equb &f7, &ff, &a2, &e5, &a0, &15, &20, &f7
     equb &ff
     equs "`ODER"
@@ -2427,18 +2427,18 @@ data_1625 = sub_1624+1
 ; &1ee0 referenced 1 time by &4625
 .code_1ee0
     jsr osbyte                          ; Paused: wait for P to be released...  Scan keyboard from key 16
-    cpx #&37 ; '7'
-    beq code_1ee0
+    cpx #&37 ; '7'                      ; ...
+    beq code_1ee0                       ; ...
 ; &1ee7 referenced 1 time by &462c
 .code_1ee7
     jsr osbyte                          ; ...then pressed again  Scan keyboard from key 16
-    cpx #&37 ; '7'
-    bne code_1ee7
+    cpx #&37 ; '7'                      ; ...
+    bne code_1ee7                       ; ...
     lda #&10                            ; Restart the frame timing
-    sta os_vsync_counter
+    sta os_vsync_counter                ; ...
 ; &1ef3 referenced 1 time by &461e
 .return_6
-    rts
+    rts                                 ; Return
     equb &f9, &60, &00, &00, &00, &00, &00, &00
     equs "<<<<"
 ; ***************************************************************************************
@@ -2781,7 +2781,6 @@ data_213a = object_free_map+58
 ;     X: preserved
 ; &0400 referenced 1 time by &72b9
 .add_thousand_points
-.add_thousand_points_joy
     inc hero_score_thousands,x          ; Add one to the thousands digit
     lda hero_score_thousands,x          ; ...
     cmp #&28 ; '('                      ; Past 9?
@@ -2837,7 +2836,6 @@ data_213a = object_free_map+58
 ;     LEVEL_NUMBER: level loaded (1-25)
 ; &0450 referenced 1 time by &3b86
 .decrypt_level
-.decrypt_level_joy
     ldy #0                              ; Point at &6B00, the start of the level...
     sty plot_x                          ; ...low byte
     sty sprite_width                    ; Start the sum at zero
@@ -2890,7 +2888,6 @@ data_213a = object_free_map+58
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00
 .sprite_blank
-.sprite_blank_joy
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
@@ -2912,7 +2909,6 @@ data_213a = object_free_map+58
 ; playing.
 ; &0500 referenced 1 time by &3551
 .hero_menu
-.hero_menu_joy
     lda #&1c                            ; VDU 28: a text window over the left of the screen...
     jsr oswrch                          ; ...
     lda #0                              ; ...
@@ -2933,7 +2929,6 @@ data_213a = object_free_map+58
 ; Print the sixteen positioned strings of menu_text.
 ; &0524 referenced 6 times by &52ce, &5373, &53a0, &56ce, &5773, &57a0
 .print_menu
-.print_menu_joy
     ldx #&0f                            ; Fifteen strings, then one more by falling through
     ldy #0                              ; ...
 ; &0528 referenced 2 times by &52dc, &56dc
@@ -2954,7 +2949,6 @@ data_213a = object_free_map+58
 ;     Y: offset of the next string
 ; &052e referenced 2 times by &52d8, &56d8
 .print_menu_string
-.print_menu_string_joy
     lda #&1f                            ; VDU 31: move the text cursor...
     jsr oswrch                          ; ...
     lda menu_text,y                     ; ...to the string's column...
@@ -2980,7 +2974,6 @@ data_213a = object_free_map+58
 ;     Y: offset of the entry
 ; &054d referenced 2 times by &5370, &5770
 .set_menu_no
-.set_menu_no_joy
     lda #&4e ; 'N'                      ; "NO "
     sta menu_text,y                     ; ...
     lda #&4f ; 'O'                      ; ...
@@ -2997,7 +2990,6 @@ data_213a = object_free_map+58
 ;     Y: offset of the entry
 ; &055d referenced 2 times by &536a, &576a
 .set_menu_yes
-.set_menu_yes_joy
     lda #&59 ; 'Y'                      ; "YES"
     sta menu_text,y                     ; ...
     lda #&45 ; 'E'                      ; ...
@@ -3014,7 +3006,6 @@ data_213a = object_free_map+58
 ;     Y: offset of the entry's second character
 ; &056d referenced 2 times by &5394, &5794
 .set_menu_off
-.set_menu_off_joy
     lda #&46 ; 'F'                      ; "FF" after the O
     sta menu_text,y                     ; ...
     sta data_0601,y                     ; ...
@@ -3028,7 +3019,6 @@ data_213a = object_free_map+58
 ;     Y: offset of the entry's second character
 ; &0576 referenced 2 times by &538d, &578d
 .set_menu_on
-.set_menu_on_joy
     lda #&4e ; 'N'                      ; "N " after the O
     sta menu_text,y                     ; ...
     lda #&20 ; ' '                      ; ...
@@ -3036,7 +3026,6 @@ data_213a = object_free_map+58
     rts                                 ; Return
 ; &0581 referenced 12 times by &52d1, &5348, &534c, &5376, &5383, &53a3, &56d1, &5748, &574c, &5776, &5783, &57a3
 .menu_key_loop
-.menu_key_loop_joy
     lda #osbyte_flush_buffer_class      ; Flush the input buffers
     jsr osbyte                          ; ...  Flush selected class of buffer
     lda #osbyte_kbd_status              ; OSBYTE &CA: keyboard status &20, CAPS LOCK on and SHIFT LOCK off
@@ -3115,7 +3104,6 @@ data_213a = object_free_map+58
 ; Sixteen entries of: column, row, text, carriage return; printed by print_menu.
 ; &0600 used as index base 14 times by &52e3, &52ea, &52f1, &52ff, &530f, &531f, &5328, &56e3, &56ea, &56f1, &56ff, &570f, &571f, &5728
 .menu_text
-.menu_text_joy
 ; &53b1 used as index base 8 times by &5304, &5314, &5322, &532d, &5704, &5714, &5722, &572d
 data_0601 = menu_text+1
     equb &06, &00
@@ -3176,7 +3164,6 @@ data_0601 = menu_text+1
 ; of play, with a &64 entry in returning_hero_queue in their place.
 ; &06b0 referenced 1 time by &359d
 .remove_absent_heroes
-.remove_absent_heroes_joy
     ldx #0                              ; For each hero, keeping a count of absent heroes in Y...
     ldy #0                              ; ...
 ; &06b4 referenced 2 times by &54a3, &58a3
@@ -3658,75 +3645,90 @@ data_0601 = menu_text+1
     equb &ad, &12, &02, &8d, &77, &07, &ad, &13
     equb &02, &8d, &78, &07, &a9, &ff, &20, &00
     equb &30, &4c, &00, &20, &00, &00, &00, &00
-    cmp #&81
-    bne data_07e9
-    cpx #&98
-    beq data_079b
-    cpx #&99
-    beq data_07c6
-    cpx #&b9
-    beq data_07b8
-    cpx #&97
-    beq data_07a9
-    cpx #&9d
-    beq data_07d5
-    jmp data_e772
+; ***************************************************************************************
+; BYTEV handler: read a joystick for the third player's keys
+;
+; Installed by Coder, in the joystick image of &0400-&07FF only. Answers OSBYTE &81 scans
+; of the third player's keys from the analogue port: left (&98) and right (&97) from
+; channel 1 at its extremes, up (&B9) and down (&99) from channel 2, and fire (&9D) from
+; the fire buttons. Every other call goes to the MOS 1.20 OSBYTE routine at &E772
+; directly.
+;
+; On Entry:
+;     A: OSBYTE number
+;     X: OSBYTE X
+;
+; On Exit:
+;     X: &FF if the key is pressed, 0 if not
+    cmp #&81                            ; OSBYTE &81 (INKEY)?
+    bne data_07e9                       ; No: pass it on
+    cpx #&98                            ; Left key (>)?
+    beq data_079b                       ; ...
+    cpx #&99                            ; Down key (<)?
+    beq data_07c6                       ; ...
+    cpx #&b9                            ; Up key (K)?
+    beq data_07b8                       ; ...
+    cpx #&97                            ; Right key (?)?
+    beq data_07a9                       ; ...
+    cpx #&9d                            ; Fire key (SPACE)?
+    beq data_07d5                       ; ...
+    jmp mos_osbyte_default              ; Another key: pass it on
 ; &079b referenced 1 time by &5936
 .data_079b
-    ldx #1
-    lda #osbyte_read_adc_or_get_buffer_status
+    ldx #1                              ; Left: channel 1 high byte &FF?
+    lda #osbyte_read_adc_or_get_buffer_status  ; ...
     jsr osbyte                          ; Read ADC channel X or buffer status
-    cpy #&ff
-    bne data_07e6
-    ldx #&ff
-    rts
+    cpy #&ff                            ; ...
+    bne data_07e6                       ; No: not pressed
+    ldx #&ff                            ; Yes: pressed
+    rts                                 ; Return
 ; &07a9 referenced 1 time by &5942
 .data_07a9
-    ldx #1
-    lda #osbyte_read_adc_or_get_buffer_status
+    ldx #1                              ; Right: channel 1 high byte 0?
+    lda #osbyte_read_adc_or_get_buffer_status  ; ...
     jsr osbyte                          ; Read ADC channel X or buffer status
-    cpy #0
-    bne data_07e6
-    dey
-    ldx #&ff
-    rts
+    cpy #0                              ; ...
+    bne data_07e6                       ; No: not pressed
+    dey                                 ; Yes: pressed (Y = &FF)
+    ldx #&ff                            ; ...
+    rts                                 ; Return
 ; &07b8 referenced 1 time by &593e
 .data_07b8
-    ldx #2
-    lda #osbyte_read_adc_or_get_buffer_status
+    ldx #2                              ; Up: channel 2 high byte &FF?
+    lda #osbyte_read_adc_or_get_buffer_status  ; ...
     jsr osbyte                          ; Read ADC channel X or buffer status
-    cpy #&ff
-    bne data_07e6
-    ldx #&ff
-    rts
+    cpy #&ff                            ; ...
+    bne data_07e6                       ; No: not pressed
+    ldx #&ff                            ; Yes: pressed
+    rts                                 ; Return
 ; &07c6 referenced 1 time by &593a
 .data_07c6
-    ldx #2
-    lda #osbyte_read_adc_or_get_buffer_status
+    ldx #2                              ; Down: channel 2 high byte 0?
+    lda #osbyte_read_adc_or_get_buffer_status  ; ...
     jsr osbyte                          ; Read ADC channel X or buffer status
-    cpy #0
-    bne data_07e6
-    dey
-    ldx #&ff
-    rts
+    cpy #0                              ; ...
+    bne data_07e6                       ; No: not pressed
+    dey                                 ; Yes: pressed (Y = &FF)
+    ldx #&ff                            ; ...
+    rts                                 ; Return
 ; &07d5 referenced 1 time by &5946
 .data_07d5
-    ldx #0
-    lda #osbyte_read_adc_or_get_buffer_status
+    ldx #0                              ; Fire: either fire button?
+    lda #osbyte_read_adc_or_get_buffer_status  ; ...
     jsr osbyte                          ; Read ADC channel X or buffer status
-    txa
-    and #3
-    beq data_07e6
-    ldx #&ff
-    ldy #&ff
-    rts
+    txa                                 ; ...
+    and #3                              ; ...
+    beq data_07e6                       ; No: not pressed
+    ldx #&ff                            ; Yes: pressed
+    ldy #&ff                            ; ...
+    rts                                 ; Return
 ; &07e6 referenced 5 times by &5954, &5962, &5971, &597f, &598f
 .data_07e6
-    ldx #0
-    rts
+    ldx #0                              ; Not pressed
+    rts                                 ; Return
 ; &07e9 referenced 1 time by &5932
 .data_07e9
-    jmp data_e772
+    jmp mos_osbyte_default              ; Pass the call on to the MOS 1.20 OSBYTE routine
     equb &00, &00, &00, &00
     equs "Dun1"
     equb &0d, &00, &00, &00, &00, &00, &00, &00
@@ -5091,188 +5093,188 @@ data_0601 = menu_text+1
 .coder_start
     lda #osbyte_escape_break_effect     ; OSBYTE &C8: set the ESCAPE and BREAK effect...
     ldx #1                              ; ...with X = 1: ESCAPE disabled
-    ldy #0
+    ldy #0                              ; ...
     jsr osbyte                          ; osbyte: escape break effect
     lda #6                              ; VDU 6, 3: enable the screen, disable the printer
-    jsr oswrch
-    lda #3
-    jsr oswrch
+    jsr oswrch                          ; ...
+    lda #3                              ; ...
+    jsr oswrch                          ; ...
     lda #0                              ; Cancel the BREAK intercept
     sta os_break_intercept              ; ...
     inc levels_started                  ; Count the level
     lda data_08be                       ; Advance the ASCII level number...
-    cmp #&20 ; ' '
-    beq code_5036
-    clc
-    adc #1
-    sta data_08be
-    cmp #&3a ; ':'
-    bcc code_504a
-    lda #&30 ; '0'
-    sta data_08be
-    inc level_digits
-    bne code_504a
+    cmp #&20 ; ' '                      ; Units digit a space (levels 1-9)?
+    beq code_5036                       ; Yes: advance the single digit
+    clc                                 ; No: advance the units digit...
+    adc #1                              ; ...
+    sta data_08be                       ; ...
+    cmp #&3a ; ':'                      ; ...past 9?
+    bcc code_504a                       ; ...
+    lda #&30 ; '0'                      ; Yes: units 0 and carry into the tens
+    sta data_08be                       ; ...
+    inc level_digits                    ; ...
+    bne code_504a                       ; ...
 ; &5036 referenced 1 time by &5020
 .code_5036
-    inc level_digits
-    lda level_digits
-    cmp #&3a ; ':'
-    bcc code_504a
-    lda #&31 ; '1'
-    sta level_digits
-    lda #&30 ; '0'
-    sta data_08be
+    inc level_digits                    ; Advance the single digit...
+    lda level_digits                    ; ...
+    cmp #&3a ; ':'                      ; ...past 9?
+    bcc code_504a                       ; ...
+    lda #&31 ; '1'                      ; Yes: level 10, "10"
+    sta level_digits                    ; ...
+    lda #&30 ; '0'                      ; ...
+    sta data_08be                       ; ...
 ; &504a referenced 3 times by &502a, &5034, &503e
 .code_504a
     ldx #0                              ; VDU 23 commands that set up the 6845 for loading
 ; &504c referenced 1 time by &5055
 .loop_504c
-    lda data_5179,x
-    jsr oswrch
-    inx
-    cpx #&15
-    bne loop_504c
+    lda data_5179,x                     ; ...
+    jsr oswrch                          ; ...
+    inx                                 ; ...
+    cpx #&15                            ; ...
+    bne loop_504c                       ; ...
     lda #&15                            ; VDU 21: disable the screen...
-    jsr oswrch
+    jsr oswrch                          ; ...
     ldx #&5d ; ']'                      ; ...and reload Dun1
-    ldy #&51 ; 'Q'
-    jsr oscli
+    ldy #&51 ; 'Q'                      ; ...
+    jsr oscli                           ; ...
     lda level_digits                    ; Put the level number's digits in level_command
-    sta level_command_digits
-    lda data_08be
-    sta data_5172
+    sta level_command_digits            ; ...
+    lda data_08be                       ; ...
+    sta data_5172                       ; ...
     lda levels_started                  ; Leave the level count in level_count_copy for game_entry
-    sta victory_steps_left
+    sta victory_steps_left              ; ...in &8E
     lda levels_started                  ; level_number = levels started - 1 (game_entry counts it again)
-    sec
-    sbc #1
-    sta level_number
+    sec                                 ; ...
+    sbc #1                              ; ...
+    sta level_number                    ; ...
     cmp #&18                            ; Level 25?
-    bne code_508b
+    bne code_508b                       ; ...
     ldx #&4c ; 'L'                      ; Yes: load Stones, which ends with level 25...
-    ldy #&51 ; 'Q'
-    jsr oscli
+    ldy #&51 ; 'Q'                      ; ...
+    jsr oscli                           ; ...
     jmp code_5092                       ; ...
 ; &508b referenced 1 time by &507f
 .code_508b
     ldx #&67 ; 'g'                      ; No: load LEVELnn
-    ldy #&51 ; 'Q'
-    jsr oscli
+    ldy #&51 ; 'Q'                      ; ...
+    jsr oscli                           ; ...
 ; &5092 referenced 1 time by &5088
 .code_5092
     lda #6                              ; VDU 6: enable the screen
-    jsr oswrch
+    jsr oswrch                          ; ...
     lda #0                              ; Copy to &0400...
-    sta sprite_width
-    lda #4
-    sta sprite_height
+    sta sprite_width                    ; ...destination pointer in sprite_width, sprite_height...
+    lda #4                              ; ...
+    sta sprite_height                   ; ...
     lda #&b0                            ; ...from &51B0 or &55B0
-    sta plot_x
+    sta plot_x                          ; ...source pointer in plot_x, plot_y
     lda #osbyte_read_adc_or_get_buffer_status  ; Read the joystick's horizontal channel
-    ldx #1
+    ldx #1                              ; ...
     jsr osbyte                          ; Read ADC channel X or buffer status
     cpy #&80                            ; High byte &80 (a joystick at rest?)...
-    bne code_50b4
+    bne code_50b4                       ; ...
     lda #&55 ; 'U'                      ; ...yes: copy the image with the joystick handler, at &55B0
-    sta plot_y
-    bne code_50b8
+    sta plot_y                          ; ...
+    bne code_50b8                       ; ...
 ; &50b4 referenced 1 time by &50ac
 .code_50b4
     lda #&51 ; 'Q'                      ; ...no: copy the keyboard-only image at &51B0
-    sta plot_y
+    sta plot_y                          ; ...
 ; &50b8 referenced 1 time by &50b2
 .code_50b8
-    ldy #0
+    ldy #0                              ; Copy a kilobyte, up to &0800...
 ; &50ba referenced 1 time by &50ce
 .loop_50ba
-    lda (plot_x),y
-    sta (sprite_width),y
-    inc sprite_width
-    bne code_50c4
-    inc sprite_height
+    lda (plot_x),y                      ; ...
+    sta (sprite_width),y                ; ...
+    inc sprite_width                    ; ...
+    bne code_50c4                       ; ...
+    inc sprite_height                   ; ...
 ; &50c4 referenced 1 time by &50c0
 .code_50c4
-    inc plot_x
-    bne code_50ca
-    inc plot_y
+    inc plot_x                          ; ...
+    bne code_50ca                       ; ...
+    inc plot_y                          ; ...
 ; &50ca referenced 1 time by &50c6
 .code_50ca
-    lda sprite_height
-    cmp #8
-    bne loop_50ba
-    lda #osbyte_read_adc_or_get_buffer_status
-    ldx #1
+    lda sprite_height                   ; ...
+    cmp #8                              ; ...
+    bne loop_50ba                       ; ...
+    lda #osbyte_read_adc_or_get_buffer_status  ; Joystick at rest again?
+    ldx #1                              ; ...
     jsr osbyte                          ; Read ADC channel X or buffer status
-    cpy #&80
-    bne code_50e5
-    lda #&80
-    sta bytev
-    lda #7
-    sta bytev + 1
+    cpy #&80                            ; ...
+    bne code_50e5                       ; No
+    lda #&80                            ; Yes: point BYTEV at the joystick handler at &0780
+    sta bytev                           ; ...
+    lda #7                              ; ...
+    sta bytev + 1                       ; ...
 ; &50e5 referenced 1 time by &50d9
 .code_50e5
-    lda #&11
-    jsr oswrch
-    lda #2
-    jsr oswrch
-    ldx #0
+    lda #&11                            ; COLOUR 2
+    jsr oswrch                          ; ...
+    lda #2                              ; ...
+    jsr oswrch                          ; ...
+    ldx #0                              ; VDU commands to set up the screen for play
 ; &50f1 referenced 1 time by &50fa
 .loop_50f1
-    lda data_518e,x
-    jsr oswrch
-    inx
-    cpx #&14
-    bne loop_50f1
-    lda levels_started
-    cmp #2
-    bcs code_510b
-    lda #0
-    sta ring_x
-    sta ring_y
-    beq code_5113
+    lda data_518e,x                     ; ...
+    jsr oswrch                          ; ...
+    inx                                 ; ...
+    cpx #&14                            ; ...
+    bne loop_50f1                       ; ...
+    lda levels_started                  ; First level?
+    cmp #2                              ; ...
+    bcs code_510b                       ; No
+    lda #0                              ; Yes: copy all of &3000-&473F to &08C0-&1FFF
+    sta ring_x                          ; ...
+    sta ring_y                          ; ...
+    beq code_5113                       ; ...
 ; &510b referenced 1 time by &5101
 .code_510b
-    lda #&40 ; '@'
-    sta ring_x
-    lda #4
-    sta ring_y
+    lda #&40 ; '@'                      ; No: copy only &3440-&473F to &0D00-&1FFF, keeping the heroes' state in &08C0-&0CFF
+    sta ring_x                          ; ...
+    lda #4                              ; ...
+    sta ring_y                          ; ...
 ; &5113 referenced 1 time by &5109
 .code_5113
-    lda ring_x
-    sta plot_x
-    lda #&30 ; '0'
-    clc
-    adc ring_y
-    sta plot_y
-    lda #&c0
-    clc
-    adc ring_x
-    sta sprite_width
-    lda #8
-    adc ring_y
-    sta sprite_height
-    ldy #0
+    lda ring_x                          ; Source = &3000 + offset...
+    sta plot_x                          ; ...
+    lda #&30 ; '0'                      ; ...
+    clc                                 ; ...
+    adc ring_y                          ; ...
+    sta plot_y                          ; ...
+    lda #&c0                            ; ...destination = &08C0 + offset
+    clc                                 ; ...
+    adc ring_x                          ; ...
+    sta sprite_width                    ; ...
+    lda #8                              ; ...
+    adc ring_y                          ; ...
+    sta sprite_height                   ; ...
+    ldy #0                              ; Copy bytes up to &4740
 ; &512d referenced 2 times by &5141, &5147
 .code_512d
-    lda (plot_x),y
-    sta (sprite_width),y
-    inc plot_x
-    bne code_5137
-    inc plot_y
+    lda (plot_x),y                      ; ...
+    sta (sprite_width),y                ; ...
+    inc plot_x                          ; ...
+    bne code_5137                       ; ...
+    inc plot_y                          ; ...
 ; &5137 referenced 1 time by &5133
 .code_5137
-    inc sprite_width
-    bne code_513d
-    inc sprite_height
+    inc sprite_width                    ; ...
+    bne code_513d                       ; ...
+    inc sprite_height                   ; ...
 ; &513d referenced 1 time by &5139
 .code_513d
-    lda plot_x
-    cmp #&40 ; '@'
-    bne code_512d
-    lda plot_y
-    cmp #&47 ; 'G'
-    bne code_512d
-    jmp game_entry
+    lda plot_x                          ; ...
+    cmp #&40 ; '@'                      ; ...
+    bne code_512d                       ; ...
+    lda plot_y                          ; ...
+    cmp #&47 ; 'G'                      ; ...
+    bne code_512d                       ; ...
+    jmp game_entry                      ; Start the game
 .stones_command
     equs "LOAD STONES 6680"
     equb &0d
@@ -8648,11 +8650,9 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     monster_offset_x:           15
 ;     osword:                     15
 ;     menu_text:                  14
-;     menu_text_joy:              14
 ;     hero_step:                  13
 ;     screen_ptr:                 13
 ;     menu_key_loop:              12
-;     menu_key_loop_joy:          12
 ;     missile_direction:          12
 ;     plot_victory_sprite:        12
 ;     ring_x:                     12
@@ -8691,7 +8691,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     missile_x:                   6
 ;     missile_y:                   6
 ;     print_menu:                  6
-;     print_menu_joy:              6
 ;     scratch2:                    6
 ;     test_key:                    6
 ;     victory_sprite:              6
@@ -8828,7 +8827,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_12d4:                   2
 ;     data_7e23:                   2
 ;     data_7e4c:                   2
-;     data_e772:                   2
 ;     door_sprite:                 2
 ;     draw_hero:                   2
 ;     draw_missile_damage:         2
@@ -8843,6 +8841,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     get_hero_cell:               2
 ;     level_checksums:             2
 ;     missile_spent_pop:           2
+;     mos_osbyte_default:          2
 ;     mos_oswrch_default:          2
 ;     next_missile:                2
 ;     play_pickup_sound:           2
@@ -8851,7 +8850,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     previous_offset_x:           2
 ;     previous_offset_y:           2
 ;     print_menu_string:           2
-;     print_menu_string_joy:       2
 ;     read_hero_keys:              2
 ;     reset_hero:                  2
 ;     return_13:                   2
@@ -8859,13 +8857,9 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     row_start_ptr_hi:            2
 ;     saved_wrchv:                 2
 ;     set_menu_no:                 2
-;     set_menu_no_joy:             2
 ;     set_menu_off:                2
-;     set_menu_off_joy:            2
 ;     set_menu_on:                 2
-;     set_menu_on_joy:             2
 ;     set_menu_yes:                2
-;     set_menu_yes_joy:            2
 ;     show_hero_room:              2
 ;     shrunk_hero:                 2
 ;     sprite_data_ptr_hi:          2
@@ -8873,7 +8867,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     trapdoor_x:                  2
 ;     trapdoor_y:                  2
 ;     add_thousand_points:         1
-;     add_thousand_points_joy:     1
 ;     advance_dying_monster:       1
 ;     animate_absent_hero:         1
 ;     bytev:                       1
@@ -9102,7 +9095,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_fffc:                   1
 ;     data_fffd:                   1
 ;     decrypt_level:               1
-;     decrypt_level_joy:           1
 ;     dissolve_chalice:            1
 ;     draw_all_views:              1
 ;     draw_armour_rating:          1
@@ -9137,7 +9129,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     hero_key_up:                 1
 ;     hero_magic_key:              1
 ;     hero_menu:                   1
-;     hero_menu_joy:               1
 ;     hero_missile_sprites:        1
 ;     hero_start_damage_taken:     1
 ;     hero_start_max_missiles:     1
@@ -9193,7 +9184,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     object_free_map:             1
 ;     plot_boots_icon:             1
 ;     remove_absent_heroes:        1
-;     remove_absent_heroes_joy:    1
 ;     reset_call_address:          1
 ;     reset_monsters:              1
 ;     reset_workspace:             1
@@ -9519,7 +9509,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_7dd0
 ;     data_7e23
 ;     data_7e4c
-;     data_e772
 ;     data_fffc
 ;     data_fffd
 ;     loop_504c

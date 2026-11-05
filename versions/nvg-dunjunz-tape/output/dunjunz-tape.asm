@@ -206,40 +206,40 @@ data_fffd             = &fffd
 ; level_command, and jump to the moved copy of load_level_from_copy.
 ; &0450 referenced 1 time by &1459
 .save_game_pages
-    lda level_filename_digits
-    pha
-    lda data_16d6
-    pha
-    ldy #0
+    lda level_filename_digits           ; Keep the level number's digits, which are about to be cleared...
+    pha                                 ; ...
+    lda data_16d6                       ; ...
+    pha                                 ; ...
+    ldy #0                              ; Copy pages &0E-&18 to &4E-&58, clearing the originals
 ; &045a referenced 2 times by &0468, &0478
 .code_045a
 ; &045c referenced 3 times by &046a, &0473, &1448
 data_045c = code_045a+2
-    lda code_0e00,y
-    pha
-    lda #0
+    lda code_0e00,y                     ; ...
+    pha                                 ; ...
+    lda #0                              ; ...
 .sub_0460
 ; &0462 referenced 2 times by &046d, &144b
 data_0462 = sub_0460+2
-    sta code_0e00,y
-    pla
+    sta code_0e00,y                     ; ...
+    pla                                 ; ...
 .sub_0464
 ; &0466 referenced 2 times by &0470, &1453
 data_0466 = sub_0464+2
-    sta data_4e00,y
-    iny
-    bne code_045a
-    inc data_045c
-    inc data_0462
-    inc data_0466
-    lda data_045c
-    cmp #&19
-    bne code_045a
-    pla
-    sta data_549b
-    pla
-    sta data_549a
-    jmp data_545c
+    sta data_4e00,y                     ; ...
+    iny                                 ; ...
+    bne code_045a                       ; ...
+    inc data_045c                       ; Next page: advance the three page operands
+    inc data_0462                       ; ...
+    inc data_0466                       ; ...
+    lda data_045c                       ; Until page &19
+    cmp #&19                            ; ...
+    bne code_045a                       ; ...
+    pla                                 ; Put the digits into the moved copy of level_command
+    sta data_549b                       ; ...
+    pla                                 ; ...
+    sta data_549a                       ; ...
+    jmp data_545c                       ; Continue in the moved copy of load_level_from_copy
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &62, &cd, &0c, &44
     equb &1a, &22, &f6
@@ -1214,9 +1214,9 @@ data_0dff = sub_0ded+18
     equb &1e, &fd, &00
 ; &0e00 referenced 3 times by &0d6b, &0ecc, &5035; also used as index base 3 times by &045a, &0460, &1476
 .code_0e00
-    jsr first_level
-    lda #0
-    sta level_number
+    jsr first_level                     ; New game: level_bcd = the level before the first played
+    lda #0                              ; level_number = 0
+    sta level_number                    ; ...
     tax                                 ; Give each hero their starting attributes
 ; &0e09 referenced 1 time by &0e0f
 .loop_0e09
@@ -1928,14 +1928,14 @@ data_12d4 = saved_wrchv+1
 ; load_level_from_copy).
 ; &1446 referenced 1 time by &1403
 .load_level
-    lda #&0e
-    sta data_045c
-    sta data_0462
-    sta data_1478
-    lda #&4e ; 'N'
-    sta data_0466
-    sta data_1475
-    jmp save_game_pages
+    lda #&0e                            ; Reset the page numbers of the copy loops below to &0E and &4E...
+    sta data_045c                       ; ...
+    sta data_0462                       ; ...
+    sta data_1478                       ; ...(in the copy at &545C)
+    lda #&4e ; 'N'                      ; ...
+    sta data_0466                       ; ...
+    sta data_1475                       ; ...(in the copy at &545C)
+    jmp save_game_pages                 ; ...and move the game out of the way
 ; ***************************************************************************************
 ; Load a level, running from the copy at &545C
 ;
@@ -1943,33 +1943,33 @@ data_12d4 = saved_wrchv+1
 ; of the copy. Select the disc filing system, *LOAD the level, reselect *TAPE, and copy
 ; pages &4E-&58 back to &0E-&18 before returning to start_level.
 .load_level_from_copy
-    ldx #&9d
-    ldy #&54 ; 'T'
-    jsr oscli
-    ldx #&95
-    ldy #&54 ; 'T'
-    jsr oscli
-    lda #osbyte_tape
-    ldx #&0c
-    jsr osbyte                          ; *TAPE: select cassette filing system
-    ldy #0
+    ldx #&9d                            ; *D. (*DISC), from the moved copy of the command at &149D
+    ldy #&54 ; 'T'                      ; ...
+    jsr oscli                           ; ...
+    ldx #&95                            ; *L.$.Ln (*LOAD), from the moved copy of level_command
+    ldy #&54 ; 'T'                      ; ...
+    jsr oscli                           ; ...
+    lda #osbyte_tape                    ; OSBYTE &8C: back to *TAPE...
+    ldx #&0c                            ; ...at 1200 baud
+    jsr osbyte                          ; ...  *TAPE: select cassette filing system
+    ldy #0                              ; Copy pages &4E-&58 back to &0E-&18
 ; &1473 referenced 2 times by &147a, &1487
 .code_1473
 ; &1475 referenced 1 time by &1456
 data_1475 = code_1473+2
-    lda data_4e00,y
+    lda data_4e00,y                     ; ...
 .sub_1476
 ; &1478 referenced 1 time by &144e
 data_1478 = sub_1476+2
-    sta code_0e00,y
-    iny
-    bne code_1473
-    inc data_5475
-    inc data_5478
-    lda data_5478
-    cmp #&19
-    bne code_1473
-    rts
+    sta code_0e00,y                     ; ...
+    iny                                 ; ...
+    bne code_1473                       ; ...
+    inc data_5475                       ; Next page: advance the page operands (in this copy)
+    inc data_5478                       ; ...
+    lda data_5478                       ; Until page &19
+    cmp #&19                            ; ...
+    bne code_1473                       ; ...
+    rts                                 ; Return to start_level
     equb &60
 ; ***************************************************************************************
 ; Set the starting level
@@ -4359,7 +4359,7 @@ data_213a = sub_212f+11
 ; from &2400-&4FFF down to &0400-&2FFF, point WRCHV at wrch_handler and start a new game.
 .start
     jsr select_tape_and_cheat           ; Select *TAPE and apply the cheat
-    nop
+    nop                                 ; (unused)
     lda #4                              ; Destination &0400...
     sta plot_y                          ; ...
     lda #&24 ; '$'                      ; ...source &2400 (both low bytes 0)

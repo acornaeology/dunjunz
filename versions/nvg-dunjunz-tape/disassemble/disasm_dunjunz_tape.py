@@ -146,6 +146,45 @@ annotator.sub(0x145C, "load_level_from_copy", "Load a level, running from the co
               "system, *LOAD the level, reselect *TAPE, and copy pages &4E-&58 "
               "back to &0E-&18 before returning to start_level.")
 
+for addr, text in [
+    (0x5003, "(unused)"),
+    (0x0E00, "New game: level_bcd = the level before the first played"),
+    (0x0E03, "level_number = 0"),
+    (0x0E05, "..."),
+    (0x1446, "Reset the page numbers of the copy loops below to &0E and "
+             "&4E..."),
+    (0x1448, "..."), (0x144B, "..."), (0x144E, "...(in the copy at &545C)"),
+    (0x1451, "..."), (0x1453, "..."), (0x1456, "...(in the copy at &545C)"),
+    (0x1459, "...and move the game out of the way"),
+    (0x0450, "Keep the level number's digits, which are about to be "
+             "cleared..."),
+    (0x0453, "..."), (0x0454, "..."), (0x0457, "..."),
+    (0x0458, "Copy pages &0E-&18 to &4E-&58, clearing the originals"),
+    (0x045A, "..."), (0x045D, "..."), (0x045E, "..."), (0x0460, "..."),
+    (0x0463, "..."), (0x0464, "..."), (0x0467, "..."), (0x0468, "..."),
+    (0x046A, "Next page: advance the three page operands"),
+    (0x046D, "..."), (0x0470, "..."),
+    (0x0473, "Until page &19"),
+    (0x0476, "..."), (0x0478, "..."),
+    (0x047A, "Put the digits into the moved copy of level_command"),
+    (0x047B, "..."), (0x047E, "..."), (0x047F, "..."),
+    (0x0482, "Continue in the moved copy of load_level_from_copy"),
+    (0x145C, "*D. (*DISC), from the moved copy of the command at &149D"),
+    (0x145E, "..."), (0x1460, "..."),
+    (0x1463, "*L.$.Ln (*LOAD), from the moved copy of level_command"),
+    (0x1465, "..."), (0x1467, "..."),
+    (0x146A, "OSBYTE &8C: back to *TAPE..."),
+    (0x146C, "...at 1200 baud"),
+    (0x146E, "..."),
+    (0x1471, "Copy pages &4E-&58 back to &0E-&18"),
+    (0x1473, "..."), (0x1476, "..."), (0x1479, "..."), (0x147A, "..."),
+    (0x147C, "Next page: advance the page operands (in this copy)"),
+    (0x147F, "..."), (0x1482, "Until page &19"), (0x1485, "..."),
+    (0x1487, "..."),
+    (0x1489, "Return to start_level"),
+]:
+    annotator.c(addr, text)
+
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)
 asm_filepath.write_text(str(ir.render(MultiFileBeebasmRenderer(

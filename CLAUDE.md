@@ -86,6 +86,11 @@ feature or defect met along the way, and note the workaround here.
   dasmos move over that overlap breaks reassembly (acornaeology/dasmos#51,
   #52), so the tape driver loads the image at its run address and emits a
   `copyblock` before saving.
+- The official disc's two &0400-&07FF images are two moves to one run
+  address. dasmos renders every label at such an address in the first
+  move's section (acornaeology/dasmos#53), so labels go only in the
+  keyboard image; the joystick image gets comments, banners and entries
+  (placement suffix None in `dunjunz_common.annotator`).
 - Synthesised offset bases inside data are named `sub_XXXX`; they are not
   subroutines (acornaeology/dasmos#50). Declaring the data removes them.
 - No execution coverage in beebium: `tools/coverage.py` uses range

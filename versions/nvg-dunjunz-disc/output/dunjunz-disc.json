@@ -206,19 +206,6 @@
       }
     },
     {
-      "addr": 1024,
-      "binary_addr": 21936,
-      "name": "add_thousand_points_joy",
-      "title": "Add 1000 to a hero's score",
-      "description": "Advance the thousands digit of hero X's score. When it passes 9 it goes back to 0 and the ten-thousands digit, kept separately as one of the small digit sprites, goes up (to at most 9); that digit is then drawn below the score, with four further small sprites beside it.",
-      "on_entry": {
-        "X": "hero number (0-3)"
-      },
-      "on_exit": {
-        "X": "preserved"
-      }
-    },
-    {
       "addr": 3791,
       "binary_addr": 13839,
       "name": "reset_hero",
@@ -322,13 +309,6 @@
       "description": "Clear the left of the screen, print the menu and let the players toggle each hero (keys 1-4) and the sound (5 on, 6 off). SPACE starts the game if at least one hero is playing."
     },
     {
-      "addr": 1280,
-      "binary_addr": 22192,
-      "name": "hero_menu_joy",
-      "title": "Choose the heroes and the sound",
-      "description": "Clear the left of the screen, print the menu and let the players toggle each hero (keys 1-4) and the sound (5 on, 6 off). SPACE starts the game if at least one hero is playing."
-    },
-    {
       "addr": 1316,
       "binary_addr": 21204,
       "name": "print_menu",
@@ -337,30 +317,9 @@
       "fall_through": true
     },
     {
-      "addr": 1316,
-      "binary_addr": 22228,
-      "name": "print_menu_joy",
-      "title": "Print the menu text",
-      "description": "Print the sixteen positioned strings of menu_text.",
-      "fall_through": true
-    },
-    {
       "addr": 1326,
       "binary_addr": 21214,
       "name": "print_menu_string",
-      "title": "Print one menu string",
-      "description": "Move the text cursor to the column and row in the two bytes at menu_text+Y, then print the following characters up to and including a carriage return.",
-      "on_entry": {
-        "Y": "offset of the string in menu_text"
-      },
-      "on_exit": {
-        "Y": "offset of the next string"
-      }
-    },
-    {
-      "addr": 1326,
-      "binary_addr": 22238,
-      "name": "print_menu_string_joy",
       "title": "Print one menu string",
       "description": "Move the text cursor to the column and row in the two bytes at menu_text+Y, then print the following characters up to and including a carriage return.",
       "on_entry": {
@@ -381,29 +340,9 @@
       }
     },
     {
-      "addr": 1357,
-      "binary_addr": 22269,
-      "name": "set_menu_no_joy",
-      "title": "Change a menu entry to NO",
-      "description": "Write \"NO \" at menu_text+Y.",
-      "on_entry": {
-        "Y": "offset of the entry"
-      }
-    },
-    {
       "addr": 1373,
       "binary_addr": 21261,
       "name": "set_menu_yes",
-      "title": "Change a menu entry to YES",
-      "description": "Write \"YES\" at menu_text+Y.",
-      "on_entry": {
-        "Y": "offset of the entry"
-      }
-    },
-    {
-      "addr": 1373,
-      "binary_addr": 22285,
-      "name": "set_menu_yes_joy",
       "title": "Change a menu entry to YES",
       "description": "Write \"YES\" at menu_text+Y.",
       "on_entry": {
@@ -421,16 +360,6 @@
       }
     },
     {
-      "addr": 1389,
-      "binary_addr": 22301,
-      "name": "set_menu_off_joy",
-      "title": "Change the sound entry to OFF",
-      "description": "Write \"FF\" at menu_text+Y, after its \"O\".",
-      "on_entry": {
-        "Y": "offset of the entry's second character"
-      }
-    },
-    {
       "addr": 1398,
       "binary_addr": 21286,
       "name": "set_menu_on",
@@ -441,26 +370,9 @@
       }
     },
     {
-      "addr": 1398,
-      "binary_addr": 22310,
-      "name": "set_menu_on_joy",
-      "title": "Change the sound entry to ON",
-      "description": "Write \"N \" at menu_text+Y, after its \"O\".",
-      "on_entry": {
-        "Y": "offset of the entry's second character"
-      }
-    },
-    {
       "addr": 1712,
       "binary_addr": 21600,
       "name": "remove_absent_heroes",
-      "title": "Take the heroes nobody plays out of the game",
-      "description": "Draw any ten-thousands score digits, then put every hero switched off on the menu out of play, with a &64 entry in returning_hero_queue in their place."
-    },
-    {
-      "addr": 1712,
-      "binary_addr": 22624,
-      "name": "remove_absent_heroes_joy",
       "title": "Take the heroes nobody plays out of the game",
       "description": "Draw any ten-thousands score digits, then put every hero switched off on the menu out of play, with a &64 entry in returning_hero_queue in their place."
     },
@@ -871,16 +783,6 @@
       }
     },
     {
-      "addr": 1104,
-      "binary_addr": 22016,
-      "name": "decrypt_level_joy",
-      "title": "Decrypt and check the level just loaded",
-      "description": "Decrypt the level at &6B00-&6DAF in place, XORing each byte with the low byte of its own address, and sum the decrypted bytes. If the sum does not match the level's entry in level_checksums, reset the machine.",
-      "on_entry": {
-        "level_number": "level loaded (1-25)"
-      }
-    },
-    {
       "addr": 5120,
       "binary_addr": 15168,
       "name": "start_level",
@@ -1001,10 +903,109 @@
       "align": "before_label"
     },
     {
+      "addr": 1024,
+      "binary_addr": 21936,
+      "name": "add_thousand_points",
+      "title": "Add 1000 to a hero's score",
+      "description": "Advance the thousands digit of hero X's score. When it passes 9 it goes back to 0 and the ten-thousands digit, kept separately as one of the small digit sprites, goes up (to at most 9); that digit is then drawn below the score, with four further small sprites beside it.",
+      "on_entry": {
+        "X": "hero number (0-3)"
+      },
+      "on_exit": {
+        "X": "preserved"
+      },
+      "align": "before_label"
+    },
+    {
+      "addr": 1104,
+      "binary_addr": 22016,
+      "name": "decrypt_level",
+      "title": "Decrypt and check the level just loaded",
+      "description": "Decrypt the level at &6B00-&6DAF in place, XORing each byte with the low byte of its own address, and sum the decrypted bytes. If the sum does not match the level's entry in level_checksums, reset the machine.",
+      "on_entry": {
+        "level_number": "level loaded (1-25)"
+      },
+      "align": "before_label"
+    },
+    {
       "addr": 1169,
       "binary_addr": 22081,
       "title": "Level checksums",
       "description": "One byte per level, 1-25: the sum, modulo 256, of the level's decrypted bytes.",
+      "align": "before_label"
+    },
+    {
+      "addr": 1280,
+      "binary_addr": 22192,
+      "name": "hero_menu",
+      "title": "Choose the heroes and the sound",
+      "description": "Clear the left of the screen, print the menu and let the players toggle each hero (keys 1-4) and the sound (5 on, 6 off). SPACE starts the game if at least one hero is playing.",
+      "align": "before_label"
+    },
+    {
+      "addr": 1316,
+      "binary_addr": 22228,
+      "name": "print_menu",
+      "title": "Print the menu text",
+      "description": "Print the sixteen positioned strings of menu_text.",
+      "align": "before_label"
+    },
+    {
+      "addr": 1326,
+      "binary_addr": 22238,
+      "name": "print_menu_string",
+      "title": "Print one menu string",
+      "description": "Move the text cursor to the column and row in the two bytes at menu_text+Y, then print the following characters up to and including a carriage return.",
+      "on_entry": {
+        "Y": "offset of the string in menu_text"
+      },
+      "on_exit": {
+        "Y": "offset of the next string"
+      },
+      "align": "before_label"
+    },
+    {
+      "addr": 1357,
+      "binary_addr": 22269,
+      "name": "set_menu_no",
+      "title": "Change a menu entry to NO",
+      "description": "Write \"NO \" at menu_text+Y.",
+      "on_entry": {
+        "Y": "offset of the entry"
+      },
+      "align": "before_label"
+    },
+    {
+      "addr": 1373,
+      "binary_addr": 22285,
+      "name": "set_menu_yes",
+      "title": "Change a menu entry to YES",
+      "description": "Write \"YES\" at menu_text+Y.",
+      "on_entry": {
+        "Y": "offset of the entry"
+      },
+      "align": "before_label"
+    },
+    {
+      "addr": 1389,
+      "binary_addr": 22301,
+      "name": "set_menu_off",
+      "title": "Change the sound entry to OFF",
+      "description": "Write \"FF\" at menu_text+Y, after its \"O\".",
+      "on_entry": {
+        "Y": "offset of the entry's second character"
+      },
+      "align": "before_label"
+    },
+    {
+      "addr": 1398,
+      "binary_addr": 22310,
+      "name": "set_menu_on",
+      "title": "Change the sound entry to ON",
+      "description": "Write \"N \" at menu_text+Y, after its \"O\".",
+      "on_entry": {
+        "Y": "offset of the entry's second character"
+      },
       "align": "before_label"
     },
     {
@@ -1013,6 +1014,28 @@
       "name": "menu_text",
       "title": "Hero menu text",
       "description": "Sixteen entries of: column, row, text, carriage return; printed by print_menu.",
+      "align": "before_label"
+    },
+    {
+      "addr": 1712,
+      "binary_addr": 22624,
+      "name": "remove_absent_heroes",
+      "title": "Take the heroes nobody plays out of the game",
+      "description": "Draw any ten-thousands score digits, then put every hero switched off on the menu out of play, with a &64 entry in returning_hero_queue in their place.",
+      "align": "before_label"
+    },
+    {
+      "addr": 1920,
+      "binary_addr": 22832,
+      "title": "BYTEV handler: read a joystick for the third player's keys",
+      "description": "Installed by Coder, in the joystick image of &0400-&07FF only. Answers OSBYTE &81 scans of the third player's keys from the analogue port: left (&98) and right (&97) from channel 1 at its extremes, up (&B9) and down (&99) from channel 2, and fire (&9D) from the fire buttons. Every other call goes to the MOS 1.20 OSBYTE routine at &E772 directly.",
+      "on_entry": {
+        "A": "OSBYTE number",
+        "X": "OSBYTE X"
+      },
+      "on_exit": {
+        "X": "&FF if the key is pressed, 0 if not"
+      },
       "align": "before_label"
     },
     {
@@ -1085,36 +1108,25 @@
     "data_0288": 648,
     "data_0289": 649,
     "add_thousand_points": 1024,
-    "add_thousand_points_joy": 1024,
     "data_041e": 1054,
     "data_0437": 1079,
     "data_0447": 1095,
     "decrypt_level": 1104,
-    "decrypt_level_joy": 1104,
     "data_045a": 1114,
     "data_046b": 1131,
     "data_0484": 1156,
     "level_checksums": 1168,
     "sprite_blank": 1231,
-    "sprite_blank_joy": 1231,
     "hero_menu": 1280,
-    "hero_menu_joy": 1280,
     "print_menu": 1316,
-    "print_menu_joy": 1316,
     "data_0528": 1320,
     "print_menu_string": 1326,
-    "print_menu_string_joy": 1326,
     "data_0540": 1344,
     "set_menu_no": 1357,
-    "set_menu_no_joy": 1357,
     "set_menu_yes": 1373,
-    "set_menu_yes_joy": 1373,
     "set_menu_off": 1389,
-    "set_menu_off_joy": 1389,
     "set_menu_on": 1398,
-    "set_menu_on_joy": 1398,
     "menu_key_loop": 1409,
-    "menu_key_loop_joy": 1409,
     "data_05c0": 1472,
     "data_05c3": 1475,
     "data_05c9": 1481,
@@ -1124,11 +1136,9 @@
     "data_05e4": 1508,
     "data_05e9": 1513,
     "menu_text": 1536,
-    "menu_text_joy": 1536,
     "data_0601": 1537,
     "data_0602": 1538,
     "remove_absent_heroes": 1712,
-    "remove_absent_heroes_joy": 1712,
     "data_06b4": 1716,
     "data_06c9": 1737,
     "data_06f0": 1776,
@@ -1149,7 +1159,7 @@
     "mos_row_offsets_lo": 50038,
     "mos_reset_entry": 55757,
     "mos_oswrch_default": 57508,
-    "data_e772": 59250,
+    "mos_osbyte_default": 59250,
     "scsi_data": 64576,
     "scsi_status": 64577,
     "scsi_select": 64578,
@@ -1567,6 +1577,12 @@
       "name": "mos_oswrch_default",
       "group": "mos_internals",
       "description": "MOS 1.20 default OSWRCH routine, WRCHV's initial value. The WRCHV handler jumps here directly instead of through the saved vector."
+    },
+    {
+      "addr": 59250,
+      "name": "mos_osbyte_default",
+      "group": "mos_internals",
+      "description": "MOS 1.20 default OSBYTE routine, BYTEV's initial value."
     }
   ],
   "regions": [],
@@ -18046,6 +18062,7 @@
       "labels": [
         "hero_key_right"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&34b8 used as index base 1 time by &6ee7"
       ],
@@ -18138,6 +18155,7 @@
         14
       ],
       "binary_addr": 13505,
+      "comment_inline": "...from new_game's second instruction",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_0e08",
@@ -18944,6 +18962,7 @@
         10
       ],
       "binary_addr": 13655,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -18953,6 +18972,7 @@
         24
       ],
       "binary_addr": 13656,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -18963,6 +18983,7 @@
         6
       ],
       "binary_addr": 13657,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#6"
@@ -18975,6 +18996,7 @@
         124
       ],
       "binary_addr": 13659,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_start_hit_points",
@@ -19853,6 +19875,7 @@
         2
       ],
       "binary_addr": 13829,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#2"
@@ -19864,6 +19887,7 @@
         129
       ],
       "binary_addr": 13831,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osbyte_inkey",
@@ -26328,6 +26352,7 @@
       "labels": [
         "check_level"
       ],
+      "comment_inline": "Decrypt and check the level Coder loaded",
       "xref_summaries": [
         "&3b86 referenced 1 time by &1403[1]"
       ],
@@ -26351,6 +26376,7 @@
         24
       ],
       "binary_addr": 15241,
+      "comment_inline": "Bottom row &18 for clear_text_area's window",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&18"
@@ -26363,6 +26389,7 @@
         22
       ],
       "binary_addr": 15243,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_1625",
@@ -26375,6 +26402,7 @@
         96
       ],
       "binary_addr": 15246,
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -26411,6 +26439,7 @@
         2
       ],
       "binary_addr": 15249,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_0288",
@@ -26424,6 +26453,7 @@
         20
       ],
       "binary_addr": 15252,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&14"
@@ -26436,6 +26466,7 @@
         2
       ],
       "binary_addr": 15254,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_0289",
@@ -26449,6 +26480,7 @@
         76
       ],
       "binary_addr": 15257,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&4c"
@@ -26461,6 +26493,7 @@
         2
       ],
       "binary_addr": 15259,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "os_break_intercept",
@@ -26514,6 +26547,7 @@
         2
       ],
       "binary_addr": 15266,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "os_break_intercept",
@@ -26527,6 +26561,7 @@
         181
       ],
       "binary_addr": 15269,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&b5"
@@ -26539,6 +26574,7 @@
         2
       ],
       "binary_addr": 15271,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_0288",
@@ -26552,6 +26588,7 @@
         21
       ],
       "binary_addr": 15274,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&15"
@@ -26564,6 +26601,7 @@
         2
       ],
       "binary_addr": 15276,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_0289",
@@ -26607,6 +26645,7 @@
       "labels": [
         "restart_intercept"
       ],
+      "comment_inline": "First call (before the filing system): nothing to do",
       "type": "code",
       "mnemonic": "bcc",
       "operand": "return_4",
@@ -26620,6 +26659,7 @@
         12
       ],
       "binary_addr": 15284,
+      "comment_inline": "Clear the screen",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&0c"
@@ -26632,6 +26672,7 @@
         255
       ],
       "binary_addr": 15286,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -26645,6 +26686,7 @@
         137
       ],
       "binary_addr": 15289,
+      "comment_inline": "*DISC",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&89"
@@ -26656,6 +26698,7 @@
         20
       ],
       "binary_addr": 15291,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#&14"
@@ -26668,6 +26711,7 @@
         255
       ],
       "binary_addr": 15293,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -26681,6 +26725,7 @@
         142
       ],
       "binary_addr": 15296,
+      "comment_inline": "*DUNJUNZ: run the loader again",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&8e"
@@ -26692,6 +26737,7 @@
         20
       ],
       "binary_addr": 15298,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#&14"
@@ -26704,6 +26750,7 @@
         255
       ],
       "binary_addr": 15300,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -26719,6 +26766,7 @@
       "labels": [
         "return_4"
       ],
+      "comment_inline": "Return to the MOS",
       "xref_summaries": [
         "&3bc7 referenced 1 time by &3bb2"
       ],
@@ -28567,6 +28615,7 @@
       "labels": [
         "sub_15b1"
       ],
+      "comment_inline": "Clear the text area (Coder has shown the level number)",
       "xref_summaries": [
         "&3cf1 referenced 1 time by &3b40"
       ],
@@ -28588,6 +28637,7 @@
         96
       ],
       "binary_addr": 15604,
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -28601,6 +28651,7 @@
       "labels": [
         "next_level_intercept"
       ],
+      "comment_inline": "First call (before the filing system): nothing to do",
       "type": "code",
       "mnemonic": "bcc",
       "operand": "return_5",
@@ -28614,6 +28665,7 @@
         22
       ],
       "binary_addr": 15607,
+      "comment_inline": "MODE 2",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&16"
@@ -28626,6 +28678,7 @@
         255
       ],
       "binary_addr": 15609,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -28639,6 +28692,7 @@
         2
       ],
       "binary_addr": 15612,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#2"
@@ -28651,6 +28705,7 @@
         255
       ],
       "binary_addr": 15614,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -28664,6 +28719,7 @@
         224
       ],
       "binary_addr": 15617,
+      "comment_inline": "*DISC",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&e0"
@@ -28675,6 +28731,7 @@
         21
       ],
       "binary_addr": 15619,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#&15"
@@ -28687,6 +28744,7 @@
         255
       ],
       "binary_addr": 15621,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -28700,6 +28758,7 @@
         229
       ],
       "binary_addr": 15624,
+      "comment_inline": "*RUN CODER",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&e5"
@@ -28711,6 +28770,7 @@
         21
       ],
       "binary_addr": 15626,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#&15"
@@ -28723,6 +28783,7 @@
         255
       ],
       "binary_addr": 15628,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -28738,6 +28799,7 @@
       "labels": [
         "return_5"
       ],
+      "comment_inline": "Return to the MOS",
       "xref_summaries": [
         "&3d0f referenced 1 time by &3cf5"
       ],
@@ -37161,6 +37223,7 @@
         55
       ],
       "binary_addr": 17955,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#&37"
@@ -37172,6 +37235,7 @@
         249
       ],
       "binary_addr": 17957,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_1ee0",
@@ -37212,6 +37276,7 @@
         55
       ],
       "binary_addr": 17962,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#&37"
@@ -37223,6 +37288,7 @@
         249
       ],
       "binary_addr": 17964,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_1ee7",
@@ -37249,6 +37315,7 @@
         2
       ],
       "binary_addr": 17968,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "os_vsync_counter",
@@ -37264,6 +37331,7 @@
       "labels": [
         "return_6"
       ],
+      "comment_inline": "Return",
       "xref_summaries": [
         "&4633 referenced 1 time by &461e"
       ],
@@ -44693,6 +44761,7 @@
         160,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -44729,6 +44798,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -44741,6 +44811,7 @@
         169,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#3"
@@ -44752,6 +44823,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -44817,6 +44889,7 @@
         201,
         32
       ],
+      "comment_inline": "Units digit a space (levels 1-9)?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&20"
@@ -44827,6 +44900,7 @@
         240,
         20
       ],
+      "comment_inline": "Yes: advance the single digit",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_5036",
@@ -44838,6 +44912,7 @@
       "bytes": [
         24
       ],
+      "comment_inline": "No: advance the units digit...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -44847,6 +44922,7 @@
         105,
         1
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#1"
@@ -44858,6 +44934,7 @@
         190,
         8
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_08be",
@@ -44870,6 +44947,7 @@
         201,
         58
       ],
+      "comment_inline": "...past 9?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&3a"
@@ -44880,6 +44958,7 @@
         144,
         30
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcc",
       "operand": "code_504a",
@@ -44892,6 +44971,7 @@
         169,
         48
       ],
+      "comment_inline": "Yes: units 0 and carry into the tens",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&30"
@@ -44903,6 +44983,7 @@
         190,
         8
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_08be",
@@ -44916,6 +44997,7 @@
         189,
         8
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
       "operand": "level_digits",
@@ -44928,6 +45010,7 @@
         208,
         20
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_504a",
@@ -44944,6 +45027,7 @@
       "labels": [
         "code_5036"
       ],
+      "comment_inline": "Advance the single digit...",
       "xref_summaries": [
         "&5036 referenced 1 time by &5020"
       ],
@@ -44966,6 +45050,7 @@
         189,
         8
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "level_digits",
@@ -44978,6 +45063,7 @@
         201,
         58
       ],
+      "comment_inline": "...past 9?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&3a"
@@ -44988,6 +45074,7 @@
         144,
         10
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcc",
       "operand": "code_504a",
@@ -45000,6 +45087,7 @@
         169,
         49
       ],
+      "comment_inline": "Yes: level 10, \"10\"",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&31"
@@ -45011,6 +45099,7 @@
         189,
         8
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "level_digits",
@@ -45023,6 +45112,7 @@
         169,
         48
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&30"
@@ -45034,6 +45124,7 @@
         190,
         8
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_08be",
@@ -45081,6 +45172,7 @@
       "labels": [
         "loop_504c"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&504c referenced 1 time by &5055"
       ],
@@ -45103,6 +45195,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -45114,6 +45207,7 @@
       "bytes": [
         232
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inx"
     },
@@ -45123,6 +45217,7 @@
         224,
         21
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#&15"
@@ -45133,6 +45228,7 @@
         208,
         245
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_504c",
@@ -45157,6 +45253,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -45180,6 +45277,7 @@
         160,
         81
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#&51"
@@ -45191,6 +45289,7 @@
         247,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -45218,6 +45317,7 @@
         113,
         81
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "level_command_digits",
@@ -45231,6 +45331,7 @@
         190,
         8
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "data_08be",
@@ -45244,6 +45345,7 @@
         114,
         81
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_5172",
@@ -45270,6 +45372,7 @@
         133,
         142
       ],
+      "comment_inline": "...in &8E",
       "type": "code",
       "mnemonic": "sta",
       "operand": "victory_steps_left",
@@ -45295,6 +45398,7 @@
       "bytes": [
         56
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sec"
     },
@@ -45304,6 +45408,7 @@
         233,
         1
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "#1"
@@ -45315,6 +45420,7 @@
         159,
         22
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "level_number",
@@ -45338,6 +45444,7 @@
         208,
         10
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_508b",
@@ -45361,6 +45468,7 @@
         160,
         81
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#&51"
@@ -45372,6 +45480,7 @@
         247,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -45421,6 +45530,7 @@
         160,
         81
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#&51"
@@ -45432,6 +45542,7 @@
         247,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -45468,6 +45579,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -45491,6 +45603,7 @@
         133,
         114
       ],
+      "comment_inline": "...destination pointer in sprite_width, sprite_height...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_width",
@@ -45503,6 +45616,7 @@
         169,
         4
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#4"
@@ -45513,6 +45627,7 @@
         133,
         115
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_height",
@@ -45536,6 +45651,7 @@
         133,
         112
       ],
+      "comment_inline": "...source pointer in plot_x, plot_y",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -45565,6 +45681,7 @@
         162,
         1
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#1"
@@ -45600,6 +45717,7 @@
         208,
         6
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_50b4",
@@ -45623,6 +45741,7 @@
         133,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -45635,6 +45754,7 @@
         208,
         4
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_50b8",
@@ -45670,6 +45790,7 @@
         133,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -45685,6 +45806,7 @@
       "labels": [
         "code_50b8"
       ],
+      "comment_inline": "Copy a kilobyte, up to &0800...",
       "xref_summaries": [
         "&50b8 referenced 1 time by &50b2"
       ],
@@ -45707,6 +45829,7 @@
       "labels": [
         "loop_50ba"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&50ba referenced 1 time by &50ce"
       ],
@@ -45728,6 +45851,7 @@
         145,
         114
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "(sprite_width),y",
@@ -45740,6 +45864,7 @@
         230,
         114
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
       "operand": "sprite_width",
@@ -45752,6 +45877,7 @@
         208,
         2
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_50c4",
@@ -45764,6 +45890,7 @@
         230,
         115
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
       "operand": "sprite_height",
@@ -45779,6 +45906,7 @@
       "labels": [
         "code_50c4"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&50c4 referenced 1 time by &50c0"
       ],
@@ -45800,6 +45928,7 @@
         208,
         2
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_50ca",
@@ -45812,6 +45941,7 @@
         230,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
       "operand": "plot_y",
@@ -45827,6 +45957,7 @@
       "labels": [
         "code_50ca"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&50ca referenced 1 time by &50c6"
       ],
@@ -45848,6 +45979,7 @@
         201,
         8
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#8"
@@ -45858,6 +45990,7 @@
         208,
         234
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_50ba",
@@ -45870,6 +46003,7 @@
         169,
         128
       ],
+      "comment_inline": "Joystick at rest again?",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osbyte_read_adc_or_get_buffer_status",
@@ -45886,6 +46020,7 @@
         162,
         1
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#1"
@@ -45910,6 +46045,7 @@
         192,
         128
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpy",
       "operand": "#&80"
@@ -45920,6 +46056,7 @@
         208,
         10
       ],
+      "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_50e5",
@@ -45932,6 +46069,7 @@
         169,
         128
       ],
+      "comment_inline": "Yes: point BYTEV at the joystick handler at &0780",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&80"
@@ -45943,6 +46081,7 @@
         10,
         2
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "bytev",
@@ -45955,6 +46094,7 @@
         169,
         7
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#7"
@@ -45966,6 +46106,7 @@
         11,
         2
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "bytev + 1",
@@ -45980,6 +46121,7 @@
       "labels": [
         "code_50e5"
       ],
+      "comment_inline": "COLOUR 2",
       "xref_summaries": [
         "&50e5 referenced 1 time by &50d9"
       ],
@@ -46000,6 +46142,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -46012,6 +46155,7 @@
         169,
         2
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#2"
@@ -46023,6 +46167,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -46035,6 +46180,7 @@
         162,
         0
       ],
+      "comment_inline": "VDU commands to set up the screen for play",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#0"
@@ -46049,6 +46195,7 @@
       "labels": [
         "loop_50f1"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&50f1 referenced 1 time by &50fa"
       ],
@@ -46071,6 +46218,7 @@
         238,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -46082,6 +46230,7 @@
       "bytes": [
         232
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inx"
     },
@@ -46091,6 +46240,7 @@
         224,
         20
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#&14"
@@ -46101,6 +46251,7 @@
         208,
         245
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_50f1",
@@ -46114,6 +46265,7 @@
         188,
         8
       ],
+      "comment_inline": "First level?",
       "type": "code",
       "mnemonic": "lda",
       "operand": "levels_started",
@@ -46126,6 +46278,7 @@
         201,
         2
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#2"
@@ -46136,6 +46289,7 @@
         176,
         8
       ],
+      "comment_inline": "No",
       "type": "code",
       "mnemonic": "bcs",
       "operand": "code_510b",
@@ -46148,6 +46302,7 @@
         169,
         0
       ],
+      "comment_inline": "Yes: copy all of &3000-&473F to &08C0-&1FFF",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -46158,6 +46313,7 @@
         133,
         128
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "ring_x",
@@ -46170,6 +46326,7 @@
         133,
         129
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "ring_y",
@@ -46182,6 +46339,7 @@
         240,
         8
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_5113",
@@ -46197,6 +46355,7 @@
       "labels": [
         "code_510b"
       ],
+      "comment_inline": "No: copy only &3440-&473F to &0D00-&1FFF, keeping the heroes' state in &08C0-&0CFF",
       "xref_summaries": [
         "&510b referenced 1 time by &5101"
       ],
@@ -46216,6 +46375,7 @@
         133,
         128
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "ring_x",
@@ -46228,6 +46388,7 @@
         169,
         4
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#4"
@@ -46238,6 +46399,7 @@
         133,
         129
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "ring_y",
@@ -46253,6 +46415,7 @@
       "labels": [
         "code_5113"
       ],
+      "comment_inline": "Source = &3000 + offset...",
       "xref_summaries": [
         "&5113 referenced 1 time by &5109"
       ],
@@ -46274,6 +46437,7 @@
         133,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -46286,6 +46450,7 @@
         169,
         48
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&30"
@@ -46295,6 +46460,7 @@
       "bytes": [
         24
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -46304,6 +46470,7 @@
         101,
         129
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "ring_y",
@@ -46316,6 +46483,7 @@
         133,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -46328,6 +46496,7 @@
         169,
         192
       ],
+      "comment_inline": "...destination = &08C0 + offset",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&c0"
@@ -46337,6 +46506,7 @@
       "bytes": [
         24
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -46346,6 +46516,7 @@
         101,
         128
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "ring_x",
@@ -46358,6 +46529,7 @@
         133,
         114
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_width",
@@ -46370,6 +46542,7 @@
         169,
         8
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#8"
@@ -46380,6 +46553,7 @@
         101,
         129
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "ring_y",
@@ -46392,6 +46566,7 @@
         133,
         115
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_height",
@@ -46404,6 +46579,7 @@
         160,
         0
       ],
+      "comment_inline": "Copy bytes up to &4740",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -46417,6 +46593,7 @@
       "labels": [
         "code_512d"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&512d referenced 2 times by &5141, &5147"
       ],
@@ -46442,6 +46619,7 @@
         145,
         114
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "(sprite_width),y",
@@ -46454,6 +46632,7 @@
         230,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
       "operand": "plot_x",
@@ -46466,6 +46645,7 @@
         208,
         2
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_5137",
@@ -46478,6 +46658,7 @@
         230,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
       "operand": "plot_y",
@@ -46493,6 +46674,7 @@
       "labels": [
         "code_5137"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&5137 referenced 1 time by &5133"
       ],
@@ -46514,6 +46696,7 @@
         208,
         2
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_513d",
@@ -46526,6 +46709,7 @@
         230,
         115
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
       "operand": "sprite_height",
@@ -46541,6 +46725,7 @@
       "labels": [
         "code_513d"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&513d referenced 1 time by &5139"
       ],
@@ -46562,6 +46747,7 @@
         201,
         64
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&40"
@@ -46572,6 +46758,7 @@
         208,
         234
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_512d",
@@ -46584,6 +46771,7 @@
         165,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "plot_y",
@@ -46596,6 +46784,7 @@
         201,
         71
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&47"
@@ -46606,6 +46795,7 @@
         208,
         228
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_512d",
@@ -46619,6 +46809,7 @@
         49,
         13
       ],
+      "comment_inline": "Start the game",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "game_entry",
@@ -46873,8 +47064,7 @@
       ],
       "binary_addr": 20912,
       "labels": [
-        "add_thousand_points",
-        "add_thousand_points_joy"
+        "add_thousand_points"
       ],
       "comment_inline": "Add one to the thousands digit",
       "xref_summaries": [
@@ -47433,8 +47623,7 @@
       ],
       "binary_addr": 20992,
       "labels": [
-        "decrypt_level",
-        "decrypt_level_joy"
+        "decrypt_level"
       ],
       "comment_inline": "Point at &6B00, the start of the level...",
       "xref_summaries": [
@@ -48102,8 +48291,7 @@
       ],
       "binary_addr": 21119,
       "labels": [
-        "sprite_blank",
-        "sprite_blank_joy"
+        "sprite_blank"
       ],
       "type": "byte",
       "values": [
@@ -48176,8 +48364,7 @@
       ],
       "binary_addr": 21168,
       "labels": [
-        "hero_menu",
-        "hero_menu_joy"
+        "hero_menu"
       ],
       "comment_inline": "VDU 28: a text window over the left of the screen...",
       "xref_summaries": [
@@ -48382,8 +48569,7 @@
       ],
       "binary_addr": 21204,
       "labels": [
-        "print_menu",
-        "print_menu_joy"
+        "print_menu"
       ],
       "comment_inline": "Fifteen strings, then one more by falling through",
       "xref_summaries": [
@@ -48500,8 +48686,7 @@
       ],
       "binary_addr": 21214,
       "labels": [
-        "print_menu_string",
-        "print_menu_string_joy"
+        "print_menu_string"
       ],
       "comment_inline": "VDU 31: move the text cursor...",
       "xref_summaries": [
@@ -48718,8 +48903,7 @@
       ],
       "binary_addr": 21245,
       "labels": [
-        "set_menu_no",
-        "set_menu_no_joy"
+        "set_menu_no"
       ],
       "comment_inline": "\"NO \"",
       "xref_summaries": [
@@ -48828,8 +49012,7 @@
       ],
       "binary_addr": 21261,
       "labels": [
-        "set_menu_yes",
-        "set_menu_yes_joy"
+        "set_menu_yes"
       ],
       "comment_inline": "\"YES\"",
       "xref_summaries": [
@@ -48938,8 +49121,7 @@
       ],
       "binary_addr": 21277,
       "labels": [
-        "set_menu_off",
-        "set_menu_off_joy"
+        "set_menu_off"
       ],
       "comment_inline": "\"FF\" after the O",
       "xref_summaries": [
@@ -49009,8 +49191,7 @@
       ],
       "binary_addr": 21286,
       "labels": [
-        "set_menu_on",
-        "set_menu_on_joy"
+        "set_menu_on"
       ],
       "comment_inline": "\"N \" after the O",
       "xref_summaries": [
@@ -49092,8 +49273,7 @@
       ],
       "binary_addr": 21297,
       "labels": [
-        "menu_key_loop",
-        "menu_key_loop_joy"
+        "menu_key_loop"
       ],
       "comment_inline": "Flush the input buffers",
       "xref_summaries": [
@@ -50041,8 +50221,7 @@
       ],
       "binary_addr": 21424,
       "labels": [
-        "menu_text",
-        "menu_text_joy"
+        "menu_text"
       ],
       "sub_labels": {
         "1537": [
@@ -50803,8 +50982,7 @@
       ],
       "binary_addr": 21600,
       "labels": [
-        "remove_absent_heroes",
-        "remove_absent_heroes_joy"
+        "remove_absent_heroes"
       ],
       "comment_inline": "For each hero, keeping a count of absent heroes in Y...",
       "xref_summaries": [
@@ -51931,8 +52109,7 @@
       ],
       "binary_addr": 21936,
       "labels": [
-        "add_thousand_points",
-        "add_thousand_points_joy"
+        "add_thousand_points"
       ],
       "comment_inline": "Add one to the thousands digit",
       "xref_summaries": [
@@ -52491,8 +52668,7 @@
       ],
       "binary_addr": 22016,
       "labels": [
-        "decrypt_level",
-        "decrypt_level_joy"
+        "decrypt_level"
       ],
       "comment_inline": "Point at &6B00, the start of the level...",
       "xref_summaries": [
@@ -53160,8 +53336,7 @@
       ],
       "binary_addr": 22143,
       "labels": [
-        "sprite_blank",
-        "sprite_blank_joy"
+        "sprite_blank"
       ],
       "type": "byte",
       "values": [
@@ -53234,8 +53409,7 @@
       ],
       "binary_addr": 22192,
       "labels": [
-        "hero_menu",
-        "hero_menu_joy"
+        "hero_menu"
       ],
       "comment_inline": "VDU 28: a text window over the left of the screen...",
       "xref_summaries": [
@@ -53440,8 +53614,7 @@
       ],
       "binary_addr": 22228,
       "labels": [
-        "print_menu",
-        "print_menu_joy"
+        "print_menu"
       ],
       "comment_inline": "Fifteen strings, then one more by falling through",
       "xref_summaries": [
@@ -53558,8 +53731,7 @@
       ],
       "binary_addr": 22238,
       "labels": [
-        "print_menu_string",
-        "print_menu_string_joy"
+        "print_menu_string"
       ],
       "comment_inline": "VDU 31: move the text cursor...",
       "xref_summaries": [
@@ -53776,8 +53948,7 @@
       ],
       "binary_addr": 22269,
       "labels": [
-        "set_menu_no",
-        "set_menu_no_joy"
+        "set_menu_no"
       ],
       "comment_inline": "\"NO \"",
       "xref_summaries": [
@@ -53886,8 +54057,7 @@
       ],
       "binary_addr": 22285,
       "labels": [
-        "set_menu_yes",
-        "set_menu_yes_joy"
+        "set_menu_yes"
       ],
       "comment_inline": "\"YES\"",
       "xref_summaries": [
@@ -53996,8 +54166,7 @@
       ],
       "binary_addr": 22301,
       "labels": [
-        "set_menu_off",
-        "set_menu_off_joy"
+        "set_menu_off"
       ],
       "comment_inline": "\"FF\" after the O",
       "xref_summaries": [
@@ -54067,8 +54236,7 @@
       ],
       "binary_addr": 22310,
       "labels": [
-        "set_menu_on",
-        "set_menu_on_joy"
+        "set_menu_on"
       ],
       "comment_inline": "\"N \" after the O",
       "xref_summaries": [
@@ -54150,8 +54318,7 @@
       ],
       "binary_addr": 22321,
       "labels": [
-        "menu_key_loop",
-        "menu_key_loop_joy"
+        "menu_key_loop"
       ],
       "comment_inline": "Flush the input buffers",
       "xref_summaries": [
@@ -55099,8 +55266,7 @@
       ],
       "binary_addr": 22448,
       "labels": [
-        "menu_text",
-        "menu_text_joy"
+        "menu_text"
       ],
       "sub_labels": {
         "1537": [
@@ -55861,8 +56027,7 @@
       ],
       "binary_addr": 22624,
       "labels": [
-        "remove_absent_heroes",
-        "remove_absent_heroes_joy"
+        "remove_absent_heroes"
       ],
       "comment_inline": "For each hero, keeping a count of absent heroes in Y...",
       "xref_summaries": [
@@ -56687,6 +56852,7 @@
         129
       ],
       "binary_addr": 22832,
+      "comment_inline": "OSBYTE &81 (INKEY)?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&81"
@@ -56698,6 +56864,7 @@
         101
       ],
       "binary_addr": 22834,
+      "comment_inline": "No: pass it on",
       "type": "code",
       "mnemonic": "bne",
       "operand": "data_07e9",
@@ -56711,6 +56878,7 @@
         152
       ],
       "binary_addr": 22836,
+      "comment_inline": "Left key (>)?",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#&98"
@@ -56722,6 +56890,7 @@
         19
       ],
       "binary_addr": 22838,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "data_079b",
@@ -56735,6 +56904,7 @@
         153
       ],
       "binary_addr": 22840,
+      "comment_inline": "Down key (<)?",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#&99"
@@ -56746,6 +56916,7 @@
         58
       ],
       "binary_addr": 22842,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "data_07c6",
@@ -56759,6 +56930,7 @@
         185
       ],
       "binary_addr": 22844,
+      "comment_inline": "Up key (K)?",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#&b9"
@@ -56770,6 +56942,7 @@
         40
       ],
       "binary_addr": 22846,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "data_07b8",
@@ -56783,6 +56956,7 @@
         151
       ],
       "binary_addr": 22848,
+      "comment_inline": "Right key (?)?",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#&97"
@@ -56794,6 +56968,7 @@
         21
       ],
       "binary_addr": 22850,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "data_07a9",
@@ -56807,6 +56982,7 @@
         157
       ],
       "binary_addr": 22852,
+      "comment_inline": "Fire key (SPACE)?",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#&9d"
@@ -56818,6 +56994,7 @@
         61
       ],
       "binary_addr": 22854,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "data_07d5",
@@ -56832,11 +57009,12 @@
         231
       ],
       "binary_addr": 22856,
+      "comment_inline": "Another key: pass it on",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "data_e772",
+      "operand": "mos_osbyte_default",
       "target": 59250,
-      "target_label": "data_e772"
+      "target_label": "mos_osbyte_default"
     },
     {
       "addr": 1947,
@@ -56848,6 +57026,7 @@
       "labels": [
         "data_079b"
       ],
+      "comment_inline": "Left: channel 1 high byte &FF?",
       "xref_summaries": [
         "&594b referenced 1 time by &5936"
       ],
@@ -56868,6 +57047,7 @@
         128
       ],
       "binary_addr": 22861,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osbyte_read_adc_or_get_buffer_status",
@@ -56900,6 +57080,7 @@
         255
       ],
       "binary_addr": 22866,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpy",
       "operand": "#&ff"
@@ -56911,6 +57092,7 @@
         64
       ],
       "binary_addr": 22868,
+      "comment_inline": "No: not pressed",
       "type": "code",
       "mnemonic": "bne",
       "operand": "data_07e6",
@@ -56924,6 +57106,7 @@
         255
       ],
       "binary_addr": 22870,
+      "comment_inline": "Yes: pressed",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&ff"
@@ -56934,6 +57117,7 @@
         96
       ],
       "binary_addr": 22872,
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -56947,6 +57131,7 @@
       "labels": [
         "data_07a9"
       ],
+      "comment_inline": "Right: channel 1 high byte 0?",
       "xref_summaries": [
         "&5959 referenced 1 time by &5942"
       ],
@@ -56967,6 +57152,7 @@
         128
       ],
       "binary_addr": 22875,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osbyte_read_adc_or_get_buffer_status",
@@ -56999,6 +57185,7 @@
         0
       ],
       "binary_addr": 22880,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpy",
       "operand": "#0"
@@ -57010,6 +57197,7 @@
         50
       ],
       "binary_addr": 22882,
+      "comment_inline": "No: not pressed",
       "type": "code",
       "mnemonic": "bne",
       "operand": "data_07e6",
@@ -57022,6 +57210,7 @@
         136
       ],
       "binary_addr": 22884,
+      "comment_inline": "Yes: pressed (Y = &FF)",
       "type": "code",
       "mnemonic": "dey"
     },
@@ -57032,6 +57221,7 @@
         255
       ],
       "binary_addr": 22885,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&ff"
@@ -57042,6 +57232,7 @@
         96
       ],
       "binary_addr": 22887,
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -57055,6 +57246,7 @@
       "labels": [
         "data_07b8"
       ],
+      "comment_inline": "Up: channel 2 high byte &FF?",
       "xref_summaries": [
         "&5968 referenced 1 time by &593e"
       ],
@@ -57075,6 +57267,7 @@
         128
       ],
       "binary_addr": 22890,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osbyte_read_adc_or_get_buffer_status",
@@ -57107,6 +57300,7 @@
         255
       ],
       "binary_addr": 22895,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpy",
       "operand": "#&ff"
@@ -57118,6 +57312,7 @@
         35
       ],
       "binary_addr": 22897,
+      "comment_inline": "No: not pressed",
       "type": "code",
       "mnemonic": "bne",
       "operand": "data_07e6",
@@ -57131,6 +57326,7 @@
         255
       ],
       "binary_addr": 22899,
+      "comment_inline": "Yes: pressed",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&ff"
@@ -57141,6 +57337,7 @@
         96
       ],
       "binary_addr": 22901,
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -57154,6 +57351,7 @@
       "labels": [
         "data_07c6"
       ],
+      "comment_inline": "Down: channel 2 high byte 0?",
       "xref_summaries": [
         "&5976 referenced 1 time by &593a"
       ],
@@ -57174,6 +57372,7 @@
         128
       ],
       "binary_addr": 22904,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osbyte_read_adc_or_get_buffer_status",
@@ -57206,6 +57405,7 @@
         0
       ],
       "binary_addr": 22909,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpy",
       "operand": "#0"
@@ -57217,6 +57417,7 @@
         21
       ],
       "binary_addr": 22911,
+      "comment_inline": "No: not pressed",
       "type": "code",
       "mnemonic": "bne",
       "operand": "data_07e6",
@@ -57229,6 +57430,7 @@
         136
       ],
       "binary_addr": 22913,
+      "comment_inline": "Yes: pressed (Y = &FF)",
       "type": "code",
       "mnemonic": "dey"
     },
@@ -57239,6 +57441,7 @@
         255
       ],
       "binary_addr": 22914,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&ff"
@@ -57249,6 +57452,7 @@
         96
       ],
       "binary_addr": 22916,
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -57262,6 +57466,7 @@
       "labels": [
         "data_07d5"
       ],
+      "comment_inline": "Fire: either fire button?",
       "xref_summaries": [
         "&5985 referenced 1 time by &5946"
       ],
@@ -57282,6 +57487,7 @@
         128
       ],
       "binary_addr": 22919,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osbyte_read_adc_or_get_buffer_status",
@@ -57313,6 +57519,7 @@
         138
       ],
       "binary_addr": 22924,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -57323,6 +57530,7 @@
         3
       ],
       "binary_addr": 22925,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "and",
       "operand": "#3"
@@ -57334,6 +57542,7 @@
         5
       ],
       "binary_addr": 22927,
+      "comment_inline": "No: not pressed",
       "type": "code",
       "mnemonic": "beq",
       "operand": "data_07e6",
@@ -57347,6 +57556,7 @@
         255
       ],
       "binary_addr": 22929,
+      "comment_inline": "Yes: pressed",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&ff"
@@ -57358,6 +57568,7 @@
         255
       ],
       "binary_addr": 22931,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#&ff"
@@ -57368,6 +57579,7 @@
         96
       ],
       "binary_addr": 22933,
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -57381,6 +57593,7 @@
       "labels": [
         "data_07e6"
       ],
+      "comment_inline": "Not pressed",
       "xref_summaries": [
         "&5996 referenced 5 times by &5954, &5962, &5971, &597f, &598f"
       ],
@@ -57416,6 +57629,7 @@
         96
       ],
       "binary_addr": 22936,
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -57430,6 +57644,7 @@
       "labels": [
         "data_07e9"
       ],
+      "comment_inline": "Pass the call on to the MOS 1.20 OSBYTE routine",
       "xref_summaries": [
         "&5999 referenced 1 time by &5932"
       ],
@@ -57441,9 +57656,9 @@
       ],
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "data_e772",
+      "operand": "mos_osbyte_default",
       "target": 59250,
-      "target_label": "data_e772"
+      "target_label": "mos_osbyte_default"
     },
     {
       "addr": 2028,

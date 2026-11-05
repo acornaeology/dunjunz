@@ -1922,6 +1922,7 @@
       "labels": [
         "save_game_pages"
       ],
+      "comment_inline": "Keep the level number's digits, which are about to be cleared...",
       "xref_summaries": [
         "&0450 referenced 1 time by &1459"
       ],
@@ -1942,6 +1943,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -1952,6 +1954,7 @@
         214,
         22
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "data_16d6",
@@ -1963,6 +1966,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -1972,6 +1976,7 @@
         160,
         0
       ],
+      "comment_inline": "Copy pages &0E-&18 to &4E-&58, clearing the originals",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -1991,6 +1996,7 @@
           "data_045c"
         ]
       },
+      "comment_inline": "...",
       "xref_summaries": [
         "&045a referenced 2 times by &0468, &0478",
         "&045c referenced 3 times by &046a, &0473, &1448"
@@ -2016,6 +2022,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -2025,6 +2032,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -2044,6 +2052,7 @@
           "data_0462"
         ]
       },
+      "comment_inline": "...",
       "xref_summaries": [
         "&0462 referenced 2 times by &046d, &144b"
       ],
@@ -2058,6 +2067,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -2076,6 +2086,7 @@
           "data_0466"
         ]
       },
+      "comment_inline": "...",
       "xref_summaries": [
         "&0466 referenced 2 times by &0470, &1453"
       ],
@@ -2090,6 +2101,7 @@
       "bytes": [
         200
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "iny"
     },
@@ -2099,6 +2111,7 @@
         208,
         240
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_045a",
@@ -2112,6 +2125,7 @@
         92,
         4
       ],
+      "comment_inline": "Next page: advance the three page operands",
       "type": "code",
       "mnemonic": "inc",
       "operand": "data_045c",
@@ -2125,6 +2139,7 @@
         98,
         4
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
       "operand": "data_0462",
@@ -2138,6 +2153,7 @@
         102,
         4
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
       "operand": "data_0466",
@@ -2151,6 +2167,7 @@
         92,
         4
       ],
+      "comment_inline": "Until page &19",
       "type": "code",
       "mnemonic": "lda",
       "operand": "data_045c",
@@ -2163,6 +2180,7 @@
         201,
         25
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&19"
@@ -2173,6 +2191,7 @@
         208,
         224
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_045a",
@@ -2184,6 +2203,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "Put the digits into the moved copy of level_command",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -2194,6 +2214,7 @@
         155,
         84
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_549b",
@@ -2205,6 +2226,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -2215,6 +2237,7 @@
         154,
         84
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_549a",
@@ -2228,6 +2251,7 @@
         92,
         84
       ],
+      "comment_inline": "Continue in the moved copy of load_level_from_copy",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "data_545c",
@@ -13501,6 +13525,7 @@
       "labels": [
         "code_0e00"
       ],
+      "comment_inline": "New game: level_bcd = the level before the first played",
       "xref_summaries": [
         "&0e00 referenced 3 times by &0d6b, &0ecc, &5035; also used as index base 3 times by &045a, &0460, &1476"
       ],
@@ -13542,6 +13567,7 @@
         169,
         0
       ],
+      "comment_inline": "level_number = 0",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -13553,6 +13579,7 @@
         159,
         22
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "level_number",
@@ -20798,6 +20825,7 @@
       "labels": [
         "load_level"
       ],
+      "comment_inline": "Reset the page numbers of the copy loops below to &0E and &4E...",
       "xref_summaries": [
         "&1446 referenced 1 time by &1403"
       ],
@@ -20818,6 +20846,7 @@
         92,
         4
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_045c",
@@ -20831,6 +20860,7 @@
         98,
         4
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_0462",
@@ -20844,6 +20874,7 @@
         120,
         20
       ],
+      "comment_inline": "...(in the copy at &545C)",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_1478",
@@ -20856,6 +20887,7 @@
         169,
         78
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&4e"
@@ -20867,6 +20899,7 @@
         102,
         4
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_0466",
@@ -20880,6 +20913,7 @@
         117,
         20
       ],
+      "comment_inline": "...(in the copy at &545C)",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_1475",
@@ -20893,6 +20927,7 @@
         80,
         4
       ],
+      "comment_inline": "...and move the game out of the way",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "save_game_pages",
@@ -20908,6 +20943,7 @@
       "labels": [
         "load_level_from_copy"
       ],
+      "comment_inline": "*D. (*DISC), from the moved copy of the command at &149D",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&9d"
@@ -20918,6 +20954,7 @@
         160,
         84
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#&54"
@@ -20929,6 +20966,7 @@
         247,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -20941,6 +20979,7 @@
         162,
         149
       ],
+      "comment_inline": "*L.$.Ln (*LOAD), from the moved copy of level_command",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&95"
@@ -20951,6 +20990,7 @@
         160,
         84
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#&54"
@@ -20962,6 +21002,7 @@
         247,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -20974,6 +21015,7 @@
         169,
         140
       ],
+      "comment_inline": "OSBYTE &8C: back to *TAPE...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osbyte_tape",
@@ -20990,6 +21032,7 @@
         162,
         12
       ],
+      "comment_inline": "...at 1200 baud",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&0c"
@@ -21001,7 +21044,7 @@
         244,
         255
       ],
-      "comment_inline": "*TAPE: select cassette filing system",
+      "comment_inline": "... *TAPE: select cassette filing system",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -21014,6 +21057,7 @@
         160,
         0
       ],
+      "comment_inline": "Copy pages &4E-&58 back to &0E-&18",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -21033,6 +21077,7 @@
           "data_1475"
         ]
       },
+      "comment_inline": "...",
       "xref_summaries": [
         "&1473 referenced 2 times by &147a, &1487",
         "&1475 referenced 1 time by &1456"
@@ -21068,6 +21113,7 @@
           "data_1478"
         ]
       },
+      "comment_inline": "...",
       "xref_summaries": [
         "&1478 referenced 1 time by &144e"
       ],
@@ -21082,6 +21128,7 @@
       "bytes": [
         200
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "iny"
     },
@@ -21091,6 +21138,7 @@
         208,
         247
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_1473",
@@ -21104,6 +21152,7 @@
         117,
         84
       ],
+      "comment_inline": "Next page: advance the page operands (in this copy)",
       "type": "code",
       "mnemonic": "inc",
       "operand": "data_5475",
@@ -21117,6 +21166,7 @@
         120,
         84
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
       "operand": "data_5478",
@@ -21130,6 +21180,7 @@
         120,
         84
       ],
+      "comment_inline": "Until page &19",
       "type": "code",
       "mnemonic": "lda",
       "operand": "data_5478",
@@ -21142,6 +21193,7 @@
         201,
         25
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&19"
@@ -21152,6 +21204,7 @@
         208,
         234
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_1473",
@@ -21163,6 +21216,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return to start_level",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -43661,6 +43715,7 @@
       "bytes": [
         234
       ],
+      "comment_inline": "(unused)",
       "type": "code",
       "mnemonic": "nop"
     },
