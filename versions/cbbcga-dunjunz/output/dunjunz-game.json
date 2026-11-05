@@ -732,6 +732,12 @@
       "name": "show_level_number",
       "title": "Show the number of the level about to start",
       "description": "Clear the text area, count the level, plot the word LEVEL and print the number in the game's font, then set a text window and colour for later messages."
+    },
+    {
+      "addr": 5190,
+      "name": "load_level",
+      "title": "Load the level file",
+      "description": "Show 23 character rows while loading, then load the file named in level_filename at &6B00 by calling the filing system's FILEV routine directly with an OSFILE block, and finally decrypt and check it. The block's byte 6 (the exec address's low byte, which must be 0 for the load address to be used) is not set here: it relies on show_level_number having cleared the screen, which the block lies in."
     }
   ],
   "banners": [
@@ -834,7 +840,7 @@
     "data_6be0": 27616,
     "data_6cb0": 27824,
     "data_6d80": 28032,
-    "data_6e60": 28256,
+    "level_osfile_block": 28256,
     "data_6e61": 28257,
     "data_6e62": 28258,
     "data_6e63": 28259,
@@ -1052,6 +1058,13 @@
         "w"
       ],
       "description": "MOS 1.20 counter decremented on every vertical sync interrupt. The game sets it and waits for it to run out to pace itself."
+    },
+    {
+      "addr": 28256,
+      "name": "level_osfile_block",
+      "length": 18,
+      "group": "screen_workspace",
+      "description": "OSFILE parameter block for loading the level, built in screen memory below Dunjun6."
     },
     {
       "addr": 50037,
@@ -19119,9 +19132,9 @@
       "comment_inline": "Load the level",
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_1446",
+      "operand": "load_level",
       "target": 5190,
-      "target_label": "sub_1446"
+      "target_label": "load_level"
     },
     {
       "addr": 5126,
@@ -19441,8 +19454,9 @@
         23
       ],
       "labels": [
-        "sub_1446"
+        "load_level"
       ],
+      "comment_inline": "VDU 23,0,6,23,0,0,0,0,0,0: set 6845 register 6...",
       "xref_summaries": [
         "&1446 referenced 1 time by &1403"
       ],
@@ -19498,6 +19512,7 @@
         169,
         6
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#6"
@@ -19521,6 +19536,7 @@
         169,
         23
       ],
+      "comment_inline": "...to 23 character rows displayed",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&17"
@@ -19544,6 +19560,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -19632,6 +19649,7 @@
         162,
         96
       ],
+      "comment_inline": "X, Y = address of the OSFILE block",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&60"
@@ -19642,6 +19660,7 @@
         160,
         110
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#&6e"
@@ -19652,6 +19671,7 @@
         169,
         208
       ],
+      "comment_inline": "Filename address = level_filename...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&d0"
@@ -19663,11 +19683,12 @@
         96,
         110
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_6e60",
+      "operand": "level_osfile_block",
       "target": 28256,
-      "target_label": "data_6e60"
+      "target_label": "level_osfile_block"
     },
     {
       "addr": 5239,
@@ -19675,6 +19696,7 @@
         169,
         22
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&16"
@@ -19686,6 +19708,7 @@
         97,
         110
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_6e61",
@@ -19698,6 +19721,7 @@
         169,
         0
       ],
+      "comment_inline": "Load address = &00006B00...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -19709,6 +19733,7 @@
         98,
         110
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_6e62",
@@ -19722,6 +19747,7 @@
         100,
         110
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_6e64",
@@ -19735,6 +19761,7 @@
         101,
         110
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_6e65",
@@ -19747,6 +19774,7 @@
         169,
         107
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&6b"
@@ -19758,6 +19786,7 @@
         99,
         110
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_6e63",
@@ -19771,6 +19800,7 @@
         18,
         2
       ],
+      "comment_inline": "Copy FILEV into the operand of the JSR below...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "filev",
@@ -19784,11 +19814,12 @@
         155,
         20
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_149b",
+      "operand": "filev_call_address",
       "target": 5275,
-      "target_label": "data_149b"
+      "target_label": "filev_call_address"
     },
     {
       "addr": 5266,
@@ -19797,6 +19828,7 @@
         19,
         2
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "filev + 1",
@@ -19809,6 +19841,7 @@
         156,
         20
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_149c",
@@ -19821,6 +19854,7 @@
         169,
         255
       ],
+      "comment_inline": "A = &FF: load the file",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&ff"
@@ -19833,16 +19867,17 @@
         48
       ],
       "labels": [
-        "sub_149a"
+        "load_level_call"
       ],
       "sub_labels": {
         "5275": [
-          "data_149b"
+          "filev_call_address"
         ],
         "5276": [
           "data_149c"
         ]
       },
+      "comment_inline": "Call the filing system's OSFILE routine directly",
       "xref_summaries": [
         "&149b referenced 1 time by &148f",
         "&149c referenced 1 time by &1495"
@@ -19860,6 +19895,7 @@
         80,
         4
       ],
+      "comment_inline": "Decrypt and check the level, and return from there",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "decrypt_level",
@@ -22631,6 +22667,9 @@
         86,
         69,
         76
+      ],
+      "labels": [
+        "level_filename"
       ],
       "type": "string",
       "string": "LEVEL"

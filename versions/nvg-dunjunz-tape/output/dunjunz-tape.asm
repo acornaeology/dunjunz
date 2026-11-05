@@ -7,10 +7,10 @@ osbyte_bell_envelope         = &d4
 osbyte_bell_frequency        = &d5
 osbyte_bell_duration         = &d6
 osbyte_inkey                 = &81
+osbyte_tape                  = &8c
 osword_envelope              = &08
 osword_sound                 = &07
 osbyte_scan_keyboard_from_16 = &7a
-osbyte_tape                  = &8c
 
 ; Memory locations
 data_0000          = &00
@@ -70,11 +70,15 @@ os_vsync_counter   = &0240  ; MOS 1.20 counter decremented on every vertical syn
 data_348c          = &348c
 ; &348c referenced 1 time by &5042
 data_4e00          = &4e00
-; &4e00 used as index base 1 time by &0464
+; &4e00 used as index base 2 times by &0464, &1473
 data_5100          = &5100
 ; &5100 referenced 1 time by &503f
 data_545c          = &545c
 ; &545c referenced 1 time by &0482
+data_5475          = &5475
+; &5475 referenced 1 time by &147c
+data_5478          = &5478
+; &5478 referenced 2 times by &147f, &1482
 data_549a          = &549a
 ; &549a referenced 1 time by &047f
 data_549b          = &549b
@@ -123,7 +127,9 @@ oswrch             = &ffee
 osword             = &fff1
 ; &fff1 referenced 15 times by &16a6, &16af, &1d18, &1ead, &1eb6, &736d, &7376, &73b9, &73e3, &748c, &74a9, &74b2, &7586, &7634, &763d
 osbyte             = &fff4
-; &fff4 referenced 18 times by &0583, &058c, &05ed, &0d37, &0d40, &0d49, &0d52, &0ec0, &0ec9, &10d4, &10ed, &1128, &1ed9, &1ee0, &1ee7, &1eee, &503c, &7c9e
+; &fff4 referenced 19 times by &0583, &058c, &05ed, &0d37, &0d40, &0d49, &0d52, &0ec0, &0ec9, &10d4, &10ed, &1128, &146e, &1ed9, &1ee0, &1ee7, &1eee, &503c, &7c9e
+oscli              = &fff7
+; &fff7 referenced 2 times by &1460, &1467
 data_fffc          = &fffc
 ; &fffc referenced 1 time by &10da
 data_fffd          = &fffd
@@ -192,8 +198,14 @@ data_fffd          = &fffd
 .return_1
     rts
     equb &00, &00, &00, &00, &00, &00, &00, &00
+; ***************************************************************************************
+; Move the game out of the way and load a level
+;
+; Keep the level number's digits on the stack, copy pages &0E-&18 to &4E-&58 and clear
+; the originals for the filing system's use, put the digits into the moved copy of
+; level_command, and jump to the moved copy of load_level_from_copy.
 ; &0450 referenced 1 time by &1459
-.code_0450
+.save_game_pages
     lda level_filename_digits
     pha
     lda data_16d6
@@ -1107,9 +1119,9 @@ data_0dff = sub_0ded+18
     equb &de, &dd, &df, &f0, &f2, &f1, &f3, &f8
     equb &fa, &f9, &fb, &f4, &f6, &f5, &f7, &fc
     equb &1e, &fd, &00
-; &0e00 referenced 3 times by &0d6b, &0ecc, &5035; also used as index base 2 times by &045a, &0460
+; &0e00 referenced 3 times by &0d6b, &0ecc, &5035; also used as index base 3 times by &045a, &0460, &1476
 .code_0e00
-    jsr sub_148b
+    jsr first_level
     lda #0
     sta level_number
     tax
@@ -1775,7 +1787,7 @@ data_12d4 = saved_wrchv+1
 ; &1400 referenced 1 time by &0e57
 .start_level
     jsr show_level_number               ; Show the level number
-    jsr sub_1446                        ; Load the level
+    jsr load_level                      ; Load the level
     jsr unpack_level                    ; Copy it into the game's tables
     jsr reset_workspace                 ; Reset page &0D
     jsr reset_monsters                  ; Reset the monsters and keys
@@ -1801,8 +1813,14 @@ data_12d4 = saved_wrchv+1
     sta plot_y
     jsr draw_view_frames                ; ...and draw the frames and the views
     rts                                 ; Return
+; ***************************************************************************************
+; Load the level file
+;
+; Reset the page numbers in the self-modifying copy loops, then move pages &0E-&18 out of
+; the filing system's way and load the level from disc (save_game_pages, continuing in
+; load_level_from_copy).
 ; &1446 referenced 1 time by &1403
-.sub_1446
+.load_level
     lda #&0e
     sta data_045c
     sta data_0462
@@ -1810,23 +1828,52 @@ data_12d4 = saved_wrchv+1
     lda #&4e ; 'N'
     sta data_0466
     sta data_1475
-    jmp code_0450
-.sub_145c
+    jmp save_game_pages
+; ***************************************************************************************
+; Load a level, running from the copy at &545C
+;
+; Runs only from its copy at &545C, made by save_game_pages, so its addresses are those
+; of the copy. Select the disc filing system, *LOAD the level, reselect *TAPE, and copy
+; pages &4E-&58 back to &0E-&18 before returning to start_level.
+.load_level_from_copy
+    ldx #&9d
+    ldy #&54 ; 'T'
+    jsr oscli
+    ldx #&95
+    ldy #&54 ; 'T'
+    jsr oscli
+    lda #osbyte_tape
+    ldx #&0c
+    jsr osbyte                          ; *TAPE: select cassette filing system
+    ldy #0
+; &1473 referenced 2 times by &147a, &1487
+.code_1473
 ; &1475 referenced 1 time by &1456
-data_1475 = sub_145c+25
+data_1475 = code_1473+2
+    lda data_4e00,y
+.sub_1476
 ; &1478 referenced 1 time by &144e
-data_1478 = sub_145c+28
-    equb &a2, &9d, &a0, &54, &20, &f7, &ff, &a2
-    equb &95, &a0, &54, &20, &f7, &ff, &a9, &8c
-    equb &a2, &0c, &20, &f4, &ff, &a0, &00, &b9
-    equb &00, &4e, &99, &00, &0e, &c8, &d0, &f7
-    equb &ee, &75, &54, &ee, &78, &54, &ad, &78
-    equb &54, &c9, &19, &d0, &ea, &60, &60
-; &148b referenced 1 time by &0e00
-.sub_148b
-    lda #0
-    sta level_bcd
+data_1478 = sub_1476+2
+    sta code_0e00,y
+    iny
+    bne code_1473
+    inc data_5475
+    inc data_5478
+    lda data_5478
+    cmp #&19
+    bne code_1473
     rts
+    equb &60
+; ***************************************************************************************
+; Set the starting level
+;
+; Set level_bcd to the level before the first one played. The operand of the LDA is 0
+; unless the loader's start-level cheat has patched it.
+; &148b referenced 1 time by &0e00
+.first_level
+    lda #0                              ; Level before the first (patched by the cheat)
+    sta level_bcd                       ; ...
+    rts                                 ; Return
     equb &ea, &ea, &ea, &ea
     equs "L.$.L1"
     equb &0d, &0d, &44, &2e, &0d
@@ -2130,6 +2177,7 @@ data_1478 = sub_145c+28
     bne loop_16b4
     equb &02, &02, &00, &00, &83, &00, &00, &00
     equb &00, &00, &00, &31, &00, &8d
+.level_command
     equs "L.$.L"
 ; &16d5 referenced 2 times by &0450, &0e4f; also used as index base 1 time by &0e3e
 .level_filename_digits
@@ -3563,44 +3611,55 @@ data_213a = sub_212f+11
     equb &00, &00, &1e, &28, &00, &05, &1e, &00
 
     org &5000
+; ***************************************************************************************
+; Start the game (DUNJ4's execution address)
+;
+; Select the cassette filing system and apply the start-level cheat, copy the game image
+; from &2400-&4FFF down to &0400-&2FFF, point WRCHV at wrch_handler and start a new game.
 .start
-    jsr sub_5038
+    jsr select_tape_and_cheat           ; Select *TAPE and apply the cheat
     nop
-    lda #4
-    sta plot_y
-    lda #&24 ; '$'
-    sta sprite_height
-    sty sprite_width
+    lda #4                              ; Destination &0400...
+    sta plot_y                          ; ...
+    lda #&24 ; '$'                      ; ...source &2400 (both low bytes 0)
+    sta sprite_height                   ; ...
+    sty sprite_width                    ; ...
 ; &500e referenced 2 times by &5013, &501d
 .code_500e
-    lda (sprite_width),y
-    sta (plot_x),y
-    iny
-    bne code_500e
-    inc plot_y
-    inc sprite_height
-    lda #&50 ; 'P'
-    cmp sprite_height
-    bne code_500e
-    lda wrchv
-    sta saved_wrchv
-    lda wrchv + 1
-    sta data_12d4
-    lda #&8f
-    sta wrchv
-    lda #&7f
-    sta wrchv + 1
-    jmp code_0e00
+    lda (sprite_width),y                ; Copy a page...
+    sta (plot_x),y                      ; ...
+    iny                                 ; ...
+    bne code_500e                       ; ...
+    inc plot_y                          ; Next page
+    inc sprite_height                   ; ...
+    lda #&50 ; 'P'                      ; Until the source reaches &5000...
+    cmp sprite_height                   ; ...
+    bne code_500e                       ; ...
+    lda wrchv                           ; Save WRCHV...
+    sta saved_wrchv                     ; ...
+    lda wrchv + 1                       ; ...
+    sta data_12d4                       ; ...in saved_wrchv
+    lda #&8f                            ; Point WRCHV at wrch_handler...
+    sta wrchv                           ; ...
+    lda #&7f                            ; ...
+    sta wrchv + 1                       ; ...
+    jmp code_0e00                       ; Start a new game
+; ***************************************************************************************
+; Select *TAPE and apply the start-level cheat
+;
+; Select the cassette filing system at 1200 baud, and copy the start level chosen in the
+; loader (at &5100, poked there by DUNJ) into the stored copy of first_level's operand,
+; where the copy loop then moves it.
 ; &5038 referenced 1 time by &5000
-.sub_5038
-    lda #osbyte_tape
-    ldx #&0c
+.select_tape_and_cheat
+    lda #osbyte_tape                    ; OSBYTE &8C: *TAPE...
+    ldx #&0c                            ; ...at 1200 baud
     jsr osbyte                          ; *TAPE: select cassette filing system
-    lda data_5100
-    sta data_348c
-    ldy #0
-    sty plot_x
-    rts
+    lda data_5100                       ; Start level chosen with the loader's cheat...
+    sta data_348c                       ; ...into the operand of first_level's LDA, at its stored address
+    ldy #0                              ; Y = 0 and plot_x = 0 for the copy
+    sty plot_x                          ; ...
+    rts                                 ; Return
     equb &ea, &ea, &ea, &ea, &ea, &ea
 
     org &6e80
@@ -7251,11 +7310,11 @@ save "DUNJ3", &6e80, &9d00, &0000, &6e80
 ;     hero_offset_y:             20
 ;     hero_offset_x:             19
 ;     monster_sprite:            19
+;     osbyte:                    19
 ;     plot_at_cell:              19
 ;     data_007d:                 18
 ;     data_007e:                 18
 ;     hero_direction:            18
-;     osbyte:                    18
 ;     monster_offset_y:          17
 ;     monster_x:                 17
 ;     monster_y:                 16
@@ -7294,6 +7353,7 @@ save "DUNJ3", &6e80, &9d00, &0000, &6e80
 ;     monster_step:               7
 ;     object_type:                7
 ;     code_0581:                  6
+;     code_0e00:                  6
 ;     code_7b04:                  6
 ;     data_0082:                  6
 ;     data_008f:                  6
@@ -7306,7 +7366,6 @@ save "DUNJ3", &6e80, &9d00, &0000, &6e80
 ;     wrchv:                      6
 ;     wrchv + 1:                  6
 ;     add_point:                  5
-;     code_0e00:                  5
 ;     code_7075:                  5
 ;     code_71d9:                  5
 ;     count:                      5
@@ -7388,6 +7447,7 @@ save "DUNJ3", &6e80, &9d00, &0000, &6e80
 ;     code_1097:                  2
 ;     code_111c:                  2
 ;     code_11bb:                  2
+;     code_1473:                  2
 ;     code_1e28:                  2
 ;     code_1ebe:                  2
 ;     code_1f91:                  2
@@ -7430,6 +7490,8 @@ save "DUNJ3", &6e80, &9d00, &0000, &6e80
 ;     data_0da4:                  2
 ;     data_0da6:                  2
 ;     data_16d6:                  2
+;     data_4e00:                  2
+;     data_5478:                  2
 ;     data_7dd0:                  2
 ;     data_7e23:                  2
 ;     data_7e4c:                  2
@@ -7442,6 +7504,7 @@ save "DUNJ3", &6e80, &9d00, &0000, &6e80
 ;     draw_view_3:                2
 ;     get_hero_cell:              2
 ;     mos_oswrch_default:         2
+;     oscli:                      2
 ;     osrdch:                     2
 ;     play_pickup_sound:          2
 ;     plot_chalice:               2
@@ -7459,7 +7522,6 @@ save "DUNJ3", &6e80, &9d00, &0000, &6e80
 ;     trapdoor_y:                 2
 ;     add_thousand_points:        1
 ;     check_for_victory:          1
-;     code_0450:                  1
 ;     code_05c0:                  1
 ;     code_05c3:                  1
 ;     code_05c9:                  1
@@ -7657,9 +7719,9 @@ save "DUNJ3", &6e80, &9d00, &0000, &6e80
 ;     data_1478:                  1
 ;     data_213a:                  1
 ;     data_348c:                  1
-;     data_4e00:                  1
 ;     data_5100:                  1
 ;     data_545c:                  1
+;     data_5475:                  1
 ;     data_549a:                  1
 ;     data_549b:                  1
 ;     data_6b00:                  1
@@ -7685,6 +7747,7 @@ save "DUNJ3", &6e80, &9d00, &0000, &6e80
 ;     drop_key:                   1
 ;     erase_boots_icon:           1
 ;     find_open_neighbour:        1
+;     first_level:                1
 ;     flip_firer_frame:           1
 ;     font_digits:                1
 ;     font_letters:               1
@@ -7702,6 +7765,7 @@ save "DUNJ3", &6e80, &9d00, &0000, &6e80
 ;     hero_missile_sprites:       1
 ;     level_loop:                 1
 ;     level_tail:                 1
+;     load_level:                 1
 ;     loop_0437:                  1
 ;     loop_0528:                  1
 ;     loop_0540:                  1
@@ -7791,7 +7855,9 @@ save "DUNJ3", &6e80, &9d00, &0000, &6e80
 ;     return_7:                   1
 ;     return_8:                   1
 ;     return_9:                   1
+;     save_game_pages:            1
 ;     screen_address:             1
+;     select_tape_and_cheat:      1
 ;     set_menu_no:                1
 ;     set_menu_off:               1
 ;     set_menu_on:                1
@@ -7801,9 +7867,6 @@ save "DUNJ3", &6e80, &9d00, &0000, &6e80
 ;     sprite_addr_lo:             1
 ;     start_level:                1
 ;     start_monster_step:         1
-;     sub_1446:                   1
-;     sub_148b:                   1
-;     sub_5038:                   1
 ;     sub_7305:                   1
 ;     unpack_level:               1
 ;     update_game:                1
@@ -7813,7 +7876,6 @@ save "DUNJ3", &6e80, &9d00, &0000, &6e80
 
 ; Automatically generated labels:
 ;     code_041e
-;     code_0450
 ;     code_045a
 ;     code_0581
 ;     code_05c0
@@ -7840,6 +7902,7 @@ save "DUNJ3", &6e80, &9d00, &0000, &6e80
 ;     code_113c
 ;     code_11bb
 ;     code_11d3
+;     code_1473
 ;     code_16bf
 ;     code_1cc5
 ;     code_1cd8
@@ -8101,6 +8164,8 @@ save "DUNJ3", &6e80, &9d00, &0000, &6e80
 ;     data_4e00
 ;     data_5100
 ;     data_545c
+;     data_5475
+;     data_5478
 ;     data_549a
 ;     data_549b
 ;     data_6b00
@@ -8211,22 +8276,19 @@ save "DUNJ3", &6e80, &9d00, &0000, &6e80
 ;     sub_0fea
 ;     sub_10e6
 ;     sub_1204
-;     sub_1446
-;     sub_145c
-;     sub_148b
+;     sub_1476
 ;     sub_212f
-;     sub_5038
 ;     sub_7305
 ;     sub_7db9
 ;     sub_7e30
 
 ; Stats:
 ;     Total size (Code + Data) = 23248 bytes
-;     Code                     = 6946 bytes (30%)
-;     Data                     = 16302 bytes (70%)
+;     Code                     = 6992 bytes (30%)
+;     Data                     = 16256 bytes (70%)
 ;
-;     Number of instructions   = 3189
-;     Number of data bytes     = 14319 bytes
+;     Number of instructions   = 3209
+;     Number of data bytes     = 14273 bytes
 ;     Number of data words     = 0 bytes
 ;     Number of string bytes   = 1983 bytes
 ;     Number of strings        = 324

@@ -65,6 +65,83 @@ game.annotate_game_entry(annotator)
 game.annotate_start_level(annotator)
 game.annotate_cassette_level_loop(annotator)
 
+# ---------------------------------------------------------------------------
+# Specific to Ole's crack: start-up and loading a level from disc.
+
+annotator.sub(0x5000, "start", "Start the game (DUNJ4's execution address)",
+              "Select the cassette filing system and apply the start-level "
+              "cheat, copy the game image from &2400-&4FFF down to "
+              "&0400-&2FFF, point WRCHV at wrch_handler and start a new game.")
+for addr, text in [
+    (0x5000, "Select *TAPE and apply the cheat"),
+    (0x5003, ""),
+    (0x5004, "Destination &0400..."),
+    (0x5006, "..."),
+    (0x5008, "...source &2400 (both low bytes 0)"),
+    (0x500A, "..."),
+    (0x500C, "..."),
+    (0x500E, "Copy a page..."),
+    (0x5010, "..."),
+    (0x5012, "..."),
+    (0x5013, "..."),
+    (0x5015, "Next page"),
+    (0x5017, "..."),
+    (0x5019, "Until the source reaches &5000..."),
+    (0x501B, "..."),
+    (0x501D, "..."),
+    (0x501F, "Save WRCHV..."),
+    (0x5022, "..."),
+    (0x5025, "..."),
+    (0x5028, "...in saved_wrchv"),
+    (0x502B, "Point WRCHV at wrch_handler..."),
+    (0x502D, "..."),
+    (0x5030, "..."),
+    (0x5032, "..."),
+    (0x5035, "Start a new game"),
+]:
+    if text:
+        annotator.c(addr, text)
+annotator.sub(0x5038, "select_tape_and_cheat", "Select *TAPE and apply the start-level cheat",
+              "Select the cassette filing system at 1200 baud, and copy the "
+              "start level chosen in the loader (at &5100, poked there by "
+              "DUNJ) into the stored copy of first_level's operand, where "
+              "the copy loop then moves it.")
+annotator.c(0x5038, "OSBYTE &8C: *TAPE...")
+annotator.c(0x503A, "...at 1200 baud")
+annotator.c(0x503F, "Start level chosen with the loader's cheat...")
+annotator.c(0x5042, "...into the operand of first_level's LDA, at its stored address")
+annotator.c(0x5045, "Y = 0 and plot_x = 0 for the copy")
+annotator.c(0x5047, "...")
+annotator.c(0x5049, "Return")
+
+annotator.sub(0x148B, "first_level", "Set the starting level",
+              "Set level_bcd to the level before the first one played. The "
+              "operand of the LDA is 0 unless the loader's start-level cheat "
+              "has patched it.")
+annotator.c(0x148B, "Level before the first (patched by the cheat)")
+annotator.c(0x148D, "...")
+annotator.c(0x1490, "Return")
+
+annotator.label(0x16D0, "level_command", length=8, description=(
+    "The command that loads a level, \"L.$.L\" followed by the level number "
+    "and a carriage return; level_loop writes the number."))
+annotator.sub(0x1446, "load_level", "Load the level file",
+              "Reset the page numbers in the self-modifying copy loops, then "
+              "move pages &0E-&18 out of the filing system's way and load the "
+              "level from disc (save_game_pages, continuing in "
+              "load_level_from_copy).")
+annotator.sub(0x0450, "save_game_pages", "Move the game out of the way and load a level",
+              "Keep the level number's digits on the stack, copy pages &0E-&18 "
+              "to &4E-&58 and clear the originals for the filing system's use, "
+              "put the digits into the moved copy of level_command, and jump "
+              "to the moved copy of load_level_from_copy.")
+annotator.entry(0x145C)
+annotator.sub(0x145C, "load_level_from_copy", "Load a level, running from the copy at &545C",
+              "Runs only from its copy at &545C, made by save_game_pages, so "
+              "its addresses are those of the copy. Select the disc filing "
+              "system, *LOAD the level, reselect *TAPE, and copy pages &4E-&58 "
+              "back to &0E-&18 before returning to start_level.")
+
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)
 asm_filepath.write_text(str(ir.render(MultiFileBeebasmRenderer(

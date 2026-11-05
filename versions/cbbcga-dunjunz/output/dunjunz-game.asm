@@ -96,7 +96,7 @@ data_6cb0          = &6cb0
 ; &6cb0 used as index base 1 time by &156a
 data_6d80          = &6d80
 ; &6d80 used as index base 1 time by &1577
-data_6e60          = &6e60
+level_osfile_block = &6e60  ; OSFILE parameter block for loading the level, built in screen memory below Dunjun6.
 ; &6e60 referenced 1 time by &1474
 data_6e61          = &6e61
 ; &6e61 referenced 1 time by &1479
@@ -1791,7 +1791,7 @@ data_12d4 = saved_wrchv+1
 ; &1400 referenced 1 time by &0e57
 .start_level
     jsr show_level_number               ; Show the level number
-    jsr sub_1446                        ; Load the level
+    jsr load_level                      ; Load the level
     jsr unpack_level                    ; Copy it into the game's tables
     jsr reset_workspace                 ; Reset page &0D
     jsr reset_monsters                  ; Reset the monsters and keys
@@ -1817,47 +1817,55 @@ data_12d4 = saved_wrchv+1
     sta plot_y
     jsr draw_view_frames                ; ...and draw the frames and the views
     rts                                 ; Return
+; ***************************************************************************************
+; Load the level file
+;
+; Show 23 character rows while loading, then load the file named in level_filename at
+; &6B00 by calling the filing system's FILEV routine directly with an OSFILE block, and
+; finally decrypt and check it. The block's byte 6 (the exec address's low byte, which
+; must be 0 for the load address to be used) is not set here: it relies on
+; show_level_number having cleared the screen, which the block lies in.
 ; &1446 referenced 1 time by &1403
-.sub_1446
-    lda #&17
+.load_level
+    lda #&17                            ; VDU 23,0,6,23,0,0,0,0,0,0: set 6845 register 6...
     jsr oswrch
     lda #0
     jsr oswrch
-    lda #6
+    lda #6                              ; ...
     jsr oswrch
-    lda #&17
+    lda #&17                            ; ...to 23 character rows displayed
     jsr oswrch
-    lda #0
-    jsr oswrch
-    jsr oswrch
+    lda #0                              ; ...
     jsr oswrch
     jsr oswrch
     jsr oswrch
     jsr oswrch
-    ldx #&60 ; '`'
-    ldy #&6e ; 'n'
-    lda #&d0
-    sta data_6e60
-    lda #&16
-    sta data_6e61
-    lda #0
-    sta data_6e62
-    sta data_6e64
-    sta data_6e65
-    lda #&6b ; 'k'
-    sta data_6e63
-    lda filev
-    sta data_149b
-    lda filev + 1
-    sta data_149c
-    lda #&ff
-.sub_149a
+    jsr oswrch
+    jsr oswrch
+    ldx #&60 ; '`'                      ; X, Y = address of the OSFILE block
+    ldy #&6e ; 'n'                      ; ...
+    lda #&d0                            ; Filename address = level_filename...
+    sta level_osfile_block              ; ...
+    lda #&16                            ; ...
+    sta data_6e61                       ; ...
+    lda #0                              ; Load address = &00006B00...
+    sta data_6e62                       ; ...
+    sta data_6e64                       ; ...
+    sta data_6e65                       ; ...
+    lda #&6b ; 'k'                      ; ...
+    sta data_6e63                       ; ...
+    lda filev                           ; Copy FILEV into the operand of the JSR below...
+    sta filev_call_address              ; ...
+    lda filev + 1                       ; ...
+    sta data_149c                       ; ...
+    lda #&ff                            ; A = &FF: load the file
+.load_level_call
 ; &149b referenced 1 time by &148f
-data_149b = sub_149a+1
+filev_call_address = load_level_call+1
 ; &149c referenced 1 time by &1495
-data_149c = sub_149a+2
-    jsr data_3000
-    jmp decrypt_level
+data_149c = load_level_call+2
+    jsr data_3000                       ; Call the filing system's OSFILE routine directly
+    jmp decrypt_level                   ; Decrypt and check the level, and return from there
 ; ***************************************************************************************
 ; Reset the game workspace for a new level
 ;
@@ -2158,6 +2166,7 @@ data_149c = sub_149a+2
     bne loop_16b4
     equb &02, &02, &00, &00, &83, &00, &00, &00
     equb &00, &00, &00, &31, &00, &8d
+.level_filename
     equs "LEVEL"
 ; &16d5 referenced 1 time by &0e4f; also used as index base 1 time by &0e3e
 .level_filename_digits
@@ -6609,7 +6618,6 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     data_10e8:                  1
 ;     data_120f:                  1
 ;     data_1210:                  1
-;     data_149b:                  1
 ;     data_149c:                  1
 ;     data_16d6:                  1
 ;     data_213a:                  1
@@ -6627,7 +6635,6 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     data_6be0:                  1
 ;     data_6cb0:                  1
 ;     data_6d80:                  1
-;     data_6e60:                  1
 ;     data_6e61:                  1
 ;     data_6e62:                  1
 ;     data_6e63:                  1
@@ -6645,6 +6652,7 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     erase_boots_icon:           1
 ;     filev:                      1
 ;     filev + 1:                  1
+;     filev_call_address:         1
 ;     find_open_neighbour:        1
 ;     flip_firer_frame:           1
 ;     font_digits:                1
@@ -6663,7 +6671,9 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     hero_missile_sprites:       1
 ;     level_checksums:            1
 ;     level_loop:                 1
+;     level_osfile_block:         1
 ;     level_tail:                 1
+;     load_level:                 1
 ;     loop_0437:                  1
 ;     loop_0528:                  1
 ;     loop_0540:                  1
@@ -6765,7 +6775,6 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     sprite_addr_lo:             1
 ;     start_level:                1
 ;     start_monster_step:         1
-;     sub_1446:                   1
 ;     sub_7305:                   1
 ;     unpack_level:               1
 ;     update_game:                1
@@ -7051,7 +7060,6 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     data_120f
 ;     data_1210
 ;     data_12d4
-;     data_149b
 ;     data_149c
 ;     data_16d6
 ;     data_213a
@@ -7069,7 +7077,6 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     data_6be0
 ;     data_6cb0
 ;     data_6d80
-;     data_6e60
 ;     data_6e61
 ;     data_6e62
 ;     data_6e63
@@ -7168,8 +7175,6 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     sub_0fea
 ;     sub_10e6
 ;     sub_1204
-;     sub_1446
-;     sub_149a
 ;     sub_212f
 ;     sub_7305
 ;     sub_7db9

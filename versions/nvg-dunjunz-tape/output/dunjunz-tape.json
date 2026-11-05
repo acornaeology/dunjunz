@@ -38,6 +38,10 @@
       "value": 129
     },
     {
+      "name": "osbyte_tape",
+      "value": 140
+    },
+    {
       "name": "osword_envelope",
       "value": 8
     },
@@ -48,10 +52,6 @@
     {
       "name": "osbyte_scan_keyboard_from_16",
       "value": 122
-    },
-    {
-      "name": "osbyte_tape",
-      "value": 140
     }
   ],
   "macros": [],
@@ -727,6 +727,42 @@
       "name": "show_level_number",
       "title": "Show the number of the level about to start",
       "description": "Clear the text area, count the level, plot the word LEVEL and print the number in the game's font, then set a text window and colour for later messages."
+    },
+    {
+      "addr": 20480,
+      "name": "start",
+      "title": "Start the game (DUNJ4's execution address)",
+      "description": "Select the cassette filing system and apply the start-level cheat, copy the game image from &2400-&4FFF down to &0400-&2FFF, point WRCHV at wrch_handler and start a new game."
+    },
+    {
+      "addr": 20536,
+      "name": "select_tape_and_cheat",
+      "title": "Select *TAPE and apply the start-level cheat",
+      "description": "Select the cassette filing system at 1200 baud, and copy the start level chosen in the loader (at &5100, poked there by DUNJ) into the stored copy of first_level's operand, where the copy loop then moves it."
+    },
+    {
+      "addr": 5259,
+      "name": "first_level",
+      "title": "Set the starting level",
+      "description": "Set level_bcd to the level before the first one played. The operand of the LDA is 0 unless the loader's start-level cheat has patched it."
+    },
+    {
+      "addr": 5190,
+      "name": "load_level",
+      "title": "Load the level file",
+      "description": "Reset the page numbers in the self-modifying copy loops, then move pages &0E-&18 out of the filing system's way and load the level from disc (save_game_pages, continuing in load_level_from_copy)."
+    },
+    {
+      "addr": 1104,
+      "name": "save_game_pages",
+      "title": "Move the game out of the way and load a level",
+      "description": "Keep the level number's digits on the stack, copy pages &0E-&18 to &4E-&58 and clear the originals for the filing system's use, put the digits into the moved copy of level_command, and jump to the moved copy of load_level_from_copy."
+    },
+    {
+      "addr": 5212,
+      "name": "load_level_from_copy",
+      "title": "Load a level, running from the copy at &545C",
+      "description": "Runs only from its copy at &545C, made by save_game_pages, so its addresses are those of the copy. Select the disc filing system, *LOAD the level, reselect *TAPE, and copy pages &4E-&58 back to &0E-&18 before returning to start_level."
     }
   ],
   "banners": [
@@ -813,6 +849,8 @@
     "data_4e00": 19968,
     "data_5100": 20736,
     "data_545c": 21596,
+    "data_5475": 21621,
+    "data_5478": 21624,
     "data_549a": 21658,
     "data_549b": 21659,
     "data_6b00": 27392,
@@ -1552,7 +1590,7 @@
         22
       ],
       "labels": [
-        "code_0450"
+        "save_game_pages"
       ],
       "xref_summaries": [
         "&0450 referenced 1 time by &1459"
@@ -12381,7 +12419,7 @@
         "code_0e00"
       ],
       "xref_summaries": [
-        "&0e00 referenced 3 times by &0d6b, &0ecc, &5035; also used as index base 2 times by &045a, &0460"
+        "&0e00 referenced 3 times by &0d6b, &0ecc, &5035; also used as index base 3 times by &045a, &0460, &1476"
       ],
       "references": [
         {
@@ -12401,15 +12439,19 @@
           "kind": "direct"
         },
         {
+          "addr": 5238,
+          "kind": "indexed"
+        },
+        {
           "addr": 20533,
           "kind": "direct"
         }
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_148b",
+      "operand": "first_level",
       "target": 5259,
-      "target_label": "sub_148b"
+      "target_label": "first_level"
     },
     {
       "addr": 3587,
@@ -19070,9 +19112,9 @@
       "comment_inline": "Load the level",
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_1446",
+      "operand": "load_level",
       "target": 5190,
-      "target_label": "sub_1446"
+      "target_label": "load_level"
     },
     {
       "addr": 5126,
@@ -19392,7 +19434,7 @@
         14
       ],
       "labels": [
-        "sub_1446"
+        "load_level"
       ],
       "xref_summaries": [
         "&1446 referenced 1 time by &1403"
@@ -19491,124 +19533,284 @@
       ],
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_0450",
+      "operand": "save_game_pages",
       "target": 1104,
-      "target_label": "code_0450"
+      "target_label": "save_game_pages"
     },
     {
       "addr": 5212,
       "bytes": [
         162,
-        157,
-        160,
-        84,
-        32,
-        247,
-        255,
-        162,
-        149,
-        160,
-        84,
-        32,
-        247,
-        255,
-        169,
-        140,
-        162,
-        12,
-        32,
-        244,
-        255,
-        160,
-        0,
-        185,
-        0,
-        78,
-        153,
-        0,
-        14,
-        200,
-        208,
-        247,
-        238,
-        117,
-        84,
-        238,
-        120,
-        84,
-        173,
-        120,
-        84,
-        201,
-        25,
-        208,
-        234,
-        96,
-        96
+        157
       ],
       "labels": [
-        "sub_145c"
+        "load_level_from_copy"
+      ],
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#&9d"
+    },
+    {
+      "addr": 5214,
+      "bytes": [
+        160,
+        84
+      ],
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#&54"
+    },
+    {
+      "addr": 5216,
+      "bytes": [
+        32,
+        247,
+        255
+      ],
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oscli",
+      "target": 65527,
+      "target_label": "oscli"
+    },
+    {
+      "addr": 5219,
+      "bytes": [
+        162,
+        149
+      ],
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#&95"
+    },
+    {
+      "addr": 5221,
+      "bytes": [
+        160,
+        84
+      ],
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#&54"
+    },
+    {
+      "addr": 5223,
+      "bytes": [
+        32,
+        247,
+        255
+      ],
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oscli",
+      "target": 65527,
+      "target_label": "oscli"
+    },
+    {
+      "addr": 5226,
+      "bytes": [
+        169,
+        140
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#osbyte_tape",
+      "expr": {
+        "text": "osbyte_tape",
+        "tree": {
+          "sym": "osbyte_tape"
+        }
+      }
+    },
+    {
+      "addr": 5228,
+      "bytes": [
+        162,
+        12
+      ],
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#&0c"
+    },
+    {
+      "addr": 5230,
+      "bytes": [
+        32,
+        244,
+        255
+      ],
+      "comment_inline": "*TAPE: select cassette filing system",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "osbyte",
+      "target": 65524,
+      "target_label": "osbyte"
+    },
+    {
+      "addr": 5233,
+      "bytes": [
+        160,
+        0
+      ],
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#0"
+    },
+    {
+      "addr": 5235,
+      "bytes": [
+        185,
+        0,
+        78
+      ],
+      "labels": [
+        "code_1473"
       ],
       "sub_labels": {
         "5237": [
           "data_1475"
-        ],
+        ]
+      },
+      "xref_summaries": [
+        "&1473 referenced 2 times by &147a, &1487",
+        "&1475 referenced 1 time by &1456"
+      ],
+      "references": [
+        {
+          "addr": 5242,
+          "kind": "direct"
+        },
+        {
+          "addr": 5255,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "data_4e00,y",
+      "target": 19968,
+      "target_label": "data_4e00"
+    },
+    {
+      "addr": 5238,
+      "bytes": [
+        153,
+        0,
+        14
+      ],
+      "labels": [
+        "sub_1476"
+      ],
+      "sub_labels": {
         "5240": [
           "data_1478"
         ]
       },
       "xref_summaries": [
-        "&1475 referenced 1 time by &1456",
         "&1478 referenced 1 time by &144e"
+      ],
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "code_0e00,y",
+      "target": 3584,
+      "target_label": "code_0e00"
+    },
+    {
+      "addr": 5241,
+      "bytes": [
+        200
+      ],
+      "type": "code",
+      "mnemonic": "iny"
+    },
+    {
+      "addr": 5242,
+      "bytes": [
+        208,
+        247
+      ],
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "code_1473",
+      "target": 5235,
+      "target_label": "code_1473"
+    },
+    {
+      "addr": 5244,
+      "bytes": [
+        238,
+        117,
+        84
+      ],
+      "type": "code",
+      "mnemonic": "inc",
+      "operand": "data_5475",
+      "target": 21621,
+      "target_label": "data_5475"
+    },
+    {
+      "addr": 5247,
+      "bytes": [
+        238,
+        120,
+        84
+      ],
+      "type": "code",
+      "mnemonic": "inc",
+      "operand": "data_5478",
+      "target": 21624,
+      "target_label": "data_5478"
+    },
+    {
+      "addr": 5250,
+      "bytes": [
+        173,
+        120,
+        84
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "data_5478",
+      "target": 21624,
+      "target_label": "data_5478"
+    },
+    {
+      "addr": 5253,
+      "bytes": [
+        201,
+        25
+      ],
+      "type": "code",
+      "mnemonic": "cmp",
+      "operand": "#&19"
+    },
+    {
+      "addr": 5255,
+      "bytes": [
+        208,
+        234
+      ],
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "code_1473",
+      "target": 5235,
+      "target_label": "code_1473"
+    },
+    {
+      "addr": 5257,
+      "bytes": [
+        96
+      ],
+      "type": "code",
+      "mnemonic": "rts"
+    },
+    {
+      "addr": 5258,
+      "bytes": [
+        96
       ],
       "type": "byte",
       "values": [
-        162,
-        157,
-        160,
-        84,
-        32,
-        247,
-        255,
-        162,
-        149,
-        160,
-        84,
-        32,
-        247,
-        255,
-        169,
-        140,
-        162,
-        12,
-        32,
-        244,
-        255,
-        160,
-        0,
-        185,
-        0,
-        78,
-        153,
-        0,
-        14,
-        200,
-        208,
-        247,
-        238,
-        117,
-        84,
-        238,
-        120,
-        84,
-        173,
-        120,
-        84,
-        201,
-        25,
-        208,
-        234,
-        96,
         96
       ]
     },
@@ -19619,8 +19821,9 @@
         0
       ],
       "labels": [
-        "sub_148b"
+        "first_level"
       ],
+      "comment_inline": "Level before the first (patched by the cheat)",
       "xref_summaries": [
         "&148b referenced 1 time by &0e00"
       ],
@@ -19641,6 +19844,7 @@
         255,
         22
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "level_bcd",
@@ -19652,6 +19856,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -22463,6 +22668,9 @@
         36,
         46,
         76
+      ],
+      "labels": [
+        "level_command"
       ],
       "type": "string",
       "string": "L.$.L"
@@ -40914,11 +41122,12 @@
       "labels": [
         "start"
       ],
+      "comment_inline": "Select *TAPE and apply the cheat",
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_5038",
+      "operand": "select_tape_and_cheat",
       "target": 20536,
-      "target_label": "sub_5038"
+      "target_label": "select_tape_and_cheat"
     },
     {
       "addr": 20483,
@@ -40934,6 +41143,7 @@
         169,
         4
       ],
+      "comment_inline": "Destination &0400...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#4"
@@ -40944,6 +41154,7 @@
         133,
         113
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -40956,6 +41167,7 @@
         169,
         36
       ],
+      "comment_inline": "...source &2400 (both low bytes 0)",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&24"
@@ -40966,6 +41178,7 @@
         133,
         115
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_height",
@@ -40978,6 +41191,7 @@
         132,
         114
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sty",
       "operand": "sprite_width",
@@ -40993,6 +41207,7 @@
       "labels": [
         "code_500e"
       ],
+      "comment_inline": "Copy a page...",
       "xref_summaries": [
         "&500e referenced 2 times by &5013, &501d"
       ],
@@ -41018,6 +41233,7 @@
         145,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "(plot_x),y",
@@ -41029,6 +41245,7 @@
       "bytes": [
         200
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "iny"
     },
@@ -41038,6 +41255,7 @@
         208,
         249
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_500e",
@@ -41050,6 +41268,7 @@
         230,
         113
       ],
+      "comment_inline": "Next page",
       "type": "code",
       "mnemonic": "inc",
       "operand": "plot_y",
@@ -41062,6 +41281,7 @@
         230,
         115
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
       "operand": "sprite_height",
@@ -41074,6 +41294,7 @@
         169,
         80
       ],
+      "comment_inline": "Until the source reaches &5000...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&50"
@@ -41084,6 +41305,7 @@
         197,
         115
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "sprite_height",
@@ -41096,6 +41318,7 @@
         208,
         239
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_500e",
@@ -41109,6 +41332,7 @@
         14,
         2
       ],
+      "comment_inline": "Save WRCHV...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "wrchv",
@@ -41122,6 +41346,7 @@
         211,
         18
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "saved_wrchv",
@@ -41135,6 +41360,7 @@
         15,
         2
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "wrchv + 1",
@@ -41147,6 +41373,7 @@
         212,
         18
       ],
+      "comment_inline": "...in saved_wrchv",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_12d4",
@@ -41159,6 +41386,7 @@
         169,
         143
       ],
+      "comment_inline": "Point WRCHV at wrch_handler...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&8f"
@@ -41170,6 +41398,7 @@
         14,
         2
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "wrchv",
@@ -41182,6 +41411,7 @@
         169,
         127
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&7f"
@@ -41193,6 +41423,7 @@
         15,
         2
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "wrchv + 1",
@@ -41205,6 +41436,7 @@
         0,
         14
       ],
+      "comment_inline": "Start a new game",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_0e00",
@@ -41218,8 +41450,9 @@
         140
       ],
       "labels": [
-        "sub_5038"
+        "select_tape_and_cheat"
       ],
+      "comment_inline": "OSBYTE &8C: *TAPE...",
       "xref_summaries": [
         "&5038 referenced 1 time by &5000"
       ],
@@ -41245,6 +41478,7 @@
         162,
         12
       ],
+      "comment_inline": "...at 1200 baud",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&0c"
@@ -41270,6 +41504,7 @@
         0,
         81
       ],
+      "comment_inline": "Start level chosen with the loader's cheat...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "data_5100",
@@ -41283,6 +41518,7 @@
         140,
         52
       ],
+      "comment_inline": "...into the operand of first_level's LDA, at its stored address",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_348c",
@@ -41295,6 +41531,7 @@
         160,
         0
       ],
+      "comment_inline": "Y = 0 and plot_x = 0 for the copy",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -41305,6 +41542,7 @@
         132,
         112
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sty",
       "operand": "plot_x",
@@ -41316,6 +41554,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },

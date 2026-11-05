@@ -63,6 +63,54 @@ game.annotate_level_check(annotator)
 game.annotate_start_level(annotator)
 game.annotate_cassette_level_loop(annotator)
 
+# ---------------------------------------------------------------------------
+# Specific to the sideways RAM hack: loading a level from ROMFS.
+
+annotator.label(0x16D0, "level_filename", length=8, description=(
+    "The level's filename, \"LEVEL\" followed by the level number and a "
+    "carriage return, written by level_loop."))
+annotator.label(0x6E60, "level_osfile_block", length=18, group="screen_workspace",
+                description=(
+                    "OSFILE parameter block for loading the level, built in "
+                    "screen memory below Dunjun6."))
+annotator.label(0x149B, "filev_call_address", length=2, description=(
+    "Operand of the JSR at load_level_call, set to the contents of FILEV."))
+annotator.sub(0x1446, "load_level", "Load the level file",
+              "Show 23 character rows while loading, then load the file named "
+              "in level_filename at &6B00 by calling the filing system's FILEV "
+              "routine directly with an OSFILE block, and finally decrypt and "
+              "check it. The block's byte 6 (the exec address's low byte, "
+              "which must be 0 for the load address to be used) is not set "
+              "here: it relies on show_level_number having cleared the screen, "
+              "which the block lies in.")
+for addr, text in [
+    (0x1446, "VDU 23,0,6,23,0,0,0,0,0,0: set 6845 register 6..."),
+    (0x1450, "..."),
+    (0x1455, "...to 23 character rows displayed"),
+    (0x145A, "..."),
+    (0x146E, "X, Y = address of the OSFILE block"),
+    (0x1470, "..."),
+    (0x1472, "Filename address = level_filename..."),
+    (0x1474, "..."),
+    (0x1477, "..."),
+    (0x1479, "..."),
+    (0x147C, "Load address = &00006B00..."),
+    (0x147E, "..."),
+    (0x1481, "..."),
+    (0x1484, "..."),
+    (0x1487, "..."),
+    (0x1489, "..."),
+    (0x148C, "Copy FILEV into the operand of the JSR below..."),
+    (0x148F, "..."),
+    (0x1492, "..."),
+    (0x1495, "..."),
+    (0x1498, "A = &FF: load the file"),
+    (0x149A, "Call the filing system's OSFILE routine directly"),
+    (0x149D, "Decrypt and check the level, and return from there"),
+]:
+    annotator.c(addr, text)
+annotator.label(0x149A, "load_level_call")
+
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)
 asm_filepath.write_text(str(ir.render(MultiFileBeebasmRenderer(SAVED_FILES))), encoding="utf-8")
