@@ -75,3 +75,62 @@ Ranger "2 fireballs" with strong magic, whereas the story text (lines
 130–140) says "The Ranger uses a bow" and "The Wizard has been taught how
 to cast powerful fireballs". To be confirmed against the game code
 (weapon type and limit per hero).
+
+## Level data
+
+### Levels are encrypted and checksummed; a failed checksum resets the machine
+
+Each level file is &2B0 bytes, loaded at &6B00–&6DAF. The routine at &0450
+decrypts it in place, XORing each byte with the low byte of its own
+address, and sums the decrypted bytes modulo 256. It compares the sum with
+the entry for the current level (1–25, held at &169F) in the table at
+&0491–&04A9. On a mismatch it calls &D9CD, the reset entry of MOS 1.20,
+so a tampered level resets the machine.
+
+Consequences:
+- A level editor must re-encrypt the level and update the table, or the
+  game resets on loading the level.
+- On any MOS other than 1.20, &D9CD is not the reset entry, so a failed
+  checksum jumps into the middle of unrelated MOS code.
+
+### This disc resets the machine on reaching level 5
+
+`LEVEL5` in the `Dunjun2` ROMFS image decrypts to a sum of &4D, but the
+table in `Dunjun4` holds &1A for level 5. The other 24 levels match.
+Confirmed in beebium: with the level counters set so that the next level
+is 5, the game reaches `JSR &D9CD` at &0481 with &72=&4D. With level 4 it
+returns normally.
+
+Origin, from the archives at
+<https://rk.nvg.ntnu.no/bbc/sw/BugByte/> (`Dunjunz.zip`, a disc release
+with a level editor, and `Dunjunz-tape.zip`):
+- The tape release's `DUNJ4` carries the same table as this disc
+  (&1A for level 5).
+- The disc release's game (`0/Dun1`) and its `Coder` and `Editor`
+  programs carry &4D for level 5. Its `0/Level5` sums to &4D, matching.
+- This disc's level files decrypt with the same scheme as the disc
+  release's levels, and its `LEVEL5` has the same sum (&4D).
+
+So this sideways RAM version appears to combine code derived from the
+tape release with the disc release's level files, of which level 5
+differs from the tape's. Fix: set &0495 in `Dunjun4` to &4D (or restore
+the tape's level 5).
+
+## Provenance of this disc
+
+The sideways RAM version is described on stardot as an unofficial hack
+(<https://stardot.org.uk/forums/viewtopic.php?t=16227>). Its game files
+match the tape release except for:
+- &0450–&0484: the tape release's code here is a different routine; the
+  hack has the level decrypt/checksum routine described above.
+- &1447–&149F: the level loader, rewritten to load `LEVELn` by calling
+  the filing system's FILEV handler with an OSFILE block at &6E60.
+- &0E00–&0E06 and the filename at &16D0: the new-game entry and the
+  level filename.
+- Workspace and table bytes in &0800–&08BF, &0D2F–&0D30 and &0D80–&0D85,
+  where the hack's files differ from the tape's file contents. These look
+  like values from a running game, i.e. the files were saved from memory.
+  To be confirmed.
+
+`Dunjun6` is byte-identical to the first &1180 bytes of the tape's
+`DUNJ3`.
