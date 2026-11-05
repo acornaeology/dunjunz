@@ -5684,52 +5684,52 @@ data_213a = sub_212f+11
 ;     X: hero number (0-3)
 ; &76da referenced 1 time by &6e91
 .animate_absent_hero
-    dec hero_offset_y,x
-    beq code_76e0
-    rts
+    dec hero_offset_y,x                 ; Every other frame...
+    beq code_76e0                       ; ...
+    rts                                 ; ...
 ; &76e0 referenced 1 time by &76dd
 .code_76e0
-    lda #2
-    sta hero_offset_y,x
-    jsr get_hero_cell
-    lda #0
-    sta data_007d
-    sta data_007e
-    lda hero_frame,x
-    tay
-    lda hero_appearance_sprites,y
-    sta sprite_number
-    txa
-    pha
-    jsr plot_at_cell
-    pla
-    tax
-    clc
-    lda hero_frame,x
-    adc hero_offset_x,x
-    cmp #9
-    bcc code_770b
-    lda #8
+    lda #2                              ; ...
+    sta hero_offset_y,x                 ; ...
+    jsr get_hero_cell                   ; Plot the current appearance sprite at the hero's cell
+    lda #0                              ; ...
+    sta data_007d                       ; ...
+    sta data_007e                       ; ...
+    lda hero_frame,x                    ; ...
+    tay                                 ; ...
+    lda hero_appearance_sprites,y       ; ...
+    sta sprite_number                   ; ...
+    txa                                 ; ...
+    pha                                 ; ...
+    jsr plot_at_cell                    ; ...
+    pla                                 ; ...
+    tax                                 ; ...
+    clc                                 ; Step to the next (+1 dying, -1 returning), stopping at 8
+    lda hero_frame,x                    ; ...
+    adc hero_offset_x,x                 ; ...
+    cmp #9                              ; ...
+    bcc code_770b                       ; ...
+    lda #8                              ; ...
 ; &770b referenced 1 time by &7707
 .code_770b
-    cmp #0
-    bne code_772e
-    lda #5
-    sta hero_direction,x
-    lda #0
-    sta hero_step,x
-    sta hero_offset_x,x
-    sta hero_offset_y,x
-    sta hero_frame,x
-    lda #&21 ; '!'
-    sta hero_health_tens,x
-    sta hero_health_units,x
-    jsr lose_health_point
-    rts
+    cmp #0                              ; Reached the first sprite (returning)?
+    bne code_772e                       ; No
+    lda #5                              ; Yes: in play, facing down...
+    sta hero_direction,x                ; ...
+    lda #0                              ; ...with no step or offsets...
+    sta hero_step,x                     ; ...
+    sta hero_offset_x,x                 ; ...
+    sta hero_offset_y,x                 ; ...
+    sta hero_frame,x                    ; ...
+    lda #&21 ; '!'                      ; ...and health 33, drawn by taking a point
+    sta hero_health_tens,x              ; ...
+    sta hero_health_units,x             ; ...
+    jsr lose_health_point               ; ...
+    rts                                 ; Return
 ; &772e referenced 1 time by &770d
 .code_772e
-    sta hero_frame,x
-    rts
+    sta hero_frame,x                    ; Store the frame
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Draw a hero
 ;
@@ -6202,118 +6202,118 @@ data_213a = sub_212f+11
 ; at a trapdoor.
 ; &79c1 referenced 1 time by &1ed4
 .update_monsters
-    ldx #8
-    lda #0
-    sta data_007d
-    sta data_007e
-    lda #&2c ; ','
-    sta sprite_number
+    ldx #8                              ; Draw the eight trapdoors (sprite &2C)...
+    lda #0                              ; ...
+    sta data_007d                       ; ...
+    sta data_007e                       ; ...
+    lda #&2c ; ','                      ; ...
+    sta sprite_number                   ; ...
 ; &79cd referenced 1 time by &79e1
 .loop_79cd
-    lda data_0b8f,x
-    sta cell_x
-    lda data_0b97,x
-    sta cell_y
-    txa
-    pha
-    jsr plot_at_cell
-    pla
-    tax
-    dex
-    bne loop_79cd
-    ldx #&1e
+    lda data_0b8f,x                     ; ...
+    sta cell_x                          ; ...
+    lda data_0b97,x                     ; ...
+    sta cell_y                          ; ...
+    txa                                 ; ...
+    pha                                 ; ...
+    jsr plot_at_cell                    ; ...
+    pla                                 ; ...
+    tax                                 ; ...
+    dex                                 ; ...
+    bne loop_79cd                       ; ...
+    ldx #&1e                            ; For each monster, 30 to 1...
 ; &79e5 referenced 1 time by &7b2d
-.code_79e5
-    txa
-    pha
-    lda monster_x,x
-    sta cell_x
-    sta previous_x
-    lda monster_y,x
-    sta cell_y
-    sta previous_y
-    lda #&15
-    sta sprite_number
-    lda monster_offset_x,x
-    sta data_007d
-    lda monster_offset_y,x
-    sta data_007e
-    jsr plot_at_cell
-    pla
-    pha
-    tax
-    lda monster_sprite,x
-    cmp #&15
-    bcc code_7a17
-    jmp code_7b31
+.next_monster_update
+    txa                                 ; ...
+    pha                                 ; ...
+    lda monster_x,x                     ; Erase it at its cell and offsets, remembering the cell
+    sta cell_x                          ; ...
+    sta previous_x                      ; ...
+    lda monster_y,x                     ; ...
+    sta cell_y                          ; ...
+    sta previous_y                      ; ...
+    lda #&15                            ; ...
+    sta sprite_number                   ; ...
+    lda monster_offset_x,x              ; ...
+    sta data_007d                       ; ...
+    lda monster_offset_y,x              ; ...
+    sta data_007e                       ; ...
+    jsr plot_at_cell                    ; ...
+    pla                                 ; ...
+    pha                                 ; ...
+    tax                                 ; ...
+    lda monster_sprite,x                ; Dying?
+    cmp #&15                            ; ...
+    bcc code_7a17                       ; No
+    jmp advance_dying_monster           ; Yes: advance the death animation
 ; &7a17 referenced 1 time by &7a12
 .code_7a17
-    lda monster_step,x
-    beq code_7a23
-    jsr continue_monster_step
-    pla
-    jmp code_7b04
+    lda monster_step,x                  ; Part way through a step?
+    beq code_7a23                       ; No
+    jsr continue_monster_step           ; Yes: continue it and draw
+    pla                                 ; ...
+    jmp draw_monster                    ; ...
 ; &7a23 referenced 1 time by &7a1a
 .code_7a23
-    lda monster_sprite,x
-    cmp #9
-    bne code_7a2d
-    dec monster_y,x
+    lda monster_sprite,x                ; Start a step: move the cell in the direction it faces, up...
+    cmp #9                              ; ...
+    bne code_7a2d                       ; ...
+    dec monster_y,x                     ; ...
 ; &7a2d referenced 1 time by &7a28
 .code_7a2d
-    cmp #&0b
-    bne code_7a34
-    inc monster_x,x
+    cmp #&0b                            ; ...right...
+    bne code_7a34                       ; ...
+    inc monster_x,x                     ; ...
 ; &7a34 referenced 1 time by &7a2f
 .code_7a34
-    cmp #&0d
-    bne code_7a3b
-    inc monster_y,x
+    cmp #&0d                            ; ...down...
+    bne code_7a3b                       ; ...
+    inc monster_y,x                     ; ...
 ; &7a3b referenced 1 time by &7a36
 .code_7a3b
-    cmp #&0f
-    bne code_7a42
-    dec monster_x,x
+    cmp #&0f                            ; ...left
+    bne code_7a42                       ; ...
+    dec monster_x,x                     ; ...
 ; &7a42 referenced 1 time by &7a3d
 .code_7a42
-    jsr start_monster_step
-    lda monster_x,x
-    sta cell_x
-    lda monster_y,x
-    sta cell_y
-    jsr test_wall
-    beq code_7a87
-    pla
-    tax
-    lda previous_x
-    sta monster_x,x
-    lda previous_y
-    sta monster_y,x
-    lda #0
-    sta monster_step,x
-    sta monster_offset_x,x
-    sta monster_offset_y,x
-    lda system_via_t1c_l
-    and #7
-    clc
-    adc #8
-    sta monster_sprite,x
-    and #1
-    beq code_7a81
-    jmp code_7b04
+    jsr start_monster_step              ; Set the step's offsets
+    lda monster_x,x                     ; Wall in the new cell?
+    sta cell_x                          ; ...
+    lda monster_y,x                     ; ...
+    sta cell_y                          ; ...
+    jsr test_wall                       ; ...
+    beq code_7a87                       ; No
+    pla                                 ; Yes: stay put, with no step...
+    tax                                 ; ...
+    lda previous_x                      ; ...
+    sta monster_x,x                     ; ...
+    lda previous_y                      ; ...
+    sta monster_y,x                     ; ...
+    lda #0                              ; ...
+    sta monster_step,x                  ; ...
+    sta monster_offset_x,x              ; ...
+    sta monster_offset_y,x              ; ...
+    lda system_via_t1c_l                ; ...and turn a random way: sprite 8 + (timer AND 7)...
+    and #7                              ; ...
+    clc                                 ; ...
+    adc #8                              ; ...
+    sta monster_sprite,x                ; ...
+    and #1                              ; ...made odd (9, &0B, &0D or &0F)
+    beq code_7a81                       ; ...
+    jmp draw_monster                    ; ...
 ; &7a81 referenced 1 time by &7a7c
 .code_7a81
-    inc monster_sprite,x
-    jmp code_7b04
+    inc monster_sprite,x                ; ...
+    jmp draw_monster                    ; ...
 ; &7a87 referenced 1 time by &7a54
 .code_7a87
-    pla
-    pha
-    sta scratch
-    jsr find_creature
-    cmp #0
-    beq code_7ac1
-    pla
+    pla                                 ; Is another monster, or a hero, in the new cell? (A hero there is hurt)
+    pha                                 ; ...
+    sta scratch                         ; ...
+    jsr find_creature                   ; ...
+    cmp #0                              ; ...
+    beq code_7ac1                       ; No
+    pla                                 ; Yes: stay put, with no step, and turn a random way
     tax
     lda previous_x
     sta monster_x,x
@@ -6329,96 +6329,96 @@ data_213a = sub_212f+11
     adc #8
     sta monster_sprite,x
     and #1
-    bne code_7b04
+    bne draw_monster
     inc monster_sprite,x
-    jmp code_7b04
+    jmp draw_monster
 ; &7ac1 referenced 1 time by &7a91
 .code_7ac1
-    pla
-    tax
-    lda monster_sprite,x
-    cmp #9
-    beq code_7adc
-    cmp #&0d
-    beq code_7adc
-    lda monster_x,x
-    and #7
-    beq code_7aea
-    cmp #7
-    beq code_7aea
-    jmp code_7af8
+    pla                                 ; Moving vertically...
+    tax                                 ; ...
+    lda monster_sprite,x                ; ...
+    cmp #9                              ; ...
+    beq code_7adc                       ; ...
+    cmp #&0d                            ; ...
+    beq code_7adc                       ; ...
+    lda monster_x,x                     ; No: at the left or right edge of a room?
+    and #7                              ; ...
+    beq code_7aea                       ; ...
+    cmp #7                              ; ...
+    beq code_7aea                       ; ...
+    jmp code_7af8                       ; No: move on
 ; &7adc referenced 2 times by &7ac8, &7acc
 .code_7adc
-    lda monster_y,x
-    and #7
-    beq code_7aea
-    cmp #7
-    beq code_7aea
-    jmp code_7af8
+    lda monster_y,x                     ; Yes: at the top or bottom edge of a room?
+    and #7                              ; ...
+    beq code_7aea                       ; ...
+    cmp #7                              ; ...
+    beq code_7aea                       ; ...
+    jmp code_7af8                       ; No: move on
 ; &7aea referenced 4 times by &7ad3, &7ad7, &7ae1, &7ae5
 .code_7aea
-    lda #0
-    sta monster_step,x
-    sta monster_offset_x,x
-    sta monster_offset_y,x
-    jmp code_7b04
+    lda #0                              ; At a room edge: cancel the step, so it arrives at once
+    sta monster_step,x                  ; ...
+    sta monster_offset_x,x              ; ...
+    sta monster_offset_y,x              ; ...
+    jmp draw_monster                    ; ...
 ; &7af8 referenced 2 times by &7ad9, &7ae7
 .code_7af8
-    lda previous_x
-    sta monster_x,x
-    lda previous_y
-    sta monster_y,x
+    lda previous_x                      ; Move on: stay in the old cell until the step ends
+    sta monster_x,x                     ; ...
+    lda previous_y                      ; ...
+    sta monster_y,x                     ; ...
 ; &7b04 referenced 6 times by &7a20, &7a7e, &7a84, &7ab9, &7abe, &7af5
-.code_7b04
-    lda monster_x,x
-    sta cell_x
-    lda monster_y,x
-    sta cell_y
-    clc
-    lda monster_sprite,x
-    adc monster_frame,x
-    sta sprite_number
-    lda monster_offset_x,x
-    sta data_007d
-    lda monster_offset_y,x
-    sta data_007e
-    txa
-    pha
-    jsr plot_at_cell
+.draw_monster
+    lda monster_x,x                     ; Draw it: sprite = direction + frame, at its cell and offsets
+    sta cell_x                          ; ...
+    lda monster_y,x                     ; ...
+    sta cell_y                          ; ...
+    clc                                 ; ...
+    lda monster_sprite,x                ; ...
+    adc monster_frame,x                 ; ...
+    sta sprite_number                   ; ...
+    lda monster_offset_x,x              ; ...
+    sta data_007d                       ; ...
+    lda monster_offset_y,x              ; ...
+    sta data_007e                       ; ...
+    txa                                 ; ...
+    pha                                 ; ...
+    jsr plot_at_cell                    ; ...
 ; &7b28 referenced 3 times by &7b5f, &7cf8, &7cfb
-.code_7b28
-    pla
-    tax
-    dex
-    beq return_13
-    jmp code_79e5
+.monster_done
+    pla                                 ; ...
+    tax                                 ; ...
+    dex                                 ; Next monster
+    beq return_13                       ; ...
+    jmp next_monster_update             ; ...
 ; &7b30 referenced 1 time by &7b2b
 .return_13
-    rts
+    rts                                 ; Return
 ; &7b31 referenced 1 time by &7a14
-.code_7b31
-    pla
-    inc monster_sprite,x
-    lda monster_sprite,x
-    cmp #&1a
-    bne code_7b3f
-    jmp code_7cb3
+.advance_dying_monster
+    pla                                 ; ...
+    inc monster_sprite,x                ; Next death frame
+    lda monster_sprite,x                ; ...
+    cmp #&1a                            ; Animation over?
+    bne code_7b3f                       ; No
+    jmp monster_reappears               ; Yes: bring it back at a trapdoor
 ; &7b3f referenced 1 time by &7b3a
 .code_7b3f
-    txa
-    pha
-    lda monster_x,x
-    sta cell_x
-    lda monster_y,x
-    sta cell_y
-    lda monster_sprite,x
-    sta sprite_number
-    lda monster_offset_x,x
-    sta data_007d
-    lda monster_offset_y,x
-    sta data_007e
-    jsr plot_at_cell
-    jmp code_7b28
+    txa                                 ; Draw the death frame
+    pha                                 ; ...
+    lda monster_x,x                     ; ...
+    sta cell_x                          ; ...
+    lda monster_y,x                     ; ...
+    sta cell_y                          ; ...
+    lda monster_sprite,x                ; ...
+    sta sprite_number                   ; ...
+    lda monster_offset_x,x              ; ...
+    sta data_007d                       ; ...
+    lda monster_offset_y,x              ; ...
+    sta data_007e                       ; ...
+    jsr plot_at_cell                    ; ...
+    jmp monster_done                    ; ...
 ; ***************************************************************************************
 ; Start a hero's step between cells
 ;
@@ -6432,41 +6432,41 @@ data_213a = sub_212f+11
 ;     X: preserved
 ; &7b62 referenced 4 times by &6ece, &6ee1, &6ef4, &6f07
 .start_hero_step
-    lda #1
-    sta hero_step,x
-    lda hero_direction,x
-    cmp #1
-    bne code_7b79
-    lda #0
-    sta hero_offset_x,x
-    lda #&fa
-    sta hero_offset_y,x
-    rts
+    lda #1                              ; Step in progress
+    sta hero_step,x                     ; ...
+    lda hero_direction,x                ; Facing up: drawn 6 rows up
+    cmp #1                              ; ...
+    bne code_7b79                       ; ...
+    lda #0                              ; ...
+    sta hero_offset_x,x                 ; ...
+    lda #&fa                            ; ...
+    sta hero_offset_y,x                 ; ...
+    rts                                 ; Return
 ; &7b79 referenced 1 time by &7b6c
 .code_7b79
-    cmp #3
-    bne code_7b88
-    lda #0
-    sta hero_offset_y,x
-    lda #2
-    sta hero_offset_x,x
-    rts
+    cmp #3                              ; Facing right: 2 columns right
+    bne code_7b88                       ; ...
+    lda #0                              ; ...
+    sta hero_offset_y,x                 ; ...
+    lda #2                              ; ...
+    sta hero_offset_x,x                 ; ...
+    rts                                 ; Return
 ; &7b88 referenced 1 time by &7b7b
 .code_7b88
-    cmp #5
-    bne code_7b97
-    lda #0
-    sta hero_offset_x,x
-    lda #6
-    sta hero_offset_y,x
-    rts
+    cmp #5                              ; Facing down: 6 rows down
+    bne code_7b97                       ; ...
+    lda #0                              ; ...
+    sta hero_offset_x,x                 ; ...
+    lda #6                              ; ...
+    sta hero_offset_y,x                 ; ...
+    rts                                 ; Return
 ; &7b97 referenced 1 time by &7b8a
 .code_7b97
-    lda #0
-    sta hero_offset_y,x
-    lda #&fe
-    sta hero_offset_x,x
-    rts
+    lda #0                              ; Facing left: 2 columns left
+    sta hero_offset_y,x                 ; ...
+    lda #&fe                            ; ...
+    sta hero_offset_x,x                 ; ...
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Continue a hero's step between cells
 ;
@@ -6481,158 +6481,160 @@ data_213a = sub_212f+11
 ;     X: preserved
 ; &7ba2 referenced 1 time by &6eb4
 .continue_hero_step
-    lda hero_frame,x
-    eor #1
-    sta hero_frame,x
-    dec hero_step,x
-    bne code_7bd6
-    lda hero_direction,x
-    cmp #1
-    bne code_7bb9
-    dec hero_y,x
+    lda hero_frame,x                    ; Toggle the hero's frame
+    eor #1                              ; ...
+    sta hero_frame,x                    ; ...
+    dec hero_step,x                     ; Count down the step
+    bne code_7bd6                       ; Not over
+    lda hero_direction,x                ; Over: move the cell on in the direction faced, up...
+    cmp #1                              ; ...
+    bne code_7bb9                       ; ...
+    dec hero_y,x                        ; ...
 ; &7bb9 referenced 1 time by &7bb4
 .code_7bb9
-    cmp #3
-    bne code_7bc0
-    inc hero_x,x
+    cmp #3                              ; ...right...
+    bne code_7bc0                       ; ...
+    inc hero_x,x                        ; ...
 ; &7bc0 referenced 1 time by &7bbb
 .code_7bc0
-    cmp #5
-    bne code_7bc7
-    inc hero_y,x
+    cmp #5                              ; ...down...
+    bne code_7bc7                       ; ...
+    inc hero_y,x                        ; ...
 ; &7bc7 referenced 1 time by &7bc2
 .code_7bc7
-    cmp #7
-    bne code_7bce
-    dec hero_x,x
+    cmp #7                              ; ...left
+    bne code_7bce                       ; ...
+    dec hero_x,x                        ; ...
 ; &7bce referenced 1 time by &7bc9
 .code_7bce
-    lda #0
-    sta hero_offset_x,x
-    sta hero_offset_y,x
+    lda #0                              ; ...with no offsets
+    sta hero_offset_x,x                 ; ...
+    sta hero_offset_y,x                 ; ...
 ; &7bd6 referenced 1 time by &7bad
 .code_7bd6
-    clc
-    lda hero_offset_x,x
-    adc hero_offset_x,x
-    sta hero_offset_x,x
-    clc
-    lda hero_offset_y,x
-    adc hero_offset_y,x
-    sta hero_offset_y,x
-    rts
+    clc                                 ; Double the offsets
+    lda hero_offset_x,x                 ; ...
+    adc hero_offset_x,x                 ; ...
+    sta hero_offset_x,x                 ; ...
+    clc                                 ; ...
+    lda hero_offset_y,x                 ; ...
+    adc hero_offset_y,x                 ; ...
+    sta hero_offset_y,x                 ; ...
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Start a monster's step between cells
 ;
-; Set the step counter and the pixel offsets for monster X's direction.
+; Set monster X's step counter to 3 and its pixel offsets to one step in its direction of
+; travel: 3 rows up or down, or one byte column left or right.
 ;
 ; On Entry:
 ;     X: monster number
 ; &7beb referenced 1 time by &7a42
 .start_monster_step
-    lda #3
-    sta monster_step,x
-    lda monster_sprite,x
-    cmp #9
-    bne code_7c02
-    lda #0
-    sta monster_offset_x,x
-    lda #&fd
-    sta monster_offset_y,x
-    rts
+    lda #3                              ; Three frames per step
+    sta monster_step,x                  ; ...
+    lda monster_sprite,x                ; First frame's offsets, in the direction of travel: up...
+    cmp #9                              ; ...
+    bne code_7c02                       ; ...
+    lda #0                              ; ...
+    sta monster_offset_x,x              ; ...
+    lda #&fd                            ; ...3 rows up
+    sta monster_offset_y,x              ; ...
+    rts                                 ; Return
 ; &7c02 referenced 1 time by &7bf5
 .code_7c02
-    cmp #&0b
-    bne code_7c11
-    lda #0
-    sta monster_offset_y,x
-    lda #1
-    sta monster_offset_x,x
-    rts
+    cmp #&0b                            ; Moving right...
+    bne code_7c11                       ; ...
+    lda #0                              ; ...
+    sta monster_offset_y,x              ; ...
+    lda #1                              ; ...1 column right
+    sta monster_offset_x,x              ; ...
+    rts                                 ; Return
 ; &7c11 referenced 1 time by &7c04
 .code_7c11
-    cmp #&0d
-    bne code_7c20
-    lda #0
-    sta monster_offset_x,x
-    lda #3
-    sta monster_offset_y,x
-    rts
+    cmp #&0d                            ; Moving down...
+    bne code_7c20                       ; ...
+    lda #0                              ; ...
+    sta monster_offset_x,x              ; ...
+    lda #3                              ; ...3 rows down
+    sta monster_offset_y,x              ; ...
+    rts                                 ; Return
 ; &7c20 referenced 1 time by &7c13
 .code_7c20
-    lda #0
-    sta monster_offset_y,x
-    lda #&ff
-    sta monster_offset_x,x
-    rts
+    lda #0                              ; Left: 1 column left
+    sta monster_offset_y,x              ; ...
+    lda #&ff                            ; ...
+    sta monster_offset_x,x              ; ...
+    rts                                 ; Return
 ; ***************************************************************************************
 ; Continue a monster's step between cells
 ;
-; Toggle monster X's frame and move its pixel offsets towards zero, moving it to the next
-; cell when the step ends.
+; Toggle monster X's frame and count down its step. When it ends, move the monster one
+; cell on and clear its offsets; otherwise grow the offsets by another column or three
+; rows.
 ;
 ; On Entry:
 ;     X: monster number
 ; &7c2b referenced 1 time by &7a1c
 .continue_monster_step
-    lda monster_frame,x
-    eor #1
-    sta monster_frame,x
-    dec monster_step,x
-    bne code_7c5f
-    lda monster_sprite,x
-    cmp #9
-    bne code_7c42
-    dec monster_y,x
+    lda monster_frame,x                 ; Toggle the monster's frame
+    eor #1                              ; ...
+    sta monster_frame,x                 ; ...
+    dec monster_step,x                  ; Count down the step
+    bne code_7c5f                       ; Not over: grow the offsets
+    lda monster_sprite,x                ; Over: move the cell on in its direction, up...
+    cmp #9                              ; ...
+    bne code_7c42                       ; ...
+    dec monster_y,x                     ; ...
 ; &7c42 referenced 1 time by &7c3d
 .code_7c42
-    cmp #&0b
-    bne code_7c49
-    inc monster_x,x
+    cmp #&0b                            ; ...right...
+    bne code_7c49                       ; ...
+    inc monster_x,x                     ; ...
 ; &7c49 referenced 1 time by &7c44
 .code_7c49
-    cmp #&0d
-    bne code_7c50
-    inc monster_y,x
+    cmp #&0d                            ; ...down...
+    bne code_7c50                       ; ...
+    inc monster_y,x                     ; ...
 ; &7c50 referenced 1 time by &7c4b
 .code_7c50
-    cmp #&0f
-    bne code_7c57
-    dec monster_x,x
+    cmp #&0f                            ; ...left
+    bne code_7c57                       ; ...
+    dec monster_x,x                     ; ...
 ; &7c57 referenced 1 time by &7c52
 .code_7c57
-    lda #0
-    sta monster_offset_x,x
-    sta monster_offset_y,x
+    lda #0                              ; ...with no offsets
+    sta monster_offset_x,x              ; ...
+    sta monster_offset_y,x              ; ...
 ; &7c5f referenced 1 time by &7c36
 .code_7c5f
-    lda monster_offset_x,x
-    beq code_7c6f
-    bpl code_7c6c
-    dec monster_offset_x,x
-    jmp code_7c6f
+    lda monster_offset_x,x              ; Grow the horizontal offset by a column, away from zero
+    beq code_7c6f                       ; ...
+    bpl code_7c6c                       ; ...
+    dec monster_offset_x,x              ; ...
+    jmp code_7c6f                       ; ...
 ; &7c6c referenced 1 time by &7c64
 .code_7c6c
-    inc monster_offset_x,x
+    inc monster_offset_x,x              ; ...
 ; &7c6f referenced 2 times by &7c62, &7c69
 .code_7c6f
-    lda monster_offset_y,x
-    beq return_14
-    bpl code_7c82
-    sec
-    lda monster_offset_y,x
-    sbc #3
-    sta monster_offset_y,x
-    jmp return_14
+    lda monster_offset_y,x              ; Grow the vertical offset by three rows, away from zero
+    beq return_14                       ; ...
+    bpl code_7c82                       ; ...
+    sec                                 ; ...
+    lda monster_offset_y,x              ; ...
+    sbc #3                              ; ...
+    sta monster_offset_y,x              ; ...
+    jmp return_14                       ; ...
 ; &7c82 referenced 1 time by &7c74
 .code_7c82
-    clc
-    lda monster_offset_y,x
-    adc #3
-    sta monster_offset_y,x
+    clc                                 ; ...
+    lda monster_offset_y,x              ; ...
+    adc #3                              ; ...
+    sta monster_offset_y,x              ; ...
 ; &7c8b referenced 2 times by &7c72, &7c7f
 .return_14
-    rts
+    rts                                 ; Return
     equb &de, &35, &0d, &bd, &35, &0d, &d0, &00
     equb &60
 ; ***************************************************************************************
@@ -6672,42 +6674,42 @@ data_213a = sub_212f+11
     lda #1                              ; ...
     rts                                 ; ...
 ; &7cb3 referenced 1 time by &7b3c
-.code_7cb3
-    inc next_trapdoor
-    lda next_trapdoor
-    cmp #8
-    bne code_7cc2
-    lda #0
-    sta next_trapdoor
+.monster_reappears
+    inc next_trapdoor                   ; Next trapdoor, 0-7 in turn
+    lda next_trapdoor                   ; ...
+    cmp #8                              ; ...
+    bne code_7cc2                       ; ...
+    lda #0                              ; ...
+    sta next_trapdoor                   ; ...
 ; &7cc2 referenced 1 time by &7cbb
 .code_7cc2
-    ldy next_trapdoor
-    lda trapdoor_x,y
-    sta monster_x,x
-    lda trapdoor_y,y
-    sta monster_y,x
-    lda #9
-    sta monster_sprite,x
-    lda #0
-    sta monster_step,x
-    sta monster_offset_x,x
-    sta monster_offset_y,x
-    txa
-    pha
-    stx scratch
-    jsr find_creature
-    cmp #0
-    beq code_7cfb
-    pla
-    pha
-    tax
-    lda #&ff
-    sta monster_x,x
-    sta monster_y,x
-    jmp code_7b28
+    ldy next_trapdoor                   ; ...
+    lda trapdoor_x,y                    ; Put the monster on it, facing up, with no step
+    sta monster_x,x                     ; ...
+    lda trapdoor_y,y                    ; ...
+    sta monster_y,x                     ; ...
+    lda #9                              ; ...
+    sta monster_sprite,x                ; ...
+    lda #0                              ; ...
+    sta monster_step,x                  ; ...
+    sta monster_offset_x,x              ; ...
+    sta monster_offset_y,x              ; ...
+    txa                                 ; Is anything else on the trapdoor? (A hero there is hurt)
+    pha                                 ; ...
+    stx scratch                         ; ...
+    jsr find_creature                   ; ...
+    cmp #0                              ; ...
+    beq code_7cfb                       ; No: done
+    pla                                 ; Yes: wait off the map, to try again next frame
+    pha                                 ; ...
+    tax                                 ; ...
+    lda #&ff                            ; ...
+    sta monster_x,x                     ; ...
+    sta monster_y,x                     ; ...
+    jmp monster_done                    ; ...
 ; &7cfb referenced 1 time by &7ceb
 .code_7cfb
-    jmp code_7b28
+    jmp monster_done                    ; Done
     equb &00
 ; &7cff referenced 3 times by &0e1b, &158f, &759b
 .monster_start_hit_points
@@ -7019,9 +7021,9 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     object_type:                 7
 ;     play_level:                  7
 ;     code_0581:                   6
-;     code_7b04:                   6
 ;     data_0082:                   6
 ;     data_008f:                   6
+;     draw_monster:                6
 ;     hero_score_ten_thousands:    6
 ;     level_bcd:                   6
 ;     level_number:                6
@@ -7082,7 +7084,6 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     code_7470:                   3
 ;     code_76d4:                   3
 ;     code_798d:                   3
-;     code_7b28:                   3
 ;     data_008d:                   3
 ;     exit_shrinks_left:           3
 ;     exiting_hero:                3
@@ -7090,6 +7091,7 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     hero_magic_delay:            3
 ;     magic_kill_count:            3
 ;     missile_damage:              3
+;     monster_done:                3
 ;     monster_frame:               3
 ;     monster_start_hit_points:    3
 ;     next_victory_sprite:         3
@@ -7177,6 +7179,7 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     trapdoor_x:                  2
 ;     trapdoor_y:                  2
 ;     add_thousand_points:         1
+;     advance_dying_monster:       1
 ;     animate_absent_hero:         1
 ;     check_for_victory:           1
 ;     check_magic:                 1
@@ -7303,7 +7306,6 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     code_78c7:                   1
 ;     code_78e1:                   1
 ;     code_79bc:                   1
-;     code_79e5:                   1
 ;     code_7a17:                   1
 ;     code_7a23:                   1
 ;     code_7a2d:                   1
@@ -7313,7 +7315,6 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     code_7a81:                   1
 ;     code_7a87:                   1
 ;     code_7ac1:                   1
-;     code_7b31:                   1
 ;     code_7b3f:                   1
 ;     code_7b79:                   1
 ;     code_7b88:                   1
@@ -7333,7 +7334,6 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     code_7c5f:                   1
 ;     code_7c6c:                   1
 ;     code_7c82:                   1
-;     code_7cb3:                   1
 ;     code_7cc2:                   1
 ;     code_7cfb:                   1
 ;     code_7fb5:                   1
@@ -7492,11 +7492,13 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     loop_7fd1:                   1
 ;     loop_7fe8:                   1
 ;     missile_spent:               1
+;     monster_reappears:           1
 ;     mos_reset_entry:             1
 ;     mos_row_offsets:             1
 ;     mos_row_offsets_lo:          1
 ;     move_heroes:                 1
 ;     move_missiles:               1
+;     next_monster_update:         1
 ;     object_free_map:             1
 ;     plot_boots_icon:             1
 ;     print_menu_string:           1
@@ -7693,7 +7695,6 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     code_798d
 ;     code_79b7
 ;     code_79bc
-;     code_79e5
 ;     code_7a17
 ;     code_7a23
 ;     code_7a2d
@@ -7706,9 +7707,6 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     code_7adc
 ;     code_7aea
 ;     code_7af8
-;     code_7b04
-;     code_7b28
-;     code_7b31
 ;     code_7b3f
 ;     code_7b79
 ;     code_7b88
@@ -7730,7 +7728,6 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     code_7c6f
 ;     code_7c82
 ;     code_7cae
-;     code_7cb3
 ;     code_7cc2
 ;     code_7cfb
 ;     code_7fb5

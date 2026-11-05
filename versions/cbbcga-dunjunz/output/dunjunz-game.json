@@ -690,7 +690,7 @@
       "addr": 31723,
       "name": "start_monster_step",
       "title": "Start a monster's step between cells",
-      "description": "Set the step counter and the pixel offsets for monster X's direction.",
+      "description": "Set monster X's step counter to 3 and its pixel offsets to one step in its direction of travel: 3 rows up or down, or one byte column left or right.",
       "on_entry": {
         "X": "monster number"
       }
@@ -699,7 +699,7 @@
       "addr": 31787,
       "name": "continue_monster_step",
       "title": "Continue a monster's step between cells",
-      "description": "Toggle monster X's frame and move its pixel offsets towards zero, moving it to the next cell when the step ends.",
+      "description": "Toggle monster X's frame and count down its step. When it ends, move the monster one cell on and clear its offsets; otherwise grow the offsets by another column or three rows.",
       "on_entry": {
         "X": "monster number"
       }
@@ -56269,6 +56269,7 @@
       "labels": [
         "animate_absent_hero"
       ],
+      "comment_inline": "Every other frame...",
       "xref_summaries": [
         "&76da referenced 1 time by &6e91"
       ],
@@ -56290,6 +56291,7 @@
         240,
         1
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_76e0",
@@ -56301,6 +56303,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -56313,6 +56316,7 @@
       "labels": [
         "code_76e0"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&76e0 referenced 1 time by &76dd"
       ],
@@ -56333,6 +56337,7 @@
         48,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_offset_y,x",
@@ -56346,6 +56351,7 @@
         122,
         119
       ],
+      "comment_inline": "Plot the current appearance sprite at the hero's cell",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "get_hero_cell",
@@ -56358,6 +56364,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -56368,6 +56375,7 @@
         133,
         125
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007d",
@@ -56380,6 +56388,7 @@
         133,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007e",
@@ -56393,6 +56402,7 @@
         32,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_frame,x",
@@ -56404,6 +56414,7 @@
       "bytes": [
         168
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -56414,6 +56425,7 @@
         48,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_appearance_sprites,y",
@@ -56426,6 +56438,7 @@
         133,
         122
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -56437,6 +56450,7 @@
       "bytes": [
         138
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -56445,6 +56459,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -56455,6 +56470,7 @@
         82,
         120
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_at_cell",
@@ -56466,6 +56482,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -56474,6 +56491,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -56482,6 +56500,7 @@
       "bytes": [
         24
       ],
+      "comment_inline": "Step to the next (+1 dying, -1 returning), stopping at 8",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -56492,6 +56511,7 @@
         32,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_frame,x",
@@ -56505,6 +56525,7 @@
         42,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "hero_offset_x,x",
@@ -56517,6 +56538,7 @@
         201,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#9"
@@ -56527,6 +56549,7 @@
         144,
         2
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcc",
       "operand": "code_770b",
@@ -56539,6 +56562,7 @@
         169,
         8
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#8"
@@ -56552,6 +56576,7 @@
       "labels": [
         "code_770b"
       ],
+      "comment_inline": "Reached the first sprite (returning)?",
       "xref_summaries": [
         "&770b referenced 1 time by &7707"
       ],
@@ -56571,6 +56596,7 @@
         208,
         31
       ],
+      "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_772e",
@@ -56583,6 +56609,7 @@
         169,
         5
       ],
+      "comment_inline": "Yes: in play, facing down...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#5"
@@ -56594,6 +56621,7 @@
         26,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_direction,x",
@@ -56606,6 +56634,7 @@
         169,
         0
       ],
+      "comment_inline": "...with no step or offsets...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -56617,6 +56646,7 @@
         37,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_step,x",
@@ -56630,6 +56660,7 @@
         42,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_offset_x,x",
@@ -56643,6 +56674,7 @@
         48,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_offset_y,x",
@@ -56656,6 +56688,7 @@
         32,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_frame,x",
@@ -56668,6 +56701,7 @@
         169,
         33
       ],
+      "comment_inline": "...and health 33, drawn by taking a point",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&21"
@@ -56679,6 +56713,7 @@
         144,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_health_tens,x",
@@ -56692,6 +56727,7 @@
         149,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_health_units,x",
@@ -56705,6 +56741,7 @@
         33,
         114
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "lose_health_point",
@@ -56716,6 +56753,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -56729,6 +56767,7 @@
       "labels": [
         "code_772e"
       ],
+      "comment_inline": "Store the frame",
       "xref_summaries": [
         "&772e referenced 1 time by &770d"
       ],
@@ -56749,6 +56788,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -60918,6 +60958,7 @@
       "labels": [
         "update_monsters"
       ],
+      "comment_inline": "Draw the eight trapdoors (sprite &2C)...",
       "xref_summaries": [
         "&79c1 referenced 1 time by &1ed4"
       ],
@@ -60937,6 +60978,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -60947,6 +60989,7 @@
         133,
         125
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007d",
@@ -60959,6 +61002,7 @@
         133,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007e",
@@ -60971,6 +61015,7 @@
         169,
         44
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&2c"
@@ -60981,6 +61026,7 @@
         133,
         122
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -60997,6 +61043,7 @@
       "labels": [
         "loop_79cd"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&79cd referenced 1 time by &79e1"
       ],
@@ -61019,6 +61066,7 @@
         2,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_x",
@@ -61032,6 +61080,7 @@
         151,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "data_0b97,x",
@@ -61045,6 +61094,7 @@
         3,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_y",
@@ -61056,6 +61106,7 @@
       "bytes": [
         138
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -61064,6 +61115,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -61074,6 +61126,7 @@
         82,
         120
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_at_cell",
@@ -61085,6 +61138,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -61093,6 +61147,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -61101,6 +61156,7 @@
       "bytes": [
         202
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "dex"
     },
@@ -61110,6 +61166,7 @@
         208,
         234
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "loop_79cd",
@@ -61122,6 +61179,7 @@
         162,
         30
       ],
+      "comment_inline": "For each monster, 30 to 1...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&1e"
@@ -61132,8 +61190,9 @@
         138
       ],
       "labels": [
-        "code_79e5"
+        "next_monster_update"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&79e5 referenced 1 time by &7b2d"
       ],
@@ -61151,6 +61210,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -61161,6 +61221,7 @@
         0,
         126
       ],
+      "comment_inline": "Erase it at its cell and offsets, remembering the cell",
       "type": "code",
       "mnemonic": "lda",
       "operand": "monster_x,x",
@@ -61174,6 +61235,7 @@
         2,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_x",
@@ -61187,6 +61249,7 @@
         6,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "previous_x",
@@ -61200,6 +61263,7 @@
         41,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "monster_y,x",
@@ -61213,6 +61277,7 @@
         3,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_y",
@@ -61226,6 +61291,7 @@
         7,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "previous_y",
@@ -61238,6 +61304,7 @@
         169,
         21
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&15"
@@ -61248,6 +61315,7 @@
         133,
         122
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -61261,6 +61329,7 @@
         164,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "monster_offset_x,x",
@@ -61273,6 +61342,7 @@
         133,
         125
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007d",
@@ -61286,6 +61356,7 @@
         205,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "monster_offset_y,x",
@@ -61298,6 +61369,7 @@
         133,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007e",
@@ -61311,6 +61383,7 @@
         82,
         120
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_at_cell",
@@ -61322,6 +61395,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -61330,6 +61404,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -61338,6 +61413,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -61348,6 +61424,7 @@
         82,
         126
       ],
+      "comment_inline": "Dying?",
       "type": "code",
       "mnemonic": "lda",
       "operand": "monster_sprite,x",
@@ -61360,6 +61437,7 @@
         201,
         21
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&15"
@@ -61370,6 +61448,7 @@
         144,
         3
       ],
+      "comment_inline": "No",
       "type": "code",
       "mnemonic": "bcc",
       "operand": "code_7a17",
@@ -61383,11 +61462,12 @@
         49,
         123
       ],
+      "comment_inline": "Yes: advance the death animation",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_7b31",
+      "operand": "advance_dying_monster",
       "target": 31537,
-      "target_label": "code_7b31"
+      "target_label": "advance_dying_monster"
     },
     {
       "addr": 31255,
@@ -61399,6 +61479,7 @@
       "labels": [
         "code_7a17"
       ],
+      "comment_inline": "Part way through a step?",
       "xref_summaries": [
         "&7a17 referenced 1 time by &7a12"
       ],
@@ -61420,6 +61501,7 @@
         240,
         7
       ],
+      "comment_inline": "No",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_7a23",
@@ -61433,6 +61515,7 @@
         43,
         124
       ],
+      "comment_inline": "Yes: continue it and draw",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "continue_monster_step",
@@ -61444,6 +61527,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -61454,11 +61538,12 @@
         4,
         123
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_7b04",
+      "operand": "draw_monster",
       "target": 31492,
-      "target_label": "code_7b04"
+      "target_label": "draw_monster"
     },
     {
       "addr": 31267,
@@ -61470,6 +61555,7 @@
       "labels": [
         "code_7a23"
       ],
+      "comment_inline": "Start a step: move the cell in the direction it faces, up...",
       "xref_summaries": [
         "&7a23 referenced 1 time by &7a1a"
       ],
@@ -61491,6 +61577,7 @@
         201,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#9"
@@ -61501,6 +61588,7 @@
         208,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_7a2d",
@@ -61514,6 +61602,7 @@
         41,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "dec",
       "operand": "monster_y,x",
@@ -61529,6 +61618,7 @@
       "labels": [
         "code_7a2d"
       ],
+      "comment_inline": "...right...",
       "xref_summaries": [
         "&7a2d referenced 1 time by &7a28"
       ],
@@ -61548,6 +61638,7 @@
         208,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_7a34",
@@ -61561,6 +61652,7 @@
         0,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
       "operand": "monster_x,x",
@@ -61576,6 +61668,7 @@
       "labels": [
         "code_7a34"
       ],
+      "comment_inline": "...down...",
       "xref_summaries": [
         "&7a34 referenced 1 time by &7a2f"
       ],
@@ -61595,6 +61688,7 @@
         208,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_7a3b",
@@ -61608,6 +61702,7 @@
         41,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
       "operand": "monster_y,x",
@@ -61623,6 +61718,7 @@
       "labels": [
         "code_7a3b"
       ],
+      "comment_inline": "...left",
       "xref_summaries": [
         "&7a3b referenced 1 time by &7a36"
       ],
@@ -61642,6 +61738,7 @@
         208,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_7a42",
@@ -61655,6 +61752,7 @@
         0,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "dec",
       "operand": "monster_x,x",
@@ -61671,6 +61769,7 @@
       "labels": [
         "code_7a42"
       ],
+      "comment_inline": "Set the step's offsets",
       "xref_summaries": [
         "&7a42 referenced 1 time by &7a3d"
       ],
@@ -61693,6 +61792,7 @@
         0,
         126
       ],
+      "comment_inline": "Wall in the new cell?",
       "type": "code",
       "mnemonic": "lda",
       "operand": "monster_x,x",
@@ -61706,6 +61806,7 @@
         2,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_x",
@@ -61719,6 +61820,7 @@
         41,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "monster_y,x",
@@ -61732,6 +61834,7 @@
         3,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_y",
@@ -61745,6 +61848,7 @@
         252,
         120
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "test_wall",
@@ -61757,6 +61861,7 @@
         240,
         49
       ],
+      "comment_inline": "No",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_7a87",
@@ -61768,6 +61873,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "Yes: stay put, with no step...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -61776,6 +61882,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -61786,6 +61893,7 @@
         6,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "previous_x",
@@ -61799,6 +61907,7 @@
         0,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_x,x",
@@ -61812,6 +61921,7 @@
         7,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "previous_y",
@@ -61825,6 +61935,7 @@
         41,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_y,x",
@@ -61837,6 +61948,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -61848,6 +61960,7 @@
         246,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_step,x",
@@ -61861,6 +61974,7 @@
         164,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_offset_x,x",
@@ -61874,6 +61988,7 @@
         205,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_offset_y,x",
@@ -61887,6 +62002,7 @@
         68,
         254
       ],
+      "comment_inline": "...and turn a random way: sprite 8 + (timer AND 7)...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "system_via_t1c_l",
@@ -61899,6 +62015,7 @@
         41,
         7
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "and",
       "operand": "#7"
@@ -61908,6 +62025,7 @@
       "bytes": [
         24
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -61917,6 +62035,7 @@
         105,
         8
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#8"
@@ -61928,6 +62047,7 @@
         82,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_sprite,x",
@@ -61940,6 +62060,7 @@
         41,
         1
       ],
+      "comment_inline": "...made odd (9, &0B, &0D or &0F)",
       "type": "code",
       "mnemonic": "and",
       "operand": "#1"
@@ -61950,6 +62071,7 @@
         240,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_7a81",
@@ -61963,11 +62085,12 @@
         4,
         123
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_7b04",
+      "operand": "draw_monster",
       "target": 31492,
-      "target_label": "code_7b04"
+      "target_label": "draw_monster"
     },
     {
       "addr": 31361,
@@ -61979,6 +62102,7 @@
       "labels": [
         "code_7a81"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&7a81 referenced 1 time by &7a7c"
       ],
@@ -62001,11 +62125,12 @@
         4,
         123
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_7b04",
+      "operand": "draw_monster",
       "target": 31492,
-      "target_label": "code_7b04"
+      "target_label": "draw_monster"
     },
     {
       "addr": 31367,
@@ -62015,6 +62140,7 @@
       "labels": [
         "code_7a87"
       ],
+      "comment_inline": "Is another monster, or a hero, in the new cell? (A hero there is hurt)",
       "xref_summaries": [
         "&7a87 referenced 1 time by &7a54"
       ],
@@ -62032,6 +62158,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -62042,6 +62169,7 @@
         0,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "scratch",
@@ -62055,6 +62183,7 @@
         116,
         121
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "find_creature",
@@ -62067,6 +62196,7 @@
         201,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#0"
@@ -62077,6 +62207,7 @@
         240,
         46
       ],
+      "comment_inline": "No",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_7ac1",
@@ -62088,6 +62219,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "Yes: stay put, with no step, and turn a random way",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -62272,9 +62404,9 @@
       ],
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7b04",
+      "operand": "draw_monster",
       "target": 31492,
-      "target_label": "code_7b04"
+      "target_label": "draw_monster"
     },
     {
       "addr": 31419,
@@ -62298,9 +62430,9 @@
       ],
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_7b04",
+      "operand": "draw_monster",
       "target": 31492,
-      "target_label": "code_7b04"
+      "target_label": "draw_monster"
     },
     {
       "addr": 31425,
@@ -62310,6 +62442,7 @@
       "labels": [
         "code_7ac1"
       ],
+      "comment_inline": "Moving vertically...",
       "xref_summaries": [
         "&7ac1 referenced 1 time by &7a91"
       ],
@@ -62327,6 +62460,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -62337,6 +62471,7 @@
         82,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "monster_sprite,x",
@@ -62349,6 +62484,7 @@
         201,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#9"
@@ -62359,6 +62495,7 @@
         240,
         18
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_7adc",
@@ -62371,6 +62508,7 @@
         201,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&0d"
@@ -62381,6 +62519,7 @@
         240,
         14
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_7adc",
@@ -62394,6 +62533,7 @@
         0,
         126
       ],
+      "comment_inline": "No: at the left or right edge of a room?",
       "type": "code",
       "mnemonic": "lda",
       "operand": "monster_x,x",
@@ -62406,6 +62546,7 @@
         41,
         7
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "and",
       "operand": "#7"
@@ -62416,6 +62557,7 @@
         240,
         21
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_7aea",
@@ -62428,6 +62570,7 @@
         201,
         7
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#7"
@@ -62438,6 +62581,7 @@
         240,
         17
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_7aea",
@@ -62451,6 +62595,7 @@
         248,
         122
       ],
+      "comment_inline": "No: move on",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_7af8",
@@ -62467,6 +62612,7 @@
       "labels": [
         "code_7adc"
       ],
+      "comment_inline": "Yes: at the top or bottom edge of a room?",
       "xref_summaries": [
         "&7adc referenced 2 times by &7ac8, &7acc"
       ],
@@ -62492,6 +62638,7 @@
         41,
         7
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "and",
       "operand": "#7"
@@ -62502,6 +62649,7 @@
         240,
         7
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_7aea",
@@ -62514,6 +62662,7 @@
         201,
         7
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#7"
@@ -62524,6 +62673,7 @@
         240,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_7aea",
@@ -62537,6 +62687,7 @@
         248,
         122
       ],
+      "comment_inline": "No: move on",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_7af8",
@@ -62552,6 +62703,7 @@
       "labels": [
         "code_7aea"
       ],
+      "comment_inline": "At a room edge: cancel the step, so it arrives at once",
       "xref_summaries": [
         "&7aea referenced 4 times by &7ad3, &7ad7, &7ae1, &7ae5"
       ],
@@ -62584,6 +62736,7 @@
         246,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_step,x",
@@ -62597,6 +62750,7 @@
         164,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_offset_x,x",
@@ -62610,6 +62764,7 @@
         205,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_offset_y,x",
@@ -62623,11 +62778,12 @@
         4,
         123
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_7b04",
+      "operand": "draw_monster",
       "target": 31492,
-      "target_label": "code_7b04"
+      "target_label": "draw_monster"
     },
     {
       "addr": 31480,
@@ -62639,6 +62795,7 @@
       "labels": [
         "code_7af8"
       ],
+      "comment_inline": "Move on: stay in the old cell until the step ends",
       "xref_summaries": [
         "&7af8 referenced 2 times by &7ad9, &7ae7"
       ],
@@ -62665,6 +62822,7 @@
         0,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_x,x",
@@ -62678,6 +62836,7 @@
         7,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "previous_y",
@@ -62691,6 +62850,7 @@
         41,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_y,x",
@@ -62705,8 +62865,9 @@
         126
       ],
       "labels": [
-        "code_7b04"
+        "draw_monster"
       ],
+      "comment_inline": "Draw it: sprite = direction + frame, at its cell and offsets",
       "xref_summaries": [
         "&7b04 referenced 6 times by &7a20, &7a7e, &7a84, &7ab9, &7abe, &7af5"
       ],
@@ -62749,6 +62910,7 @@
         2,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_x",
@@ -62762,6 +62924,7 @@
         41,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "monster_y,x",
@@ -62775,6 +62938,7 @@
         3,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_y",
@@ -62786,6 +62950,7 @@
       "bytes": [
         24
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -62796,6 +62961,7 @@
         82,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "monster_sprite,x",
@@ -62809,6 +62975,7 @@
         123,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "monster_frame,x",
@@ -62821,6 +62988,7 @@
         133,
         122
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -62834,6 +63002,7 @@
         164,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "monster_offset_x,x",
@@ -62846,6 +63015,7 @@
         133,
         125
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007d",
@@ -62859,6 +63029,7 @@
         205,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "monster_offset_y,x",
@@ -62871,6 +63042,7 @@
         133,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007e",
@@ -62882,6 +63054,7 @@
       "bytes": [
         138
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -62890,6 +63063,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -62900,6 +63074,7 @@
         82,
         120
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_at_cell",
@@ -62912,8 +63087,9 @@
         104
       ],
       "labels": [
-        "code_7b28"
+        "monster_done"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&7b28 referenced 3 times by &7b5f, &7cf8, &7cfb"
       ],
@@ -62939,6 +63115,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -62947,6 +63124,7 @@
       "bytes": [
         202
       ],
+      "comment_inline": "Next monster",
       "type": "code",
       "mnemonic": "dex"
     },
@@ -62956,6 +63134,7 @@
         240,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "return_13",
@@ -62969,11 +63148,12 @@
         229,
         121
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_79e5",
+      "operand": "next_monster_update",
       "target": 31205,
-      "target_label": "code_79e5"
+      "target_label": "next_monster_update"
     },
     {
       "addr": 31536,
@@ -62983,6 +63163,7 @@
       "labels": [
         "return_13"
       ],
+      "comment_inline": "Return",
       "xref_summaries": [
         "&7b30 referenced 1 time by &7b2b"
       ],
@@ -63001,8 +63182,9 @@
         104
       ],
       "labels": [
-        "code_7b31"
+        "advance_dying_monster"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&7b31 referenced 1 time by &7a14"
       ],
@@ -63022,6 +63204,7 @@
         82,
         126
       ],
+      "comment_inline": "Next death frame",
       "type": "code",
       "mnemonic": "inc",
       "operand": "monster_sprite,x",
@@ -63035,6 +63218,7 @@
         82,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "monster_sprite,x",
@@ -63047,6 +63231,7 @@
         201,
         26
       ],
+      "comment_inline": "Animation over?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&1a"
@@ -63057,6 +63242,7 @@
         208,
         3
       ],
+      "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_7b3f",
@@ -63070,11 +63256,12 @@
         179,
         124
       ],
+      "comment_inline": "Yes: bring it back at a trapdoor",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_7cb3",
+      "operand": "monster_reappears",
       "target": 31923,
-      "target_label": "code_7cb3"
+      "target_label": "monster_reappears"
     },
     {
       "addr": 31551,
@@ -63084,6 +63271,7 @@
       "labels": [
         "code_7b3f"
       ],
+      "comment_inline": "Draw the death frame",
       "xref_summaries": [
         "&7b3f referenced 1 time by &7b3a"
       ],
@@ -63101,6 +63289,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -63111,6 +63300,7 @@
         0,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "monster_x,x",
@@ -63124,6 +63314,7 @@
         2,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_x",
@@ -63137,6 +63328,7 @@
         41,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "monster_y,x",
@@ -63150,6 +63342,7 @@
         3,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_y",
@@ -63163,6 +63356,7 @@
         82,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "monster_sprite,x",
@@ -63175,6 +63369,7 @@
         133,
         122
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -63188,6 +63383,7 @@
         164,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "monster_offset_x,x",
@@ -63200,6 +63396,7 @@
         133,
         125
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007d",
@@ -63213,6 +63410,7 @@
         205,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "monster_offset_y,x",
@@ -63225,6 +63423,7 @@
         133,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007e",
@@ -63238,6 +63437,7 @@
         82,
         120
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_at_cell",
@@ -63251,11 +63451,12 @@
         40,
         123
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_7b28",
+      "operand": "monster_done",
       "target": 31528,
-      "target_label": "code_7b28"
+      "target_label": "monster_done"
     },
     {
       "addr": 31586,
@@ -63266,6 +63467,7 @@
       "labels": [
         "start_hero_step"
       ],
+      "comment_inline": "Step in progress",
       "xref_summaries": [
         "&7b62 referenced 4 times by &6ece, &6ee1, &6ef4, &6f07"
       ],
@@ -63298,6 +63500,7 @@
         37,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_step,x",
@@ -63311,6 +63514,7 @@
         26,
         13
       ],
+      "comment_inline": "Facing up: drawn 6 rows up",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_direction,x",
@@ -63323,6 +63527,7 @@
         201,
         1
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#1"
@@ -63333,6 +63538,7 @@
         208,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_7b79",
@@ -63345,6 +63551,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -63356,6 +63563,7 @@
         42,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_offset_x,x",
@@ -63368,6 +63576,7 @@
         169,
         250
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&fa"
@@ -63379,6 +63588,7 @@
         48,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_offset_y,x",
@@ -63390,6 +63600,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -63402,6 +63613,7 @@
       "labels": [
         "code_7b79"
       ],
+      "comment_inline": "Facing right: 2 columns right",
       "xref_summaries": [
         "&7b79 referenced 1 time by &7b6c"
       ],
@@ -63421,6 +63633,7 @@
         208,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_7b88",
@@ -63433,6 +63646,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -63444,6 +63658,7 @@
         48,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_offset_y,x",
@@ -63456,6 +63671,7 @@
         169,
         2
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#2"
@@ -63467,6 +63683,7 @@
         42,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_offset_x,x",
@@ -63478,6 +63695,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -63490,6 +63708,7 @@
       "labels": [
         "code_7b88"
       ],
+      "comment_inline": "Facing down: 6 rows down",
       "xref_summaries": [
         "&7b88 referenced 1 time by &7b7b"
       ],
@@ -63509,6 +63728,7 @@
         208,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_7b97",
@@ -63521,6 +63741,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -63532,6 +63753,7 @@
         42,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_offset_x,x",
@@ -63544,6 +63766,7 @@
         169,
         6
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#6"
@@ -63555,6 +63778,7 @@
         48,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_offset_y,x",
@@ -63566,6 +63790,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -63578,6 +63803,7 @@
       "labels": [
         "code_7b97"
       ],
+      "comment_inline": "Facing left: 2 columns left",
       "xref_summaries": [
         "&7b97 referenced 1 time by &7b8a"
       ],
@@ -63598,6 +63824,7 @@
         48,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_offset_y,x",
@@ -63610,6 +63837,7 @@
         169,
         254
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&fe"
@@ -63621,6 +63849,7 @@
         42,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_offset_x,x",
@@ -63632,6 +63861,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -63645,6 +63875,7 @@
       "labels": [
         "continue_hero_step"
       ],
+      "comment_inline": "Toggle the hero's frame",
       "xref_summaries": [
         "&7ba2 referenced 1 time by &6eb4"
       ],
@@ -63666,6 +63897,7 @@
         73,
         1
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "eor",
       "operand": "#1"
@@ -63677,6 +63909,7 @@
         32,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_frame,x",
@@ -63690,6 +63923,7 @@
         37,
         13
       ],
+      "comment_inline": "Count down the step",
       "type": "code",
       "mnemonic": "dec",
       "operand": "hero_step,x",
@@ -63702,6 +63936,7 @@
         208,
         39
       ],
+      "comment_inline": "Not over",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_7bd6",
@@ -63715,6 +63950,7 @@
         26,
         13
       ],
+      "comment_inline": "Over: move the cell on in the direction faced, up...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_direction,x",
@@ -63727,6 +63963,7 @@
         201,
         1
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#1"
@@ -63737,6 +63974,7 @@
         208,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_7bb9",
@@ -63750,6 +63988,7 @@
         21,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "dec",
       "operand": "hero_y,x",
@@ -63765,6 +64004,7 @@
       "labels": [
         "code_7bb9"
       ],
+      "comment_inline": "...right...",
       "xref_summaries": [
         "&7bb9 referenced 1 time by &7bb4"
       ],
@@ -63784,6 +64024,7 @@
         208,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_7bc0",
@@ -63797,6 +64038,7 @@
         16,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
       "operand": "hero_x,x",
@@ -63812,6 +64054,7 @@
       "labels": [
         "code_7bc0"
       ],
+      "comment_inline": "...down...",
       "xref_summaries": [
         "&7bc0 referenced 1 time by &7bbb"
       ],
@@ -63831,6 +64074,7 @@
         208,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_7bc7",
@@ -63844,6 +64088,7 @@
         21,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
       "operand": "hero_y,x",
@@ -63859,6 +64104,7 @@
       "labels": [
         "code_7bc7"
       ],
+      "comment_inline": "...left",
       "xref_summaries": [
         "&7bc7 referenced 1 time by &7bc2"
       ],
@@ -63878,6 +64124,7 @@
         208,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_7bce",
@@ -63891,6 +64138,7 @@
         16,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "dec",
       "operand": "hero_x,x",
@@ -63906,6 +64154,7 @@
       "labels": [
         "code_7bce"
       ],
+      "comment_inline": "...with no offsets",
       "xref_summaries": [
         "&7bce referenced 1 time by &7bc9"
       ],
@@ -63926,6 +64175,7 @@
         42,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_offset_x,x",
@@ -63939,6 +64189,7 @@
         48,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_offset_y,x",
@@ -63953,6 +64204,7 @@
       "labels": [
         "code_7bd6"
       ],
+      "comment_inline": "Double the offsets",
       "xref_summaries": [
         "&7bd6 referenced 1 time by &7bad"
       ],
@@ -63972,6 +64224,7 @@
         42,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_offset_x,x",
@@ -63985,6 +64238,7 @@
         42,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "hero_offset_x,x",
@@ -63998,6 +64252,7 @@
         42,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_offset_x,x",
@@ -64009,6 +64264,7 @@
       "bytes": [
         24
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -64019,6 +64275,7 @@
         48,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_offset_y,x",
@@ -64032,6 +64289,7 @@
         48,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "hero_offset_y,x",
@@ -64045,6 +64303,7 @@
         48,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_offset_y,x",
@@ -64056,6 +64315,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -64068,6 +64328,7 @@
       "labels": [
         "start_monster_step"
       ],
+      "comment_inline": "Three frames per step",
       "xref_summaries": [
         "&7beb referenced 1 time by &7a42"
       ],
@@ -64088,6 +64349,7 @@
         246,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_step,x",
@@ -64101,6 +64363,7 @@
         82,
         126
       ],
+      "comment_inline": "First frame's offsets, in the direction of travel: up...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "monster_sprite,x",
@@ -64113,6 +64376,7 @@
         201,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#9"
@@ -64123,6 +64387,7 @@
         208,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_7c02",
@@ -64135,6 +64400,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -64146,6 +64412,7 @@
         164,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_offset_x,x",
@@ -64158,6 +64425,7 @@
         169,
         253
       ],
+      "comment_inline": "...3 rows up",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&fd"
@@ -64169,6 +64437,7 @@
         205,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_offset_y,x",
@@ -64180,6 +64449,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -64192,6 +64462,7 @@
       "labels": [
         "code_7c02"
       ],
+      "comment_inline": "Moving right...",
       "xref_summaries": [
         "&7c02 referenced 1 time by &7bf5"
       ],
@@ -64211,6 +64482,7 @@
         208,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_7c11",
@@ -64223,6 +64495,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -64234,6 +64507,7 @@
         205,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_offset_y,x",
@@ -64246,6 +64520,7 @@
         169,
         1
       ],
+      "comment_inline": "...1 column right",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#1"
@@ -64257,6 +64532,7 @@
         164,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_offset_x,x",
@@ -64268,6 +64544,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -64280,6 +64557,7 @@
       "labels": [
         "code_7c11"
       ],
+      "comment_inline": "Moving down...",
       "xref_summaries": [
         "&7c11 referenced 1 time by &7c04"
       ],
@@ -64299,6 +64577,7 @@
         208,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_7c20",
@@ -64311,6 +64590,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -64322,6 +64602,7 @@
         164,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_offset_x,x",
@@ -64334,6 +64615,7 @@
         169,
         3
       ],
+      "comment_inline": "...3 rows down",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#3"
@@ -64345,6 +64627,7 @@
         205,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_offset_y,x",
@@ -64356,6 +64639,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -64368,6 +64652,7 @@
       "labels": [
         "code_7c20"
       ],
+      "comment_inline": "Left: 1 column left",
       "xref_summaries": [
         "&7c20 referenced 1 time by &7c13"
       ],
@@ -64388,6 +64673,7 @@
         205,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_offset_y,x",
@@ -64400,6 +64686,7 @@
         169,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&ff"
@@ -64411,6 +64698,7 @@
         164,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_offset_x,x",
@@ -64422,6 +64710,7 @@
       "bytes": [
         96
       ],
+      "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -64435,6 +64724,7 @@
       "labels": [
         "continue_monster_step"
       ],
+      "comment_inline": "Toggle the monster's frame",
       "xref_summaries": [
         "&7c2b referenced 1 time by &7a1c"
       ],
@@ -64456,6 +64746,7 @@
         73,
         1
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "eor",
       "operand": "#1"
@@ -64467,6 +64758,7 @@
         123,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_frame,x",
@@ -64480,6 +64772,7 @@
         246,
         126
       ],
+      "comment_inline": "Count down the step",
       "type": "code",
       "mnemonic": "dec",
       "operand": "monster_step,x",
@@ -64492,6 +64785,7 @@
         208,
         39
       ],
+      "comment_inline": "Not over: grow the offsets",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_7c5f",
@@ -64505,6 +64799,7 @@
         82,
         126
       ],
+      "comment_inline": "Over: move the cell on in its direction, up...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "monster_sprite,x",
@@ -64517,6 +64812,7 @@
         201,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#9"
@@ -64527,6 +64823,7 @@
         208,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_7c42",
@@ -64540,6 +64837,7 @@
         41,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "dec",
       "operand": "monster_y,x",
@@ -64555,6 +64853,7 @@
       "labels": [
         "code_7c42"
       ],
+      "comment_inline": "...right...",
       "xref_summaries": [
         "&7c42 referenced 1 time by &7c3d"
       ],
@@ -64574,6 +64873,7 @@
         208,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_7c49",
@@ -64587,6 +64887,7 @@
         0,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
       "operand": "monster_x,x",
@@ -64602,6 +64903,7 @@
       "labels": [
         "code_7c49"
       ],
+      "comment_inline": "...down...",
       "xref_summaries": [
         "&7c49 referenced 1 time by &7c44"
       ],
@@ -64621,6 +64923,7 @@
         208,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_7c50",
@@ -64634,6 +64937,7 @@
         41,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
       "operand": "monster_y,x",
@@ -64649,6 +64953,7 @@
       "labels": [
         "code_7c50"
       ],
+      "comment_inline": "...left",
       "xref_summaries": [
         "&7c50 referenced 1 time by &7c4b"
       ],
@@ -64668,6 +64973,7 @@
         208,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_7c57",
@@ -64681,6 +64987,7 @@
         0,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "dec",
       "operand": "monster_x,x",
@@ -64696,6 +65003,7 @@
       "labels": [
         "code_7c57"
       ],
+      "comment_inline": "...with no offsets",
       "xref_summaries": [
         "&7c57 referenced 1 time by &7c52"
       ],
@@ -64716,6 +65024,7 @@
         164,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_offset_x,x",
@@ -64729,6 +65038,7 @@
         205,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_offset_y,x",
@@ -64745,6 +65055,7 @@
       "labels": [
         "code_7c5f"
       ],
+      "comment_inline": "Grow the horizontal offset by a column, away from zero",
       "xref_summaries": [
         "&7c5f referenced 1 time by &7c36"
       ],
@@ -64766,6 +65077,7 @@
         240,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_7c6f",
@@ -64778,6 +65090,7 @@
         16,
         6
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bpl",
       "operand": "code_7c6c",
@@ -64791,6 +65104,7 @@
         164,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "dec",
       "operand": "monster_offset_x,x",
@@ -64804,6 +65118,7 @@
         111,
         124
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_7c6f",
@@ -64820,6 +65135,7 @@
       "labels": [
         "code_7c6c"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&7c6c referenced 1 time by &7c64"
       ],
@@ -64845,6 +65161,7 @@
       "labels": [
         "code_7c6f"
       ],
+      "comment_inline": "Grow the vertical offset by three rows, away from zero",
       "xref_summaries": [
         "&7c6f referenced 2 times by &7c62, &7c69"
       ],
@@ -64870,6 +65187,7 @@
         240,
         23
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
       "operand": "return_14",
@@ -64882,6 +65200,7 @@
         16,
         12
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bpl",
       "operand": "code_7c82",
@@ -64893,6 +65212,7 @@
       "bytes": [
         56
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sec"
     },
@@ -64903,6 +65223,7 @@
         205,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "monster_offset_y,x",
@@ -64915,6 +65236,7 @@
         233,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "#3"
@@ -64926,6 +65248,7 @@
         205,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_offset_y,x",
@@ -64939,6 +65262,7 @@
         139,
         124
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "return_14",
@@ -64953,6 +65277,7 @@
       "labels": [
         "code_7c82"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&7c82 referenced 1 time by &7c74"
       ],
@@ -64972,6 +65297,7 @@
         205,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "monster_offset_y,x",
@@ -64984,6 +65310,7 @@
         105,
         3
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#3"
@@ -64995,6 +65322,7 @@
         205,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_offset_y,x",
@@ -65009,6 +65337,7 @@
       "labels": [
         "return_14"
       ],
+      "comment_inline": "Return",
       "xref_summaries": [
         "&7c8b referenced 2 times by &7c72, &7c7f"
       ],
@@ -65318,8 +65647,9 @@
         11
       ],
       "labels": [
-        "code_7cb3"
+        "monster_reappears"
       ],
+      "comment_inline": "Next trapdoor, 0-7 in turn",
       "xref_summaries": [
         "&7cb3 referenced 1 time by &7b3c"
       ],
@@ -65342,6 +65672,7 @@
         47,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "next_trapdoor",
@@ -65354,6 +65685,7 @@
         201,
         8
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#8"
@@ -65364,6 +65696,7 @@
         208,
         5
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_7cc2",
@@ -65376,6 +65709,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -65387,6 +65721,7 @@
         47,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "next_trapdoor",
@@ -65403,6 +65738,7 @@
       "labels": [
         "code_7cc2"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&7cc2 referenced 1 time by &7cbb"
       ],
@@ -65425,6 +65761,7 @@
         144,
         11
       ],
+      "comment_inline": "Put the monster on it, facing up, with no step",
       "type": "code",
       "mnemonic": "lda",
       "operand": "trapdoor_x,y",
@@ -65438,6 +65775,7 @@
         0,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_x,x",
@@ -65451,6 +65789,7 @@
         152,
         11
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "trapdoor_y,y",
@@ -65464,6 +65803,7 @@
         41,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_y,x",
@@ -65476,6 +65816,7 @@
         169,
         9
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#9"
@@ -65487,6 +65828,7 @@
         82,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_sprite,x",
@@ -65499,6 +65841,7 @@
         169,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -65510,6 +65853,7 @@
         246,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_step,x",
@@ -65523,6 +65867,7 @@
         164,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_offset_x,x",
@@ -65536,6 +65881,7 @@
         205,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_offset_y,x",
@@ -65547,6 +65893,7 @@
       "bytes": [
         138
       ],
+      "comment_inline": "Is anything else on the trapdoor? (A hero there is hurt)",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -65555,6 +65902,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -65565,6 +65913,7 @@
         0,
         13
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "stx",
       "operand": "scratch",
@@ -65578,6 +65927,7 @@
         116,
         121
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "find_creature",
@@ -65590,6 +65940,7 @@
         201,
         0
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#0"
@@ -65600,6 +65951,7 @@
         240,
         14
       ],
+      "comment_inline": "No: done",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_7cfb",
@@ -65611,6 +65963,7 @@
       "bytes": [
         104
       ],
+      "comment_inline": "Yes: wait off the map, to try again next frame",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -65619,6 +65972,7 @@
       "bytes": [
         72
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -65627,6 +65981,7 @@
       "bytes": [
         170
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -65636,6 +65991,7 @@
         169,
         255
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&ff"
@@ -65647,6 +66003,7 @@
         0,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_x,x",
@@ -65660,6 +66017,7 @@
         41,
         126
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "monster_y,x",
@@ -65673,11 +66031,12 @@
         40,
         123
       ],
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_7b28",
+      "operand": "monster_done",
       "target": 31528,
-      "target_label": "code_7b28"
+      "target_label": "monster_done"
     },
     {
       "addr": 31995,
@@ -65689,6 +66048,7 @@
       "labels": [
         "code_7cfb"
       ],
+      "comment_inline": "Done",
       "xref_summaries": [
         "&7cfb referenced 1 time by &7ceb"
       ],
@@ -65700,9 +66060,9 @@
       ],
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_7b28",
+      "operand": "monster_done",
       "target": 31528,
-      "target_label": "code_7b28"
+      "target_label": "monster_done"
     },
     {
       "addr": 31998,
