@@ -54,3 +54,9 @@ the full catalogue, the boot chain and the confirmed runtime memory map.
   disassembly in comments, banners or docs.
 - Variable/function suffixes: `_filename`, `_filepath`, `_dirname`,
   `_dirpath` (never `_dir` or `_file`).
+
+## Findings log
+
+Record anything discovered that matters beyond the disassembly itself
+(emulator-compatibility hazards, bugs, inaccurate instructions, candidate
+fixes) in `docs/findings.md` as it is found, with the evidence.

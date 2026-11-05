@@ -104,17 +104,8 @@ loading of levels from tape.
 
 ## Notes for emulator compatibility
 
-- The level data is only reachable through ROMFS in sideways RAM; without
-  two writable sockets the loader stops with "NO ROM AVAILABLE IN MACHINE"
-  or "Image has not loaded".
-- `PROCROMSLOTS` does not test whether a socket is writable. It reads the
-  copyright-offset byte at &8007 and the three bytes after the offset it
-  points to, via OSRDRM; a socket is a candidate unless those read as
-  `(C)` (a ROM) or the four bytes read as &80 &80 &80 &80. The &80 test
-  assumes an empty socket reads back the high byte of the address bus.
-  On an emulator where an empty socket reads differently, an empty socket
-  is chosen as a candidate and the load fails at `FNtest`.
-- `DUNK` rejects the Master 128 by its `INKEY(-256)` OS identification.
+See [findings.md](findings.md) for the loader's sideways RAM detection,
+its socket choice, and where the instructions disagree with the loader.
 
 ## Open questions
 
