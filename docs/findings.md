@@ -185,8 +185,11 @@ against the MOS 1.20 ROM in beebium:
 | &C375 | Table of screen row offsets, row × 640, as high/low byte pairs | The screen address routine at &0967, for every sprite plot (all releases) |
 | &D9CD | The reset entry (the RESET vector's target) | `JSR &D9CD` when a level fails its checksum (official disc, sideways RAM hack) |
 | &E772 | The default OSBYTE handler (BYTEV's initial value) | The joystick BYTEV handler's fall-through (official disc, joystick mode) |
+| &E0A4 | The default OSWRCH handler (WRCHV's initial value) | The game's WRCHV handler at &7F8F passes every character on with `JMP &E0A4`, not through the WRCHV value it saved (all releases) |
+| &0C00 | Definition of character 128 (user-defined characters, default font arrangement) | The WRCHV handler copies each letter or digit glyph there and prints character 128 (all releases) |
 
 On another MOS, sprites are drawn at wrong addresses, a failed checksum
-jumps into unrelated code, and joystick mode breaks OSBYTE. A portable
-version would need its own 640-byte row table and would chain to the
-previous BYTEV.
+jumps into unrelated code, joystick mode breaks OSBYTE, and text output
+bypasses anything else hooked into WRCHV. A portable version would need
+its own 640-byte row table, would chain to the saved vectors, and would
+define character 128 with VDU 23.
