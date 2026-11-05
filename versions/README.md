@@ -17,10 +17,10 @@ None of these is a pristine original:
   Cracker (MCC)". `DUNJ` adds a start-level cheat (press `@`; it pokes
   `?&5100`), loads `DUNJ2` (loading screen at &3280) and `DUNJ3` (code at
   &6E80), and runs `DUNJ4`. That file is the &0400–&2FFF game image stored
-  &2000 higher, at &2400, with a relocator at its exec address &5000. The
+  &2000 higher, at &2400, with its exec address at &5000 (presumably code that moves it into place; not yet examined). The
   original protected tape is reported on bbcmicro.co.uk as
   `Dunjunz_B.uef` (stardot thread, see `../docs`).
-- **The official disc release** (`Dunjunz.zip`) includes Bug-Byte's level
+- **The official disc release** (`Dunjunz.zip`) includes a level
   editor (`EDITOR`, `CODER`, `DEFAULT`) and a README.
 - **The sideways RAM disc is a hack of Ole's crack.** Its intro
   (`DUNJUNZ` lines 510–570) is `PLOAD` with new text and picture, its game
