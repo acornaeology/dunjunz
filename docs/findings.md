@@ -70,11 +70,41 @@ Possible fix: say that the levels need two sideways RAM banks in sockets
 
 ### Wizard and Ranger descriptions are swapped
 
-Lines 210–240 give the Magic-User/Wizard "3 arrows at a time" and the
-Ranger "2 fireballs" with strong magic, whereas the story text (lines
-130–140) says "The Ranger uses a bow" and "The Wizard has been taught how
-to cast powerful fireballs". To be confirmed against the game code
-(weapon type and limit per hero).
+Lines 210–240 give the "Magic-User/Wizard" 3 arrows, leather armour and
+magic that "drains his energy badly", and the "Ranger" 2 fireballs, a
+robe that "takes maximum damage" and magic that "uses hardly any energy".
+The story text (lines 130–140) says the opposite: "The Ranger uses a bow",
+"The Wizard has been taught how to cast powerful fireballs". The game
+code agrees with the story text, so the two headings in lines 210–240 are
+swapped. In the code (hero 0 Ranger, hero 1 Magic-User, matching the menu
+and the top-left/top-right views):
+
+| | Ranger (hero 0) | Magic-User (hero 1) | Where |
+|---|---|---|---|
+| Missiles | arrows (sprites 17–20) | fireballs (69–72) | `hero_missile_sprites` |
+| Missiles in flight | 3 | 2 | starting table at &0F80 |
+| Missile damage | 2 | 3 | starting table at &0F84 |
+| Health lost per hit | 7 (armour 3) | 9 (armour 1, the worst) | starting table at &0F88 |
+| Health cost of magic | 6 | 3 | magic code at &7647 |
+
+(The instructions' "each fireball does the same damage as two arrows"
+does not match 3 against 2 either.)
+
+### The Cross of Resurrection resurrects; it does not raise armour
+
+Line 340 describes the Cross with the same words as the Magic Helmet:
+"Increases armour rating by 1 point". In the code, collecting a Cross
+(object type &2A, `collect_objects`) scores ten points and brings back
+the first hero waiting in `returning_hero_queue`, a hero who died on this
+level. The hero materialises and returns with health 32. Only the helmet
+(&60) lowers `hero_damage_taken`.
+
+### Energy drainers take 10 health per contact, not 20
+
+Line 310 says an Energy Drainer makes you "Lose 20 health points".
+`collect_objects` calls `lose_health_point` ten times when a hero touches
+one (types &53–&5E). Whether a hero can touch one twice in a single move
+has not been checked in play.
 
 ## Level data
 
