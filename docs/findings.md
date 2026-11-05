@@ -256,7 +256,7 @@ The game-over message (&0F90) contains "YOU ALL." with the full stop at
 the message the code writes spaces over &0FF1–&0FF4. The message always
 appears as "YOU ALL" with no full stop.
 
-### Casting magic briefly stops the other heroes moving (probable bug)
+### Casting magic briefly stops the other heroes moving (likely bug)
 
 `move_heroes` handles heroes 0 and 1 (the two with magic) by jumping to
 the magic code at &7619. That code counts down `hero_magic_delay` and,
@@ -268,3 +268,9 @@ three frames every hero is frozen when the Ranger (hero 0) cast, and the
 Barbarian and Fighter are frozen when the Magic-User (hero 1) cast. The
 delay seems meant to stop the magic key repeating, and skipping the
 other heroes looks unintended.
+
+Confirmed in beebium on the sideways RAM hack, with a breakpoint counting
+how often `move_heroes` reaches hero 3 in each frame. It does so once
+every frame, except for the three frames after the Ranger casts (CTRL),
+when it is not reached at all. A fix: make the not-yet branch at &761E
+jump to the next hero (&70C1) instead of returning.
