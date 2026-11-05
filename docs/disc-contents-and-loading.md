@@ -107,12 +107,16 @@ loading of levels from tape.
 See [findings.md](findings.md) for the loader's sideways RAM detection,
 its socket choice, and where the instructions disagree with the loader.
 
+## Answered since
+
+- How a level is loaded: `load_level` (&1446) calls the filing system's
+  FILEV routine directly with an OSFILE block at &6E60, loading `LEVELn`
+  from ROMFS to &6B00; `decrypt_level` (&0450) decrypts and checks it.
+- The level format: see [level-format.md](level-format.md).
+- What the game files contain: see
+  [analysis/how-the-game-works.md](analysis/how-the-game-works.md).
+
 ## Open questions
 
-- How the game locates and loads a `LEVELn` file (OSFILE or OSFIND/OSBGET
-  under ROMFS) and where in memory the level map is unpacked.
-- The format of a level file (compare with David Boddie's DunjunzMaps
-  tools, see `dunjunz_resources.md`).
-- What `Dunjun4`, `Dunjun5`, `Dunjun6` and `Dunjun7` each contain (code,
-  sprites, tables).
-- What `TITLE` does beyond drawing the title page.
+- What `TITLE` (&3800) does beyond drawing the title page; it has not
+  been disassembled.
