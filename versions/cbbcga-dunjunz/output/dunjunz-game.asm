@@ -783,39 +783,6 @@ data_0601 = menu_text+1
 ; &099f referenced 1 time by &099b
 .return_4
     rts                                 ; Return
-.sub_09a0
-; &09f0 referenced 4 times by &1f7a, &1fa7, &1fd3, &2026
-data_09f0 = sub_09a0+80
-; &09f1 referenced 4 times by &1f80, &1fad, &1fd9, &202c
-data_09f1 = sub_09a0+81
-; &09f2 referenced 5 times by &14ad, &1f10, &1f96, &2034, &2078
-data_09f2 = sub_09a0+82
-; &09f3 referenced 5 times by &1fbe, &1fc3, &1fce, &1ff4, &2086
-data_09f3 = sub_09a0+83
-; &09f4 referenced 3 times by &1fdf, &1ff7, &208b
-data_09f4 = sub_09a0+84
-; &09f5 referenced 3 times by &1f9e, &1fba, &207e
-data_09f5 = sub_09a0+85
-; &09f6 referenced 1 time by &2042; also used as index base 1 time by &1fe2
-data_09f6 = sub_09a0+86
-; &09f7 referenced 1 time by &14be
-data_09f7 = sub_09a0+87
-; &09f8 referenced 1 time by &14c1
-data_09f8 = sub_09a0+88
-; &09f9 referenced 1 time by &14b0
-data_09f9 = sub_09a0+89
-; &09fa referenced 1 time by &14b3; also used as index base 1 time by &1fe7
-data_09fa = sub_09a0+90
-; &09fb referenced 1 time by &14ce
-data_09fb = sub_09a0+91
-; &09fc referenced 1 time by &14d3
-data_09fc = sub_09a0+92
-; &09fd referenced 1 time by &14c4
-data_09fd = sub_09a0+93
-; &09fe referenced 1 time by &14b6
-data_09fe = sub_09a0+94
-; &09ff referenced 4 times by &14c9, &1f2d, &2045, &2081
-data_09ff = sub_09a0+95
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -826,8 +793,47 @@ data_09ff = sub_09a0+95
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &04, &2c, &00, &ff, &00, &03, &04, &01
-    equb &01, &00, &00, &05, &03, &01, &00, &ff
+; &09f0 referenced 4 times by &1f7a, &1fa7, &1fd3, &2026
+.exit_saved_x
+    equb &04
+; &09f1 referenced 4 times by &1f80, &1fad, &1fd9, &202c
+.exit_saved_y
+    equb &2c
+; &09f2 referenced 5 times by &14ad, &1f10, &1f96, &2034, &2078
+.exit_busy
+    equb &00
+; &09f3 referenced 5 times by &1fbe, &1fc3, &1fce, &1ff4, &2086
+.exit_spin
+    equb &ff
+; &09f4 referenced 3 times by &1fdf, &1ff7, &208b
+.exit_shrinks_left
+    equb &00
+; &09f5 referenced 3 times by &1f9e, &1fba, &207e
+.exiting_hero
+    equb &03
+; &09f6 referenced 1 time by &2042; also used as index base 1 time by &1fe2
+.exit_offsets_x
+; &09f7 referenced 1 time by &14be
+data_09f7 = exit_offsets_x+1
+; &09f8 referenced 1 time by &14c1
+data_09f8 = exit_offsets_x+2
+; &09f9 referenced 1 time by &14b0
+data_09f9 = exit_offsets_x+3
+    equb &04, &01, &01, &00
+; &09fa referenced 1 time by &14b3; also used as index base 1 time by &1fe7
+.exit_offsets_y
+; &09fb referenced 1 time by &14ce
+data_09fb = exit_offsets_y+1
+; &09fc referenced 1 time by &14d3
+data_09fc = exit_offsets_y+2
+; &09fd referenced 1 time by &14c4
+data_09fd = exit_offsets_y+3
+; &09fe referenced 1 time by &14b6
+data_09fe = exit_offsets_y+4
+    equb &00, &05, &03, &01, &00
+; &09ff referenced 4 times by &14c9, &1f2d, &2045, &2081
+.shrunk_hero
+    equb &ff
 .sprite_boots
     equb &00, &00, &00, &00
     equb &00, &00, &00, &15
@@ -1264,7 +1270,7 @@ data_0dff = sub_0ded+18
     jsr remove_absent_heroes            ; Take out the heroes nobody plays
     lda #1                              ; Let one vertical sync pass before play starts
     sta os_vsync_counter                ; ...
-    jsr code_1f00                       ; Play the level until it ends
+    jsr play_level                      ; Play the level until it ends
     ldx #0                              ; Count the heroes who died, giving each back their starting attributes
     stx count                           ; ...
 ; &0e6d referenced 1 time by &0e7d
@@ -1974,9 +1980,9 @@ data_149c = load_level_call+2
     inx                                 ; ...
     bne loop_14a2                       ; ...
     lda #0                              ; Reset the exit and other per-level state
-    sta data_09f2
+    sta exit_busy
     sta data_09f9
-    sta data_09fa
+    sta exit_offsets_y
     sta data_09fe
     sta next_trapdoor                   ; First monster emerges from trapdoor 0
     lda #1
@@ -1984,7 +1990,7 @@ data_149c = load_level_call+2
     sta data_09f8
     sta data_09fd
     lda #&ff
-    sta data_09ff
+    sta shrunk_hero
     lda #5
     sta data_09fb
     lda #3
@@ -2958,130 +2964,139 @@ data_16d6 = level_filename_digits+1
     rts
     equb &00, &00, &00, &00, &00, &00
     equs "<<<<"
+; ***************************************************************************************
+; Play a level until it ends
+;
+; Run one frame every three vertical syncs: check for victory and update the game, take
+; any hero standing on the exit down it, and animate one going down. Return when no hero
+; is in play and every death animation has finished. Each hero_enters_exit leaves its
+; return address on the stack (it ends with a jump back here), so the first RTS at the
+; end of a level returns into this loop, once for each hero who left by the exit, before
+; the last returns to the caller.
 ; &1f00 referenced 7 times by &0e65, &1f03, &1f9b, &1fef, &2023, &2037, &208e
-.code_1f00
-    lda os_vsync_counter
-    bpl code_1f00
-    lda #2
-    sta os_vsync_counter
-    jsr check_for_victory
-    jsr update_game
-    lda data_09f2
-    bne code_1f36
-    ldx #4
+.play_level
+    lda os_vsync_counter                ; Wait for the vertical sync counter to pass zero...
+    bpl play_level                      ; ...
+    lda #2                              ; ...and set it for three syncs from now
+    sta os_vsync_counter                ; ...
+    jsr check_for_victory               ; Has the Chalice been found?
+    jsr update_game                     ; Run a frame
+    lda exit_busy                       ; A hero going down the exit?
+    bne code_1f36                       ; Yes: carry on
+    ldx #4                              ; Is any hero in play, or still dying?
 ; &1f17 referenced 1 time by &1f2b
 .loop_1f17
-    lda data_0d19,x
-    bne code_1f36
-    lda data_0d8f,x
-    cmp #&1d
-    bne code_1f2a
-    lda data_0d1f,x
-    cmp #8
-    bcc code_1f36
+    lda data_0d19,x                     ; In play?
+    bne code_1f36                       ; Yes: carry on
+    lda data_0d8f,x                     ; Dead...
+    cmp #&1d                            ; ...
+    bne code_1f2a                       ; ...
+    lda data_0d1f,x                     ; ...with the death animation unfinished?
+    cmp #8                              ; ...
+    bcc code_1f36                       ; Yes: carry on
 ; &1f2a referenced 1 time by &1f21
 .code_1f2a
-    dex
-    bne loop_1f17
-    ldx data_09ff
-    bmi return_8
-    jsr restore_hero_sprites
+    dex                                 ; Next hero
+    bne loop_1f17                       ; ...
+    ldx shrunk_hero                     ; The level is over: restore the last exiting hero's sprites
+    bmi return_8                        ; ...
+    jsr restore_hero_sprites            ; ...
 ; &1f35 referenced 1 time by &1f30
 .return_8
-    rts
+    rts                                 ; Return
 ; &1f36 referenced 3 times by &1f13, &1f1a, &1f28
 .code_1f36
-    ldx #0
+    ldx #0                              ; Is a hero on the exit?
 ; &1f38 referenced 1 time by &1f94
 .loop_1f38
-    lda hero_x,x
-    cmp exit_x
-    bne code_1f91
-    lda hero_y,x
-    cmp exit_y
-    bne code_1f91
-    jsr drop_key
-    lda #&63 ; 'c'
-    sta hero_step,x
-    lda #0
-    sta hero_direction,x
-    lda hero_x,x
-    sta cell_x
-    lda hero_y,x
-    sta cell_y
-    lda #0
-    sta data_007d
-    sta data_007e
-    lda #&15
-    sta sprite_number
-    txa
-    pha
-    jsr plot_at_cell
-    pla
-    tax
-    lda #&ff
-    sta hero_x,x
-    lda exit_x
-    sta data_09f0
-    lda exit_y
-    sta data_09f1
-    lda #&ff
-    sta exit_x
-    sta exit_y
-    jsr hero_enters_exit
-    jmp code_1f96
+    lda hero_x,x                        ; ...
+    cmp exit_x                          ; ...
+    bne code_1f91                       ; ...
+    lda hero_y,x                        ; ...
+    cmp exit_y                          ; ...
+    bne code_1f91                       ; ...
+    jsr drop_key                        ; Yes: drop their key beside it
+    lda #&63 ; 'c'                      ; Take them out of play for the rest of the level
+    sta hero_step,x                     ; ...
+    lda #0                              ; ...
+    sta hero_direction,x                ; ...
+    lda hero_x,x                        ; Erase them
+    sta cell_x                          ; ...
+    lda hero_y,x                        ; ...
+    sta cell_y                          ; ...
+    lda #0                              ; ...
+    sta data_007d                       ; ...
+    sta data_007e                       ; ...
+    lda #&15                            ; ...
+    sta sprite_number                   ; ...
+    txa                                 ; ...
+    pha                                 ; ...
+    jsr plot_at_cell                    ; ...
+    pla                                 ; ...
+    tax                                 ; ...
+    lda #&ff                            ; Move them off the map
+    sta hero_x,x                        ; ...
+    lda exit_x                          ; Hide the exit while they go down it, keeping its position
+    sta exit_saved_x                    ; ...
+    lda exit_y                          ; ...
+    sta exit_saved_y                    ; ...
+    lda #&ff                            ; ...
+    sta exit_x                          ; ...
+    sta exit_y                          ; ...
+    jsr hero_enters_exit                ; Start the exit animation (which jumps back to play_level)
+    jmp code_1f96                       ; Reached by the RTS at the end of the level
 ; &1f91 referenced 2 times by &1f3e, &1f46
 .code_1f91
-    inx
-    cpx #4
-    bne loop_1f38
+    inx                                 ; Next hero
+    cpx #4                              ; ...
+    bne loop_1f38                       ; ...
 ; &1f96 referenced 1 time by &1f8e
 .code_1f96
-    lda data_09f2
-    bne code_1f9e
-    jmp code_1f00
+    lda exit_busy                       ; A hero going down the exit?
+    bne code_1f9e                       ; Yes
+    jmp play_level                      ; No: next frame
 ; &1f9e referenced 1 time by &1f99
 .code_1f9e
-    ldx data_09f5
-    lda #0
-    sta data_007d
-    sta data_007e
-    lda data_09f0
-    sta cell_x
-    lda data_09f1
-    sta cell_y
-    lda #&51 ; 'Q'
-    sta sprite_number
-    jsr plot_at_cell
-    ldx data_09f5
-    clc
-    lda data_09f3
-    adc #2
-    sta data_09f3
-    cmp #9
-    beq code_1ff2
-    clc
-    lda hero_sprites,x
-    adc data_09f3
-    sta sprite_number
-    lda data_09f0
-    sta cell_x
-    lda data_09f1
-    sta cell_y
-    ldx data_09f4
-    lda data_09f6,x
-    sta data_007d
-    lda data_09fa,x
-    sta data_007e
-    jsr plot_at_cell
-    jmp code_1f00
+    ldx exiting_hero                    ; Redraw the exit
+    lda #0                              ; ...
+    sta data_007d                       ; ...
+    sta data_007e                       ; ...
+    lda exit_saved_x                    ; ...
+    sta cell_x                          ; ...
+    lda exit_saved_y                    ; ...
+    sta cell_y                          ; ...
+    lda #&51 ; 'Q'                      ; ...
+    sta sprite_number                   ; ...
+    jsr plot_at_cell                    ; ...
+    ldx exiting_hero                    ; Turn the hero a quarter (frames 1, 3, 5, 7)
+    clc                                 ; ...
+    lda exit_spin                       ; ...
+    adc #2                              ; ...
+    sta exit_spin                       ; ...
+    cmp #9                              ; A full turn?
+    beq code_1ff2                       ; Yes: shrink the hero
+    clc                                 ; Plot the hero on the exit, centred for its current size
+    lda hero_sprites,x                  ; ...
+    adc exit_spin                       ; ...
+    sta sprite_number                   ; ...
+    lda exit_saved_x                    ; ...
+    sta cell_x                          ; ...
+    lda exit_saved_y                    ; ...
+    sta cell_y                          ; ...
+    ldx exit_shrinks_left               ; ...
+    lda exit_offsets_x,x                ; ...
+    sta data_007d                       ; ...
+    lda exit_offsets_y,x                ; ...
+    sta data_007e                       ; ...
+    jsr plot_at_cell                    ; ...
+    jmp play_level                      ; Next frame
 ; &1ff2 referenced 1 time by &1fc8
 .code_1ff2
-    lda #&ff
-    sta data_09f3
-    dec data_09f4
-    beq code_2026
-    clc
+    lda #&ff                            ; Start the next turn
+    sta exit_spin                       ; ...
+    dec exit_shrinks_left               ; Last turn done?
+    beq code_2026                       ; Yes: the hero has gone
+    clc                                 ; Shrink the hero's eight sprites: one byte narrower...
     lda hero_sprites,x
     adc #1
     tay
@@ -3105,33 +3120,35 @@ data_16d6 = level_filename_digits+1
     inx
     cpx scratch
     bne loop_2014
-    jmp code_1f00
+    jmp play_level                      ; ...three rows shorter. Next frame
 ; &2026 referenced 1 time by &1ffa
 .code_2026
-    lda data_09f0
-    sta exit_x
-    lda data_09f1
-    sta exit_y
-    lda #0
-    sta data_09f2
-    jmp code_1f00
+    lda exit_saved_x                    ; Put the exit back...
+    sta exit_x                          ; ...
+    lda exit_saved_y                    ; ...
+    sta exit_y                          ; ...
+    lda #0                              ; ...and end the animation
+    sta exit_busy                       ; ...
+    jmp play_level                      ; Next frame
 ; ***************************************************************************************
 ; Start a hero going down the exit
 ;
-; Play the exit sound and begin shrinking the hero's sprites.
+; Play the exit sound, restore any hero shrunk before, and start the animation of hero X
+; spinning and shrinking on the exit. Ends by jumping to play_level rather than
+; returning.
 ;
 ; On Entry:
 ;     X: hero number (0-3)
 ; &203a referenced 1 time by &1f8b
 .hero_enters_exit
-    stx scratch2
-    jsr queue_exit_marker
-    lda #4
-    sta data_09f6
-    ldx data_09ff
-    bmi code_2076
-    jsr restore_hero_sprites
-    jmp code_2076
+    stx scratch2                        ; Keep the hero number
+    jsr queue_exit_marker               ; Sound the exit and queue a marker
+    lda #4                              ; ...
+    sta exit_offsets_x                  ; ...
+    ldx shrunk_hero                     ; Restore the sprites of any hero shrunk before
+    bmi code_2076                       ; ...
+    jsr restore_hero_sprites            ; ...
+    jmp code_2076                       ; ...
 ; ***************************************************************************************
 ; Restore a hero's sprite sizes
 ;
@@ -3168,16 +3185,16 @@ data_16d6 = level_filename_digits+1
     rts
 ; &2076 referenced 2 times by &2048, &204d
 .code_2076
-    lda #1
-    sta data_09f2
-    lda scratch2
-    sta data_09f5
-    sta data_09ff
-    lda #&ff
-    sta data_09f3
-    lda #4
-    sta data_09f4
-    jmp code_1f00
+    lda #1                              ; Start the animation for this hero...
+    sta exit_busy                       ; ...
+    lda scratch2                        ; ...
+    sta exiting_hero                    ; ...
+    sta shrunk_hero                     ; ...
+    lda #&ff                            ; ...turning from the start...
+    sta exit_spin                       ; ...
+    lda #4                              ; ...for four turns
+    sta exit_shrinks_left               ; ...
+    jmp play_level                      ; Back to play_level, without returning
 ; ***************************************************************************************
 ; Drop the key a hero carries
 ;
@@ -6980,7 +6997,6 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     scratch2:                    8
 ;     test_wall:                   8
 ;     cell_room:                   7
-;     code_1f00:                   7
 ;     data_0081:                   7
 ;     hero_damage_taken:           7
 ;     hero_health_units:           7
@@ -6991,6 +7007,7 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     menu_text:                   7
 ;     monster_step:                7
 ;     object_type:                 7
+;     play_level:                  7
 ;     code_0581:                   6
 ;     code_7b04:                   6
 ;     data_0082:                   6
@@ -7007,9 +7024,9 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     code_71d9:                   5
 ;     count:                       5
 ;     data_0084:                   5
-;     data_09f2:                   5
-;     data_09f3:                   5
 ;     erase_hero:                  5
+;     exit_busy:                   5
+;     exit_spin:                   5
 ;     hero_score_hundreds:         5
 ;     hero_score_tens:             5
 ;     hero_score_thousands:        5
@@ -7024,13 +7041,12 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     code_7ff6:                   4
 ;     data_007c:                   4
 ;     data_0601:                   4
-;     data_09f0:                   4
-;     data_09f1:                   4
-;     data_09ff:                   4
 ;     door_x:                      4
 ;     door_y:                      4
 ;     draw_moved_hero:             4
 ;     draw_room:                   4
+;     exit_saved_x:                4
+;     exit_saved_y:                4
 ;     exit_x:                      4
 ;     exit_y:                      4
 ;     find_creature:               4
@@ -7042,6 +7058,7 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     missile_sprite_base:         4
 ;     monster_hit_points:          4
 ;     next_hero:                   4
+;     shrunk_hero:                 4
 ;     sprite_heights:              4
 ;     start_hero_step:             4
 ;     step_hero:                   4
@@ -7057,8 +7074,8 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     code_798d:                   3
 ;     code_7b28:                   3
 ;     data_008d:                   3
-;     data_09f4:                   3
-;     data_09f5:                   3
+;     exit_shrinks_left:           3
+;     exiting_hero:                3
 ;     hero_has_boots:              3
 ;     hero_magic_delay:            3
 ;     magic_kill_count:            3
@@ -7104,8 +7121,6 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     credit_missile_owner:        2
 ;     data_008e:                   2
 ;     data_0602:                   2
-;     data_09f6:                   2
-;     data_09fa:                   2
 ;     data_0b2b:                   2
 ;     data_0b2c:                   2
 ;     data_0b2d:                   2
@@ -7128,6 +7143,8 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     draw_view_1:                 2
 ;     draw_view_2:                 2
 ;     draw_view_3:                 2
+;     exit_offsets_x:              2
+;     exit_offsets_y:              2
 ;     get_hero_cell:               2
 ;     level_filename_digits:       2
 ;     mos_oswrch_default:          2
@@ -7557,7 +7574,6 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     code_1ec4
 ;     code_1ec6
 ;     code_1ece
-;     code_1f00
 ;     code_1f2a
 ;     code_1f36
 ;     code_1f91
@@ -7732,22 +7748,13 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     data_00fc
 ;     data_0601
 ;     data_0602
-;     data_09f0
-;     data_09f1
-;     data_09f2
-;     data_09f3
-;     data_09f4
-;     data_09f5
-;     data_09f6
 ;     data_09f7
 ;     data_09f8
 ;     data_09f9
-;     data_09fa
 ;     data_09fb
 ;     data_09fc
 ;     data_09fd
 ;     data_09fe
-;     data_09ff
 ;     data_0b2b
 ;     data_0b2c
 ;     data_0b2d
@@ -7866,7 +7873,6 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     return_7
 ;     return_8
 ;     return_9
-;     sub_09a0
 ;     sub_0d63
 ;     sub_0ded
 ;     sub_0fea

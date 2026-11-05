@@ -21,6 +21,7 @@ def annotate(a: Annotator) -> None:
     annotate_sprites(a)
     annotate_data(a)
     annotate_hero_comments(a)
+    annotate_play_loop(a)
 
 
 # ---------------------------------------------------------------------------
@@ -628,8 +629,9 @@ def annotate_routines(a: Annotator) -> None:
           "pick up and swap keys, then draw the objects, move the missiles "
           "and the monsters, and handle the pause key.")
     a.sub(0x203A, "hero_enters_exit", "Start a hero going down the exit",
-          "Play the exit sound and begin shrinking the hero's sprites.",
-          on_entry=X_HERO)
+          "Play the exit sound, restore any hero shrunk before, and start "
+          "the animation of hero X spinning and shrinking on the exit. Ends "
+          "by jumping to play_level rather than returning.", on_entry=X_HERO)
     a.sub(0x2050, "restore_hero_sprites", "Restore a hero's sprite sizes",
           "Put back the width and height of all eight of hero X's sprites, "
           "which the exit animation shrinks.", on_entry=X_HERO)
@@ -1726,5 +1728,118 @@ def annotate_hero_comments(a: Annotator) -> None:
         (0x76A5, "..."), (0x76A6, "..."), (0x76A7, "..."), (0x76A8, "..."),
         (0x76AB, "No magic: carry on with the keys"),
         (0x76AE, "Magic cast: redraw the hero"),
+    ]:
+        a.c(addr, text)
+
+
+def annotate_play_loop(a: Annotator) -> None:
+    for addr, name, description in [
+        (0x09F0, "exit_saved_x", "The exit's map x, kept while a hero goes down it."),
+        (0x09F1, "exit_saved_y", "The exit's map y, kept while a hero goes down it."),
+        (0x09F2, "exit_busy", "Non-zero while a hero is going down the exit."),
+        (0x09F3, "exit_spin", "Direction (1, 3, 5, 7) of the hero spinning on the exit."),
+        (0x09F4, "exit_shrinks_left", "Spins left before the hero has gone (4 to 1)."),
+        (0x09F5, "exiting_hero", "The hero going down the exit."),
+        (0x09FF, "shrunk_hero", "The hero whose sprites are shrunk, or &FF."),
+    ]:
+        a.label(addr, name, description=description)
+    a.index_base(0x09F6, "exit_offsets_x", group="game_state", description=(
+        "Horizontal pixel offset of the shrinking hero, entries 1-4 by "
+        "exit_shrinks_left."))
+    a.label(0x09FA, "exit_offsets_y", description=(
+        "Vertical pixel offset of the shrinking hero, entries 1-4 by "
+        "exit_shrinks_left (at exit_offsets_y+1 to +4). Also entry 4 of "
+        "exit_offsets_x."))
+
+    a.sub(0x1F00, "play_level", "Play a level until it ends",
+          "Run one frame every three vertical syncs: check for victory and "
+          "update the game, take any hero standing on the exit down it, and "
+          "animate one going down. Return when no hero is in play and every "
+          "death animation has finished. Each hero_enters_exit leaves its "
+          "return address on the stack (it ends with a jump back here), so "
+          "the first RTS at the end of a level returns into this loop, once "
+          "for each hero who left by the exit, before the last returns to "
+          "the caller.")
+    for addr, text in [
+        (0x1F00, "Wait for the vertical sync counter to pass zero..."),
+        (0x1F03, "..."),
+        (0x1F05, "...and set it for three syncs from now"),
+        (0x1F07, "..."),
+        (0x1F0A, "Has the Chalice been found?"),
+        (0x1F0D, "Run a frame"),
+        (0x1F10, "A hero going down the exit?"),
+        (0x1F13, "Yes: carry on"),
+        (0x1F15, "Is any hero in play, or still dying?"),
+        (0x1F17, "In play?"),
+        (0x1F1A, "Yes: carry on"),
+        (0x1F1C, "Dead..."),
+        (0x1F1F, "..."), (0x1F21, "..."),
+        (0x1F23, "...with the death animation unfinished?"),
+        (0x1F26, "..."),
+        (0x1F28, "Yes: carry on"),
+        (0x1F2A, "Next hero"),
+        (0x1F2B, "..."),
+        (0x1F2D, "The level is over: restore the last exiting hero's sprites"),
+        (0x1F30, "..."), (0x1F32, "..."),
+        (0x1F35, "Return"),
+        (0x1F36, "Is a hero on the exit?"),
+        (0x1F38, "..."), (0x1F3B, "..."), (0x1F3E, "..."),
+        (0x1F40, "..."), (0x1F43, "..."), (0x1F46, "..."),
+        (0x1F48, "Yes: drop their key beside it"),
+        (0x1F4B, "Take them out of play for the rest of the level"),
+        (0x1F4D, "..."), (0x1F50, "..."), (0x1F52, "..."),
+        (0x1F55, "Erase them"),
+        (0x1F58, "..."), (0x1F5B, "..."), (0x1F5E, "..."), (0x1F61, "..."),
+        (0x1F63, "..."), (0x1F65, "..."), (0x1F67, "..."), (0x1F69, "..."),
+        (0x1F6B, "..."), (0x1F6C, "..."), (0x1F6D, "..."), (0x1F70, "..."),
+        (0x1F71, "..."),
+        (0x1F72, "Move them off the map"),
+        (0x1F74, "..."),
+        (0x1F77, "Hide the exit while they go down it, keeping its position"),
+        (0x1F7A, "..."), (0x1F7D, "..."), (0x1F80, "..."), (0x1F83, "..."),
+        (0x1F85, "..."), (0x1F88, "..."),
+        (0x1F8B, "Start the exit animation (which jumps back to play_level)"),
+        (0x1F8E, "Reached by the RTS at the end of the level"),
+        (0x1F91, "Next hero"),
+        (0x1F92, "..."), (0x1F94, "..."),
+        (0x1F96, "A hero going down the exit?"),
+        (0x1F99, "Yes"),
+        (0x1F9B, "No: next frame"),
+        (0x1F9E, "Redraw the exit"),
+        (0x1FA1, "..."), (0x1FA3, "..."), (0x1FA5, "..."), (0x1FA7, "..."),
+        (0x1FAA, "..."), (0x1FAD, "..."), (0x1FB0, "..."), (0x1FB3, "..."),
+        (0x1FB5, "..."), (0x1FB7, "..."),
+        (0x1FBA, "Turn the hero a quarter (frames 1, 3, 5, 7)"),
+        (0x1FBD, "..."), (0x1FBE, "..."), (0x1FC1, "..."), (0x1FC3, "..."),
+        (0x1FC6, "A full turn?"),
+        (0x1FC8, "Yes: shrink the hero"),
+        (0x1FCA, "Plot the hero on the exit, centred for its current size"),
+        (0x1FCB, "..."), (0x1FCE, "..."), (0x1FD1, "..."), (0x1FD3, "..."),
+        (0x1FD6, "..."), (0x1FD9, "..."), (0x1FDC, "..."), (0x1FDF, "..."),
+        (0x1FE2, "..."), (0x1FE5, "..."), (0x1FE7, "..."), (0x1FEA, "..."),
+        (0x1FEC, "..."),
+        (0x1FEF, "Next frame"),
+        (0x1FF2, "Start the next turn"),
+        (0x1FF4, "..."),
+        (0x1FF7, "Last turn done?"),
+        (0x1FFA, "Yes: the hero has gone"),
+        (0x1FFC, "Shrink the hero's eight sprites: one byte narrower..."),
+        (0x2023, "...three rows shorter. Next frame"),
+        (0x2026, "Put the exit back..."),
+        (0x2029, "..."), (0x202C, "..."), (0x202F, "..."),
+        (0x2032, "...and end the animation"),
+        (0x2034, "..."),
+        (0x2037, "Next frame"),
+
+        (0x203A, "Keep the hero number"),
+        (0x203D, "Sound the exit and queue a marker"),
+        (0x2040, "..."), (0x2042, "..."),
+        (0x2045, "Restore the sprites of any hero shrunk before"),
+        (0x2048, "..."), (0x204A, "..."), (0x204D, "..."),
+        (0x2076, "Start the animation for this hero..."),
+        (0x2078, "..."), (0x207B, "..."), (0x207E, "..."), (0x2081, "..."),
+        (0x2084, "...turning from the start..."), (0x2086, "..."),
+        (0x2089, "...for four turns"), (0x208B, "..."),
+        (0x208E, "Back to play_level, without returning"),
     ]:
         a.c(addr, text)

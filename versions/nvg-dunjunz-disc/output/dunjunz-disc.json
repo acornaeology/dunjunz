@@ -565,7 +565,7 @@
       "binary_addr": 18298,
       "name": "hero_enters_exit",
       "title": "Start a hero going down the exit",
-      "description": "Play the exit sound and begin shrinking the hero's sprites.",
+      "description": "Play the exit sound, restore any hero shrunk before, and start the animation of hero X spinning and shrinking on the exit. Ends by jumping to play_level rather than returning.",
       "on_entry": {
         "X": "hero number (0-3)"
       }
@@ -833,6 +833,13 @@
         "Z": "set if the key is pressed",
         "X": "preserved"
       }
+    },
+    {
+      "addr": 7936,
+      "binary_addr": 17984,
+      "name": "play_level",
+      "title": "Play a level until it ends",
+      "description": "Run one frame every three vertical syncs: check for victory and update the game, take any hero standing on the exit down it, and animate one going down. Return when no hero is in play and every death animation has finished. Each hero_enters_exit leaves its return address on the stack (it ends with a jump back here), so the first RTS at the end of a level returns into this loop, once for each hero who left by the exit, before the last returns to the caller."
     },
     {
       "addr": 3377,
@@ -12634,96 +12641,9 @@
         0,
         0,
         0,
-        0,
-        4,
-        44,
-        0,
-        255,
-        0,
-        3,
-        4,
-        1,
-        1,
-        0,
-        0,
-        5,
-        3,
-        1,
-        0,
-        255
+        0
       ],
       "binary_addr": 12512,
-      "labels": [
-        "sub_09a0"
-      ],
-      "sub_labels": {
-        "2544": [
-          "data_09f0"
-        ],
-        "2545": [
-          "data_09f1"
-        ],
-        "2546": [
-          "data_09f2"
-        ],
-        "2547": [
-          "data_09f3"
-        ],
-        "2548": [
-          "data_09f4"
-        ],
-        "2549": [
-          "data_09f5"
-        ],
-        "2550": [
-          "data_09f6"
-        ],
-        "2551": [
-          "data_09f7"
-        ],
-        "2552": [
-          "data_09f8"
-        ],
-        "2553": [
-          "data_09f9"
-        ],
-        "2554": [
-          "data_09fa"
-        ],
-        "2555": [
-          "data_09fb"
-        ],
-        "2556": [
-          "data_09fc"
-        ],
-        "2557": [
-          "data_09fd"
-        ],
-        "2558": [
-          "data_09fe"
-        ],
-        "2559": [
-          "data_09ff"
-        ]
-      },
-      "xref_summaries": [
-        "&3130 referenced 3 times by &46ba, &46e7, &4713",
-        "&3131 referenced 3 times by &46c0, &46ed, &4719",
-        "&3132 referenced 3 times by &3bed, &4650, &46d6",
-        "&3133 referenced 4 times by &46fe, &4703, &470e, &4734",
-        "&3134 referenced 2 times by &471f, &4737",
-        "&3135 referenced 2 times by &46de, &46fa",
-        "&3136 used as index base 1 time by &4722",
-        "&3137 referenced 1 time by &3bfe",
-        "&3138 referenced 1 time by &3c01",
-        "&3139 referenced 1 time by &3bf0",
-        "&313a referenced 1 time by &3bf3; also used as index base 1 time by &4727",
-        "&313b referenced 1 time by &3c0e",
-        "&313c referenced 1 time by &3c13",
-        "&313d referenced 1 time by &3c04",
-        "&313e referenced 1 time by &3bf6",
-        "&313f referenced 2 times by &3c09, &466d"
-      ],
       "type": "byte",
       "values": [
         0,
@@ -12805,22 +12725,333 @@
         0,
         0,
         0,
-        0,
-        4,
-        44,
-        0,
-        255,
-        0,
-        3,
+        0
+      ]
+    },
+    {
+      "addr": 2544,
+      "bytes": [
+        4
+      ],
+      "binary_addr": 12592,
+      "labels": [
+        "exit_saved_x"
+      ],
+      "xref_summaries": [
+        "&3130 referenced 3 times by &1f7a[1], &1fa7[1], &1fd3[1]"
+      ],
+      "references": [
+        {
+          "addr": 8058,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 8103,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 8147,
+          "kind": "direct",
+          "move_id": 1
+        }
+      ],
+      "type": "byte",
+      "values": [
+        4
+      ]
+    },
+    {
+      "addr": 2545,
+      "bytes": [
+        44
+      ],
+      "binary_addr": 12593,
+      "labels": [
+        "exit_saved_y"
+      ],
+      "xref_summaries": [
+        "&3131 referenced 3 times by &1f80[1], &1fad[1], &1fd9[1]"
+      ],
+      "references": [
+        {
+          "addr": 8064,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 8109,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 8153,
+          "kind": "direct",
+          "move_id": 1
+        }
+      ],
+      "type": "byte",
+      "values": [
+        44
+      ]
+    },
+    {
+      "addr": 2546,
+      "bytes": [
+        0
+      ],
+      "binary_addr": 12594,
+      "labels": [
+        "exit_busy"
+      ],
+      "xref_summaries": [
+        "&3132 referenced 3 times by &14ad[1], &1f10[1], &1f96[1]"
+      ],
+      "references": [
+        {
+          "addr": 5293,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 7952,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 8086,
+          "kind": "direct",
+          "move_id": 1
+        }
+      ],
+      "type": "byte",
+      "values": [
+        0
+      ]
+    },
+    {
+      "addr": 2547,
+      "bytes": [
+        255
+      ],
+      "binary_addr": 12595,
+      "labels": [
+        "exit_spin"
+      ],
+      "xref_summaries": [
+        "&3133 referenced 4 times by &1fbe[1], &1fc3[1], &1fce[1], &1ff4[1]"
+      ],
+      "references": [
+        {
+          "addr": 8126,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 8131,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 8142,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 8180,
+          "kind": "direct",
+          "move_id": 1
+        }
+      ],
+      "type": "byte",
+      "values": [
+        255
+      ]
+    },
+    {
+      "addr": 2548,
+      "bytes": [
+        0
+      ],
+      "binary_addr": 12596,
+      "labels": [
+        "exit_shrinks_left"
+      ],
+      "xref_summaries": [
+        "&3134 referenced 2 times by &1fdf[1], &1ff7[1]"
+      ],
+      "references": [
+        {
+          "addr": 8159,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 8183,
+          "kind": "direct",
+          "move_id": 1
+        }
+      ],
+      "type": "byte",
+      "values": [
+        0
+      ]
+    },
+    {
+      "addr": 2549,
+      "bytes": [
+        3
+      ],
+      "binary_addr": 12597,
+      "labels": [
+        "exiting_hero"
+      ],
+      "xref_summaries": [
+        "&3135 referenced 2 times by &1f9e[1], &1fba[1]"
+      ],
+      "references": [
+        {
+          "addr": 8094,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 8122,
+          "kind": "direct",
+          "move_id": 1
+        }
+      ],
+      "type": "byte",
+      "values": [
+        3
+      ]
+    },
+    {
+      "addr": 2550,
+      "bytes": [
         4,
         1,
         1,
-        0,
+        0
+      ],
+      "binary_addr": 12598,
+      "labels": [
+        "exit_offsets_x"
+      ],
+      "sub_labels": {
+        "2551": [
+          "data_09f7"
+        ],
+        "2552": [
+          "data_09f8"
+        ],
+        "2553": [
+          "data_09f9"
+        ]
+      },
+      "xref_summaries": [
+        "&3136 used as index base 1 time by &1fe2[1]",
+        "&3137 referenced 1 time by &3bfe",
+        "&3138 referenced 1 time by &3c01",
+        "&3139 referenced 1 time by &3bf0"
+      ],
+      "references": [
+        {
+          "addr": 8162,
+          "kind": "indexed",
+          "move_id": 1
+        }
+      ],
+      "type": "byte",
+      "values": [
+        4,
+        1,
+        1,
+        0
+      ]
+    },
+    {
+      "addr": 2554,
+      "bytes": [
         0,
         5,
         3,
         1,
+        0
+      ],
+      "binary_addr": 12602,
+      "labels": [
+        "exit_offsets_y"
+      ],
+      "sub_labels": {
+        "2555": [
+          "data_09fb"
+        ],
+        "2556": [
+          "data_09fc"
+        ],
+        "2557": [
+          "data_09fd"
+        ],
+        "2558": [
+          "data_09fe"
+        ]
+      },
+      "xref_summaries": [
+        "&313a referenced 1 time by &14b3[1]; also used as index base 1 time by &1fe7[1]",
+        "&313b referenced 1 time by &3c0e",
+        "&313c referenced 1 time by &3c13",
+        "&313d referenced 1 time by &3c04",
+        "&313e referenced 1 time by &3bf6"
+      ],
+      "references": [
+        {
+          "addr": 5299,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 8167,
+          "kind": "indexed",
+          "move_id": 1
+        }
+      ],
+      "type": "byte",
+      "values": [
         0,
+        5,
+        3,
+        1,
+        0
+      ]
+    },
+    {
+      "addr": 2559,
+      "bytes": [
+        255
+      ],
+      "binary_addr": 12607,
+      "labels": [
+        "shrunk_hero"
+      ],
+      "xref_summaries": [
+        "&313f referenced 2 times by &14c9[1], &1f2d[1]"
+      ],
+      "references": [
+        {
+          "addr": 5321,
+          "kind": "direct",
+          "move_id": 1
+        },
+        {
+          "addr": 7981,
+          "kind": "direct",
+          "move_id": 1
+        }
+      ],
+      "type": "byte",
+      "values": [
         255
       ]
     },
@@ -18761,9 +18992,9 @@
       "comment_inline": "Play the level until it ends",
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "code_1f00",
+      "operand": "play_level",
       "target": 7936,
-      "target_label": "code_1f00"
+      "target_label": "play_level"
     },
     {
       "addr": 3688,
@@ -26248,9 +26479,9 @@
       "binary_addr": 15341,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_09f2",
+      "operand": "exit_busy",
       "target": 2546,
-      "target_label": "data_09f2"
+      "target_label": "exit_busy"
     },
     {
       "addr": 5296,
@@ -26276,9 +26507,9 @@
       "binary_addr": 15347,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_09fa",
+      "operand": "exit_offsets_y",
       "target": 2554,
-      "target_label": "data_09fa"
+      "target_label": "exit_offsets_y"
     },
     {
       "addr": 5302,
@@ -26383,9 +26614,9 @@
       "binary_addr": 15369,
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_09ff",
+      "operand": "shrunk_hero",
       "target": 2559,
-      "target_label": "data_09ff"
+      "target_label": "shrunk_hero"
     },
     {
       "addr": 5324,
@@ -36312,27 +36543,32 @@
       ],
       "binary_addr": 17984,
       "labels": [
-        "code_1f00"
+        "play_level"
       ],
+      "comment_inline": "Wait for the vertical sync counter to pass zero...",
       "xref_summaries": [
-        "&4640 referenced 4 times by &35a5, &4643, &46db, &472f"
+        "&4640 referenced 4 times by &0e65[1], &1f03[1], &1f9b[1], &1fef[1]"
       ],
       "references": [
         {
-          "addr": 13733,
-          "kind": "direct"
+          "addr": 3685,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 17987,
-          "kind": "direct"
+          "addr": 7939,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 18139,
-          "kind": "direct"
+          "addr": 8091,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 18223,
-          "kind": "direct"
+          "addr": 8175,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -36348,11 +36584,12 @@
         251
       ],
       "binary_addr": 17987,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bpl",
-      "operand": "code_1f00",
+      "operand": "play_level",
       "target": 7936,
-      "target_label": "code_1f00"
+      "target_label": "play_level"
     },
     {
       "addr": 7941,
@@ -36361,6 +36598,7 @@
         2
       ],
       "binary_addr": 17989,
+      "comment_inline": "...and set it for three syncs from now",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#2"
@@ -36373,6 +36611,7 @@
         2
       ],
       "binary_addr": 17991,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "os_vsync_counter",
@@ -36387,6 +36626,7 @@
         16
       ],
       "binary_addr": 17994,
+      "comment_inline": "Has the Chalice been found?",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "check_for_victory",
@@ -36401,6 +36641,7 @@
         28
       ],
       "binary_addr": 17997,
+      "comment_inline": "Run a frame",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "update_game",
@@ -36415,11 +36656,12 @@
         9
       ],
       "binary_addr": 18000,
+      "comment_inline": "A hero going down the exit?",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_09f2",
+      "operand": "exit_busy",
       "target": 2546,
-      "target_label": "data_09f2"
+      "target_label": "exit_busy"
     },
     {
       "addr": 7955,
@@ -36428,6 +36670,7 @@
         33
       ],
       "binary_addr": 18003,
+      "comment_inline": "Yes: carry on",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_1f36",
@@ -36441,6 +36684,7 @@
         4
       ],
       "binary_addr": 18005,
+      "comment_inline": "Is any hero in play, or still dying?",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#4"
@@ -36456,6 +36700,7 @@
       "labels": [
         "code_1f17"
       ],
+      "comment_inline": "In play?",
       "xref_summaries": [
         "&4657 referenced 1 time by &466b"
       ],
@@ -36478,6 +36723,7 @@
         26
       ],
       "binary_addr": 18010,
+      "comment_inline": "Yes: carry on",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_1f36",
@@ -36492,6 +36738,7 @@
         13
       ],
       "binary_addr": 18012,
+      "comment_inline": "Dead...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "data_0d8f,x",
@@ -36505,6 +36752,7 @@
         29
       ],
       "binary_addr": 18015,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&1d"
@@ -36516,6 +36764,7 @@
         7
       ],
       "binary_addr": 18017,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_1f2a",
@@ -36530,6 +36779,7 @@
         13
       ],
       "binary_addr": 18019,
+      "comment_inline": "...with the death animation unfinished?",
       "type": "code",
       "mnemonic": "lda",
       "operand": "data_0d1f,x",
@@ -36543,6 +36793,7 @@
         8
       ],
       "binary_addr": 18022,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#8"
@@ -36554,6 +36805,7 @@
         12
       ],
       "binary_addr": 18024,
+      "comment_inline": "Yes: carry on",
       "type": "code",
       "mnemonic": "bcc",
       "operand": "code_1f36",
@@ -36569,6 +36821,7 @@
       "labels": [
         "code_1f2a"
       ],
+      "comment_inline": "Next hero",
       "xref_summaries": [
         "&466a referenced 1 time by &4661"
       ],
@@ -36588,6 +36841,7 @@
         234
       ],
       "binary_addr": 18027,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_1f17",
@@ -36602,11 +36856,12 @@
         9
       ],
       "binary_addr": 18029,
+      "comment_inline": "The level is over: restore the last exiting hero's sprites",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "data_09ff",
+      "operand": "shrunk_hero",
       "target": 2559,
-      "target_label": "data_09ff"
+      "target_label": "shrunk_hero"
     },
     {
       "addr": 7984,
@@ -36615,6 +36870,7 @@
         3
       ],
       "binary_addr": 18032,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bmi",
       "operand": "return_7",
@@ -36629,6 +36885,7 @@
         32
       ],
       "binary_addr": 18034,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "restore_hero_sprites",
@@ -36644,6 +36901,7 @@
       "labels": [
         "return_7"
       ],
+      "comment_inline": "Return",
       "xref_summaries": [
         "&4675 referenced 1 time by &4670"
       ],
@@ -36666,6 +36924,7 @@
       "labels": [
         "code_1f36"
       ],
+      "comment_inline": "Is a hero on the exit?",
       "xref_summaries": [
         "&4676 referenced 3 times by &4653, &465a, &4668"
       ],
@@ -36698,6 +36957,7 @@
       "labels": [
         "code_1f38"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&4678 referenced 1 time by &46d4"
       ],
@@ -36721,6 +36981,7 @@
         127
       ],
       "binary_addr": 18043,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "exit_x",
@@ -36734,6 +36995,7 @@
         81
       ],
       "binary_addr": 18046,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_1f91",
@@ -36748,6 +37010,7 @@
         13
       ],
       "binary_addr": 18048,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_y,x",
@@ -36762,6 +37025,7 @@
         127
       ],
       "binary_addr": 18051,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "exit_y",
@@ -36775,6 +37039,7 @@
         73
       ],
       "binary_addr": 18054,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_1f91",
@@ -36789,6 +37054,7 @@
         32
       ],
       "binary_addr": 18056,
+      "comment_inline": "Yes: drop their key beside it",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "drop_key",
@@ -36802,6 +37068,7 @@
         99
       ],
       "binary_addr": 18059,
+      "comment_inline": "Take them out of play for the rest of the level",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&63"
@@ -36814,6 +37081,7 @@
         13
       ],
       "binary_addr": 18061,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_step,x",
@@ -36827,6 +37095,7 @@
         0
       ],
       "binary_addr": 18064,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -36839,6 +37108,7 @@
         13
       ],
       "binary_addr": 18066,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_direction,x",
@@ -36853,6 +37123,7 @@
         13
       ],
       "binary_addr": 18069,
+      "comment_inline": "Erase them",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_x,x",
@@ -36867,6 +37138,7 @@
         13
       ],
       "binary_addr": 18072,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_x",
@@ -36881,6 +37153,7 @@
         13
       ],
       "binary_addr": 18075,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_y,x",
@@ -36895,6 +37168,7 @@
         13
       ],
       "binary_addr": 18078,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_y",
@@ -36908,6 +37182,7 @@
         0
       ],
       "binary_addr": 18081,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -36919,6 +37194,7 @@
         125
       ],
       "binary_addr": 18083,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007d",
@@ -36932,6 +37208,7 @@
         126
       ],
       "binary_addr": 18085,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007e",
@@ -36945,6 +37222,7 @@
         21
       ],
       "binary_addr": 18087,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&15"
@@ -36956,6 +37234,7 @@
         122
       ],
       "binary_addr": 18089,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -36968,6 +37247,7 @@
         138
       ],
       "binary_addr": 18091,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -36977,6 +37257,7 @@
         72
       ],
       "binary_addr": 18092,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -36988,6 +37269,7 @@
         120
       ],
       "binary_addr": 18093,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_at_cell",
@@ -37000,6 +37282,7 @@
         104
       ],
       "binary_addr": 18096,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -37009,6 +37292,7 @@
         170
       ],
       "binary_addr": 18097,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -37019,6 +37303,7 @@
         255
       ],
       "binary_addr": 18098,
+      "comment_inline": "Move them off the map",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&ff"
@@ -37031,6 +37316,7 @@
         13
       ],
       "binary_addr": 18100,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "hero_x,x",
@@ -37045,6 +37331,7 @@
         127
       ],
       "binary_addr": 18103,
+      "comment_inline": "Hide the exit while they go down it, keeping its position",
       "type": "code",
       "mnemonic": "lda",
       "operand": "exit_x",
@@ -37059,11 +37346,12 @@
         9
       ],
       "binary_addr": 18106,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_09f0",
+      "operand": "exit_saved_x",
       "target": 2544,
-      "target_label": "data_09f0"
+      "target_label": "exit_saved_x"
     },
     {
       "addr": 8061,
@@ -37073,6 +37361,7 @@
         127
       ],
       "binary_addr": 18109,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "exit_y",
@@ -37087,11 +37376,12 @@
         9
       ],
       "binary_addr": 18112,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_09f1",
+      "operand": "exit_saved_y",
       "target": 2545,
-      "target_label": "data_09f1"
+      "target_label": "exit_saved_y"
     },
     {
       "addr": 8067,
@@ -37100,6 +37390,7 @@
         255
       ],
       "binary_addr": 18115,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&ff"
@@ -37112,6 +37403,7 @@
         127
       ],
       "binary_addr": 18117,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "exit_x",
@@ -37126,6 +37418,7 @@
         127
       ],
       "binary_addr": 18120,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "exit_y",
@@ -37140,6 +37433,7 @@
         32
       ],
       "binary_addr": 18123,
+      "comment_inline": "Start the exit animation (which jumps back to play_level)",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "hero_enters_exit",
@@ -37154,6 +37448,7 @@
         31
       ],
       "binary_addr": 18126,
+      "comment_inline": "Reached by the RTS at the end of the level",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "code_1f96",
@@ -37169,6 +37464,7 @@
       "labels": [
         "code_1f91"
       ],
+      "comment_inline": "Next hero",
       "xref_summaries": [
         "&46d1 referenced 2 times by &467e, &4686"
       ],
@@ -37192,6 +37488,7 @@
         4
       ],
       "binary_addr": 18130,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#4"
@@ -37203,6 +37500,7 @@
         162
       ],
       "binary_addr": 18132,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_1f38",
@@ -37220,6 +37518,7 @@
       "labels": [
         "code_1f96"
       ],
+      "comment_inline": "A hero going down the exit?",
       "xref_summaries": [
         "&46d6 referenced 1 time by &46ce"
       ],
@@ -37231,9 +37530,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_09f2",
+      "operand": "exit_busy",
       "target": 2546,
-      "target_label": "data_09f2"
+      "target_label": "exit_busy"
     },
     {
       "addr": 8089,
@@ -37242,6 +37541,7 @@
         3
       ],
       "binary_addr": 18137,
+      "comment_inline": "Yes",
       "type": "code",
       "mnemonic": "bne",
       "operand": "code_1f9e",
@@ -37256,11 +37556,12 @@
         31
       ],
       "binary_addr": 18139,
+      "comment_inline": "No: next frame",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_1f00",
+      "operand": "play_level",
       "target": 7936,
-      "target_label": "code_1f00"
+      "target_label": "play_level"
     },
     {
       "addr": 8094,
@@ -37273,6 +37574,7 @@
       "labels": [
         "code_1f9e"
       ],
+      "comment_inline": "Redraw the exit",
       "xref_summaries": [
         "&46de referenced 1 time by &46d9"
       ],
@@ -37284,9 +37586,9 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "data_09f5",
+      "operand": "exiting_hero",
       "target": 2549,
-      "target_label": "data_09f5"
+      "target_label": "exiting_hero"
     },
     {
       "addr": 8097,
@@ -37295,6 +37597,7 @@
         0
       ],
       "binary_addr": 18145,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -37306,6 +37609,7 @@
         125
       ],
       "binary_addr": 18147,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007d",
@@ -37319,6 +37623,7 @@
         126
       ],
       "binary_addr": 18149,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007e",
@@ -37333,11 +37638,12 @@
         9
       ],
       "binary_addr": 18151,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_09f0",
+      "operand": "exit_saved_x",
       "target": 2544,
-      "target_label": "data_09f0"
+      "target_label": "exit_saved_x"
     },
     {
       "addr": 8106,
@@ -37347,6 +37653,7 @@
         13
       ],
       "binary_addr": 18154,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_x",
@@ -37361,11 +37668,12 @@
         9
       ],
       "binary_addr": 18157,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_09f1",
+      "operand": "exit_saved_y",
       "target": 2545,
-      "target_label": "data_09f1"
+      "target_label": "exit_saved_y"
     },
     {
       "addr": 8112,
@@ -37375,6 +37683,7 @@
         13
       ],
       "binary_addr": 18160,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_y",
@@ -37388,6 +37697,7 @@
         81
       ],
       "binary_addr": 18163,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&51"
@@ -37399,6 +37709,7 @@
         122
       ],
       "binary_addr": 18165,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -37413,6 +37724,7 @@
         120
       ],
       "binary_addr": 18167,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_at_cell",
@@ -37427,11 +37739,12 @@
         9
       ],
       "binary_addr": 18170,
+      "comment_inline": "Turn the hero a quarter (frames 1, 3, 5, 7)",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "data_09f5",
+      "operand": "exiting_hero",
       "target": 2549,
-      "target_label": "data_09f5"
+      "target_label": "exiting_hero"
     },
     {
       "addr": 8125,
@@ -37439,6 +37752,7 @@
         24
       ],
       "binary_addr": 18173,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -37450,11 +37764,12 @@
         9
       ],
       "binary_addr": 18174,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_09f3",
+      "operand": "exit_spin",
       "target": 2547,
-      "target_label": "data_09f3"
+      "target_label": "exit_spin"
     },
     {
       "addr": 8129,
@@ -37463,6 +37778,7 @@
         2
       ],
       "binary_addr": 18177,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#2"
@@ -37475,11 +37791,12 @@
         9
       ],
       "binary_addr": 18179,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_09f3",
+      "operand": "exit_spin",
       "target": 2547,
-      "target_label": "data_09f3"
+      "target_label": "exit_spin"
     },
     {
       "addr": 8134,
@@ -37488,6 +37805,7 @@
         9
       ],
       "binary_addr": 18182,
+      "comment_inline": "A full turn?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#9"
@@ -37499,6 +37817,7 @@
         40
       ],
       "binary_addr": 18184,
+      "comment_inline": "Yes: shrink the hero",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_1ff2",
@@ -37511,6 +37830,7 @@
         24
       ],
       "binary_addr": 18186,
+      "comment_inline": "Plot the hero on the exit, centred for its current size",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -37522,6 +37842,7 @@
         13
       ],
       "binary_addr": 18187,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "hero_sprites,x",
@@ -37536,11 +37857,12 @@
         9
       ],
       "binary_addr": 18190,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
-      "operand": "data_09f3",
+      "operand": "exit_spin",
       "target": 2547,
-      "target_label": "data_09f3"
+      "target_label": "exit_spin"
     },
     {
       "addr": 8145,
@@ -37549,6 +37871,7 @@
         122
       ],
       "binary_addr": 18193,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -37563,11 +37886,12 @@
         9
       ],
       "binary_addr": 18195,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_09f0",
+      "operand": "exit_saved_x",
       "target": 2544,
-      "target_label": "data_09f0"
+      "target_label": "exit_saved_x"
     },
     {
       "addr": 8150,
@@ -37577,6 +37901,7 @@
         13
       ],
       "binary_addr": 18198,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_x",
@@ -37591,11 +37916,12 @@
         9
       ],
       "binary_addr": 18201,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_09f1",
+      "operand": "exit_saved_y",
       "target": 2545,
-      "target_label": "data_09f1"
+      "target_label": "exit_saved_y"
     },
     {
       "addr": 8156,
@@ -37605,6 +37931,7 @@
         13
       ],
       "binary_addr": 18204,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cell_y",
@@ -37619,11 +37946,12 @@
         9
       ],
       "binary_addr": 18207,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "data_09f4",
+      "operand": "exit_shrinks_left",
       "target": 2548,
-      "target_label": "data_09f4"
+      "target_label": "exit_shrinks_left"
     },
     {
       "addr": 8162,
@@ -37633,11 +37961,12 @@
         9
       ],
       "binary_addr": 18210,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_09f6,x",
+      "operand": "exit_offsets_x,x",
       "target": 2550,
-      "target_label": "data_09f6"
+      "target_label": "exit_offsets_x"
     },
     {
       "addr": 8165,
@@ -37646,6 +37975,7 @@
         125
       ],
       "binary_addr": 18213,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007d",
@@ -37660,11 +37990,12 @@
         9
       ],
       "binary_addr": 18215,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_09fa,x",
+      "operand": "exit_offsets_y,x",
       "target": 2554,
-      "target_label": "data_09fa"
+      "target_label": "exit_offsets_y"
     },
     {
       "addr": 8170,
@@ -37673,6 +38004,7 @@
         126
       ],
       "binary_addr": 18218,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "data_007e",
@@ -37687,6 +38019,7 @@
         120
       ],
       "binary_addr": 18220,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_at_cell",
@@ -37701,11 +38034,12 @@
         31
       ],
       "binary_addr": 18223,
+      "comment_inline": "Next frame",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_1f00",
+      "operand": "play_level",
       "target": 7936,
-      "target_label": "code_1f00"
+      "target_label": "play_level"
     },
     {
       "addr": 8178,
@@ -37717,6 +38051,7 @@
       "labels": [
         "code_1ff2"
       ],
+      "comment_inline": "Start the next turn",
       "xref_summaries": [
         "&4732 referenced 1 time by &4708"
       ],
@@ -37738,11 +38073,12 @@
         9
       ],
       "binary_addr": 18228,
+      "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_09f3",
+      "operand": "exit_spin",
       "target": 2547,
-      "target_label": "data_09f3"
+      "target_label": "exit_spin"
     },
     {
       "addr": 8183,
@@ -37752,11 +38088,12 @@
         9
       ],
       "binary_addr": 18231,
+      "comment_inline": "Last turn done?",
       "type": "code",
       "mnemonic": "dec",
-      "operand": "data_09f4",
+      "operand": "exit_shrinks_left",
       "target": 2548,
-      "target_label": "data_09f4"
+      "target_label": "exit_shrinks_left"
     },
     {
       "addr": 8186,
@@ -37765,6 +38102,7 @@
         42
       ],
       "binary_addr": 18234,
+      "comment_inline": "Yes: the hero has gone",
       "type": "code",
       "mnemonic": "beq",
       "operand": "code_2026",
@@ -37777,6 +38115,7 @@
         24
       ],
       "binary_addr": 18236,
+      "comment_inline": "Shrink the hero's eight sprites: one byte narrower...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -37806,9 +38145,6 @@
     {
       "addr": 8193,
       "bytes": [
-        0,
-        0,
-        0,
         0,
         0,
         0,
@@ -37880,7 +38216,20 @@
         0,
         0,
         0,
+        0
+      ]
+    },
+    {
+      "addr": 8227,
+      "bytes": [
         0,
+        0,
+        0
+      ],
+      "binary_addr": 18275,
+      "comment_inline": "...three rows shorter. Next frame",
+      "type": "byte",
+      "values": [
         0,
         0,
         0
@@ -37895,6 +38244,7 @@
       "labels": [
         "code_2026"
       ],
+      "comment_inline": "Put the exit back...",
       "xref_summaries": [
         "&4766 referenced 1 time by &473a"
       ],
@@ -37911,44 +38261,104 @@
       "addr": 8231,
       "bytes": [
         0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         0
       ],
       "binary_addr": 18279,
       "type": "byte",
       "values": [
         0,
+        0
+      ]
+    },
+    {
+      "addr": 8233,
+      "bytes": [
         0,
         0,
+        0
+      ],
+      "binary_addr": 18281,
+      "comment_inline": "...",
+      "type": "byte",
+      "values": [
         0,
         0,
+        0
+      ]
+    },
+    {
+      "addr": 8236,
+      "bytes": [
         0,
         0,
+        0
+      ],
+      "binary_addr": 18284,
+      "comment_inline": "...",
+      "type": "byte",
+      "values": [
         0,
         0,
+        0
+      ]
+    },
+    {
+      "addr": 8239,
+      "bytes": [
         0,
         0,
+        0
+      ],
+      "binary_addr": 18287,
+      "comment_inline": "...",
+      "type": "byte",
+      "values": [
         0,
         0,
+        0
+      ]
+    },
+    {
+      "addr": 8242,
+      "bytes": [
+        0,
+        0
+      ],
+      "binary_addr": 18290,
+      "comment_inline": "...and end the animation",
+      "type": "byte",
+      "values": [
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 8244,
+      "bytes": [
         0,
         0,
+        0
+      ],
+      "binary_addr": 18292,
+      "comment_inline": "...",
+      "type": "byte",
+      "values": [
         0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 8247,
+      "bytes": [
+        0,
+        0,
+        0
+      ],
+      "binary_addr": 18295,
+      "comment_inline": "Next frame",
+      "type": "byte",
+      "values": [
         0,
         0,
         0
@@ -37963,6 +38373,7 @@
       "labels": [
         "hero_enters_exit"
       ],
+      "comment_inline": "Keep the hero number",
       "xref_summaries": [
         "&477a referenced 1 time by &1f8b[1]"
       ],
@@ -37980,48 +38391,118 @@
       "addr": 8251,
       "bytes": [
         0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         0
       ],
       "binary_addr": 18299,
       "type": "byte",
       "values": [
         0,
+        0
+      ]
+    },
+    {
+      "addr": 8253,
+      "bytes": [
         0,
         0,
+        0
+      ],
+      "binary_addr": 18301,
+      "comment_inline": "Sound the exit and queue a marker",
+      "type": "byte",
+      "values": [
         0,
         0,
+        0
+      ]
+    },
+    {
+      "addr": 8256,
+      "bytes": [
+        0,
+        0
+      ],
+      "binary_addr": 18304,
+      "comment_inline": "...",
+      "type": "byte",
+      "values": [
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 8258,
+      "bytes": [
         0,
         0,
+        0
+      ],
+      "binary_addr": 18306,
+      "comment_inline": "...",
+      "type": "byte",
+      "values": [
         0,
         0,
+        0
+      ]
+    },
+    {
+      "addr": 8261,
+      "bytes": [
         0,
         0,
+        0
+      ],
+      "binary_addr": 18309,
+      "comment_inline": "Restore the sprites of any hero shrunk before",
+      "type": "byte",
+      "values": [
         0,
         0,
+        0
+      ]
+    },
+    {
+      "addr": 8264,
+      "bytes": [
+        0,
+        0
+      ],
+      "binary_addr": 18312,
+      "comment_inline": "...",
+      "type": "byte",
+      "values": [
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 8266,
+      "bytes": [
         0,
         0,
+        0
+      ],
+      "binary_addr": 18314,
+      "comment_inline": "...",
+      "type": "byte",
+      "values": [
         0,
         0,
+        0
+      ]
+    },
+    {
+      "addr": 8269,
+      "bytes": [
         0,
+        0,
+        0
+      ],
+      "binary_addr": 18317,
+      "comment_inline": "...",
+      "type": "byte",
+      "values": [
         0,
         0,
         0
@@ -38052,33 +38533,6 @@
     {
       "addr": 8273,
       "bytes": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         0,
         0,
         0,
@@ -38156,31 +38610,158 @@
         0,
         0,
         0,
+        0
+      ]
+    },
+    {
+      "addr": 8310,
+      "bytes": [
+        0,
+        0
+      ],
+      "binary_addr": 18358,
+      "comment_inline": "Start the animation for this hero...",
+      "type": "byte",
+      "values": [
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 8312,
+      "bytes": [
         0,
         0,
+        0
+      ],
+      "binary_addr": 18360,
+      "comment_inline": "...",
+      "type": "byte",
+      "values": [
         0,
         0,
+        0
+      ]
+    },
+    {
+      "addr": 8315,
+      "bytes": [
         0,
         0,
+        0
+      ],
+      "binary_addr": 18363,
+      "comment_inline": "...",
+      "type": "byte",
+      "values": [
         0,
         0,
+        0
+      ]
+    },
+    {
+      "addr": 8318,
+      "bytes": [
         0,
         0,
+        0
+      ],
+      "binary_addr": 18366,
+      "comment_inline": "...",
+      "type": "byte",
+      "values": [
         0,
         0,
+        0
+      ]
+    },
+    {
+      "addr": 8321,
+      "bytes": [
         0,
         0,
+        0
+      ],
+      "binary_addr": 18369,
+      "comment_inline": "...",
+      "type": "byte",
+      "values": [
         0,
         0,
+        0
+      ]
+    },
+    {
+      "addr": 8324,
+      "bytes": [
+        0,
+        0
+      ],
+      "binary_addr": 18372,
+      "comment_inline": "...turning from the start...",
+      "type": "byte",
+      "values": [
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 8326,
+      "bytes": [
         0,
         0,
+        0
+      ],
+      "binary_addr": 18374,
+      "comment_inline": "...",
+      "type": "byte",
+      "values": [
         0,
         0,
+        0
+      ]
+    },
+    {
+      "addr": 8329,
+      "bytes": [
+        0,
+        0
+      ],
+      "binary_addr": 18377,
+      "comment_inline": "...for four turns",
+      "type": "byte",
+      "values": [
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 8331,
+      "bytes": [
         0,
         0,
+        0
+      ],
+      "binary_addr": 18379,
+      "comment_inline": "...",
+      "type": "byte",
+      "values": [
         0,
         0,
+        0
+      ]
+    },
+    {
+      "addr": 8334,
+      "bytes": [
         0,
+        0,
+        0
+      ],
+      "binary_addr": 18382,
+      "comment_inline": "Back to play_level, without returning",
+      "type": "byte",
+      "values": [
         0,
         0,
         0
