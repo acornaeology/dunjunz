@@ -58,9 +58,6 @@ for move in (low_keyboard, low_joystick):
 d.entry(0x5000, "coder_start")
 
 # Coder copies &3000-&473F; the rest of the page before Coder is zeros.
-# Declared as data because tracing falls through from the end of game_core
-# into stored &4740 (acornaeology/dasmos#55).
-d.byte(0x4740, 0x08C0)
 d.banner(0x4740, title="Unused",
          description="Zeros between the stored game core (&3000-&473F) and Coder (&5000).")
 
