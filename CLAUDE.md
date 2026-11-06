@@ -91,6 +91,11 @@ feature or defect met along the way, and note the workaround here.
   move's section (acornaeology/dasmos#53), so labels go only in the
   keyboard image; the joystick image gets comments, banners and entries
   (placement suffix None in `dunjunz_common.annotator`).
+- fantasm adds a target for every `versions/dunjunz-<id>` directory even
+  when `[[targets]]` is configured, and `verify --all` counts those as
+  failures (acornaeology/fantasm#26). Each version's main target
+  therefore carries the version id (`swram_hack`, `tape_crack_ole`,
+  `disc_nvg`) so the two coincide.
 - Synthesised offset bases inside data are named `sub_XXXX`; they are not
   subroutines (acornaeology/dasmos#50). Declaring the data removes them.
 - No execution coverage in beebium: `tools/coverage.py` uses range
