@@ -103,13 +103,9 @@ feature or defect met along the way, and note the workaround here.
   `Annotator.region` gives each offset in a moved table an `expr_label`
   instead (`trapdoor_x - 1`).
 - The official disc's two &0400-&07FF images are two moves to one run
-  address. Explicit labels with `move=` render in their own image (the
-  joystick image's carry a `_joystick` suffix), but auto-labels and
-  `expr_label`s referenced from both images render once, in the keyboard
-  image, and the joystick image's operands use them
-  (acornaeology/dasmos#54). So every branch target in &0400-&07FF is named
-  explicitly in `dunjunz_common/game.py`; `menu_text + 1` in the joystick
-  image still names the keyboard image's table.
+  address. Each image's labels are its own (the joystick image's carry a
+  `_joystick` suffix), and every branch target in the page is named in
+  `dunjunz_common/game.py`.
 - fantasm adds a target for every `versions/dunjunz-<id>` directory even
   when `[[targets]]` is configured, and `verify --all` counts those as
   failures (acornaeology/fantasm#26). Each version's main target

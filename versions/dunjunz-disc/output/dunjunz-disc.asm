@@ -2818,7 +2818,7 @@ data_1625 = code_1624+1
     bne draw_ten_thousands              ; No
     lda #&72 ; 'r'                      ; Yes: keep it at 9
     sta page6_score_ten_thousands,x     ; ...
-; &041e referenced 4 times by &51c7, &5472, &55c7, &5872
+; &041e referenced 2 times by &51c7, &5472
 .draw_ten_thousands
     sta sprite_number                   ; Plot it below the score...
     lda #&45 ; 'E'                      ; ...
@@ -2833,7 +2833,7 @@ data_1625 = code_1624+1
     lda #&71 ; 'q'                      ; ...with four of sprite &71 beside it
     sta sprite_number                   ; ...
     ldy #4                              ; ...
-; &0437 referenced 2 times by &51f3, &55f3
+; &0437 referenced 1 time by &51f3
 .draw_ten_thousands_loop
     tya                                 ; ...
     pha                                 ; ...
@@ -2846,7 +2846,7 @@ data_1625 = code_1624+1
     bne draw_ten_thousands_loop         ; ...
     pla                                 ; ...
     tax                                 ; ...
-; &0447 referenced 2 times by &51b8, &55b8
+; &0447 referenced 1 time by &51b8
 .add_thousand_points_done
     rts                                 ; Return
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -2866,7 +2866,7 @@ data_1625 = code_1624+1
     sty sprite_width                    ; Start the sum at zero
     lda #&6b ; 'k'                      ; ...
     sta plot_y                          ; ...high byte
-; &045a referenced 4 times by &521f, &5225, &561f, &5625
+; &045a referenced 2 times by &521f, &5225
 .decrypt_level_loop
     lda (plot_x),y                      ; Fetch a byte...
     eor plot_x                          ; ...XOR it with the low byte of its address...
@@ -2877,7 +2877,7 @@ data_1625 = code_1624+1
     inc plot_x                          ; Next byte...
     bne decrypt_level_next              ; ...
     inc plot_y                          ; ...with carry into the high byte
-; &046b referenced 2 times by &5217, &5617
+; &046b referenced 1 time by &5217
 .decrypt_level_next
     lda plot_x                          ; Stop at &6DB0, the end of the level...
     cmp #&b0                            ; ...
@@ -2890,7 +2890,7 @@ data_1625 = code_1624+1
     cmp level_checksums,x               ; ...with this level's checksum
     beq decrypt_level_done              ; Match: return
     jsr mos_reset_entry                 ; No match: reset the machine (MOS 1.20 only)
-; &0484 referenced 2 times by &522f, &562f
+; &0484 referenced 1 time by &522f
 .decrypt_level_done
     rts                                 ; Return
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -2952,11 +2952,11 @@ data_1625 = code_1624+1
 ; Print the menu text
 ;
 ; Print the sixteen positioned strings of menu_text.
-; &0524 referenced 6 times by &52ce, &5373, &53a0, &56ce, &5773, &57a0
+; &0524 referenced 3 times by &52ce, &5373, &53a0
 .print_menu
     ldx #&0f                            ; Fifteen strings, then one more by falling through
     ldy #0                              ; ...
-; &0528 referenced 2 times by &52dc, &56dc
+; &0528 referenced 1 time by &52dc
 .print_menu_loop
     jsr print_menu_string               ; ...
     dex                                 ; ...
@@ -2972,7 +2972,7 @@ data_1625 = code_1624+1
 ;
 ; On Exit:
 ;     Y: offset of the next string
-; &052e referenced 2 times by &52d8, &56d8
+; &052e referenced 1 time by &52d8
 .print_menu_string
     lda #&1f                            ; VDU 31: move the text cursor...
     jsr oswrch                          ; ...
@@ -2981,7 +2981,7 @@ data_1625 = code_1624+1
     iny                                 ; ...
     lda menu_text,y                     ; ...and row
     jsr oswrch                          ; ...
-; &0540 referenced 2 times by &52f9, &56f9
+; &0540 referenced 1 time by &52f9
 .print_menu_string_loop
     iny                                 ; Print the characters...
     lda menu_text,y                     ; ...
@@ -2997,7 +2997,7 @@ data_1625 = code_1624+1
 ;
 ; On Entry:
 ;     Y: offset of the entry
-; &054d referenced 2 times by &5370, &5770
+; &054d referenced 1 time by &5370
 .set_menu_no
     lda #&4e ; 'N'                      ; "NO "
     sta menu_text,y                     ; ...
@@ -3013,7 +3013,7 @@ data_1625 = code_1624+1
 ;
 ; On Entry:
 ;     Y: offset of the entry
-; &055d referenced 2 times by &536a, &576a
+; &055d referenced 1 time by &536a
 .set_menu_yes
     lda #&59 ; 'Y'                      ; "YES"
     sta menu_text,y                     ; ...
@@ -3029,7 +3029,7 @@ data_1625 = code_1624+1
 ;
 ; On Entry:
 ;     Y: offset of the entry's second character
-; &056d referenced 2 times by &5394, &5794
+; &056d referenced 1 time by &5394
 .set_menu_off
     lda #&46 ; 'F'                      ; "FF" after the O
     sta menu_text,y                     ; ...
@@ -3042,14 +3042,14 @@ data_1625 = code_1624+1
 ;
 ; On Entry:
 ;     Y: offset of the entry's second character
-; &0576 referenced 2 times by &538d, &578d
+; &0576 referenced 1 time by &538d
 .set_menu_on
     lda #&4e ; 'N'                      ; "N " after the O
     sta menu_text,y                     ; ...
     lda #&20 ; ' '                      ; ...
     sta menu_text + 1,y                 ; ...
     rts                                 ; Return
-; &0581 referenced 12 times by &52d1, &5348, &534c, &5376, &5383, &53a3, &56d1, &5748, &574c, &5776, &5783, &57a3
+; &0581 referenced 6 times by &52d1, &5348, &534c, &5376, &5383, &53a3
 .menu_key_loop
     lda #osbyte_flush_buffer_class      ; Flush the input buffers
     jsr osbyte                          ; ...  Flush selected class of buffer
@@ -3082,27 +3082,27 @@ data_1625 = code_1624+1
     bne menu_hero_off                   ; Now absent?
     jsr set_menu_yes                    ; No: YES
     jmp menu_reprint                    ; ...
-; &05c0 referenced 2 times by &5368, &5768
+; &05c0 referenced 1 time by &5368
 .menu_hero_off
     jsr set_menu_no                     ; Yes: NO
-; &05c3 referenced 2 times by &536d, &576d
+; &05c3 referenced 1 time by &536d
 .menu_reprint
     jsr print_menu                      ; Reprint the menu
     jmp menu_key_loop                   ; Next key
-; &05c9 referenced 2 times by &5344, &5744
+; &05c9 referenced 1 time by &5344
 .menu_space
     ldx #3                              ; SPACE: is any hero playing?
-; &05cb referenced 2 times by &5381, &5781
+; &05cb referenced 1 time by &5381
 .menu_space_check_hero
     lda hero_absent,x                   ; ...
     beq menu_done                       ; Yes: return and start
     dex                                 ; ...
     bpl menu_space_check_hero           ; ...
     jmp menu_key_loop                   ; No: next key
-; &05d6 referenced 2 times by &537e, &577e
+; &05d6 referenced 1 time by &537e
 .menu_done
     rts                                 ; Return
-; &05d7 referenced 2 times by &5354, &5754
+; &05d7 referenced 1 time by &5354
 .menu_sound_key
     ldy #&99                            ; Sound: Y = offset of the second letter of ON/OFF
     cmp #5                              ; Key 6 (A = key - "1")?
@@ -3110,11 +3110,11 @@ data_1625 = code_1624+1
     jsr set_menu_on                     ; Key 5: ON...
     ldx #0                              ; ...with X = 0 to enable the sound
     beq menu_set_sound                  ; ...
-; &05e4 referenced 2 times by &538b, &578b
+; &05e4 referenced 1 time by &538b
 .menu_sound_off
     jsr set_menu_off                    ; Key 6: OFF...
     ldx #1                              ; ...with X = 1 to suppress it
-; &05e9 referenced 2 times by &5392, &5792
+; &05e9 referenced 1 time by &5392
 .menu_set_sound
     lda #osbyte_sound_suppression       ; OSBYTE &D2: sound suppression
     ldy #0                              ; ...
@@ -3127,7 +3127,7 @@ data_1625 = code_1624+1
 ; Hero menu text
 ;
 ; Sixteen entries of: column, row, text, carriage return; printed by print_menu.
-; &0600 used as index base 14 times by &52e3, &52ea, &52f1, &52ff, &530f, &531f, &5328, &56e3, &56ea, &56f1, &56ff, &570f, &571f, &5728
+; &0600 used as index base 7 times by &52e3, &52ea, &52f1, &52ff, &530f, &531f, &5328
 .menu_text
 ; &53b1 used as index base 8 times by &5304, &5314, &5322, &532d, &5704, &5714, &5722, &572d
     equb &06, &00
@@ -3189,7 +3189,7 @@ data_1625 = code_1624+1
 .remove_absent_heroes
     ldx #0                              ; For each hero, keeping a count of absent heroes in Y...
     ldy #0                              ; ...
-; &06b4 referenced 2 times by &54a3, &58a3
+; &06b4 referenced 1 time by &54a3
 .remove_absent_heroes_loop
     lda hero_score_ten_thousands,x      ; Score of 10000 or more?
     cmp #&6a ; 'j'                      ; ...
@@ -3204,7 +3204,7 @@ data_1625 = code_1624+1
     tay                                 ; ...
     pla                                 ; ...
     tax                                 ; ...
-; &06c9 referenced 2 times by &5469, &5869
+; &06c9 referenced 1 time by &5469
 .remove_absent_heroes_check
     lda hero_absent,x                   ; Switched off on the menu?
     beq remove_absent_heroes_next       ; No
@@ -3222,14 +3222,14 @@ data_1625 = code_1624+1
     lda #&64 ; 'd'                      ; ...and a &64 marker in the returning queue
     sta returning_hero_queue,y          ; ...
     iny                                 ; ...
-; &06f0 referenced 2 times by &547c, &587c
+; &06f0 referenced 1 time by &547c
 .remove_absent_heroes_next
     inx                                 ; Next hero
     cpx #4                              ; ...
     bne remove_absent_heroes_loop       ; ...
     rts                                 ; Return
     equb &00, &00
-; &06f8 used as index base 6 times by &51bf, &51c2, &51cb, &55bf, &55c2, &55cb
+; &06f8 used as index base 3 times by &51bf, &51c2, &51cb
 .page6_score_ten_thousands
     equs "iiii"
     equb &00, &00, &00, &00
@@ -3333,6 +3333,7 @@ data_1625 = code_1624+1
 ;
 ; On Exit:
 ;     X: preserved
+; &0400 referenced 1 time by &72b9
 .add_thousand_points_joystick
     inc hero_score_thousands,x          ; Add one to the thousands digit
     lda hero_score_thousands,x          ; ...
@@ -3346,6 +3347,7 @@ data_1625 = code_1624+1
     bne draw_ten_thousands_joystick     ; No
     lda #&72 ; 'r'                      ; Yes: keep it at 9
     sta page6_score_ten_thousands_joystick,x  ; ...
+; &041e referenced 2 times by &55c7, &5872
 .draw_ten_thousands_joystick
     sta sprite_number                   ; Plot it below the score...
     lda #&45 ; 'E'                      ; ...
@@ -3360,6 +3362,7 @@ data_1625 = code_1624+1
     lda #&71 ; 'q'                      ; ...with four of sprite &71 beside it
     sta sprite_number                   ; ...
     ldy #4                              ; ...
+; &0437 referenced 1 time by &55f3
 .draw_ten_thousands_loop_joystick
     tya                                 ; ...
     pha                                 ; ...
@@ -3372,6 +3375,7 @@ data_1625 = code_1624+1
     bne draw_ten_thousands_loop_joystick  ; ...
     pla                                 ; ...
     tax                                 ; ...
+; &0447 referenced 1 time by &55b8
 .add_thousand_points_done_joystick
     rts                                 ; Return
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -3384,12 +3388,14 @@ data_1625 = code_1624+1
 ;
 ; On Entry:
 ;     LEVEL_NUMBER: level loaded (1-25)
+; &0450 referenced 1 time by &3b86
 .decrypt_level_joystick
     ldy #0                              ; Point at &6B00, the start of the level...
     sty plot_x                          ; ...low byte
     sty sprite_width                    ; Start the sum at zero
     lda #&6b ; 'k'                      ; ...
     sta plot_y                          ; ...high byte
+; &045a referenced 2 times by &561f, &5625
 .decrypt_level_loop_joystick
     lda (plot_x),y                      ; Fetch a byte...
     eor plot_x                          ; ...XOR it with the low byte of its address...
@@ -3400,6 +3406,7 @@ data_1625 = code_1624+1
     inc plot_x                          ; Next byte...
     bne decrypt_level_next_joystick     ; ...
     inc plot_y                          ; ...with carry into the high byte
+; &046b referenced 1 time by &5617
 .decrypt_level_next_joystick
     lda plot_x                          ; Stop at &6DB0, the end of the level...
     cmp #&b0                            ; ...
@@ -3412,6 +3419,7 @@ data_1625 = code_1624+1
     cmp level_checksums,x               ; ...with this level's checksum
     beq decrypt_level_done_joystick     ; Match: return
     jsr mos_reset_entry                 ; No match: reset the machine (MOS 1.20 only)
+; &0484 referenced 1 time by &562f
 .decrypt_level_done_joystick
     rts                                 ; Return
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -3451,6 +3459,7 @@ data_1625 = code_1624+1
 ; Clear the left of the screen, print the menu and let the players toggle each hero (keys
 ; 1-4) and the sound (5 on, 6 off). SPACE starts the game if at least one hero is
 ; playing.
+; &0500 referenced 1 time by &3551
 .hero_menu_joystick
     lda #&1c                            ; VDU 28: a text window over the left of the screen...
     jsr oswrch                          ; ...
@@ -3470,9 +3479,11 @@ data_1625 = code_1624+1
 ; Print the menu text
 ;
 ; Print the sixteen positioned strings of menu_text.
+; &0524 referenced 3 times by &56ce, &5773, &57a0
 .print_menu_joystick
     ldx #&0f                            ; Fifteen strings, then one more by falling through
     ldy #0                              ; ...
+; &0528 referenced 1 time by &56dc
 .print_menu_loop_joystick
     jsr print_menu_string_joystick      ; ...
     dex                                 ; ...
@@ -3488,6 +3499,7 @@ data_1625 = code_1624+1
 ;
 ; On Exit:
 ;     Y: offset of the next string
+; &052e referenced 1 time by &56d8
 .print_menu_string_joystick
     lda #&1f                            ; VDU 31: move the text cursor...
     jsr oswrch                          ; ...
@@ -3496,6 +3508,7 @@ data_1625 = code_1624+1
     iny                                 ; ...
     lda menu_text_joystick,y            ; ...and row
     jsr oswrch                          ; ...
+; &0540 referenced 1 time by &56f9
 .print_menu_string_loop_joystick
     iny                                 ; Print the characters...
     lda menu_text_joystick,y            ; ...
@@ -3511,13 +3524,14 @@ data_1625 = code_1624+1
 ;
 ; On Entry:
 ;     Y: offset of the entry
+; &054d referenced 1 time by &5770
 .set_menu_no_joystick
     lda #&4e ; 'N'                      ; "NO "
     sta menu_text_joystick,y            ; ...
     lda #&4f ; 'O'                      ; ...
-    sta menu_text + 1,y                 ; ...
+    sta menu_text_joystick + 1,y        ; ...
     lda #&20 ; ' '                      ; ...
-    sta menu_text + 2,y                 ; ...
+    sta menu_text_joystick + 2,y        ; ...
     rts                                 ; Return
 ; ***************************************************************************************
 ; Change a menu entry to YES
@@ -3526,13 +3540,14 @@ data_1625 = code_1624+1
 ;
 ; On Entry:
 ;     Y: offset of the entry
+; &055d referenced 1 time by &576a
 .set_menu_yes_joystick
     lda #&59 ; 'Y'                      ; "YES"
     sta menu_text_joystick,y            ; ...
     lda #&45 ; 'E'                      ; ...
-    sta menu_text + 1,y                 ; ...
+    sta menu_text_joystick + 1,y        ; ...
     lda #&53 ; 'S'                      ; ...
-    sta menu_text + 2,y                 ; ...
+    sta menu_text_joystick + 2,y        ; ...
     rts                                 ; Return
 ; ***************************************************************************************
 ; Change the sound entry to OFF
@@ -3541,10 +3556,11 @@ data_1625 = code_1624+1
 ;
 ; On Entry:
 ;     Y: offset of the entry's second character
+; &056d referenced 1 time by &5794
 .set_menu_off_joystick
     lda #&46 ; 'F'                      ; "FF" after the O
     sta menu_text_joystick,y            ; ...
-    sta menu_text + 1,y                 ; ...
+    sta menu_text_joystick + 1,y        ; ...
     rts                                 ; Return
 ; ***************************************************************************************
 ; Change the sound entry to ON
@@ -3553,12 +3569,14 @@ data_1625 = code_1624+1
 ;
 ; On Entry:
 ;     Y: offset of the entry's second character
+; &0576 referenced 1 time by &578d
 .set_menu_on_joystick
     lda #&4e ; 'N'                      ; "N " after the O
     sta menu_text_joystick,y            ; ...
     lda #&20 ; ' '                      ; ...
-    sta menu_text + 1,y                 ; ...
+    sta menu_text_joystick + 1,y        ; ...
     rts                                 ; Return
+; &0581 referenced 6 times by &56d1, &5748, &574c, &5776, &5783, &57a3
 .menu_key_loop_joystick
     lda #osbyte_flush_buffer_class      ; Flush the input buffers
     jsr osbyte                          ; ...  Flush selected class of buffer
@@ -3591,21 +3609,27 @@ data_1625 = code_1624+1
     bne menu_hero_off_joystick          ; Now absent?
     jsr set_menu_yes_joystick           ; No: YES
     jmp menu_reprint_joystick           ; ...
+; &05c0 referenced 1 time by &5768
 .menu_hero_off_joystick
     jsr set_menu_no_joystick            ; Yes: NO
+; &05c3 referenced 1 time by &576d
 .menu_reprint_joystick
     jsr print_menu_joystick             ; Reprint the menu
     jmp menu_key_loop_joystick          ; Next key
+; &05c9 referenced 1 time by &5744
 .menu_space_joystick
     ldx #3                              ; SPACE: is any hero playing?
+; &05cb referenced 1 time by &5781
 .menu_space_check_hero_joystick
     lda hero_absent,x                   ; ...
     beq menu_done_joystick              ; Yes: return and start
     dex                                 ; ...
     bpl menu_space_check_hero_joystick  ; ...
     jmp menu_key_loop_joystick          ; No: next key
+; &05d6 referenced 1 time by &577e
 .menu_done_joystick
     rts                                 ; Return
+; &05d7 referenced 1 time by &5754
 .menu_sound_key_joystick
     ldy #&99                            ; Sound: Y = offset of the second letter of ON/OFF
     cmp #5                              ; Key 6 (A = key - "1")?
@@ -3613,9 +3637,11 @@ data_1625 = code_1624+1
     jsr set_menu_on_joystick            ; Key 5: ON...
     ldx #0                              ; ...with X = 0 to enable the sound
     beq menu_set_sound_joystick         ; ...
+; &05e4 referenced 1 time by &578b
 .menu_sound_off_joystick
     jsr set_menu_off_joystick           ; Key 6: OFF...
     ldx #1                              ; ...with X = 1 to suppress it
+; &05e9 referenced 1 time by &5792
 .menu_set_sound_joystick
     lda #osbyte_sound_suppression       ; OSBYTE &D2: sound suppression
     ldy #0                              ; ...
@@ -3628,6 +3654,7 @@ data_1625 = code_1624+1
 ; Hero menu text
 ;
 ; Sixteen entries of: column, row, text, carriage return; printed by print_menu.
+; &0600 used as index base 7 times by &56e3, &56ea, &56f1, &56ff, &570f, &571f, &5728
 .menu_text_joystick
     equb &06, &00
 ; &0602 used as index base 4 times by &5309, &5319, &5709, &5719
@@ -3684,9 +3711,11 @@ data_1625 = code_1624+1
 ;
 ; Draw any ten-thousands score digits, then put every hero switched off on the menu out
 ; of play, with a &64 entry in returning_hero_queue in their place.
+; &06b0 referenced 1 time by &359d
 .remove_absent_heroes_joystick
     ldx #0                              ; For each hero, keeping a count of absent heroes in Y...
     ldy #0                              ; ...
+; &06b4 referenced 1 time by &58a3
 .remove_absent_heroes_loop_joystick
     lda hero_score_ten_thousands,x      ; Score of 10000 or more?
     cmp #&6a ; 'j'                      ; ...
@@ -3701,6 +3730,7 @@ data_1625 = code_1624+1
     tay                                 ; ...
     pla                                 ; ...
     tax                                 ; ...
+; &06c9 referenced 1 time by &5869
 .remove_absent_heroes_check_joystick
     lda hero_absent,x                   ; Switched off on the menu?
     beq remove_absent_heroes_next_joystick  ; No
@@ -3718,12 +3748,14 @@ data_1625 = code_1624+1
     lda #&64 ; 'd'                      ; ...and a &64 marker in the returning queue
     sta returning_hero_queue,y          ; ...
     iny                                 ; ...
+; &06f0 referenced 1 time by &587c
 .remove_absent_heroes_next_joystick
     inx                                 ; Next hero
     cpx #4                              ; ...
     bne remove_absent_heroes_loop_joystick  ; ...
     rts                                 ; Return
     equb &00, &00
+; &06f8 used as index base 3 times by &55bf, &55c2, &55cb
 .page6_score_ten_thousands_joystick
     equs "iiii"
     equb &00, &00, &00, &00

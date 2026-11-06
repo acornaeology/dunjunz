@@ -2231,17 +2231,19 @@
       },
       "comment_inline": "...",
       "xref_summaries": [
-        "&245a referenced 2 times by &2468, &2478",
-        "&245c referenced 3 times by &246a, &2473, &3448"
+        "&245a referenced 2 times by &0468[1], &0478[1]",
+        "&245c referenced 3 times by &046a[1], &0473[1], &1448[1]"
       ],
       "references": [
         {
-          "addr": 9320,
-          "kind": "direct"
+          "addr": 1128,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 9336,
-          "kind": "direct"
+          "addr": 1144,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -2293,7 +2295,7 @@
       },
       "comment_inline": "...",
       "xref_summaries": [
-        "&2462 referenced 2 times by &246d, &344b"
+        "&2462 referenced 2 times by &046d[1], &144b[1]"
       ],
       "type": "code",
       "mnemonic": "sta",
@@ -2331,7 +2333,7 @@
       },
       "comment_inline": "...",
       "xref_summaries": [
-        "&2466 referenced 2 times by &2470, &3453"
+        "&2466 referenced 2 times by &0470[1], &1453[1]"
       ],
       "type": "code",
       "mnemonic": "sta",
@@ -7734,12 +7736,13 @@
       ],
       "comment_inline": "Remember where this pixel row starts...",
       "xref_summaries": [
-        "&291d referenced 1 time by &2964"
+        "&291d referenced 1 time by &0964[1]"
       ],
       "references": [
         {
-          "addr": 10596,
-          "kind": "direct"
+          "addr": 2404,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -7843,12 +7846,13 @@
       ],
       "comment_inline": "Copy one sprite byte...",
       "xref_summaries": [
-        "&2929 referenced 1 time by &293f"
+        "&2929 referenced 1 time by &093f[1]"
       ],
       "references": [
         {
-          "addr": 10559,
-          "kind": "direct"
+          "addr": 2367,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -7969,12 +7973,13 @@
       ],
       "comment_inline": "Next sprite data byte",
       "xref_summaries": [
-        "&2938 referenced 1 time by &2934"
+        "&2938 referenced 1 time by &0934[1]"
       ],
       "references": [
         {
-          "addr": 10548,
-          "kind": "direct"
+          "addr": 2356,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -8025,12 +8030,13 @@
       ],
       "comment_inline": "Count the bytes across",
       "xref_summaries": [
-        "&293e referenced 1 time by &293a"
+        "&293e referenced 1 time by &093a[1]"
       ],
       "references": [
         {
-          "addr": 10554,
-          "kind": "direct"
+          "addr": 2362,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -8300,12 +8306,13 @@
       ],
       "comment_inline": "Recover the row count",
       "xref_summaries": [
-        "&2961 referenced 1 time by &2952"
+        "&2961 referenced 1 time by &0952[1]"
       ],
       "references": [
         {
-          "addr": 10578,
-          "kind": "direct"
+          "addr": 2386,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -8832,12 +8839,13 @@
       ],
       "comment_inline": "Return",
       "xref_summaries": [
-        "&299f referenced 1 time by &299b"
+        "&299f referenced 1 time by &099b[1]"
       ],
       "references": [
         {
-          "addr": 10651,
-          "kind": "direct"
+          "addr": 2459,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -17620,28 +17628,33 @@
       ],
       "comment_inline": "New game: level_bcd = the level before the first played",
       "xref_summaries": [
-        "&2e00 referenced 3 times by &2d6b, &2ecc, &5035; also used as index base 3 times by &245a, &2460, &3476"
+        "&2e00 referenced 3 times by &0d6b[1], &0ecc[1], &5035; also used as index base 3 times by &045a[1], &0460[1], &1476[1]"
       ],
       "references": [
         {
-          "addr": 9306,
-          "kind": "indexed"
+          "addr": 1114,
+          "kind": "indexed",
+          "move_id": 1
         },
         {
-          "addr": 9312,
-          "kind": "indexed"
+          "addr": 1120,
+          "kind": "indexed",
+          "move_id": 1
         },
         {
-          "addr": 11627,
-          "kind": "direct"
+          "addr": 3435,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 11980,
-          "kind": "direct"
+          "addr": 3788,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 13430,
-          "kind": "indexed"
+          "addr": 5238,
+          "kind": "indexed",
+          "move_id": 1
         },
         {
           "addr": 20533,
@@ -17708,12 +17721,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&2e09 referenced 1 time by &2e0f"
+        "&2e09 referenced 1 time by &0e0f[1]"
       ],
       "references": [
         {
-          "addr": 11791,
-          "kind": "direct"
+          "addr": 3599,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -18023,12 +18037,13 @@
       ],
       "comment_inline": "X = 1: two digits",
       "xref_summaries": [
-        "&2e34 referenced 1 time by &2e2e"
+        "&2e34 referenced 1 time by &0e2e[1]"
       ],
       "references": [
         {
-          "addr": 11822,
-          "kind": "direct"
+          "addr": 3630,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -18049,12 +18064,13 @@
       ],
       "comment_inline": "Units digit...",
       "xref_summaries": [
-        "&2e36 referenced 1 time by &2e32"
+        "&2e36 referenced 1 time by &0e32[1]"
       ],
       "references": [
         {
-          "addr": 11826,
-          "kind": "direct"
+          "addr": 3634,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -18257,12 +18273,13 @@
       ],
       "comment_inline": "Terminate the filename with a carriage return",
       "xref_summaries": [
-        "&2e52 referenced 1 time by &2e43"
+        "&2e52 referenced 1 time by &0e43[1]"
       ],
       "references": [
         {
-          "addr": 11843,
-          "kind": "direct"
+          "addr": 3651,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -18420,12 +18437,13 @@
       ],
       "comment_inline": "Dead?",
       "xref_summaries": [
-        "&2e6d referenced 1 time by &2e7d"
+        "&2e6d referenced 1 time by &0e7d[1]"
       ],
       "references": [
         {
-          "addr": 11901,
-          "kind": "direct"
+          "addr": 3709,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -18506,12 +18524,13 @@
       ],
       "comment_inline": "Next hero",
       "xref_summaries": [
-        "&2e7a referenced 1 time by &2e72"
+        "&2e7a referenced 1 time by &0e72[1]"
       ],
       "references": [
         {
-          "addr": 11890,
-          "kind": "direct"
+          "addr": 3698,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -18803,12 +18822,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&2ea8 referenced 1 time by &2eac"
+        "&2ea8 referenced 1 time by &0eac[1]"
       ],
       "references": [
         {
-          "addr": 11948,
-          "kind": "direct"
+          "addr": 3756,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -18856,12 +18876,13 @@
       ],
       "comment_inline": "Print game_over_message...",
       "xref_summaries": [
-        "&2eae referenced 1 time by &2eb7"
+        "&2eae referenced 1 time by &0eb7[1]"
       ],
       "references": [
         {
-          "addr": 11959,
-          "kind": "direct"
+          "addr": 3767,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -18939,12 +18960,13 @@
       ],
       "comment_inline": "Wait for the vertical sync counter to run out",
       "xref_summaries": [
-        "&2eb9 referenced 1 time by &2ebc"
+        "&2eb9 referenced 1 time by &0ebc[1]"
       ],
       "references": [
         {
-          "addr": 11964,
-          "kind": "direct"
+          "addr": 3772,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -19380,12 +19402,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&2efc referenced 1 time by &2f65"
+        "&2efc referenced 1 time by &0f65[1]"
       ],
       "references": [
         {
-          "addr": 12133,
-          "kind": "direct"
+          "addr": 3941,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -19761,12 +19784,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&2f3a referenced 1 time by &2f4b"
+        "&2f3a referenced 1 time by &0f4b[1]"
       ],
       "references": [
         {
-          "addr": 12107,
-          "kind": "direct"
+          "addr": 3915,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -21010,12 +21034,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&3079 referenced 1 time by &3087"
+        "&3079 referenced 1 time by &1087[1]"
       ],
       "references": [
         {
-          "addr": 12423,
-          "kind": "direct"
+          "addr": 4231,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -21092,12 +21117,13 @@
       ],
       "comment_inline": "Next hero",
       "xref_summaries": [
-        "&3084 referenced 1 time by &3095"
+        "&3084 referenced 1 time by &1095[1]"
       ],
       "references": [
         {
-          "addr": 12437,
-          "kind": "direct"
+          "addr": 4245,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -21143,12 +21169,13 @@
       ],
       "comment_inline": "Return",
       "xref_summaries": [
-        "&3089 referenced 1 time by &3075"
+        "&3089 referenced 1 time by &1075[1]"
       ],
       "references": [
         {
-          "addr": 12405,
-          "kind": "direct"
+          "addr": 4213,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -21168,16 +21195,18 @@
       ],
       "comment_inline": "...and y 4 or 5?",
       "xref_summaries": [
-        "&308a referenced 2 times by &307e, &3082"
+        "&308a referenced 2 times by &107e[1], &1082[1]"
       ],
       "references": [
         {
-          "addr": 12414,
-          "kind": "direct"
+          "addr": 4222,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 12418,
-          "kind": "direct"
+          "addr": 4226,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -21271,16 +21300,18 @@
       ],
       "comment_inline": "Yes: play the victory sequence",
       "xref_summaries": [
-        "&3097 referenced 2 times by &308f, &3093"
+        "&3097 referenced 2 times by &108f[1], &1093[1]"
       ],
       "references": [
         {
-          "addr": 12431,
-          "kind": "direct"
+          "addr": 4239,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 12435,
-          "kind": "direct"
+          "addr": 4243,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -21490,12 +21521,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&30ba referenced 1 time by &30c3"
+        "&30ba referenced 1 time by &10c3[1]"
       ],
       "references": [
         {
-          "addr": 12483,
-          "kind": "direct"
+          "addr": 4291,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -21585,12 +21617,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&30c7 referenced 1 time by &30d0"
+        "&30c7 referenced 1 time by &10d0[1]"
       ],
       "references": [
         {
-          "addr": 12496,
-          "kind": "direct"
+          "addr": 4304,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -22050,12 +22083,13 @@
       ],
       "comment_inline": "Raise the pitch",
       "xref_summaries": [
-        "&310a referenced 1 time by &3146"
+        "&310a referenced 1 time by &1146[1]"
       ],
       "references": [
         {
-          "addr": 12614,
-          "kind": "direct"
+          "addr": 4422,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -22195,16 +22229,18 @@
       ],
       "comment_inline": "Shorten the delay...",
       "xref_summaries": [
-        "&311c referenced 2 times by &3111, &3117"
+        "&311c referenced 2 times by &1111[1], &1117[1]"
       ],
       "references": [
         {
-          "addr": 12561,
-          "kind": "direct"
+          "addr": 4369,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 12567,
-          "kind": "direct"
+          "addr": 4375,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -22269,12 +22305,13 @@
       ],
       "comment_inline": "OSBYTE &D5: the bell's pitch...",
       "xref_summaries": [
-        "&3124 referenced 1 time by &311e"
+        "&3124 referenced 1 time by &111e[1]"
       ],
       "references": [
         {
-          "addr": 12574,
-          "kind": "direct"
+          "addr": 4382,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -22435,12 +22472,13 @@
       ],
       "comment_inline": "Wait for the delay",
       "xref_summaries": [
-        "&313c referenced 1 time by &3137"
+        "&313c referenced 1 time by &1137[1]"
       ],
       "references": [
         {
-          "addr": 12599,
-          "kind": "direct"
+          "addr": 4407,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -22462,12 +22500,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&313e referenced 1 time by &3144"
+        "&313e referenced 1 time by &1144[1]"
       ],
       "references": [
         {
-          "addr": 12612,
-          "kind": "direct"
+          "addr": 4420,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -22486,12 +22525,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&3140 referenced 1 time by &3141"
+        "&3140 referenced 1 time by &1141[1]"
       ],
       "references": [
         {
-          "addr": 12609,
-          "kind": "direct"
+          "addr": 4417,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -23406,16 +23446,18 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&31bb referenced 2 times by &31b0, &31b7"
+        "&31bb referenced 2 times by &11b0[1], &11b7[1]"
       ],
       "references": [
         {
-          "addr": 12720,
-          "kind": "direct"
+          "addr": 4528,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 12727,
-          "kind": "direct"
+          "addr": 4535,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -23590,12 +23632,13 @@
       ],
       "comment_inline": "Return",
       "xref_summaries": [
-        "&31d2 referenced 1 time by &31c7"
+        "&31d2 referenced 1 time by &11c7[1]"
       ],
       "references": [
         {
-          "addr": 12743,
-          "kind": "direct"
+          "addr": 4551,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -23614,12 +23657,13 @@
       ],
       "comment_inline": "Erase the ring",
       "xref_summaries": [
-        "&31d3 referenced 1 time by &3119"
+        "&31d3 referenced 1 time by &1119[1]"
       ],
       "references": [
         {
-          "addr": 12569,
-          "kind": "direct"
+          "addr": 4377,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -23697,12 +23741,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&31de referenced 1 time by &31e2"
+        "&31de referenced 1 time by &11e2[1]"
       ],
       "references": [
         {
-          "addr": 12770,
-          "kind": "direct"
+          "addr": 4578,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -23795,12 +23840,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&31ec referenced 1 time by &31ef"
+        "&31ec referenced 1 time by &11ef[1]"
       ],
       "references": [
         {
-          "addr": 12783,
-          "kind": "direct"
+          "addr": 4591,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -26186,17 +26232,19 @@
       },
       "comment_inline": "...",
       "xref_summaries": [
-        "&3473 referenced 2 times by &347a, &3487",
-        "&3475 referenced 1 time by &3456"
+        "&3473 referenced 2 times by &147a[1], &1487[1]",
+        "&3475 referenced 1 time by &1456[1]"
       ],
       "references": [
         {
-          "addr": 13434,
-          "kind": "direct"
+          "addr": 5242,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 13447,
-          "kind": "direct"
+          "addr": 5255,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -26224,7 +26272,7 @@
       },
       "comment_inline": "...",
       "xref_summaries": [
-        "&3478 referenced 1 time by &344e"
+        "&3478 referenced 1 time by &144e[1]"
       ],
       "type": "code",
       "mnemonic": "sta",
@@ -26503,12 +26551,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&34a2 referenced 1 time by &34a9"
+        "&34a2 referenced 1 time by &14a9[1]"
       ],
       "references": [
         {
-          "addr": 13481,
-          "kind": "direct"
+          "addr": 5289,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -26912,12 +26961,13 @@
       ],
       "comment_inline": "VDU 25...",
       "xref_summaries": [
-        "&34e5 referenced 1 time by &3500"
+        "&34e5 referenced 1 time by &1500[1]"
       ],
       "references": [
         {
-          "addr": 13568,
-          "kind": "direct"
+          "addr": 5376,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -26966,12 +27016,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&34ec referenced 1 time by &34f4"
+        "&34ec referenced 1 time by &14f4[1]"
       ],
       "references": [
         {
-          "addr": 13556,
-          "kind": "direct"
+          "addr": 5364,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -27252,12 +27303,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&3512 referenced 1 time by &3525"
+        "&3512 referenced 1 time by &1525[1]"
       ],
       "references": [
         {
-          "addr": 13605,
-          "kind": "direct"
+          "addr": 5413,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -27399,12 +27451,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&3529 referenced 1 time by &353c"
+        "&3529 referenced 1 time by &153c[1]"
       ],
       "references": [
         {
-          "addr": 13628,
-          "kind": "direct"
+          "addr": 5436,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -27546,12 +27599,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&3540 referenced 1 time by &354d"
+        "&3540 referenced 1 time by &154d[1]"
       ],
       "references": [
         {
-          "addr": 13645,
-          "kind": "direct"
+          "addr": 5453,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -27661,12 +27715,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&3551 referenced 1 time by &3560"
+        "&3551 referenced 1 time by &1560[1]"
       ],
       "references": [
         {
-          "addr": 13664,
-          "kind": "direct"
+          "addr": 5472,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -27789,12 +27844,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&3564 referenced 1 time by &3573"
+        "&3564 referenced 1 time by &1573[1]"
       ],
       "references": [
         {
-          "addr": 13683,
-          "kind": "direct"
+          "addr": 5491,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -27917,12 +27973,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&3577 referenced 1 time by &3580"
+        "&3577 referenced 1 time by &1580[1]"
       ],
       "references": [
         {
-          "addr": 13696,
-          "kind": "direct"
+          "addr": 5504,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -28036,12 +28093,13 @@
       ],
       "comment_inline": "...dying, so that they emerge from the trapdoors...",
       "xref_summaries": [
-        "&3585 referenced 1 time by &3596"
+        "&3585 referenced 1 time by &1596[1]"
       ],
       "references": [
         {
-          "addr": 13718,
-          "kind": "direct"
+          "addr": 5526,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -28191,12 +28249,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&359c referenced 1 time by &35ae"
+        "&359c referenced 1 time by &15ae[1]"
       ],
       "references": [
         {
-          "addr": 13742,
-          "kind": "direct"
+          "addr": 5550,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -29681,12 +29740,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&36b4 referenced 1 time by &36c0"
+        "&36b4 referenced 1 time by &16c0[1]"
       ],
       "references": [
         {
-          "addr": 14016,
-          "kind": "direct"
+          "addr": 5824,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -29762,12 +29822,13 @@
       ],
       "comment_inline": "Next entry",
       "xref_summaries": [
-        "&36bf referenced 1 time by &36b7"
+        "&36bf referenced 1 time by &16b7[1]"
       ],
       "references": [
         {
-          "addr": 14007,
-          "kind": "direct"
+          "addr": 5815,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -33708,12 +33769,13 @@
       ],
       "comment_inline": "...look for a door at the cell the hero is moving into",
       "xref_summaries": [
-        "&3cc5 referenced 1 time by &3dbf"
+        "&3cc5 referenced 1 time by &1dbf[1]"
       ],
       "references": [
         {
-          "addr": 15807,
-          "kind": "direct"
+          "addr": 7615,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -33835,12 +33897,13 @@
       ],
       "comment_inline": "This door's x?",
       "xref_summaries": [
-        "&3cd8 referenced 1 time by &3db5"
+        "&3cd8 referenced 1 time by &1db5[1]"
       ],
       "references": [
         {
-          "addr": 15797,
-          "kind": "direct"
+          "addr": 7605,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -33910,12 +33973,13 @@
       ],
       "comment_inline": "...and y?",
       "xref_summaries": [
-        "&3ce3 referenced 1 time by &3cde"
+        "&3ce3 referenced 1 time by &1cde[1]"
       ],
       "references": [
         {
-          "addr": 15582,
-          "kind": "direct"
+          "addr": 7390,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -33983,12 +34047,13 @@
       ],
       "comment_inline": "Does the hero carry this door's key?",
       "xref_summaries": [
-        "&3cee referenced 1 time by &3ce9"
+        "&3cee referenced 1 time by &1ce9[1]"
       ],
       "references": [
         {
-          "addr": 15593,
-          "kind": "direct"
+          "addr": 7401,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -34086,12 +34151,13 @@
       ],
       "comment_inline": "Open the door: 7 points...",
       "xref_summaries": [
-        "&3cfa referenced 1 time by &3cf5"
+        "&3cfa referenced 1 time by &1cf5[1]"
       ],
       "references": [
         {
-          "addr": 15605,
-          "kind": "direct"
+          "addr": 7413,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -34171,12 +34237,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&3d03 referenced 1 time by &3d0b"
+        "&3d03 referenced 1 time by &1d0b[1]"
       ],
       "references": [
         {
-          "addr": 15627,
-          "kind": "direct"
+          "addr": 7435,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -35363,20 +35430,23 @@
       ],
       "comment_inline": "Next door",
       "xref_summaries": [
-        "&3db2 referenced 3 times by &3ce0, &3ceb, &3cf7"
+        "&3db2 referenced 3 times by &1ce0[1], &1ceb[1], &1cf7[1]"
       ],
       "references": [
         {
-          "addr": 15584,
-          "kind": "direct"
+          "addr": 7392,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 15595,
-          "kind": "direct"
+          "addr": 7403,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 15607,
-          "kind": "direct"
+          "addr": 7415,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -35425,12 +35495,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&3db8 referenced 1 time by &3db3"
+        "&3db8 referenced 1 time by &1db3[1]"
       ],
       "references": [
         {
-          "addr": 15795,
-          "kind": "direct"
+          "addr": 7603,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -35459,12 +35530,13 @@
       ],
       "comment_inline": "Next hero",
       "xref_summaries": [
-        "&3dba referenced 1 time by &3daf"
+        "&3dba referenced 1 time by &1daf[1]"
       ],
       "references": [
         {
-          "addr": 15791,
-          "kind": "direct"
+          "addr": 7599,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -35625,12 +35697,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&3dce referenced 1 time by &3de2"
+        "&3dce referenced 1 time by &1de2[1]"
       ],
       "references": [
         {
-          "addr": 15842,
-          "kind": "direct"
+          "addr": 7650,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -35891,12 +35964,13 @@
       ],
       "comment_inline": "Death animation finished?",
       "xref_summaries": [
-        "&3df3 referenced 1 time by &3dee"
+        "&3df3 referenced 1 time by &1dee[1]"
       ],
       "references": [
         {
-          "addr": 15854,
-          "kind": "direct"
+          "addr": 7662,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -36243,16 +36317,18 @@
       ],
       "comment_inline": "Just swapped keys?",
       "xref_summaries": [
-        "&3e28 referenced 2 times by &3de9, &3df8"
+        "&3e28 referenced 2 times by &1de9[1], &1df8[1]"
       ],
       "references": [
         {
-          "addr": 15849,
-          "kind": "direct"
+          "addr": 7657,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 15864,
-          "kind": "direct"
+          "addr": 7672,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -36335,12 +36411,13 @@
       ],
       "comment_inline": "Is there a key at the hero's cell?",
       "xref_summaries": [
-        "&3e35 referenced 1 time by &3e2b"
+        "&3e35 referenced 1 time by &1e2b[1]"
       ],
       "references": [
         {
-          "addr": 15915,
-          "kind": "direct"
+          "addr": 7723,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -36446,12 +36523,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&3e45 referenced 1 time by &3ec1"
+        "&3e45 referenced 1 time by &1ec1[1]"
       ],
       "references": [
         {
-          "addr": 16065,
-          "kind": "direct"
+          "addr": 7873,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -37339,16 +37417,18 @@
       ],
       "comment_inline": "Next key",
       "xref_summaries": [
-        "&3ebe referenced 2 times by &3e4b, &3e53"
+        "&3ebe referenced 2 times by &1e4b[1], &1e53[1]"
       ],
       "references": [
         {
-          "addr": 15947,
-          "kind": "direct"
+          "addr": 7755,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 15955,
-          "kind": "direct"
+          "addr": 7763,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -37397,12 +37477,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&3ec4 referenced 1 time by &3ebf"
+        "&3ec4 referenced 1 time by &1ebf[1]"
       ],
       "references": [
         {
-          "addr": 16063,
-          "kind": "direct"
+          "addr": 7871,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -37431,24 +37512,28 @@
       ],
       "comment_inline": "Next hero",
       "xref_summaries": [
-        "&3ec6 referenced 4 times by &3df0, &3e25, &3e32, &3ebb"
+        "&3ec6 referenced 4 times by &1df0[1], &1e25[1], &1e32[1], &1ebb[1]"
       ],
       "references": [
         {
-          "addr": 15856,
-          "kind": "direct"
+          "addr": 7664,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 15909,
-          "kind": "direct"
+          "addr": 7717,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 15922,
-          "kind": "direct"
+          "addr": 7730,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 16059,
-          "kind": "direct"
+          "addr": 7867,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -37636,12 +37721,13 @@
       ],
       "comment_inline": "Paused: wait for f1 to be released... Scan keyboard from key 16",
       "xref_summaries": [
-        "&3ee0 referenced 1 time by &3ee5"
+        "&3ee0 referenced 1 time by &1ee5[1]"
       ],
       "references": [
         {
-          "addr": 16101,
-          "kind": "direct"
+          "addr": 7909,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -37692,12 +37778,13 @@
       ],
       "comment_inline": "...pressed again... Scan keyboard from key 16",
       "xref_summaries": [
-        "&3ee7 referenced 1 time by &3eec"
+        "&3ee7 referenced 1 time by &1eec[1]"
       ],
       "references": [
         {
-          "addr": 16108,
-          "kind": "direct"
+          "addr": 7916,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -37748,12 +37835,13 @@
       ],
       "comment_inline": "...and released Scan keyboard from key 16",
       "xref_summaries": [
-        "&3eee referenced 1 time by &3ef3"
+        "&3eee referenced 1 time by &1ef3[1]"
       ],
       "references": [
         {
-          "addr": 16115,
-          "kind": "direct"
+          "addr": 7923,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -37802,12 +37890,13 @@
       ],
       "comment_inline": "Return",
       "xref_summaries": [
-        "&3ef5 referenced 1 time by &3ede"
+        "&3ef5 referenced 1 time by &1ede[1]"
       ],
       "references": [
         {
-          "addr": 16094,
-          "kind": "direct"
+          "addr": 7902,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -38041,12 +38130,13 @@
       ],
       "comment_inline": "In play?",
       "xref_summaries": [
-        "&3f17 referenced 1 time by &3f2b"
+        "&3f17 referenced 1 time by &1f2b[1]"
       ],
       "references": [
         {
-          "addr": 16171,
-          "kind": "direct"
+          "addr": 7979,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -38167,12 +38257,13 @@
       ],
       "comment_inline": "Next hero",
       "xref_summaries": [
-        "&3f2a referenced 1 time by &3f21"
+        "&3f2a referenced 1 time by &1f21[1]"
       ],
       "references": [
         {
-          "addr": 16161,
-          "kind": "direct"
+          "addr": 7969,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -38252,12 +38343,13 @@
       ],
       "comment_inline": "Return",
       "xref_summaries": [
-        "&3f35 referenced 1 time by &3f30"
+        "&3f35 referenced 1 time by &1f30[1]"
       ],
       "references": [
         {
-          "addr": 16176,
-          "kind": "direct"
+          "addr": 7984,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -38276,20 +38368,23 @@
       ],
       "comment_inline": "Is a hero on the exit?",
       "xref_summaries": [
-        "&3f36 referenced 3 times by &3f13, &3f1a, &3f28"
+        "&3f36 referenced 3 times by &1f13[1], &1f1a[1], &1f28[1]"
       ],
       "references": [
         {
-          "addr": 16147,
-          "kind": "direct"
+          "addr": 7955,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 16154,
-          "kind": "direct"
+          "addr": 7962,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 16168,
-          "kind": "direct"
+          "addr": 7976,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -38310,12 +38405,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&3f38 referenced 1 time by &3f94"
+        "&3f38 referenced 1 time by &1f94[1]"
       ],
       "references": [
         {
-          "addr": 16276,
-          "kind": "direct"
+          "addr": 8084,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -38853,16 +38949,18 @@
       ],
       "comment_inline": "Next hero",
       "xref_summaries": [
-        "&3f91 referenced 2 times by &3f3e, &3f46"
+        "&3f91 referenced 2 times by &1f3e[1], &1f46[1]"
       ],
       "references": [
         {
-          "addr": 16190,
-          "kind": "direct"
+          "addr": 7998,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 16198,
-          "kind": "direct"
+          "addr": 8006,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -38910,12 +39008,13 @@
       ],
       "comment_inline": "A hero going down the exit?",
       "xref_summaries": [
-        "&3f96 referenced 1 time by &3f8e"
+        "&3f96 referenced 1 time by &1f8e[1]"
       ],
       "references": [
         {
-          "addr": 16270,
-          "kind": "direct"
+          "addr": 8078,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -38969,12 +39068,13 @@
       ],
       "comment_inline": "Redraw the exit",
       "xref_summaries": [
-        "&3f9e referenced 1 time by &3f99"
+        "&3f9e referenced 1 time by &1f99[1]"
       ],
       "references": [
         {
-          "addr": 16281,
-          "kind": "direct"
+          "addr": 8089,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -39479,12 +39579,13 @@
       ],
       "comment_inline": "Start the next turn",
       "xref_summaries": [
-        "&3ff2 referenced 1 time by &3fc8"
+        "&3ff2 referenced 1 time by &1fc8[1]"
       ],
       "references": [
         {
-          "addr": 16328,
-          "kind": "direct"
+          "addr": 8136,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -39643,12 +39744,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&4009 referenced 1 time by &4010"
+        "&4009 referenced 1 time by &2010[1]"
       ],
       "references": [
         {
-          "addr": 16400,
-          "kind": "direct"
+          "addr": 8208,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -39733,12 +39835,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&4014 referenced 1 time by &4021"
+        "&4014 referenced 1 time by &2021[1]"
       ],
       "references": [
         {
-          "addr": 16417,
-          "kind": "direct"
+          "addr": 8225,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -39861,12 +39964,13 @@
       ],
       "comment_inline": "Put the exit back...",
       "xref_summaries": [
-        "&4026 referenced 1 time by &3ffa"
+        "&4026 referenced 1 time by &1ffa[1]"
       ],
       "references": [
         {
-          "addr": 16378,
-          "kind": "direct"
+          "addr": 8186,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -40241,12 +40345,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&405f referenced 1 time by &4066"
+        "&405f referenced 1 time by &2066[1]"
       ],
       "references": [
         {
-          "addr": 16486,
-          "kind": "direct"
+          "addr": 8294,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -40346,12 +40451,13 @@
       ],
       "comment_inline": "...",
       "xref_summaries": [
-        "&406c referenced 1 time by &4073"
+        "&406c referenced 1 time by &2073[1]"
       ],
       "references": [
         {
-          "addr": 16499,
-          "kind": "direct"
+          "addr": 8307,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -40426,16 +40532,18 @@
       ],
       "comment_inline": "Start the animation for this hero...",
       "xref_summaries": [
-        "&4076 referenced 2 times by &4048, &404d"
+        "&4076 referenced 2 times by &2048[1], &204d[1]"
       ],
       "references": [
         {
-          "addr": 16456,
-          "kind": "direct"
+          "addr": 8264,
+          "kind": "direct",
+          "move_id": 1
         },
         {
-          "addr": 16461,
-          "kind": "direct"
+          "addr": 8269,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -41106,12 +41214,13 @@
       ],
       "comment_inline": "The cell to the right",
       "xref_summaries": [
-        "&40db referenced 1 time by &40d8"
+        "&40db referenced 1 time by &20d8[1]"
       ],
       "references": [
         {
-          "addr": 16600,
-          "kind": "direct"
+          "addr": 8408,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -41205,12 +41314,13 @@
       ],
       "comment_inline": "The cell below",
       "xref_summaries": [
-        "&40e9 referenced 1 time by &40e6"
+        "&40e9 referenced 1 time by &20e6[1]"
       ],
       "references": [
         {
-          "addr": 16614,
-          "kind": "direct"
+          "addr": 8422,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -41304,12 +41414,13 @@
       ],
       "comment_inline": "Otherwise the cell to the left",
       "xref_summaries": [
-        "&40f7 referenced 1 time by &40f4"
+        "&40f7 referenced 1 time by &20f4[1]"
       ],
       "references": [
         {
-          "addr": 16628,
-          "kind": "direct"
+          "addr": 8436,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -60841,12 +60952,13 @@
       ],
       "comment_inline": "No pixel offsets",
       "xref_summaries": [
-        "&7305 referenced 1 time by &3ece"
+        "&7305 referenced 1 time by &1ece[1]"
       ],
       "references": [
         {
-          "addr": 16078,
-          "kind": "direct"
+          "addr": 7886,
+          "kind": "direct",
+          "move_id": 1
         }
       ],
       "type": "code",
@@ -79100,7 +79212,7 @@
       ],
       "image": 1,
       "xref_summaries": [
-        "&7dd0 used as index base 2 times by &2424, &2f71"
+        "&7dd0 used as index base 2 times by &0424[1], &0f71[1]"
       ],
       "type": "byte",
       "values": [
@@ -79264,7 +79376,7 @@
       ],
       "xref_summaries": [
         "&7e00 used as index base 17 times by &158c[1], &7667, &797e, &79e7, &7a31, &7a3f, &7a45, &7a5b, &7a98, &7ace, &7afb, &7b04, &7b41, &7c46, &7c54, &7cc8, &7cf2",
-        "&7e23 referenced 2 times by &3d29, &3d39"
+        "&7e23 referenced 2 times by &1d29[1], &1d39[1]"
       ],
       "references": [
         {
@@ -79521,7 +79633,7 @@
       ],
       "image": 1,
       "xref_summaries": [
-        "&7e4c referenced 2 times by &3d23, &3d3f"
+        "&7e4c referenced 2 times by &1d23[1], &1d3f[1]"
       ],
       "type": "byte",
       "values": [
