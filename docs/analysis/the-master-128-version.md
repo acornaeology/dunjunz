@@ -4,7 +4,8 @@ The official 1987 flippy disc has the Master 128 conversion on its boot side,
 side 2. Its `BOOT` is signed "Mastered by S Benfield". This document covers
 what that side shares with the Model B releases, what it changes, which
 Master features it uses, and how it copes with the Master's WD1770 disc
-controller and DFS 2.24.
+controller and DFS 2.24 (the DFS that beebjit's Master 128 runs, sideways ROM
+bank 9 reading "DFS 2.24 (C)1985 Acorn" **[confirmed]**).
 
 The full listing is `versions/dunjunz-disc_master/`. Its driver,
 `disasm_dunjunz_disc_master.py`, applies the shared game annotations and
@@ -278,6 +279,11 @@ DFS's NMI page intact whenever the DFS runs.
 
 ## Not yet examined
 
+- **What happens if the disc is not turned over.** The Master side has
+  only `Level1`, so asking for level 2 there should give a DFS error,
+  which the game does not trap. In beebjit, with the level digit changed
+  to 2 just before the first load, the emulation reached none of the
+  probe's later breakpoints, so the outcome is not yet known.
 - **The Master `Editor` and `Default`.** The README says the other
   side's are "for the BBC model B ONLY".
 - **The remainder of `Code2`**, its tune data, has not been transcribed
