@@ -1,6 +1,6 @@
 # Dunjunz disc: contents and loading sequence
 
-Source image: `versions/cbbcga-dunjunz/Disc060-DunjunzRx2.ssd` (BBC Micro
+Source image: `versions/dunjunz-swram_hack/Disc060-DunjunzRx2.ssd` (BBC Micro
 Games Archive, "Sideways RAM version"). Single-sided 40-track DFS, title
 `DUNJUNZ`, boot option 3 (EXEC), 12 files.
 

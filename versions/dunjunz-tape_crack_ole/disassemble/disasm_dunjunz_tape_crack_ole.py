@@ -33,8 +33,8 @@ from dunjunz_common.rendering import MultiFileBeebasmRenderer, SavedFile  # noqa
 BINARY_DIRPATH = VERSION_DIRPATH / "binary"
 OUTPUT_DIRPATH = VERSION_DIRPATH / "output"
 
-asm_filepath = Path(os.environ.get("FANTASM_ASM", OUTPUT_DIRPATH / "dunjunz-tape.asm"))
-json_filepath = Path(os.environ.get("FANTASM_JSON", OUTPUT_DIRPATH / "dunjunz-tape.json"))
+asm_filepath = Path(os.environ.get("FANTASM_ASM", OUTPUT_DIRPATH / "dunjunz-tape_crack_ole.asm"))
+json_filepath = Path(os.environ.get("FANTASM_JSON", OUTPUT_DIRPATH / "dunjunz-tape_crack_ole.json"))
 
 SAVED_FILES = [
     SavedFile("DUNJ4", start=0x2400, end=0x5050, exec_addr=0x5000, load_addr=0x2400),

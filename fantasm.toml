@@ -2,7 +2,7 @@
 
 [project]
 name = "dunjunz"
-default_target = "dunjun7"
+default_target = "swram_hack"
 
 [binary]
 cpu = "6502"
@@ -15,70 +15,70 @@ cpu = "6502"
 
 [[targets]]
 id = "dunjun4"
-binary = "versions/cbbcga-dunjunz/binary/Dunjun4"
-driver = "versions/cbbcga-dunjunz/disassemble/disasm_dunjunz_game.py"
-asm = "versions/cbbcga-dunjunz/output/dunjunz-game.asm"
-json = "versions/cbbcga-dunjunz/output/dunjunz-game.json"
+binary = "versions/dunjunz-swram_hack/binary/Dunjun4"
+driver = "versions/dunjunz-swram_hack/disassemble/disasm_dunjunz_swram_hack.py"
+asm = "versions/dunjunz-swram_hack/output/dunjunz-swram_hack.asm"
+json = "versions/dunjunz-swram_hack/output/dunjunz-swram_hack.json"
 verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunjun4" }
 
 [[targets]]
-id = "dunjun7"
-binary = "versions/cbbcga-dunjunz/binary/Dunjun7"
-driver = "versions/cbbcga-dunjunz/disassemble/disasm_dunjunz_game.py"
-asm = "versions/cbbcga-dunjunz/output/dunjunz-game.asm"
-json = "versions/cbbcga-dunjunz/output/dunjunz-game.json"
+id = "swram_hack"
+binary = "versions/dunjunz-swram_hack/binary/Dunjun7"
+driver = "versions/dunjunz-swram_hack/disassemble/disasm_dunjunz_swram_hack.py"
+asm = "versions/dunjunz-swram_hack/output/dunjunz-swram_hack.asm"
+json = "versions/dunjunz-swram_hack/output/dunjunz-swram_hack.json"
 verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunjun7" }
 
 [[targets]]
 id = "dunjun5"
-binary = "versions/cbbcga-dunjunz/binary/Dunjun5"
-driver = "versions/cbbcga-dunjunz/disassemble/disasm_dunjunz_game.py"
-asm = "versions/cbbcga-dunjunz/output/dunjunz-game.asm"
-json = "versions/cbbcga-dunjunz/output/dunjunz-game.json"
+binary = "versions/dunjunz-swram_hack/binary/Dunjun5"
+driver = "versions/dunjunz-swram_hack/disassemble/disasm_dunjunz_swram_hack.py"
+asm = "versions/dunjunz-swram_hack/output/dunjunz-swram_hack.asm"
+json = "versions/dunjunz-swram_hack/output/dunjunz-swram_hack.json"
 verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunjun5" }
 
 [[targets]]
 id = "dunjun6"
-binary = "versions/cbbcga-dunjunz/binary/Dunjun6"
-driver = "versions/cbbcga-dunjunz/disassemble/disasm_dunjunz_game.py"
-asm = "versions/cbbcga-dunjunz/output/dunjunz-game.asm"
-json = "versions/cbbcga-dunjunz/output/dunjunz-game.json"
+binary = "versions/dunjunz-swram_hack/binary/Dunjun6"
+driver = "versions/dunjunz-swram_hack/disassemble/disasm_dunjunz_swram_hack.py"
+asm = "versions/dunjunz-swram_hack/output/dunjunz-swram_hack.asm"
+json = "versions/dunjunz-swram_hack/output/dunjunz-swram_hack.json"
 verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunjun6" }
 
 # Ole's crack of the cassette: DUNJ4 (the &0400-&2FFF image stored at &2400,
 # plus start-up code at &5000) and DUNJ3 (&6E80 onwards).
 
 [[targets]]
-id = "tape-dunj4"
-binary = "versions/nvg-dunjunz-tape/binary/DUNJ4"
-driver = "versions/nvg-dunjunz-tape/disassemble/disasm_dunjunz_tape.py"
-asm = "versions/nvg-dunjunz-tape/output/dunjunz-tape.asm"
-json = "versions/nvg-dunjunz-tape/output/dunjunz-tape.json"
+id = "tape_crack_ole"
+binary = "versions/dunjunz-tape_crack_ole/binary/DUNJ4"
+driver = "versions/dunjunz-tape_crack_ole/disassemble/disasm_dunjunz_tape_crack_ole.py"
+asm = "versions/dunjunz-tape_crack_ole/output/dunjunz-tape_crack_ole.asm"
+json = "versions/dunjunz-tape_crack_ole/output/dunjunz-tape_crack_ole.json"
 verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "DUNJ4" }
 
 [[targets]]
 id = "tape-dunj3"
-binary = "versions/nvg-dunjunz-tape/binary/DUNJ3"
-driver = "versions/nvg-dunjunz-tape/disassemble/disasm_dunjunz_tape.py"
-asm = "versions/nvg-dunjunz-tape/output/dunjunz-tape.asm"
-json = "versions/nvg-dunjunz-tape/output/dunjunz-tape.json"
+binary = "versions/dunjunz-tape_crack_ole/binary/DUNJ3"
+driver = "versions/dunjunz-tape_crack_ole/disassemble/disasm_dunjunz_tape_crack_ole.py"
+asm = "versions/dunjunz-tape_crack_ole/output/dunjunz-tape_crack_ole.asm"
+json = "versions/dunjunz-tape_crack_ole/output/dunjunz-tape_crack_ole.json"
 verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "DUNJ3" }
 
 # The official disc release, Model B side: Dun1 (the game, reloaded every
 # level) and Coder (its per-level loader, also stored inside Dun1).
 
 [[targets]]
-id = "disc-dun1"
-binary = "versions/nvg-dunjunz-disc/binary/Dun1"
-driver = "versions/nvg-dunjunz-disc/disassemble/disasm_dunjunz_disc.py"
-asm = "versions/nvg-dunjunz-disc/output/dunjunz-disc.asm"
-json = "versions/nvg-dunjunz-disc/output/dunjunz-disc.json"
+id = "disc_nvg"
+binary = "versions/dunjunz-disc_nvg/binary/Dun1"
+driver = "versions/dunjunz-disc_nvg/disassemble/disasm_dunjunz_disc_nvg.py"
+asm = "versions/dunjunz-disc_nvg/output/dunjunz-disc_nvg.asm"
+json = "versions/dunjunz-disc_nvg/output/dunjunz-disc_nvg.json"
 verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dun1" }
 
 [[targets]]
 id = "disc-coder"
-binary = "versions/nvg-dunjunz-disc/binary/Coder"
-driver = "versions/nvg-dunjunz-disc/disassemble/disasm_dunjunz_disc.py"
-asm = "versions/nvg-dunjunz-disc/output/dunjunz-disc.asm"
-json = "versions/nvg-dunjunz-disc/output/dunjunz-disc.json"
+binary = "versions/dunjunz-disc_nvg/binary/Coder"
+driver = "versions/dunjunz-disc_nvg/disassemble/disasm_dunjunz_disc_nvg.py"
+asm = "versions/dunjunz-disc_nvg/output/dunjunz-disc_nvg.asm"
+json = "versions/dunjunz-disc_nvg/output/dunjunz-disc_nvg.json"
 verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Coder" }

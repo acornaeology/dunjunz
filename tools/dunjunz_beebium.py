@@ -12,7 +12,7 @@ from beebium.client import Beebium
 from beebium.client.sideways import SlotType
 
 REPO_DIRPATH = Path(__file__).resolve().parent.parent
-DISC_FILEPATH = REPO_DIRPATH / "versions" / "cbbcga-dunjunz" / "Disc060-DunjunzRx2.ssd"
+DISC_FILEPATH = REPO_DIRPATH / "versions" / "dunjunz-swram_hack" / "Disc060-DunjunzRx2.ssd"
 GAME_ENTRY = 0x0D31
 
 # Keyboard matrix (row, column) of each player's controls, from the controls

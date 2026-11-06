@@ -24,23 +24,23 @@ def _read(version_dirname, filename):
 def swr_image() -> dict[int, int]:
     image = {}
     for name, addr in [("Dunjun4", 0x0400), ("Dunjun7", 0x0D00), ("Dunjun5", 0x1100), ("Dunjun6", 0x6E80)]:
-        for i, b in enumerate(_read("cbbcga-dunjunz", name)):
+        for i, b in enumerate(_read("dunjunz-swram_hack", name)):
             image[addr + i] = b
     return image
 
 
 def tape_image() -> dict[int, int]:
     image = {}
-    dunj4 = _read("nvg-dunjunz-tape", "DUNJ4")
+    dunj4 = _read("dunjunz-tape_crack_ole", "DUNJ4")
     for i, b in enumerate(dunj4[:0x2C00]):
         image[0x0400 + i] = b
-    for i, b in enumerate(_read("nvg-dunjunz-tape", "DUNJ3")[:0x1180]):
+    for i, b in enumerate(_read("dunjunz-tape_crack_ole", "DUNJ3")[:0x1180]):
         image[0x6E80 + i] = b
     return image
 
 
 def disc_image(joystick: bool = False) -> dict[int, int]:
-    dun1 = _read("nvg-dunjunz-disc", "Dun1")
+    dun1 = _read("dunjunz-disc_nvg", "Dun1")
 
     def at(addr):
         return dun1[addr - 0x2000]

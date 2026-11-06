@@ -13,9 +13,9 @@ See [docs/history-and-provenance.md](docs/history-and-provenance.md).
 
 | Directory | Release |
 |---|---|
-| `versions/nvg-dunjunz-tape/` | Ole's crack of the 1986 cassette |
-| `versions/nvg-dunjunz-disc/` | The 1987 flippy disc (Model B side; Master side archived) |
-| `versions/cbbcga-dunjunz/` | An unofficial sideways RAM hack, with the levels in ROMFS |
+| `versions/dunjunz-tape_crack_ole/` | Ole's crack of the 1986 cassette |
+| `versions/dunjunz-disc_nvg/` | The 1987 flippy disc (Model B side; Master side archived) |
+| `versions/dunjunz-swram_hack/` | An unofficial sideways RAM hack, with the levels in ROMFS |
 
 The game code is annotated once, in `dunjunz_common/`, keyed by run-time
 address, and applied to each release by its driver
@@ -40,9 +40,9 @@ Requires [uv](https://docs.astral.sh/uv/) and
 
 ```sh
 uv sync
-uv run fantasm disassemble dunjun7      # sideways RAM hack
-uv run fantasm disassemble tape-dunj4   # Ole's crack
-uv run fantasm disassemble disc-dun1    # official disc
+uv run fantasm disassemble swram_hack   # sideways RAM hack
+uv run fantasm disassemble tape_crack_ole # Ole's crack
+uv run fantasm disassemble disc_nvg     # official disc
 uv run fantasm verify --all             # reassemble and compare every file
 ```
 

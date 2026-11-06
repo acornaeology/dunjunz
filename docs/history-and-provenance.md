@@ -33,7 +33,7 @@ version on one side and the Model B version on the other
 September 1987, from everygamegoing.com **[reported]**.
 
 No original image of this disc has been found either. The closest copy is
-`Dunjunz.zip` from the NVG archive (`versions/nvg-dunjunz-disc/`), which
+`Dunjunz.zip` from the NVG archive (`versions/dunjunz-disc_nvg/`), which
 holds the two sides as directories `2/` and `0/` **[confirmed]**:
 
 - **Side 2, the boot side, is the Master version.** Its `!BOOT` chains
@@ -68,7 +68,7 @@ area, so later levels cannot be loaded through DFS
 
 ## Ole's crack of the cassette
 
-`Dunjunz-tape.zip` from the NVG archive (`versions/nvg-dunjunz-tape/`) is
+`Dunjunz-tape.zip` from the NVG archive (`versions/dunjunz-tape_crack_ole/`) is
 not the original cassette. It is a crack **[confirmed]**:
 
 - `PLOAD` (BASIC) runs `EXPAND` (an image unpacker, "(C) 1985 Rhys E.
@@ -101,7 +101,7 @@ versions do not, because it "uses &A00 rather than &D00"
 
 ## The sideways RAM hack
 
-`Disc060-DunjunzRx2.ssd` (`versions/cbbcga-dunjunz/`), from the BBC
+`Disc060-DunjunzRx2.ssd` (`versions/dunjunz-swram_hack/`), from the BBC
 Micro Games Archive, is an unofficial conversion that keeps all 25 levels
 in two banks of sideways RAM as ROMFS images and loads them through the
 MOS's ROM filing system **[reported as unofficial: billcarr2005,

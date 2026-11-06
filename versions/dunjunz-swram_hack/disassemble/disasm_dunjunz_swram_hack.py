@@ -30,8 +30,8 @@ from dunjunz_common.rendering import MultiFileBeebasmRenderer, SavedFile  # noqa
 BINARY_DIRPATH = VERSION_DIRPATH / "binary"
 OUTPUT_DIRPATH = VERSION_DIRPATH / "output"
 
-asm_filepath = Path(os.environ.get("FANTASM_ASM", OUTPUT_DIRPATH / "dunjunz-game.asm"))
-json_filepath = Path(os.environ.get("FANTASM_JSON", OUTPUT_DIRPATH / "dunjunz-game.json"))
+asm_filepath = Path(os.environ.get("FANTASM_ASM", OUTPUT_DIRPATH / "dunjunz-swram_hack.asm"))
+json_filepath = Path(os.environ.get("FANTASM_JSON", OUTPUT_DIRPATH / "dunjunz-swram_hack.json"))
 
 # (DFS name, load address, length), in address order.
 GAME_FILES = [

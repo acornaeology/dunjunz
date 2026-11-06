@@ -14,7 +14,7 @@ import zipfile
 from pathlib import Path
 
 REPO_DIRPATH = Path(__file__).resolve().parent.parent
-TAPE_ZIP_FILEPATH = REPO_DIRPATH / "versions" / "nvg-dunjunz-tape" / "Dunjunz-tape.zip"
+TAPE_ZIP_FILEPATH = REPO_DIRPATH / "versions" / "dunjunz-tape_crack_ole" / "Dunjunz-tape.zip"
 BASE = 0x6B00
 
 OBJECT_SYMBOLS = {0x28: "$", 0x29: "f", 0x2A: "+", 0x2B: "T", 0x51: "E",

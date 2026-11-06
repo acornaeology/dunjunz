@@ -20,7 +20,7 @@ as evidence accumulates, tagging statements [confirmed], [reported] or
 
 The first version disassembled:
 
-`versions/cbbcga-dunjunz/Disc060-DunjunzRx2.ssd` — the BBC Micro Games
+`versions/dunjunz-swram_hack/Disc060-DunjunzRx2.ssd` — the BBC Micro Games
 Archive "Sideways RAM version". See `docs/disc-contents-and-loading.md` for
 the full catalogue, the boot chain and the confirmed runtime memory map.
 

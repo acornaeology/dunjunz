@@ -22,7 +22,7 @@ from dasmos.ext.cpus.cpu6502.cpu import OPCODES
 
 from dunjunz_beebium import PLAYER_KEYS, REPO_DIRPATH, boot_to, launched_machine
 
-JSON_FILEPATH = REPO_DIRPATH / "versions" / "cbbcga-dunjunz" / "output" / "dunjunz-game.json"
+JSON_FILEPATH = REPO_DIRPATH / "versions" / "dunjunz-swram_hack" / "output" / "dunjunz-swram_hack.json"
 GAME_RANGES = [(0x0400, 0x3000), (0x6E80, 0x8000)]
 MAX_STEPS_PER_HIT = 5000
 
