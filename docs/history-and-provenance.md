@@ -83,7 +83,10 @@ What they show **[confirmed]**:
 - **No copy protection.** On both sides, tracks 0–39 are standard DFS
   tracks: ten 256-byte sectors numbered 0–9, each ID carrying its own
   track number. Every sector reads without error. Tracks 40 and 41 are
-  unformatted (8271 result &18, sector not found).
+  unformatted (8271 result &18, sector not found). Track 40 is the last
+  in the captures. oaknut's HFE decoder, reading the flux independently,
+  finds the same layout and no deleted-data marks, and flattens each side
+  to an SSD byte-identical to the 8271 reading.
 - **The same files as the NVG archive.** All 19 files on the Master side
   and all 31 on the Model B side are byte-identical to `Dunjunz.zip`'s
   `2/` and `0/`, with the same load and exec addresses. The Master
