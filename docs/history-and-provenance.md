@@ -52,7 +52,17 @@ captures' **[confirmed]**. The contents of the two sides are:
   "BBC Version on the flip side of this disc. please turn over the disc
   and press the Space Bar." This side's files are locked, and several
   load into the Master's &C000–&DFFF private RAM (`Code` &C500, `Code2`
-  &C700, `Code3` &D800, `Table` &C5A0) **[confirmed]**.
+  &C700, `Code3` &D800, `Table` &C5A0) **[confirmed]**. It is disassembled
+  in `versions/dunjunz-disc_master/` and described in
+  [the-master-128-version.md](analysis/the-master-128-version.md).
+- **The Master game descends from the cassette game, not from the Model B
+  disc's.** Its resident level loop, its menu tables at &06F8, and the
+  leftover "…nz1" of the cassette images' "Dunjunz1" at &07F5 are the
+  cassette lineage's. The level checksum routine and table, the P pause
+  key, the joystick handler and the `*DUNJUNZ` loader are taken from the
+  Model B disc **[confirmed]**. So the conversion was made from the
+  cassette game's code, with the disc release's parts added
+  **[inference]**.
 - **Side 0 is the Model B version.** `Dunjunz` (load &26C0, exec &2700),
   the game `Dun1` (&2000, &6000 bytes, up to &8000), `Screen` (&3280, the
   loading screen), `Stones` (&6E80), `Coder` (&5000), `Editor`,
@@ -146,6 +156,16 @@ after level 2 loads **[reported: billcarr2005, lurkio, richardtoohey,
 stardot]**. The game overwrites &0D00–&10FF, the DFS's NMI and workspace
 area, so later levels cannot be loaded through DFS
 **[reported: duikkie, stardot]**.
+
+The Master side avoids the problem rather than depending on a DFS
+version **[confirmed]**:
+- the game stays resident and loads each level through OSCLI;
+- it saves the filing system's page &0D in private RAM, and puts it back
+  before every load;
+- DFS 2.24 keeps the rest of its workspace in private RAM, away from the
+  game.
+
+See [the-master-128-version.md](analysis/the-master-128-version.md#the-disc-controller-and-the-dfs).
 
 ## Variations
 

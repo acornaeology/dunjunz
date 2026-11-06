@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        version: ["disc", "tape_crack_ole", "swram_hack"]
+        version: ["disc", "disc_master", "tape_crack_ole", "swram_hack"]
     steps:
       - uses: actions/checkout@v4
 

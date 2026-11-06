@@ -10,16 +10,18 @@ systems becomes possible.
 
 ## Releases
 
-The reference version is the official 1987 flippy disc, disassembled
-from flux captures of both its sides. The other two are variations on
-the game: a crack of the 1986 cassette, and an unofficial hack built
+The reference version is the official 1987 flippy disc's Model B side,
+disassembled from flux captures of both its sides; the disc's Master 128
+side, the official conversion for the Master, is a version of its own.
+The other two are variations on the game: a crack of the 1986 cassette, and an unofficial hack built
 from that crack and the disc. No image of the original cassette has
 turned up yet. See
 [docs/history-and-provenance.md](docs/history-and-provenance.md).
 
 | Directory | Release |
 |---|---|
-| `versions/dunjunz-disc/` | The official 1987 flippy disc, from HFE captures (Model B side disassembled; Master side archived) |
+| `versions/dunjunz-disc/` | The official 1987 flippy disc, Model B side, from HFE captures (both sides' captures are kept here) |
+| `versions/dunjunz-disc_master/` | The same disc's Master 128 side |
 | `versions/dunjunz-tape_crack_ole/` | Ole's crack of the 1986 cassette |
 | `versions/dunjunz-swram_hack/` | An unofficial sideways RAM hack, with the levels in ROMFS |
 
@@ -32,6 +34,9 @@ original files.
 ## Documentation
 
 - [How the game works](docs/analysis/how-the-game-works.md)
+- [The Master 128 version](docs/analysis/the-master-128-version.md): what
+  it shares and changes, its use of private RAM, and how it works with the
+  WD1770 and DFS 2.24
 - [Level format](docs/level-format.md)
 - [Findings](docs/findings.md): emulator-compatibility hazards, bugs,
   inaccuracies in the instructions, candidate fixes
@@ -46,7 +51,8 @@ Requires [uv](https://docs.astral.sh/uv/) and
 
 ```sh
 uv sync
-uv run fantasm disassemble disc           # official disc
+uv run fantasm disassemble disc           # official disc, Model B side
+uv run fantasm disassemble disc_master    # official disc, Master 128 side
 uv run fantasm disassemble tape_crack_ole # Ole's crack
 uv run fantasm disassemble swram_hack     # sideways RAM hack
 uv run fantasm verify --all               # reassemble and compare every file

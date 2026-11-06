@@ -302,7 +302,11 @@ cassette loading itself, or something in the hack's making
 The Master side's `Coder` (load &0400, exec &0740, length &3FF) is
 another such image, with a different program at &0740. That program
 copies page &0D to &C400 (in the Master's private RAM), `*LOAD`s `DUNJ2`
-to `DUNJ5` through OSCLI, sends VDU 17,2 and jumps to &0E00.
+to `DUNJ5` through OSCLI, sends VDU 17,2 and jumps to &0E00. Its &07F5
+still holds "nz1", the end of the cassette lineage's "Dunjunz1": the
+Master conversion was built over a cassette-lineage &0400 image, not the
+Model B disc's **[confirmed]**. See
+[the-master-128-version.md](analysis/the-master-128-version.md).
 
 ## Dependence on MOS 1.20
 
@@ -317,11 +321,85 @@ against the MOS 1.20 ROM in beebium:
 | &E0A4 | The default OSWRCH handler (WRCHV's initial value) | The game's WRCHV handler at &7F8F passes every character on with `JMP &E0A4`, not through the WRCHV value it saved (all releases) |
 | &0C00 | Definition of character 128 (user-defined characters, default font arrangement) | The WRCHV handler copies each letter or digit glyph there and prints character 128 (all releases) |
 
+The Model B side's loader, `Dunjunz`, also reads &C375: its title-screen
+star plotter at &2876 indexes the table at &287D and &2885
+**[confirmed]**. The Master conversion handles each of these addresses:
+it carries its own copy of the row table, passes on to MOS 3.20's entry
+points, and bypasses the font routine (see
+[the-master-128-version.md](analysis/the-master-128-version.md)).
+
 On another MOS, sprites are drawn at wrong addresses, a failed checksum
 jumps into unrelated code, joystick mode breaks OSBYTE, and text output
 bypasses anything else hooked into WRCHV. A portable version would need
 its own 640-byte row table, would chain to the saved vectors, and would
 define character 128 with VDU 23.
+
+## Official disc release (Master 128 side)
+
+The full account is in
+[the-master-128-version.md](analysis/the-master-128-version.md). The
+findings that matter beyond the listing:
+
+### It works with the WD1770 and DFS 2.24 by protecting page &0D
+
+The Master game never drives the disc controller. Every file and level is
+loaded with `*LOAD` through OSCLI. The one piece of filing-system state it
+damages is page &0D, which holds the DFS's NMI routine (on a Master its
+first bytes are `PHA : LDA &FE28`, the 1770 status register) and which
+the game uses as its per-level workspace. So `Coder` saves the page at
+&C400 in private RAM at start-up, and `load_level` (&1483) puts it back
+before every `*LOAD`. Only then is the game's workspace rebuilt from
+`workspace_template`. Between levels the game stays resident: there is no
+reset and no BREAK intercept. Confirmed in beebjit's Master 128 (MOS
+3.20, DFS 2.24): just before level 1's `*LOAD`, page &0D and &C400 are
+identical, and the DFS writes nothing to the game's private-RAM files
+(&C400–&D8FF) while it loads.
+
+**Bearing on a DFS-portable Model B build [inference]:**
+- **What carries over:** the same approach would remove the Model B
+  disc's reset between levels and its dependence on DFS 0.90's memory
+  use. That means keeping the game resident, loading levels through
+  OSCLI, and putting the filing system's pages back before each load.
+- **What makes it harder:** on a Model B the filing system's workspace
+  includes &0E00–&10FF, where the game has code, not just page &0D. A
+  port would need somewhere to keep both while a level loads.
+
+### It runs with the Master's private RAM paged in, and never pages it
+
+Four files load into HAZEL (&C500–&D8FF), and page &0D is saved at
+&C400. The game reads and calls these addresses directly without writing
+ACCCON, which no file touches. It relies on MOS 3.20 starting `*RUN`
+programs with ACCCON bit 3 set: in beebjit ACCCON is &18 at `*DUNJUNZ`'s
+entry, at `Coder`'s &0740, and inside the music's event handler
+**[confirmed]**. On a Master configured or emulated otherwise, the game's
+row-offset reads would hit the MOS ROM at &C675, and its calls into
+&C500–&D8FF would run ROM code.
+
+### A failed level checksum executes BRK on a Master
+
+The checksum routine, shared with the Model B disc, still calls &D9CD,
+the MOS 1.20 reset entry, on a mismatch. With private RAM paged in, &D9CD
+on a Master is HAZEL, which holds zeros in beebjit. So a tampered or
+mis-checksummed level hits `BRK` there instead of resetting **[confirmed
+that &D9CD holds 0; the outcome is an inference]**. The Master side's
+table has the correct &4D for level 5, so the shipped levels pass.
+
+### The Master version adds music, and changes keys and text
+
+- **Music:** in-game music plays from an interval-timer event. Its
+  player and tune occupy `Code2`.
+- **Keys:** the Magic-User plays on the numeric keypad, and the Barbarian
+  and Fighter have new keys.
+- **Text:** text is printed in the MOS font, because the WRCHV handler
+  now jumps straight to MOS 3.20's OSWRCH.
+- **Timing:** the game-over wait is 5 s.
+- **Level screen:** the "LEVEL n" screen is dropped.
+
+All **[confirmed]**; see the analysis document for the details.
+
+The Model B side's lost ten-thousands digit does not arise here: the game
+is resident, and every routine uses the cassette's tables at &06F8
+(`hero_score_ten_thousands`) **[confirmed]**.
 
 ## Game (all releases)
 

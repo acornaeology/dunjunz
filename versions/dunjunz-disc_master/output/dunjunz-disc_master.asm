@@ -3070,6 +3070,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ;     A: corrupted
 ;     X: 0
 ;     Y: 0
+; On this side start_music overwrites the first three bytes with JMP &D800, so from the first level on every sprite is plotted by the identical copy in Code3, plot_sprite_hazel. The menu, before start_music first runs, uses this one.
 ; &0900 referenced 21 times by &042e, &043d, &0f79, &1daa, &1e20, &1e7d, &40ca, &7276, &7286, &72cf, &72df, &72ef, &72ff, &7613, &7838, &7842, &78aa, &78c4, &78de, &78f8, &c726
 .plot_sprite
 ; &0901 referenced 1 time by &c72b
@@ -8689,6 +8690,7 @@ data_c839 = channel_3_sound+4
 ;     A: corrupted
 ;     X: 0
 ;     Y: 0
+; Code3's copy of plot_sprite, reached by the JMP &D800 that start_music writes at &0900. It differs from the original only in its JSR to screen_address_hazel.
 .plot_sprite_hazel
     ldx sprite_number                   ; X = sprite number
     lda sprite_addr_lo,x                ; Point sprite_data_ptr at the sprite's data...

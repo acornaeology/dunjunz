@@ -8511,6 +8511,9 @@
           "data_0901"
         ]
       },
+      "comments_before_label": [
+        "On this side start_music overwrites the first three bytes with JMP &D800, so from the first level on every sprite is plotted by the identical copy in Code3, plot_sprite_hazel. The menu, before start_music first runs, uses this one."
+      ],
       "comment_inline": "X = sprite number",
       "xref_summaries": [
         "&0900 referenced 21 times by &042e, &043d, &0f79, &1daa, &1e20, &1e7d, &20ca[1], &7276, &7286, &72cf, &72df, &72ef, &72ff, &7613, &7838, &7842, &78aa, &78c4, &78de, &78f8, &c726",
@@ -96784,6 +96787,9 @@
       "image": 7,
       "labels": [
         "plot_sprite_hazel"
+      ],
+      "comments_before_label": [
+        "Code3's copy of plot_sprite, reached by the JMP &D800 that start_music writes at &0900. It differs from the original only in its JSR to screen_address_hazel."
       ],
       "comment_inline": "X = sprite number",
       "type": "code",

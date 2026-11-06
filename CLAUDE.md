@@ -11,13 +11,18 @@ Follow the `disassembly-skills:6502-disassembly` skill's method.
 
 ## Source artefacts and history
 
-Three versions live under `versions/` (see `versions/README.md`):
+Four versions live under `versions/` (see `versions/README.md`):
 
-- `dunjunz-disc/`: the reference version, the official 1987 flippy disc.
+- `dunjunz-disc/`: the reference version, the official 1987 flippy disc's
+  Model B side.
   It holds HFE flux captures of both sides, the SSDs and track reports
   derived from them (`tools/read_disc_image.py`), and the NVG archive's
   `Dunjunz.zip`, whose files are identical. `binary/` holds `Dun1` and
   `Coder` exported from the Model B side's SSD.
+- `dunjunz-disc_master/`: the same disc's Master 128 side, the official
+  Master conversion (`docs/analysis/the-master-128-version.md`). `binary/`
+  holds its eleven machine-code files, exported from the Master side's
+  HFE in `dunjunz-disc/`.
 - `dunjunz-tape_crack_ole/`: Ole's crack of the 1986 cassette. No image of
   the original cassette has been found; it would go in `dunjunz-tape/`.
 - `dunjunz-swram_hack/`: the unofficial sideways RAM hack, built from the
@@ -47,10 +52,16 @@ on the official release.
 | `Dunjun1`/`Dunjun2` | SWR | — | &0D00/&4000 | Beebug ROMFS images holding `LEVEL1`–`LEVEL25` |
 | `DUNJUNZ`, `DUNK` | &1900, &2500 | — | — | tokenised BASIC (instructions/intro; SWR and game loader) |
 | `PIC`, `Dunjun3` | &3000, &3280 | — | — | MODE 2 pictures (intro face; loading screen) |
+| `Dunjunz` (Master) | &2649 | &2649 | &0913 | `*DUNJUNZ`: loads the HAZEL files, title stars, runs `CODER2`/`CODER` |
+| `Coder2` (Master) | &2000 | &2000 | &0026 | `*L. Code`, BYTEV = &C500, `*CODER` |
+| `Coder` (Master) | &0400 | &0740 | &03FF | game &0400–&07FE; loader at &0740 saves page &0D at &C400, loads `Dunj2`–`Dunj5`, enters &0E00 |
+| `Dunj3`/`Dunj4`/`Dunj5`/`Dunj2` (Master) | &08C0/&0E00/&2000/&6E80 | same | &43F/&1200/&1000/&1180 | the resident game |
+| `Code`/`Table`/`Code2`/`Code3` (Master) | &C500/&C5A0/&C700/&D800 | same | &6C/&158/&105A/&FF | HAZEL: joystick handler; level 25, game over, row offsets, pause; music; plotter copy |
 
-- CPU: 6502 (NMOS), BBC Model B. The disc's Master 128 side (not yet
-  disassembled) is a separate conversion; the hack's loader refuses to run
-  on a Master.
+- CPU: 6502 (NMOS), BBC Model B. The disc's Master 128 side runs on the
+  65C12 but uses no 65C12-only instruction, so it is disassembled as 6502
+  too; it relies on MOS 3.20 leaving HAZEL paged in (ACCCON &18). The
+  hack's loader refuses to run on a Master.
 - Game screen: &3000–&6E7F (6845 programmed by the game; 21 rows on the
   menu, 25 rows in play).
 - Levels: the disc loads `LevelN` through DFS (`Coder`, at each level);
@@ -69,6 +80,12 @@ on the official release.
   SPACE through the BASIC, stops at the game entry, and writes memory
   snapshots and frame captures. The variant must be passed alongside the
   preset or the server refuses to start.
+
+- `uv run python tools/master_probe.py BEEBJIT_FILEPATH ADDR [DUMP ...]
+  [--then 'cmds']` runs the Master side in beebjit (beebium has no Master
+  yet, rob-smallshire/beebium#189) and reports registers, ACCCON and
+  memory at a breakpoint. Its docstring says how to build beebjit outside
+  its checkout.
 
 ## Conventions
 
@@ -122,3 +139,24 @@ feature or defect met along the way, and note the workaround here.
   &7F read ID returns no IDs.
 - `Beebium.launch` needs `variant=` repeated alongside `preset=`
   (rob-smallshire/beebium#269).
+- On the Master side, `*DUNJUNZ` and `Coder2` run where `Dunj5` later
+  loads. An annotation with no move at a run address a move also covers
+  goes into the move (acornaeology/dasmos#57), and an identity move is
+  refused, so all three are stored at spare addresses (&3649, &3000,
+  &4000) and moved; the Master driver's `placements` sends &2000-&2FFF to
+  the `dunj5` move, and `Dunj5` needs an explicit entry at &2000 because
+  `Dunj4`'s code falls through into it.
+- dasmos traces a jump's target even from bytes declared as data
+  (acornaeology/dasmos#58). The Master driver hooks `leave_title` with a
+  no-return hook and gives `Dunj5` an entry at &202C, so the command
+  strings "L. Code" and "LOAD SCREEN" (which read as JMPs) do not split
+  real code.
+- dasmos's OSBYTE &81 hook takes X >= &80 as a key scan even when Y is a
+  time limit (acornaeology/dasmos#59): `d.expr(0x0EC4, hexlit(0xF4))` in
+  the Master driver; the hook's "Test for f5" inline comment remains.
+- Shared annotations meet the Master side's differing code through
+  `Annotator(skip=...)` (ignore calls at addresses where the code
+  differs), `default_group=` (memory-map groups for labels outside plain
+  images), and the Master driver's `Shifted` proxy, which re-applies the
+  shared annotations to routines that sit at other addresses (and to
+  `Code3`, the plotter copy, with a `_hazel` suffix).

@@ -731,6 +731,13 @@ master.byte(0x07F8, 7, cols=7)
 # ---------------------------------------------------------------------------
 # Changes inside the game.
 
+master.block(0x0900, "On this side start_music overwrites the first three bytes "
+                     "with JMP &D800, so from the first level on every sprite is "
+                     "plotted by the identical copy in Code3, plot_sprite_hazel. "
+                     "The menu, before start_music first runs, uses this one.")
+master.block(0xD800, "Code3's copy of plot_sprite, reached by the JMP &D800 that "
+                     "start_music writes at &0900. It differs from the original "
+                     "only in its JSR to screen_address_hazel.")
 master.c(0x096E, "High byte of row x 640, from Table's copy of the MOS 1.20 "
                  "table in private RAM...")
 master.c(0x0976, "Low byte of row x 640")

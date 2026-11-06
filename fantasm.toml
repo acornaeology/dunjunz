@@ -88,7 +88,7 @@ verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", outpu
 # the two loaders, all in one listing.
 
 [[targets]]
-id = "disc_master"
+id = "disc_master-dunjunz"
 binary = "versions/dunjunz-disc_master/binary/Dunjunz"
 driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master.py"
 asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master.asm"
@@ -120,7 +120,7 @@ json = "versions/dunjunz-disc_master/output/dunjunz-disc_master.json"
 verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunj3" }
 
 [[targets]]
-id = "disc_master-dunj4"
+id = "disc_master"
 binary = "versions/dunjunz-disc_master/binary/Dunj4"
 driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master.py"
 asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master.asm"

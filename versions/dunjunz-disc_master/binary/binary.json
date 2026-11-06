@@ -1,0 +1,27 @@
+{
+    "title": "Dunjunz, official flippy disc (Bug-Byte, 1987), Master 128 side",
+    "size": 4608,
+    "load_address": "0x0E00",
+    "exec_address": "0x0E00",
+    "dfs_attributes": "09",
+    "md5": "d459ae57c817e980d19ef458b1bf4b1b",
+    "sha256": "eea3437a16b47ce67a0827624bcfd1423e18874c71bb44dac2381a5cfcc12fda",
+    "notes": "The eleven machine-code files of the Master 128 side, exported with oaknut from the Master side's HFE flux capture of the 1987 flippy disc (the beeb_hfe archive's Bug Byte, Dunjunz, variant 1, passed to the project by the stardot user Pernod); they are byte-identical to the NVG archive's Dunjunz.zip, directory 2. Dunj4 (&0E00-&1FFF, the figures above, entered at &0E00 to start a game) is one of five files that make up the resident game with Coder (&0400-&07FE, exec &0740), Dunj3 (&08C0), Dunj5 (&2000) and Dunj2 (&6E80). Four more load into the Master's private RAM (HAZEL): Code (&C500, the joystick handler), Table (&C5A0, level 25, game over, the screen row offsets and the pause key), Code2 (&C700, the music) and Code3 (&D800, a copy of the sprite plotter). The loaders *DUNJUNZ (Dunjunz, &2649) and Coder2 (&2000) run where Dunj5 later loads, so all three are assembled at spare addresses and moved; the listing saves every file with its DFS load and exec addresses. SHA-256 of each file is in versions/README.md.",
+    "memory_map_groups": {
+        "zero_page": "Zero page",
+        "os_vectors": "OS vectors",
+        "os_workspace": "OS workspace",
+        "mos_internals": "MOS internals",
+        "os_entry_points": "OS entry points",
+        "hardware": "Hardware I/O",
+        "game_state": "Game state",
+        "game_data": "Game data",
+        "screen_workspace": "Screen workspace",
+        "sprites": "Sprites",
+        "sound": "Sound",
+        "text": "Text",
+        "level_file": "Level file (&6B00)",
+        "loader": "*DUNJUNZ and Coder2",
+        "leftovers": "Leftovers from development"
+    }
+}
