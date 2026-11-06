@@ -22,6 +22,7 @@
         "text": "Text",
         "level_file": "Level file (&6B00)",
         "loader": "*DUNJUNZ and Coder2",
-        "leftovers": "Leftovers from development"
+        "leftovers": "Leftovers from development",
+        "private_ram": "Private RAM (HAZEL)"
     }
 }

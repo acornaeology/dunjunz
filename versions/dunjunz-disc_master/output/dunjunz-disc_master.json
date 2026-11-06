@@ -310,22 +310,6 @@
       }
     },
     {
-      "addr": 2407,
-      "name": "screen_address",
-      "title": "Calculate a screen address",
-      "description": "Set screen_ptr to the screen address of byte column plot_x on pixel row plot_y: &3000 + 640 x (plot_y DIV 8) + (plot_y MOD 8) + 8 x plot_x. The multiplication by 640 is done with a table inside MOS 1.20 (mos_row_offsets), so this only works with that MOS.",
-      "on_entry": {
-        "plot_x": "screen byte column (0-79)",
-        "plot_y": "pixel row"
-      },
-      "on_exit": {
-        "screen_ptr": "screen address",
-        "A": "corrupted",
-        "Y": "corrupted",
-        "X": "preserved"
-      }
-    },
-    {
       "addr": 1024,
       "name": "add_thousand_points",
       "title": "Add 1000 to a hero's score",
@@ -1024,22 +1008,6 @@
       }
     },
     {
-      "addr": 55399,
-      "name": "screen_address_hazel",
-      "title": "Calculate a screen address",
-      "description": "Set screen_ptr to the screen address of byte column plot_x on pixel row plot_y: &3000 + 640 x (plot_y DIV 8) + (plot_y MOD 8) + 8 x plot_x. The multiplication by 640 is done with a table inside MOS 1.20 (mos_row_offsets), so this only works with that MOS.",
-      "on_entry": {
-        "plot_x": "screen byte column (0-79)",
-        "plot_y": "pixel row"
-      },
-      "on_exit": {
-        "screen_ptr": "screen address",
-        "A": "corrupted",
-        "Y": "corrupted",
-        "X": "preserved"
-      }
-    },
-    {
       "addr": 5444,
       "name": "draw_view_frames",
       "title": "Draw the frames round the four views",
@@ -1060,6 +1028,38 @@
       "name": "set_bell",
       "title": "Set the bell sound",
       "description": "OSBYTEs &D3-&D6: the BEL character's sound on channel &13, envelope 0 (fixed amplitude), pitch &64, duration 1. The cassette game's start-up sets the same sound on channel &11."
+    },
+    {
+      "addr": 2407,
+      "name": "screen_address",
+      "title": "Calculate a screen address",
+      "description": "Set screen_ptr to the screen address of byte column plot_x on pixel row plot_y: &3000 + 640 x (plot_y DIV 8) + (plot_y MOD 8) + 8 x plot_x. The multiplication by 640 uses row_offsets in Table, this side's copy of the MOS 1.20 table, in private RAM.",
+      "on_entry": {
+        "plot_x": "screen byte column (0-79)",
+        "plot_y": "pixel row"
+      },
+      "on_exit": {
+        "screen_ptr": "screen address",
+        "A": "corrupted",
+        "Y": "corrupted",
+        "X": "preserved"
+      }
+    },
+    {
+      "addr": 55399,
+      "name": "screen_address_hazel",
+      "title": "Calculate a screen address",
+      "description": "Set screen_ptr to the screen address of byte column plot_x on pixel row plot_y: &3000 + 640 x (plot_y DIV 8) + (plot_y MOD 8) + 8 x plot_x. The multiplication by 640 uses row_offsets in Table, this side's copy of the MOS 1.20 table, in private RAM.",
+      "on_entry": {
+        "plot_x": "screen byte column (0-79)",
+        "plot_y": "pixel row"
+      },
+      "on_exit": {
+        "screen_ptr": "screen address",
+        "A": "corrupted",
+        "Y": "corrupted",
+        "X": "preserved"
+      }
     },
     {
       "addr": 5120,
@@ -1294,7 +1294,6 @@
   ],
   "external_labels": {
     "tune_ptr": 0,
-    "data_0001": 1,
     "plot_x": 112,
     "plot_y": 113,
     "sprite_width": 114,
@@ -1350,14 +1349,11 @@
     "ind2v": 562,
     "ind3v": 564,
     "os_vsync_counter": 576,
-    "data_0287": 647,
-    "data_0288": 648,
-    "data_0289": 649,
-    "data_08b0": 2224,
-    "data_08b4": 2228,
-    "data_08bc": 2236,
-    "data_08bd": 2237,
-    "data_08be": 2238,
+    "os_break_intercept": 647,
+    "modelb_hero_score_ten_thousands": 2224,
+    "modelb_hero_absent": 2228,
+    "modelb_levels_started": 2236,
+    "modelb_level_digits": 2237,
     "scratch": 3328,
     "scratch2": 3329,
     "cell_x": 3330,
@@ -1521,11 +1517,8 @@
     "level_walls": 27616,
     "level_object_free_map": 27824,
     "level_wall_sprite": 28032,
-    "mos_row_offsets": 50037,
-    "mos_row_offsets_lo": 50038,
-    "data_c400": 50176,
-    "data_d9cd": 55757,
-    "mos_oswrch_default": 57508,
+    "saved_page_0d": 50176,
+    "mos120_reset_entry": 55757,
     "mos320_oswrch_default": 59426,
     "mos320_osbyte_default": 61105,
     "scsi_data": 64576,
@@ -1625,7 +1618,6 @@
     {
       "addr": 0,
       "name": "tune_ptr",
-      "length": 2,
       "group": "zero_page",
       "description": "The music's place in the tune: the current three-byte step."
     },
@@ -1870,6 +1862,45 @@
         "w"
       ],
       "description": "MOS 1.20 counter decremented on every vertical sync interrupt. The game sets it and waits for it to run out to pace itself."
+    },
+    {
+      "addr": 647,
+      "name": "os_break_intercept",
+      "group": "os_workspace",
+      "access": [
+        "w"
+      ],
+      "description": "MOS BREAK intercept: a JMP here is called during a reset. *DUNJUNZ sets its address but leaves it disabled."
+    },
+    {
+      "addr": 2224,
+      "name": "modelb_hero_score_ten_thousands",
+      "group": "loader",
+      "access": [
+        "b"
+      ],
+      "description": "Where *DUNJUNZ sets up the Model B side's per-hero ten-thousands digits, as the Model B loader does; this side's game does not read it."
+    },
+    {
+      "addr": 2228,
+      "name": "modelb_hero_absent",
+      "group": "loader",
+      "access": [
+        "b"
+      ],
+      "description": "Where *DUNJUNZ sets up the Model B side's per-hero absent flags, as the Model B loader does; this side's game does not read it."
+    },
+    {
+      "addr": 2236,
+      "name": "modelb_levels_started",
+      "group": "loader",
+      "description": "Where *DUNJUNZ sets up the Model B side's count of levels started, as the Model B loader does; this side's game does not read it."
+    },
+    {
+      "addr": 2237,
+      "name": "modelb_level_digits",
+      "group": "loader",
+      "description": "Where *DUNJUNZ sets up the Model B side's ASCII level digits, as the Model B loader does; this side's game does not read it."
     },
     {
       "addr": 3328,
@@ -2794,25 +2825,20 @@
       "description": "Level file: The level's wall block, copied to wall_sprite."
     },
     {
-      "addr": 50037,
-      "name": "mos_row_offsets",
-      "group": "mos_internals",
+      "addr": 50176,
+      "name": "saved_page_0d",
+      "length": 256,
+      "group": "private_ram",
       "access": [
-        "r"
+        "b"
       ],
-      "description": "MOS 1.20 table of screen row offsets for 640-byte rows (row x 640, high byte then low byte, one pair per character row). Read directly by screen_address; it is not part of any documented interface."
+      "description": "The MOS's page &0D (the filing system's NMI code and workspace), saved here by Coder and copied back by load_level before each level is loaded."
     },
     {
-      "addr": 50038,
-      "name": "mos_row_offsets_lo",
+      "addr": 55757,
+      "name": "mos120_reset_entry",
       "group": "mos_internals",
-      "description": "Low bytes of mos_row_offsets."
-    },
-    {
-      "addr": 57508,
-      "name": "mos_oswrch_default",
-      "group": "mos_internals",
-      "description": "MOS 1.20 default OSWRCH routine, WRCHV's initial value. The WRCHV handler jumps here directly instead of through the saved vector."
+      "description": "The MOS 1.20 reset entry, which decrypt_level calls on a failed checksum. On a Master, with private RAM paged in, it is HAZEL."
     },
     {
       "addr": 59426,
@@ -3016,6 +3042,88 @@
       ],
       "named_slots": false,
       "description": "Operand of the JSR at reset_call, set from the RESET vector."
+    },
+    {
+      "anchor": 647,
+      "name": "os_break_intercept",
+      "window": [
+        0,
+        2
+      ],
+      "named_slots": false,
+      "group": "os_workspace",
+      "description": "MOS BREAK intercept: a JMP here is called during a reset. *DUNJUNZ sets its address but leaves it disabled."
+    },
+    {
+      "anchor": 2237,
+      "name": "modelb_level_digits",
+      "window": [
+        0,
+        1
+      ],
+      "named_slots": false,
+      "group": "loader",
+      "description": "Where *DUNJUNZ sets up the Model B side's ASCII level digits, as the Model B loader does; this side's game does not read it."
+    },
+    {
+      "anchor": 5381,
+      "name": "level_command_digits",
+      "window": [
+        0,
+        1
+      ],
+      "named_slots": false
+    },
+    {
+      "anchor": 0,
+      "name": "tune_ptr",
+      "window": [
+        0,
+        1
+      ],
+      "named_slots": false,
+      "group": "zero_page",
+      "description": "The music's place in the tune: the current three-byte step."
+    },
+    {
+      "anchor": 51229,
+      "name": "channel_1_sound",
+      "window": [
+        0,
+        7
+      ],
+      "named_slots": false,
+      "description": "OSWORD 7 block: SOUND &11, -9 (envelope 9), pitch, 1: the rhythm."
+    },
+    {
+      "anchor": 51237,
+      "name": "noise_sound",
+      "window": [
+        0,
+        7
+      ],
+      "named_slots": false,
+      "description": "OSWORD 7 block: SOUND &10, envelope 7, 3, 3: noise with the rhythm."
+    },
+    {
+      "anchor": 51245,
+      "name": "channel_2_sound",
+      "window": [
+        0,
+        7
+      ],
+      "named_slots": false,
+      "description": "OSWORD 7 block: SOUND &12, envelope 8, pitch, 10."
+    },
+    {
+      "anchor": 51253,
+      "name": "channel_3_sound",
+      "window": [
+        0,
+        7
+      ],
+      "named_slots": false,
+      "description": "OSWORD 7 block: SOUND &13, envelope (set per section), pitch, 8."
     }
   ],
   "items": [
@@ -3943,9 +4051,9 @@
       "comment_inline": "No match: call &D9CD, the MOS 1.20 reset entry; on a Master it is private RAM that no file of this side fills",
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "data_d9cd",
+      "operand": "mos120_reset_entry",
       "target": 55757,
-      "target_label": "data_d9cd"
+      "target_label": "mos120_reset_entry"
     },
     {
       "addr": 1156,
@@ -7481,9 +7589,9 @@
       "comment_inline": "...to &C400 in private RAM",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_c400,x",
+      "operand": "saved_page_0d,x",
       "target": 50176,
-      "target_label": "data_c400"
+      "target_label": "saved_page_0d"
     },
     {
       "addr": 1867,
@@ -8506,11 +8614,6 @@
       "labels": [
         "plot_sprite"
       ],
-      "sub_labels": {
-        "2305": [
-          "data_0901"
-        ]
-      },
       "comments_before_label": [
         "On this side start_music overwrites the first three bytes with JMP &D800, so from the first level on every sprite is plotted by the identical copy in Code3, plot_sprite_hazel. The menu, before start_music first runs, uses this one."
       ],
@@ -8621,9 +8724,6 @@
         26
       ],
       "image": 1,
-      "labels": [
-        "code_0902"
-      ],
       "comment_inline": "Point sprite_data_ptr at the sprite's data...",
       "xref_summaries": [
         "&0902 referenced 1 time by &c730"
@@ -20252,9 +20352,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0001",
-      "target": 1,
-      "target_label": "data_0001"
+      "operand": "tune_ptr + 1",
+      "target": 1
     },
     {
       "addr": 5144,
@@ -20736,9 +20835,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0001",
-      "target": 1,
-      "target_label": "data_0001"
+      "operand": "tune_ptr + 1",
+      "target": 1
     },
     {
       "addr": 5230,
@@ -20935,9 +21033,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_c400,x",
+      "operand": "saved_page_0d,x",
       "target": 50176,
-      "target_label": "data_c400"
+      "target_label": "saved_page_0d"
     },
     {
       "addr": 5256,
@@ -21042,9 +21140,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_1506",
-      "target": 5382,
-      "target_label": "data_1506"
+      "operand": "level_command_digits + 1",
+      "target": 5382
     },
     {
       "addr": 5274,
@@ -21288,9 +21385,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_1506",
-      "target": 5382,
-      "target_label": "data_1506"
+      "operand": "level_command_digits + 1",
+      "target": 5382
     },
     {
       "addr": 5311,
@@ -21664,9 +21760,6 @@
       "sub_labels": {
         "5381": [
           "level_command_digits"
-        ],
-        "5382": [
-          "data_1506"
         ]
       },
       "xref_summaries": [
@@ -34848,9 +34941,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_08bc",
+      "operand": "modelb_levels_started",
       "target": 2236,
-      "target_label": "data_08bc"
+      "target_label": "modelb_levels_started"
     },
     {
       "addr": 10005,
@@ -34879,9 +34972,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_08bd",
+      "operand": "modelb_level_digits",
       "target": 2237,
-      "target_label": "data_08bd"
+      "target_label": "modelb_level_digits"
     },
     {
       "addr": 10010,
@@ -34910,9 +35003,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_08be",
-      "target": 2238,
-      "target_label": "data_08be"
+      "operand": "modelb_level_digits + 1",
+      "target": 2238
     },
     {
       "addr": 10015,
@@ -34969,9 +35061,9 @@
       "comment_inline": "...at &08B0...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_08b0,x",
+      "operand": "modelb_hero_score_ten_thousands,x",
       "target": 2224,
-      "target_label": "data_08b0"
+      "target_label": "modelb_hero_score_ten_thousands"
     },
     {
       "addr": 10022,
@@ -35000,9 +35092,9 @@
       "comment_inline": "...at &08B4 (the Model B release's menu tables)",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_08b4,x",
+      "operand": "modelb_hero_absent,x",
       "target": 2228,
-      "target_label": "data_08b4"
+      "target_label": "modelb_hero_absent"
     },
     {
       "addr": 10027,
@@ -35060,9 +35152,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0288",
-      "target": 648,
-      "target_label": "data_0288"
+      "operand": "os_break_intercept + 1",
+      "target": 648
     },
     {
       "addr": 10035,
@@ -35091,9 +35182,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0289",
-      "target": 649,
-      "target_label": "data_0289"
+      "operand": "os_break_intercept + 2",
+      "target": 649
     },
     {
       "addr": 10040,
@@ -35122,9 +35212,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0287",
+      "operand": "os_break_intercept",
       "target": 647,
-      "target_label": "data_0287"
+      "target_label": "os_break_intercept"
     },
     {
       "addr": 10045,
@@ -35711,9 +35801,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0287",
+      "operand": "os_break_intercept",
       "target": 647,
-      "target_label": "data_0287"
+      "target_label": "os_break_intercept"
     },
     {
       "addr": 10129,
@@ -86922,9 +87012,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0901",
-      "target": 2305,
-      "target_label": "data_0901"
+      "operand": "plot_sprite + 1",
+      "target": 2305
     },
     {
       "addr": 50990,
@@ -86949,9 +87038,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "code_0902",
-      "target": 2306,
-      "target_label": "code_0902"
+      "operand": "plot_sprite + 2",
+      "target": 2306
     },
     {
       "addr": 50995,
@@ -87001,9 +87089,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0001",
-      "target": 1,
-      "target_label": "data_0001"
+      "operand": "tune_ptr + 1",
+      "target": 1
     },
     {
       "addr": 51003,
@@ -87661,9 +87748,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_c831",
-      "target": 51249,
-      "target_label": "data_c831"
+      "operand": "channel_2_sound + 4",
+      "target": 51249
     },
     {
       "addr": 51082,
@@ -87803,9 +87889,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_c839",
-      "target": 51257,
-      "target_label": "data_c839"
+      "operand": "channel_3_sound + 4",
+      "target": 51257
     },
     {
       "addr": 51100,
@@ -87954,9 +88039,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_0001",
-      "target": 1,
-      "target_label": "data_0001"
+      "operand": "tune_ptr + 1",
+      "target": 1
     },
     {
       "addr": 51118,
@@ -87980,9 +88064,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0001",
-      "target": 1,
-      "target_label": "data_0001"
+      "operand": "tune_ptr + 1",
+      "target": 1
     },
     {
       "addr": 51122,
@@ -88161,9 +88244,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_c821",
-      "target": 51233,
-      "target_label": "data_c821"
+      "operand": "channel_1_sound + 4",
+      "target": 51233
     },
     {
       "addr": 51150,
@@ -88521,9 +88603,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_c837",
-      "target": 51255,
-      "target_label": "data_c837"
+      "operand": "channel_3_sound + 2",
+      "target": 51255
     },
     {
       "addr": 51191,
@@ -88711,9 +88792,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0001",
-      "target": 1,
-      "target_label": "data_0001"
+      "operand": "tune_ptr + 1",
+      "target": 1
     },
     {
       "addr": 51222,
@@ -88772,11 +88852,6 @@
       "labels": [
         "channel_1_sound"
       ],
-      "sub_labels": {
-        "51233": [
-          "data_c821"
-        ]
-      },
       "xref_summaries": [
         "&c821 referenced 1 time by &c7cb"
       ],
@@ -88836,11 +88911,6 @@
       "labels": [
         "channel_2_sound"
       ],
-      "sub_labels": {
-        "51249": [
-          "data_c831"
-        ]
-      },
       "xref_summaries": [
         "&c831 referenced 1 time by &c787"
       ],
@@ -88872,14 +88942,6 @@
       "labels": [
         "channel_3_sound"
       ],
-      "sub_labels": {
-        "51255": [
-          "data_c837"
-        ],
-        "51257": [
-          "data_c839"
-        ]
-      },
       "xref_summaries": [
         "&c837 referenced 1 time by &c7f4",
         "&c839 referenced 1 time by &c799"

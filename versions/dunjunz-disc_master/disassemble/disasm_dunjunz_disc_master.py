@@ -90,6 +90,7 @@ d.use_environment("acorn_master_hardware")
 DIFFERENT_RANGES = [
     (0x0481, 0x0484),  # the failed-checksum call: not a reset on a Master
     (0x0700, 0x0800),  # Coder's leftovers and the loader at &0740
+    (0x0967, 0x0968),  # screen_address: its banner names the MOS 1.20 table
     (0x096E, 0x0970),  # row offsets read from Table, not the MOS
     (0x0976, 0x0978),
     (0x0E86, 0x0E8B),  # game over: stop the music
@@ -98,6 +99,9 @@ DIFFERENT_RANGES = [
     (0x1ED7, 0x1EF7),  # the pause key, moved to Table
     (0x6F45, 0x6F4A),  # the bell, removed
     (0x7F8F, 0x7F92),  # WRCHV handler: straight to the MOS
+    (0xC375, 0xC377),  # MOS 1.20 addresses this side does not use
+    (0xD9CD, 0xD9CE),
+    (0xE0A4, 0xE0A5),
 ]
 
 
@@ -629,7 +633,8 @@ apply_shifted(0x1510, 0x1583, 0x1571)                  # unpack_level
 apply_shifted(0x1583, 0x15B1, 0x15E4)                  # reset_monsters
 apply_shifted(0x161A, 0x1639, 0x1619)                  # clear_text_area
 # Code3: the sprite plotter and screen_address, copied into private RAM.
-apply_shifted(0x0900, 0x09A0, 0xD800, suffix="_hazel", exclude={0x096E, 0x0976})
+apply_shifted(0x0900, 0x09A0, 0xD800, suffix="_hazel",
+              exclude={0x0967, 0x096E, 0x0976})
 
 master = Annotator(d, "disc_master", placements, default_group=memory_group)
 
@@ -738,6 +743,17 @@ master.block(0x0900, "On this side start_music overwrites the first three bytes 
 master.block(0xD800, "Code3's copy of plot_sprite, reached by the JMP &D800 that "
                      "start_music writes at &0900. It differs from the original "
                      "only in its JSR to screen_address_hazel.")
+for addr, suffix in [(0x0967, ""), (0xD867, "_hazel")]:
+    master.sub(addr, "screen_address" + suffix, "Calculate a screen address",
+               "Set screen_ptr to the screen address of byte column plot_x on "
+               "pixel row plot_y: &3000 + 640 x (plot_y DIV 8) + (plot_y MOD "
+               "8) + 8 x plot_x. The multiplication by 640 uses row_offsets "
+               "in Table, this side's copy of the MOS 1.20 table, in private "
+               "RAM.",
+               on_entry={"plot_x": "screen byte column (0-79)", "plot_y": "pixel row"},
+               on_exit={"screen_ptr": "screen address", "A": "corrupted",
+                        "Y": "corrupted", "X": "preserved"})
+    master.c(addr, "Character row = plot_y DIV 8...")
 master.c(0x096E, "High byte of row x 640, from Table's copy of the MOS 1.20 "
                  "table in private RAM...")
 master.c(0x0976, "Low byte of row x 640")
@@ -778,6 +794,30 @@ master.banner(0x7F92, "The game-font WRCHV handler, unused",
               "WRCHV's entry at &7F8F jumps straight to the MOS, so none of "
               "this runs and text appears in the MOS font.")
 master.byte(0x7F92, 0x6E, cols=8)
+master.label(0xD9CD, "mos120_reset_entry", group="mos_internals", description=(
+    "The MOS 1.20 reset entry, which decrypt_level calls on a failed "
+    "checksum. On a Master, with private RAM paged in, it is HAZEL."))
+master.region(0x0287, "os_break_intercept", (0, 2), group="os_workspace",
+             access="w", description=(
+                 "MOS BREAK intercept: a JMP here is called during a reset. "
+                 "*DUNJUNZ sets its address but leaves it disabled."))
+for addr, name, text in [
+    (0x08B0, "modelb_hero_score_ten_thousands", "the Model B side's per-hero ten-thousands digits"),
+    (0x08B4, "modelb_hero_absent", "the Model B side's per-hero absent flags"),
+    (0x08BC, "modelb_levels_started", "the Model B side's count of levels started"),
+    (0x08BD, "modelb_level_digits", "the Model B side's ASCII level digits"),
+]:
+    declare = master.region if addr == 0x08BD else master.label
+    window = {"window": (0, 1)} if addr == 0x08BD else {}
+    declare(addr, name, group="loader", **window, description=(
+        f"Where *DUNJUNZ sets up {text}, as the Model B loader does; this "
+        "side's game does not read it."))
+master.label(0xC400, "saved_page_0d", length=256, group="private_ram", description=(
+    "The MOS's page &0D (the filing system's NMI code and workspace), "
+    "saved here by Coder and copied back by load_level before each level "
+    "is loaded."))
+d.expr_label(0x0901, "plot_sprite+1")
+d.expr_label(0x0902, "plot_sprite+2")
 master.label(0xE822, "mos320_oswrch_default", group="mos_internals", description=(
     "MOS 3.20's default OSWRCH routine, WRCHV's initial value."))
 master.label(0xEEB1, "mos320_osbyte_default", group="mos_internals", description=(
@@ -877,7 +917,7 @@ comments(master, [
 master.label(0x14FB, "level_command", description=(
     "\"LOAD LEVELnn 6B00\", with the level's digits written at "
     "level_command+10."))
-master.label(0x1505, "level_command_digits", length=2)
+master.region(0x1505, "level_command_digits", (0, 1))
 master.string(0x14FB, 17)
 master.byte(0x150C)
 master.sub(0x1612, "count_level", "Clear the text area and count the level",
@@ -1068,7 +1108,7 @@ master.label(0xC76B, "music_section", description=(
 master.byte(0xC769)
 master.byte(0xC76A)
 master.byte(0xC76B)
-master.label(0x0000, "tune_ptr", length=2, group="zero_page", description=(
+master.region(0x0000, "tune_ptr", (0, 1), group="zero_page", description=(
     "The music's place in the tune: the current three-byte step."))
 
 master.sub(0xC76C, "music_event", "Event handler: play one step of the music",
@@ -1142,7 +1182,7 @@ for addr, name, text in [
     (0xC82D, "channel_2_sound", "SOUND &12, envelope 8, pitch, 10"),
     (0xC835, "channel_3_sound", "SOUND &13, envelope (set per section), pitch, 8"),
 ]:
-    master.label(addr, name, length=8, description=f"OSWORD 7 block: {text}.")
+    master.region(addr, name, (0, 7), description=f"OSWORD 7 block: {text}.")
     master.byte(addr, 8, cols=8)
 master.label(0xC83D, "section_ptrs_lo", length=25, description=(
     "Low bytes of the tune's sections, 0-24."))
