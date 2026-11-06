@@ -12,7 +12,7 @@ REPO_DIRPATH = Path(__file__).resolve().parent.parent
 JSON_FILEPATHS = {
     "swr": "versions/dunjunz-swram_hack/output/dunjunz-swram_hack.json",
     "tape": "versions/dunjunz-tape_crack_ole/output/dunjunz-tape_crack_ole.json",
-    "disc": "versions/dunjunz-disc_nvg/output/dunjunz-disc_nvg.json",
+    "disc": "versions/dunjunz-disc/output/dunjunz-disc.json",
 }
 
 

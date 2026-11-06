@@ -40,7 +40,7 @@ def tape_image() -> dict[int, int]:
 
 
 def disc_image(joystick: bool = False) -> dict[int, int]:
-    dun1 = _read("dunjunz-disc_nvg", "Dun1")
+    dun1 = _read("dunjunz-disc", "Dun1")
 
     def at(addr):
         return dun1[addr - 0x2000]

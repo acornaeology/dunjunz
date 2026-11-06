@@ -68,17 +68,17 @@ verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", outpu
 # level) and Coder (its per-level loader, also stored inside Dun1).
 
 [[targets]]
-id = "disc_nvg"
-binary = "versions/dunjunz-disc_nvg/binary/Dun1"
-driver = "versions/dunjunz-disc_nvg/disassemble/disasm_dunjunz_disc_nvg.py"
-asm = "versions/dunjunz-disc_nvg/output/dunjunz-disc_nvg.asm"
-json = "versions/dunjunz-disc_nvg/output/dunjunz-disc_nvg.json"
+id = "disc"
+binary = "versions/dunjunz-disc/binary/Dun1"
+driver = "versions/dunjunz-disc/disassemble/disasm_dunjunz_disc.py"
+asm = "versions/dunjunz-disc/output/dunjunz-disc.asm"
+json = "versions/dunjunz-disc/output/dunjunz-disc.json"
 verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dun1" }
 
 [[targets]]
 id = "disc-coder"
-binary = "versions/dunjunz-disc_nvg/binary/Coder"
-driver = "versions/dunjunz-disc_nvg/disassemble/disasm_dunjunz_disc_nvg.py"
-asm = "versions/dunjunz-disc_nvg/output/dunjunz-disc_nvg.asm"
-json = "versions/dunjunz-disc_nvg/output/dunjunz-disc_nvg.json"
+binary = "versions/dunjunz-disc/binary/Coder"
+driver = "versions/dunjunz-disc/disassemble/disasm_dunjunz_disc.py"
+asm = "versions/dunjunz-disc/output/dunjunz-disc.asm"
+json = "versions/dunjunz-disc/output/dunjunz-disc.json"
 verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Coder" }

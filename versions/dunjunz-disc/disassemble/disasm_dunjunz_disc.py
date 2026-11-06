@@ -31,8 +31,8 @@ from dunjunz_common.rendering import MultiFileBeebasmRenderer, SavedFile  # noqa
 BINARY_DIRPATH = VERSION_DIRPATH / "binary"
 OUTPUT_DIRPATH = VERSION_DIRPATH / "output"
 
-asm_filepath = Path(os.environ.get("FANTASM_ASM", OUTPUT_DIRPATH / "dunjunz-disc_nvg.asm"))
-json_filepath = Path(os.environ.get("FANTASM_JSON", OUTPUT_DIRPATH / "dunjunz-disc_nvg.json"))
+asm_filepath = Path(os.environ.get("FANTASM_ASM", OUTPUT_DIRPATH / "dunjunz-disc.asm"))
+json_filepath = Path(os.environ.get("FANTASM_JSON", OUTPUT_DIRPATH / "dunjunz-disc.json"))
 
 SAVED_FILES = [
     SavedFile("Dun1", start=0x2000, end=0x8000, exec_addr=0x2000, load_addr=0x2000),

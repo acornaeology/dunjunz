@@ -3,6 +3,12 @@
 Dunjunz was written by Julian Avis and published by Bug-Byte (cassette
 1986; disc 1987). This document records what the surviving copies are,
 how they relate to one another, and the evidence for each relationship.
+
+The reference copy is the official 1987 flippy disc, from flux captures
+of both its sides (`versions/dunjunz-disc/`). The other copies are
+variations on the game: an archive of the same disc's files, a crack of
+the 1986 cassette, and an unofficial sideways RAM hack built from the
+crack and the disc. No image of the original cassette has been found.
 Statements are tagged by their basis:
 
 - **[confirmed]**: checked against the files or by running them in
@@ -32,12 +38,12 @@ version on one side and the Model B version on the other
 **[reported: billcarr2005, stardot]**. The thread dates it to
 September 1987, from everygamegoing.com **[reported]**.
 
-Two copies have been examined. `Dunjunz.zip` from the NVG archive
-(`versions/dunjunz-disc_nvg/`) holds the files of the two sides as
-directories `2/` and `0/` **[confirmed]**. The flux captures in
-`versions/dunjunz-disc/` hold the same files as whole discs (see
-[The HFE captures](#the-hfe-captures) below). The contents of the two
-sides are:
+The disassembly's copy of this release is a pair of flux captures, one
+per side, in `versions/dunjunz-disc/` (see
+[The HFE captures](#the-hfe-captures) below). The same directory keeps
+`Dunjunz.zip` from the NVG archive, which holds the files of the two
+sides as directories `2/` and `0/`; they are byte-identical to the
+captures' **[confirmed]**. The contents of the two sides are:
 
 - **Side 2, the boot side, is the Master version.** Its `!BOOT` chains
   `BOOT`, whose first line reads "(c) Bug Byte 1987. Mastered by S
@@ -96,12 +102,19 @@ What they show **[confirmed]**:
 - **Slack.** 26 files on the Model B side have non-zero bytes after their
   end, in their last sector.
 
-Whether the captured disc is a Bug-Byte original is **[inference]**. A
-file-by-file copy would carry neither the draft `BOOT` nor the Model B
-side's catalogue, so the captures are at least a sector-level copy of the
-disc the Master side was written on. A commercial duplicate made from that
-master disc would look the same. So would a sector copy of one made later.
-Whatever this disc is, the NVG archive's files match it exactly.
+The captures are treated here as the official release. That they are of
+a Bug-Byte disc, rather than a later sector copy of one, is
+**[inference]**. A file-by-file copy would carry neither the draft `BOOT`
+nor the Model B side's catalogue, so the captures are at least a
+sector-level copy of the disc the Master side was written on.
+
+### The NVG archive copy
+
+`Dunjunz.zip` from the NVG archive (dated 31 July 1996 inside the
+archive) is the files of this disc and nothing else. Its `2/` holds the
+Master side's 19 files and its `0/` the Model B side's 31, all
+byte-identical to the captures', with the same load and exec addresses
+**[confirmed]**.
 
 ### DFS compatibility
 
@@ -112,7 +125,9 @@ stardot]**. The game overwrites &0D00–&10FF, the DFS's NMI and workspace
 area, so later levels cannot be loaded through DFS
 **[reported: duikkie, stardot]**.
 
-## Ole's crack of the cassette
+## Variations
+
+### Ole's crack of the cassette
 
 `Dunjunz-tape.zip` from the NVG archive (`versions/dunjunz-tape_crack_ole/`) is
 not the original cassette. It is a crack **[confirmed]**:
@@ -129,8 +144,9 @@ not the original cassette. It is a crack **[confirmed]**:
   &3280) and `DUNJ3` (code at &6E80), and runs `DUNJ4`.
 - `DUNJ4` (load &2400, exec &5000) holds the game's &0400–&2FFF image
   stored &2000 above where it runs **[confirmed by comparison with the
-  hack's files]**. The code at &5000 presumably moves it into place; it
-  has not yet been examined.
+  hack's files]**. Its start-up code at &5000 selects `*TAPE`, copies
+  the cheat's start level into the image, and copies the image down to
+  &0400 **[confirmed]**.
 - The levels `L1`–`L25` (&2B0 bytes each, load &6B00) are stored
   decrypted. They are the same levels as the disc release's, whose files
   are encrypted (each byte XORed with the low byte of its address)
@@ -145,7 +161,7 @@ duikkie reports that the tape version works reliably where the disc
 versions do not, because it "uses &A00 rather than &D00"
 **[reported, stardot]**.
 
-## The sideways RAM hack
+### The sideways RAM hack
 
 `Disc060-DunjunzRx2.ssd` (`versions/dunjunz-swram_hack/`), from the BBC
 Micro Games Archive, is an unofficial conversion that keeps all 25 levels
@@ -199,8 +215,8 @@ Cassette (Bug-Byte, 1986) ──cracked──> Ole's crack (NVG Dunjunz-tape.zip
         │                          code, intro, checksum table
         v                                        v
 Flippy disc (Bug-Byte, 1987) ──levels, checksum routine──> Sideways RAM hack
-  (NVG Dunjunz.zip; Master side 2,                           (BBC Micro Games Archive
-   Model B side 0, level editor)                              Disc060-DunjunzRx2.ssd)
+  (HFE captures, both sides;                                 (BBC Micro Games Archive
+   files archived as NVG Dunjunz.zip)                         Disc060-DunjunzRx2.ssd)
 ```
 
 That the crack's code comes from the cassette, and that the 1987 disc's
@@ -211,8 +227,7 @@ images needed to confirm them have not been found.
 
 - An image of the original protected cassette (reportedly
   `Dunjunz_B.uef` on bbcmicro.co.uk).
-- Who made the HFE captures, and from which disc: a shop copy, a
-  Bug-Byte duplicate or the publisher's master. The stardot thread also
+- Who made the HFE captures, and from which disc. The stardot thread also
   mentions STH archive images `Dunjunz-Master-side0_M.ssd` and
   `Dunjunz-Master-side1_B.ssd` **[reported]**, which could be compared
   with them.

@@ -8,13 +8,17 @@ systems becomes possible.
 
 ## Releases
 
-Three surviving releases are disassembled; none is a pristine original.
-See [docs/history-and-provenance.md](docs/history-and-provenance.md).
+The reference version is the official 1987 flippy disc, disassembled
+from flux captures of both its sides. The other two are variations on
+the game: a crack of the 1986 cassette, and an unofficial hack built
+from that crack and the disc. No image of the original cassette has
+turned up yet. See
+[docs/history-and-provenance.md](docs/history-and-provenance.md).
 
 | Directory | Release |
 |---|---|
+| `versions/dunjunz-disc/` | The official 1987 flippy disc, from HFE captures (Model B side disassembled; Master side archived) |
 | `versions/dunjunz-tape_crack_ole/` | Ole's crack of the 1986 cassette |
-| `versions/dunjunz-disc_nvg/` | The 1987 flippy disc (Model B side; Master side archived) |
 | `versions/dunjunz-swram_hack/` | An unofficial sideways RAM hack, with the levels in ROMFS |
 
 The game code is annotated once, in `dunjunz_common/`, keyed by run-time
@@ -40,10 +44,10 @@ Requires [uv](https://docs.astral.sh/uv/) and
 
 ```sh
 uv sync
-uv run fantasm disassemble swram_hack   # sideways RAM hack
+uv run fantasm disassemble disc           # official disc
 uv run fantasm disassemble tape_crack_ole # Ole's crack
-uv run fantasm disassemble disc_nvg     # official disc
-uv run fantasm verify --all             # reassemble and compare every file
+uv run fantasm disassemble swram_hack     # sideways RAM hack
+uv run fantasm verify --all               # reassemble and compare every file
 ```
 
 ## Tools

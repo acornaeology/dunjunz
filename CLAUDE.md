@@ -11,39 +11,51 @@ Follow the `disassembly-skills:6502-disassembly` skill's method.
 
 ## Source artefacts and history
 
-Three releases live under `versions/` (see `versions/README.md`): Ole's
-crack of the cassette, an archive of the 1987 flippy disc, and the
-unofficial sideways RAM hack. None is a pristine original.
-`versions/dunjunz-disc/` adds HFE flux captures of both sides of a flippy
-disc, possibly an original, with SSDs derived from them; their files match
-the NVG archive's exactly. How they
-relate is written up in `docs/history-and-provenance.md`; keep it current
-as evidence accumulates, tagging statements [confirmed], [reported] or
-[inference].
+Three versions live under `versions/` (see `versions/README.md`):
 
-The first version disassembled:
+- `dunjunz-disc/`: the reference version, the official 1987 flippy disc.
+  It holds HFE flux captures of both sides, the SSDs and track reports
+  derived from them (`tools/read_disc_image.py`), and the NVG archive's
+  `Dunjunz.zip`, whose files are identical. `binary/` holds `Dun1` and
+  `Coder` exported from the Model B side's SSD.
+- `dunjunz-tape_crack_ole/`: Ole's crack of the 1986 cassette. No image of
+  the original cassette has been found; it would go in `dunjunz-tape/`.
+- `dunjunz-swram_hack/`: the unofficial sideways RAM hack, built from the
+  crack and the disc (the BBC Micro Games Archive "Sideways RAM version",
+  `Disc060-DunjunzRx2.ssd`; see `docs/disc-contents-and-loading.md` for
+  its catalogue, boot chain and runtime memory map).
 
-`versions/dunjunz-swram_hack/Disc060-DunjunzRx2.ssd` — the BBC Micro Games
-Archive "Sideways RAM version". See `docs/disc-contents-and-loading.md` for
-the full catalogue, the boot chain and the confirmed runtime memory map.
+How they relate is written up in `docs/history-and-provenance.md`; keep
+it current as evidence accumulates, tagging statements [confirmed],
+[reported] or [inference]. Describe the crack and the hack as variations
+on the official release.
 
 ## Binaries
 
+
 | File | Load | Exec | Size | Notes |
 |---|---|---|---|---|
-| `Dunjun4` | &0400 | — | &0900 | game code/data |
-| `Dunjun7` | &0D00 | — | &0400 | game code/data; loaded at &3000 then copied to &0D00; game entry &0D31 |
-| `Dunjun5` | &1100 | — | &1F00 | game code/data |
-| `Dunjun6` | &6E80 | — | &1180 | game code/data, just above the play screen |
-| `TITLE` | &3800 | &38C6 | &0C00 | title page machine code (separate program) |
+| `Dun1` (disc) | &2000 | &2000 | &6000 | the whole game; Coder builds the resident game from it at each level (see the disc driver's docstring) |
+| `Coder` (disc) | &5000 | &5000 | &09B0 | level loader, run for every level; holds the keyboard and joystick &0400 images |
+| `DUNJ4` (crack) | &2400 | &5000 | &2C50 | the &0400–&2FFF game image stored &2000 high, plus start-up at &5000 |
+| `DUNJ3` (crack) | &6E80 | — | &2E80 | its first &1180 bytes are the game's &6E80–&7FFF |
+| `Dunjun4` (hack) | &0400 | — | &0900 | game code/data |
+| `Dunjun7` (hack) | &0D00 | — | &0400 | game code/data; loaded at &3000 then copied to &0D00; game entry &0D31 |
+| `Dunjun5` (hack) | &1100 | — | &1F00 | game code/data |
+| `Dunjun6` (hack) | &6E80 | — | &1180 | game code/data, just above the play screen |
+| `TITLE` (hack) | &3800 | &38C6 | &0C00 | title page machine code (separate program) |
 | `Dunjun1`/`Dunjun2` | SWR | — | &0D00/&4000 | Beebug ROMFS images holding `LEVEL1`–`LEVEL25` |
 | `DUNJUNZ`, `DUNK` | &1900, &2500 | — | — | tokenised BASIC (instructions/intro; SWR and game loader) |
 | `PIC`, `Dunjun3` | &3000, &3280 | — | — | MODE 2 pictures (intro face; loading screen) |
 
-- CPU: 6502 (NMOS), BBC Model B. The game refuses to run on a Master 128.
+- CPU: 6502 (NMOS), BBC Model B. The disc's Master 128 side (not yet
+  disassembled) is a separate conversion; the hack's loader refuses to run
+  on a Master.
 - Game screen: &3000–&6E7F (6845 programmed by the game; 21 rows on the
   menu, 25 rows in play).
-- Levels are read from ROMFS in sideways RAM (`*TAPE` then `*ROM`).
+- Levels: the disc loads `LevelN` through DFS (`Coder`, at each level);
+  the crack loads `Ln` with `*LOAD`; the hack reads them from ROMFS in
+  sideways RAM (`*TAPE` then `*ROM`).
 
 ## Tools
 
@@ -98,7 +110,7 @@ feature or defect met along the way, and note the workaround here.
   when `[[targets]]` is configured, and `verify --all` counts those as
   failures (acornaeology/fantasm#26). Each version's main target
   therefore carries the version id (`swram_hack`, `tape_crack_ole`,
-  `disc_nvg`) so the two coincide.
+  `disc`) so the two coincide.
 - Synthesised offset bases inside data are named `sub_XXXX`; they are not
   subroutines (acornaeology/dasmos#50). Declaring the data removes them.
 - No execution coverage in beebium: `tools/coverage.py` uses range
