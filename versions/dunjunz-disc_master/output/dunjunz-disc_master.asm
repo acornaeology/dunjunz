@@ -1,39 +1,58 @@
 ; Constants
-osbyte_flush_buffer_class    = &0f
-osbyte_kbd_status            = &ca
-osbyte_sound_suppression     = &d2
-osbyte_bell_envelope         = &d4
-osbyte_bell_frequency        = &d5
-osword_envelope              = &08
-osword_sound                 = &07
-osbyte_inkey                 = &81
-osbyte_scan_keyboard_from_16 = &7a
+title_plot_reversed                  = &7b  ; Zero page flag for title_plot_star: non-zero plots each row right to left
+star_x                               = &80  ; Zero page: each star's byte column (three stars)
+star_y                               = &83  ; Zero page: each star's pixel row
+star_frame                           = &86  ; Zero page: each star's animation frame, 0-6
+star_frame_step                      = &89  ; Zero page: each star's frame step, +1 or -1
+star_place                           = &8c  ; Zero page: each star's place in star_places_x
+osbyte_flush_buffer_class            = &0f
+osbyte_kbd_status                    = &ca
+osbyte_sound_suppression             = &d2
+osbyte_bell_channel                  = &d3
+osbyte_bell_envelope                 = &d4
+osbyte_bell_frequency                = &d5
+osbyte_bell_duration                 = &d6
+osbyte_inkey                         = &81
+inkey_key_f5                         = &8b
+osword_envelope                      = &08
+osword_sound                         = &07
+osbyte_read_adc_or_get_buffer_status = &80
+osbyte_escape_break_effect           = &c8
+osbyte_set_cursor_editing            = &04
+osbyte_flush_buffer                  = &15
+osbyte_scan_keyboard_from_16         = &7a
+osbyte_enable_event                  = &0e
+event_interval_timer_crossing_zero   = &05
+osbyte_disable_event                 = &0d
+osword_write_interval_timer          = &04
 
 ; Memory locations
-data_0000             = &00
-; &00 referenced 1 time by &10e6
+tune_ptr              = &00  ; The music's place in the tune: the current three-byte step.
+; &00 referenced 12 times by &10e6, &1413, &146f, &c735, &c774, &c783, &c795, &c7a5, &c7aa, &c7f2, &c80f, &c818
+data_0001             = &01
+; &01 referenced 6 times by &1416, &146c, &c739, &c7ac, &c7b0, &c814
 plot_x                = &70  ; Sprite position: screen byte column, 0-79 (two MODE 2 pixels per byte). Also used as a scratch byte and pointer low byte by other routines.
-; &70 referenced 35 times by &0422, &0439, &043b, &0452, &045a, &045c, &045e, &0465, &046b, &05a7, &05ab, &0984, &0991, &0f68, &1da6, &1e1c, &1e77, &40c6, &726d, &7282, &72c6, &72db, &72eb, &72fb, &75b8, &75d9, &75e4, &75fb, &7823, &7846, &784a, &78a1, &78bb, &78d5, &78ef
+; &70 referenced 44 times by &0422, &0439, &043b, &0452, &045a, &045c, &045e, &0465, &046b, &05a7, &05ab, &0984, &0991, &0f68, &1458, &154d, &1558, &155c, &1da6, &1e1c, &1e77, &3893, &38a0, &39bc, &40c6, &726d, &7282, &72c6, &72db, &72eb, &72fb, &75b8, &75d9, &75e4, &75fb, &7823, &7846, &784a, &78a1, &78bb, &78d5, &78ef, &d884, &d891
 plot_y                = &71  ; Sprite position: pixel row from the top of the screen. Also used as a pointer high byte by other routines.
-; &71 referenced 27 times by &042a, &0458, &0469, &0471, &0967, &097b, &0f77, &1da2, &1e18, &1e73, &40c2, &7269, &72c2, &75b4, &75d5, &75ec, &7603, &7797, &77a9, &77bb, &77cd, &77ef, &77f3, &78a8, &78c2, &78dc, &78f6
+; &71 referenced 33 times by &042a, &0458, &0469, &0471, &0967, &097b, &0f77, &145c, &1da2, &1e18, &1e73, &3876, &388a, &39c1, &40c2, &7269, &72c2, &75b4, &75d5, &75ec, &7603, &7797, &77a9, &77bb, &77cd, &77ef, &77f3, &78a8, &78c2, &78dc, &78f6, &d867, &d87b
 sprite_width          = &72  ; Width of the sprite being plotted, in screen bytes.
-; &72 referenced 6 times by &0454, &0461, &0463, &047a, &090f, &0927
+; &72 referenced 10 times by &0454, &0461, &0463, &047a, &090f, &0927, &3802, &3823, &d80f, &d827
 sprite_height         = &73  ; Height of the sprite being plotted, in pixel rows.
-; &73 referenced 2 times by &0914, &091b
+; &73 referenced 6 times by &0914, &091b, &3806, &3817, &d814, &d81b
 screen_ptr            = &74  ; Screen address being written, low byte.
-; &74 referenced 13 times by &091d, &092b, &092e, &0932, &0946, &094e, &0955, &0959, &0979, &097f, &0981, &0997, &0999
+; &74 referenced 42 times by &091d, &092b, &092e, &0932, &0946, &094e, &0955, &0959, &0979, &097f, &0981, &0997, &0999, &3819, &3827, &3829, &3830, &3834, &383d, &3841, &3855, &385d, &3864, &3868, &3888, &388e, &3890, &38a6, &38a8, &d81d, &d82b, &d82e, &d832, &d846, &d84e, &d855, &d859, &d879, &d87f, &d881, &d897, &d899
 screen_ptr_hi         = &75  ; Screen address being written, high byte.
-; &75 referenced 9 times by &0921, &0936, &094c, &095b, &095f, &0974, &098d, &098f, &099d
+; &75 referenced 28 times by &0921, &0936, &094c, &095b, &095f, &0974, &098d, &098f, &099d, &381d, &3838, &3845, &385b, &386a, &386e, &3883, &389c, &389e, &38ac, &d821, &d836, &d84c, &d85b, &d85f, &d874, &d88d, &d88f, &d89d
 row_start_ptr         = &76  ; Screen address of the first byte of the sprite row being plotted, low byte.
-; &76 referenced 2 times by &091f, &0942
+; &76 referenced 6 times by &091f, &0942, &381b, &3851, &d81f, &d842
 row_start_ptr_hi      = &77  ; Screen address of the first byte of the sprite row being plotted, high byte.
-; &77 referenced 2 times by &0923, &0948
+; &77 referenced 6 times by &0923, &0948, &381f, &3857, &d823, &d848
 sprite_data_ptr       = &78  ; Address of the next sprite data byte to plot, low byte.
-; &78 referenced 3 times by &0905, &0929, &0938
+; &78 referenced 9 times by &0905, &0929, &0938, &380d, &3825, &3847, &d805, &d829, &d838
 sprite_data_ptr_hi    = &79  ; Address of the next sprite data byte to plot, high byte.
-; &79 referenced 2 times by &090a, &093c
+; &79 referenced 6 times by &090a, &093c, &3812, &384b, &d80a, &d83c
 sprite_number         = &7a  ; Sprite to plot: an index into the sprite tables at sprite_addr_lo, sprite_addr_hi, sprite_widths and sprite_heights.
-; &7a referenced 44 times by &041e, &0433, &0900, &0f6a, &11a6, &11fe, &1d2e, &1d9a, &1dca, &1e10, &1e57, &1e6b, &1f69, &1fb5, &1fd1, &40ba, &7077, &70a2, &70e9, &720f, &7242, &7272, &727e, &72cb, &72d7, &72e7, &72f7, &731c, &75c0, &75dd, &75f4, &7608, &760f, &7663, &767a, &7695, &76f5, &7813, &7836, &7840, &79cb, &79fb, &7b17, &7b50
+; &7a referenced 47 times by &041e, &0433, &0900, &0f6a, &11a6, &11fe, &1d2e, &1d9a, &1dca, &1e10, &1e57, &1e6b, &1f69, &1fb5, &1fd1, &3808, &39c6, &40ba, &7077, &70a2, &70e9, &720f, &7242, &7272, &727e, &72cb, &72d7, &72e7, &72f7, &731c, &75c0, &75dd, &75f4, &7608, &760f, &7663, &767a, &7695, &76f5, &7813, &7836, &7840, &79cb, &79fb, &7b17, &7b50, &d800
 map_ptr               = &7b  ; Pointer into room_walls or object_free_map at a cell's room, low byte; set by test_wall and test_object_free.
 ; &7b referenced 21 times by &1d5b, &1d62, &1d64, &1d80, &1d85, &7046, &7542, &767f, &77a1, &77b3, &77c5, &77d7, &77e4, &790e, &7915, &7917, &792f, &794a, &7951, &7953, &796b
 map_ptr_hi            = &7c  ; Pointer into a map, high byte.
@@ -57,13 +76,35 @@ victory_steps_left    = &8e  ; Rises left in the victory tone.
 victory_pitch         = &8f  ; Pitch of the victory tone.
 ; &8f referenced 6 times by &10fc, &110b, &110f, &1124, &7934, &7970
 os_zp_fa              = &fa  ; MOS zero-page workspace, read by dissolve_chalice to vary its random choice.
-; &fa referenced 1 time by &11c3
+; &fa referenced 2 times by &11c3, &394d
 os_irq_a              = &fc  ; MOS 1.20: A at the last interrupt, read by dissolve_chalice to vary its random choice.
-; &fc referenced 1 time by &11c1
+; &fc referenced 2 times by &11c1, &394f
+bytev                 = &020a
+; &020a referenced 1 time by &3009
+wrchv                 = &020e
+; &020e referenced 1 time by &1568
+evntv                 = &0220
+; &0220 referenced 1 time by &c74c
 os_vsync_counter      = &0240  ; MOS 1.20 counter decremented on every vertical sync interrupt. The game sets it and waits for it to run out to pace itself.
-; &0240 referenced 5 times by &11e9, &11ec, &1f00, &1f07, &c6ea
+; &0240 referenced 7 times by &0e62, &0eb9, &11e9, &11ec, &1f00, &1f07, &c6ea
+data_0287             = &0287
+; &0287 referenced 2 times by &373a, &378e
+data_0288             = &0288
+; &0288 referenced 1 time by &3730
+data_0289             = &0289
+; &0289 referenced 1 time by &3735
+data_08b0             = &08b0
+; &08b0 used as index base 1 time by &3723
+data_08b4             = &08b4
+; &08b4 used as index base 1 time by &3728
+data_08bc             = &08bc
+; &08bc referenced 1 time by &3712
+data_08bd             = &08bd
+; &08bd referenced 1 time by &3717
+data_08be             = &08be
+; &08be referenced 1 time by &371c
 scratch               = &0d00  ; General-purpose scratch byte.
-; &0d00 referenced 46 times by &1cc5, &1d00, &1d4e, &1d52, &1d55, &1d58, &1d77, &1d82, &405a, &4063, &4070, &6f19, &6f1e, &6f25, &6f71, &6fd7, &7002, &7007, &713c, &74b6, &74c3, &74d8, &77e6, &782c, &7857, &785b, &785e, &7861, &7886, &788b, &7901, &7905, &7908, &790b, &7926, &7931, &793d, &7941, &7944, &7947, &7962, &796d, &7976, &7990, &7a89, &7ce3
+; &0d00 referenced 49 times by &1cc5, &1d00, &1d4e, &1d52, &1d55, &1d58, &1d77, &1d82, &4006, &400d, &401e, &405a, &4063, &4070, &6f19, &6f1e, &6f25, &6f71, &6fd7, &7002, &7007, &713c, &74b6, &74c3, &74d8, &77e6, &782c, &7857, &785b, &785e, &7861, &7886, &788b, &7901, &7905, &7908, &790b, &7926, &7931, &793d, &7941, &7944, &7947, &7962, &796d, &7976, &7990, &7a89, &7ce3; also used as index base 3 times by &0745, &1488, &1512
 scratch2              = &0d01  ; Second scratch byte.
 ; &0d01 referenced 8 times by &403a, &407b, &74d2, &7503, &7509, &750c, &7829, &782f
 cell_x                = &0d02  ; Map x of the cell being drawn, tested or moved to. plot_at_cell replaces it with the pixel offset within the room.
@@ -113,7 +154,7 @@ hero_key_left         = &0d7c  ; INKEY key number of each hero's left key.
 hero_key_fire         = &0d80  ; INKEY key number of each hero's fire key.
 ; &0d80 used as index base 1 time by &6f0d
 hero_health_tens      = &0d90  ; Health tens digit, as a digit sprite (&1E-&27); &1D when the hero is dead.
-; &0d90 used as index base 9 times by &06df, &7236, &7239, &726f, &738e, &7391, &739a, &7506, &7724
+; &0d90 used as index base 10 times by &06df, &0e6d, &7236, &7239, &726f, &738e, &7391, &739a, &7506, &7724
 hero_health_units     = &0d95  ; Health units digit, as a digit sprite.
 ; &0d95 used as index base 7 times by &7227, &722a, &7233, &727b, &739d, &750f, &7727
 view_room             = &0da0  ; The room each hero's view shows: a pointer into room_walls, low byte then high byte, for each hero in turn (hero x at view_room + 2x).
@@ -133,34 +174,54 @@ teleport_last         = &0dfd  ; Index of the last object to search when looking
 victory_sprite_copy   = &0dff  ; Written by draw_victory_ring; not read.
 ; &0dff referenced 1 time by &1160
 level_object_x        = &6b00  ; Level file: Objects' map x (entries 1-30, entry 30 the exit).
+; &6b00 used as index base 1 time by &1573
 level_object_y        = &6b20  ; Level file: Objects' map y.
+; &6b20 used as index base 1 time by &1579
 level_object_type     = &6b40  ; Level file: Objects' types.
+; &6b40 used as index base 1 time by &157f
 level_door_x          = &6b60  ; Level file: Doors' map x (entries 1-20).
+; &6b60 used as index base 1 time by &158a
 level_door_y          = &6b75  ; Level file: Doors' map y.
+; &6b75 used as index base 1 time by &1590
 level_door_sprite     = &6b8a  ; Level file: Doors' sprites.
+; &6b8a used as index base 1 time by &1596
 level_key_x           = &6ba0  ; Level file: Keys' map x (entries 1-20).
+; &6ba0 used as index base 1 time by &15a1
 level_key_y           = &6bb5  ; Level file: Keys' map y.
+; &6bb5 used as index base 1 time by &15a7
 level_trapdoor_x      = &6bd0  ; Level file: Trapdoors' map x (entries 0-7).
+; &6bd0 used as index base 1 time by &15b2
 level_trapdoor_y      = &6bd8  ; Level file: Trapdoors' map y.
+; &6bd8 used as index base 1 time by &15b8
 level_walls           = &6be0  ; Level file: Wall map (&C9 bytes used).
+; &6be0 used as index base 1 time by &15c5
 level_object_free_map = &6cb0  ; Level file: Map of cells without objects (&C9 bytes used).
+; &6cb0 used as index base 1 time by &15cb
 level_wall_sprite     = &6d80  ; Level file: The level's wall block, copied to wall_sprite.
+; &6d80 used as index base 1 time by &15d8
 mos_row_offsets       = &c375  ; MOS 1.20 table of screen row offsets for 640-byte rows (row x 640, high byte then low byte, one pair per character row). Read directly by screen_address; it is not part of any documented interface.
+data_c400             = &c400
+; &c400 used as index base 2 times by &0748, &1485
 data_d9cd             = &d9cd
 ; &d9cd referenced 1 time by &0481
 mos_oswrch_default    = &e0a4  ; MOS 1.20 default OSWRCH routine, WRCHV's initial value. The WRCHV handler jumps here directly instead of through the saved vector.
+mos320_oswrch_default = &e822  ; MOS 3.20's default OSWRCH routine, WRCHV's initial value.
+mos320_osbyte_default = &eeb1  ; MOS 3.20's default OSBYTE routine, BYTEV's initial value.
+; &eeb1 referenced 2 times by &c518, &c569
 system_via_t1c_l      = &fe44
-; &fe44 referenced 3 times by &11be, &7a6f, &7aac
+; &fe44 referenced 5 times by &11be, &390a, &394a, &7a6f, &7aac
 osrdch                = &ffe0
 ; &ffe0 referenced 2 times by &058f, &10d7
 osasci                = &ffe3
-; &ffe3 referenced 2 times by &10bd, &10ca
+; &ffe3 referenced 3 times by &0eb1, &10bd, &10ca
 oswrch                = &ffee
-; &ffee referenced 17 times by &0502, &0507, &050c, &0511, &0516, &051b, &0530, &0536, &053d, &0544, &109c, &10a1, &10a6, &10ab, &10b0, &10b5, &112d
+; &ffee referenced 67 times by &0502, &0507, &050c, &0511, &0516, &051b, &0530, &0536, &053d, &0544, &076f, &07c2, &07c7, &0e8d, &0e92, &0e97, &0e9c, &0ea1, &109c, &10a1, &10a6, &10ab, &10b0, &10b5, &112d, &1430, &1435, &143a, &143f, &1444, &1447, &144a, &144d, &1450, &1453, &14c1, &14c6, &14cb, &14d0, &14d5, &14d8, &14db, &14de, &14e1, &14e4, &1548, &154f, &161b, &1620, &1625, &162a, &162f, &1634, &3699, &36c2, &36ce, &374b, &374f, &3754, &3757, &375a, &375d, &376c, &37c1, &37c6, &37ce, &c605
 osword                = &fff1
-; &fff1 referenced 15 times by &16a6, &16af, &1d18, &1ead, &1eb6, &736d, &7376, &73b9, &73e3, &748c, &74a9, &74b2, &7586, &7634, &763d
+; &fff1 referenced 24 times by &16a6, &16af, &1d18, &1ead, &1eb6, &736d, &7376, &73b9, &73e3, &748c, &74a9, &74b2, &7586, &7634, &763d, &c706, &c70f, &c718, &c721, &c790, &c7a2, &c7d4, &c7dd, &c7e6
 osbyte                = &fff4
-; &fff4 referenced 10 times by &0583, &058c, &05ed, &10d4, &10ed, &1128, &7c9e, &c6d2, &c6de, &c6f0
+; &fff4 referenced 28 times by &0583, &058c, &05ed, &07d6, &07df, &07e8, &07f1, &0ec0, &0ec9, &10d4, &10ed, &1128, &3674, &3706, &370d, &3775, &3919, &7c9e, &c51f, &c52d, &c53c, &c54a, &c559, &c6d2, &c6de, &c6f0, &c75a, &c766
+oscli                 = &fff7
+; &fff7 referenced 17 times by &0752, &0759, &0760, &0767, &14f5, &3004, &3015, &364d, &3654, &3683, &368a, &36b1, &36c9, &3741, &377f, &3789, &c5a4
 reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; &fffc referenced 1 time by &10da
 
@@ -169,11 +230,26 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 
 ; Move 1: &3000 to &2000 for length 38
     org &2000
-    equb &a2, &18, &a0, &20, &20, &f7, &ff, &a9
-    equb &00, &8d, &0a, &02, &a9, &c5, &8d, &0b
-    equb &02, &a2, &20, &a0, &20, &20, &f7, &ff
+; ***************************************************************************************
+; Coder2: install the joystick handler and run Coder
+;
+; Run by *DUNJUNZ when a joystick is present. *L. Code loads the joystick handler into
+; private RAM at &C500, BYTEV is pointed at it, and *CODER is run, which does not return.
+.coder2_start
+    ldx #&18                            ; *L. Code: load the joystick handler at &C500
+    ldy #&20 ; ' '                      ; ...
+    jsr oscli                           ; ...
+    lda #0                              ; BYTEV = &C500, the joystick handler...
+    sta bytev                           ; ...
+    lda #&c5                            ; ...
+    sta bytev + 1                       ; ...
+    ldx #&20 ; ' '                      ; *CODER: load and start the game (no return)
+    ldy #&20 ; ' '                      ; ...
+    jsr oscli                           ; ...
+.load_code_command
     equs "L. Code"
     equb &0d
+.coder_command2
     equs "CODER"
     equb &0d
 
@@ -181,382 +257,842 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     ; Copy the newly assembled block of code back to it's proper place in the binary
     ; file.
     ; (Note the parameter order: 'copyblock <start>,<end>,<dest>')
-    copyblock &2000, *, &3000
+    copyblock coder2_start, *, &3000
 
     ; Clear the area of memory we just temporarily used to assemble the new block,
     ; allowing us to assemble there again if needed
-    clear &2000, &2026
+    clear coder2_start, &2026
 
     ; Set the program counter to the next position in the binary file.
-    org &3000 + (* - &2000)
+    org &3000 + (* - coder2_start)
 
 
     org &3649
 
 ; Move 2: &3649 to &2649 for length 2323
     org &2649
-    equb &a2, &5a, &a0, &26, &20, &f7, &ff, &a2
-    equb &65, &a0, &26, &20, &f7, &ff, &4c, &ad
-    equs "&LOAD C"
-    equs "ode2"
+; ***************************************************************************************
+; *DUNJUNZ: load the private-RAM code and show the title
+;
+; Run by BOOT on a Master 128. Load Code2, Code3 and Table into the Master's private RAM
+; (HAZEL, &C000-&DFFF), which MOS 3.20 leaves paged in for a *RUN program, then carry on
+; into the Model B loader's start-up at title_start.
+.dunjunz_start
+    ldx #&5a ; 'Z'                      ; *LOAD Code2 (the music, at &C700)
+    ldy #&26 ; '&'                      ; ...
+    jsr oscli                           ; ...
+    ldx #&65 ; 'e'                      ; *LOAD Code3 (a copy of the sprite plotter, at &D800)
+    ldy #&26 ; '&'                      ; ...
+    jsr oscli                           ; ...
+    jmp code_26ad                       ; Load Table and start the title
+.load_code2_command
+    equs "LOAD Code2"
     equb &0d
+.load_code3_command
     equs "LOAD Code3"
-    equb &0d, &a9, &80, &a2, &01, &20, &f4, &ff
-    equb &c0, &80, &f0, &0b, &c0, &81, &f0, &07
-    equb &a2, &a9, &a0, &27, &20, &f7, &ff, &a2
-    equb &8d, &a0, &26, &20, &f7, &ff
-    equs "COD"
-    equs "ER2"
-    equb &0d, &a2, &00, &bd, &a2, &26, &20, &ee
-    equb &ff, &e8, &e0, &0b, &d0, &f5, &60, &17
-    equb &00, &01, &00, &00, &00, &00, &00, &00
-    equb &00, &15, &a2, &b7, &a0, &26, &20, &f7
-    equb &ff, &4c, &00
-    equs "'L. TABLE"
     equb &0d
-    equb &a9, &15, &20, &ee, &ff, &a2, &98, &a0
-    equb &27, &20, &f7, &ff, &a9, &06, &20, &ee
-    equb &ff, &60, &20, &94, &26, &ea, &ea
-    equs "Lp&' "
-    equb &f7, &ff, &0d, &36, &17, &00, &0d, &1e
-    equb &00, &2a, &05, &14, &00, &15, &00, &00
-    equb &00, &00, &2a, &00
-    equb &00, &04, &08, &00, &2a, &04, &08, &2a
-    equb &15, &3c, &3d, &00
-    equs "3<9"
-    equb &00, &a9, &c8, &a2, &01, &a0, &00, &20
-    equb &f4, &ff, &a9, &04, &a2, &01, &20, &f4
-    equb &ff, &a9, &00, &8d, &bc, &08, &a9, &30
-    equb &8d, &bd, &08, &a9, &20, &8d, &be, &08
-    equb &a2
-    equb &03, &a9, &69, &9d, &b0, &08, &a9, &00
-    equb &9d, &b4, &08, &ca, &10, &f3, &a9, &b5
-    equb &8d, &88, &02, &a9, &15, &8d, &89, &02
-    equb &a9, &00, &8d, &87, &02, &a2, &b7, &a0
-    equb &27, &20, &f7, &ff, &20, &bf, &27, &a2
-    equb &0f, &a9, &13, &20, &ee, &ff, &8a, &20
-    equb &ee, &ff, &a9, &00, &20, &ee, &ff, &20
-    equb &ee, &ff, &20, &ee, &ff, &20, &ee, &ff
-    equb &ca, &10, &e6, &20, &c0, &26, &ea, &ea
-    equb &ea, &ea, &a9, &14, &20, &ee, &ff, &a9
-    equb &00, &85, &7b, &a9, &15, &20, &f4, &ff
-    equb &20, &00, &29, &a2, &af, &a0, &27, &20
-    equb &f7, &ff, &20, &bf, &27, &a2, &a4, &a0
-    equb &27, &20, &f7, &ff, &a9, &00, &8d, &87
-    equb &02, &20, &d2, &26, &ea, &ea, &ea, &ea
+; ***************************************************************************************
+; Run Coder, through Coder2 if a joystick is present
+;
+; Read joystick channel 1. A reading with high byte &80 or &81 (a joystick at rest) runs
+; CODER2, which installs the joystick handler and runs CODER; anything else runs CODER
+; directly. Neither returns.
+; &2670 referenced 1 time by &36d7
+.run_coder
+    lda #osbyte_read_adc_or_get_buffer_status  ; OSBYTE &80: read ADC channel 1 (joystick 1, horizontal)...
+    ldx #1                              ; ...
+    jsr osbyte                          ; ...  Read ADC channel X or buffer status
+    cpy #&80                            ; High byte &80 (at rest)?
+    beq code_2686                       ; Yes: a joystick
+    cpy #&81                            ; High byte &81?
+    beq code_2686                       ; Yes: a joystick
+    ldx #&a9                            ; No joystick: *CODER, which does not return
+    ldy #&27                            ; ...
+    jsr oscli                           ; ...
+; &2686 referenced 2 times by &3679, &367d
+.code_2686
+    ldx #&8d                            ; Joystick: *CODER2, which does not return
+    ldy #&26 ; '&'                      ; ...
+    jsr oscli                           ; ...
+.coder2_command
+    equs "CODER2"
+    equb &0d
+; ***************************************************************************************
+; Blank the display and disable VDU output
+;
+; Send VDU 23,0,1,0,0,0,0,0,0,0 (6845 register 1, characters per row, set to 0) and VDU
+; 21, from blank_display_vdu.
+; &2694 referenced 1 time by &36d2
+.blank_display
+    ldx #0                              ; Send the eleven bytes of blank_display_vdu
+; &2696 referenced 1 time by &369f
+.code_2696
+    lda blank_display_vdu,x             ; ...
+    jsr oswrch                          ; ...
+    inx                                 ; ...
+    cpx #&0b                            ; ...
+    bne code_2696                       ; ...
+    rts                                 ; Return
+; &26a2 used as index base 1 time by &3696
+.blank_display_vdu
+    equb &17, &00, &01, &00, &00, &00, &00, &00, &00, &00, &15
+; &26ad referenced 1 time by &3657
+.code_26ad
+    ldx #&b7                            ; *L. TABLE (level 25, game over, row offsets, pause, at &C5A0)
+    ldy #&26 ; '&'                      ; ...
+    jsr oscli                           ; ...
+    jmp title_start                     ; Carry on with the Model B loader's start-up
+.load_table_command
+    equs "L. TABLE"
+    equb &0d
+; ***************************************************************************************
+; Load the title screen while output is off
+;
+; VDU 21, *LOAD SCREEN (the MODE 2 picture, to &3280), VDU 6.
+; &26c0 referenced 1 time by &3763
+.load_title_screen
+    lda #&15                            ; VDU 21: disable VDU output
+    jsr oswrch                          ; ...
+    ldx #&98                            ; *LOAD SCREEN
+    ldy #&27                            ; ...
+    jsr oscli                           ; ...
+    lda #6                              ; VDU 6: enable VDU output
+    jsr oswrch                          ; ...
+    rts                                 ; Return
+; ***************************************************************************************
+; Blank the display and run Coder
+;
+; Where the Model B loader ends with VDU 21 and *CODER, this version blanks the display
+; and chooses between CODER and CODER2. It never returns.
+; &26d2 referenced 1 time by &3791
+.leave_title
+    jsr blank_display                   ; Blank the display and disable output
+    nop                                 ; Padding
+    nop                                 ; ...
+    jmp run_coder                       ; Run Coder (no return)
+; ***************************************************************************************
+; Unused
+;
+; Leftover bytes, never run: the tail of the Model B loader's *CODER call, then data.
+    equb &27, &20, &f7, &ff, &0d, &36, &17, &00
+    equb &0d, &1e, &00, &2a, &05, &14, &00, &15
+    equb &00, &00, &00, &00, &2a, &00, &00, &04
+    equb &08, &00, &2a, &04, &08, &2a, &15, &3c
+    equb &3d, &00, &33, &3c, &39, &00
+; ***************************************************************************************
+; Set up, show the title and run Coder
+;
+; The Model B loader's start-up. Disable ESCAPE, make the cursor keys return codes, set
+; the Model B release's level counter and menu tables in page &08 (not used by this
+; side's game), point the BREAK intercept at &15B5 but leave it disabled, load and show
+; the title screen, twinkle stars on it until a key is pressed, then select the game's
+; display and run Coder.
+; &2700 referenced 1 time by &36b4
+.title_start
+    lda #osbyte_escape_break_effect     ; OSBYTE &C8: ESCAPE disabled...
+    ldx #1                              ; ...
+    ldy #0                              ; ...
+    jsr osbyte                          ; ...  osbyte: escape break effect
+    lda #osbyte_set_cursor_editing      ; OSBYTE 4, 1: cursor keys return codes
+    ldx #1                              ; ...
+    jsr osbyte                          ; ...  Set cursor editing keys
+    lda #0                              ; Levels started = 0, for the Model B release's Coder
+    sta data_08bc                       ; ...
+    lda #&30 ; '0'                      ; Level digits = "0 "...
+    sta data_08bd                       ; ...
+    lda #&20 ; ' '                      ; ...
+    sta data_08be                       ; ...
+    ldx #3                              ; For each hero...
+; &2721 referenced 1 time by &372c
+.code_2721
+    lda #&69 ; 'i'                      ; ...no ten-thousands digit (sprite &69)...
+    sta data_08b0,x                     ; ...at &08B0...
+    lda #0                              ; ...and switched on...
+    sta data_08b4,x                     ; ...at &08B4 (the Model B release's menu tables)
+    dex                                 ; ...
+    bpl code_2721                       ; ...
+    lda #&b5                            ; BREAK intercept address = &15B5 (the Model B game's next-level intercept)...
+    sta data_0288                       ; ...
+    lda #&15                            ; ...
+    sta data_0289                       ; ...
+    lda #0                              ; ...but disabled: &0287 is not a JMP
+    sta data_0287                       ; ...
+    ldx #&b7                            ; *TV 255,1: vertical offset for the title's MODE 2
+    ldy #&27                            ; ...
+    jsr oscli                           ; ...
+    jsr mode2_cursor_off                ; MODE 2, cursor off
+    ldx #&0f                            ; Make all sixteen logical colours black...
+; &2749 referenced 1 time by &3761
+.code_2749
+    lda #&13                            ; ...VDU 19, colour, 0, 0, 0, 0...
+    jsr oswrch                          ; ...
+    txa                                 ; ...
+    jsr oswrch                          ; ...
+    lda #0                              ; ...
+    jsr oswrch                          ; ...
+    jsr oswrch                          ; ...
+    jsr oswrch                          ; ...
+    jsr oswrch                          ; ...
+    dex                                 ; ...
+    bpl code_2749                       ; ...
+    jsr load_title_screen               ; Load the title screen unseen
+    nop                                 ; Padding
+    nop                                 ; ...
+    nop                                 ; ...
+    nop                                 ; ...
+    lda #&14                            ; VDU 20: default colours, showing the picture
+    jsr oswrch                          ; ...
+    lda #0                              ; Plot the stars left to right
+    sta title_plot_reversed             ; ...
+    lda #osbyte_flush_buffer            ; OSBYTE &15: flush the buffer X
+    jsr osbyte                          ; ...  Flush specific buffer X
+    jsr twinkle_stars                   ; Twinkle stars until a key is pressed
+    ldx #&af                            ; *TV 252,1: vertical offset for the game's display
+    ldy #&27                            ; ...
+    jsr oscli                           ; ...
+    jsr mode2_cursor_off                ; MODE 2, cursor off
+    ldx #&a4                            ; *DISC
+    ldy #&27                            ; ...
+    jsr oscli                           ; ...
+    lda #0                              ; BREAK intercept stays disabled
+    sta data_0287                       ; ...
+    jsr leave_title                     ; Blank the display and run Coder (no return)
+    equb &ea                            ; Padding
+    equb &ea                            ; ...
+    equb &ea                            ; ...
+    equb &ea                            ; ...
+.load_screen_command
     equs "LOAD SCREEN"
     equb &0d
+.disc_command
     equs "DISC"
     equb &0d
+.coder_command
     equs "CODER"
-    equb &0d, &54
-    equs "V252 1"
     equb &0d
+.tv_game_command
+    equs "TV252 1"
+    equb &0d
+.tv_title_command
     equs "TV255 1"
-    equb &0d, &a9, &16, &20, &ee, &ff, &a9, &02
-    equb &20, &ee, &ff, &a2, &00, &bd, &f0, &27
-    equb &20, &ee, &ff, &e8, &e0, &0b, &d0, &f5
-    equb &60, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00
-    equb &00, &00, &0a, &00, &00, &00, &0a, &00
-    equb &00, &00, &0a, &00, &00, &00, &0a, &00
-    equb &17, &00, &0a, &20, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &05, &07, &00
-    equb &a9, &07, &85, &72, &a9, &1c, &85, &73
-    equb &a6, &7a, &bd, &c0, &28, &85, &78, &bd
-    equb &d0, &28, &85
-    equs "y v("
-    equb &a6, &73, &a5, &74, &85, &76, &a5, &75
-    equb &85, &77, &8a, &48, &a6, &72, &b1
-    equs "xQt"
-    equb &91, &74, &a5, &7b, &d0, &0d, &18, &a5
-    equb &74, &69, &08, &85, &74, &90, &0f, &e6
-    equb &75, &d0, &0b, &38, &a5, &74, &e9
-    equb &08, &85, &74, &b0, &02, &c6, &75, &e6
-    equb &78, &d0, &02, &e6, &79, &ca, &d0, &d5
-    equb &18, &a5, &76, &69, &01, &85, &74, &a5
-    equb &77, &69, &00, &85, &75, &a5, &74, &29
-    equb &07, &d0, &0d, &18, &a5
-    equs "tix"
-    equb &85, &74, &a5, &75, &69, &02, &85, &75
-    equb &68, &aa, &ca, &d0, &a4, &60, &a5
-    equs "qJJ)"
-    equb &fe, &a8, &b9, &75, &c6, &18, &69, &30
-    equb &85, &75, &b9, &76, &c6, &85, &74, &a5
-    equb &71, &29, &07, &65, &74, &85, &74, &18
-    equb &a5, &70, &29, &e0
-    equs "****"
-    equb &18, &65, &75, &85, &75
+    equb &0d
+; ***************************************************************************************
+; Select MODE 2 and turn the cursor off
+;
+; VDU 22,2 then VDU 23,0,10,&20,0,0,0,0,0,0 (6845 register 10: no cursor), from
+; cursor_off_vdu.
+; &27bf referenced 2 times by &3744, &3782
+.mode2_cursor_off
+    lda #&16                            ; VDU 22, 2: MODE 2
+    jsr oswrch                          ; ...
+    lda #2                              ; ...
+    jsr oswrch                          ; ...
+    ldx #0                              ; Send the eleven bytes of cursor_off_vdu
+; &27cb referenced 1 time by &37d4
+.code_27cb
+    lda cursor_off_vdu,x                ; ...
+    jsr oswrch                          ; ...
+    inx                                 ; ...
+    cpx #&0b                            ; ...
+    bne code_27cb                       ; ...
+    rts                                 ; Return
+; ***************************************************************************************
+; Unused
+;
+; Leftover bytes.
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &0a, &00, &00, &00, &0a
+    equb &00, &00, &00, &0a, &00, &00, &00, &0a
+    equb &00
+; &27f0 used as index base 1 time by &37cb
+.cursor_off_vdu
+    equb &17, &00, &0a, &20, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &05, &07, &00
+; ***************************************************************************************
+; Plot a star frame on the title screen
+;
+; Exclusive-OR a 7-byte by 28-row frame of the star animation onto the MODE 2 screen at
+; byte column plot_x and pixel row plot_y, row by row and left to right (or right to left
+; if title_plot_reversed is set). A version of the game's plot_sprite with its own
+; frames.
+;
+; On Entry:
+;     PLOT_X: byte column
+;     PLOT_Y: pixel row
+;     SPRITE_NUMBER: frame, 0-6
+; &2800 referenced 1 time by &39ca
+.title_plot_star
+    lda #7                              ; Seven bytes wide...
+    sta sprite_width                    ; ...
+    lda #&1c                            ; ...and 28 rows high
+    sta sprite_height                   ; ...
+    ldx sprite_number                   ; Point at the frame's data...
+    lda star_frames_lo,x                ; ...
+    sta sprite_data_ptr                 ; ...
+    lda star_frames_hi,x                ; ...
+    sta sprite_data_ptr_hi              ; ...
+    jsr title_screen_address            ; Screen address of the top left
+    ldx sprite_height                   ; For each row...
+; &2819 referenced 1 time by &3873
+.code_2819
+    lda screen_ptr                      ; ...remember its start...
+    sta row_start_ptr                   ; ...
+    lda screen_ptr_hi                   ; ...
+    sta row_start_ptr_hi                ; ...
+    txa                                 ; ...
+    pha                                 ; ...
+    ldx sprite_width                    ; ...for each byte across...
+; &2825 referenced 1 time by &384e
+.code_2825
+    lda (sprite_data_ptr),y             ; ...exclusive-OR the frame onto the screen...
+    eor (screen_ptr),y                  ; ...
+    sta (screen_ptr),y                  ; ...
+    lda title_plot_reversed             ; ...and step a character cell (8 bytes) right or left
+    bne code_283c                       ; ...
+    clc                                 ; Right...
+    lda screen_ptr                      ; ...
+    adc #8                              ; ...
+    sta screen_ptr                      ; ...
+    bcc code_2847                       ; ...
+    inc screen_ptr_hi                   ; ...
+    bne code_2847                       ; ...(always branches)
+; &283c referenced 1 time by &382d
+.code_283c
+    sec                                 ; Left...
+    lda screen_ptr                      ; ...
+    sbc #8                              ; ...
+    sta screen_ptr                      ; ...
+    bcs code_2847                       ; ...
+    dec screen_ptr_hi                   ; ...
+; &2847 referenced 3 times by &3836, &383a, &3843
+.code_2847
+    inc sprite_data_ptr                 ; Next byte of the frame
+    bne code_284d                       ; ...
+    inc sprite_data_ptr_hi              ; ...
+; &284d referenced 1 time by &3849
+.code_284d
+    dex                                 ; Next byte across
+    bne code_2825                       ; ...
+    clc                                 ; Down one pixel row from the row's start...
+    lda row_start_ptr                   ; ...
+    adc #1                              ; ...
+    sta screen_ptr                      ; ...
+    lda row_start_ptr_hi                ; ...
+    adc #0                              ; ...
+    sta screen_ptr_hi                   ; ...
+    lda screen_ptr                      ; ...crossing into the next character row every eight (640 - 8 bytes on)
+    and #7                              ; ...
+    bne code_2870                       ; ...
+    clc                                 ; ...
+    lda screen_ptr                      ; ...
+    adc #&78 ; 'x'                      ; ...
+    sta screen_ptr                      ; ...
+    lda screen_ptr_hi                   ; ...
+    adc #2                              ; ...
+    sta screen_ptr_hi                   ; ...
+; &2870 referenced 1 time by &3861
+.code_2870
+    pla                                 ; Next row
+    tax                                 ; ...
+    dex                                 ; ...
+    bne code_2819                       ; ...
+    rts                                 ; Return
+; ***************************************************************************************
+; Calculate a title screen address
+;
+; The game's screen_address, reading the row offsets from Table at &C675 in private RAM
+; where the Model B loader reads MOS 1.20's at &C375.
+;
+; On Entry:
+;     PLOT_X: byte column
+;     PLOT_Y: pixel row
+;
+; On Exit:
+;     SCREEN_PTR: screen address
+;     Y: 0
+; &2876 referenced 1 time by &3814
+.title_screen_address
+    lda plot_y                          ; Character row x 2...
+    lsr a                               ; ...
+    lsr a                               ; ...
+    and #&fe                            ; ...
+    tay                                 ; ...
+    lda row_offsets,y                   ; High byte of row x 640, from Table's copy of the MOS table...
+    clc                                 ; ...plus &3000, the screen start
+    adc #&30 ; '0'                      ; ...
+    sta screen_ptr_hi                   ; ...
+    lda row_offsets_lo,y                ; Low byte of row x 640
+    sta screen_ptr                      ; ...
+    lda plot_y                          ; Plus the pixel row within the character row
+    and #7                              ; ...
+    adc screen_ptr                      ; ...
+    sta screen_ptr                      ; ...
+    clc                                 ; Plus 8 x byte column: high part...
+    lda plot_x                          ; ...
+    and #&e0                            ; ...
+    rol a                               ; ...
+    rol a                               ; ...
+    rol a                               ; ...
+    rol a                               ; ...
+    clc                                 ; ...
+    adc screen_ptr_hi                   ; ...
+    sta screen_ptr_hi                   ; ...
+    lda plot_x                          ; ...low part
+    asl a                               ; ...
+    asl a                               ; ...
+    asl a                               ; ...
+    clc                                 ; ...
+    adc screen_ptr                      ; ...
+    sta screen_ptr                      ; ...
+    bcc code_28ae                       ; ...
+    inc screen_ptr_hi                   ; ...
+; &28ae referenced 1 time by &38aa
+.code_28ae
+    ldy #0                              ; Y = 0 for the plotting loop
+    rts                                 ; Return
+; ***************************************************************************************
+; Unused
+;
+; Leftover bytes.
+    equb &0d, &18, &a5, &74, &69, &78, &85, &74
+    equb &a5, &75, &69, &02, &85, &75, &68
+; &28c0 used as index base 1 time by &380a
+.star_frames_lo
+    equb &00, &c4, &88, &4c, &10, &d4, &98
+    equb &15, &4a, &29, &fe, &a8, &b9, &75, &c3, &18
+; &28d0 used as index base 1 time by &380f
+.star_frames_hi
+    equb &2a, &2a, &2b, &2c, &2d, &2d, &2e
+    equb &22, &74, &a5, &71, &29, &07, &65, &74
+    equb &85, &2a, &2a, &2b, &2c, &2d, &2d, &2e
+    equb &22, &2a, &2a, &18, &65, &75, &85, &75
     equb &a5, &70, &0a, &0a, &0a, &18, &65, &74
     equb &85, &74, &90, &02, &e6, &75, &a0, &00
-    equb &60, &0d, &18, &a5
-    equs "tix"
-    equb &85, &74, &a5, &75, &69, &02, &85, &75
-    equb &68, &00, &c4, &88, &4c, &10, &d4, &98
-    equb &15, &4a, &29, &fe, &a8, &b9, &75, &c3
-    equb &18
-    equs "**+,--.", &22, "t"
-    equb &a5, &71, &29, &07, &65, &74, &85
-    equs "**+,--.", &22, "**"
-    equb &18, &65, &75, &85, &75, &a5, &70, &0a
-    equb &0a, &0a, &18, &65, &74, &85, &74, &90
-    equb &02, &e6, &75, &a0, &00, &00
-    equb &a2, &02, &a9, &00, &9d, &da, &29, &ca
-    equb &10, &fa, &ad, &44, &fe, &29, &03, &d0
-    equb &03
-    equs " .) m)"
-    equb &a9, &7a, &20, &f4, &ff, &e0, &ff, &f0
-    equb &ea, &a0, &02, &b9, &da, &29, &f0, &03
-    equb &20, &b9, &29, &88, &10, &f5, &60, &a0
     equb &00
-    equb &b9, &da, &29, &f0, &06, &c8, &c0, &03
-    equb &d0, &f6, &60, &a9, &01, &99, &da, &29
-    equb &a9, &01, &99, &89, &00, &a9, &00, &99
-    equb &86, &00, &ad, &44, &fe, &45, &fa, &45
-    equb &fc, &29, &07, &aa, &bd, &e0, &29, &30
-    equb &f1, &99, &80, &00, &bd, &f0, &29, &99
-    equb &83, &00, &96, &8c, &a9, &ff, &9d, &e0
-    equb &29, &20, &b9, &29, &60, &a0, &00, &b9
-    equb &da, &29, &f0, &5c, &20, &b9, &29, &18
-    equb &b9, &86, &00, &79, &89, &00, &99, &86
-    equb &00, &30, &10, &c9, &07, &90, &1b, &a9
-    equb &05, &99, &86, &00, &a9, &ff, &99, &89
-    equb &00, &30, &0f, &a9, &00, &99, &da, &29
-    equb &b9, &80, &00, &b6, &8c, &9d, &e0, &29
-    equb &10, &03, &20, &b9, &29, &98, &48, &a2
-    equb &05, &a0, &ff, &88, &d0, &fd, &ca, &d0
-    equb &f8, &68, &a8, &c8, &c0, &03, &d0, &b7
-    equb &60, &b9, &80, &00, &85, &70, &b9, &83
-    equb &00, &85, &71, &b9, &86, &00, &85, &7a
-    equb &98, &48, &20, &00, &28, &68, &a8, &60
-    equb &98, &48, &a2, &14, &d0, &d3
-    equs "88>>88>>88/ "
-    equb &05, &00, &1f, &46, &46, &14, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &0f, &0f
-    equs "$B3"
-    equb &0f, &48, &15, &00, &00, &00, &00, &00
-    equb &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &2a
-    equb &00, &00, &00, &00, &00, &00, &2a, &00
-    equb &00, &00, &00, &00
-    equb &15, &1f, &00, &00, &00, &00, &00, &00
-    equb &2a, &00, &00, &00, &00, &00, &00, &2a
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &2a, &00
-    equb &00, &00, &00, &00, &00, &2a, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00, &00
-    equb &00, &00, &2a, &00, &00, &00, &00, &00
-    equb &2a, &0a, &2a, &00, &00, &00, &00, &00
-    equb &2a, &00, &00, &00, &00, &00, &00, &2a
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &2a, &00, &00
-    equb &00, &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00, &00
-    equb &00, &00, &2a, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &2a, &00, &00, &00, &00, &00, &00, &2a
-    equb &00, &00, &00, &00, &00, &00, &2a, &00
-    equb &00, &00, &00, &15, &2a, &00, &3f, &00
-    equb &00, &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00, &00
-    equb &00, &00, &2a, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &2a, &00, &00, &00, &00, &00, &00, &2a
-    equb &00, &00, &00, &00, &00, &00, &2a, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &2a, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &2a, &00, &00, &00, &00, &00, &00, &2a
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &2a, &00, &00
-    equb &00, &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00, &00
-    equb &00, &00, &2a, &00, &00, &00, &00, &2a
-    equb &2a, &00, &2a, &2a, &00, &00, &00, &00
-    equb &2a, &00, &00, &00, &00, &00, &00, &2a
-    equb &00, &00, &00, &00, &00, &00, &2a, &00
-    equb &00, &00, &00, &00, &00, &2a, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00, &00
-    equb &00, &00, &2a, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &2a, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &2a, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &2a, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &2a, &00, &00, &00, &00, &00
-    equb &00, &2a, &00, &00, &00, &00, &00, &00
-    equb &2a, &00, &00, &00, &00, &00, &00, &2a
-    equb &00, &00, &00, &00, &00, &00, &2a, &00
-    equb &00, &00, &15, &15, &2a, &00, &3f, &15
-    equb &00, &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00, &00
-    equb &00, &00, &2a, &00, &00, &00, &00, &00
-    equb &00, &2a, &00, &00, &00, &00, &00, &00
-    equb &2a, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &2a, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &2a, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &2a, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &2a, &00, &00, &00, &00, &00
-    equb &00, &2a, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &2a
-    equb &00, &00, &00, &00, &00, &00, &2a, &00
-    equb &00, &00, &00, &00, &00, &2a, &00, &00
-    equb &00, &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00, &00
-    equb &00, &00, &2a, &00, &00, &00
-    equs "***"
-    equb &00
-    equs "***"
-    equb &00, &00, &00, &2a, &00, &00, &00, &00
-    equb &00, &00, &2a, &00, &00, &00, &00, &00
-    equb &00, &2a, &00
-    equb &00, &00, &00, &00, &00, &2a, &00, &00
-    equb &00, &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &2a, &00, &00, &00, &00, &00, &00
-    equb &2a, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &2a, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &2a, &00, &00, &00, &00, &00
-    equb &00, &2a, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &2a
-    equb &00, &00, &00, &00, &00, &00, &2a, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00, &00
-    equb &00, &00, &2a, &00, &00, &00, &00, &00
-    equb &00, &2a, &00, &00, &00, &00, &00, &00
-    equb &2a, &00, &00, &00, &00, &00, &00, &2a
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00
-    equs "*?*"
-    equb &00
-    equs "?**"
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &2a, &00, &00, &00, &00
-    equb &00, &00, &2a, &00, &00, &00, &00, &00
-    equb &00, &2a, &00, &00, &00, &00, &00, &00
-    equb &2a, &00, &00, &00, &00, &00, &00, &2a
-    equb &00, &00, &00, &00, &00, &00, &2a, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &2a, &00, &00, &00, &00, &00, &00
-    equb &2a, &00, &00, &00
+; ***************************************************************************************
+; Twinkle stars on the title screen until a key is pressed
+;
+; Up to three stars at once, each at one of the eight places in star_places_x and
+; star_places_y, picked at random. A star grows through frames 0-6 and shrinks back
+; through 5-0. When a key is pressed the stars still showing are erased.
+; &2900 referenced 1 time by &3778
+.twinkle_stars
+    ldx #2                              ; No stars showing
+    lda #0                              ; ...
+; &2904 referenced 1 time by &3908
+.code_2904
+    sta star_showing,x                  ; ...
+    dex                                 ; ...
+    bpl code_2904                       ; ...
+; &290a referenced 1 time by &391e
+.code_290a
+    lda system_via_t1c_l                ; One time in four (System VIA timer 1, low bits)...
+    and #3                              ; ...
+    bne code_2914                       ; ...
+    jsr start_star                      ; ...start a star
+; &2914 referenced 1 time by &390f
+.code_2914
+    jsr advance_stars                   ; Advance every star
+    lda #osbyte_scan_keyboard_from_16   ; OSBYTE &7A: any key pressed?
+    jsr osbyte                          ; ...  Scan keyboard from key 16
+    cpx #&ff                            ; ...
+    beq code_290a                       ; No: carry on
+    ldy #2                              ; Yes: erase the stars still showing...
+; &2922 referenced 1 time by &392b
+.code_2922
+    lda star_showing,y                  ; ...
+    beq code_292a                       ; ...
+    jsr plot_star                       ; ...
+; &292a referenced 1 time by &3925
+.code_292a
+    dey                                 ; ...
+    bpl code_2922                       ; ...
+    rts                                 ; Return
+; ***************************************************************************************
+; Start a star at a free place
+;
+; Take the first star not showing, if any, give it frame 0 and step +1, choose a free
+; place at random, mark the place taken and plot the first frame.
+; &292e referenced 1 time by &3911
+.start_star
+    ldy #0                              ; Find a star not showing...
+; &2930 referenced 1 time by &3938
+.code_2930
+    lda star_showing,y                  ; ...
+    beq code_293b                       ; ...
+    iny                                 ; ...
+    cpy #3                              ; ...
+    bne code_2930                       ; ...
+    rts                                 ; All three showing: return
+; &293b referenced 1 time by &3933
+.code_293b
+    lda #1                              ; Mark it showing
+    sta star_showing,y                  ; ...
+    lda #1                              ; Frame step +1...
+    sta star_frame_step,y               ; ...
+    lda #0                              ; ...from frame 0
+    sta star_frame,y                    ; ...
+; &294a referenced 1 time by &3957
+.code_294a
+    lda system_via_t1c_l                ; Pick a place at random (timer, &FA and &FC mixed)...
+    eor os_zp_fa                        ; ...
+    eor os_irq_a                        ; ...
+    and #7                              ; ...
+    tax                                 ; ...
+    lda star_places_x,x                 ; ...that is free
+    bmi code_294a                       ; ...
+    sta star_x,y                        ; Star position from the place...
+    lda star_places_y,x                 ; ...
+    sta star_y,y                        ; ...
+    stx star_place,y                    ; ...remembering the place
+    lda #&ff                            ; Mark the place taken
+    sta star_places_x,x                 ; ...
+    jsr plot_star                       ; Plot the first frame
+    rts                                 ; Return
+; ***************************************************************************************
+; Advance each star by one frame
+;
+; For each showing star, erase the frame (exclusive-OR) and step it; past frame 6 it
+; turns back at 5, and below 0 it is finished and its place freed. Then plot the new
+; frame and pause, longer for a star not showing so the timing stays even.
+; &296d referenced 1 time by &3914
+.advance_stars
+    ldy #0                              ; For each star...
+; &296f referenced 1 time by &39b6
+.code_296f
+    lda star_showing,y                  ; ...showing?
+    beq code_29d0                       ; No: just pause
+    jsr plot_star                       ; Erase its frame
+    clc                                 ; Step the frame
+    lda star_frame,y                    ; ...
+    adc star_frame_step,y               ; ...
+    sta star_frame,y                    ; ...
+    bmi code_2993                       ; Below 0: finished
+    cmp #7                              ; Past 6?
+    bcc code_29a2                       ; No: plot it
+    lda #5                              ; Yes: frame 5...
+    sta star_frame,y                    ; ...
+    lda #&ff                            ; ...stepping back
+    sta star_frame_step,y               ; ...
+    bmi code_29a2                       ; ...and plot it (always branches)
+; &2993 referenced 1 time by &3981
+.code_2993
+    lda #0                              ; Finished: not showing...
+    sta star_showing,y                  ; ...
+    lda star_x,y                        ; ...and free its place
+    ldx star_place,y                    ; ...
+    sta star_places_x,x                 ; ...
+    bpl code_29a5                       ; ...(always branches)
+; &29a2 referenced 2 times by &3985, &3991
+.code_29a2
+    jsr plot_star                       ; Plot the new frame
+; &29a5 referenced 1 time by &39a0
+.code_29a5
+    tya                                 ; Pause...
+    pha                                 ; ...
+    ldx #5                              ; ...
+; &29a9 referenced 2 times by &39af, &39d4
+.code_29a9
+    ldy #&ff                            ; ...X x 256 iterations...
+; &29ab referenced 1 time by &39ac
+.code_29ab
+    dey                                 ; ...
+    bne code_29ab                       ; ...
+    dex                                 ; ...
+    bne code_29a9                       ; ...
+    pla                                 ; ...
+    tay                                 ; ...
+    iny                                 ; Next star
+    cpy #3                              ; ...
+    bne code_296f                       ; ...
+    rts                                 ; Return
+; ***************************************************************************************
+; Plot star Y's current frame
+;
+; Call title_plot_star with the star's position and frame, keeping Y.
+;
+; On Entry:
+;     Y: star, 0-2
+;
+; On Exit:
+;     Y: preserved
+; &29b9 referenced 4 times by &3927, &3969, &3974, &39a2
+.plot_star
+    lda star_x,y                        ; plot_x = star's column
+    sta plot_x                          ; ...
+    lda star_y,y                        ; plot_y = star's row
+    sta plot_y                          ; ...
+    lda star_frame,y                    ; sprite_number = star's frame
+    sta sprite_number                   ; ...
+    tya                                 ; Plot it, keeping Y
+    pha                                 ; ...
+    jsr title_plot_star                 ; ...
+    pla                                 ; ...
+    tay                                 ; ...
+    rts                                 ; Return
+; &29d0 referenced 1 time by &3972
+.code_29d0
+    tya                                 ; Star not showing: pause for longer...
+    pha                                 ; ...
+    ldx #&14                            ; ...
+    bne code_29a9                       ; ...(always branches)
+    equb &38, &38, &3e, &3e
+; &29da used as index base 6 times by &3904, &3922, &3930, &393d, &396f, &3995
+.star_showing
+    equb &38, &38, &3e
+    equb &3e, &38, &38
+; &29e0 used as index base 3 times by &3954, &3966, &399d
+.star_places_x
+    equb &2f, &20, &05, &00, &1f, &46, &46, &14
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+; &29f0 used as index base 1 time by &395c
+.star_places_y
+    equb &0f, &0f, &24, &42, &33, &0f, &48, &15
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+; ***************************************************************************************
+; Star frames
+;
+; Seven 7-byte by 28-row MODE 2 frames of the title screen's twinkling star, from small
+; (frame 0) to large (frame 6).
+.star_frame_data
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &15, &1f, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &2a, &0a, &2a, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &15, &2a, &00, &3f, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &2a, &2a, &00, &2a, &2a, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &15, &15, &2a, &00, &3f, &15, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &2a, &2a, &2a, &00, &2a, &2a, &2a
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &2a, &3f, &2a, &00, &3f, &2a, &2a
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00
 
 
     ; Copy the newly assembled block of code back to it's proper place in the binary
     ; file.
     ; (Note the parameter order: 'copyblock <start>,<end>,<dest>')
-    copyblock &2649, *, &3649
+    copyblock dunjunz_start, *, &3649
 
     ; Clear the area of memory we just temporarily used to assemble the new block,
     ; allowing us to assemble there again if needed
-    clear &2649, &2f5c
+    clear dunjunz_start, &2f5c
 
     ; Set the program counter to the next position in the binary file.
-    org &3649 + (* - &2649)
+    org &3649 + (* - dunjunz_start)
 
 
     org &4000
 
 ; Move 3: &4000 to &2000 for length 4096
     org &2000
-    equb &69, &01                       ; ...
-    equb &a8                            ; ...
-    equb &aa                            ; ...
-    equb &69, &07                       ; ...
-    equb &8d, &00, &0d                  ; ...
-    equb &de, &d0, &1b                  ; ...
-    equb &e8                            ; ...
-    equb &ec, &00, &0d                  ; ...
-    equb &d0, &f7                       ; ...
-    equb &98                            ; Three rows shorter...
-    equb &aa                            ; ...
-    equb &38                            ; ...
-    equb &bd, &48, &1c                  ; ...
-    equb &e9, &03                       ; ...
-    equb &9d, &48, &1c                  ; ...
-    equb &e8                            ; ...
-    equb &ec, &00, &0d                  ; ...
-    equb &d0, &f1                       ; ...
-    equb &4c, &00, &1f                  ; ...three rows shorter. Next frame
+    adc #1                              ; ...
+    tay                                 ; ...
+    tax                                 ; ...
+    adc #7                              ; ...
+    sta scratch                         ; ...
+; &2009 referenced 1 time by &4010
+.code_2009
+    dec sprite_widths,x                 ; ...
+    inx                                 ; ...
+    cpx scratch                         ; ...
+    bne code_2009                       ; ...
+    tya                                 ; Three rows shorter...
+    tax                                 ; ...
+; &2014 referenced 1 time by &4021
+.code_2014
+    sec                                 ; ...
+    lda sprite_heights,x                ; ...
+    sbc #3                              ; ...
+    sta sprite_heights,x                ; ...
+    inx                                 ; ...
+    cpx scratch                         ; ...
+    bne code_2014                       ; ...
+    jmp play_level                      ; ...three rows shorter. Next frame
 ; &2026 referenced 1 time by &1ffa
 .code_2026
     lda exit_saved_x                    ; Put the exit back...
@@ -707,6 +1243,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     dec cell_x                          ; ...
     rts                                 ; Return
     equb &01, &3f
+; &2100 used as index base 1 time by &15ce
 .object_free_map
     equb &00
     equb &02
@@ -923,13 +1460,13 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &33, &ff, &c0, &33
     equb &33, &33, &33, &33
     equb &11, &33, &33, &22
-; &2200 used as index base 3 times by &1cd8, &1d8b, &77fe
+; &2200 used as index base 4 times by &158d, &1cd8, &1d8b, &77fe
 .door_x
     equb &ff, &ff, &ff, &04, &ff, &ff, &06, &ff
     equb &11, &ff, &ff, &ff, &1a, &03, &03, &0b
     equb &ff, &03, &09, &12, &ff, &ff, &ff, &ff
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
-; &2220 used as index base 3 times by &1ce3, &1d8e, &7804
+; &2220 used as index base 4 times by &1593, &1ce3, &1d8e, &7804
 .door_y
     equb &ff, &ff, &ff, &0d, &ff, &ff, &11, &ff
     equb &16, &ff, &ff, &ff, &1a
@@ -938,19 +1475,19 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equs "+.+"
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
     equb &ff, &ff, &ff, &ff
-; &2240 used as index base 1 time by &7810
+; &2240 used as index base 2 times by &1599, &7810
 .door_sprite
     equb &ff, &1c, &1c, &1d, &1c, &1c, &1d, &1d
     equb &1d, &1d, &1d, &1c, &1c, &1d, &1d, &1c
     equb &1d, &1d, &1c, &1c, &ff, &ff, &ff, &ff
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
-; &2260 used as index base 6 times by &1dce, &1e00, &1e45, &1e8c, &1ea1, &40aa
+; &2260 used as index base 7 times by &15a4, &1dce, &1e00, &1e45, &1e8c, &1ea1, &40aa
 .key_x
     equb &13, &ff, &ff, &1b, &ff, &ff, &17, &ff
     equb &1c, &ff, &ff, &ff, &02, &15, &04, &09
     equb &ff, &04, &19, &17, &ff, &ff, &ff, &ff
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
-; &2280 used as index base 6 times by &1dd4, &1e06, &1e4d, &1e92, &1ea4, &40b0
+; &2280 used as index base 7 times by &15aa, &1dd4, &1e06, &1e4d, &1e92, &1ea4, &40b0
 .key_y
     equb &25, &ff, &ff, &06, &ff, &ff, &09, &ff
     equb &18, &ff, &ff, &ff, &29, &04, &0c, &14
@@ -975,17 +1512,17 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &0f, &05
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00
-; &22e0 used as index base 9 times by &1cf2, &1d95, &1deb, &1dfa, &1e0b, &1e86, &1e97, &40a4, &40b5
+; &22e0 used as index base 10 times by &1600, &1cf2, &1d95, &1deb, &1dfa, &1e0b, &1e86, &1e97, &40a4, &40b5
 .hero_key
     equb &00, &00, &00, &00, &00
-; &22e5 used as index base 3 times by &1e28, &1e2f, &1e9c
+; &22e5 used as index base 4 times by &1603, &1e28, &1e2f, &1e9c
 .hero_key_dropped
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00
-; &22f0 used as index base 3 times by &1079, &1cc8, &6f9b
+; &22f0 used as index base 4 times by &1079, &1606, &1cc8, &6f9b
 .hero_door_x
     equb &1a, &09, &00, &16, &00
-; &22f5 used as index base 3 times by &108a, &1cce, &6fa1
+; &22f5 used as index base 4 times by &108a, &1609, &1cce, &6fa1
 .hero_door_y
     equb &06, &1d, &00, &09, &00, &00, &00, &00
     equb &00, &00, &00
@@ -1449,7 +1986,8 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &05, &00, &00, &0a, &00, &1a, &30, &05
     equb &00, &0a, &00, &05, &0f, &1a, &30, &25
     equb &0f, &00, &00, &0a, &0a, &30, &30, &0a
-    equb &05, &00, &00, &0a, &00, &0f, &0f, &00
+    equb &05
+    equb &00, &00, &0a, &00, &0f, &0f, &00
 .sprite_teleporter
     equb &3f, &3f, &3f, &3f
     equb &3e, &3c, &3c, &38
@@ -1723,6 +2261,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &00, &30, &30, &00
     equb &01, &00, &00, &00, &17, &00, &00, &90
     equb &17, &00, &00, &00, &00, &00, &00, &00
+; &2d00 used as index base 1 time by &15db
 .wall_sprite
     equb &0f, &0b, &0f, &07
     equb &03, &0f, &0f, &0f
@@ -2017,6 +2556,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ;
 ; On Entry:
 ;     LEVEL_NUMBER: level loaded (1-25)
+; &0450 referenced 2 times by &14f8, &c5a7
 .decrypt_level
     ldy #0                              ; Point at &6B00, the start of the level...
     sty plot_x                          ; ...low byte
@@ -2046,7 +2586,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     lda sprite_width                    ; Compare the sum...
     cmp level_checksums,x               ; ...with this level's checksum
     beq decrypt_level_done              ; Match: return
-    jsr data_d9cd
+    jsr data_d9cd                       ; No match: call &D9CD, the MOS 1.20 reset entry; on a Master it is private RAM that no file of this side fills
 ; &0484 referenced 1 time by &047f
 .decrypt_level_done
     rts                                 ; Return
@@ -2089,6 +2629,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; Clear the left of the screen, print the menu and let the players toggle each hero (keys
 ; 1-4) and the sound (5 on, 6 off). SPACE starts the game if at least one hero is
 ; playing.
+; &0500 referenced 1 time by &0e11
 .hero_menu
     lda #&1c                            ; VDU 28: a text window over the left of the screen...
     jsr oswrch                          ; ...
@@ -2341,6 +2882,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ;
 ; Draw any ten-thousands score digits, then put every hero switched off on the menu out
 ; of play, with a &64 entry in returning_hero_queue in their place.
+; &06b0 referenced 1 time by &0e5d
 .remove_absent_heroes
     ldx #0                              ; For each hero, keeping a count of absent heroes in Y...
     ldy #0                              ; ...
@@ -2390,19 +2932,58 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; &06fc used as index base 4 times by &05b0, &05b5, &05cb, &06c9
 .hero_absent
     equb &00, &00, &00, &00
+; ***************************************************************************************
+; Leftovers in the line-input buffer
+;
+; Not used by the game. &0700 is the MOS line-input buffer, and these bytes are what it
+; held when Coder was saved: the command *SA. CODER 400+3FF 740, then the ends of shorter
+; earlier lines and the fragment of BBC BASIC assembler (label+2:LDA#255:.label JSR&30)
+; that the Model B images and the cassette lineage's &0400 images also hold.
+.line_buffer_leftovers
     equs "*SA. CODER 400+3FF 740"
     equb &0d
     equs " 740"
     equb &0d, &54, &50, &0d, &0d, &50, &0d
-    equs "Alabel+2:LDA#255:.label JSR&30 "
-    equb &d0, &07, &a2, &00, &bd, &00, &0d, &9d
-    equb &00, &c4, &ca, &d0, &f7, &a2, &7a, &a0
-    equb &07, &20, &f7, &ff, &a2, &83, &a0, &07
-    equb &20, &f7, &ff, &a2, &8c, &a0, &07, &20
-    equb &f7, &ff, &a2, &95, &a0, &07, &20, &f7
-    equb &ff, &a2, &00, &bd, &9e, &07, &20, &ee
-    equb &ff, &e8, &e0, &15, &d0, &f5, &4c, &c0
-    equb &07
+    equs "Alabel+2:LDA#255:.label JSR&30"
+; ***************************************************************************************
+; Coder: save the MOS's page &0D, load the game and start it
+;
+; Run with *RUN CODER (or from Coder2). Set the bell sound, copy page &0D, which the MOS
+; and the filing system use for their NMI code and workspace, to &C400 in private RAM so
+; that start_level can put it back before each level is loaded, *LOAD the four other game
+; files, restore the display that *DUNJUNZ blanked, select COLOUR 2 and start a new game
+; at &0E00.
+.coder_start
+    jsr set_bell                        ; Set the bell sound
+    ldx #0                              ; Copy page &0D...
+; &0745 referenced 1 time by &074c
+.loop_0745
+    lda scratch,x                       ; ...
+    sta data_c400,x                     ; ...to &C400 in private RAM
+    dex                                 ; ...
+    bne loop_0745                       ; ...
+    ldx #&7a ; 'z'                      ; *L. DUNJ2 (&6E80-&7FFF)
+    ldy #7                              ; ...
+    jsr oscli                           ; ...
+    ldx #&83                            ; *L. DUNJ3 (&08C0-&0CFE)
+    ldy #7                              ; ...
+    jsr oscli                           ; ...
+    ldx #&8c                            ; *L. DUNJ4 (&0E00-&1FFF)
+    ldy #7                              ; ...
+    jsr oscli                           ; ...
+    ldx #&95                            ; *L. DUNJ5 (&2000-&2FFF)
+    ldy #7                              ; ...
+    jsr oscli                           ; ...
+    ldx #0                              ; Send the 21 bytes of coder_display_vdu
+; &076c referenced 1 time by &0775
+.loop_076c
+    lda coder_display_vdu,x             ; ...
+    jsr oswrch                          ; ...
+    inx                                 ; ...
+    cpx #&15                            ; ...
+    bne loop_076c                       ; ...
+    jmp code_07c0                       ; ...
+.load_dunj_commands
     equs "L. DUNJ2"
     equb &0d
     equs "L. DUNJ3"
@@ -2410,18 +2991,51 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equs "L. DUNJ4"
     equb &0d
     equs "L. DUNJ5"
-    equb &0d, &06, &17, &00, &06, &19, &00, &00
-    equb &00, &00, &00, &00, &17, &00, &01, &50
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &a9, &11, &20, &ee, &ff
-    equb &a9, &02, &20, &ee, &ff, &4c, &00, &0e
-    equb &00, &00, &00, &a9, &d3, &a2, &13, &a0
-    equb &00, &20, &f4, &ff, &a9, &d4, &a2, &00
-    equb &a0, &00, &20, &f4, &ff, &a9, &d5, &a2
-    equb &64, &a0, &00, &20, &f4, &ff, &a9, &d6
-    equb &a2, &01, &a0, &00, &20, &f4, &ff
-    equs "`nz1"
+    equb &0d
+; &079e used as index base 1 time by &076c
+.coder_display_vdu
+    equb &06, &17, &00, &06, &19, &00, &00, &00, &00, &00, &00
+    equb &17, &00, &01, &50, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+; &07c0 referenced 1 time by &0777
+.code_07c0
+    lda #&11                            ; COLOUR 2...
+    jsr oswrch                          ; ...
+    lda #2                              ; ...
+    jsr oswrch                          ; ...
+    jmp code_0e00                       ; ...and start a new game
+    equb &00, &00, &00
+; ***************************************************************************************
+; Set the bell sound
+;
+; OSBYTEs &D3-&D6: the BEL character's sound on channel &13, envelope 0 (fixed
+; amplitude), pitch &64, duration 1. The cassette game's start-up sets the same sound on
+; channel &11.
+; &07d0 referenced 1 time by &0740
+.set_bell
+    lda #osbyte_bell_channel            ; OSBYTE &D3: bell channel...
+    ldx #&13                            ; ...&13
+    ldy #0                              ; ...
+    jsr osbyte                          ; ...  osbyte: bell channel
+    lda #osbyte_bell_envelope           ; OSBYTE &D4: bell envelope...
+    ldx #0                              ; ...0, a fixed amplitude
+    ldy #0                              ; ...
+    jsr osbyte                          ; ...  osbyte: bell envelope
+    lda #osbyte_bell_frequency          ; OSBYTE &D5: bell pitch...
+    ldx #&64 ; 'd'                      ; ...&64
+    ldy #0                              ; ...
+    jsr osbyte                          ; ...  osbyte: bell frequency
+    lda #osbyte_bell_duration           ; OSBYTE &D6: bell duration...
+    ldx #1                              ; ...1
+    ldy #0                              ; ...
+    jsr osbyte                          ; ...  osbyte: bell duration
+    rts                                 ; Return
+; ***************************************************************************************
+; Leftover filename
+;
+; The end of "Dunjunz1", the name the cassette lineage's &0400 images hold at &07F0, part
+; overwritten by set_bell.
+    equs "nz1"
     equb &0d, &00, &00, &00, &00, &00, &00
 .dasmos_coder_end
 
@@ -2456,9 +3070,13 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ;     A: corrupted
 ;     X: 0
 ;     Y: 0
-; &0900 referenced 20 times by &042e, &043d, &0f79, &1daa, &1e20, &1e7d, &40ca, &7276, &7286, &72cf, &72df, &72ef, &72ff, &7613, &7838, &7842, &78aa, &78c4, &78de, &78f8
+; &0900 referenced 21 times by &042e, &043d, &0f79, &1daa, &1e20, &1e7d, &40ca, &7276, &7286, &72cf, &72df, &72ef, &72ff, &7613, &7838, &7842, &78aa, &78c4, &78de, &78f8, &c726
 .plot_sprite
+; &0901 referenced 1 time by &c72b
+data_0901 = plot_sprite+1
     ldx sprite_number                   ; X = sprite number
+; &0902 referenced 1 time by &c730
+.code_0902
     lda sprite_addr_lo,x                ; Point sprite_data_ptr at the sprite's data...
     sta sprite_data_ptr                 ; ...low byte
     lda sprite_addr_hi,x                ; ...high byte from its own table
@@ -2545,11 +3163,11 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     lsr a                               ; ...
     and #&fe                            ; ...times 2 to index the table's byte pairs
     tay                                 ; ...
-    lda data_c675,y
+    lda row_offsets,y                   ; High byte of row x 640, from Table's copy of the MOS 1.20 table in private RAM...
     clc                                 ; ...
     adc #&30 ; '0'                      ; ...plus &30: the screen starts at &3000
     sta screen_ptr_hi                   ; ...
-    lda data_c676,y
+    lda row_offsets_lo,y                ; Low byte of row x 640
     sta screen_ptr                      ; ...
     lda plot_y                          ; Add the pixel row within the character...
     and #7                              ; ...
@@ -2593,7 +3211,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; &09f1 referenced 4 times by &1f80, &1fad, &1fd9, &402c
 .exit_saved_y
     equb &2c
-; &09f2 referenced 4 times by &1f10, &1f96, &4034, &4078
+; &09f2 referenced 5 times by &151a, &1f10, &1f96, &4034, &4078
 .exit_busy
     equb &00
 ; &09f3 referenced 5 times by &1fbe, &1fc3, &1fce, &1ff4, &4086
@@ -2608,24 +3226,31 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; &09f6 referenced 1 time by &4042; also used as index base 1 time by &1fe2
 .exit_offsets_x
     equb &04
+; &09f7 referenced 1 time by &152b
 .exit_offset_x_1
     equb &01
+; &09f8 referenced 1 time by &152e
 .exit_offset_x_2
     equb &01
+; &09f9 referenced 1 time by &151d
 .exit_offset_x_3
     equb &00
-; &09fa used as index base 1 time by &1fe7
+; &09fa referenced 1 time by &1520; also used as index base 1 time by &1fe7
 .exit_offsets_y
     equb &00
+; &09fb referenced 1 time by &153b
 .exit_offset_y_1
     equb &05
+; &09fc referenced 1 time by &1540
 .exit_offset_y_2
     equb &03
+; &09fd referenced 1 time by &1531
 .exit_offset_y_3
     equb &01
+; &09fe referenced 1 time by &1523
 .exit_offset_y_4
     equb &00
-; &09ff referenced 3 times by &1f2d, &4045, &4081
+; &09ff referenced 4 times by &1536, &1f2d, &4045, &4081
 .shrunk_hero
     equb &ff
 .sprite_boots
@@ -2718,13 +3343,13 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; &0b28 referenced 3 times by &765e, &768f, &7699
 .magic_kill_count
     equb &00, &10
-; &0b2a referenced 3 times by &7421, &742b, &7432; also used as index base 5 times by &06ec, &16b4, &16bb, &7256, &725f
+; &0b2a referenced 3 times by &7421, &742b, &7432; also used as index base 6 times by &06ec, &15fd, &16b4, &16bb, &7256, &725f
 .returning_hero_queue
 ; &0b2b referenced 2 times by &742f, &7438
 ; &0b2c referenced 2 times by &7435, &743e
 ; &0b2d referenced 2 times by &743b, &7441
     equb &03, &02, &01, &04, &10
-; &0b2f referenced 4 times by &7cb3, &7cb6, &7cbf, &7cc2
+; &0b2f referenced 5 times by &1526, &7cb3, &7cb6, &7cbf, &7cc2
 .next_trapdoor
     equb &04
 ; &0b30 used as index base 1 time by &76f2
@@ -2732,7 +3357,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &16, &17, &18, &19
     equs "defgh"
     equb &10, &10, &10, &10, &10, &10, &10
-; &0b40 used as index base 3 times by &758d, &759e, &75a6
+; &0b40 used as index base 4 times by &15f3, &758d, &759e, &75a6
 .monster_hit_points
     equb &10, &08, &08, &08, &08, &08, &08, &08
     equb &08, &08, &08, &08, &08, &08, &08, &05
@@ -2749,11 +3374,11 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; &0b8f used as index base 1 time by &79cd
     equb &02, &02, &02, &03, &03, &04, &09, &09
     equb &10, &03, &03, &03, &10, &10, &10, &10
-; &0b90 used as index base 1 time by &7cc5
+; &0b90 used as index base 2 times by &15b5, &7cc5
 .trapdoor_x
 ; &0b97 used as index base 1 time by &79d3
     equb &0b, &15, &17, &10, &03, &17, &0d, &1a
-; &0b98 used as index base 1 time by &7ccb
+; &0b98 used as index base 2 times by &15bb, &7ccb
 .trapdoor_y
     equb &04, &0c, &14, &1d
     equs "% (,"
@@ -2788,6 +3413,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &02, &00
     equb &c8, &00
     equb &02, &00
+; &0c00 used as index base 1 time by &15c8
 .room_walls
     equs "TIKP$UTHO[KF,D]/DYW3CZD\8V\;VHRVao"
     equb &02
@@ -2832,93 +3458,123 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     org &0e00
 
 .dasmos_dunj4_start
-    equb &a9, &00                       ; New game: level 0...
-    equb &8d, &9f, &16                  ; ...
-    equb &8d, &ff, &16                  ; ...
-    equb &aa                            ; Give each hero their starting attributes
-    equb &20, &cf, &0e                  ; ...
-    equb &e8                            ; ...
-    equb &e0, &04                       ; ...
-    equb &d0, &f8                       ; ...
-    equb &20, &00, &05                  ; ...
+; &0e00 referenced 2 times by &07ca, &0ecc
+.code_0e00
+    lda #0                              ; New game: level 0...
+    sta level_number                    ; ...
+    sta level_bcd                       ; ...
+    tax                                 ; Give each hero their starting attributes
+; &0e09 referenced 1 time by &0e0f
+.loop_0e09
+    jsr reset_hero                      ; ...
+    inx                                 ; ...
+    cpx #4                              ; ...
+    bne loop_0e09                       ; ...
+    jsr hero_menu                       ; ...
 ; Play each level in turn until every hero is dead.
+; &0e14 referenced 1 time by &0e84
 .level_loop
-    equb &ad, &9f, &16                  ; Monster hit points = 8 + 2 x (levels played)...
-    equb &0a                            ; ...
-    equb &18                            ; ...
-    equb &69, &08                       ; ...
-    equb &8d, &ff, &7c                  ; ...
-    equb &f8                            ; Add 1 to the level number in decimal...
-    equb &18                            ; ...
-    equb &ad, &ff, &16                  ; ...
-    equb &69, &01                       ; ...
-    equb &8d, &ff, &16                  ; ...
-    equb &d8                            ; ...
-    equb &ad, &9f, &16                  ; One digit for levels 1-9, two from 10 (the count is incremented later, in show_level_number)
-    equb &c9, &09                       ; ...
-    equb &b0, &04                       ; ...
-    equb &a2, &00, &f0, &02             ; X = 0: one digit
-    equb &a2, &01                       ; X = 1: two digits
-    equb &ad, &ff, &16                  ; Units digit...
-    equb &29, &0f                       ; ...
-    equb &18                            ; ...as ASCII...
-    equb &69, &30                       ; ...
-    equb &9d, &d5, &16                  ; ...into the filename
-    equb &e0, &00                       ; Two digits?
-    equb &f0, &0d                       ; No
-    equb &ad, &ff, &16                  ; Yes: the tens digit...
-    equs "JJJJ"                         ; ...
-    equb &18                            ; ...as ASCII...
-    equb &69, &30                       ; ...
-    equb &8d, &d5, &16                  ; ...goes first
-    equb &a9, &0d                       ; Terminate the filename with a carriage return
-    equb &9d, &d6, &16                  ; ...
-    equb &20, &00, &14                  ; Load and draw the level
-    equb &20, &f7, &0e                  ; Draw the status panel
-    equb &20, &b0, &06                  ; Take out the heroes nobody plays
-    equb &a9, &01                       ; Let one vertical sync pass before play starts
-    equb &8d, &40, &02                  ; ...
-    equb &20, &00, &1f                  ; Play the level until it ends
-    equb &a2, &00                       ; Count the heroes who died, giving each back their starting attributes
-    equb &8e, &f2, &0f                  ; ...
-    equb &bd, &90, &0d                  ; Dead?
-    equb &c9, &1d                       ; ...
-    equb &d0, &06                       ; ...
-    equb &20, &cf, &0e                  ; Yes: reset them
-    equb &ee, &f2, &0f                  ; ...and count them
-    equb &e8                            ; Next hero
-    equb &e0, &04                       ; ...
-    equb &d0, &ee                       ; ...
-    equb &ad, &f2, &0f                  ; Any hero alive?
-    equb &c9, &04                       ; ...
-    equb &d0, &8e, &20, &00, &c6, &ea, &ea  ; Yes: on to the next level
-    equb &a9, &00                       ; ...
-    equb &20, &ee, &ff                  ; ...
-    equb &a9, &18                       ; ...
-    equb &20, &ee, &ff                  ; ...
-    equb &a9, &10                       ; ...
-    equb &20, &ee, &ff                  ; ...
-    equb &a9, &00                       ; ...
-    equb &20, &ee, &ff                  ; ...
-    equb &a9, &0c                       ; ...VDU 12 to clear it
-    equb &20, &ee, &ff                  ; ...
-    equb &a2, &04                       ; Put spaces back over the four message bytes used as counters
-    equb &a9, &20                       ; ...
-    equb &9d, &f0, &0f                  ; ...
-    equb &ca                            ; ...
-    equb &d0, &fa                       ; ...
-    equb &bd, &90, &0f                  ; Print game_over_message...
-    equb &20, &e3, &ff                  ; ...
-    equb &e8                            ; ...
-    equb &c9, &00                       ; ...up to its zero byte
-    equb &d0, &f5                       ; ...
-    equb &ad, &40, &02                  ; Wait for the vertical sync counter to run out
-    equb &d0, &fb                       ; ...
-    equb &a9, &0f                       ; Flush the input buffers
-    equb &20, &f4, &ff, &a2, &f4, &a0, &01  ; ...
-    equb &a9, &81                       ; ...
-    equb &20, &f4, &ff                  ; ...
-    equb &4c, &00, &0e                  ; ...then start a new game
+    lda level_number                    ; Monster hit points = 8 + 2 x (levels played)...
+    asl a                               ; ...
+    clc                                 ; ...
+    adc #8                              ; ...
+    sta monster_start_hit_points        ; ...
+    sed                                 ; Add 1 to the level number in decimal...
+    clc                                 ; ...
+    lda level_bcd                       ; ...
+    adc #1                              ; ...
+    sta level_bcd                       ; ...
+    cld                                 ; ...
+    lda level_number                    ; One digit for levels 1-9, two from 10 (the count is incremented later, in show_level_number)
+    cmp #9                              ; ...
+    bcs code_0e34                       ; ...
+    ldx #0                              ; X = 0: one digit
+    beq code_0e36                       ; ...(always branches)
+; &0e34 referenced 1 time by &0e2e
+.code_0e34
+    ldx #1                              ; X = 1: two digits
+; &0e36 referenced 1 time by &0e32
+.code_0e36
+    lda level_bcd                       ; Units digit...
+    and #&0f                            ; ...
+    clc                                 ; ...as ASCII...
+    adc #&30 ; '0'                      ; ...
+    sta level_filename_digits,x         ; ...into the filename
+    cpx #0                              ; Two digits?
+    beq code_0e52                       ; No
+    lda level_bcd                       ; Yes: the tens digit...
+    lsr a                               ; ...
+    lsr a                               ; ...
+    lsr a                               ; ...
+    lsr a                               ; ...
+    clc                                 ; ...as ASCII...
+    adc #&30 ; '0'                      ; ...
+    sta level_filename_digits           ; ...goes first
+; &0e52 referenced 1 time by &0e43
+.code_0e52
+    lda #&0d                            ; Terminate the filename with a carriage return
+    sta level_filename_digits + 1,x     ; ...
+    jsr start_level                     ; Load and draw the level
+    jsr draw_status_panel               ; Draw the status panel
+    jsr remove_absent_heroes            ; Take out the heroes nobody plays
+    lda #1                              ; Let one vertical sync pass before play starts
+    sta os_vsync_counter                ; ...
+    jsr play_level                      ; Play the level until it ends
+    ldx #0                              ; Count the heroes who died, giving each back their starting attributes
+    stx count                           ; ...
+; &0e6d referenced 1 time by &0e7d
+.loop_0e6d
+    lda hero_health_tens,x              ; Dead?
+    cmp #&1d                            ; ...
+    bne code_0e7a                       ; ...
+    jsr reset_hero                      ; Yes: reset them
+    inc count                           ; ...and count them
+; &0e7a referenced 1 time by &0e72
+.code_0e7a
+    inx                                 ; Next hero
+    cpx #4                              ; ...
+    bne loop_0e6d                       ; ...
+    lda count                           ; Any hero alive?
+    cmp #4                              ; ...
+    bne level_loop                      ; Yes: on to the next level
+    jsr game_over_music                 ; All dead: stop the music and start VDU 28,0,24,16,0, a text window on the left...
+    nop                                 ; Padding
+    nop                                 ; ...
+    lda #0                              ; ...
+    jsr oswrch                          ; ...
+    lda #&18                            ; ...
+    jsr oswrch                          ; ...
+    lda #&10                            ; ...
+    jsr oswrch                          ; ...
+    lda #0                              ; ...
+    jsr oswrch                          ; ...
+    lda #&0c                            ; ...VDU 12 to clear it
+    jsr oswrch                          ; ...
+    ldx #4                              ; Put spaces back over the four message bytes used as counters
+    lda #&20 ; ' '                      ; ...
+; &0ea8 referenced 1 time by &0eac
+.loop_0ea8
+    sta panel_hero - 1,x                ; ...
+    dex                                 ; ...
+    bne loop_0ea8                       ; ...
+; &0eae referenced 1 time by &0eb7
+.loop_0eae
+    lda game_over_message,x             ; Print game_over_message...
+    jsr osasci                          ; ...
+    inx                                 ; ...
+    cmp #0                              ; ...up to its zero byte
+    bne loop_0eae                       ; ...
+; &0eb9 referenced 1 time by &0ebc
+.loop_0eb9
+    lda os_vsync_counter                ; Wait for the vertical sync counter to run out
+    bne loop_0eb9                       ; ...
+    lda #osbyte_flush_buffer_class      ; Flush the input buffers
+    jsr osbyte                          ; ...  Flush selected class of buffer
+    ldx #&f4                            ; Wait up to &1F4 centiseconds (5 s) for a key...
+    ldy #1                              ; ...
+    lda #osbyte_inkey                   ; ...
+    jsr osbyte                          ; ...  Test for f5 key pressed
+    jmp code_0e00                       ; ...then start a new game
 ; ***************************************************************************************
 ; Give a hero their starting attributes
 ;
@@ -2931,6 +3587,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ;
 ; On Exit:
 ;     X: preserved
+; &0ecf referenced 2 times by &0e09, &0e74
 .reset_hero
     lda hero_start_max_missiles,x       ; Starting missile limit...
     sta hero_max_missiles,x             ; ...
@@ -2954,6 +3611,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; score (by taking a health point and adding a score point, from starting values one
 ; beyond those wanted), face, shield and armour rating, one icon per missile allowed, and
 ; missile damage.
+; &0ef7 referenced 1 time by &0e5a
 .draw_status_panel
     lda #0                              ; For each hero...
     sta panel_hero                      ; ...
@@ -3058,6 +3716,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; and a last line ended by a zero byte. Two bytes of it (&0FF1, &0FF2) double as
 ; counters, and are overwritten with spaces before printing, so the full stop after "YOU
 ; ALL" never appears.
+; &0f90 used as index base 1 time by &0eae
 .game_over_message
     equs "FAREWELL!        "
     equb &0d
@@ -3070,9 +3729,10 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equs "MOOD TO RESURRECT"
     equb &0d
 .data_0fea
+; &0ff0 used as index base 1 time by &0ea8
 ; &0ff1 referenced 8 times by &0ef9, &0efc, &0f18, &0f28, &0f4d, &0f5d, &0f60, &0f6d
 panel_hero = data_0fea+7
-; &0ff2 referenced 2 times by &0f35, &0f48
+; &0ff2 referenced 5 times by &0e6a, &0e77, &0e7f, &0f35, &0f48
 count = data_0fea+8
     equs "YOU ALL.         "
     equb &0d
@@ -3171,7 +3831,7 @@ count = data_0fea+8
 ; &10e7 referenced 1 time by &10dd
 reset_call_address = reset_call+1
 ; &10e8 referenced 1 time by &10e3
-    jsr data_0000                       ; ...and call it: reset the machine
+    jsr tune_ptr                        ; ...and call it: reset the machine
 ; ***************************************************************************************
 ; Play the victory sequence
 ;
@@ -3461,81 +4121,354 @@ reset_call_address = reset_call+1
     equs "<BB>"
     equb &02, &04, &18, &00
     equs "<BB>"
-    equb &02, &04, &18, &00, &74, &ad, &38, &16
-    equb &c9, &7b, &d0, &12, &ad, &69, &c7, &48
-    equb &ad, &6a, &c7, &48, &ad, &6b, &c7, &48
-    equb &a5, &00, &48, &a5, &01
-    equs "H `"
-    equb &c7, &20, &12, &16, &20, &83, &14, &20
-    equb &71, &15, &20, &0d, &15, &20, &e4, &15
-    equb &20, &19, &16, &a9, &17, &20, &ee, &ff
-    equb &a9, &00, &20, &ee, &ff, &a9, &06, &20
-    equb &ee, &ff, &a9, &19, &20, &ee, &ff, &a9
-    equb &00, &20, &ee, &ff, &20, &ee, &ff, &20
-    equb &ee, &ff, &20, &ee, &ff, &20, &ee, &ff
-    equb &20, &ee, &ff, &a9, &3a, &85, &70, &a9
-    equb &16, &85
-    equs "q D"
-    equb &15, &20, &00, &c7, &ad, &38, &16, &c9
-    equb &7b, &d0, &12, &68, &85, &01, &68, &85
-    equb &00, &68, &8d, &6b, &c7, &68, &8d, &6a
-    equb &c7, &68, &8d, &69, &c7, &a9, &7b, &8d
-    equb &38, &16, &60, &a2, &00, &bd, &00, &c4
-    equb &9d, &00, &0d, &ca, &d0, &f7, &ad, &ff
-    equb &16, &c9, &0a, &b0, &12, &a9, &20, &8d
-    equb &06, &15, &ad, &ff, &16, &29, &0f, &18
-    equb &69, &30, &8d, &05, &15, &d0, &18, &ad
-    equb &ff, &16
-    equs "JJJJ"
-    equb &18, &69, &30, &8d, &05, &15, &ad, &ff
-    equb &16, &29, &0f, &18, &69, &30, &8d, &06
-    equb &15, &a9, &17, &20, &ee, &ff, &a9, &00
-    equb &20, &ee, &ff, &a9, &06, &20, &ee, &ff
-    equb &a9, &0f, &20, &ee, &ff, &a9, &00, &20
-    equb &ee, &ff, &20, &ee, &ff, &20, &ee, &ff
-    equb &20, &ee, &ff, &20, &ee, &ff, &20, &ee
-    equb &ff, &ad, &9f, &16, &c9, &19, &d0, &03
-    equb &4c, &a0, &c5, &a2, &fb, &a0, &14, &20
-    equb &f7, &ff, &4c, &50, &04
+    equb &02, &04, &18, &00, &74
+; ***************************************************************************************
+; Set up and draw a new level
+;
+; Stop the music (saving its place after the first level), count the level, put the MOS's
+; page &0D back and load the level, unpack it, reset the workspace and monsters, clear
+; the text area, show 25 rows, draw the view frames and views, and restart the music,
+; from where it was after the first level.
+; &1400 referenced 1 time by &0e57
+.start_level
+    lda first_level_flag                ; First level?
+    cmp #&7b ; '{'                      ; ...
+    bne code_1419                       ; ...
+    lda music_rhythm_step               ; No: keep the music's place on the stack: its step...
+    pha                                 ; ...
+    lda music_transpose                 ; ...transposition...
+    pha                                 ; ...
+    lda music_section                   ; ...section...
+    pha                                 ; ...
+    lda tune_ptr                        ; ...and tune pointer (zero page &00-&01)
+    pha                                 ; ...
+    lda data_0001                       ; ...
+    pha                                 ; ...
+; &1419 referenced 1 time by &1405
+.code_1419
+    jsr stop_music                      ; Stop the music
+    jsr count_level                     ; Clear the text area and count the level
+    jsr load_level                      ; Put page &0D back and load the level
+    jsr unpack_level                    ; Copy it into the game's tables
+    jsr reset_workspace                 ; Reset page &0D for play
+    jsr reset_monsters                  ; Reset the monsters and keys
+    jsr clear_text_area                 ; Clear the text area
+    lda #&17                            ; VDU 23,0,6,25,0,0,0,0,0,0: set 6845 register 6...
+    jsr oswrch                          ; ...
+    lda #0                              ; ...
+    jsr oswrch                          ; ...
+    lda #6                              ; ...
+    jsr oswrch                          ; ...
+    lda #&19                            ; ...to 25 character rows displayed
+    jsr oswrch                          ; ...
+    lda #0                              ; ...
+    jsr oswrch                          ; ...
+    jsr oswrch                          ; ...
+    jsr oswrch                          ; ...
+    jsr oswrch                          ; ...
+    jsr oswrch                          ; ...
+    jsr oswrch                          ; ...
+    lda #&3a ; ':'                      ; Point at view_frame_plots...
+    sta plot_x                          ; ...
+    lda #&16                            ; ...
+    sta plot_y                          ; ...
+    jsr draw_view_frames                ; ...and draw the frames and the views
+    jsr start_music                     ; Start the music
+    lda first_level_flag                ; First level?
+    cmp #&7b ; '{'                      ; ...
+    bne code_147d                       ; ...
+    pla                                 ; No: put the music's place back: tune pointer...
+    sta data_0001                       ; ...
+    pla                                 ; ...
+    sta tune_ptr                        ; ...
+    pla                                 ; ...section...
+    sta music_section                   ; ...
+    pla                                 ; ...transposition...
+    sta music_transpose                 ; ...
+    pla                                 ; ...and rhythm step
+    sta music_rhythm_step               ; ...
+; &147d referenced 1 time by &1469
+.code_147d
+    lda #&7b ; '{'                      ; Mark the first level done
+    sta first_level_flag                ; ...
+    rts                                 ; Return
+; ***************************************************************************************
+; Put the MOS's page &0D back and load the level
+;
+; Copy the MOS's page &0D back from &C400 (Coder saved it there), so that the filing
+; system's NMI code and workspace are intact, write the level number's digits into
+; level_command, show 15 rows while loading, and *LOAD LEVELnn 6B00 (level 25 comes from
+; Stones, via load_stones in Table). Then decrypt and check it.
+; &1483 referenced 1 time by &141f
+.load_level
+    ldx #0                              ; Copy &C400-&C4FF back to page &0D...
+; &1485 referenced 1 time by &148c
+.loop_1485
+    lda data_c400,x                     ; ...
+    sta scratch,x                       ; ...
+    dex                                 ; ...
+    bne loop_1485                       ; ...
+    lda level_bcd                       ; Level 10 or more (in BCD)?
+    cmp #&0a                            ; ...
+    bcs code_14a7                       ; ...
+    lda #&20 ; ' '                      ; No: units digit then a space
+    sta data_1506                       ; ...
+    lda level_bcd                       ; ...
+    and #&0f                            ; ...
+    clc                                 ; ...
+    adc #&30 ; '0'                      ; ...
+    sta level_command_digits            ; ...
+    bne code_14bf                       ; ...(always branches)
+; &14a7 referenced 1 time by &1493
+.code_14a7
+    lda level_bcd                       ; Yes: tens digit...
+    lsr a                               ; ...
+    lsr a                               ; ...
+    lsr a                               ; ...
+    lsr a                               ; ...
+    clc                                 ; ...
+    adc #&30 ; '0'                      ; ...
+    sta level_command_digits            ; ...
+    lda level_bcd                       ; ...then units digit
+    and #&0f                            ; ...
+    clc                                 ; ...
+    adc #&30 ; '0'                      ; ...
+    sta data_1506                       ; ...
+; &14bf referenced 1 time by &14a5
+.code_14bf
+    lda #&17                            ; VDU 23,0,6,15,0,0,0,0,0,0: show 15 character rows while loading...
+    jsr oswrch                          ; ...
+    lda #0                              ; ...
+    jsr oswrch                          ; ...
+    lda #6                              ; ...
+    jsr oswrch                          ; ...
+    lda #&0f                            ; ...
+    jsr oswrch                          ; ...
+    lda #0                              ; ...
+    jsr oswrch                          ; ...
+    jsr oswrch                          ; ...
+    jsr oswrch                          ; ...
+    jsr oswrch                          ; ...
+    jsr oswrch                          ; ...
+    jsr oswrch                          ; ...
+    lda level_number                    ; Level 25?
+    cmp #&19                            ; ...
+    bne code_14f1                       ; ...
+    jmp load_stones                     ; Yes: load it from Stones (and check it there)
+; &14f1 referenced 1 time by &14ec
+.code_14f1
+    ldx #&fb                            ; No: *LOAD LEVELnn 6B00
+    ldy #&14                            ; ...
+    jsr oscli                           ; ...
+    jmp decrypt_level                   ; Decrypt and check it, and return from there
+.level_command
+; &1505 referenced 2 times by &14a2, &14b1
+level_command_digits = level_command+10
+; &1506 referenced 2 times by &1497, &14bc
+data_1506 = level_command+11
     equs "LOAD LEVEL11 6B00"
-    equb &0d, &a2, &00, &bd, &00, &7d, &9d, &00
-    equb &0d, &e8, &d0, &f7, &a9, &00, &8d, &f2
-    equb &09, &8d, &f9, &09, &8d, &fa, &09, &8d
-    equb &fe, &09, &8d, &2f, &0b, &a9, &01, &8d
-    equb &f7, &09, &8d, &f8, &09, &8d, &fd, &09
-    equb &a9, &ff, &8d, &ff, &09, &a9, &05, &8d
-    equb &fb, &09, &a9, &03, &8d, &fc, &09, &60
-    equb &a2, &14, &a9, &19, &20, &ee, &ff, &a0
-    equb &00, &b1, &70, &20, &ee, &ff, &c8, &c0
-    equb &05, &d0, &f6, &18, &a5, &70, &69, &05
-    equb &85, &70, &a0, &00, &ca, &d0, &e3, &20
-    equb &88, &77, &a9, &8f, &8d, &0e, &02, &a9
-    equb &7f, &8d, &0f, &02, &60, &a2, &1e, &bd
-    equb &00, &6b, &9d, &20, &7f, &bd, &20, &6b
-    equb &9d, &3f, &7f, &bd, &40, &6b, &9d, &5e
-    equb &7f, &ca, &d0, &eb, &a2, &14, &bd, &60
-    equb &6b, &9d, &00, &22, &bd, &75, &6b, &9d
-    equb &20, &22, &bd, &8a, &6b, &9d, &40, &22
-    equb &ca, &d0, &eb, &a2, &14, &bd, &a0, &6b
-    equb &9d, &60, &22, &bd, &b5, &6b, &9d, &80
-    equb &22, &ca, &d0, &f1, &a2, &00, &bd, &d0
-    equb &6b, &9d, &90, &0b, &bd, &d8, &6b, &9d
-    equb &98, &0b, &e8, &e0, &08, &d0, &ef, &a2
-    equb &00, &bd, &e0, &6b, &9d, &00, &0c, &bd
-    equb &b0, &6c, &9d, &00, &21, &e8, &e0, &c9
-    equb &d0, &ef, &a2, &00, &bd, &80, &6d, &9d
-    equb &00, &2d, &e8, &e0, &30, &d0, &f5, &60
-    equb &a2, &1e, &a9, &15, &9d, &52, &7e, &a9
-    equb &ff, &9d, &00, &7e, &ad, &ff, &7c, &9d
-    equb &40, &0b, &ca, &d0, &ed, &a2, &00, &a9
-    equb &00, &9d, &2a, &0b, &9d, &e0, &22, &9d
-    equb &e5, &22, &9d, &f0, &22, &9d, &f5, &22
-    equb &e8, &e0, &04, &d0, &ec, &60, &20, &19
-    equb &16, &ee, &9f, &16, &60, &a9, &1c, &20
-    equb &ee, &ff, &a9, &00, &20, &ee, &ff, &a9
-    equb &18, &20, &ee, &ff, &a9, &13, &20, &ee
-    equb &ff, &a9, &00, &20, &ee, &ff, &a9, &0c
-    equb &20, &ee, &ff, &60, &ea, &60
+    equb &0d
+; ***************************************************************************************
+; Reset the game workspace for a new level
+;
+; Copy workspace_template into page &0D and clear the per-level state.
+; &150d referenced 1 time by &1425
+.reset_workspace
+    ldx #0                              ; Copy workspace_template to page &0D
+; &150f referenced 1 time by &1516
+.loop_150f
+    lda workspace_template,x            ; ...
+    sta scratch,x                       ; ...
+    inx                                 ; ...
+    bne loop_150f                       ; ...
+    lda #0                              ; Reset the exit and other per-level state
+    sta exit_busy                       ; ...
+    sta exit_offset_x_3                 ; ...
+    sta exit_offsets_y                  ; ...
+    sta exit_offset_y_4                 ; ...
+    sta next_trapdoor                   ; First monster emerges from trapdoor 0
+    lda #1                              ; Offsets for the exit animation, and no hero shrunk
+    sta exit_offset_x_1                 ; ...
+    sta exit_offset_x_2                 ; ...
+    sta exit_offset_y_3                 ; ...
+    lda #&ff                            ; ...
+    sta shrunk_hero                     ; ...
+    lda #5                              ; ...
+    sta exit_offset_y_1                 ; ...
+    lda #3                              ; ...
+    sta exit_offset_y_2                 ; ...
+    rts                                 ; Return
+; ***************************************************************************************
+; Draw the frames round the four views
+;
+; Send the twenty PLOT commands of view_frame_plots, draw the four views, then point
+; WRCHV at &7F8F, which on this side passes every character straight to the MOS.
+;
+; On Entry:
+;     PLOT_X: address of view_frame_plots, low byte
+;     PLOT_Y: address of view_frame_plots, high byte
+; &1544 referenced 1 time by &145e
+.draw_view_frames
+    ldx #&14                            ; Twenty PLOT commands
+; &1546 referenced 1 time by &1561
+.loop_1546
+    lda #&19                            ; VDU 25...
+    jsr oswrch                          ; ...
+    ldy #0                              ; ...then the five bytes of the command
+; &154d referenced 1 time by &1555
+.loop_154d
+    lda (plot_x),y                      ; ...
+    jsr oswrch                          ; ...
+    iny                                 ; ...
+    cpy #5                              ; ...
+    bne loop_154d                       ; ...
+    clc                                 ; Next command
+    lda plot_x                          ; ...
+    adc #5                              ; ...
+    sta plot_x                          ; ...
+    ldy #0                              ; ...
+    dex                                 ; ...
+    bne loop_1546                       ; ...
+    jsr draw_all_views                  ; Draw the four views
+    lda #&8f                            ; Point WRCHV at &7F8F...
+    sta wrchv                           ; ...
+    lda #&7f                            ; ...
+    sta wrchv + 1                       ; ...
+    rts                                 ; Return
+; ***************************************************************************************
+; Copy the loaded level into the game's tables
+;
+; Distribute the level file at &6B00 into the object, door, key, trapdoor and map tables
+; and the wall sprite.
+; &1571 referenced 1 time by &1422
+.unpack_level
+    ldx #&1e                            ; Objects 30 to 1: position and type
+; &1573 referenced 1 time by &1586
+.loop_1573
+    lda level_object_x,x                ; ...
+    sta object_x,x                      ; ...
+    lda level_object_y,x                ; ...
+    sta object_y,x                      ; ...
+    lda level_object_type,x             ; ...
+    sta object_type,x                   ; ...
+    dex                                 ; ...
+    bne loop_1573                       ; ...
+    ldx #&14                            ; Doors 20 to 1: position and sprite
+; &158a referenced 1 time by &159d
+.loop_158a
+    lda level_door_x,x                  ; ...
+    sta door_x,x                        ; ...
+    lda level_door_y,x                  ; ...
+    sta door_y,x                        ; ...
+    lda level_door_sprite,x             ; ...
+    sta door_sprite,x                   ; ...
+    dex                                 ; ...
+    bne loop_158a                       ; ...
+    ldx #&14                            ; Keys 20 to 1: position
+; &15a1 referenced 1 time by &15ae
+.loop_15a1
+    lda level_key_x,x                   ; ...
+    sta key_x,x                         ; ...
+    lda level_key_y,x                   ; ...
+    sta key_y,x                         ; ...
+    dex                                 ; ...
+    bne loop_15a1                       ; ...
+    ldx #0                              ; Trapdoors 0 to 7: position
+; &15b2 referenced 1 time by &15c1
+.loop_15b2
+    lda level_trapdoor_x,x              ; ...
+    sta trapdoor_x,x                    ; ...
+    lda level_trapdoor_y,x              ; ...
+    sta trapdoor_y,x                    ; ...
+    inx                                 ; ...
+    cpx #8                              ; ...
+    bne loop_15b2                       ; ...
+    ldx #0                              ; Wall map and object-free map, &C9 bytes each
+; &15c5 referenced 1 time by &15d4
+.loop_15c5
+    lda level_walls,x                   ; ...
+    sta room_walls,x                    ; ...
+    lda level_object_free_map,x         ; ...
+    sta object_free_map,x               ; ...
+    inx                                 ; ...
+    cpx #&c9                            ; ...
+    bne loop_15c5                       ; ...
+    ldx #0                              ; The level's wall sprite, &30 bytes
+; &15d8 referenced 1 time by &15e1
+.loop_15d8
+    lda level_wall_sprite,x             ; ...
+    sta wall_sprite,x                   ; ...
+    inx                                 ; ...
+    cpx #&30 ; '0'                      ; ...
+    bne loop_15d8                       ; ...
+    rts                                 ; Return
+; ***************************************************************************************
+; Clear the monsters for a new level
+;
+; Mark every monster as not yet appeared, give each the level's starting hit points, and
+; clear the heroes' keys and the returning_hero_queue.
+; &15e4 referenced 1 time by &1428
+.reset_monsters
+    ldx #&1e                            ; Monsters 30 to 1...
+; &15e6 referenced 1 time by &15f7
+.loop_15e6
+    lda #&15                            ; ...dying, so that they emerge from the trapdoors...
+    sta monster_sprite,x                ; ...
+    lda #&ff                            ; ...off the map...
+    sta monster_x,x                     ; ...
+    lda monster_start_hit_points        ; ...with this level's hit points
+    sta monster_hit_points,x            ; ...
+    dex                                 ; ...
+    bne loop_15e6                       ; ...
+    ldx #0                              ; For each hero: clear the returning queue, the key carried and the door-check position
+    lda #0                              ; ...
+; &15fd referenced 1 time by &160f
+.loop_15fd
+    sta returning_hero_queue,x          ; ...
+    sta hero_key,x                      ; ...
+    sta hero_key_dropped,x              ; ...
+    sta hero_door_x,x                   ; ...
+    sta hero_door_y,x                   ; ...
+    inx                                 ; ...
+    cpx #4                              ; ...
+    bne loop_15fd                       ; ...
+    rts                                 ; Return
+; ***************************************************************************************
+; Clear the text area and count the level
+;
+; The cassette game's show_level_number also plots LEVEL and the number; this side shows
+; no level number.
+; &1612 referenced 1 time by &141c
+.count_level
+    jsr clear_text_area                 ; Clear the text area
+    inc level_number                    ; Count the level
+    rts                                 ; Return
+; ***************************************************************************************
+; Clear the left of the screen
+;
+; Set a text window over the left of the screen and clear it.
+; &1619 referenced 2 times by &142b, &1612
+.clear_text_area
+    lda #&1c                            ; VDU 28: a text window over the whole of the left of the screen...
+    jsr oswrch                          ; ...
+    lda #0                              ; ...
+    jsr oswrch                          ; ...
+    lda #&18                            ; ...
+    jsr oswrch                          ; ...
+    lda #&13                            ; ...
+    jsr oswrch                          ; ...
+.code_162d
+; &162e referenced 1 time by &c60a
+clear_text_area_top = code_162d+1
+    lda #0                              ; ...
+    jsr oswrch                          ; ...
+    lda #&0c                            ; ...VDU 12 to clear it
+    jsr oswrch                          ; ...
+    rts                                 ; Return
+; &1638 referenced 3 times by &1400, &1464, &147f
+.first_level_flag
+    equb &ea
+    equb &60
 ; ***************************************************************************************
 ; View frame PLOT commands
 ;
@@ -3562,7 +4495,7 @@ reset_call_address = reset_call+1
     equb &01, &00, &00, &84, &01
     equb &05, &28, &02, &66, &02
     equb &08
-; &169f referenced 2 times by &0477, &1070
+; &169f referenced 7 times by &0477, &0e02, &0e14, &0e29, &1070, &14e7, &1615
 .level_number
     equb &01
 ; ***************************************************************************************
@@ -3594,7 +4527,9 @@ reset_call_address = reset_call+1
     equb &02, &02, &00, &00, &83, &00, &00, &00
     equb &00, &00, &00, &31, &00, &8d
     equs "LEVEL"
+; &16d5 referenced 1 time by &0e4f; also used as index base 1 time by &0e3e
 .level_filename_digits
+; &16d6 used as index base 1 time by &0e54
     equb &31, &0d, &0d, &70, &00, &8d, &35, &f8
     equb &00, &00, &00, &00
     equs "code"
@@ -3602,6 +4537,7 @@ reset_call_address = reset_call+1
     equb &50, &00, &00, &00, &fa, &16, &78, &00
     equb &8c, &50, &20, &00, &00, &02, &00, &79
     equb &00, &8c
+; &16ff referenced 9 times by &0e05, &0e20, &0e25, &0e36, &0e45, &148e, &149a, &14a7, &14b4
 .level_bcd
     equb &01
 .sprite_sword_up
@@ -3889,7 +4825,7 @@ reset_call_address = reset_call+1
 ;
 ; Four tables of 120 entries, indexed by sprite number: data address low bytes, high
 ; bytes, widths in bytes and heights in rows.
-; &1ae0 used as index base 1 time by &0902
+; &1ae0 used as index base 2 times by &0902, &d802
 .sprite_addr_lo
     equb &00, &30, &60, &90, &c0, &f0, &20, &50
     equb &c0, &80, &b0, &e0, &10, &40, &70, &a0
@@ -3906,7 +4842,7 @@ reset_call_address = reset_call+1
     equb &30, &60, &c0, &90, &f0, &20, &50, &80
     equb &b0, &00, &24, &29, &2e, &33, &38, &3d
     equb &42, &47, &4c, &10, &60, &6c, &78, &cf
-; &1b58 used as index base 1 time by &0907
+; &1b58 used as index base 2 times by &0907, &d807
 .sprite_addr_hi
     equb &2d, &2d, &2d, &2d, &2d, &2d, &2e, &2e
     equb &19, &2e, &2e, &2e, &2f, &2f, &2f, &2f
@@ -3923,7 +4859,7 @@ reset_call_address = reset_call+1
     equb &0a, &0a, &0a, &0a, &19, &1a, &1a, &1a
     equb &1a, &18, &18, &18, &18, &18, &18, &18
     equb &18, &18, &18, &12, &18, &18, &18, &04
-; &1bd0 used as index base 2 times by &090c, &405f
+; &1bd0 used as index base 4 times by &090c, &4009, &405f, &d80c
 .sprite_widths
     equb &04, &04, &04, &04, &04, &04, &04, &04
     equb &04, &04, &04, &04, &04, &04, &04, &04
@@ -3940,7 +4876,7 @@ reset_call_address = reset_call+1
     equb &04, &04, &04, &04, &04, &04, &04, &04
     equb &04, &03, &01, &01, &01, &01, &01, &01
     equb &01, &01, &01, &08, &04, &02, &0c, &02
-; &1c48 used as index base 2 times by &0911, &406c
+; &1c48 used as index base 5 times by &0911, &4015, &401a, &406c, &d811
 .sprite_heights
     equb &0c, &0c, &0c, &0c, &0c, &0c, &0c, &0c
     equb &0c, &0c, &0c, &0c, &0c, &0c, &0c, &0c
@@ -4261,12 +5197,18 @@ reset_call_address = reset_call+1
     jsr sub_7305                        ; Draw the objects
     jsr move_missiles                   ; Move the missiles
     jsr update_monsters                 ; Move the monsters
-    jmp code_c6d0
+.check_pause
+    jmp pause_check                     ; Check the pause key (the routine is in Table)
+; ***************************************************************************************
+; Unused
+;
+; The rest of the cassette game's f1 pause routine, never run since check_pause jumps to
+; pause_check in Table.
     equb &60, &ff, &e0, &71, &d0, &15, &20, &f4
     equb &ff, &e0, &71, &f0, &f9, &20, &f4, &ff
     equb &e0, &71, &d0, &f9, &20, &f4, &ff, &e0
-    equb &71, &f0, &f9, &60, &00, &00, &00, &00
-    equb &00, &00
+    equb &71, &f0, &f9, &60, &00
+    equb &00, &00, &00, &00, &00
     equs "<<<<"
 ; ***************************************************************************************
 ; Play a level until it ends
@@ -4277,7 +5219,7 @@ reset_call_address = reset_call+1
 ; return address on the stack (it ends with a jump back here), so the first RTS at the
 ; end of a level returns into this loop, once for each hero who left by the exit, before
 ; the last returns to the caller.
-; &1f00 referenced 5 times by &1f03, &1f9b, &1fef, &4037, &408e
+; &1f00 referenced 7 times by &0e65, &1f03, &1f9b, &1fef, &4023, &4037, &408e
 .play_level
     lda os_vsync_counter                ; Wait for the vertical sync counter to pass zero...
     bpl play_level                      ; ...
@@ -4535,11 +5477,11 @@ reset_call_address = reset_call+1
     sta missile_x,y                     ; ...
     lda hero_y,x                        ; ...
     sta missile_y,y                     ; ...
-    nop
-    nop
-    nop
-    nop
-    nop
+    nop                                 ; Padding where the cassette game sounds the bell (VDU 7)
+    nop                                 ; ...
+    nop                                 ; ...
+    nop                                 ; ...
+    nop                                 ; ...
     lda hero_missile_damage,x           ; The missile carries the hero's missile damage...
     sta missile_damage,y                ; ...
     lda hero_missile_sprites,x          ; ...and sprites
@@ -5908,6 +6850,7 @@ reset_call_address = reset_call+1
 ; Draw all four views
 ;
 ; Draw the room each hero's view shows.
+; &7788 referenced 1 time by &1563
 .draw_all_views
     jsr draw_view_0                     ; Top-left view
     jsr draw_view_1                     ; Top-right view
@@ -6807,7 +7750,7 @@ reset_call_address = reset_call+1
 .code_7cfb
     jmp monster_done                    ; Done
     equb &00
-; &7cff referenced 1 time by &759b
+; &7cff referenced 3 times by &0e1b, &15f0, &759b
 .monster_start_hit_points
     equb &08
 ; ***************************************************************************************
@@ -6817,6 +7760,7 @@ reset_call_address = reset_call+1
 ; heroes' starting positions, directions, keys (hero_key_up etc. at +&70), health of 99 +
 ; 1 (at +&90, +&95), the views' rooms (+&A0), sprite bases (+&B0, +&B5), bit masks (+&C0)
 ; and panel rows (+&D0).
+; &7d00 used as index base 1 time by &150f
 .workspace_template
     equb &00, &00, &1f, &1f, &d2, &d2, &cc, &b1
     equb &07, &07, &01, &01, &00
@@ -6858,7 +7802,7 @@ reset_call_address = reset_call+1
     equb &de, &dd, &df, &f0, &f2, &f1, &f3, &f8
     equb &fa, &f9, &fb, &f4, &f6, &f5, &f7, &fc
     equb &1e, &fd, &00
-; &7e00 used as index base 16 times by &7667, &797e, &79e7, &7a31, &7a3f, &7a45, &7a5b, &7a98, &7ace, &7afb, &7b04, &7b41, &7c46, &7c54, &7cc8, &7cf2
+; &7e00 used as index base 17 times by &15ed, &7667, &797e, &79e7, &7a31, &7a3f, &7a45, &7a5b, &7a98, &7ace, &7afb, &7b04, &7b41, &7c46, &7c54, &7cc8, &7cf2
 .monster_x
 ; &7e23 referenced 2 times by &1d29, &1d39
     equb &00, &04, &0b, &09, &1d, &08, &01, &06
@@ -6876,7 +7820,7 @@ reset_call_address = reset_call+1
     equb &06, &1a, &14, &03, &1d, &07, &0d, &17
     equb &00, &00, &00, &00, &1b, &00, &00, &00
     equb &00, &00
-; &7e52 used as index base 18 times by &7144, &7598, &7683, &768c, &7a0d, &7a23, &7a77, &7a81, &7ab4, &7abb, &7ac3, &7b11, &7b32, &7b35, &7b4d, &7bf0, &7c38, &7cd3
+; &7e52 used as index base 19 times by &15e8, &7144, &7598, &7683, &768c, &7a0d, &7a23, &7a77, &7a81, &7ab4, &7abb, &7ac3, &7b11, &7b32, &7b35, &7b4d, &7bf0, &7c38, &7cd3
 .monster_sprite
     equb &00, &09, &0d, &0b, &0b, &0b, &09, &0f
     equb &0f, &0b, &0d, &0b, &0b, &0f, &0d, &0d
@@ -6916,7 +7860,7 @@ reset_call_address = reset_call+1
     equb &02, &00, &01, &01, &00, &00, &01, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00
-; &7f20 used as index base 8 times by &7173, &719a, &730d, &7337, &73ea, &7413, &7469, &74bb
+; &7f20 used as index base 9 times by &1576, &7173, &719a, &730d, &7337, &73ea, &7413, &7469, &74bb
 .object_x
     equb &00, &ff, &ff, &ff, &ff, &ff, &18, &04
     equb &04, &05, &ff, &ff, &ff, &ff, &ff, &ff
@@ -6925,7 +7869,7 @@ reset_call_address = reset_call+1
 ; &7f3e referenced 4 times by &1f3b, &1f77, &1f85, &4029
 .exit_x
     equb &04
-; &7f3f used as index base 8 times by &717b, &719d, &7313, &7342, &73f3, &7416, &746c, &74be
+; &7f3f used as index base 9 times by &157c, &717b, &719d, &7313, &7342, &73f3, &7416, &746c, &74be
 .object_y
     equb &00, &ff, &ff, &ff, &ff, &ff, &15, &18
     equb &19, &19, &ff, &ff, &ff, &ff, &ff, &ff
@@ -6935,104 +7879,141 @@ reset_call_address = reset_call+1
 ; &7f5d referenced 4 times by &1f43, &1f7d, &1f88, &402f
 .exit_y
     equb &2c
-; &7f5e used as index base 6 times by &7183, &718e, &7191, &7319, &735c, &73c8
+; &7f5e used as index base 7 times by &1582, &7183, &718e, &7191, &7319, &735c, &73c8
 .object_type
     equb &00
     equs "___)c_S+S((``(*b(()(++++)(()(Q"
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &4c, &22, &e8
-    equb &48                            ; ...
-    equb &98                            ; ...and Y
-    equb &48                            ; ...
-    equb &a5, &70                       ; Classify the character
-    equb &c9, &30                       ; Below '0': print it unchanged
-    equb &90, &5b                       ; ...
-    equb &c9, &3a                       ; '0'-'9': a digit
-    equb &90, &3b                       ; ...
-    equb &c9, &41                       ; ':'-'@': print it unchanged
-    equb &90, &53                       ; ...
-    equb &c9, &5b                       ; 'A'-'Z': a capital letter
-    equb &90, &0e                       ; ...
-    equb &c9, &61                       ; '['-'`': print it unchanged
-    equb &90, &4b                       ; ...
-    equb &c9, &7b                       ; Above 'z': print it unchanged
-    equb &b0, &47                       ; ...
-    equb &38                            ; A lower-case letter: letter number 0-25
-    equb &e9, &61                       ; ...
-    equb &4c, &b8, &7f                  ; ...
-    equb &38                            ; A capital letter: letter number 0-25
-    equb &e9, &41                       ; ...
-    equb &0a                            ; x 8: offset of the glyph in font_letters
-    equb &0a                            ; ...
-    equb &0a                            ; ...
-    equb &d0, &00                       ; Branch to the next instruction either way
-    equb &aa                            ; X = offset of the first glyph byte
-    equb &18                            ; Stop after eight bytes
-    equb &69, &08                       ; ...
-    equb &85, &70                       ; ...
-    equb &a0, &00                       ; Y indexes the character 128 definition
-    equb &bd, &d7, &12                  ; Copy a glyph byte...
-    equb &99, &00, &0c                  ; ...into the character 128 definition
-    equb &c8                            ; ...
-    equb &e8                            ; ...
-    equb &e4, &70                       ; ...
-    equb &d0, &f4                       ; Loop for eight bytes
-    equb &68                            ; Restore Y...
-    equb &a8                            ; ...
-    equb &68                            ; ...and X
-    equb &aa                            ; ...
-    equb &a9, &80                       ; Print character 128, now showing the glyph...
-    equb &4c, &a4, &e0                  ; ...through the MOS 1.20 OSWRCH routine
-    equb &38                            ; A digit: digit number 0-9
-    equb &e9, &30                       ; ...
-    equb &0a                            ; x 8: offset of the glyph in font_digits
-    equb &0a                            ; ...
-    equb &0a                            ; ...
-    equb &aa                            ; X = offset of the first glyph byte
-    equb &18                            ; Stop after eight bytes
-    equb &69, &08                       ; ...
-    equb &85, &70                       ; ...
-    equb &a0, &00                       ; Y indexes the character 128 definition
-    equb &bd, &a7, &13                  ; Copy a glyph byte...
-    equb &99, &00, &0c                  ; ...into the character 128 definition
-    equb &c8                            ; ...
-    equb &e8                            ; ...
-    equb &e4, &70                       ; ...
-    equb &d0, &f4                       ; Loop for eight bytes
-    equb &f0, &db                       ; Print character 128 (always branches)
-    equb &68                            ; Any other character: restore Y...
-    equb &a8                            ; ...
-    equb &68                            ; ...and X
-    equb &aa                            ; ...
-    equb &a5, &70                       ; Recover the character
-    equb &4c, &a4, &e0, &00             ; ...and print it through the MOS 1.20 OSWRCH routine
+    equb &00, &00
+    equb &4c, &22, &e8                  ; Pass every character straight to MOS 3.20's OSWRCH (&E822)
+; ***************************************************************************************
+; The game-font WRCHV handler, unused
+;
+; The rest of the cassette game's wrch_handler, which prints letters and digits in the
+; game's own font. On this side WRCHV's entry at &7F8F jumps straight to the MOS, so none
+; of this runs and text appears in the MOS font.
+    equb &48, &98, &48, &a5, &70, &c9, &30, &90
+    equb &5b, &c9, &3a, &90, &3b, &c9, &41, &90
+    equb &53, &c9, &5b, &90, &0e, &c9, &61, &90
+    equb &4b, &c9, &7b, &b0, &47, &38, &e9, &61
+    equb &4c, &b8, &7f, &38, &e9, &41, &0a, &0a
+    equb &0a, &d0, &00, &aa, &18, &69, &08, &85
+    equb &70, &a0, &00, &bd, &d7, &12, &99, &00
+    equb &0c, &c8, &e8, &e4, &70, &d0, &f4, &68
+    equb &a8, &68, &aa, &a9, &80, &4c, &a4, &e0
+    equb &38, &e9, &30, &0a, &0a, &0a, &aa, &18
+    equb &69, &08, &85, &70, &a0, &00, &bd, &a7
+    equb &13, &99, &00, &0c, &c8, &e8, &e4, &70
+    equb &d0, &f4, &f0, &db, &68, &a8, &68, &aa
+    equb &a5, &70, &4c, &a4, &e0, &00   ; ...  ...and Y  ...  Classify the character  Below '0': print it unchanged  ...  '0'-'9': a digit  ...  ':'-'@': print it unchanged  ...  'A'-'Z': a capital letter  ...  '['-'`': print it unchanged  ...  Above 'z': print it unchanged  ...  A lower-case letter: letter number 0-25  ...  ...  A capital letter: letter number 0-25  ...  x 8: offset of the glyph in font_letters  ...  ...  Branch to the next instruction either way  X = offset of the first glyph byte  Stop after eight bytes  ...  ...  Y indexes the character 128 definition  Copy a glyph byte...  ...into the character 128 definition  ...  ...  ...  Loop for eight bytes  Restore Y...  ...  ...and X  ...  Print character 128, now showing the glyph...  ...through the MOS 1.20 OSWRCH routine  A digit: digit number 0-9  ...  x 8: offset of the glyph in font_digits  ...  ...  X = offset of the first glyph byte  Stop after eight bytes  ...  ...  Y indexes the character 128 definition  Copy a glyph byte...  ...into the character 128 definition  ...  ...  ...  Loop for eight bytes  Print character 128 (always branches)  Any other character: restore Y...  ...  ...and X  ...  Recover the character  ...and print it through the MOS 1.20 OSWRCH routine
 .dasmos_dunj2_end
 
     org &c500
 
 .dasmos_code_start
-    equb &c9, &81, &d0, &65, &e0, &aa, &f0, &13
-    equb &e0, &9b, &f0, &3a, &e0, &ac, &f0, &28
-    equb &e0, &9a, &f0, &15, &e0, &9d, &f0, &3d
-    equb &4c, &b1, &ee, &a2, &01, &a9, &80, &20
-    equb &f4, &ff, &c0, &ff, &d0, &40, &a2, &ff
-    equb &60, &a2, &01, &a9, &80, &20, &f4, &ff
-    equb &c0, &00, &d0, &32, &88, &a2, &ff, &60
-    equb &a2, &02, &a9, &80, &20, &f4, &ff, &c0
-    equb &ff, &d0, &23, &a2, &ff, &60, &a2, &02
-    equb &a9, &80, &20, &f4, &ff, &c0, &00, &d0
-    equb &15, &88, &a2, &ff, &60, &a2, &00, &a9
-    equb &80, &20, &f4, &ff, &8a, &29, &03, &f0
-    equb &05, &a2, &ff, &a0, &ff, &60, &a2, &00
-    equb &60, &4c, &b1, &ee
+; ***************************************************************************************
+; BYTEV handler: read a joystick for the Barbarian's keys
+;
+; Installed by Coder2. Answers OSBYTE &81 scans of the third hero's keys from the
+; analogue port: N (&AA) and M (&9A) from channel 1 at its extremes, B (&9B) and G (&AC)
+; from channel 2, and fire (SPACE, &9D) from the fire buttons. Every other call goes to
+; the MOS 3.20 OSBYTE routine at &EEB1 directly. It is the Model B side's handler with
+; this side's keys and MOS.
+;
+; On Entry:
+;     A: OSBYTE number
+;     X: OSBYTE X
+;
+; On Exit:
+;     X: &FF if the key is pressed, 0 if not
+.joystick_bytev
+    cmp #&81                            ; OSBYTE &81 (INKEY)?
+    bne code_c569                       ; No: pass it on
+    cpx #&aa                            ; N (left)?
+    beq code_c51b                       ; ...
+    cpx #&9b                            ; B (down)?
+    beq code_c546                       ; ...
+    cpx #&ac                            ; G (up)?
+    beq code_c538                       ; ...
+    cpx #&9a                            ; M (right)?
+    beq code_c529                       ; ...
+    cpx #&9d                            ; SPACE (fire)?
+    beq code_c555                       ; ...
+    jmp mos320_osbyte_default           ; Another key: pass it on
+; &c51b referenced 1 time by &c506
+.code_c51b
+    ldx #1                              ; N: channel 1 high byte &FF?
+    lda #osbyte_read_adc_or_get_buffer_status  ; ...
+    jsr osbyte                          ; Read ADC channel X or buffer status  ...
+    cpy #&ff                            ; ...
+    bne code_c566                       ; No: not pressed
+    ldx #&ff                            ; Yes: pressed
+    rts                                 ; Return
+; &c529 referenced 1 time by &c512
+.code_c529
+    ldx #1                              ; M: channel 1 high byte 0?
+    lda #osbyte_read_adc_or_get_buffer_status  ; ...
+    jsr osbyte                          ; Read ADC channel X or buffer status  ...
+    cpy #0                              ; ...
+    bne code_c566                       ; No: not pressed
+    dey                                 ; Yes: pressed (Y = &FF)
+    ldx #&ff                            ; ...
+    rts                                 ; Return
+; &c538 referenced 1 time by &c50e
+.code_c538
+    ldx #2                              ; G: channel 2 high byte &FF?
+    lda #osbyte_read_adc_or_get_buffer_status  ; ...
+    jsr osbyte                          ; Read ADC channel X or buffer status  ...
+    cpy #&ff                            ; ...
+    bne code_c566                       ; No: not pressed
+    ldx #&ff                            ; Yes: pressed
+    rts                                 ; Return
+; &c546 referenced 1 time by &c50a
+.code_c546
+    ldx #2                              ; B: channel 2 high byte 0?
+    lda #osbyte_read_adc_or_get_buffer_status  ; ...
+    jsr osbyte                          ; Read ADC channel X or buffer status  ...
+    cpy #0                              ; ...
+    bne code_c566                       ; No: not pressed
+    dey                                 ; Yes: pressed (Y = &FF)
+    ldx #&ff                            ; ...
+    rts                                 ; Return
+; &c555 referenced 1 time by &c516
+.code_c555
+    ldx #0                              ; Fire: either fire button?
+    lda #osbyte_read_adc_or_get_buffer_status  ; ...
+    jsr osbyte                          ; ...  Read ADC channel X or buffer status
+    txa                                 ; ...
+    and #3                              ; ...
+    beq code_c566                       ; No: not pressed
+    ldx #&ff                            ; Yes: pressed
+    ldy #&ff                            ; ...
+    rts                                 ; Return
+; &c566 referenced 5 times by &c524, &c532, &c541, &c54f, &c55f
+.code_c566
+    ldx #0                              ; Not pressed
+    rts                                 ; Return
+; &c569 referenced 1 time by &c502
+.code_c569
+    jmp mos320_osbyte_default           ; Pass the call on to the MOS 3.20 OSBYTE routine
 .dasmos_code_end
 
     org &c5a0
 
 .dasmos_table_start
-    equb &a2, &aa, &a0, &c5, &20, &f7, &ff, &4c
-    equb &50, &04
+; ***************************************************************************************
+; Load level 25 from Stones
+;
+; Level 25 has no file of its own: Stones ends with its data, so *LOAD STONES 6680 puts
+; it at &6B00. Then decrypt and check it.
+; &c5a0 referenced 1 time by &14ee
+.load_stones
+    ldx #&aa                            ; *LOAD STONES 6680
+    ldy #&c5                            ; ...
+    jsr oscli                           ; ...
+    jmp decrypt_level                   ; Decrypt and check it, and return from there
+.stones_command
     equs "LOAD STONES 6680"
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -7042,11 +8023,27 @@ reset_call_address = reset_call+1
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &20, &60
-    equb &c7, &a9, &1c, &20, &ee, &ff, &a9, &00
-    equb &8d, &2e, &16, &60, &ee, &ff, &a9, &02
-    equb &20, &ee, &ff, &a2, &1c, &a0, &c6, &20
-    equb &f7, &ff
+    equb &00, &00, &00, &00, &00, &00
+; ***************************************************************************************
+; Stop the music for the game-over message
+;
+; Stop the music, send the VDU 28 that the game-over code's text window begins with, and
+; set the top row in clear_text_area's window to 0.
+; &c600 referenced 1 time by &0e86
+.game_over_music
+    jsr stop_music                      ; Stop the music
+    lda #&1c                            ; VDU 28: the game-over text window...
+    jsr oswrch                          ; ...
+    lda #0                              ; Top row 0 in clear_text_area's window
+    sta clear_text_area_top             ; ...
+    rts                                 ; Return
+; ***************************************************************************************
+; Unused
+;
+; Leftover bytes: the end of a routine that selects COLOUR 2 and runs *DUNJUNZ (its
+; command follows), and zeros.
+    equb &ee, &ff, &a9, &02, &20, &ee, &ff
+    equb &a2, &1c, &a0, &c6, &20, &f7, &ff
     equs "DUNJUNZ"
     equb &0d, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -7059,624 +8056,776 @@ reset_call_address = reset_call+1
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00
-; &c675 used as index base 1 time by &096e
-.data_c675
-    equb &00
-; &c676 used as index base 1 time by &0976
-.data_c676
-    equb &00, &02, &80, &05, &00, &07, &80, &0a
-    equb &00, &0c, &80, &0f, &00, &11, &80, &14
-    equb &00, &16, &80, &19, &00, &1b, &80, &1e
-    equb &00, &20, &80, &23, &00, &25, &80, &28
-    equb &00, &2a, &80, &2d, &00, &2f, &80, &32
-    equb &00, &34, &80, &37, &00, &39, &80, &3c
-    equb &00, &3e, &80, &41, &00, &43, &80, &46
-    equb &00, &48, &80, &4b, &00, &4d, &80, &00
+; ***************************************************************************************
+; Screen row offsets
+;
+; Row x 640 for character rows 0-24, high byte first: the table screen_address and the
+; title's star plotter read here instead of in MOS 1.20.
+; &c675 used as index base 3 times by &096e, &387d, &d86e
+.row_offsets
+; &c676 used as index base 3 times by &0976, &3885, &d876
+row_offsets_lo = row_offsets+1
+    equb &00, &00, &02, &80, &05, &00, &07, &80, &0a, &00
+    equb &0c, &80, &0f, &00, &11, &80, &14, &00, &16, &80
+    equb &19, &00, &1b, &80, &1e, &00, &20, &80, &23, &00
+    equb &25, &80, &28, &00, &2a, &80, &2d, &00, &2f, &80
+    equb &32, &00, &34, &80, &37, &00, &39, &80, &3c, &00
+    equb &3e, &80, &41, &00, &43, &80, &46, &00
+    equb &48, &80, &4b, &00, &4d, &80, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &a2, &c8, &a0, &c6, &20, &f7
-    equb &ff
-    equs "`FREE"
+    equb &00
+; ***************************************************************************************
+; Unused
+;
+; A leftover routine, never called: *FREE.
+    equb &a2, &c8, &a0, &c6, &20, &f7, &ff, &60
+    equs "FREE"
     equb &0d, &00, &00, &00
+; ***************************************************************************************
+; Pause while P is pressed
+;
+; Called from check_pause in the game's update. If P (internal key &37) is held, wait for
+; it to be released, pressed again and released, then restart the frame timing. The Model
+; B side uses the same key.
 ; &c6d0 referenced 1 time by &1ed7
-.code_c6d0
-    lda #osbyte_scan_keyboard_from_16
-    jsr osbyte                          ; Scan keyboard from key 16
-    cpx #&37 ; '7'
-    bne return_11
-    jsr code_c6ee
+.pause_check
+    lda #osbyte_scan_keyboard_from_16   ; OSBYTE &7A: which key is pressed?
+    jsr osbyte                          ; ...  Scan keyboard from key 16
+    cpx #&37 ; '7'                      ; P?
+    bne return_11                       ; No: return
+    jsr wait_p_released                 ; Paused: wait for P to be released...
 ; &c6dc referenced 1 time by &c6e3
 .loop_c6dc
-    lda #osbyte_scan_keyboard_from_16
-    jsr osbyte                          ; Scan keyboard from key 16
-    cpx #&37 ; '7'
-    bne loop_c6dc
-    jsr code_c6ee
-    lda #2
-    sta os_vsync_counter
+    lda #osbyte_scan_keyboard_from_16   ; ...pressed again...
+    jsr osbyte                          ; ...  Scan keyboard from key 16
+    cpx #&37 ; '7'                      ; ...
+    bne loop_c6dc                       ; ...
+    jsr wait_p_released                 ; ...and released
+    lda #2                              ; Restart the frame timing
+    sta os_vsync_counter                ; ...
 ; &c6ed referenced 1 time by &c6d7
 .return_11
-    rts
+    rts                                 ; Return
+; ***************************************************************************************
+; Wait until P is not pressed
 ; &c6ee referenced 3 times by &c6d9, &c6e5, &c6f5
-.code_c6ee
-    lda #osbyte_scan_keyboard_from_16
-    jsr osbyte                          ; Scan keyboard from key 16
-    cpx #&37 ; '7'
-    beq code_c6ee
-    rts
+.wait_p_released
+    lda #osbyte_scan_keyboard_from_16   ; OSBYTE &7A: which key is pressed?
+    jsr osbyte                          ; ...  Scan keyboard from key 16
+    cpx #&37 ; '7'                      ; Still P?
+    beq wait_p_released                 ; Yes: keep waiting
+    rts                                 ; Return
 .dasmos_table_end
 
     org &c700
 
 .dasmos_code2_start
-    equb &a2, &6f, &a0, &c8, &a9, &08, &20, &f1
-    equb &ff, &a2, &7d, &a0, &c8, &a9, &08, &20
-    equb &f1, &ff, &a2, &8b, &a0, &c8, &a9, &08
-    equb &20, &f1, &ff, &a2, &99, &a0, &c8, &a9
-    equb &08, &20, &f1, &ff, &a9, &4c, &8d, &00
-    equb &09, &a9, &00, &8d, &01, &09, &a9, &d8
-    equb &8d, &02, &09, &a9, &cd, &85, &00, &a9
-    equb &c8, &85, &01, &a9, &00, &8d, &6b, &c7
-    equb &a9, &ff, &8d, &69, &c7, &a9, &00, &8d
-    equb &6a, &c7, &a9, &6c, &8d, &20, &02, &a9
-    equb &c7, &8d, &21, &02, &a9, &0e, &a2, &05
-    equb &a0, &00, &20, &f4, &ff, &4c, &6c, &c7
-    equb &a9, &0d, &a2, &05, &a0, &00, &4c, &f4
-    equb &ff, &ff, &ea, &ea, &08, &48, &98, &48
-    equb &8a, &48, &a0, &00, &b1, &00, &c9, &ff
-    equb &f0, &76, &c9, &00, &f0, &03, &8d, &6a
-    equb &c7, &a0, &01, &b1, &00, &f0, &0c, &8d
-    equb &31, &c8, &a2, &2d, &a0, &c8, &a9, &07
-    equb &20, &f1, &ff, &a0, &02, &b1, &00, &f0
-    equb &0c, &8d, &39, &c8, &a2, &35, &a0, &c8
-    equb &a9, &07, &20, &f1, &ff, &a5, &00, &18
-    equb &69, &03, &85, &00, &a5, &01, &69, &00
-    equb &85, &01, &ad, &69, &c7, &18, &69, &01
-    equb &c9, &20, &30, &02, &a9, &00, &8d, &69
-    equb &c7, &a8, &b9, &ac, &c8, &f0, &19, &18
-    equb &6d, &6a, &c7, &8d, &21, &c8, &a2, &1d
-    equb &a0, &c8, &a9, &07, &20, &f1, &ff, &a2
-    equb &25, &a0, &c8, &a9, &07, &20, &f1, &ff
-    equb &a2, &a7, &a0, &c8, &a9, &04, &20, &f1
-    equb &ff, &68, &aa, &68, &a8
-    equs "h(`"
-    equb &a0, &01, &b1, &00, &8d, &37, &c8, &ee
-    equb &6b, &c7, &ad, &6b, &c7, &c9, &19, &d0
-    equb &0a, &a9, &ff, &8d, &69, &c7, &a9, &01
-    equb &8d, &6b, &c7, &a8, &b9, &3d, &c8, &85
-    equb &00, &b9, &56, &c8, &85, &01, &a0, &00
-    equb &b1, &00, &4c, &7a, &c7, &11, &00, &09
-    equb &00, &00, &00, &01, &00, &10, &00, &07
-    equb &00, &03, &00, &03, &00, &12, &00, &08
-    equb &00, &00, &00, &0a, &00, &13, &00, &06
-    equb &00, &00, &00, &08, &00, &cd, &8f, &11
-    equb &11, &cd, &7d, &7d, &cd, &33, &33, &b5
-    equb &77, &77, &cd, &11
-    equs "9[[??"
-    equb &c1, &43, &43, &c5, &cd, &c8, &c9, &cb
-    equb &cb, &c8, &d1, &d1, &c8, &cc, &cc, &cd
-    equb &ce, &ce, &c8, &cb, &cf, &d0, &d0, &d2
-    equb &d2, &d3, &d5, &d5, &d6, &c8, &06, &05
-    equb &00, &ff, &01, &01, &01, &01, &01, &ff
-    equb &ff, &ff, &78, &00, &07, &01, &00, &00
-    equb &00, &00, &00, &00, &7e, &fe, &ff, &fc
-    equb &50, &7e, &08, &07, &00, &ff, &01, &01
-    equb &01, &01, &50, &ff, &ff, &ff, &7e, &64
-    equb &09, &04, &00, &ff, &01, &01, &01, &01
-    equb &00, &00, &00, &00, &00, &00, &f4, &ff
-    equb &ff, &ff, &ff
-    equs "tttt"
-    equb &a4, &00, &74, &74, &00, &74, &74, &00
-    equb &a4, &00, &00, &a4
-    equs "ttt"
-    equb &00, &a4, &00, &74, &74, &00, &74, &74
-    equb &00, &a4, &00, &00, &a4, &74, &04, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &ff, &06
-    equb &04, &4d, &1d, &00, &00, &00, &00, &00
-    equb &29, &00, &00, &00, &00, &00, &39, &00
-    equb &00, &00, &00, &00, &29, &00, &00, &00
-    equb &00, &00, &1d, &00, &00, &00, &00, &00
-    equb &29, &00, &00, &00, &00, &00, &39, &00
-    equb &00, &00, &00, &00, &29, &00, &00, &00
-    equb &00, &00, &1d, &00, &00, &00, &00, &00
-    equb &29, &00, &00, &00, &00, &00, &39, &00
-    equb &00, &00, &00, &00, &29, &00, &00, &00
-    equb &00, &00, &1d, &00, &00, &00, &00, &00
-    equb &29, &00, &00, &00, &00, &00, &39, &00
-    equb &00, &00, &00, &00, &29, &00, &00, &00
-    equb &00, &00, &1d, &00, &00, &00, &00, &00
-    equb &29, &00, &00, &00, &00, &00, &39, &00
-    equb &00, &00, &00, &00, &29, &00, &00, &00
-    equb &00, &00, &1d, &00, &00, &00, &00, &00
-    equb &29, &00, &00, &00, &00, &00, &39, &00
-    equb &00, &00, &00, &00, &29, &00, &00, &00
-    equb &00, &00, &1d, &00, &00, &00, &00, &00
-    equb &29, &00, &00, &00, &00, &00, &39, &00
-    equb &00, &00, &00, &00, &29, &00, &00, &00
-    equb &00, &00, &1d, &00, &00, &00, &00, &00
-    equb &29, &00, &00, &00, &00, &00, &39, &00
-    equb &00, &00, &00, &4d, &29, &00, &00, &00
-    equb &fc, &45, &15, &00, &00, &00, &00, &00
-    equb &25, &00, &00, &00, &00, &00, &31, &00
-    equb &00, &00, &00, &00, &25, &00, &00, &00
-    equb &00, &00, &15, &00, &00, &00, &00, &00
-    equb &25, &00, &00, &00, &00, &00, &31, &00
-    equb &00, &00, &00, &00, &25, &00, &00, &00
-    equb &00, &00, &15, &00, &00, &00, &00, &00
-    equb &25, &00, &00, &00, &00, &00, &31, &00
-    equb &00, &00, &00, &00, &25, &00, &00, &00
-    equb &00, &00, &15, &00, &00, &00, &00, &00
-    equb &25, &00, &00, &00, &00, &00, &31, &00
-    equb &00, &00, &00, &00, &25, &00, &00, &00
-    equb &04, &4d, &1d, &00, &00, &00, &00, &00
-    equb &29, &00, &00, &00, &00, &00, &39, &00
-    equb &00, &00, &00, &00, &29, &00, &00, &00
-    equb &00, &00, &1d, &00, &00, &00, &00, &00
-    equb &29, &00, &00, &00, &00, &00, &39, &00
-    equb &00, &00, &00, &00, &29, &00, &00, &00
-    equb &00, &00, &1d, &00, &00, &00, &00, &00
-    equb &29, &00, &00, &00, &00, &00, &39, &00
-    equb &00, &00, &00, &00, &29, &00, &00, &00
-    equb &00, &00, &1d, &00, &00, &00, &00, &00
-    equb &29, &00, &00, &00, &00, &00, &39, &00
-    equb &00, &00, &00, &00, &29, &00, &00, &00
-    equb &ff, &06, &04, &00, &1d, &00, &00, &00
-    equb &00, &00, &29, &00, &00, &00, &00, &00
-    equb &39, &00, &00, &00, &00, &00, &29, &00
-    equb &00, &00, &00, &00, &1d, &00, &00, &00
-    equb &00, &00, &29, &00, &00, &00, &00, &00
-    equb &39, &00, &00, &00, &00, &00, &29, &00
-    equb &00, &00, &00, &00, &1d, &00, &00, &00
-    equb &00, &00, &29, &00, &00, &00, &00, &00
-    equb &39, &00, &00, &00, &00, &00, &29, &00
-    equb &00, &00, &00, &00, &1d, &00, &00, &00
-    equb &00, &00, &29, &00, &00, &00, &00, &00
-    equb &39, &00, &00, &00, &00, &4d, &29, &00
-    equb &55, &00, &00, &59, &1d, &00, &00, &00
-    equb &00, &00, &29, &00, &00, &00, &00, &00
-    equb &39, &00, &00, &00, &00, &00, &29, &00
-    equb &00, &00, &00, &55, &1d, &00, &00, &00
-    equb &00, &4d, &29, &00, &00, &00, &00, &00
-    equb &39, &00, &00, &00, &00, &45, &29, &00
-    equb &00, &00, &fc, &00, &15, &00, &00, &00
-    equb &00, &00, &25, &00, &00, &00, &00, &00
-    equb &31, &00, &00, &00, &00, &00, &25, &00
-    equb &00, &00, &00, &00, &15, &00, &00, &00
-    equb &00, &00, &25, &00, &00, &00, &00, &00
-    equb &31, &00, &00, &00, &00, &4d, &25, &00
-    equb &55, &00, &04, &59, &1d, &00, &00, &00
-    equb &00, &00, &29, &00, &00, &00, &00, &00
-    equb &39, &00, &00, &00, &00, &00, &29, &00
-    equb &00, &00, &00, &55, &1d, &00, &00, &00
-    equb &00, &59, &29, &00, &00, &00, &00, &00
-    equb &39, &00, &00, &00, &00, &61, &29, &00
-    equb &00, &00, &fc, &00, &15, &00, &00, &00
-    equb &00, &00, &25, &00, &00, &00, &00, &00
-    equb &31, &00, &00, &00, &00, &00, &25, &00
-    equb &00, &00, &00, &00, &15, &00, &00, &00
-    equb &00, &59, &25, &00, &00, &00, &00, &55
-    equb &31, &00, &00, &00, &00, &4d, &1d, &00
-    equb &00, &00, &ff, &06, &04, &59, &00, &00
-    equb &55, &00, &00, &59, &00, &00, &4d, &00
-    equb &00, &55, &00, &00, &4d, &00, &00, &55
-    equb &00, &00, &45, &00, &00, &4d, &59, &00
-    equb &45, &55, &00, &4d, &59, &00, &3d, &4d
-    equb &00, &45, &55, &00, &3d, &4d, &00, &59
-    equb &55, &00, &4d, &45, &00, &59, &4d, &00
-    equb &55, &45, &00, &59, &4d, &00, &4d, &3d
-    equb &00, &55, &45, &00, &4d, &3d, &00, &55
-    equb &59, &00, &61, &4d, &00, &00, &59, &00
-    equb &00, &55, &00, &00, &59, &00, &00, &4d
-    equb &00, &00, &55, &00, &00, &4d, &00, &00
-    equb &55, &00, &00, &61, &fc, &59, &00, &00
-    equb &55, &00, &00, &59, &00, &00, &4d, &00
-    equb &00, &55, &00, &00, &4d, &00, &00, &55
-    equb &00, &00, &45, &00, &00, &4d, &59, &00
-    equb &45, &55, &00, &4d, &59, &00, &3d, &4d
-    equb &00, &45, &55, &00, &3d, &4d, &00, &59
-    equb &55, &00, &4d, &45, &00, &59, &4d, &00
-    equb &55, &45, &00, &59, &4d, &00, &4d, &3d
-    equb &00, &55, &45, &00, &4d, &3d, &00, &55
-    equb &59, &00, &61, &4d, &00, &00, &59, &00
-    equb &00, &55, &00, &00, &59, &00, &00, &4d
-    equb &00, &00, &55, &00, &00, &4d, &00, &00
-    equb &55, &00, &00, &61, &f4, &59, &00, &00
-    equb &55, &00, &00, &59, &00, &00, &4d, &00
-    equb &00, &55, &00, &00, &4d, &00, &00, &55
-    equb &00, &00, &45, &00, &00, &4d, &59, &00
-    equb &45, &55, &00, &4d, &59, &00, &3d, &4d
-    equb &00, &45, &55, &00, &3d, &4d, &00, &59
-    equb &55, &00, &4d, &45, &00, &59, &4d, &00
-    equb &55, &45, &00, &59, &4d, &00, &4d, &3d
-    equb &00, &55, &45, &00, &4d, &3d, &00, &55
-    equb &59, &00, &61, &4d, &00, &00, &59, &00
-    equb &00, &55, &00, &00, &59, &00, &00, &4d
-    equb &00, &00, &55, &00, &00, &4d, &00, &00
-    equb &55, &00, &00, &61, &00, &59, &00, &00
-    equb &55, &00, &f0, &59, &00, &00, &4d, &00
-    equb &00, &55, &00, &00, &4d, &00, &00, &55
-    equb &00, &00, &45, &00, &00, &4d, &59, &00
-    equb &45, &55, &00, &4d, &59, &00, &3d, &4d
-    equb &00, &45, &55, &00, &3d, &4d, &00, &59
-    equb &55, &00, &4d, &45, &00, &59, &4d, &00
-    equb &55, &45, &00, &59, &4d, &00, &4d, &3d
-    equb &00, &55, &45, &00, &4d, &3d, &00, &55
-    equb &59, &00, &61, &4d, &00, &00, &59, &00
-    equb &00, &55, &00, &00, &59, &00, &00, &4d
-    equb &00, &00, &55, &00, &00, &4d, &00, &00
-    equb &55, &00, &00, &61, &ff, &06, &04, &59
-    equb &00, &00, &00, &00, &00, &55, &00, &00
-    equb &00, &00, &00, &59, &00, &00, &00, &00
-    equb &00, &4d, &00, &00, &00, &00, &00, &55
-    equb &00, &00, &00, &00, &00, &4d, &00, &00
-    equb &00, &00, &00, &55, &00, &00, &00, &00
-    equb &00, &45, &00, &00, &00, &00, &00, &59
-    equb &00, &00, &00, &00, &00, &55, &00, &00
-    equb &00, &00, &00, &59, &00, &00, &00, &00
-    equb &00, &4d, &00, &00, &00, &00, &00, &55
-    equb &00, &00, &00, &00, &00, &4d, &00, &00
-    equb &00, &00, &00, &55, &00, &00, &00, &00
-    equb &00, &45, &00, &00, &00, &00, &00, &59
-    equb &69, &00, &00, &00, &00, &55, &61, &00
-    equb &00, &00, &00, &59, &69, &00, &00, &00
-    equb &00, &4d, &59, &00, &00, &00, &00, &55
-    equb &61, &00, &00, &00, &00, &4d, &59, &00
-    equb &00, &00, &00, &55, &61, &00, &00, &00
-    equb &00, &45, &55, &00, &00, &00, &00, &59
-    equb &69, &00, &00, &00, &00, &55, &61, &00
-    equb &00, &00, &00, &59, &69, &00, &00, &00
-    equb &00, &4d, &59, &00, &00, &00, &00, &55
-    equb &61, &00, &00, &00, &00, &4d, &59, &00
-    equb &00, &00, &00, &55, &61, &00, &00, &00
-    equb &00, &45, &55, &00, &00, &00, &ff, &08
-    equb &04, &59, &55, &00, &61, &00, &00, &59
-    equb &4d, &00, &61, &00, &00, &59, &55, &00
-    equb &61, &00, &00, &69, &59, &00, &00, &00
-    equb &00, &00, &61, &00, &00, &00, &00, &00
-    equb &59, &00, &00, &00, &00, &00, &55, &00
-    equb &00, &00, &00, &00, &4d, &00, &00, &00
-    equb &00, &59, &55, &00, &61, &00, &00, &59
-    equb &4d, &00, &61, &00, &00, &59, &55, &00
-    equb &61, &00, &00, &69, &59, &00, &00, &00
-    equb &00, &00, &61, &00, &00, &00, &00, &00
-    equb &59, &00, &00, &00, &00, &00, &55, &00
-    equb &00, &00, &00, &00, &4d, &00, &00, &00
-    equb &fc, &55, &55, &00, &59, &00, &00, &55
-    equb &4d, &00, &59, &00, &00, &55, &55, &00
-    equb &59, &00, &00, &61, &59, &00, &00, &00
-    equb &00, &00, &61, &00, &00, &00, &00, &00
-    equb &59, &00, &00, &00, &00, &00, &55, &00
-    equb &00, &00, &00, &00, &4d, &00, &00, &00
-    equb &00, &55, &55, &00, &59, &00, &00, &55
-    equb &4d, &00, &59, &00, &00, &55, &55, &00
-    equb &59, &00, &00, &61, &59, &00, &00, &00
-    equb &00, &00, &61, &00, &00, &00, &00, &00
-    equb &59, &00, &00, &00, &00, &00, &55, &00
-    equb &00, &00, &00, &00, &4d, &00, &00, &00
-    equb &ff, &06, &0c, &00, &25, &00, &00, &00
-    equb &00, &00, &31, &00, &00, &00, &00, &00
-    equb &3d, &00, &00, &00, &00, &00, &31, &00
-    equb &00, &00, &00, &00, &25, &00, &00, &00
-    equb &00, &00, &31, &00, &00, &00, &00, &00
-    equb &3d, &00, &00, &00, &00, &00, &31, &00
-    equb &00, &00, &00, &00, &25, &00, &00, &00
-    equb &00, &00, &31, &00, &00, &00, &00, &00
-    equb &3d, &00, &00, &00, &00, &00, &31, &00
-    equb &00, &00, &00, &00, &25, &00, &00, &00
-    equb &00, &00, &31, &00, &00, &00, &00, &00
-    equb &3d, &00, &00, &00, &00, &55, &31, &00
-    equb &59, &00, &00, &61, &25, &00, &00, &00
-    equb &00, &00, &31, &00, &00, &00, &00, &00
-    equb &3d, &00, &00, &00, &00, &00, &31, &00
-    equb &00, &00, &00, &59, &25, &00, &00, &00
-    equb &00, &55, &31, &00, &00, &00, &00, &00
-    equb &3d, &00, &00, &00, &00, &4d, &31, &00
-    equb &00, &00, &04, &00, &1d, &00, &00, &00
-    equb &00, &00, &29, &00, &00, &00, &00, &00
-    equb &39, &00, &00, &00, &00, &00, &29, &00
-    equb &00, &00, &00, &00, &1d, &00, &00, &00
-    equb &00, &00, &29, &00, &00, &00, &00, &00
-    equb &39, &00, &00, &00, &00, &55, &29, &00
-    equb &59, &00, &00, &61, &1d, &00, &00, &00
-    equb &00, &00, &29, &00, &00, &00, &00, &00
-    equb &39, &00, &00, &00, &00, &00, &29, &00
-    equb &00, &00, &00, &59, &1d, &00, &00, &00
-    equb &00, &61, &29, &00, &00, &00, &00, &00
-    equb &39, &00, &00, &00, &00, &69, &29, &00
-    equb &00, &00, &00, &00, &1d, &00, &00, &00
-    equb &00, &00, &29, &00, &00, &00, &00, &00
-    equb &39, &00, &00, &00, &00, &00, &29, &00
-    equb &00, &00, &00, &00, &1d, &00, &00, &00
-    equb &00, &61, &29, &00, &00, &00, &00, &59
-    equb &39, &00, &00, &00, &00, &4d, &29, &00
-    equb &00, &00, &ff, &06, &fc, &59, &00, &00
-    equb &00, &00, &00, &61, &00, &00, &00, &00
-    equb &00, &69, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &f0, &4d, &00, &00
-    equb &00, &00, &00, &55, &00, &00, &00, &00
-    equb &00, &59, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &4d, &00, &00
-    equb &00, &00, &00, &55, &00, &00, &00, &00
-    equb &00, &59, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &61, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &04, &55, &00, &00
-    equb &00, &00, &00, &59, &00, &00, &00, &00
-    equb &00, &61, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &69, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &59, &00, &00
-    equb &00, &00, &00, &61, &00, &00, &00, &00
-    equb &00, &69, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &ff, &08, &04, &1d
-    equb &09, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &29
-    equb &1d, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &fc, &25
-    equb &15, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &f4, &1d
-    equb &0d, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &ff, &08
-    equb &10, &00, &1d, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &29, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &39, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &29, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &45, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &39, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &59, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &45, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &04, &55, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &59, &00, &00, &55, &00
-    equb &00, &4d, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &f4, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &0d, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &15, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &0d, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &1d, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &1d
-    equb &00, &00, &00, &00, &00, &15, &00, &00
-    equb &00, &00, &00, &0d, &00, &00, &00, &00
-    equb &f0, &09, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &09
-    equb &00, &00, &00, &00, &00, &0d, &00, &00
-    equb &00, &00, &00, &15, &00, &00, &00, &00
-    equb &00, &1d, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &25, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &ff, &08, &04, &00, &1d, &00, &00, &00
-    equb &00, &00, &25, &00, &00, &00, &00, &00
-    equb &1d, &00, &00, &00, &00, &00, &29, &00
-    equb &00, &00, &00, &00, &1d, &00, &00, &00
-    equb &00, &00, &31, &00, &00, &00, &00, &00
-    equb &1d, &00, &00, &00, &00, &00, &39, &00
-    equb &00, &00, &00, &00, &1d, &00, &00, &00
-    equb &00, &00, &31, &00, &00, &00, &00, &00
-    equb &1d, &00, &00, &00, &00, &00, &29, &00
-    equb &00, &00, &00, &00, &1d, &00, &00, &00
-    equb &00, &00, &25, &00, &00, &00, &00, &00
-    equb &1d, &00, &00, &00, &00, &00, &15, &00
-    equb &00, &00, &00, &00, &1d, &00, &00, &00
-    equb &00, &00, &25, &00, &00, &00, &00, &00
-    equb &1d, &00, &00, &00, &00, &00, &29, &00
-    equb &00, &00, &00, &00, &1d, &00, &00, &00
-    equb &00, &00, &31, &00, &00, &00, &00, &00
-    equb &1d, &00, &00, &00, &00, &00, &39, &00
-    equb &00, &00, &00, &00, &1d, &00, &00, &00
-    equb &00, &00, &31, &00, &00, &00, &00, &00
-    equb &1d, &00, &00, &00, &00, &00, &29, &00
-    equb &00, &00, &00, &00, &1d, &00, &00, &00
-    equb &00, &00, &25, &00, &00, &00, &00, &00
-    equb &1d, &00, &00, &00, &00, &00, &15, &00
-    equb &00, &00, &fc, &00, &1d, &00, &00, &00
-    equb &00, &00, &25, &00, &00, &00, &00, &00
-    equb &1d, &00, &00, &00, &00, &00, &29, &00
-    equb &00, &00, &00, &00, &1d, &00, &00, &00
-    equb &00, &00, &31, &00, &00, &00, &00, &00
-    equb &1d, &00, &00, &00, &00, &00, &39, &00
-    equb &00, &00, &00, &00, &1d, &00, &00, &00
-    equb &00, &00, &31, &00, &00, &00, &00, &00
-    equb &1d, &00, &00, &00, &00, &00, &29, &00
-    equb &00, &00, &00, &00, &1d, &00, &00, &00
-    equb &00, &00, &25, &00, &00, &00, &00, &00
-    equb &1d, &00, &00, &00, &00, &00, &15, &00
-    equb &00, &00, &f4, &00, &1d, &00, &00, &00
-    equb &00, &00, &25, &00, &00, &00, &00, &00
-    equb &1d, &00, &00, &00, &00, &00, &29, &00
-    equb &00, &00, &00, &00, &1d, &00, &00, &00
-    equb &00, &00, &31, &00, &00, &00, &00, &00
-    equb &1d, &00, &00, &00, &00, &00, &39, &00
-    equb &00, &00, &00, &00, &1d, &00, &00, &00
-    equb &00, &00, &31, &00, &00, &00, &00, &00
-    equb &1d, &00, &00, &00, &00, &00, &29, &00
-    equb &00, &00, &00, &00, &1d, &00, &00, &00
-    equb &00, &00, &25, &00, &00, &00, &00, &00
-    equb &1d, &00, &00, &00, &00, &00, &15, &00
-    equb &00, &00, &ff, &07, &04, &4d, &1d, &00
-    equb &00, &00, &00, &00, &25, &00, &00, &00
-    equb &00, &45, &1d, &00, &00, &00, &00, &55
-    equb &29, &00, &00, &00, &00, &00, &1d, &00
-    equb &00, &00, &00, &00, &31, &00, &00, &00
-    equb &00, &59, &1d, &00, &00, &00, &00, &4d
-    equb &39, &00, &00, &00, &00, &00, &1d, &00
-    equb &00, &00, &00, &00, &31, &00, &00, &00
-    equb &00, &39, &1d, &00, &00, &00, &00, &45
-    equb &29, &00, &00, &00, &00, &00, &1d, &00
-    equb &00, &00, &00, &00, &25, &00, &00, &00
-    equb &00, &00, &1d, &00, &00, &00, &00, &39
-    equb &15, &00, &00, &00, &00, &4d, &1d, &00
-    equb &00, &00, &00, &00, &25, &00, &00, &00
-    equb &00, &45, &1d, &00, &00, &00, &00, &55
-    equb &29, &00, &00, &00, &00, &00, &1d, &00
-    equb &00, &00, &00, &00, &31, &00, &00, &00
-    equb &00, &59, &1d, &00, &00, &00, &00, &4d
-    equb &39, &00, &00, &00, &00, &00, &1d, &00
-    equb &00, &00, &00, &00, &31, &00, &00, &00
-    equb &00, &00, &1d, &00, &00, &00, &00, &00
-    equb &29, &00, &00, &00, &00, &00, &1d, &00
-    equb &00, &00, &00, &00, &25, &00, &00, &00
-    equb &00, &00, &1d, &00, &00, &00, &00, &00
-    equb &15, &00, &00, &00, &fc, &4d, &1d, &00
-    equb &00, &00, &00, &00, &25, &00, &00, &00
-    equb &00, &45, &1d, &00, &00, &00, &00, &55
-    equb &29, &00, &00, &00, &00, &00, &1d, &00
-    equb &00, &00, &00, &00, &31, &00, &00, &00
-    equb &00, &59, &1d, &00, &00, &00, &00, &4d
-    equb &39, &00, &00, &00, &00, &00, &1d, &00
-    equb &00, &00, &00, &00, &31, &00, &00, &00
-    equb &00, &39, &1d, &00, &00, &00, &00, &45
-    equb &29, &00, &00, &00, &00, &00, &1d, &00
-    equb &00, &00, &00, &00, &25, &00, &00, &00
-    equb &00, &00, &1d, &00, &00, &00, &00, &39
-    equb &15, &00, &00, &00, &f4, &4d, &1d, &00
-    equb &00, &00, &00, &00, &25, &00, &00, &00
-    equb &00, &45, &1d, &00, &00, &00, &00, &55
-    equb &29, &00, &00, &00, &00, &00, &1d, &00
-    equb &00, &00, &00, &00, &31, &00, &00, &00
-    equb &00, &59, &1d, &00, &00, &00, &00, &4d
-    equb &39, &00, &00, &00, &00, &00, &1d, &00
-    equb &00, &00, &00, &00, &31, &00, &00, &00
-    equb &00, &00, &1d, &00, &00, &00, &00, &00
-    equb &29, &00, &00, &00, &00, &00, &1d, &00
-    equb &00, &00, &00, &00, &25, &00, &00, &00
-    equb &00, &00, &1d, &00, &00, &00, &00, &00
-    equb &15, &00, &00, &00, &ff, &07, &04, &55
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &59
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &4d
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &59
-    equb &29, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &55
-    equb &25, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &4d
-    equb &1d, &ff, &08
+; ***************************************************************************************
+; Start the music
+;
+; Define envelopes 6-9, redirect the game's plot_sprite to the copy in Code3, point the
+; tune at its first section, and play it on the interval timer: EVNTV is pointed at
+; music_event and the interval timer event enabled. Then play the first step.
+; &c700 referenced 1 time by &1461
+.start_music
+    ldx #<(envelope_6)                  ; ENVELOPE 6...
+    ldy #>(envelope_6)                  ; ...
+    lda #osword_envelope                ; ...
+    jsr osword                          ; ...  ENVELOPE command
+    ldx #<(envelope_7)                  ; ENVELOPE 7...
+    ldy #>(envelope_7)                  ; ...
+    lda #osword_envelope                ; ...
+    jsr osword                          ; ...  ENVELOPE command
+    ldx #<(envelope_8)                  ; ENVELOPE 8...
+    ldy #>(envelope_8)                  ; ...
+    lda #osword_envelope                ; ...
+    jsr osword                          ; ...  ENVELOPE command
+    ldx #<(envelope_9)                  ; ENVELOPE 9
+    ldy #>(envelope_9)                  ; ...
+    lda #osword_envelope                ; ...
+    jsr osword                          ; ...  ENVELOPE command
+    lda #&4c ; 'L'                      ; Make plot_sprite JMP &D800, the copy in Code3...
+    sta plot_sprite                     ; ...
+    lda #0                              ; ...
+    sta data_0901                       ; ...
+    lda #&d8                            ; ...
+    sta code_0902                       ; ...
+    lda #&cd                            ; Tune pointer (zero page &00-&01) = the first section...
+    sta tune_ptr                        ; ...
+    lda #&c8                            ; ...
+    sta data_0001                       ; ...
+    lda #0                              ; Section 0
+    sta music_section                   ; ...
+    lda #&ff                            ; Rhythm step -1, so the first step plays step 0
+    sta music_rhythm_step               ; ...
+    lda #0                              ; No transposition
+    sta music_transpose                 ; ...
+    lda #&6c ; 'l'                      ; EVNTV = music_event...
+    sta evntv                           ; ...
+    lda #&c7                            ; ...
+    sta evntv + 1                       ; ...
+    lda #osbyte_enable_event            ; OSBYTE 14, 5: enable the interval timer event
+    ldx #event_interval_timer_crossing_zero  ; ...
+    ldy #0                              ; ...
+    jsr osbyte                          ; ...  Enable event
+    jmp music_event                     ; Play the first step, and return from there
+; ***************************************************************************************
+; Stop the music
+;
+; OSBYTE 13, 5: disable the interval timer event.
+; &c760 referenced 2 times by &1419, &c600
+.stop_music
+    lda #osbyte_disable_event           ; OSBYTE 13, 5: disable the interval timer event
+    ldx #event_interval_timer_crossing_zero  ; ...
+    ldy #0                              ; ...
+    jmp osbyte                          ; ...  Disable event
+; &c769 referenced 6 times by &1407, &147a, &c742, &c7b2, &c7be, &c803
+.music_rhythm_step
+    equb &ff
+; &c76a referenced 5 times by &140b, &1476, &c747, &c77e, &c7c8
+.music_transpose
+    equb &ea
+; &c76b referenced 6 times by &140f, &1472, &c73d, &c7f7, &c7fa, &c808
+.music_section
+    equb &ea
+; ***************************************************************************************
+; Event handler: play one step of the music
+;
+; Called through EVNTV for the interval timer event, which start_music sets to recur
+; every 12 centiseconds. A tune step is three bytes: a transposition for the rhythm (0
+; for no change) or &FF to end the section, a pitch for channel 2 and a pitch for channel
+; 3 (0 for silence). Each step also plays the next of the 32 steps of rhythm_pattern on
+; channel 1 and the noise channel. At the end of a section the next byte sets channel 3's
+; envelope and the next section starts; after section 24 the tune goes back to section 1.
+; The interval timer is then reset.
+;
+; On Exit:
+;     A: preserved
+;     X: preserved
+;     Y: preserved
+; &c76c referenced 1 time by &c75d
+.music_event
+    php                                 ; Save the flags and registers
+    pha                                 ; ...
+    tya                                 ; ...
+    pha                                 ; ...
+    txa                                 ; ...
+    pha                                 ; ...
+    ldy #0                              ; First byte of the step...
+    lda (tune_ptr),y                    ; ...
+    cmp #&ff                            ; ...&FF?
+    beq code_c7f0                       ; Yes: end of the section
+; &c77a referenced 1 time by &c81a
+.code_c77a
+    cmp #0                              ; Non-zero: a new transposition
+    beq code_c781                       ; ...
+    sta music_transpose                 ; ...
+; &c781 referenced 1 time by &c77c
+.code_c781
+    ldy #1                              ; Second byte: channel 2's pitch...
+    lda (tune_ptr),y                    ; ...
+    beq code_c793                       ; ...0 for none
+    sta data_c831                       ; ...
+    ldx #<(channel_2_sound)             ; SOUND channel_2_sound...
+    ldy #>(channel_2_sound)             ; ...
+    lda #osword_sound                   ; ...
+    jsr osword                          ; ...  SOUND command
+; &c793 referenced 1 time by &c785
+.code_c793
+    ldy #2                              ; Third byte: channel 3's pitch...
+    lda (tune_ptr),y                    ; ...
+    beq code_c7a5                       ; ...0 for none
+    sta data_c839                       ; ...
+    ldx #<(channel_3_sound)             ; SOUND channel_3_sound...
+    ldy #>(channel_3_sound)             ; ...
+    lda #osword_sound                   ; ...
+    jsr osword                          ; ...  SOUND command
+; &c7a5 referenced 1 time by &c797
+.code_c7a5
+    lda tune_ptr                        ; Next step: tune_ptr += 3...
+    clc                                 ; ...
+    adc #3                              ; ...
+    sta tune_ptr                        ; ...
+    lda data_0001                       ; ...
+    adc #0                              ; ...
+    sta data_0001                       ; ...
+    lda music_rhythm_step               ; Next rhythm step, 0-31...
+    clc                                 ; ...
+    adc #1                              ; ...
+    cmp #&20 ; ' '                      ; ...
+    bmi code_c7be                       ; ...
+    lda #0                              ; ...
+; &c7be referenced 1 time by &c7ba
+.code_c7be
+    sta music_rhythm_step               ; ...
+    tay                                 ; Its pitch, 0 for a rest...
+    lda rhythm_pattern,y                ; ...
+    beq code_c7e0                       ; ...
+    clc                                 ; ...transposed...
+    adc music_transpose                 ; ...
+    sta data_c821                       ; ...
+    ldx #<(channel_1_sound)             ; ...on channel 1...
+    ldy #>(channel_1_sound)             ; ...
+    lda #osword_sound                   ; ...
+    jsr osword                          ; ...  SOUND command
+    ldx #<(noise_sound)                 ; ...with the noise channel
+    ldy #>(noise_sound)                 ; ...
+    lda #osword_sound                   ; ...
+    jsr osword                          ; ...  SOUND command
+; &c7e0 referenced 1 time by &c7c5
+.code_c7e0
+    ldx #<(music_interval)              ; OSWORD 4: interval timer = -12 centiseconds, for the next step
+    ldy #>(music_interval)              ; ...
+    lda #osword_write_interval_timer    ; ...
+    jsr osword                          ; ...  Write interval timer
+    pla                                 ; Restore the registers and flags
+    tax                                 ; ...
+    pla                                 ; ...
+    tay                                 ; ...
+    pla                                 ; ...
+    plp                                 ; ...
+    rts                                 ; Return
+; &c7f0 referenced 1 time by &c778
+.code_c7f0
+    ldy #1                              ; End of section: the next byte is channel 3's envelope
+    lda (tune_ptr),y                    ; ...
+    sta data_c837                       ; ...
+    inc music_section                   ; Next section...
+    lda music_section                   ; ...
+    cmp #&19                            ; ...
+    bne code_c80b                       ; ...past 24?
+    lda #&ff                            ; Yes: back to section 1, with the rhythm restarting
+    sta music_rhythm_step               ; ...
+    lda #1                              ; ...
+    sta music_section                   ; ...
+; &c80b referenced 1 time by &c7ff
+.code_c80b
+    tay                                 ; Point tune_ptr at the section...
+    lda section_ptrs_lo,y               ; ...
+    sta tune_ptr                        ; ...
+    lda section_ptrs_hi,y               ; ...
+    sta data_0001                       ; ...
+    ldy #0                              ; ...and play its first step
+    lda (tune_ptr),y                    ; ...
+    jmp code_c77a                       ; ...
+.channel_1_sound
+; &c821 referenced 1 time by &c7cb
+data_c821 = channel_1_sound+4
+    equb &11, &00, &09, &00, &00, &00, &01, &00
+.noise_sound
+    equb &10, &00, &07, &00, &03, &00, &03, &00
+.channel_2_sound
+; &c831 referenced 1 time by &c787
+data_c831 = channel_2_sound+4
+    equb &12, &00, &08, &00, &00, &00, &0a, &00
+.channel_3_sound
+; &c837 referenced 1 time by &c7f4
+data_c837 = channel_3_sound+2
+; &c839 referenced 1 time by &c799
+data_c839 = channel_3_sound+4
+    equb &13, &00, &06, &00, &00, &00, &08, &00
+; &c83d used as index base 1 time by &c80c
+.section_ptrs_lo
+    equb &cd, &8f, &11, &11, &cd, &7d, &7d, &cd, &33, &33, &b5, &77, &77
+    equb &cd, &11, &39, &5b, &5b, &3f, &3f, &c1, &43, &43, &c5, &cd
+; &c856 used as index base 1 time by &c811
+.section_ptrs_hi
+    equb &c8, &c9, &cb, &cb, &c8, &d1, &d1, &c8, &cc, &cc, &cd, &ce, &ce
+    equb &c8, &cb, &cf, &d0, &d0, &d2, &d2, &d3, &d5, &d5, &d6, &c8
+.envelope_6
+    equb &06, &05, &00, &ff, &01, &01, &01, &01, &01, &ff, &ff, &ff, &78, &00
+.envelope_7
+    equb &07, &01, &00, &00, &00, &00, &00, &00, &7e, &fe, &ff, &fc, &50, &7e
+.envelope_8
+    equb &08, &07, &00, &ff, &01, &01, &01, &01, &50, &ff, &ff, &ff, &7e, &64
+.envelope_9
+    equb &09, &04, &00, &ff, &01, &01, &01, &01, &00, &00, &00, &00, &00, &00
+.music_interval
+    equb &f4, &ff, &ff, &ff, &ff
+; &c8ac used as index base 1 time by &c7c2
+.rhythm_pattern
+    equb &74, &74, &74, &74, &a4, &00, &74, &74, &00, &74, &74, &00, &a4, &00, &00, &a4
+    equb &74, &74, &74, &00, &a4, &00, &74, &74, &00, &74, &74, &00, &a4, &00, &00, &a4
+; ***************************************************************************************
+; The tune
+;
+; The music's data: sections of three-byte steps (transposition or &FF, channel 2 pitch,
+; channel 3 pitch), reached through section_ptrs_lo and section_ptrs_hi.
+    equb &74
+.tune
+    equb &04, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &ff, &06, &04, &4d, &1d, &00, &00, &00, &00, &00, &29, &00
+    equb &00, &00, &00, &00, &39, &00, &00, &00, &00, &00, &29, &00
+    equb &00, &00, &00, &00, &1d, &00, &00, &00, &00, &00, &29, &00
+    equb &00, &00, &00, &00, &39, &00, &00, &00, &00, &00, &29, &00
+    equb &00, &00, &00, &00, &1d, &00, &00, &00, &00, &00, &29, &00
+    equb &00, &00, &00, &00, &39, &00, &00, &00, &00, &00, &29, &00
+    equb &00, &00, &00, &00, &1d, &00, &00, &00, &00, &00, &29, &00
+    equb &00, &00, &00, &00, &39, &00, &00, &00, &00, &00, &29, &00
+    equb &00, &00, &00, &00, &1d, &00, &00, &00, &00, &00, &29, &00
+    equb &00, &00, &00, &00, &39, &00, &00, &00, &00, &00, &29, &00
+    equb &00, &00, &00, &00, &1d, &00, &00, &00, &00, &00, &29, &00
+    equb &00, &00, &00, &00, &39, &00, &00, &00, &00, &00, &29, &00
+    equb &00, &00, &00, &00, &1d, &00, &00, &00, &00, &00, &29, &00
+    equb &00, &00, &00, &00, &39, &00, &00, &00, &00, &00, &29, &00
+    equb &00, &00, &00, &00, &1d, &00, &00, &00, &00, &00, &29, &00
+    equb &00, &00, &00, &00, &39, &00, &00, &00, &00, &4d, &29, &00
+    equb &00, &00, &fc, &45, &15, &00, &00, &00, &00, &00, &25, &00
+    equb &00, &00, &00, &00, &31, &00, &00, &00, &00, &00, &25, &00
+    equb &00, &00, &00, &00, &15, &00, &00, &00, &00, &00, &25, &00
+    equb &00, &00, &00, &00, &31, &00, &00, &00, &00, &00, &25, &00
+    equb &00, &00, &00, &00, &15, &00, &00, &00, &00, &00, &25, &00
+    equb &00, &00, &00, &00, &31, &00, &00, &00, &00, &00, &25, &00
+    equb &00, &00, &00, &00, &15, &00, &00, &00, &00, &00, &25, &00
+    equb &00, &00, &00, &00, &31, &00, &00, &00, &00, &00, &25, &00
+    equb &00, &00, &04, &4d, &1d, &00, &00, &00, &00, &00, &29, &00
+    equb &00, &00, &00, &00, &39, &00, &00, &00, &00, &00, &29, &00
+    equb &00, &00, &00, &00, &1d, &00, &00, &00, &00, &00, &29, &00
+    equb &00, &00, &00, &00, &39, &00, &00, &00, &00, &00, &29, &00
+    equb &00, &00, &00, &00, &1d, &00, &00, &00, &00, &00, &29, &00
+    equb &00, &00, &00, &00, &39, &00, &00, &00, &00, &00, &29, &00
+    equb &00, &00, &00, &00, &1d, &00, &00, &00, &00, &00, &29, &00
+    equb &00, &00, &00, &00, &39, &00, &00, &00, &00, &00, &29, &00
+    equb &00, &00, &ff, &06, &04, &00, &1d, &00, &00, &00, &00, &00
+    equb &29, &00, &00, &00, &00, &00, &39, &00, &00, &00, &00, &00
+    equb &29, &00, &00, &00, &00, &00, &1d, &00, &00, &00, &00, &00
+    equb &29, &00, &00, &00, &00, &00, &39, &00, &00, &00, &00, &00
+    equb &29, &00, &00, &00, &00, &00, &1d, &00, &00, &00, &00, &00
+    equb &29, &00, &00, &00, &00, &00, &39, &00, &00, &00, &00, &00
+    equb &29, &00, &00, &00, &00, &00, &1d, &00, &00, &00, &00, &00
+    equb &29, &00, &00, &00, &00, &00, &39, &00, &00, &00, &00, &4d
+    equb &29, &00, &55, &00, &00, &59, &1d, &00, &00, &00, &00, &00
+    equb &29, &00, &00, &00, &00, &00, &39, &00, &00, &00, &00, &00
+    equb &29, &00, &00, &00, &00, &55, &1d, &00, &00, &00, &00, &4d
+    equb &29, &00, &00, &00, &00, &00, &39, &00, &00, &00, &00, &45
+    equb &29, &00, &00, &00, &fc, &00, &15, &00, &00, &00, &00, &00
+    equb &25, &00, &00, &00, &00, &00, &31, &00, &00, &00, &00, &00
+    equb &25, &00, &00, &00, &00, &00, &15, &00, &00, &00, &00, &00
+    equb &25, &00, &00, &00, &00, &00, &31, &00, &00, &00, &00, &4d
+    equb &25, &00, &55, &00, &04, &59, &1d, &00, &00, &00, &00, &00
+    equb &29, &00, &00, &00, &00, &00, &39, &00, &00, &00, &00, &00
+    equb &29, &00, &00, &00, &00, &55, &1d, &00, &00, &00, &00, &59
+    equb &29, &00, &00, &00, &00, &00, &39, &00, &00, &00, &00, &61
+    equb &29, &00, &00, &00, &fc, &00, &15, &00, &00, &00, &00, &00
+    equb &25, &00, &00, &00, &00, &00, &31, &00, &00, &00, &00, &00
+    equb &25, &00, &00, &00, &00, &00, &15, &00, &00, &00, &00, &59
+    equb &25, &00, &00, &00, &00, &55, &31, &00, &00, &00, &00, &4d
+    equb &1d, &00, &00, &00, &ff, &06, &04, &59, &00, &00, &55, &00
+    equb &00, &59, &00, &00, &4d, &00, &00, &55, &00, &00, &4d, &00
+    equb &00, &55, &00, &00, &45, &00, &00, &4d, &59, &00, &45, &55
+    equb &00, &4d, &59, &00, &3d, &4d, &00, &45, &55, &00, &3d, &4d
+    equb &00, &59, &55, &00, &4d, &45, &00, &59, &4d, &00, &55, &45
+    equb &00, &59, &4d, &00, &4d, &3d, &00, &55, &45, &00, &4d, &3d
+    equb &00, &55, &59, &00, &61, &4d, &00, &00, &59, &00, &00, &55
+    equb &00, &00, &59, &00, &00, &4d, &00, &00, &55, &00, &00, &4d
+    equb &00, &00, &55, &00, &00, &61, &fc, &59, &00, &00, &55, &00
+    equb &00, &59, &00, &00, &4d, &00, &00, &55, &00, &00, &4d, &00
+    equb &00, &55, &00, &00, &45, &00, &00, &4d, &59, &00, &45, &55
+    equb &00, &4d, &59, &00, &3d, &4d, &00, &45, &55, &00, &3d, &4d
+    equb &00, &59, &55, &00, &4d, &45, &00, &59, &4d, &00, &55, &45
+    equb &00, &59, &4d, &00, &4d, &3d, &00, &55, &45, &00, &4d, &3d
+    equb &00, &55, &59, &00, &61, &4d, &00, &00, &59, &00, &00, &55
+    equb &00, &00, &59, &00, &00, &4d, &00, &00, &55, &00, &00, &4d
+    equb &00, &00, &55, &00, &00, &61, &f4, &59, &00, &00, &55, &00
+    equb &00, &59, &00, &00, &4d, &00, &00, &55, &00, &00, &4d, &00
+    equb &00, &55, &00, &00, &45, &00, &00, &4d, &59, &00, &45, &55
+    equb &00, &4d, &59, &00, &3d, &4d, &00, &45, &55, &00, &3d, &4d
+    equb &00, &59, &55, &00, &4d, &45, &00, &59, &4d, &00, &55, &45
+    equb &00, &59, &4d, &00, &4d, &3d, &00, &55, &45, &00, &4d, &3d
+    equb &00, &55, &59, &00, &61, &4d, &00, &00, &59, &00, &00, &55
+    equb &00, &00, &59, &00, &00, &4d, &00, &00, &55, &00, &00, &4d
+    equb &00, &00, &55, &00, &00, &61, &00, &59, &00, &00, &55, &00
+    equb &f0, &59, &00, &00, &4d, &00, &00, &55, &00, &00, &4d, &00
+    equb &00, &55, &00, &00, &45, &00, &00, &4d, &59, &00, &45, &55
+    equb &00, &4d, &59, &00, &3d, &4d, &00, &45, &55, &00, &3d, &4d
+    equb &00, &59, &55, &00, &4d, &45, &00, &59, &4d, &00, &55, &45
+    equb &00, &59, &4d, &00, &4d, &3d, &00, &55, &45, &00, &4d, &3d
+    equb &00, &55, &59, &00, &61, &4d, &00, &00, &59, &00, &00, &55
+    equb &00, &00, &59, &00, &00, &4d, &00, &00, &55, &00, &00, &4d
+    equb &00, &00, &55, &00, &00, &61, &ff, &06, &04, &59, &00, &00
+    equb &00, &00, &00, &55, &00, &00, &00, &00, &00, &59, &00, &00
+    equb &00, &00, &00, &4d, &00, &00, &00, &00, &00, &55, &00, &00
+    equb &00, &00, &00, &4d, &00, &00, &00, &00, &00, &55, &00, &00
+    equb &00, &00, &00, &45, &00, &00, &00, &00, &00, &59, &00, &00
+    equb &00, &00, &00, &55, &00, &00, &00, &00, &00, &59, &00, &00
+    equb &00, &00, &00, &4d, &00, &00, &00, &00, &00, &55, &00, &00
+    equb &00, &00, &00, &4d, &00, &00, &00, &00, &00, &55, &00, &00
+    equb &00, &00, &00, &45, &00, &00, &00, &00, &00, &59, &69, &00
+    equb &00, &00, &00, &55, &61, &00, &00, &00, &00, &59, &69, &00
+    equb &00, &00, &00, &4d, &59, &00, &00, &00, &00, &55, &61, &00
+    equb &00, &00, &00, &4d, &59, &00, &00, &00, &00, &55, &61, &00
+    equb &00, &00, &00, &45, &55, &00, &00, &00, &00, &59, &69, &00
+    equb &00, &00, &00, &55, &61, &00, &00, &00, &00, &59, &69, &00
+    equb &00, &00, &00, &4d, &59, &00, &00, &00, &00, &55, &61, &00
+    equb &00, &00, &00, &4d, &59, &00, &00, &00, &00, &55, &61, &00
+    equb &00, &00, &00, &45, &55, &00, &00, &00, &ff, &08, &04, &59
+    equb &55, &00, &61, &00, &00, &59, &4d, &00, &61, &00, &00, &59
+    equb &55, &00, &61, &00, &00, &69, &59, &00, &00, &00, &00, &00
+    equb &61, &00, &00, &00, &00, &00, &59, &00, &00, &00, &00, &00
+    equb &55, &00, &00, &00, &00, &00, &4d, &00, &00, &00, &00, &59
+    equb &55, &00, &61, &00, &00, &59, &4d, &00, &61, &00, &00, &59
+    equb &55, &00, &61, &00, &00, &69, &59, &00, &00, &00, &00, &00
+    equb &61, &00, &00, &00, &00, &00, &59, &00, &00, &00, &00, &00
+    equb &55, &00, &00, &00, &00, &00, &4d, &00, &00, &00, &fc, &55
+    equb &55, &00, &59, &00, &00, &55, &4d, &00, &59, &00, &00, &55
+    equb &55, &00, &59, &00, &00, &61, &59, &00, &00, &00, &00, &00
+    equb &61, &00, &00, &00, &00, &00, &59, &00, &00, &00, &00, &00
+    equb &55, &00, &00, &00, &00, &00, &4d, &00, &00, &00, &00, &55
+    equb &55, &00, &59, &00, &00, &55, &4d, &00, &59, &00, &00, &55
+    equb &55, &00, &59, &00, &00, &61, &59, &00, &00, &00, &00, &00
+    equb &61, &00, &00, &00, &00, &00, &59, &00, &00, &00, &00, &00
+    equb &55, &00, &00, &00, &00, &00, &4d, &00, &00, &00, &ff, &06
+    equb &0c, &00, &25, &00, &00, &00, &00, &00, &31, &00, &00, &00
+    equb &00, &00, &3d, &00, &00, &00, &00, &00, &31, &00, &00, &00
+    equb &00, &00, &25, &00, &00, &00, &00, &00, &31, &00, &00, &00
+    equb &00, &00, &3d, &00, &00, &00, &00, &00, &31, &00, &00, &00
+    equb &00, &00, &25, &00, &00, &00, &00, &00, &31, &00, &00, &00
+    equb &00, &00, &3d, &00, &00, &00, &00, &00, &31, &00, &00, &00
+    equb &00, &00, &25, &00, &00, &00, &00, &00, &31, &00, &00, &00
+    equb &00, &00, &3d, &00, &00, &00, &00, &55, &31, &00, &59, &00
+    equb &00, &61, &25, &00, &00, &00, &00, &00, &31, &00, &00, &00
+    equb &00, &00, &3d, &00, &00, &00, &00, &00, &31, &00, &00, &00
+    equb &00, &59, &25, &00, &00, &00, &00, &55, &31, &00, &00, &00
+    equb &00, &00, &3d, &00, &00, &00, &00, &4d, &31, &00, &00, &00
+    equb &04, &00, &1d, &00, &00, &00, &00, &00, &29, &00, &00, &00
+    equb &00, &00, &39, &00, &00, &00, &00, &00, &29, &00, &00, &00
+    equb &00, &00, &1d, &00, &00, &00, &00, &00, &29, &00, &00, &00
+    equb &00, &00, &39, &00, &00, &00, &00, &55, &29, &00, &59, &00
+    equb &00, &61, &1d, &00, &00, &00, &00, &00, &29, &00, &00, &00
+    equb &00, &00, &39, &00, &00, &00, &00, &00, &29, &00, &00, &00
+    equb &00, &59, &1d, &00, &00, &00, &00, &61, &29, &00, &00, &00
+    equb &00, &00, &39, &00, &00, &00, &00, &69, &29, &00, &00, &00
+    equb &00, &00, &1d, &00, &00, &00, &00, &00, &29, &00, &00, &00
+    equb &00, &00, &39, &00, &00, &00, &00, &00, &29, &00, &00, &00
+    equb &00, &00, &1d, &00, &00, &00, &00, &61, &29, &00, &00, &00
+    equb &00, &59, &39, &00, &00, &00, &00, &4d, &29, &00, &00, &00
+    equb &ff, &06, &fc, &59, &00, &00, &00, &00, &00, &61, &00, &00
+    equb &00, &00, &00, &69, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &f0, &4d, &00, &00, &00, &00, &00, &55, &00, &00
+    equb &00, &00, &00, &59, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &4d, &00, &00, &00, &00, &00, &55, &00, &00
+    equb &00, &00, &00, &59, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &61, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &04, &55, &00, &00, &00, &00, &00, &59, &00, &00
+    equb &00, &00, &00, &61, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &69, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &59, &00, &00, &00, &00, &00, &61, &00, &00
+    equb &00, &00, &00, &69, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &ff, &08, &04, &1d, &09, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &29, &1d, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &fc, &25, &15, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &f4, &1d, &0d, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &ff, &08, &10, &00, &1d, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &29, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &39, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &29, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &45, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &39, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &59, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &45, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &04, &55, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &59, &00, &00, &55, &00, &00, &4d, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &f4, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &0d, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &15, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &0d, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &1d, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &1d, &00, &00, &00, &00, &00, &15, &00, &00, &00, &00
+    equb &00, &0d, &00, &00, &00, &00, &f0, &09, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &09, &00, &00, &00, &00, &00, &0d, &00, &00, &00, &00
+    equb &00, &15, &00, &00, &00, &00, &00, &1d, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &25, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &ff, &08, &04, &00, &1d, &00
+    equb &00, &00, &00, &00, &25, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &29, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &31, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &39, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &31, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &29, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &25, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &15, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &25, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &29, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &31, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &39, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &31, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &29, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &25, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &15, &00, &00, &00, &fc, &00, &1d, &00
+    equb &00, &00, &00, &00, &25, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &29, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &31, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &39, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &31, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &29, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &25, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &15, &00, &00, &00, &f4, &00, &1d, &00
+    equb &00, &00, &00, &00, &25, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &29, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &31, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &39, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &31, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &29, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &25, &00, &00, &00, &00, &00, &1d, &00
+    equb &00, &00, &00, &00, &15, &00, &00, &00, &ff, &07, &04, &4d
+    equb &1d, &00, &00, &00, &00, &00, &25, &00, &00, &00, &00, &45
+    equb &1d, &00, &00, &00, &00, &55, &29, &00, &00, &00, &00, &00
+    equb &1d, &00, &00, &00, &00, &00, &31, &00, &00, &00, &00, &59
+    equb &1d, &00, &00, &00, &00, &4d, &39, &00, &00, &00, &00, &00
+    equb &1d, &00, &00, &00, &00, &00, &31, &00, &00, &00, &00, &39
+    equb &1d, &00, &00, &00, &00, &45, &29, &00, &00, &00, &00, &00
+    equb &1d, &00, &00, &00, &00, &00, &25, &00, &00, &00, &00, &00
+    equb &1d, &00, &00, &00, &00, &39, &15, &00, &00, &00, &00, &4d
+    equb &1d, &00, &00, &00, &00, &00, &25, &00, &00, &00, &00, &45
+    equb &1d, &00, &00, &00, &00, &55, &29, &00, &00, &00, &00, &00
+    equb &1d, &00, &00, &00, &00, &00, &31, &00, &00, &00, &00, &59
+    equb &1d, &00, &00, &00, &00, &4d, &39, &00, &00, &00, &00, &00
+    equb &1d, &00, &00, &00, &00, &00, &31, &00, &00, &00, &00, &00
+    equb &1d, &00, &00, &00, &00, &00, &29, &00, &00, &00, &00, &00
+    equb &1d, &00, &00, &00, &00, &00, &25, &00, &00, &00, &00, &00
+    equb &1d, &00, &00, &00, &00, &00, &15, &00, &00, &00, &fc, &4d
+    equb &1d, &00, &00, &00, &00, &00, &25, &00, &00, &00, &00, &45
+    equb &1d, &00, &00, &00, &00, &55, &29, &00, &00, &00, &00, &00
+    equb &1d, &00, &00, &00, &00, &00, &31, &00, &00, &00, &00, &59
+    equb &1d, &00, &00, &00, &00, &4d, &39, &00, &00, &00, &00, &00
+    equb &1d, &00, &00, &00, &00, &00, &31, &00, &00, &00, &00, &39
+    equb &1d, &00, &00, &00, &00, &45, &29, &00, &00, &00, &00, &00
+    equb &1d, &00, &00, &00, &00, &00, &25, &00, &00, &00, &00, &00
+    equb &1d, &00, &00, &00, &00, &39, &15, &00, &00, &00, &f4, &4d
+    equb &1d, &00, &00, &00, &00, &00, &25, &00, &00, &00, &00, &45
+    equb &1d, &00, &00, &00, &00, &55, &29, &00, &00, &00, &00, &00
+    equb &1d, &00, &00, &00, &00, &00, &31, &00, &00, &00, &00, &59
+    equb &1d, &00, &00, &00, &00, &4d, &39, &00, &00, &00, &00, &00
+    equb &1d, &00, &00, &00, &00, &00, &31, &00, &00, &00, &00, &00
+    equb &1d, &00, &00, &00, &00, &00, &29, &00, &00, &00, &00, &00
+    equb &1d, &00, &00, &00, &00, &00, &25, &00, &00, &00, &00, &00
+    equb &1d, &00, &00, &00, &00, &00, &15, &00, &00, &00, &ff, &07
+    equb &04, &55, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &59, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &4d, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &59, &29, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &55, &25, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &4d, &1d, &ff, &08
 .dasmos_code2_end
 
     org &d800
 
 .dasmos_code3_start
-    equb &a6, &7a, &bd, &e0, &1a, &85, &78, &bd
-    equb &58, &1b, &85, &79, &bd, &d0, &1b, &85
-    equb &72, &bd, &48, &1c, &85
-    equs "s g"
-    equb &d8, &a0, &00, &a6, &73, &a5, &74, &85
-    equb &76, &a5, &75, &85, &77, &8a, &48, &a6
-    equb &72, &b1, &78, &91, &74, &18, &a5, &74
-    equb &69, &08, &85, &74, &90, &02, &e6, &75
-    equb &e6, &78, &d0, &02, &e6, &79, &ca, &d0
-    equb &e8, &18, &a5, &76, &69, &01, &85, &74
-    equb &a5, &77, &69, &00, &85, &75, &a5, &74
-    equb &29, &07, &d0, &0d, &18, &a5
-    equs "tix"
-    equb &85, &74, &a5, &75, &69, &02, &85, &75
-    equb &68, &aa, &ca, &d0, &b7, &60, &a5
-    equs "qJJ)"
-    equb &fe, &a8, &b9, &75, &c6, &18, &69, &30
-    equb &85, &75, &b9, &76, &c6, &85, &74, &a5
-    equb &71, &29, &07, &65, &74, &85, &74, &18
-    equb &a5, &70, &29, &e0
-    equs "****"
-    equb &18, &65, &75, &85, &75, &a5, &70, &0a
-    equb &0a, &0a, &18, &65, &74, &85, &74, &90
-    equb &02, &e6, &75, &60, &00, &00, &00, &00
+; ***************************************************************************************
+; Plot a sprite
+;
+; Copy sprite sprite_number to the screen with its top-left corner at byte column plot_x,
+; pixel row plot_y. The sprite tables give the address of its data and its size; the data
+; is stored row by row, sprite_width bytes to a row, and is written over the screen
+; contents without masking. The screen is laid out like MODE 2 with 640-byte character
+; rows from &3000, so successive bytes of a sprite row are 8 bytes apart, and each pixel
+; row starts one byte below the last, or 640-7 bytes on when it crosses into the next
+; character row.
+;
+; On Entry:
+;     PLOT_X: screen byte column (0-79)
+;     PLOT_Y: pixel row
+;     SPRITE_NUMBER: sprite to plot
+;
+; On Exit:
+;     A: corrupted
+;     X: 0
+;     Y: 0
+.plot_sprite_hazel
+    ldx sprite_number                   ; X = sprite number
+    lda sprite_addr_lo,x                ; Point sprite_data_ptr at the sprite's data...
+    sta sprite_data_ptr                 ; ...low byte
+    lda sprite_addr_hi,x                ; ...high byte from its own table
+    sta sprite_data_ptr_hi              ; ...
+    lda sprite_widths,x                 ; Width in screen bytes
+    sta sprite_width                    ; ...for the inner loop
+    lda sprite_heights,x                ; Height in pixel rows
+    sta sprite_height                   ; ...for the outer loop
+    jsr screen_address_hazel            ; screen_ptr = address of the top-left byte
+    ldy #0                              ; Index stays 0: the pointers themselves advance
+    ldx sprite_height                   ; X counts the pixel rows still to plot
+; &d81d referenced 1 time by &d864
+.loop_d81d
+    lda screen_ptr                      ; Remember where this pixel row starts...
+    sta row_start_ptr                   ; ...
+    lda screen_ptr_hi                   ; ...
+    sta row_start_ptr_hi                ; ...in row_start_ptr
+    txa                                 ; Save the row count
+    pha                                 ; ...
+    ldx sprite_width                    ; X counts the bytes across this row
+; &d829 referenced 1 time by &d83f
+.loop_d829
+    lda (sprite_data_ptr),y             ; Copy one sprite byte...
+    sta (screen_ptr),y                  ; ...to the screen
+    clc                                 ; Step screen_ptr right one byte column: 8 bytes on
+    lda screen_ptr                      ; ...
+    adc #8                              ; ...
+    sta screen_ptr                      ; ...
+    bcc code_d838                       ; ...
+    inc screen_ptr_hi                   ; ...with carry into the high byte
+; &d838 referenced 1 time by &d834
+.code_d838
+    inc sprite_data_ptr                 ; Next sprite data byte
+    bne code_d83e                       ; ...
+    inc sprite_data_ptr_hi              ; ...with carry into the high byte
+; &d83e referenced 1 time by &d83a
+.code_d83e
+    dex                                 ; Count the bytes across
+    bne loop_d829                       ; Loop until the row is done
+    clc                                 ; screen_ptr = row start + 1: the next pixel row down
+    lda row_start_ptr                   ; ...
+    adc #1                              ; ...
+    sta screen_ptr                      ; ...
+    lda row_start_ptr_hi                ; ...
+    adc #0                              ; ...
+    sta screen_ptr_hi                   ; ...
+    lda screen_ptr                      ; Has it crossed into the next character row?
+    and #7                              ; ...(pixel row within the character now 0)
+    bne code_d861                       ; No: carry on
+    clc                                 ; Yes: add 640-8 to reach the top pixel row of the...
+    lda screen_ptr                      ; ...character row below
+    adc #&78 ; 'x'                      ; ...
+    sta screen_ptr                      ; ...
+    lda screen_ptr_hi                   ; ...
+    adc #2                              ; ...
+    sta screen_ptr_hi                   ; ...
+; &d861 referenced 1 time by &d852
+.code_d861
+    pla                                 ; Recover the row count
+    tax                                 ; ...
+    dex                                 ; Count the pixel rows
+    bne loop_d81d                       ; Loop until the sprite is done
+    rts                                 ; Return
+; ***************************************************************************************
+; Calculate a screen address
+;
+; Set screen_ptr to the screen address of byte column plot_x on pixel row plot_y: &3000 +
+; 640 x (plot_y DIV 8) + (plot_y MOD 8) + 8 x plot_x. The multiplication by 640 is done
+; with a table inside MOS 1.20 (mos_row_offsets), so this only works with that MOS.
+;
+; On Entry:
+;     PLOT_X: screen byte column (0-79)
+;     PLOT_Y: pixel row
+;
+; On Exit:
+;     SCREEN_PTR: screen address
+;     A: corrupted
+;     Y: corrupted
+;     X: preserved
+; &d867 referenced 1 time by &d816
+.screen_address_hazel
+    lda plot_y                          ; Character row = plot_y DIV 8...
+    lsr a                               ; ...
+    lsr a                               ; ...
+    and #&fe                            ; ...times 2 to index the table's byte pairs
+    tay                                 ; ...
+    lda row_offsets,y                   ; High byte of row x 640, from Table's copy of the MOS 1.20 table...
+    clc                                 ; ...
+    adc #&30 ; '0'                      ; ...plus &30: the screen starts at &3000
+    sta screen_ptr_hi                   ; ...
+    lda row_offsets_lo,y                ; Low byte of row x 640
+    sta screen_ptr                      ; ...
+    lda plot_y                          ; Add the pixel row within the character...
+    and #7                              ; ...
+    adc screen_ptr                      ; ...(no carry: the low byte is &00 or &80)
+    sta screen_ptr                      ; ...
+    clc                                 ; Add 8 x plot_x: first its top three bits...
+    lda plot_x                          ; ...
+    and #&e0                            ; ...
+    rol a                               ; ...rotated down to bits 0-2...
+    rol a                               ; ...
+    rol a                               ; ...
+    rol a                               ; ...
+    clc                                 ; ...
+    adc screen_ptr_hi                   ; ...into the high byte
+    sta screen_ptr_hi                   ; ...
+    lda plot_x                          ; ...then plot_x x 8 into the low byte
+    asl a                               ; ...
+    asl a                               ; ...
+    asl a                               ; ...
+    clc                                 ; ...
+    adc screen_ptr                      ; ...
+    sta screen_ptr                      ; ...
+    bcc return_12                       ; ...
+    inc screen_ptr_hi                   ; ...with carry into the high byte
+; &d89f referenced 1 time by &d89b
+.return_12
+    rts                                 ; Return
+; ***************************************************************************************
+; Copied data
+;
+; The rest of the copy of the game's &0900-&09FE: the bytes that follow screen_address
+; there, including the exit workspace's initial values. Not used here.
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &ff, &ff, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &ff, &ff, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &04, &2c, &00, &ff
-    equb &00, &03, &04, &01, &01, &00, &00, &05
-    equb &03, &01, &00
+    equb &04, &2c, &00, &ff, &00, &03, &04, &01
+    equb &01, &00, &00, &05, &03, &01, &00
 .dasmos_code3_end
 
 save "Coder", dasmos_coder_start, dasmos_coder_end, &0740, &0400
@@ -7692,47 +8841,52 @@ save "Code2", dasmos_code2_start, dasmos_code2_end, &c700, &c700
 save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 
 ; Label references by decreasing frequency:
+;     oswrch:                      67
 ;     cell_x:                      59
 ;     cell_y:                      55
-;     scratch:                     46
-;     sprite_number:               44
-;     plot_x:                      35
+;     scratch:                     52
+;     sprite_number:               47
+;     plot_x:                      44
+;     screen_ptr:                  42
+;     plot_y:                      33
 ;     hero_x:                      29
+;     osbyte:                      28
+;     screen_ptr_hi:               28
 ;     hero_y:                      27
-;     plot_y:                      27
+;     osword:                      24
 ;     map_ptr:                     21
+;     plot_sprite:                 21
 ;     hero_offset_y:               20
-;     plot_sprite:                 20
 ;     hero_offset_x:               19
+;     monster_sprite:              19
 ;     plot_at_cell:                19
 ;     hero_direction:              18
-;     monster_sprite:              18
 ;     plot_offset_x:               18
 ;     plot_offset_y:               18
 ;     monster_offset_y:            17
-;     oswrch:                      17
-;     monster_x:                   16
+;     monster_x:                   17
+;     oscli:                       17
 ;     monster_y:                   16
 ;     monster_offset_x:            15
-;     osword:                      15
 ;     hero_frame:                  14
-;     screen_ptr:                  13
 ;     hero_step:                   12
 ;     missile_direction:           12
 ;     plot_victory_sprite:         12
+;     tune_ptr:                    12
 ;     previous_x:                  11
 ;     previous_y:                  11
+;     hero_health_tens:            10
+;     hero_key:                    10
 ;     hero_panel_y:                10
-;     osbyte:                      10
-;     hero_health_tens:             9
-;     hero_key:                     9
+;     sprite_width:                10
 ;     hero_max_missiles:            9
-;     screen_ptr_hi:                9
+;     level_bcd:                    9
+;     object_x:                     9
+;     object_y:                     9
+;     returning_hero_queue:         9
+;     sprite_data_ptr:              9
 ;     lose_health_point:            8
-;     object_x:                     8
-;     object_y:                     8
 ;     panel_hero:                   8
-;     returning_hero_queue:         8
 ;     ring_x:                       8
 ;     scratch2:                     8
 ;     test_wall:                    8
@@ -7741,84 +8895,106 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     hero_health_units:            7
 ;     hero_missile_damage:          7
 ;     hero_score_units:             7
+;     key_x:                        7
+;     key_y:                        7
+;     level_number:                 7
 ;     menu_text:                    7
 ;     monster_step:                 7
+;     object_type:                  7
+;     os_vsync_counter:             7
+;     play_level:                   7
 ;     ring_y:                       7
+;     data_0001:                    6
 ;     draw_monster:                 6
 ;     hero_score_ten_thousands:     6
-;     key_x:                        6
-;     key_y:                        6
 ;     menu_key_loop:                6
 ;     missile_x:                    6
 ;     missile_y:                    6
-;     object_type:                  6
-;     sprite_width:                 6
+;     music_rhythm_step:            6
+;     music_section:                6
+;     row_start_ptr:                6
+;     row_start_ptr_hi:             6
+;     sprite_data_ptr_hi:           6
+;     sprite_height:                6
+;     star_showing:                 6
 ;     test_key:                     6
 ;     victory_pitch:                6
 ;     victory_sprite:               6
 ;     add_point:                    5
 ;     code_71d9:                    5
+;     code_c566:                    5
+;     count:                        5
 ;     erase_hero:                   5
+;     exit_busy:                    5
 ;     exit_spin:                    5
 ;     hero_score_hundreds:          5
 ;     hero_score_tens:              5
 ;     hero_score_thousands:         5
-;     os_vsync_counter:             5
-;     play_level:                   5
+;     music_transpose:              5
+;     next_trapdoor:                5
 ;     plot_panel_sprite:            5
+;     sprite_heights:               5
+;     system_via_t1c_l:             5
 ;     victory_delay:                5
 ;     view_room:                    5
 ;     add_ten_points:               4
 ;     code_1ec6:                    4
 ;     code_703b:                    4
 ;     code_7aea:                    4
+;     door_x:                       4
+;     door_y:                       4
 ;     draw_moved_hero:              4
 ;     draw_room:                    4
-;     exit_busy:                    4
 ;     exit_saved_x:                 4
 ;     exit_saved_y:                 4
 ;     exit_x:                       4
 ;     exit_y:                       4
 ;     find_creature:                4
 ;     hero_absent:                  4
+;     hero_door_x:                  4
+;     hero_door_y:                  4
+;     hero_key_dropped:             4
 ;     hero_sprites:                 4
 ;     map_ptr_hi:                   4
 ;     menu_text + 1:                4
 ;     missile_sprite_base:          4
+;     monster_hit_points:           4
 ;     next_hero:                    4
-;     next_trapdoor:                4
 ;     plot_keeping_x:               4
+;     plot_star:                    4
+;     shrunk_hero:                  4
+;     sprite_widths:                4
 ;     start_hero_step:              4
 ;     step_hero:                    4
 ;     bit_masks:                    3
 ;     code_1db2:                    3
 ;     code_1f36:                    3
+;     code_2847:                    3
 ;     code_7266:                    3
 ;     code_72bc:                    3
 ;     code_7470:                    3
 ;     code_76d4:                    3
 ;     code_798d:                    3
-;     code_c6ee:                    3
-;     door_x:                       3
-;     door_y:                       3
 ;     exit_shrinks_left:            3
 ;     exiting_hero:                 3
-;     hero_door_x:                  3
-;     hero_door_y:                  3
+;     first_level_flag:             3
 ;     hero_has_boots:               3
-;     hero_key_dropped:             3
 ;     hero_magic_delay:             3
 ;     magic_kill_count:             3
 ;     missile_damage:               3
 ;     monster_done:                 3
 ;     monster_frame:                3
-;     monster_hit_points:           3
+;     monster_start_hit_points:     3
 ;     next_victory_sprite:          3
+;     osasci:                       3
 ;     print_menu:                   3
-;     shrunk_hero:                  3
-;     sprite_data_ptr:              3
-;     system_via_t1c_l:             3
+;     row_offsets:                  3
+;     row_offsets_lo:               3
+;     star_places_x:                3
 ;     victory_pitch_step:           3
+;     wait_p_released:              3
+;     clear_text_area:              2
+;     code_0e00:                    2
 ;     code_108a:                    2
 ;     code_1097:                    2
 ;     code_111c:                    2
@@ -7827,6 +9003,9 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     code_1ebe:                    2
 ;     code_1f91:                    2
 ;     code_2076:                    2
+;     code_2686:                    2
+;     code_29a2:                    2
+;     code_29a9:                    2
 ;     code_7156:                    2
 ;     code_71d4:                    2
 ;     code_71d7:                    2
@@ -7840,9 +9019,13 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     code_7af8:                    2
 ;     code_7c6f:                    2
 ;     code_7cae:                    2
-;     count:                        2
 ;     credit_missile_owner:         2
+;     data_0287:                    2
+;     data_1506:                    2
+;     data_c400:                    2
+;     decrypt_level:                2
 ;     decrypt_level_loop:           2
+;     door_sprite:                  2
 ;     draw_hero:                    2
 ;     draw_missile_damage:          2
 ;     draw_ten_thousands:           2
@@ -7852,19 +9035,24 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     draw_view_2:                  2
 ;     draw_view_3:                  2
 ;     exit_offsets_x:               2
+;     exit_offsets_y:               2
 ;     food_sound + 4:               2
 ;     get_hero_cell:                2
 ;     hero_frame + 1:               2
 ;     hero_frame + 2:               2
 ;     hero_frame + 3:               2
 ;     hit_sound + 4:                2
-;     level_number:                 2
+;     level_command_digits:         2
+;     level_filename_digits:        2
 ;     menu_text + 2:                2
 ;     missile_spent_pop:            2
+;     mode2_cursor_off:             2
 ;     monster_x + 35:               2
 ;     monster_y + 35:               2
+;     mos320_osbyte_default:        2
 ;     next_missile:                 2
-;     osasci:                       2
+;     os_irq_a:                     2
+;     os_zp_fa:                     2
 ;     osrdch:                       2
 ;     play_pickup_sound:            2
 ;     plot_chalice:                 2
@@ -7872,19 +9060,19 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     previous_offset_x:            2
 ;     previous_offset_y:            2
 ;     read_hero_keys:               2
+;     reset_hero:                   2
 ;     restore_hero_sprites:         2
 ;     return_10:                    2
 ;     returning_hero_queue + 1:     2
 ;     returning_hero_queue + 2:     2
 ;     returning_hero_queue + 3:     2
-;     row_start_ptr:                2
-;     row_start_ptr_hi:             2
 ;     show_hero_room:               2
-;     sprite_data_ptr_hi:           2
-;     sprite_height:                2
-;     sprite_heights:               2
-;     sprite_widths:                2
+;     sprite_addr_hi:               2
+;     sprite_addr_lo:               2
+;     stop_music:                   2
 ;     test_object_free:             2
+;     trapdoor_x:                   2
+;     trapdoor_y:                   2
 ;     victory_steps_left:           2
 ;     view_room + 2:                2
 ;     view_room + 4:                2
@@ -7893,17 +9081,34 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     add_thousand_points:          1
 ;     add_thousand_points_done:     1
 ;     advance_dying_monster:        1
+;     advance_stars:                1
 ;     animate_absent_hero:          1
+;     blank_display:                1
+;     blank_display_vdu:            1
+;     bytev:                        1
+;     bytev + 1:                    1
 ;     check_for_victory:            1
 ;     check_hero_keys:              1
 ;     check_magic:                  1
+;     clear_text_area_top:          1
+;     code_07c0:                    1
+;     code_0902:                    1
 ;     code_0938:                    1
 ;     code_093e:                    1
 ;     code_0961:                    1
+;     code_0e34:                    1
+;     code_0e36:                    1
+;     code_0e52:                    1
+;     code_0e7a:                    1
 ;     code_110a:                    1
 ;     code_1124:                    1
 ;     code_113c:                    1
 ;     code_11d3:                    1
+;     code_1419:                    1
+;     code_147d:                    1
+;     code_14a7:                    1
+;     code_14bf:                    1
+;     code_14f1:                    1
 ;     code_16bf:                    1
 ;     code_1cc5:                    1
 ;     code_1cd8:                    1
@@ -7920,12 +9125,38 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     code_1f96:                    1
 ;     code_1f9e:                    1
 ;     code_1ff2:                    1
+;     code_2009:                    1
+;     code_2014:                    1
 ;     code_2026:                    1
 ;     code_205f:                    1
 ;     code_206c:                    1
 ;     code_20db:                    1
 ;     code_20e9:                    1
 ;     code_20f7:                    1
+;     code_2696:                    1
+;     code_26ad:                    1
+;     code_2721:                    1
+;     code_2749:                    1
+;     code_27cb:                    1
+;     code_2819:                    1
+;     code_2825:                    1
+;     code_283c:                    1
+;     code_284d:                    1
+;     code_2870:                    1
+;     code_28ae:                    1
+;     code_2904:                    1
+;     code_290a:                    1
+;     code_2914:                    1
+;     code_2922:                    1
+;     code_292a:                    1
+;     code_2930:                    1
+;     code_293b:                    1
+;     code_294a:                    1
+;     code_296f:                    1
+;     code_2993:                    1
+;     code_29a5:                    1
+;     code_29ab:                    1
+;     code_29d0:                    1
 ;     code_6e82:                    1
 ;     code_6e91:                    1
 ;     code_6e97:                    1
@@ -8034,30 +9265,70 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     code_7c82:                    1
 ;     code_7cc2:                    1
 ;     code_7cfb:                    1
-;     code_c6d0:                    1
+;     code_c51b:                    1
+;     code_c529:                    1
+;     code_c538:                    1
+;     code_c546:                    1
+;     code_c555:                    1
+;     code_c569:                    1
+;     code_c77a:                    1
+;     code_c781:                    1
+;     code_c793:                    1
+;     code_c7a5:                    1
+;     code_c7be:                    1
+;     code_c7e0:                    1
+;     code_c7f0:                    1
+;     code_c80b:                    1
+;     code_d838:                    1
+;     code_d83e:                    1
+;     code_d861:                    1
+;     coder_display_vdu:            1
 ;     collect_objects:              1
 ;     continue_hero_step:           1
 ;     continue_monster_step:        1
+;     count_level:                  1
+;     cursor_off_vdu:               1
 ;     dasmos_start:                 1
-;     data_0000:                    1
-;     data_c675:                    1
-;     data_c676:                    1
+;     data_0288:                    1
+;     data_0289:                    1
+;     data_08b0:                    1
+;     data_08b4:                    1
+;     data_08bc:                    1
+;     data_08bd:                    1
+;     data_08be:                    1
+;     data_0901:                    1
+;     data_c821:                    1
+;     data_c831:                    1
+;     data_c837:                    1
+;     data_c839:                    1
 ;     data_d9cd:                    1
 ;     decrypt_level_done:           1
 ;     decrypt_level_next:           1
 ;     dissolve_chalice:             1
-;     door_sprite:                  1
+;     draw_all_views:               1
 ;     draw_armour_rating:           1
 ;     draw_keys:                    1
 ;     draw_new_missile_icon:        1
 ;     draw_room_row:                1
+;     draw_status_panel:            1
 ;     draw_ten_thousands_loop:      1
+;     draw_view_frames:             1
 ;     drop_key:                     1
 ;     erase_boots_icon:             1
-;     exit_offsets_y:               1
+;     evntv:                        1
+;     evntv + 1:                    1
+;     exit_offset_x_1:              1
+;     exit_offset_x_2:              1
+;     exit_offset_x_3:              1
+;     exit_offset_y_1:              1
+;     exit_offset_y_2:              1
+;     exit_offset_y_3:              1
+;     exit_offset_y_4:              1
 ;     find_open_neighbour:          1
 ;     fire_missile:                 1
 ;     flip_firer_frame:             1
+;     game_over_message:            1
+;     game_over_music:              1
 ;     hero_appearance_sprites:      1
 ;     hero_direction - 1:           1
 ;     hero_enters_exit:             1
@@ -8070,13 +9341,40 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     hero_key_right:               1
 ;     hero_key_up:                  1
 ;     hero_magic_key:               1
+;     hero_menu:                    1
 ;     hero_missile_sprites:         1
 ;     hero_start_damage_taken:      1
 ;     hero_start_max_missiles:      1
 ;     hero_start_missile_damage:    1
+;     leave_title:                  1
 ;     level_checksums:              1
+;     level_door_sprite:            1
+;     level_door_x:                 1
+;     level_door_y:                 1
+;     level_filename_digits + 1:    1
+;     level_key_x:                  1
+;     level_key_y:                  1
+;     level_loop:                   1
+;     level_object_free_map:        1
+;     level_object_type:            1
+;     level_object_x:               1
+;     level_object_y:               1
+;     level_trapdoor_x:             1
+;     level_trapdoor_y:             1
+;     level_wall_sprite:            1
+;     level_walls:                  1
+;     load_level:                   1
+;     load_stones:                  1
+;     load_title_screen:            1
+;     loop_0745:                    1
+;     loop_076c:                    1
 ;     loop_091d:                    1
 ;     loop_0929:                    1
+;     loop_0e09:                    1
+;     loop_0e6d:                    1
+;     loop_0ea8:                    1
+;     loop_0eae:                    1
+;     loop_0eb9:                    1
 ;     loop_0efc:                    1
 ;     loop_0f3a:                    1
 ;     loop_1079:                    1
@@ -8087,6 +9385,18 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     loop_1140:                    1
 ;     loop_11de:                    1
 ;     loop_11ec:                    1
+;     loop_1485:                    1
+;     loop_150f:                    1
+;     loop_1546:                    1
+;     loop_154d:                    1
+;     loop_1573:                    1
+;     loop_158a:                    1
+;     loop_15a1:                    1
+;     loop_15b2:                    1
+;     loop_15c5:                    1
+;     loop_15d8:                    1
+;     loop_15e6:                    1
+;     loop_15fd:                    1
 ;     loop_16b4:                    1
 ;     loop_1d03:                    1
 ;     loop_1dce:                    1
@@ -8111,6 +9421,8 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     loop_79aa:                    1
 ;     loop_79cd:                    1
 ;     loop_c6dc:                    1
+;     loop_d81d:                    1
+;     loop_d829:                    1
 ;     menu_done:                    1
 ;     menu_hero_off:                1
 ;     menu_reprint:                 1
@@ -8121,27 +9433,32 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     menu_space_check_hero:        1
 ;     missile_spent:                1
 ;     monster_reappears:            1
-;     monster_start_hit_points:     1
 ;     move_heroes:                  1
 ;     move_missiles:                1
+;     music_event:                  1
 ;     next_monster_update:          1
+;     object_free_map:              1
 ;     object_free_map + 58:         1
-;     os_irq_a:                     1
-;     os_zp_fa:                     1
+;     panel_hero - 1:               1
+;     pause_check:                  1
 ;     plot_boots_icon:              1
 ;     print_menu_loop:              1
 ;     print_menu_string:            1
 ;     print_menu_string_loop:       1
 ;     queue_exit_marker:            1
+;     remove_absent_heroes:         1
 ;     remove_absent_heroes_check:   1
 ;     remove_absent_heroes_loop:    1
 ;     remove_absent_heroes_next:    1
 ;     reset_call_address:           1
 ;     reset_call_address + 1:       1
+;     reset_monsters:               1
 ;     reset_vector:                 1
 ;     reset_vector + 1:             1
+;     reset_workspace:              1
 ;     return_1:                     1
 ;     return_11:                    1
+;     return_12:                    1
 ;     return_2:                     1
 ;     return_3:                     1
 ;     return_4:                     1
@@ -8150,33 +9467,63 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     return_7:                     1
 ;     return_8:                     1
 ;     return_9:                     1
+;     rhythm_pattern:               1
+;     room_walls:                   1
 ;     room_walls + 58:              1
+;     run_coder:                    1
 ;     screen_address:               1
+;     screen_address_hazel:         1
+;     section_ptrs_hi:              1
+;     section_ptrs_lo:              1
+;     set_bell:                     1
 ;     set_menu_no:                  1
 ;     set_menu_off:                 1
 ;     set_menu_on:                  1
 ;     set_menu_yes:                 1
-;     sprite_addr_hi:               1
-;     sprite_addr_lo:               1
+;     sprite_axe_left:              1
+;     sprite_axe_right:             1
 ;     sprite_chalice:               1
 ;     sprite_chalice - 1:           1
+;     sprite_fighter_down_0:        1
+;     sprite_key:                   1
+;     sprite_treasure:              1
+;     star_frames_hi:               1
+;     star_frames_lo:               1
+;     star_places_y:                1
+;     start_level:                  1
 ;     start_monster_step:           1
+;     start_music:                  1
+;     start_star:                   1
 ;     sub_7305:                     1
 ;     teleport_last:                1
-;     trapdoor_x:                   1
+;     title_plot_star:              1
+;     title_screen_address:         1
+;     title_start:                  1
 ;     trapdoor_x - 1:               1
-;     trapdoor_y:                   1
 ;     trapdoor_y - 1:               1
+;     twinkle_stars:                1
+;     unpack_level:                 1
 ;     update_game:                  1
 ;     update_monsters:              1
 ;     update_rest:                  1
 ;     victory_sequence:             1
 ;     victory_sprite_copy:          1
+;     wall_sprite:                  1
+;     workspace_template:           1
+;     wrchv:                        1
+;     wrchv + 1:                    1
 
 ; Automatically generated labels:
+;     code_07c0
+;     code_0902
 ;     code_0938
 ;     code_093e
 ;     code_0961
+;     code_0e00
+;     code_0e34
+;     code_0e36
+;     code_0e52
+;     code_0e7a
 ;     code_108a
 ;     code_1097
 ;     code_110a
@@ -8185,6 +9532,12 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     code_113c
 ;     code_11bb
 ;     code_11d3
+;     code_1419
+;     code_147d
+;     code_14a7
+;     code_14bf
+;     code_14f1
+;     code_162d
 ;     code_16bf
 ;     code_1cc5
 ;     code_1cd8
@@ -8207,6 +9560,8 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     code_1f96
 ;     code_1f9e
 ;     code_1ff2
+;     code_2009
+;     code_2014
 ;     code_2026
 ;     code_205f
 ;     code_206c
@@ -8214,6 +9569,34 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     code_20db
 ;     code_20e9
 ;     code_20f7
+;     code_2686
+;     code_2696
+;     code_26ad
+;     code_2721
+;     code_2749
+;     code_27cb
+;     code_2819
+;     code_2825
+;     code_283c
+;     code_2847
+;     code_284d
+;     code_2870
+;     code_28ae
+;     code_2904
+;     code_290a
+;     code_2914
+;     code_2922
+;     code_292a
+;     code_2930
+;     code_293b
+;     code_294a
+;     code_296f
+;     code_2993
+;     code_29a2
+;     code_29a5
+;     code_29a9
+;     code_29ab
+;     code_29d0
 ;     code_6e82
 ;     code_6e91
 ;     code_6e97
@@ -8343,15 +9726,51 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     code_7cae
 ;     code_7cc2
 ;     code_7cfb
-;     code_c6d0
-;     code_c6ee
-;     data_0000
+;     code_c51b
+;     code_c529
+;     code_c538
+;     code_c546
+;     code_c555
+;     code_c566
+;     code_c569
+;     code_c77a
+;     code_c781
+;     code_c793
+;     code_c7a5
+;     code_c7be
+;     code_c7e0
+;     code_c7f0
+;     code_c80b
+;     code_d838
+;     code_d83e
+;     code_d861
+;     data_0001
+;     data_0287
+;     data_0288
+;     data_0289
+;     data_08b0
+;     data_08b4
+;     data_08bc
+;     data_08bd
+;     data_08be
+;     data_0901
 ;     data_0fea
-;     data_c675
-;     data_c676
+;     data_1506
+;     data_c400
+;     data_c821
+;     data_c831
+;     data_c837
+;     data_c839
 ;     data_d9cd
+;     loop_0745
+;     loop_076c
 ;     loop_091d
 ;     loop_0929
+;     loop_0e09
+;     loop_0e6d
+;     loop_0ea8
+;     loop_0eae
+;     loop_0eb9
 ;     loop_0efc
 ;     loop_0f3a
 ;     loop_1079
@@ -8362,6 +9781,18 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     loop_1140
 ;     loop_11de
 ;     loop_11ec
+;     loop_1485
+;     loop_150f
+;     loop_1546
+;     loop_154d
+;     loop_1573
+;     loop_158a
+;     loop_15a1
+;     loop_15b2
+;     loop_15c5
+;     loop_15d8
+;     loop_15e6
+;     loop_15fd
 ;     loop_16b4
 ;     loop_1d03
 ;     loop_1dce
@@ -8386,9 +9817,12 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     loop_79aa
 ;     loop_79cd
 ;     loop_c6dc
+;     loop_d81d
+;     loop_d829
 ;     return_1
 ;     return_10
 ;     return_11
+;     return_12
 ;     return_2
 ;     return_3
 ;     return_4
@@ -8401,11 +9835,11 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 
 ; Stats:
 ;     Total size (Code + Data) = 22548 bytes
-;     Code                     = 5959 bytes (26%)
-;     Data                     = 16589 bytes (74%)
+;     Code                     = 8119 bytes (36%)
+;     Data                     = 14429 bytes (64%)
 ;
-;     Number of instructions   = 2747
-;     Number of data bytes     = 15592 bytes
+;     Number of instructions   = 3759
+;     Number of data bytes     = 13560 bytes
 ;     Number of data words     = 0 bytes
-;     Number of string bytes   = 997 bytes
-;     Number of strings        = 137
+;     Number of string bytes   = 869 bytes
+;     Number of strings        = 106

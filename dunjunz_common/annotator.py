@@ -11,7 +11,10 @@ shared annotations can be applied to all versions.
 
 A version whose code differs from the shared annotations' in places passes
 a `skip` predicate: every call naming an address it accepts is ignored, so
-the version's own driver can annotate those addresses instead.
+the version's own driver can annotate those addresses instead. A
+`default_group` function gives a memory-map group to labels that would
+otherwise have none, for a version whose layout places them outside its
+loaded images.
 """
 
 from collections.abc import Callable, Iterable
@@ -36,11 +39,13 @@ class Annotator:
         version: str,
         placements: Callable[[int], Iterable[Placement]] = identity_placements,
         skip: Callable[[int], bool] | None = None,
+        default_group: Callable[[int], str | None] | None = None,
     ):
         self.d = d
         self.version = version
         self.placements = placements
         self.skip = skip
+        self.default_group = default_group
 
     def _each(self, addr):
         if self.skip is not None and self.skip(addr):
@@ -96,6 +101,10 @@ class Annotator:
         version's placements."""
         if self.skip is not None and self.skip(addr):
             return
+        if self.default_group is not None and "group" not in kwargs:
+            group = self.default_group(addr)
+            if group is not None:
+                kwargs["group"] = group
         if not self._loaded(addr):
             self.d.label(addr, name, **kwargs)
             return
