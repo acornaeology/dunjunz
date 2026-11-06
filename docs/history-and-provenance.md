@@ -72,7 +72,9 @@ captures' **[confirmed]**. The contents of the two sides are:
 
 `versions/dunjunz-disc/` holds two HFE v3 files, one per side, dated
 26 September 2020. They were supplied by the stardot user Pernod by
-personal communication **[reported: Pernod]**. `D1S1` is the Master side and `D1S2` the
+personal communication **[reported: Pernod]**. They are captures from a
+community archive of original BBC Micro discs, catalogued in the
+spreadsheet "BBC discs and fingerprints" (see below). `D1S1` is the Master side and `D1S2` the
 Model B side. Each is a 41-track, single-sided FM capture at 250 kbit/s.
 `tools/read_disc_image.py` reads every track through beebium's emulated
 8271 (sector IDs, then data) and writes the `.ssd` and a per-track
@@ -105,11 +107,28 @@ What they show **[confirmed]**:
 - **Slack.** 26 files on the Model B side have non-zero bytes after their
   end, in their last sector.
 
-The captures are treated here as the official release. That they are of
-a Bug-Byte disc, rather than a later sector copy of one, is
-**[inference]**. A file-by-file copy would carry neither the draft `BOOT`
-nor the Model B side's catalogue, so the captures are at least a
-sector-level copy of the disc the Master side was written on.
+### The archive catalogue
+
+The captures' file names follow the archive's convention
+(`<Title>_<Disc>_<Tracks>_<HFE grab version>_<CRC32>_<Variant>.hfe`).
+The catalogue lists both under Bug Byte, Dunjunz **[reported: catalogue]**:
+
+| Disc | Tracks | CRC32 | Variant | DFS title | Cycle | Submitter | Duplicates |
+|---|---|---|---|---|---|---|---|
+| D1S1 (boot, Master) | 40 | 8518BF40 | 1 | MASTER 128 V | 42 | VectorEyes | VectorEyes, pumpkin, ip |
+| D1S2 (model B) | 40 | 54F4B47A | 1 | Dunjunz | 59 | VectorEyes | VectorEyes, pumpkin, ip |
+
+The DFS titles and cycle numbers (&42, &59) match the captures'
+catalogues **[confirmed]**. The catalogue gives no "birthday" date and
+no copy-protection notes for either side, and lists only one variant.
+VectorEyes submitted the captures. Discs owned by pumpkin and ip have the
+same fingerprints.
+
+Three copies owned by different people having identical fingerprints
+shows that this is the disc as Bug-Byte duplicated it, not a one-off
+copy **[inference]**. If so, the draft `BOOT` in the Master side's free
+space and the Model B side's 80-track catalogue were on every copy sold,
+copied sector for sector from the master disc.
 
 ### The NVG archive copy
 
@@ -230,17 +249,18 @@ images needed to confirm them have not been found.
 
 - An image of the original protected cassette (reportedly
   `Dunjunz_B.uef` on bbcmicro.co.uk).
-- The history of the disc Pernod's captures were made from. The stardot thread also
-  mentions STH archive images `Dunjunz-Master-side0_M.ssd` and
-  `Dunjunz-Master-side1_B.ssd` **[reported]**, which could be compared
-  with them.
+- The stardot thread mentions STH archive images
+  `Dunjunz-Master-side0_M.ssd` and `Dunjunz-Master-side1_B.ssd`
+  **[reported]**, which could be compared with the captures.
 
 ## Sources
 
 - Stardot, "Dunjunz versions": <https://stardot.org.uk/forums/viewtopic.php?t=16227>;
   notes in [stardot-dunjunz-versions-thread.md](stardot-dunjunz-versions-thread.md).
 - HFE captures of the flippy disc: Pernod (stardot), personal
-  communication.
+  communication. Captured by VectorEyes for the community archive of
+  original discs ("beeb_hfe", <https://drive.google.com/drive/folders/140xzJarpb3HX04MaqR_m8AzDoG3Bdyky>), catalogued in "BBC discs and
+  fingerprints" (<https://docs.google.com/spreadsheets/d/1q006avySqZMcUGuqPlpFOgKLgdRTOzj9gucy3pS2Uks/edit?gid=0#gid=0>).
 - NVG archive: <https://rk.nvg.ntnu.no/bbc/sw/BugByte/>.
 - BBC Micro Games Archive: <https://bbcmicro.co.uk/game.php?id=1068>.
 - File-level details: [disc-contents-and-loading.md](disc-contents-and-loading.md),
