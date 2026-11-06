@@ -86,8 +86,8 @@ What they show **[confirmed]**:
   unformatted (8271 result &18, sector not found).
 - **The same files as the NVG archive.** All 19 files on the Master side
   and all 31 on the Model B side are byte-identical to `Dunjunz.zip`'s
-  `2/` and `0/`, with the same load and exec addresses, and all are
-  locked.
+  `2/` and `0/`, with the same load and exec addresses. The Master
+  side's files are locked; the Model B side's are not.
 - **Catalogues.** The Master side is titled "MASTER 128 V", with boot
   option 3 (EXEC) and 400 sectors. The Model B side is titled "Dunjunz",
   with boot option 0. Its catalogue gives 800 sectors (80 tracks),
