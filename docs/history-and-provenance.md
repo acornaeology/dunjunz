@@ -70,9 +70,9 @@ captures' **[confirmed]**. The contents of the two sides are:
 
 ### The HFE captures
 
-`versions/dunjunz-disc/` holds two HFE v3 files, one per side, made on
-26 September 2020 and given to this project. Who made them, and from
-which disc, is not yet recorded. `D1S1` is the Master side and `D1S2` the
+`versions/dunjunz-disc/` holds two HFE v3 files, one per side, dated
+26 September 2020. They were supplied by the stardot user Pernod by
+personal communication **[reported: Pernod]**. `D1S1` is the Master side and `D1S2` the
 Model B side. Each is a 41-track, single-sided FM capture at 250 kbit/s.
 `tools/read_disc_image.py` reads every track through beebium's emulated
 8271 (sector IDs, then data) and writes the `.ssd` and a per-track
@@ -227,7 +227,7 @@ images needed to confirm them have not been found.
 
 - An image of the original protected cassette (reportedly
   `Dunjunz_B.uef` on bbcmicro.co.uk).
-- Who made the HFE captures, and from which disc. The stardot thread also
+- The history of the disc Pernod's captures were made from. The stardot thread also
   mentions STH archive images `Dunjunz-Master-side0_M.ssd` and
   `Dunjunz-Master-side1_B.ssd` **[reported]**, which could be compared
   with them.
@@ -236,6 +236,8 @@ images needed to confirm them have not been found.
 
 - Stardot, "Dunjunz versions": <https://stardot.org.uk/forums/viewtopic.php?t=16227>;
   notes in [stardot-dunjunz-versions-thread.md](stardot-dunjunz-versions-thread.md).
+- HFE captures of the flippy disc: Pernod (stardot), personal
+  communication.
 - NVG archive: <https://rk.nvg.ntnu.no/bbc/sw/BugByte/>.
 - BBC Micro Games Archive: <https://bbcmicro.co.uk/game.php?id=1068>.
 - File-level details: [disc-contents-and-loading.md](disc-contents-and-loading.md),
