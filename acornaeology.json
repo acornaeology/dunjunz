@@ -1,0 +1,74 @@
+{
+    "slug": "dunjunz",
+    "name": "Dunjunz",
+    "description": "Annotated disassemblies of Dunjunz, the four-player dungeon game for the BBC Micro by Julian Avis, published by Bug-Byte on cassette in 1986 and on a flippy disc in 1987. The reference version is the official disc, from flux captures of both its sides; the others are Ole's crack of the cassette and an unofficial sideways RAM hack built from the crack and the disc. The game code is annotated once and applied to all three, and every listing reassembles byte for byte to the original files. The original game is © 1986–1987 Bug-Byte; the annotations and disassembly scripts here are © 2026 Acornaeology.",
+    "versions": ["disc", "tape_crack_ole", "swram_hack"],
+    "analyses": [
+        {
+            "label": "How Dunjunz works",
+            "url": "docs/analysis/how-the-game-works.md",
+            "icon": "doc",
+            "note": "A tour of the resident game: the memory map, the four-view screen, the level loop, the frame, heroes, missiles, monsters, objects, doors and keys, the exit, winning, and its dependence on MOS 1.20."
+        },
+        {
+            "label": "The level format",
+            "url": "docs/level-format.md",
+            "icon": "doc",
+            "note": "The &2B0-byte level files: their encryption and checksum, the tables of objects, doors, keys and trapdoors, the wall and object-free maps, and the ending message hidden in level 25's map."
+        },
+        {
+            "label": "Releases, cracks and hacks",
+            "url": "docs/history-and-provenance.md",
+            "icon": "doc",
+            "note": "What the surviving copies are and how they relate: the 1987 flippy disc and its flux captures, Ole's crack of the cassette, and the sideways RAM hack, with the evidence for each relationship."
+        },
+        {
+            "label": "Findings: bugs, compatibility hazards and fixes",
+            "url": "docs/findings.md",
+            "icon": "doc",
+            "note": "Bugs in the game and its releases (the level 5 reset, the lost ten-thousands digit, the magic freeze), the game's dependence on MOS 1.20 and DFS 0.90, errors in the instructions, and candidate fixes."
+        },
+        {
+            "label": "The sideways RAM hack's disc and loading",
+            "url": "docs/disc-contents-and-loading.md",
+            "icon": "doc",
+            "note": "The catalogue of the sideways RAM hack's disc, its boot chain from BASIC to the game, and its runtime memory map."
+        },
+        {
+            "label": "Notes from the stardot \"Dunjunz versions\" thread",
+            "url": "docs/stardot-dunjunz-versions-thread.md",
+            "icon": "doc",
+            "note": "What the stardot discussion reports about the releases, their compatibility with DFS versions, and where images of them can be found."
+        }
+    ],
+    "references": [
+        {
+            "label": "Stardot: Dunjunz versions",
+            "url": "https://stardot.org.uk/forums/viewtopic.php?t=16227",
+            "category": "discussion",
+            "icon": "chat",
+            "note": "Discussion of the releases of Dunjunz, the sideways RAM hack and which DFS versions the disc works with."
+        },
+        {
+            "label": "Dunjunz at the BBC Micro Games Archive",
+            "url": "https://bbcmicro.co.uk/game.php?id=1068",
+            "category": "related",
+            "icon": "ref",
+            "note": "The source of the sideways RAM hack's disc image."
+        },
+        {
+            "label": "Bug-Byte software at the NVG archive",
+            "url": "https://rk.nvg.ntnu.no/bbc/sw/BugByte/",
+            "category": "related",
+            "icon": "ref",
+            "note": "The source of Ole's crack (Dunjunz-tape.zip) and of an archive of the flippy disc's files (Dunjunz.zip)."
+        },
+        {
+            "label": "DunjunzMaps",
+            "url": "https://github.com/stardot/DunjunzMaps",
+            "category": "related",
+            "icon": "ref",
+            "note": "David Boddie's tools for reading and drawing Dunjunz levels."
+        }
+    ]
+}

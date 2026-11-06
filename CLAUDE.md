@@ -124,5 +124,8 @@ feature or defect met along the way, and note the workaround here.
   `basic.wait_for_prompt` returns while a line is still being typed
   (rob-smallshire/beebium#270). With the 1770 preset (DFS 2.26), OSWORD
   &7F read ID returns no IDs.
+- Code that falls off the end of a dasmos move is also traced at the next
+  stored address (acornaeology/dasmos#55); the disc driver declares Dun1's
+  &4740-&4FFF as data.
 - `Beebium.launch` needs `variant=` repeated alongside `preset=`
   (rob-smallshire/beebium#269).

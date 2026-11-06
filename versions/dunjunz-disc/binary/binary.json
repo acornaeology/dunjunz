@@ -1,0 +1,27 @@
+{
+    "title": "Dunjunz, official flippy disc (Bug-Byte, 1987), Model B side",
+    "size": 24576,
+    "load_address": "0x2000",
+    "exec_address": "0x2000",
+    "dfs_attributes": "03",
+    "md5": "dcfa6146e2bb5c32559865337ef175c9",
+    "sha256": "5f40fe371da5d4a388d6abfd0cda3c683992b363c425fb90746e02f505c77f31",
+    "notes": "Dun1 and Coder, exported with oaknut-disc from the Model B side of HFE flux captures of the 1987 flippy disc, supplied by the stardot user Pernod; the files are byte-identical to the NVG archive's Dunjunz.zip. Dun1 (&2000-&7FFF, the figures above) holds the whole game. Coder (&5000-&59AF, 2480 bytes, exec &5000; SHA-256 2809c2aca27673963f795033190d0668c59789161483f173b331a8b468ae1775) is run for every level: it reloads Dun1, loads the level, copies &3000-&473F down to &08C0-&1FFF and one of two images of &0400-&07FF (keyboard only, or with a joystick handler) into place, and starts the game. The listing saves both files.",
+    "memory_map_groups": {
+        "zero_page": "Zero page",
+        "os_vectors": "OS vectors",
+        "os_workspace": "OS workspace",
+        "mos_internals": "MOS 1.20 internals",
+        "os_entry_points": "OS entry points",
+        "hardware": "Hardware I/O",
+        "game_state": "Game state",
+        "game_data": "Game data",
+        "screen_workspace": "Screen workspace",
+        "sprites": "Sprites",
+        "sound": "Sound",
+        "text": "Text",
+        "level_file": "Level file (&6B00)",
+        "disc_state": "Disc release: level loading",
+        "leftovers": "Leftovers from development"
+    }
+}

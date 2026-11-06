@@ -42,7 +42,7 @@ d.load(BINARY_DIRPATH / "Dun1", 0x2000, name="Dun1", exec_addr=0x2000)
 d.use_environment("acorn_mos")
 d.use_environment("acorn_model_b_hardware")
 
-game_core = d.add_move(0x08C0, 0x3000, 0x1880, name="game_core")
+game_core = d.add_move(0x08C0, 0x3000, 0x1740, name="game_core")
 low_keyboard = d.add_move(0x0400, 0x51B0, 0x0400, name="low_keyboard")
 low_joystick = d.add_move(0x0400, 0x55B0, 0x0400, name="low_joystick")
 
@@ -56,6 +56,13 @@ for move in (low_keyboard, low_joystick):
             d.entry(addr)
 
 d.entry(0x5000, "coder_start")
+
+# Coder copies &3000-&473F; the rest of the page before Coder is zeros.
+# Declared as data because tracing falls through from the end of game_core
+# into stored &4740 (acornaeology/dasmos#55).
+d.byte(0x4740, 0x08C0)
+d.banner(0x4740, title="Unused",
+         description="Zeros between the stored game core (&3000-&473F) and Coder (&5000).")
 
 
 def placements(addr):

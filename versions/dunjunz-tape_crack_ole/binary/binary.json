@@ -1,0 +1,26 @@
+{
+    "title": "Dunjunz, Ole's crack of the cassette (1986)",
+    "size": 11344,
+    "load_address": "0x2400",
+    "exec_address": "0x5000",
+    "md5": "259f45bcefa8b34fea32f758a14d9865",
+    "sha256": "11edee179e7ff74561c0131cf715a77635d1478106e45d83d96986e0d34dae83",
+    "notes": "DUNJ4 and DUNJ3 from Dunjunz-tape.zip in the NVG archive, a crack of the 1986 cassette by Ole (\"The great Demon from Denmark\"). DUNJ4 (the figures above) is the game's &0400-&2FFF image stored at &2400, followed by start-up code at &5000 that copies it into place and applies the cracker's start-level cheat. DUNJ3 (load &6E80, 11904 bytes; SHA-256 03d92abc11b36d22e2a9a7365ee90aa47f32aa6d2e243188e3f5fdc423abbd22) holds &6E80-&7FFF. The levels are stored decrypted and loaded with *LOAD. The listing saves both files.",
+    "memory_map_groups": {
+        "zero_page": "Zero page",
+        "os_vectors": "OS vectors",
+        "os_workspace": "OS workspace",
+        "mos_internals": "MOS 1.20 internals",
+        "os_entry_points": "OS entry points",
+        "hardware": "Hardware I/O",
+        "game_state": "Game state",
+        "game_data": "Game data",
+        "screen_workspace": "Screen workspace",
+        "sprites": "Sprites",
+        "sound": "Sound",
+        "text": "Text",
+        "level_file": "Level file (&6B00)",
+        "disc_state": "Disc release: level loading",
+        "leftovers": "Leftovers from development"
+    }
+}

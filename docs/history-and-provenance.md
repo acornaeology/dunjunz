@@ -244,4 +244,4 @@ images needed to confirm them have not been found.
 - NVG archive: <https://rk.nvg.ntnu.no/bbc/sw/BugByte/>.
 - BBC Micro Games Archive: <https://bbcmicro.co.uk/game.php?id=1068>.
 - File-level details: [disc-contents-and-loading.md](disc-contents-and-loading.md),
-  [`../versions/README.md`](../versions/README.md).
+  [`versions/README.md`](https://github.com/acornaeology/dunjunz/blob/master/versions/README.md).

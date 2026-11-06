@@ -18,9 +18,9 @@ osbyte_sound_suppression             = &d2
 data_0000                = &00
 ; &00 referenced 1 time by &3826
 plot_x                   = &70  ; Sprite position: screen byte column, 0-79 (two MODE 2 pixels per byte). Also used as a scratch byte and pointer low byte by other routines.
-; &70 referenced 63 times by &30c4, &30d1, &36a8, &3b7c, &3c2c, &3c37, &3c3b, &44e6, &455c, &45b7, &50a1, &50ba, &50c4, &5115, &512d, &5131, &513d, &51d2, &51e9, &51eb, &5202, &520a, &520c, &520e, &5215, &521b, &5357, &535b, &55d2, &55e9, &55eb, &5602, &560a, &560c, &560e, &5615, &561b, &5757, &575b, &726d, &7282, &72c6, &72db, &72eb, &72fb, &75b8, &75d9, &75e4, &75fb, &7823, &7846, &784a, &78a1, &78bb, &78d5, &78ef, &7f8f, &7f95, &7fc1, &7fcd, &7fe4, &7ff0, &7ffa
+; &70 referenced 64 times by &20c6, &30c4, &30d1, &36a8, &3b7c, &3c2c, &3c37, &3c3b, &44e6, &455c, &45b7, &50a1, &50ba, &50c4, &5115, &512d, &5131, &513d, &51d2, &51e9, &51eb, &5202, &520a, &520c, &520e, &5215, &521b, &5357, &535b, &55d2, &55e9, &55eb, &5602, &560a, &560c, &560e, &5615, &561b, &5757, &575b, &726d, &7282, &72c6, &72db, &72eb, &72fb, &75b8, &75d9, &75e4, &75fb, &7823, &7846, &784a, &78a1, &78bb, &78d5, &78ef, &7f8f, &7f95, &7fc1, &7fcd, &7fe4, &7ff0, &7ffa
 plot_y                   = &71  ; Sprite position: pixel row from the top of the screen. Also used as a pointer high byte by other routines.
-; &71 referenced 37 times by &30a7, &30bb, &36b7, &3b80, &44e2, &4558, &45b3, &50b0, &50b6, &50c8, &511c, &5135, &5143, &51da, &5208, &5219, &5221, &55da, &5608, &5619, &5621, &7269, &72c2, &75b4, &75d5, &75ec, &7603, &7797, &77a9, &77bb, &77cd, &77ef, &77f3, &78a8, &78c2, &78dc, &78f6
+; &71 referenced 38 times by &20c2, &30a7, &30bb, &36b7, &3b80, &44e2, &4558, &45b3, &50b0, &50b6, &50c8, &511c, &5135, &5143, &51da, &5208, &5219, &5221, &55da, &5608, &5619, &5621, &7269, &72c2, &75b4, &75d5, &75ec, &7603, &7797, &77a9, &77bb, &77cd, &77ef, &77f3, &78a8, &78c2, &78dc, &78f6
 sprite_width             = &72  ; Width of the sprite being plotted, in screen bytes.
 ; &72 referenced 16 times by &304f, &3067, &5099, &50bc, &50be, &5123, &512f, &5137, &5204, &5211, &5213, &522a, &5604, &5611, &5613, &562a
 sprite_height            = &73  ; Height of the sprite being plotted, in pixel rows.
@@ -38,7 +38,7 @@ sprite_data_ptr          = &78  ; Address of the next sprite data byte to plot, 
 sprite_data_ptr_hi       = &79  ; Address of the next sprite data byte to plot, high byte.
 ; &79 referenced 2 times by &304a, &307c
 sprite_number            = &7a  ; Sprite to plot: an index into the sprite tables at sprite_addr_lo, sprite_addr_hi, sprite_widths and sprite_heights.
-; &7a referenced 45 times by &3040, &36aa, &38e6, &393e, &446e, &44da, &450a, &4550, &4597, &45ab, &46a9, &46f5, &4711, &51ce, &51e3, &55ce, &55e3, &7077, &70a2, &70e9, &720f, &7242, &7272, &727e, &72cb, &72d7, &72e7, &72f7, &731c, &75c0, &75dd, &75f4, &7608, &760f, &7663, &767a, &7695, &76f5, &7813, &7836, &7840, &79cb, &79fb, &7b17, &7b50
+; &7a referenced 46 times by &20ba, &3040, &36aa, &38e6, &393e, &446e, &44da, &450a, &4550, &4597, &45ab, &46a9, &46f5, &4711, &51ce, &51e3, &55ce, &55e3, &7077, &70a2, &70e9, &720f, &7242, &7272, &727e, &72cb, &72d7, &72e7, &72f7, &731c, &75c0, &75dd, &75f4, &7608, &760f, &7663, &767a, &7695, &76f5, &7813, &7836, &7840, &79cb, &79fb, &7b17, &7b50
 map_ptr                  = &7b  ; Pointer into room_walls or object_free_map at a cell's room, low byte; set by test_wall and test_object_free.
 ; &7b referenced 21 times by &449b, &44a2, &44a4, &44c0, &44c5, &7046, &7542, &767f, &77a1, &77b3, &77c5, &77d7, &77e4, &790e, &7915, &7917, &792f, &794a, &7951, &7953, &796b
 map_ptr_hi               = &7c  ; Pointer into a map, high byte.
@@ -121,7 +121,7 @@ reset_vector             = &fffc  ; 6502 RESET vector, in the MOS ROM.
 
     org &3000
 
-; Move 1: &3000 to &08c0 for length 6272
+; Move 1: &3000 to &08c0 for length 5952
     org &08c0
     equb &80, &05, &05, &05, &05, &05, &05, &80
     equb &00, &00, &f6, &80, &80, &00, &00, &00
@@ -151,7 +151,7 @@ reset_vector             = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ;     A: corrupted
 ;     X: 0
 ;     Y: 0
-; &0900 referenced 21 times by &36b9, &44ea, &4560, &45bd, &51de, &51ed, &55de, &55ed, &7276, &7286, &72cf, &72df, &72ef, &72ff, &7613, &7838, &7842, &78aa, &78c4, &78de, &78f8
+; &0900 referenced 22 times by &20ca, &36b9, &44ea, &4560, &45bd, &51de, &51ed, &55de, &55ed, &7276, &7286, &72cf, &72df, &72ef, &72ff, &7613, &7838, &7842, &78aa, &78c4, &78de, &78f8
 .plot_sprite
     ldx sprite_number                   ; X = sprite number
     lda sprite_addr_lo,x                ; Point sprite_data_ptr at the sprite's data...
@@ -282,25 +282,25 @@ reset_vector             = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-; &09f0 referenced 3 times by &46ba, &46e7, &4713
+; &09f0 referenced 4 times by &2026, &46ba, &46e7, &4713
 .exit_saved_x
     equb &04
-; &09f1 referenced 3 times by &46c0, &46ed, &4719
+; &09f1 referenced 4 times by &202c, &46c0, &46ed, &4719
 .exit_saved_y
     equb &2c
-; &09f2 referenced 3 times by &3bed, &4650, &46d6
+; &09f2 referenced 5 times by &2034, &2078, &3bed, &4650, &46d6
 .exit_busy
     equb &00
-; &09f3 referenced 4 times by &46fe, &4703, &470e, &4734
+; &09f3 referenced 5 times by &2086, &46fe, &4703, &470e, &4734
 .exit_spin
     equb &ff
-; &09f4 referenced 2 times by &471f, &4737
+; &09f4 referenced 3 times by &208b, &471f, &4737
 .exit_shrinks_left
     equb &00
-; &09f5 referenced 2 times by &46de, &46fa
+; &09f5 referenced 3 times by &207e, &46de, &46fa
 .exiting_hero
     equb &03
-; &09f6 used as index base 1 time by &4722
+; &09f6 referenced 1 time by &2042; also used as index base 1 time by &4722
 .exit_offsets_x
     equb &04
 ; &09f7 referenced 1 time by &3bfe
@@ -327,7 +327,7 @@ reset_vector             = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; &09fe referenced 1 time by &3bf6
 .exit_offset_y_4
     equb &00
-; &09ff referenced 2 times by &3c09, &466d
+; &09ff referenced 4 times by &2045, &2081, &3c09, &466d
 .shrunk_hero
     equb &ff
 .sprite_boots
@@ -725,16 +725,16 @@ reset_vector             = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &06, &00
     equb &06, &00
     equb &12, &00, &03, &00, &c8, &00, &0a, &00
-; &0d00 referenced 43 times by &4405, &4440, &448e, &4492, &4495, &4498, &44b7, &44c2, &6f19, &6f1e, &6f25, &6f71, &6fd7, &7002, &7007, &713c, &74b6, &74c3, &74d8, &77e6, &782c, &7857, &785b, &785e, &7861, &7886, &788b, &7901, &7905, &7908, &790b, &7926, &7931, &793d, &7941, &7944, &7947, &7962, &796d, &7976, &7990, &7a89, &7ce3; also used as index base 1 time by &3be5
+; &0d00 referenced 49 times by &2006, &200d, &201e, &205a, &2063, &2070, &4405, &4440, &448e, &4492, &4495, &4498, &44b7, &44c2, &6f19, &6f1e, &6f25, &6f71, &6fd7, &7002, &7007, &713c, &74b6, &74c3, &74d8, &77e6, &782c, &7857, &785b, &785e, &7861, &7886, &788b, &7901, &7905, &7908, &790b, &7926, &7931, &793d, &7941, &7944, &7947, &7962, &796d, &7976, &7990, &7a89, &7ce3; also used as index base 1 time by &3be5
 .scratch
     equb &a9
-; &0d01 referenced 6 times by &74d2, &7503, &7509, &750c, &7829, &782f
+; &0d01 referenced 8 times by &203a, &207b, &74d2, &7503, &7509, &750c, &7829, &782f
 .scratch2
     equb &30
-; &0d02 referenced 54 times by &38dc, &3934, &440b, &441b, &4466, &447c, &449d, &44ac, &4511, &4578, &4588, &4698, &46ea, &4716, &6fa7, &700f, &707c, &70aa, &70ee, &7120, &715b, &7176, &71e3, &7310, &732c, &733a, &73f0, &752f, &766a, &777d, &779b, &77ad, &77bf, &77d1, &7801, &7820, &7867, &7872, &787c, &789e, &78b8, &78d2, &78ec, &7910, &791d, &794c, &7959, &797b, &7997, &79d0, &79ea, &7a48, &7b07, &7b44
+; &0d02 referenced 59 times by &2094, &20a7, &20de, &20e9, &20fa, &38dc, &3934, &440b, &441b, &4466, &447c, &449d, &44ac, &4511, &4578, &4588, &4698, &46ea, &4716, &6fa7, &700f, &707c, &70aa, &70ee, &7120, &715b, &7176, &71e3, &7310, &732c, &733a, &73f0, &752f, &766a, &777d, &779b, &77ad, &77bf, &77d1, &7801, &7820, &7867, &7872, &787c, &789e, &78b8, &78d2, &78ec, &7910, &791d, &794c, &7959, &797b, &7997, &79d0, &79ea, &7a48, &7b07, &7b44
 .cell_x
     equb &8d
-; &0d03 referenced 49 times by &38e1, &3939, &4411, &4426, &4460, &4482, &4489, &44ba, &4517, &457e, &4590, &469e, &46f0, &471c, &6fad, &7017, &7082, &70b0, &70f4, &7126, &7161, &717e, &71eb, &7316, &7332, &7345, &73fc, &7535, &7670, &7783, &7807, &7852, &787f, &7890, &78a5, &78bf, &78d9, &78f3, &78fc, &7929, &7938, &7965, &7983, &799f, &79d6, &79f3, &7a4e, &7b0d, &7b4a
+; &0d03 referenced 55 times by &209a, &20ad, &20d0, &20db, &20ec, &20f7, &38e1, &3939, &4411, &4426, &4460, &4482, &4489, &44ba, &4517, &457e, &4590, &469e, &46f0, &471c, &6fad, &7017, &7082, &70b0, &70f4, &7126, &7161, &717e, &71eb, &7316, &7332, &7345, &73fc, &7535, &7670, &7783, &7807, &7852, &787f, &7890, &78a5, &78bf, &78d9, &78f3, &78fc, &7929, &7938, &7965, &7983, &799f, &79d6, &79f3, &7a4e, &7b0d, &7b4a
 .cell_y
     equb &bd
 ; &0d04 referenced 7 times by &7864, &786c, &786f, &7896, &78b0, &78ca, &78e4
@@ -752,10 +752,10 @@ reset_vector             = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; &0d09 referenced 2 times by &6eac, &708a
 .previous_offset_y
     equb &08, &a9, &00, &8d, &bc, &08, &ea
-; &0d10 used as index base 29 times by &453d, &4575, &45c9, &4678, &4695, &46b4, &5497, &5897, &6e97, &6f39, &6f59, &6f87, &6f95, &6f98, &6fa4, &6fbe, &6fe8, &700c, &7024, &706c, &70a7, &71e0, &7329, &73ed, &752c, &777a, &799a, &7bbd, &7bcb
+; &0d10 used as index base 30 times by &2091, &453d, &4575, &45c9, &4678, &4695, &46b4, &5497, &5897, &6e97, &6f39, &6f59, &6f87, &6f95, &6f98, &6fa4, &6fbe, &6fe8, &700c, &7024, &706c, &70a7, &71e0, &7329, &73ed, &752c, &777a, &799a, &7bbd, &7bcb
 .hero_x
     equb &4c, &10, &0d, &0d, &a2
-; &0d15 used as index base 26 times by &4543, &457b, &45cf, &4680, &469b, &6e9d, &6f3f, &6f5f, &6f80, &6f8e, &6f9e, &6faa, &6fc4, &6fee, &7014, &702a, &7072, &70ad, &71e8, &732f, &73f9, &7532, &7780, &79a2, &7bb6, &7bc4
+; &0d15 used as index base 27 times by &2097, &4543, &457b, &45cf, &4680, &469b, &6e9d, &6f3f, &6f5f, &6f80, &6f8e, &6f9e, &6faa, &6fc4, &6fee, &7014, &702a, &7072, &70ad, &71e8, &732f, &73f9, &7532, &7780, &79a2, &7bb6, &7bc4
 .hero_y
     equb &80, &a0, &0d, &a9
 ; &0d19 used as index base 1 time by &4657
@@ -883,7 +883,7 @@ hero_key_fire = code_0d7f+1
 .hero_missile_sprites
     equb &10
     equs "DLHh"
-; &0db5 used as index base 3 times by &470b, &473d, &709f
+; &0db5 used as index base 4 times by &2051, &470b, &473d, &709f
 .hero_sprites
     equb &00
     equs ",4<"
@@ -895,7 +895,7 @@ hero_key_fire = code_0d7f+1
 .bit_masks
     equb &80, &40, &20, &10, &08, &04, &02, &01
     equb &b9, &30, &0d, &9d, &08, &0d, &4c, &d4
-; &0dd0 used as index base 9 times by &44dc, &4552, &45ad, &7266, &72bd, &75af, &75cf, &75e7, &75fe
+; &0dd0 used as index base 10 times by &20bc, &44dc, &4552, &45ad, &7266, &72bd, &75af, &75cf, &75e7, &75fe
 .hero_panel_y
     equb &0e, &3c, &6a, &98, &e8, &e0, &04, &d0
     equb &0a, &a2, &00, &ad, &40, &0d, &49, &01
@@ -1923,6 +1923,7 @@ data_1625 = code_1624+1
 ; Sound the exit and add a queue marker
 ;
 ; Play the exit sound and put a &64 entry in the first free slot of returning_hero_queue.
+; &16a0 referenced 1 time by &203d
 .queue_exit_marker
     ldx #<(exit_envelope)               ; Define the exit envelope...
     ldy #>(exit_envelope)               ; ...
@@ -2278,7 +2279,7 @@ data_1625 = code_1624+1
     equb &0a, &0a, &0a, &0a, &19, &1a, &1a, &1a
     equb &1a, &18, &18, &18, &18, &18, &18, &18
     equb &18, &18, &18, &12, &18, &18, &18, &04
-; &1bd0 used as index base 1 time by &304c
+; &1bd0 used as index base 3 times by &2009, &205f, &304c
 .sprite_widths
     equb &04, &04, &04, &04, &04, &04, &04, &04
     equb &04, &04, &04, &04, &04, &04, &04, &04
@@ -2295,7 +2296,7 @@ data_1625 = code_1624+1
     equb &04, &04, &04, &04, &04, &04, &04, &04
     equb &04, &03, &01, &01, &01, &01, &01, &01
     equb &01, &01, &01, &08, &04, &02, &0c, &02
-; &1c48 used as index base 1 time by &3051
+; &1c48 used as index base 4 times by &2015, &201a, &206c, &3051
 .sprite_heights
     equb &0c, &0c, &0c, &0c, &0c, &0c, &0c, &0c
     equb &0c, &0c, &0c, &0c, &0c, &0c, &0c, &0c
@@ -2646,7 +2647,7 @@ data_1625 = code_1624+1
 ; return address on the stack (it ends with a jump back here), so the first RTS at the
 ; end of a level returns into this loop, once for each hero who left by the exit, before
 ; the last returns to the caller.
-; &1f00 referenced 4 times by &35a5, &4643, &46db, &472f
+; &1f00 referenced 7 times by &2023, &2037, &208e, &35a5, &4643, &46db, &472f
 .play_level
     lda os_vsync_counter                ; Wait for the vertical sync counter to pass zero...
     bpl play_level                      ; ...
@@ -2771,177 +2772,6 @@ data_1625 = code_1624+1
     beq code_2026                       ; Yes: the hero has gone
     clc                                 ; Shrink the hero's eight sprites: one byte narrower...
     lda hero_sprites,x                  ; ...
-    brk                                 ; ...
-    equb &00
-    equb &00                            ; ...
-    equb &00                            ; ...
-    equb &00, &00                       ; ...
-    equb &00, &00, &00                  ; ...
-    equb &00, &00, &00                  ; ...
-    equb &00                            ; ...
-    equb &00, &00, &00                  ; ...
-    equb &00, &00                       ; ...
-    equb &00                            ; Three rows shorter...
-    equb &00                            ; ...
-    equb &00                            ; ...
-    equb &00, &00, &00                  ; ...
-    equb &00, &00                       ; ...
-    equb &00, &00, &00                  ; ...
-    equb &00                            ; ...
-    equb &00, &00, &00                  ; ...
-    equb &00, &00                       ; ...
-    equb &00, &00, &00                  ; ...three rows shorter. Next frame
-; &2026 referenced 1 time by &473a
-.code_2026
-    brk                                 ; Put the exit back...
-    equb &00, &00
-    equb &00, &00, &00                  ; ...
-    equb &00, &00, &00                  ; ...
-    equb &00, &00, &00                  ; ...
-    equb &00, &00                       ; ...and end the animation
-    equb &00, &00, &00                  ; ...
-    equb &00, &00, &00                  ; Next frame
-; ***************************************************************************************
-; Start a hero going down the exit
-;
-; Play the exit sound, restore any hero shrunk before, and start the animation of hero X
-; spinning and shrinking on the exit. Ends by jumping to play_level rather than
-; returning.
-;
-; On Entry:
-;     X: hero number (0-3)
-; &203a referenced 1 time by &46cb
-.hero_enters_exit
-    brk                                 ; Keep the hero number
-    equb &00, &00
-    equb &00, &00, &00                  ; Sound the exit and queue a marker
-    equb &00, &00                       ; ...
-    equb &00, &00, &00                  ; ...
-    equb &00, &00, &00                  ; Restore the sprites of any hero shrunk before
-    equb &00, &00                       ; ...
-    equb &00, &00, &00                  ; ...
-    equb &00, &00, &00                  ; ...
-; ***************************************************************************************
-; Restore a hero's sprite sizes
-;
-; Put back the width and height of all eight of hero X's sprites, which the exit
-; animation shrinks.
-;
-; On Entry:
-;     X: hero number (0-3)
-; &2050 referenced 1 time by &4672
-.restore_hero_sprites
-    brk                                 ; The hero's eight sprites, from base + 1
-    equb &00, &00, &00                  ; ...
-    equb &00, &00                       ; ...
-    equb &00                            ; ...
-    equb &00                            ; ...
-    equb &00, &00                       ; ...
-    equb &00, &00, &00                  ; ...
-    equb &00, &00                       ; Widths back to 4...
-    equb &00, &00, &00                  ; ...
-    equb &00                            ; ...
-    equb &00, &00, &00                  ; ...
-    equb &00, &00                       ; ...
-    equb &00                            ; ...
-    equb &00                            ; ...
-    equb &00, &00                       ; ...heights back to 12
-    equb &00, &00, &00                  ; ...
-    equb &00                            ; ...
-    equb &00, &00, &00                  ; ...
-    equb &00, &00                       ; ...
-    equb &00                            ; Return
-    equb &00, &00                       ; Start the animation for this hero...
-    equb &00, &00, &00                  ; ...
-    equb &00, &00, &00                  ; ...
-    equb &00, &00, &00                  ; ...
-    equb &00, &00, &00                  ; ...
-    equb &00, &00                       ; ...turning from the start...
-    equb &00, &00, &00                  ; ...
-    equb &00, &00                       ; ...for four turns
-    equb &00, &00, &00                  ; ...
-    equb &00, &00, &00                  ; Back to play_level, without returning
-; ***************************************************************************************
-; Drop the key a hero carries
-;
-; Put hero X's key in a free cell next to them, and remove it from their panel section.
-;
-; On Entry:
-;     X: hero number (0-3)
-;
-; On Exit:
-;     X: preserved
-; &2091 referenced 1 time by &4688
-.drop_key
-    brk                                 ; From the hero's cell...
-    equb &00, &00
-    equb &00, &00, &00                  ; ...
-    equb &00, &00, &00                  ; ...
-    equb &00, &00, &00                  ; ...
-    equb &00                            ; ...find a free cell next to it
-    equb &00                            ; ...
-    equb &00, &00, &00                  ; ...
-    equb &00                            ; ...
-    equb &00                            ; ...
-    equb &00, &00, &00                  ; Put the hero's key there
-    equb &00, &00, &00                  ; ...
-    equb &00, &00, &00                  ; ...
-    equb &00, &00, &00                  ; ...
-    equb &00, &00, &00                  ; ...
-    equb &00, &00                       ; The hero carries no key
-    equb &00, &00, &00                  ; ...
-    equb &00, &00                       ; Erase the key icon from the panel
-    equb &00, &00                       ; ...
-    equb &00, &00, &00                  ; ...
-    equb &00                            ; ...
-    equb &00, &00                       ; ...
-    equb &00, &00                       ; ...
-    equb &00, &00                       ; ...
-    equb &00, &00                       ; ...
-    equb &00                            ; ...
-    equb &00                            ; ...
-    equb &00, &00, &00                  ; ...
-    equb &00                            ; ...
-    equb &00                            ; ...
-    equb &00                            ; Return
-; ***************************************************************************************
-; Find a free cell next to a cell
-;
-; Starting with cell_x, cell_y, try the cells above, to the right, below and to the left,
-; and leave cell_x, cell_y at the first without a wall.
-.find_open_neighbour
-    brk                                 ; The cell above
-    equb &00, &00
-    equb &00, &00, &00                  ; ...free?
-    equb &00, &00                       ; ...
-    equb &00, &00                       ; No
-    equb &00                            ; Yes: return
-    equb &00, &00, &00                  ; The cell to the right
-    equb &00, &00, &00                  ; ...
-    equb &00, &00, &00                  ; ...free?
-    equb &00, &00                       ; ...
-    equb &00, &00                       ; No
-    equb &00                            ; Yes: return
-    equb &00, &00, &00                  ; The cell below
-    equb &00, &00, &00                  ; ...
-    equb &00, &00, &00                  ; ...free?
-    equb &00, &00                       ; ...
-    equb &00, &00                       ; No
-    equb &00                            ; Yes: return
-    equb &00, &00, &00                  ; Otherwise the cell to the left
-    equb &00, &00, &00                  ; ...
-    equb &00, &00, &00                  ; Return
-; &2100 used as index base 1 time by &3cad
-.object_free_map
-; &487a used as index base 1 time by &3807
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
 
 
     ; Copy the newly assembled block of code back to it's proper place in the binary
@@ -2951,7 +2781,7 @@ data_1625 = code_1624+1
 
     ; Clear the area of memory we just temporarily used to assemble the new block,
     ; allowing us to assemble there again if needed
-    clear &08c0, &2140
+    clear &08c0, &2000
 
     ; Set the program counter to the next position in the binary file.
     org &3000 + (* - &08c0)
@@ -4055,40 +3885,181 @@ data_1625 = code_1624+1
     org &2000
 
 .dasmos_start
-    equb &69, &01, &a8, &aa, &69, &07, &8d, &00
-    equb &0d, &de, &d0, &1b, &e8, &ec, &00, &0d
-    equb &d0, &f7, &98, &aa, &38, &bd, &48, &1c
-    equb &e9, &03, &9d, &48, &1c, &e8, &ec, &00
-    equb &0d, &d0, &f1, &4c, &00, &1f, &ad, &f0
-    equb &09, &8d, &3e, &7f, &ad, &f1, &09, &8d
-    equb &5d, &7f, &a9, &00, &8d, &f2, &09, &4c
-    equb &00, &1f
-    equb &8e, &01, &0d, &20, &a0, &16, &a9, &04
-    equb &8d, &f6, &09, &ae, &ff, &09
-    equs "0, P Lv "
-    equb &18, &bd, &b5, &0d, &69, &01, &aa, &a8
-    equb &69, &07, &8d, &00, &0d, &a9, &04, &99
-    equb &d0, &1b, &c8, &cc, &00, &0d, &d0, &f7
-    equb &8a, &a8, &a9, &0c, &99, &48, &1c, &c8
-    equb &cc, &00, &0d, &d0, &f7, &60, &a9, &01
-    equb &8d, &f2, &09, &ad, &01, &0d, &8d, &f5
-    equb &09, &8d, &ff, &09, &a9, &ff, &8d, &f3
-    equb &09, &a9, &04, &8d, &f4, &09, &4c, &00
-    equb &1f
-    equb &bd, &10, &0d, &8d, &02, &0d, &bd, &15
-    equb &0d, &8d, &03, &0d, &8a, &48, &20, &d0
-    equb &20, &68, &aa, &bc, &e0, &22, &ad, &02
-    equb &0d, &99, &60, &22, &ad, &03, &0d, &99
-    equb &80, &22, &a9, &00, &9d, &e0, &22, &a9
-    equb &1a, &85, &7a, &bd, &d0, &0d, &38, &e9
-    equb &0d, &85, &71, &a9, &4a, &85, &70, &8a
-    equb &48, &20, &00, &09, &68, &aa, &60
-    equb &ce, &03, &0d, &20, &fc, &78, &c0, &00
-    equb &d0, &01, &60, &ee, &03, &0d, &ee, &02
-    equb &0d, &20, &fc, &78, &c0, &00, &d0, &01
-    equb &60, &ce, &02, &0d, &ee, &03, &0d, &20
-    equb &fc, &78, &c0, &00, &d0, &01, &60, &ce
-    equb &03, &0d, &ce, &02, &0d, &60, &01, &3f
+    adc #1                              ; ...
+    tay                                 ; ...
+    tax                                 ; ...
+    adc #7                              ; ...
+    sta scratch                         ; ...
+; &2009 referenced 1 time by &2010
+.loop_2009
+    dec sprite_widths,x                 ; ...
+    inx                                 ; ...
+    cpx scratch                         ; ...
+    bne loop_2009                       ; ...
+    tya                                 ; Three rows shorter...
+    tax                                 ; ...
+; &2014 referenced 1 time by &2021
+.loop_2014
+    sec                                 ; ...
+    lda sprite_heights,x                ; ...
+    sbc #3                              ; ...
+    sta sprite_heights,x                ; ...
+    inx                                 ; ...
+    cpx scratch                         ; ...
+    bne loop_2014                       ; ...
+    jmp play_level                      ; ...three rows shorter. Next frame
+; &2026 referenced 1 time by &473a
+.code_2026
+    lda exit_saved_x                    ; Put the exit back...
+    sta exit_x                          ; ...
+    lda exit_saved_y                    ; ...
+    sta exit_y                          ; ...
+    lda #0                              ; ...and end the animation
+    sta exit_busy                       ; ...
+    jmp play_level                      ; Next frame
+; ***************************************************************************************
+; Start a hero going down the exit
+;
+; Play the exit sound, restore any hero shrunk before, and start the animation of hero X
+; spinning and shrinking on the exit. Ends by jumping to play_level rather than
+; returning.
+;
+; On Entry:
+;     X: hero number (0-3)
+; &203a referenced 1 time by &46cb
+.hero_enters_exit
+    stx scratch2                        ; Keep the hero number
+    jsr queue_exit_marker               ; Sound the exit and queue a marker
+    lda #4                              ; ...
+    sta exit_offsets_x                  ; ...
+    ldx shrunk_hero                     ; Restore the sprites of any hero shrunk before
+    bmi code_2076                       ; ...
+    jsr restore_hero_sprites            ; ...
+    jmp code_2076                       ; ...
+; ***************************************************************************************
+; Restore a hero's sprite sizes
+;
+; Put back the width and height of all eight of hero X's sprites, which the exit
+; animation shrinks.
+;
+; On Entry:
+;     X: hero number (0-3)
+; &2050 referenced 2 times by &204a, &4672
+.restore_hero_sprites
+    clc                                 ; The hero's eight sprites, from base + 1
+    lda hero_sprites,x                  ; ...
+    adc #1                              ; ...
+    tax                                 ; ...
+    tay                                 ; ...
+    adc #7                              ; ...
+    sta scratch                         ; ...
+    lda #4                              ; Widths back to 4...
+; &205f referenced 1 time by &2066
+.loop_205f
+    sta sprite_widths,y                 ; ...
+    iny                                 ; ...
+    cpy scratch                         ; ...
+    bne loop_205f                       ; ...
+    txa                                 ; ...
+    tay                                 ; ...
+    lda #&0c                            ; ...heights back to 12
+; &206c referenced 1 time by &2073
+.loop_206c
+    sta sprite_heights,y                ; ...
+    iny                                 ; ...
+    cpy scratch                         ; ...
+    bne loop_206c                       ; ...
+    rts                                 ; Return
+; &2076 referenced 2 times by &2048, &204d
+.code_2076
+    lda #1                              ; Start the animation for this hero...
+    sta exit_busy                       ; ...
+    lda scratch2                        ; ...
+    sta exiting_hero                    ; ...
+    sta shrunk_hero                     ; ...
+    lda #&ff                            ; ...turning from the start...
+    sta exit_spin                       ; ...
+    lda #4                              ; ...for four turns
+    sta exit_shrinks_left               ; ...
+    jmp play_level                      ; Back to play_level, without returning
+; ***************************************************************************************
+; Drop the key a hero carries
+;
+; Put hero X's key in a free cell next to them, and remove it from their panel section.
+;
+; On Entry:
+;     X: hero number (0-3)
+;
+; On Exit:
+;     X: preserved
+; &2091 referenced 1 time by &4688
+.drop_key
+    lda hero_x,x                        ; From the hero's cell...
+    sta cell_x                          ; ...
+    lda hero_y,x                        ; ...
+    sta cell_y                          ; ...
+    txa                                 ; ...find a free cell next to it
+    pha                                 ; ...
+    jsr find_open_neighbour             ; ...
+    pla                                 ; ...
+    tax                                 ; ...
+    ldy hero_key,x                      ; Put the hero's key there
+    lda cell_x                          ; ...
+    sta key_x,y                         ; ...
+    lda cell_y                          ; ...
+    sta key_y,y                         ; ...
+    lda #0                              ; The hero carries no key
+    sta hero_key,x                      ; ...
+    lda #&1a                            ; Erase the key icon from the panel
+    sta sprite_number                   ; ...
+    lda hero_panel_y,x                  ; ...
+    sec                                 ; ...
+    sbc #&0d                            ; ...
+    sta plot_y                          ; ...
+    lda #&4a ; 'J'                      ; ...
+    sta plot_x                          ; ...
+    txa                                 ; ...
+    pha                                 ; ...
+    jsr plot_sprite                     ; ...
+    pla                                 ; ...
+    tax                                 ; ...
+    rts                                 ; Return
+; ***************************************************************************************
+; Find a free cell next to a cell
+;
+; Starting with cell_x, cell_y, try the cells above, to the right, below and to the left,
+; and leave cell_x, cell_y at the first without a wall.
+; &20d0 referenced 1 time by &209f
+.find_open_neighbour
+    dec cell_y                          ; The cell above
+    jsr test_wall                       ; ...free?
+    cpy #0                              ; ...
+    bne code_20db                       ; No
+    rts                                 ; Yes: return
+; &20db referenced 1 time by &20d8
+.code_20db
+    inc cell_y                          ; The cell to the right
+    inc cell_x                          ; ...
+    jsr test_wall                       ; ...free?
+    cpy #0                              ; ...
+    bne code_20e9                       ; No
+    rts                                 ; Yes: return
+; &20e9 referenced 1 time by &20e6
+.code_20e9
+    dec cell_x                          ; The cell below
+    inc cell_y                          ; ...
+    jsr test_wall                       ; ...free?
+    cpy #0                              ; ...
+    bne code_20f7                       ; No
+    rts                                 ; Yes: return
+; &20f7 referenced 1 time by &20f4
+.code_20f7
+    dec cell_y                          ; Otherwise the cell to the left
+    dec cell_x                          ; ...
+    rts                                 ; Return
+    equb &01, &3f
+; &2100 used as index base 1 time by &3cad
+.object_free_map
     equb &00, &02, &07, &07, &1f, &3f, &7d, &7f
     equb &00, &30, &78, &fd, &7f, &ff, &80, &00
     equb &00, &60, &e0, &c0, &df, &c0, &1f, &0f
@@ -4157,13 +4128,13 @@ data_1625 = code_1624+1
     equb &1d, &1d, &1d, &1c, &1c, &1d, &1d, &1c
     equb &1d, &1d, &1c, &1c, &ff, &ff, &ff, &ff
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
-; &2260 used as index base 6 times by &3c83, &450e, &4540, &4585, &45cc, &45e1
+; &2260 used as index base 7 times by &20aa, &3c83, &450e, &4540, &4585, &45cc, &45e1
 .key_x
     equb &13, &ff, &ff, &1b, &ff, &ff, &17, &ff
     equb &1c, &ff, &ff, &ff, &02, &15, &04, &09
     equb &ff, &04, &19, &17, &ff, &ff, &ff, &ff
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
-; &2280 used as index base 6 times by &3c89, &4514, &4546, &458d, &45d2, &45e4
+; &2280 used as index base 7 times by &20b0, &3c89, &4514, &4546, &458d, &45d2, &45e4
 .key_y
     equb &25, &ff, &ff, &06, &ff, &ff, &09, &ff
     equb &18, &ff, &ff, &ff, &29, &04, &0c, &14
@@ -4188,7 +4159,7 @@ data_1625 = code_1624+1
     equb &0f, &05
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00
-; &22e0 used as index base 8 times by &3cdf, &4432, &44d5, &452b, &453a, &454b, &45c6, &45d7
+; &22e0 used as index base 10 times by &20a4, &20b5, &3cdf, &4432, &44d5, &452b, &453a, &454b, &45c6, &45d7
 .hero_key
     equb &00, &00, &00, &00, &00
 ; &22e5 used as index base 4 times by &3ce2, &4568, &456f, &45dc
@@ -5146,7 +5117,51 @@ data_1625 = code_1624+1
     equb &00, &00, &1e, &28
     equb &00, &05, &1e, &00
 
-    org &4880
+    org &4740
+; ***************************************************************************************
+; Unused
+;
+; Zeros between the stored game core (&3000-&473F) and Coder (&5000).
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -8030,7 +8045,7 @@ data_5172 = level_command+11
 ;     A: wall bit
 ;     Y: wall bit
 ;     Z: set if no wall
-; &78fc referenced 5 times by &6fb2, &712b, &753a, &7675, &7a51
+; &78fc referenced 8 times by &20d3, &20e1, &20ef, &6fb2, &712b, &753a, &7675, &7a51
 .test_wall
     lda cell_y                          ; Room offset = (cell_y AND &F8) x 4 + (cell_x AND &F8)...
     and #&f8                            ; ...
@@ -8793,7 +8808,7 @@ data_5172 = level_command+11
     equb &04, &05, &ff, &ff, &ff, &ff, &ff, &ff
     equb &ff, &ff, &ff, &ff, &ff, &01, &07, &04
     equb &04, &ff, &ff, &ff, &ff, &ff
-; &7f3e referenced 3 times by &467b, &46b7, &46c5
+; &7f3e referenced 4 times by &2029, &467b, &46b7, &46c5
 .exit_x
     equb &04
 ; &7f3f used as index base 9 times by &3c5b, &717b, &719d, &7313, &7342, &73f3, &7416, &746c, &74be
@@ -8803,7 +8818,7 @@ data_5172 = level_command+11
     equb &ff, &ff, &ff, &ff, &ff
     equs "**+."
     equb &ff, &ff, &ff, &ff, &ff
-; &7f5d referenced 3 times by &4683, &46bd, &46c8
+; &7f5d referenced 4 times by &202f, &4683, &46bd, &46c8
 .exit_y
     equb &2c
 ; &7f5e used as index base 7 times by &3c61, &7183, &718e, &7191, &7319, &735c, &73c8
@@ -8921,18 +8936,18 @@ save "Dun1", dasmos_start, dasmos_end, &2000, &2000
 save "Coder", &5000, &59b0, &5000, &5000
 
 ; Label references by decreasing frequency:
+;     plot_x:                               64
 ;     oswrch:                               63
-;     plot_x:                               63
-;     cell_x:                               54
-;     cell_y:                               49
-;     sprite_number:                        45
-;     scratch:                              44
-;     plot_y:                               37
-;     hero_x:                               29
+;     cell_x:                               59
+;     cell_y:                               55
+;     scratch:                              50
+;     sprite_number:                        46
+;     plot_y:                               38
+;     hero_x:                               30
+;     hero_y:                               27
 ;     osbyte:                               27
-;     hero_y:                               26
+;     plot_sprite:                          22
 ;     map_ptr:                              21
-;     plot_sprite:                          21
 ;     hero_offset_y:                        20
 ;     hero_direction:                       19
 ;     hero_offset_x:                        19
@@ -8960,33 +8975,36 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     previous_x:                           11
 ;     previous_y:                           11
 ;     ring_y:                               11
+;     hero_key:                             10
+;     hero_panel_y:                         10
 ;     returning_hero_queue:                 10
 ;     hero_max_missiles:                     9
-;     hero_panel_y:                          9
 ;     object_x:                              9
 ;     object_y:                              9
 ;     screen_ptr_hi:                         9
 ;     hero_absent:                           8
-;     hero_key:                              8
 ;     hero_score_thousands:                  8
 ;     hero_score_units:                      8
 ;     lose_health_point:                     8
 ;     menu_text + 1:                         8
 ;     menu_text_joystick + 1:                8
 ;     panel_hero:                            8
+;     scratch2:                              8
+;     test_wall:                             8
 ;     cell_room:                             7
 ;     hero_damage_taken:                     7
 ;     hero_health_units:                     7
 ;     hero_missile_damage:                   7
+;     key_x:                                 7
+;     key_y:                                 7
 ;     monster_step:                          7
 ;     object_type:                           7
 ;     os_vsync_counter:                      7
 ;     oscli:                                 7
+;     play_level:                            7
 ;     sprite_height:                         7
 ;     victory_pitch:                         7
 ;     draw_monster:                          6
-;     key_x:                                 6
-;     key_y:                                 6
 ;     levels_started:                        6
 ;     missile_x:                             6
 ;     missile_y:                             6
@@ -8994,7 +9012,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     page6_score_ten_thousands_joystick:    6
 ;     print_menu:                            6
 ;     print_menu_joystick:                   6
-;     scratch2:                              6
 ;     test_key:                              6
 ;     victory_sprite:                        6
 ;     add_point:                             5
@@ -9003,6 +9020,8 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     count:                                 5
 ;     data_08be:                             5
 ;     erase_hero:                            5
+;     exit_busy:                             5
+;     exit_spin:                             5
 ;     hero_score_hundreds:                   5
 ;     hero_score_ten_thousands:              5
 ;     hero_score_tens:                       5
@@ -9010,7 +9029,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     level_number:                          5
 ;     next_trapdoor:                         5
 ;     plot_panel_sprite:                     5
-;     test_wall:                             5
 ;     victory_delay:                         5
 ;     view_room:                             5
 ;     add_ten_points:                        4
@@ -9026,11 +9044,15 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     draw_room:                             4
 ;     draw_ten_thousands:                    4
 ;     draw_ten_thousands_joystick:           4
-;     exit_spin:                             4
+;     exit_saved_x:                          4
+;     exit_saved_y:                          4
+;     exit_x:                                4
+;     exit_y:                                4
 ;     find_creature:                         4
 ;     hero_door_x:                           4
 ;     hero_door_y:                           4
 ;     hero_key_dropped:                      4
+;     hero_sprites:                          4
 ;     level_count_copy:                      4
 ;     map_ptr_hi:                            4
 ;     menu_text + 2:                         4
@@ -9038,8 +9060,9 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     missile_sprite_base:                   4
 ;     monster_hit_points:                    4
 ;     next_hero:                             4
-;     play_level:                            4
 ;     plot_keeping_x:                        4
+;     shrunk_hero:                           4
+;     sprite_heights:                        4
 ;     start_hero_step:                       4
 ;     step_hero:                             4
 ;     victory_steps_left:                    4
@@ -9054,14 +9077,10 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     code_7470:                             3
 ;     code_76d4:                             3
 ;     code_798d:                             3
-;     exit_busy:                             3
-;     exit_saved_x:                          3
-;     exit_saved_y:                          3
-;     exit_x:                                3
-;     exit_y:                                3
+;     exit_shrinks_left:                     3
+;     exiting_hero:                          3
 ;     hero_has_boots:                        3
 ;     hero_magic_delay:                      3
-;     hero_sprites:                          3
 ;     magic_kill_count:                      3
 ;     missile_damage:                        3
 ;     monster_done:                          3
@@ -9074,6 +9093,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     osrdch:                                3
 ;     room_walls:                            3
 ;     sprite_data_ptr:                       3
+;     sprite_widths:                         3
 ;     system_via_t1c_l:                      3
 ;     victory_pitch_step:                    3
 ;     workspace_template + 208:              3
@@ -9089,6 +9109,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     code_1e28:                             2
 ;     code_1ebe:                             2
 ;     code_1f91:                             2
+;     code_2076:                             2
 ;     code_512d:                             2
 ;     code_7156:                             2
 ;     code_71d4:                             2
@@ -9120,9 +9141,8 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     draw_view_1:                           2
 ;     draw_view_2:                           2
 ;     draw_view_3:                           2
+;     exit_offsets_x:                        2
 ;     exit_offsets_y:                        2
-;     exit_shrinks_left:                     2
-;     exiting_hero:                          2
 ;     filev:                                 2
 ;     filev + 1:                             2
 ;     food_sound + 4:                        2
@@ -9173,6 +9193,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     remove_absent_heroes_next:             2
 ;     remove_absent_heroes_next_joystick:    2
 ;     reset_hero:                            2
+;     restore_hero_sprites:                  2
 ;     return_13:                             2
 ;     returning_hero_queue + 1:              2
 ;     returning_hero_queue + 2:              2
@@ -9190,7 +9211,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     set_menu_yes:                          2
 ;     set_menu_yes_joystick:                 2
 ;     show_hero_room:                        2
-;     shrunk_hero:                           2
 ;     sprite_data_ptr_hi:                    2
 ;     test_object_free:                      2
 ;     trapdoor_x:                            2
@@ -9281,6 +9301,9 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     code_1f9e:                             1
 ;     code_1ff2:                             1
 ;     code_2026:                             1
+;     code_20db:                             1
+;     code_20e9:                             1
+;     code_20f7:                             1
 ;     code_5036:                             1
 ;     code_508b:                             1
 ;     code_5092:                             1
@@ -9432,7 +9455,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     exit_offset_y_2:                       1
 ;     exit_offset_y_3:                       1
 ;     exit_offset_y_4:                       1
-;     exit_offsets_x:                        1
+;     find_open_neighbour:                   1
 ;     fire_missile:                          1
 ;     flip_firer_frame:                      1
 ;     font_digits:                           1
@@ -9473,6 +9496,10 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     level_trapdoor_y:                      1
 ;     level_wall_sprite:                     1
 ;     level_walls:                           1
+;     loop_2009:                             1
+;     loop_2014:                             1
+;     loop_205f:                             1
+;     loop_206c:                             1
 ;     loop_504c:                             1
 ;     loop_50ba:                             1
 ;     loop_50f1:                             1
@@ -9511,6 +9538,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     os_zp_fa:                              1
 ;     panel_hero - 1:                        1
 ;     plot_boots_icon:                       1
+;     queue_exit_marker:                     1
 ;     remove_absent_heroes:                  1
 ;     remove_absent_heroes_joystick:         1
 ;     reset_call_address:                    1
@@ -9520,7 +9548,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     reset_vector + 1:                      1
 ;     reset_workspace:                       1
 ;     restart_by_reset:                      1
-;     restore_hero_sprites:                  1
 ;     return_1:                              1
 ;     return_10:                             1
 ;     return_11:                             1
@@ -9539,8 +9566,6 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     sprite_addr_lo:                        1
 ;     sprite_chalice:                        1
 ;     sprite_chalice - 1:                    1
-;     sprite_heights:                        1
-;     sprite_widths:                         1
 ;     start_level:                           1
 ;     start_monster_step:                    1
 ;     sub_15b1:                              1
@@ -9643,6 +9668,10 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     code_1f9e
 ;     code_1ff2
 ;     code_2026
+;     code_2076
+;     code_20db
+;     code_20e9
+;     code_20f7
 ;     code_5036
 ;     code_504a
 ;     code_508b
@@ -9800,6 +9829,10 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_5172
 ;     data_5179
 ;     data_518e
+;     loop_2009
+;     loop_2014
+;     loop_205f
+;     loop_206c
 ;     loop_504c
 ;     loop_50ba
 ;     loop_50f1
@@ -9842,11 +9875,11 @@ save "Coder", &5000, &59b0, &5000, &5000
 
 ; Stats:
 ;     Total size (Code + Data) = 24576 bytes
-;     Code                     = 7540 bytes (31%)
-;     Data                     = 17036 bytes (69%)
+;     Code                     = 7788 bytes (32%)
+;     Data                     = 16788 bytes (68%)
 ;
-;     Number of instructions   = 3466
-;     Number of data bytes     = 16087 bytes
+;     Number of instructions   = 3574
+;     Number of data bytes     = 15847 bytes
 ;     Number of data words     = 0 bytes
-;     Number of string bytes   = 949 bytes
-;     Number of strings        = 126
+;     Number of string bytes   = 941 bytes
+;     Number of strings        = 125
