@@ -28,7 +28,8 @@
         "end_addr": 32768,
         "exec_addr": 28288
       }
-    ]
+    ],
+    "moves": []
   },
   "constants": [
     {
