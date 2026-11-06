@@ -1,4 +1,5 @@
 ; Constants
+boot_osfile_block                    = &6b00  ; OSFILE control block built by boot_loader (in the level buffer)
 osbyte_bell_channel                  = &d3
 osbyte_bell_envelope                 = &d4
 osbyte_bell_frequency                = &d5
@@ -67,9 +68,11 @@ os_zp_fa                 = &fa  ; MOS zero-page workspace, read by dissolve_chal
 os_irq_a                 = &fc  ; MOS 1.20: A at the last interrupt, read by dissolve_chalice to vary its random choice.
 ; &fc referenced 1 time by &3901
 bytev                    = &020a
-; &020a referenced 1 time by &50dd
+; &020a referenced 2 times by &50dd, &58f2
 wrchv                    = &020e
 ; &020e referenced 4 times by &3495, &34a3, &3c1a, &3c47
+filev                    = &0212
+; &0212 referenced 2 times by &550e, &5918
 os_vsync_counter         = &0240  ; MOS 1.20 counter decremented on every vertical sync interrupt. The game sets it and waits for it to run out to pace itself.
 ; &0240 referenced 7 times by &35a2, &35f9, &3929, &392c, &4630, &4640, &4647
 os_break_intercept       = &0287  ; MOS BREAK intercept: if &0287 holds a JMP opcode the MOS jumps to &0287 twice during a reset, before and after the filing system is initialised (carry clear, then set).
@@ -3400,18 +3403,53 @@ data_1625 = code_1624+1
 .page6_score_ten_thousands
     equs "iiii"
     equb &00, &00, &00, &00
+; ***************************************************************************************
+; Leftovers in the line-input buffer
+;
+; Not used by the game. &0700 is the MOS 1.20 line-input buffer, and these bytes are what
+; it held when this image was saved: the command *SA. DANK 400+3FF 740, then a fragment
+; of BBC BASIC assembler (label+2:LDA#255:.label JSR&30).
+.line_buffer_leftovers
     equs "*SA. DANK 400+3FF 740"
     equb &0d, &0d
     equs "740"
     equb &0d, &0d, &54, &50, &0d, &0d, &50, &0d
     equs "Alabel+2:LDA#255:.label JSR&30"
-    equb &a2, &00, &a0, &6b, &a9, &f0, &8d, &00
-    equb &6b, &a9, &07, &8d, &01, &6b, &a9, &00
-    equb &8d, &02, &6b, &8d, &04, &6b, &8d, &05
-    equb &6b, &a9, &20, &8d, &03, &6b, &ad, &12
-    equb &02, &8d, &6d, &07, &ad, &13, &02, &8d
-    equb &6e, &07, &a9, &ff, &20, &00, &30, &4c
-    equb &00, &20, &00, &00, &00, &00, &00, &00
+; ***************************************************************************************
+; Load the game file and run it (not used)
+;
+; Build an OSFILE control block at &6B00 naming boot_filename with load address &2000,
+; call the filing system's FILEV handler to load the file, and jump to &2000. &0740 is
+; the execution address in the *SAVE command left at &0700, so this is the image's own
+; entry point when it is *RUN, but nothing in this release reaches it.
+.boot_loader
+    ldx #<(boot_osfile_block)           ; X/Y = &6B00, the control block...
+    ldy #>(boot_osfile_block)           ; ...high byte
+    lda #<(boot_filename)               ; Filename address: boot_filename...
+    sta boot_osfile_block               ; ...
+    lda #>(boot_filename)               ; ...
+    sta boot_osfile_block + 1           ; ...
+    lda #0                              ; Load address &00002000...
+    sta boot_osfile_block + 2           ; ...
+    sta boot_osfile_block + 4           ; ...
+    sta boot_osfile_block + 5           ; ...
+    lda #&20 ; ' '                      ; ...
+    sta boot_osfile_block + 3           ; ...
+    lda filev                           ; Copy FILEV into the JSR below...
+    sta boot_load_call + 1              ; ...
+    lda filev + 1                       ; ...
+    sta boot_load_call + 2              ; ...
+    lda #&ff                            ; OSFILE &FF: load the file
+.boot_load_call
+; &551d referenced 1 time by &5511
+; &551e referenced 1 time by &5517
+    jsr &3000                           ; Call FILEV (operand patched above)
+    jmp &2000                           ; Run the game
+    equb &00, &00, &00, &00
+    equb &00
+; &0777 referenced 1 time by &591b
+    equb &00
+; &0778 referenced 1 time by &5921
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -3427,6 +3465,9 @@ data_1625 = code_1624+1
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
+; ***************************************************************************************
+; Name of the file boot_loader loads
+.boot_filename
     equs "Dun1"
     equb &0d, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00
@@ -3856,19 +3897,54 @@ data_1625 = code_1624+1
 .page6_score_ten_thousands_joystick
     equs "iiii"
     equb &00, &00, &00, &00
+; ***************************************************************************************
+; Leftovers in the line-input buffer
+;
+; Not used by the game. &0700 is the MOS 1.20 line-input buffer, and these bytes are what
+; it held when this image was saved: the command *SA. Control 400+3FF, then a fragment of
+; BBC BASIC assembler (label+2:LDA#255:.label JSR&30).
+.line_buffer_leftovers_joystick
     equs "*SA. Control 400+3FF"
     equb &0d, &0d, &0d
     equs "740"
     equb &0d, &0d, &54, &50, &0d, &0d, &50, &0d
     equs "Alabel+2:LDA#255:.label JSR&30"
-    equb &a9, &80, &8d, &0a, &02, &a9, &07, &8d
-    equb &0b, &02, &a2, &00, &a0, &6b, &a9, &f0
-    equb &8d, &00, &6b, &a9, &07, &8d, &01, &6b
-    equb &a9, &00, &8d, &02, &6b, &8d, &04, &6b
-    equb &8d, &05, &6b, &a9, &20, &8d, &03, &6b
-    equb &ad, &12, &02, &8d, &77, &07, &ad, &13
-    equb &02, &8d, &78, &07, &a9, &ff, &20, &00
-    equb &30, &4c, &00, &20, &00, &00, &00, &00
+; ***************************************************************************************
+; Load the game file and run it (not used)
+;
+; Point BYTEV at joystick_bytev (&0780), then build an OSFILE control block at &6B00
+; naming boot_filename with load address &2000, call the filing system's FILEV handler to
+; load the file, and jump to &2000. &0740 is the execution address in the *SAVE command
+; left at &0700, so this is the image's own entry point when it is *RUN, but nothing in
+; this release reaches it.
+.boot_loader_joystick
+    lda #<(joystick_bytev)              ; BYTEV = &0780, joystick_bytev...
+    sta bytev                           ; ...
+    lda #>(joystick_bytev)              ; ...
+    sta bytev + 1                       ; ...
+    ldx #<(boot_osfile_block)           ; X/Y = &6B00, the control block...
+    ldy #>(boot_osfile_block)           ; ...high byte
+    lda #<(boot_filename_joystick)      ; Filename address: boot_filename...
+    sta boot_osfile_block               ; ...
+    lda #>(boot_filename_joystick)      ; ...
+    sta boot_osfile_block + 1           ; ...
+    lda #0                              ; Load address &00002000...
+    sta boot_osfile_block + 2           ; ...
+    sta boot_osfile_block + 4           ; ...
+    sta boot_osfile_block + 5           ; ...
+    lda #&20 ; ' '                      ; ...
+    sta boot_osfile_block + 3           ; ...
+    lda filev                           ; Copy FILEV into the JSR below...
+    sta boot_load_call_joystick + 1     ; ...
+    lda filev + 1                       ; ...
+    sta boot_load_call_joystick + 2     ; ...
+    lda #&ff                            ; OSFILE &FF: load the file
+.boot_load_call_joystick
+; &5927 referenced 1 time by &591b
+; &5928 referenced 1 time by &5921
+    jsr &3000                           ; Call FILEV (operand patched above)
+    jmp &2000                           ; Run the game
+    equb &00, &00, &00, &00
 ; ***************************************************************************************
 ; BYTEV handler: read a joystick for the third player's keys
 ;
@@ -3955,6 +4031,9 @@ data_1625 = code_1624+1
 .code_07e9
     jmp mos_osbyte_default              ; Pass the call on to the MOS 1.20 OSBYTE routine
     equb &00, &00, &00, &00
+; ***************************************************************************************
+; Name of the file boot_loader loads
+.boot_filename_joystick
     equs "Dun1"
     equb &0d, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00
@@ -9000,6 +9079,8 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     workspace_template + 208:              3
 ;     add_thousand_points_done:              2
 ;     add_thousand_points_done_joystick:     2
+;     bytev:                                 2
+;     bytev + 1:                             2
 ;     clear_text_area:                       2
 ;     code_108a:                             2
 ;     code_1097:                             2
@@ -9042,6 +9123,8 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     exit_offsets_y:                        2
 ;     exit_shrinks_left:                     2
 ;     exiting_hero:                          2
+;     filev:                                 2
+;     filev + 1:                             2
 ;     food_sound + 4:                        2
 ;     get_hero_cell:                         2
 ;     hero_frame + 1:                        2
@@ -9119,8 +9202,10 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     add_thousand_points_joystick:          1
 ;     advance_dying_monster:                 1
 ;     animate_absent_hero:                   1
-;     bytev:                                 1
-;     bytev + 1:                             1
+;     boot_load_call + 1:                    1
+;     boot_load_call + 2:                    1
+;     boot_load_call_joystick + 1:           1
+;     boot_load_call_joystick + 2:           1
 ;     check_for_victory:                     1
 ;     check_hero_keys:                       1
 ;     check_level:                           1
@@ -9757,11 +9842,11 @@ save "Coder", &5000, &59b0, &5000, &5000
 
 ; Stats:
 ;     Total size (Code + Data) = 24576 bytes
-;     Code                     = 7430 bytes (30%)
-;     Data                     = 17146 bytes (70%)
+;     Code                     = 7540 bytes (31%)
+;     Data                     = 17036 bytes (69%)
 ;
-;     Number of instructions   = 3424
-;     Number of data bytes     = 16197 bytes
+;     Number of instructions   = 3466
+;     Number of data bytes     = 16087 bytes
 ;     Number of data words     = 0 bytes
 ;     Number of string bytes   = 949 bytes
 ;     Number of strings        = 126

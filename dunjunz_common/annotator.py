@@ -69,6 +69,12 @@ class Annotator:
         for move, _ in self._each(addr):
             self.d.comment(addr, text, align=INLINE, move=move)
 
+    def expr(self, operand_addr, expression):
+        """Render the operand whose first byte is at operand_addr as
+        `expression` (a dasmos.expr expression)."""
+        for move, _ in self._each(operand_addr):
+            self.d.expr(operand_addr, expression, move=move)
+
     def block(self, addr, text):
         """Comment placed on its own line(s) before the item at addr."""
         for move, _ in self._each(addr):

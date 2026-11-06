@@ -77,6 +77,13 @@ game.annotate_level_check(annotator)
 game.annotate_start_level(annotator)
 game.annotate_level_end(annotator)
 game.annotate_menu_tables(annotator, 0x08B0)
+game.declare_boot_osfile_block(d)
+keyboard_only = Annotator(d, "disc", lambda addr: [(low_keyboard, "")])
+joystick_image = Annotator(d, "disc", lambda addr: [(low_joystick, "_joystick")])
+game.annotate_page7_leftovers(keyboard_only, "*SA. DANK 400+3FF 740")
+game.annotate_boot_loader(keyboard_only)
+game.annotate_page7_leftovers(joystick_image, "*SA. Control 400+3FF")
+game.annotate_boot_loader(joystick_image, sets_bytev=True)
 annotator.label(0x06F8, "page6_score_ten_thousands", length=4, group="game_state", description=(
     "Each hero's score ten-thousands digit where add_thousand_points still "
     "keeps it, at its cassette address. Every other routine uses "

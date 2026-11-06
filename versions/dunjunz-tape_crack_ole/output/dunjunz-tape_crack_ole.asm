@@ -1,4 +1,5 @@
 ; Constants
+boot_osfile_block            = &6b00  ; OSFILE control block built by boot_loader (in the level buffer)
 osbyte_flush_buffer_class    = &0f
 osbyte_kbd_status            = &ca
 osbyte_sound_suppression     = &d2
@@ -65,6 +66,8 @@ os_irq_a              = &fc  ; MOS 1.20: A at the last interrupt, read by dissol
 ; &fc referenced 1 time by &31c1
 wrchv                 = &020e
 ; &020e referenced 6 times by &2d55, &2d63, &34da, &3507, &501f, &502d
+filev                 = &0212
+; &0212 referenced 1 time by &275e
 os_vsync_counter      = &0240  ; MOS 1.20 counter decremented on every vertical sync interrupt. The game sets it and waits for it to run out to pace itself.
 ; &0240 referenced 6 times by &2e62, &2eb9, &31e9, &31ec, &3f00, &3f07
 data_348c             = &348c
@@ -573,16 +576,46 @@ data_0466 = code_0464+2
 ; &06fc used as index base 4 times by &25b0, &25b5, &25cb, &26c9
 .hero_absent
     equb &00, &00, &00, &00
+; ***************************************************************************************
+; Leftovers in the line-input buffer
+;
+; Not used by the game. &0700 is the MOS 1.20 line-input buffer, and these bytes are what
+; it held when this image was saved: the command *SAVE Dunjunz.K 400 7FF 740, then a
+; fragment of BBC BASIC assembler (label+2:LDA#255:.label JSR&30).
+.line_buffer_leftovers
     equs "*SAVE Dunjunz.K 400 7FF 740"
     equb &0d, &54, &50, &0d, &0d, &50, &0d
     equs "Alabel+2:LDA#255:.label JSR&30"
-    equb &a2, &00, &a0, &6b, &a9, &f0, &8d, &00
-    equb &6b, &a9, &07, &8d, &01, &6b, &a9, &00
-    equb &8d, &02, &6b, &8d, &04, &6b, &8d, &05
-    equb &6b, &a9, &20, &8d, &03, &6b, &ad, &12
-    equb &02, &8d, &6d, &07, &ad, &13, &02, &8d
-    equb &6e, &07, &a9, &ff, &20, &00, &30, &4c
-    equb &00, &20, &00, &00, &00, &00, &00, &00
+; ***************************************************************************************
+; Load the game file and run it (not used)
+;
+; Build an OSFILE control block at &6B00 naming boot_filename with load address &2000,
+; call the filing system's FILEV handler to load the file, and jump to &2000. &0740 is
+; the execution address in the *SAVE command left at &0700, so this is the image's own
+; entry point when it is *RUN, but nothing in this release reaches it.
+.boot_loader
+    ldx #<(boot_osfile_block)           ; X/Y = &6B00, the control block...
+    ldy #>(boot_osfile_block)           ; ...high byte
+    lda #<(boot_filename)               ; Filename address: boot_filename...
+    sta boot_osfile_block               ; ...
+    lda #>(boot_filename)               ; ...
+    sta boot_osfile_block + 1           ; ...
+    lda #0                              ; Load address &00002000...
+    sta boot_osfile_block + 2           ; ...
+    sta boot_osfile_block + 4           ; ...
+    sta boot_osfile_block + 5           ; ...
+    lda #&20 ; ' '                      ; ...
+    sta boot_osfile_block + 3           ; ...
+    lda filev                           ; Copy FILEV into the JSR below...
+    sta boot_load_call + 1              ; ...
+    lda filev + 1                       ; ...
+    sta boot_load_call + 2              ; ...
+    lda #&ff                            ; OSFILE &FF: load the file
+.boot_load_call
+; &276d referenced 1 time by &2761
+; &276e referenced 1 time by &2767
+    jsr &3000                           ; Call FILEV (operand patched above)
+    jmp &2000                           ; Run the game
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -598,6 +631,10 @@ data_0466 = code_0464+2
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00
+; ***************************************************************************************
+; Name of the file boot_loader loads
+.boot_filename
     equs "Dunjunz1"
     equb &0d, &00, &00, &00, &00, &00, &00, &00
     equb &00, &01, &0b, &00, &00, &05, &07, &00
@@ -8653,6 +8690,8 @@ save "DUNJ3", dasmos_dunj3_start, dasmos_dunj3_end, &0000, &6e80
 ;     add_thousand_points_done:     1
 ;     advance_dying_monster:        1
 ;     animate_absent_hero:          1
+;     boot_load_call + 1:           1
+;     boot_load_call + 2:           1
 ;     check_for_victory:            1
 ;     check_hero_keys:              1
 ;     check_magic:                  1
@@ -8869,6 +8908,8 @@ save "DUNJ3", dasmos_dunj3_start, dasmos_dunj3_end, &0000, &6e80
 ;     exit_offset_y_2:              1
 ;     exit_offset_y_3:              1
 ;     exit_offset_y_4:              1
+;     filev:                        1
+;     filev + 1:                    1
 ;     find_open_neighbour:          1
 ;     fire_missile:                 1
 ;     first_level:                  1
@@ -9278,11 +9319,11 @@ save "DUNJ3", dasmos_dunj3_start, dasmos_dunj3_end, &0000, &6e80
 
 ; Stats:
 ;     Total size (Code + Data) = 23248 bytes
-;     Code                     = 6992 bytes (30%)
-;     Data                     = 16256 bytes (70%)
+;     Code                     = 7042 bytes (30%)
+;     Data                     = 16206 bytes (70%)
 ;
-;     Number of instructions   = 3209
-;     Number of data bytes     = 14854 bytes
+;     Number of instructions   = 3228
+;     Number of data bytes     = 14804 bytes
 ;     Number of data words     = 0 bytes
 ;     Number of string bytes   = 1402 bytes
 ;     Number of strings        = 219

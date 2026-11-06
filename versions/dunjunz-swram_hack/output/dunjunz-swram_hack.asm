@@ -1,4 +1,5 @@
 ; Constants
+boot_osfile_block            = &6b00  ; OSFILE control block built by boot_loader (in the level buffer)
 osbyte_flush_buffer_class    = &0f
 osbyte_kbd_status            = &ca
 osbyte_sound_suppression     = &d2
@@ -65,7 +66,7 @@ os_irq_a              = &fc  ; MOS 1.20: A at the last interrupt, read by dissol
 wrchv                 = &020e
 ; &020e referenced 4 times by &0d55, &0d63, &14da, &1507
 filev                 = &0212
-; &0212 referenced 1 time by &148c
+; &0212 referenced 2 times by &075e, &148c
 os_vsync_counter      = &0240  ; MOS 1.20 counter decremented on every vertical sync interrupt. The game sets it and waits for it to run out to pace itself.
 ; &0240 referenced 6 times by &0e62, &0eb9, &11e9, &11ec, &1f00, &1f07
 data_3000             = &3000
@@ -569,16 +570,48 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; &06fc used as index base 4 times by &05b0, &05b5, &05cb, &06c9
 .hero_absent
     equb &00, &00, &00, &00
+; ***************************************************************************************
+; Leftovers in the line-input buffer
+;
+; Not used by the game. &0700 is the MOS 1.20 line-input buffer, and these bytes are what
+; it held when this image was saved: the command *SAVE Dunjunz.K 400 7FF 740, then a
+; fragment of BBC BASIC assembler (label+2:LDA#255:.label JSR&30).
+.line_buffer_leftovers
     equs "*SAVE Dunjunz.K 400 7FF 740"
     equb &0d, &54, &50, &0d, &0d, &50, &0d
     equs "Alabel+2:LDA#255:.label JSR&30"
-    equb &a2, &00, &a0, &6b, &a9, &f0, &8d, &00
-    equb &6b, &a9, &07, &8d, &01, &6b, &a9, &00
-    equb &8d, &02, &6b, &8d, &04, &6b, &8d, &05
-    equb &6b, &a9, &20, &8d, &03, &6b, &ad, &12
-    equb &02, &8d, &6d, &07, &ad, &13, &02, &8d
-    equb &6e, &07, &a9, &ff, &20, &7d, &f2, &4c
-    equb &00, &20, &00, &00, &00, &00, &00, &00
+; ***************************************************************************************
+; Load the game file and run it (not used)
+;
+; Build an OSFILE control block at &6B00 naming boot_filename with load address &2000,
+; call the filing system's FILEV handler to load the file, and jump to &2000. &0740 is
+; the execution address in the *SAVE command left at &0700, so this is the image's own
+; entry point when it is *RUN, but nothing in this release reaches it. The JSR's stored
+; operand is &F27D, the MOS 1.20 FILEV handler for the cassette and ROM filing systems,
+; so the image was saved after this loader had run with one of them selected.
+.boot_loader
+    ldx #<(boot_osfile_block)           ; X/Y = &6B00, the control block...
+    ldy #>(boot_osfile_block)           ; ...high byte
+    lda #<(boot_filename)               ; Filename address: boot_filename...
+    sta boot_osfile_block               ; ...
+    lda #>(boot_filename)               ; ...
+    sta boot_osfile_block + 1           ; ...
+    lda #0                              ; Load address &00002000...
+    sta boot_osfile_block + 2           ; ...
+    sta boot_osfile_block + 4           ; ...
+    sta boot_osfile_block + 5           ; ...
+    lda #&20 ; ' '                      ; ...
+    sta boot_osfile_block + 3           ; ...
+    lda filev                           ; Copy FILEV into the JSR below...
+    sta boot_load_call + 1              ; ...
+    lda filev + 1                       ; ...
+    sta boot_load_call + 2              ; ...
+    lda #&ff                            ; OSFILE &FF: load the file
+.boot_load_call
+; &076d referenced 1 time by &0761
+; &076e referenced 1 time by &0767
+    jsr &f27d                           ; Call FILEV (operand patched above)
+    jmp &2000                           ; Run the game
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -594,6 +627,10 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00
+; ***************************************************************************************
+; Name of the file boot_loader loads
+.boot_filename
     equs "Dunjunz1"
     equb &0d, &00, &00, &00, &00, &00, &00, &00
     equb &ff, &00, &00, &00, &00, &00, &00, &00
@@ -7108,6 +7145,8 @@ save "Dunjun6", dasmos_dunjun6_start, dasmos_dunjun6_end, &6e80, &6e80
 ;     draw_view_3:                  2
 ;     exit_offsets_x:               2
 ;     exit_offsets_y:               2
+;     filev:                        2
+;     filev + 1:                    2
 ;     food_sound + 4:               2
 ;     get_hero_cell:                2
 ;     hero_frame + 1:               2
@@ -7153,6 +7192,8 @@ save "Dunjun6", dasmos_dunjun6_start, dasmos_dunjun6_end, &6e80, &6e80
 ;     add_thousand_points_done:     1
 ;     advance_dying_monster:        1
 ;     animate_absent_hero:          1
+;     boot_load_call + 1:           1
+;     boot_load_call + 2:           1
 ;     check_for_victory:            1
 ;     check_hero_keys:              1
 ;     check_magic:                  1
@@ -7326,8 +7367,6 @@ save "Dunjun6", dasmos_dunjun6_start, dasmos_dunjun6_end, &6e80, &6e80
 ;     exit_offset_y_2:              1
 ;     exit_offset_y_3:              1
 ;     exit_offset_y_4:              1
-;     filev:                        1
-;     filev + 1:                    1
 ;     filev_call_address:           1
 ;     filev_call_address + 1:       1
 ;     find_open_neighbour:          1
@@ -7767,11 +7806,11 @@ save "Dunjun6", dasmos_dunjun6_start, dasmos_dunjun6_end, &6e80, &6e80
 
 ; Stats:
 ;     Total size (Code + Data) = 15744 bytes
-;     Code                     = 6934 bytes (44%)
-;     Data                     = 8810 bytes (56%)
+;     Code                     = 6984 bytes (44%)
+;     Data                     = 8760 bytes (56%)
 ;
-;     Number of instructions   = 3181
-;     Number of data bytes     = 8040 bytes
+;     Number of instructions   = 3200
+;     Number of data bytes     = 7990 bytes
 ;     Number of data words     = 0 bytes
 ;     Number of string bytes   = 770 bytes
 ;     Number of strings        = 99

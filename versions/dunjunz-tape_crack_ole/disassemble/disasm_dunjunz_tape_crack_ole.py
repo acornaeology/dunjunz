@@ -62,6 +62,9 @@ game.annotate_level_end(annotator)
 game.annotate_cassette_pause(annotator)
 game.annotate_cassette_continuations(annotator)
 game.annotate_menu_tables(annotator, 0x06F8)
+game.declare_boot_osfile_block(d)
+game.annotate_page7_leftovers(annotator, "*SAVE Dunjunz.K 400 7FF 740")
+game.annotate_boot_loader(annotator)
 game.annotate_cassette_level_loop(annotator)
 
 # ---------------------------------------------------------------------------

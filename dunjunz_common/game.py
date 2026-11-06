@@ -1058,6 +1058,101 @@ def annotate_level_end(a: Annotator) -> None:
     a.c(0x0EC0, "...")
 
 
+BOOT_OSFILE_BLOCK = 0x6B00
+BOOT_FILENAME_ADDR = 0x07F0
+
+
+def declare_boot_osfile_block(d) -> None:
+    """The control block the page &07 loader builds; once per driver."""
+    d.constant(BOOT_OSFILE_BLOCK, "boot_osfile_block",
+               comment="OSFILE control block built by boot_loader (in the level buffer)")
+
+
+def annotate_page7_leftovers(a: Annotator, saved_as: str) -> None:
+    """&0700-&073F of a &0400-&07FF image: what the development machine's
+    line-input buffer held when the image was saved."""
+    a.label(0x0700, "line_buffer_leftovers", group="leftovers", description=(
+        "Leftover contents of the MOS 1.20 line-input buffer (&0700) from "
+        "the machine the image was saved on."))
+    a.banner(0x0700, "Leftovers in the line-input buffer",
+             "Not used by the game. &0700 is the MOS 1.20 line-input buffer, "
+             "and these bytes are what it held when this image was saved: the "
+             f"command {saved_as}, then a fragment of BBC BASIC assembler "
+             "(label+2:LDA#255:.label JSR&30).")
+
+
+def annotate_boot_loader(a: Annotator, operand_note: str = "", sets_bytev: bool = False,
+                         stored_call: int = 0x3000) -> None:
+    """A loader left in page &07 of each &0400-&07FF image, at the
+    execution address of the *SAVE command left in the line buffer. It
+    loads the game file named at &07F0 to &2000 through FILEV and jumps
+    there. Nothing in these releases runs it."""
+    from dasmos.expr import hexlit, hi, lo, ref, sym
+
+    block = sym("boot_osfile_block")
+    entry = 0x0740
+    start = entry + (10 if sets_bytev else 0)
+    prelude = ("Point BYTEV at joystick_bytev (&0780), then build"
+               if sets_bytev else "Build")
+    a.sub(entry, "boot_loader", "Load the game file and run it (not used)",
+          prelude + " an OSFILE control block at &6B00 naming boot_filename with "
+          "load address &2000, call the filing system's FILEV handler to "
+          "load the file, and jump to &2000. &0740 is the execution address "
+          "in the *SAVE command left at &0700, so this is the image's own "
+          "entry point when it is *RUN, but nothing in this release reaches "
+          "it." + operand_note)
+    call = start + 0x2C
+    a.region(call, "boot_load_call", (0, 2))
+    a.label(BOOT_FILENAME_ADDR, "boot_filename", group="leftovers",
+            description="Name of the file boot_loader loads, CR-terminated.")
+    a.expr(start + 0x01, lo(block))
+    a.expr(start + 0x03, hi(block))
+    a.expr(start + 0x05, lo(ref(BOOT_FILENAME_ADDR)))
+    a.expr(start + 0x07, block)
+    a.expr(start + 0x0A, hi(ref(BOOT_FILENAME_ADDR)))
+    a.expr(start + 0x0C, block + 1)
+    a.expr(start + 0x11, block + 2)
+    a.expr(start + 0x14, block + 4)
+    a.expr(start + 0x17, block + 5)
+    a.expr(start + 0x1C, block + 3)
+    a.expr(start + 0x2D, hexlit(stored_call))
+    a.expr(start + 0x30, hexlit(0x2000))
+    if sets_bytev:
+        a.expr(entry + 0x01, lo(ref(0x0780)))
+        a.expr(entry + 0x06, hi(ref(0x0780)))
+    for offset, text in [
+        (0x00, "X/Y = &6B00, the control block..."),
+        (0x02, "...high byte"),
+        (0x04, "Filename address: boot_filename..."),
+        (0x06, "..."),
+        (0x09, "..."),
+        (0x0B, "..."),
+        (0x0E, "Load address &00002000..."),
+        (0x10, "..."),
+        (0x13, "..."),
+        (0x16, "..."),
+        (0x19, "..."),
+        (0x1B, "..."),
+        (0x1E, "Copy FILEV into the JSR below..."),
+        (0x21, "..."),
+        (0x24, "..."),
+        (0x27, "..."),
+        (0x2A, "OSFILE &FF: load the file"),
+        (0x2C, "Call FILEV (operand patched above)"),
+        (0x2F, "Run the game"),
+    ]:
+        a.c(start + offset, text)
+    if sets_bytev:
+        for offset, text in [
+            (0x00, "BYTEV = &0780, joystick_bytev..."),
+            (0x02, "..."),
+            (0x05, "..."),
+            (0x07, "..."),
+        ]:
+            a.c(entry + offset, text)
+    a.banner(BOOT_FILENAME_ADDR, "Name of the file boot_loader loads")
+
+
 def annotate_menu_tables(a: Annotator, base: int) -> None:
     """The per-hero table pair the menu and score code use: at &06F8 in the
     cassette lineage, moved to &08B0 in the official disc release, where

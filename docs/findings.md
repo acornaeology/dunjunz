@@ -280,7 +280,24 @@ of those saves. It builds an OSFILE block at &6B00 for the filename at
 &07F0 (`Dun1` on the disc, `Dunjunz1` in the cassette lineage), with
 load address &2000. It copies FILEV into its own `JSR` operand, calls it
 to load the file, and jumps to &2000. Nothing in the three releases'
-game code reaches it, and the listings show it as data.
+game code reaches it. The listings annotate it as `boot_loader`. In the
+disc's joystick image it first points BYTEV at the joystick handler.
+
+The `JSR`'s stored operand records whether the loader had run before
+the image was saved:
+
+- in the disc's images and the crack's, it is &3000, a placeholder
+  never patched;
+- in the sideways RAM hack's `Dunjun4`, it is &F27D. That is the FILEV
+  handler of MOS 1.20 for both the cassette and the ROM filing systems
+  (FILEV reads &F27D after either `*TAPE` or `*ROM` in beebium, and &FF1B
+  under DFS) **[confirmed]**.
+
+The hack's own loader, `DUNK`, jumps straight to &0D31 and never runs
+&0740. So the image the hack was saved from had run this loader with the
+cassette or ROM filing system selected. That could be the original
+cassette loading itself, or something in the hack's making
+**[inference]**.
 
 The Master side's `Coder` (load &0400, exec &0740, length &3FF) is
 another such image, with a different program at &0740. That program

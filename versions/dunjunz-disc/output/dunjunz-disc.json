@@ -17,6 +17,11 @@
   },
   "constants": [
     {
+      "name": "boot_osfile_block",
+      "value": 27392,
+      "comment": "OSFILE control block built by boot_loader (in the level buffer)"
+    },
+    {
       "name": "osbyte_bell_channel",
       "value": 211
     },
@@ -899,6 +904,20 @@
       "description": "Show the level number, load and unpack the level, reset the workspace and monsters, then clear the text area, set the screen to its full 25-row height and draw the view frames and views."
     },
     {
+      "addr": 1856,
+      "binary_addr": 21744,
+      "name": "boot_loader",
+      "title": "Load the game file and run it (not used)",
+      "description": "Build an OSFILE control block at &6B00 naming boot_filename with load address &2000, call the filing system's FILEV handler to load the file, and jump to &2000. &0740 is the execution address in the *SAVE command left at &0700, so this is the image's own entry point when it is *RUN, but nothing in this release reaches it."
+    },
+    {
+      "addr": 1856,
+      "binary_addr": 22768,
+      "name": "boot_loader_joystick",
+      "title": "Load the game file and run it (not used)",
+      "description": "Point BYTEV at joystick_bytev (&0780), then build an OSFILE control block at &6B00 naming boot_filename with load address &2000, call the filing system's FILEV handler to load the file, and jump to &2000. &0740 is the execution address in the *SAVE command left at &0700, so this is the image's own entry point when it is *RUN, but nothing in this release reaches it."
+    },
+    {
       "addr": 20480,
       "name": "coder_start",
       "title": "Coder: load the game and the next level",
@@ -1026,6 +1045,21 @@
       "align": "before_label"
     },
     {
+      "addr": 1792,
+      "binary_addr": 21680,
+      "name": "line_buffer_leftovers",
+      "title": "Leftovers in the line-input buffer",
+      "description": "Not used by the game. &0700 is the MOS 1.20 line-input buffer, and these bytes are what it held when this image was saved: the command *SA. DANK 400+3FF 740, then a fragment of BBC BASIC assembler (label+2:LDA#255:.label JSR&30).",
+      "align": "before_label"
+    },
+    {
+      "addr": 2032,
+      "binary_addr": 21920,
+      "name": "boot_filename",
+      "title": "Name of the file boot_loader loads",
+      "align": "before_label"
+    },
+    {
       "addr": 1169,
       "binary_addr": 22081,
       "title": "Level checksums",
@@ -1038,6 +1072,21 @@
       "name": "menu_text_joystick",
       "title": "Hero menu text",
       "description": "Sixteen entries of: column, row, text, carriage return; printed by print_menu.",
+      "align": "before_label"
+    },
+    {
+      "addr": 1792,
+      "binary_addr": 22704,
+      "name": "line_buffer_leftovers_joystick",
+      "title": "Leftovers in the line-input buffer",
+      "description": "Not used by the game. &0700 is the MOS 1.20 line-input buffer, and these bytes are what it held when this image was saved: the command *SA. Control 400+3FF, then a fragment of BBC BASIC assembler (label+2:LDA#255:.label JSR&30).",
+      "align": "before_label"
+    },
+    {
+      "addr": 2032,
+      "binary_addr": 22944,
+      "name": "boot_filename_joystick",
+      "title": "Name of the file boot_loader loads",
       "align": "before_label"
     },
     {
@@ -1176,6 +1225,12 @@
     "remove_absent_heroes_next_joystick": 1776,
     "page6_score_ten_thousands": 1784,
     "page6_score_ten_thousands_joystick": 1784,
+    "line_buffer_leftovers": 1792,
+    "line_buffer_leftovers_joystick": 1792,
+    "boot_loader": 1856,
+    "boot_loader_joystick": 1856,
+    "boot_load_call": 1900,
+    "boot_load_call_joystick": 1910,
     "joystick_bytev": 1920,
     "code_079b": 1947,
     "code_07a9": 1961,
@@ -1184,6 +1239,8 @@
     "code_07d5": 2005,
     "code_07e6": 2022,
     "code_07e9": 2025,
+    "boot_filename": 2032,
+    "boot_filename_joystick": 2032,
     "hero_score_ten_thousands": 2224,
     "hero_absent": 2228,
     "levels_started": 2236,
@@ -1568,6 +1625,18 @@
         "b"
       ],
       "description": "Each hero's score ten-thousands digit where add_thousand_points still keeps it, at its cassette address. Every other routine uses hero_score_ten_thousands at &08B0, and Coder reloads this page for every level, so the digit is lost between levels."
+    },
+    {
+      "addr": 1792,
+      "name": "line_buffer_leftovers",
+      "group": "leftovers",
+      "description": "Leftover contents of the MOS 1.20 line-input buffer (&0700) from the machine the image was saved on."
+    },
+    {
+      "addr": 2032,
+      "name": "boot_filename",
+      "group": "leftovers",
+      "description": "Name of the file boot_loader loads, CR-terminated."
     },
     {
       "addr": 2224,
@@ -53995,6 +54064,9 @@
         48
       ],
       "binary_addr": 21680,
+      "labels": [
+        "line_buffer_leftovers"
+      ],
       "type": "string",
       "string": "*SA. DANK 400+3FF 740"
     },
@@ -54089,61 +54161,441 @@
       "addr": 1856,
       "bytes": [
         162,
-        0,
+        0
+      ],
+      "binary_addr": 21744,
+      "labels": [
+        "boot_loader"
+      ],
+      "comment_inline": "X/Y = &6B00, the control block...",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#<(boot_osfile_block)",
+      "expr": {
+        "text": "<(boot_osfile_block)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "boot_osfile_block"
+          }
+        }
+      }
+    },
+    {
+      "addr": 1858,
+      "bytes": [
         160,
-        107,
+        107
+      ],
+      "binary_addr": 21746,
+      "comment_inline": "...high byte",
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#>(boot_osfile_block)",
+      "expr": {
+        "text": ">(boot_osfile_block)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "boot_osfile_block"
+          }
+        }
+      }
+    },
+    {
+      "addr": 1860,
+      "bytes": [
         169,
-        240,
+        240
+      ],
+      "binary_addr": 21748,
+      "comment_inline": "Filename address: boot_filename...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#<(boot_filename)",
+      "expr": {
+        "text": "<(boot_filename)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "ref": 2032,
+            "name": "boot_filename"
+          }
+        }
+      }
+    },
+    {
+      "addr": 1862,
+      "bytes": [
         141,
         0,
-        107,
+        107
+      ],
+      "binary_addr": 21750,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "boot_osfile_block",
+      "expr": {
+        "text": "boot_osfile_block",
+        "tree": {
+          "sym": "boot_osfile_block"
+        }
+      },
+      "target": 27392,
+      "target_label": "level_object_x"
+    },
+    {
+      "addr": 1865,
+      "bytes": [
         169,
-        7,
+        7
+      ],
+      "binary_addr": 21753,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#>(boot_filename)",
+      "expr": {
+        "text": ">(boot_filename)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "ref": 2032,
+            "name": "boot_filename"
+          }
+        }
+      }
+    },
+    {
+      "addr": 1867,
+      "bytes": [
         141,
         1,
-        107,
+        107
+      ],
+      "binary_addr": 21755,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "boot_osfile_block + 1",
+      "expr": {
+        "text": "boot_osfile_block + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "boot_osfile_block"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      },
+      "target": 27393
+    },
+    {
+      "addr": 1870,
+      "bytes": [
         169,
-        0,
+        0
+      ],
+      "binary_addr": 21758,
+      "comment_inline": "Load address &00002000...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#0"
+    },
+    {
+      "addr": 1872,
+      "bytes": [
         141,
         2,
-        107,
+        107
+      ],
+      "binary_addr": 21760,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "boot_osfile_block + 2",
+      "expr": {
+        "text": "boot_osfile_block + 2",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "boot_osfile_block"
+          },
+          "right": {
+            "int": 2,
+            "radix": "auto"
+          }
+        }
+      },
+      "target": 27394
+    },
+    {
+      "addr": 1875,
+      "bytes": [
         141,
         4,
-        107,
+        107
+      ],
+      "binary_addr": 21763,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "boot_osfile_block + 4",
+      "expr": {
+        "text": "boot_osfile_block + 4",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "boot_osfile_block"
+          },
+          "right": {
+            "int": 4,
+            "radix": "auto"
+          }
+        }
+      },
+      "target": 27396
+    },
+    {
+      "addr": 1878,
+      "bytes": [
         141,
         5,
-        107,
+        107
+      ],
+      "binary_addr": 21766,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "boot_osfile_block + 5",
+      "expr": {
+        "text": "boot_osfile_block + 5",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "boot_osfile_block"
+          },
+          "right": {
+            "int": 5,
+            "radix": "auto"
+          }
+        }
+      },
+      "target": 27397
+    },
+    {
+      "addr": 1881,
+      "bytes": [
         169,
-        32,
+        32
+      ],
+      "binary_addr": 21769,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&20"
+    },
+    {
+      "addr": 1883,
+      "bytes": [
         141,
         3,
-        107,
+        107
+      ],
+      "binary_addr": 21771,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "boot_osfile_block + 3",
+      "expr": {
+        "text": "boot_osfile_block + 3",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "boot_osfile_block"
+          },
+          "right": {
+            "int": 3,
+            "radix": "auto"
+          }
+        }
+      },
+      "target": 27395
+    },
+    {
+      "addr": 1886,
+      "bytes": [
         173,
         18,
-        2,
+        2
+      ],
+      "binary_addr": 21774,
+      "comment_inline": "Copy FILEV into the JSR below...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "filev",
+      "target": 530,
+      "target_label": "filev"
+    },
+    {
+      "addr": 1889,
+      "bytes": [
         141,
         109,
-        7,
+        7
+      ],
+      "binary_addr": 21777,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "boot_load_call + 1",
+      "target": 1901
+    },
+    {
+      "addr": 1892,
+      "bytes": [
         173,
         19,
-        2,
+        2
+      ],
+      "binary_addr": 21780,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "filev + 1",
+      "target": 531
+    },
+    {
+      "addr": 1895,
+      "bytes": [
         141,
         110,
-        7,
+        7
+      ],
+      "binary_addr": 21783,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "boot_load_call + 2",
+      "target": 1902
+    },
+    {
+      "addr": 1898,
+      "bytes": [
         169,
-        255,
+        255
+      ],
+      "binary_addr": 21786,
+      "comment_inline": "OSFILE &FF: load the file",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&ff"
+    },
+    {
+      "addr": 1900,
+      "bytes": [
         32,
         0,
-        48,
+        48
+      ],
+      "binary_addr": 21788,
+      "labels": [
+        "boot_load_call"
+      ],
+      "comment_inline": "Call FILEV (operand patched above)",
+      "xref_summaries": [
+        "&551d referenced 1 time by &0761[2]",
+        "&551e referenced 1 time by &0767[2]"
+      ],
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "&3000",
+      "expr": {
+        "text": "&3000",
+        "tree": {
+          "int": 12288,
+          "radix": "hex"
+        }
+      },
+      "target": 12288
+    },
+    {
+      "addr": 1903,
+      "bytes": [
         76,
         0,
-        32,
+        32
+      ],
+      "binary_addr": 21791,
+      "comment_inline": "Run the game",
+      "type": "code",
+      "mnemonic": "jmp",
+      "operand": "&2000",
+      "expr": {
+        "text": "&2000",
+        "tree": {
+          "int": 8192,
+          "radix": "hex"
+        }
+      },
+      "target": 8192
+    },
+    {
+      "addr": 1906,
+      "bytes": [
         0,
         0,
         0,
+        0
+      ],
+      "binary_addr": 21794,
+      "type": "byte",
+      "values": [
         0,
         0,
         0,
+        0
+      ]
+    },
+    {
+      "addr": 1910,
+      "bytes": [
+        0
+      ],
+      "binary_addr": 21798,
+      "type": "byte",
+      "values": [
+        0
+      ]
+    },
+    {
+      "addr": 1911,
+      "bytes": [
+        0
+      ],
+      "binary_addr": 21799,
+      "xref_summaries": [
+        "&5527 referenced 1 time by &076b[3]"
+      ],
+      "references": [
+        {
+          "addr": 1899,
+          "kind": "direct",
+          "move_id": 3
+        }
+      ],
+      "type": "byte",
+      "values": [
+        0
+      ]
+    },
+    {
+      "addr": 1912,
+      "bytes": [
         0,
         0,
         0,
@@ -54153,65 +54605,19 @@
         0,
         0
       ],
-      "binary_addr": 21744,
+      "binary_addr": 21800,
+      "xref_summaries": [
+        "&5528 referenced 1 time by &0771[3]"
+      ],
+      "references": [
+        {
+          "addr": 1905,
+          "kind": "direct",
+          "move_id": 3
+        }
+      ],
       "type": "byte",
       "values": [
-        162,
-        0,
-        160,
-        107,
-        169,
-        240,
-        141,
-        0,
-        107,
-        169,
-        7,
-        141,
-        1,
-        107,
-        169,
-        0,
-        141,
-        2,
-        107,
-        141,
-        4,
-        107,
-        141,
-        5,
-        107,
-        169,
-        32,
-        141,
-        3,
-        107,
-        173,
-        18,
-        2,
-        141,
-        109,
-        7,
-        173,
-        19,
-        2,
-        141,
-        110,
-        7,
-        169,
-        255,
-        32,
-        0,
-        48,
-        76,
-        0,
-        32,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         0,
         0,
         0,
@@ -54473,6 +54879,9 @@
         49
       ],
       "binary_addr": 21920,
+      "labels": [
+        "boot_filename"
+      ],
       "type": "string",
       "string": "Dun1"
     },
@@ -59062,6 +59471,9 @@
         70
       ],
       "binary_addr": 22704,
+      "labels": [
+        "line_buffer_leftovers_joystick"
+      ],
       "type": "string",
       "string": "*SA. Control 400+3FF"
     },
@@ -59158,133 +59570,486 @@
       "addr": 1856,
       "bytes": [
         169,
-        128,
+        128
+      ],
+      "binary_addr": 22768,
+      "labels": [
+        "boot_loader_joystick"
+      ],
+      "comment_inline": "BYTEV = &0780, joystick_bytev...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#<(joystick_bytev)",
+      "expr": {
+        "text": "<(joystick_bytev)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "ref": 1920,
+            "name": "joystick_bytev"
+          }
+        }
+      }
+    },
+    {
+      "addr": 1858,
+      "bytes": [
         141,
         10,
-        2,
+        2
+      ],
+      "binary_addr": 22770,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "bytev",
+      "target": 522,
+      "target_label": "bytev"
+    },
+    {
+      "addr": 1861,
+      "bytes": [
         169,
-        7,
+        7
+      ],
+      "binary_addr": 22773,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#>(joystick_bytev)",
+      "expr": {
+        "text": ">(joystick_bytev)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "ref": 1920,
+            "name": "joystick_bytev"
+          }
+        }
+      }
+    },
+    {
+      "addr": 1863,
+      "bytes": [
         141,
         11,
-        2,
+        2
+      ],
+      "binary_addr": 22775,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "bytev + 1",
+      "target": 523
+    },
+    {
+      "addr": 1866,
+      "bytes": [
         162,
-        0,
+        0
+      ],
+      "binary_addr": 22778,
+      "comment_inline": "X/Y = &6B00, the control block...",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#<(boot_osfile_block)",
+      "expr": {
+        "text": "<(boot_osfile_block)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "boot_osfile_block"
+          }
+        }
+      }
+    },
+    {
+      "addr": 1868,
+      "bytes": [
         160,
-        107,
+        107
+      ],
+      "binary_addr": 22780,
+      "comment_inline": "...high byte",
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#>(boot_osfile_block)",
+      "expr": {
+        "text": ">(boot_osfile_block)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "boot_osfile_block"
+          }
+        }
+      }
+    },
+    {
+      "addr": 1870,
+      "bytes": [
         169,
-        240,
+        240
+      ],
+      "binary_addr": 22782,
+      "comment_inline": "Filename address: boot_filename...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#<(boot_filename)",
+      "expr": {
+        "text": "<(boot_filename)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "ref": 2032,
+            "name": "boot_filename"
+          }
+        }
+      }
+    },
+    {
+      "addr": 1872,
+      "bytes": [
         141,
         0,
-        107,
+        107
+      ],
+      "binary_addr": 22784,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "boot_osfile_block",
+      "expr": {
+        "text": "boot_osfile_block",
+        "tree": {
+          "sym": "boot_osfile_block"
+        }
+      },
+      "target": 27392,
+      "target_label": "level_object_x"
+    },
+    {
+      "addr": 1875,
+      "bytes": [
         169,
-        7,
+        7
+      ],
+      "binary_addr": 22787,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#>(boot_filename)",
+      "expr": {
+        "text": ">(boot_filename)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "ref": 2032,
+            "name": "boot_filename"
+          }
+        }
+      }
+    },
+    {
+      "addr": 1877,
+      "bytes": [
         141,
         1,
-        107,
+        107
+      ],
+      "binary_addr": 22789,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "boot_osfile_block + 1",
+      "expr": {
+        "text": "boot_osfile_block + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "boot_osfile_block"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      },
+      "target": 27393
+    },
+    {
+      "addr": 1880,
+      "bytes": [
         169,
-        0,
+        0
+      ],
+      "binary_addr": 22792,
+      "comment_inline": "Load address &00002000...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#0"
+    },
+    {
+      "addr": 1882,
+      "bytes": [
         141,
         2,
-        107,
+        107
+      ],
+      "binary_addr": 22794,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "boot_osfile_block + 2",
+      "expr": {
+        "text": "boot_osfile_block + 2",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "boot_osfile_block"
+          },
+          "right": {
+            "int": 2,
+            "radix": "auto"
+          }
+        }
+      },
+      "target": 27394
+    },
+    {
+      "addr": 1885,
+      "bytes": [
         141,
         4,
-        107,
+        107
+      ],
+      "binary_addr": 22797,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "boot_osfile_block + 4",
+      "expr": {
+        "text": "boot_osfile_block + 4",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "boot_osfile_block"
+          },
+          "right": {
+            "int": 4,
+            "radix": "auto"
+          }
+        }
+      },
+      "target": 27396
+    },
+    {
+      "addr": 1888,
+      "bytes": [
         141,
         5,
-        107,
+        107
+      ],
+      "binary_addr": 22800,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "boot_osfile_block + 5",
+      "expr": {
+        "text": "boot_osfile_block + 5",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "boot_osfile_block"
+          },
+          "right": {
+            "int": 5,
+            "radix": "auto"
+          }
+        }
+      },
+      "target": 27397
+    },
+    {
+      "addr": 1891,
+      "bytes": [
         169,
-        32,
+        32
+      ],
+      "binary_addr": 22803,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&20"
+    },
+    {
+      "addr": 1893,
+      "bytes": [
         141,
         3,
-        107,
+        107
+      ],
+      "binary_addr": 22805,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "boot_osfile_block + 3",
+      "expr": {
+        "text": "boot_osfile_block + 3",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "boot_osfile_block"
+          },
+          "right": {
+            "int": 3,
+            "radix": "auto"
+          }
+        }
+      },
+      "target": 27395
+    },
+    {
+      "addr": 1896,
+      "bytes": [
         173,
         18,
-        2,
+        2
+      ],
+      "binary_addr": 22808,
+      "comment_inline": "Copy FILEV into the JSR below...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "filev",
+      "target": 530,
+      "target_label": "filev"
+    },
+    {
+      "addr": 1899,
+      "bytes": [
         141,
         119,
-        7,
+        7
+      ],
+      "binary_addr": 22811,
+      "comment_inline": "...",
+      "xref_summaries": [
+        "&591d referenced 1 time by &0761[2]"
+      ],
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "boot_load_call_joystick + 1",
+      "target": 1911
+    },
+    {
+      "addr": 1902,
+      "bytes": [
         173,
         19,
-        2,
+        2
+      ],
+      "binary_addr": 22814,
+      "comment_inline": "...",
+      "xref_summaries": [
+        "&591e referenced 1 time by &0767[2]"
+      ],
+      "references": [
+        {
+          "addr": 1895,
+          "kind": "direct",
+          "move_id": 2
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "filev + 1",
+      "target": 531
+    },
+    {
+      "addr": 1905,
+      "bytes": [
         141,
         120,
-        7,
+        7
+      ],
+      "binary_addr": 22817,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "boot_load_call_joystick + 2",
+      "target": 1912
+    },
+    {
+      "addr": 1908,
+      "bytes": [
         169,
-        255,
+        255
+      ],
+      "binary_addr": 22820,
+      "comment_inline": "OSFILE &FF: load the file",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&ff"
+    },
+    {
+      "addr": 1910,
+      "bytes": [
         32,
         0,
-        48,
+        48
+      ],
+      "binary_addr": 22822,
+      "labels": [
+        "boot_load_call_joystick"
+      ],
+      "comment_inline": "Call FILEV (operand patched above)",
+      "xref_summaries": [
+        "&5927 referenced 1 time by &076b[3]",
+        "&5928 referenced 1 time by &0771[3]"
+      ],
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "&3000",
+      "expr": {
+        "text": "&3000",
+        "tree": {
+          "int": 12288,
+          "radix": "hex"
+        }
+      },
+      "target": 12288
+    },
+    {
+      "addr": 1913,
+      "bytes": [
         76,
         0,
-        32,
+        32
+      ],
+      "binary_addr": 22825,
+      "comment_inline": "Run the game",
+      "type": "code",
+      "mnemonic": "jmp",
+      "operand": "&2000",
+      "expr": {
+        "text": "&2000",
+        "tree": {
+          "int": 8192,
+          "radix": "hex"
+        }
+      },
+      "target": 8192
+    },
+    {
+      "addr": 1916,
+      "bytes": [
         0,
         0,
         0,
         0
       ],
-      "binary_addr": 22768,
+      "binary_addr": 22828,
       "type": "byte",
       "values": [
-        169,
-        128,
-        141,
-        10,
-        2,
-        169,
-        7,
-        141,
-        11,
-        2,
-        162,
-        0,
-        160,
-        107,
-        169,
-        240,
-        141,
-        0,
-        107,
-        169,
-        7,
-        141,
-        1,
-        107,
-        169,
-        0,
-        141,
-        2,
-        107,
-        141,
-        4,
-        107,
-        141,
-        5,
-        107,
-        169,
-        32,
-        141,
-        3,
-        107,
-        173,
-        18,
-        2,
-        141,
-        119,
-        7,
-        173,
-        19,
-        2,
-        141,
-        120,
-        7,
-        169,
-        255,
-        32,
-        0,
-        48,
-        76,
-        0,
-        32,
         0,
         0,
         0,
@@ -60135,6 +60900,9 @@
         49
       ],
       "binary_addr": 22944,
+      "labels": [
+        "boot_filename_joystick"
+      ],
       "type": "string",
       "string": "Dun1"
     },

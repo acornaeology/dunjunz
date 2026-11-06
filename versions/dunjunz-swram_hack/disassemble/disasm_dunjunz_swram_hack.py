@@ -59,6 +59,9 @@ game.annotate_cassette_pause(annotator)
 game.annotate_cassette_continuations(annotator)
 game.annotate_hack_continuations(annotator)
 game.annotate_menu_tables(annotator, 0x06F8)
+game.declare_boot_osfile_block(d)
+game.annotate_page7_leftovers(annotator, "*SAVE Dunjunz.K 400 7FF 740")
+game.annotate_boot_loader(annotator, stored_call=0xF27D, operand_note=(" The JSR's stored operand is &F27D, the MOS 1.20 FILEV handler for the cassette and ROM filing systems, so the image was saved after this loader had run with one of them selected."))
 game.annotate_cassette_level_loop(annotator)
 
 # ---------------------------------------------------------------------------

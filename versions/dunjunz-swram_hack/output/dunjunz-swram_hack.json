@@ -32,6 +32,11 @@
   },
   "constants": [
     {
+      "name": "boot_osfile_block",
+      "value": 27392,
+      "comment": "OSFILE control block built by boot_loader (in the level buffer)"
+    },
+    {
       "name": "osbyte_flush_buffer_class",
       "value": 15
     },
@@ -772,6 +777,12 @@
       "description": "Show the level number, load and unpack the level, reset the workspace and monsters, then clear the text area, set the screen to its full 25-row height and draw the view frames and views."
     },
     {
+      "addr": 1856,
+      "name": "boot_loader",
+      "title": "Load the game file and run it (not used)",
+      "description": "Build an OSFILE control block at &6B00 naming boot_filename with load address &2000, call the filing system's FILEV handler to load the file, and jump to &2000. &0740 is the execution address in the *SAVE command left at &0700, so this is the image's own entry point when it is *RUN, but nothing in this release reaches it. The JSR's stored operand is &F27D, the MOS 1.20 FILEV handler for the cassette and ROM filing systems, so the image was saved after this loader had run with one of them selected."
+    },
+    {
       "addr": 5553,
       "name": "show_level_number",
       "title": "Show the number of the level about to start",
@@ -796,6 +807,19 @@
       "name": "menu_text",
       "title": "Hero menu text",
       "description": "Sixteen entries of: column, row, text, carriage return; printed by print_menu.",
+      "align": "before_label"
+    },
+    {
+      "addr": 1792,
+      "name": "line_buffer_leftovers",
+      "title": "Leftovers in the line-input buffer",
+      "description": "Not used by the game. &0700 is the MOS 1.20 line-input buffer, and these bytes are what it held when this image was saved: the command *SAVE Dunjunz.K 400 7FF 740, then a fragment of BBC BASIC assembler (label+2:LDA#255:.label JSR&30).",
+      "align": "before_label"
+    },
+    {
+      "addr": 2032,
+      "name": "boot_filename",
+      "title": "Name of the file boot_loader loads",
       "align": "before_label"
     },
     {
@@ -1620,6 +1644,15 @@
       ],
       "named_slots": false,
       "description": "Operand of the JSR at reset_call, set from the RESET vector."
+    },
+    {
+      "anchor": 1900,
+      "name": "boot_load_call",
+      "window": [
+        0,
+        2
+      ],
+      "named_slots": false
     },
     {
       "anchor": 28256,
@@ -5949,6 +5982,9 @@
         48
       ],
       "image": 0,
+      "labels": [
+        "line_buffer_leftovers"
+      ],
       "type": "string",
       "string": "*SAVE Dunjunz.K 400 7FF 740"
     },
@@ -6017,55 +6053,392 @@
       "addr": 1856,
       "bytes": [
         162,
-        0,
+        0
+      ],
+      "image": 0,
+      "labels": [
+        "boot_loader"
+      ],
+      "comment_inline": "X/Y = &6B00, the control block...",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#<(boot_osfile_block)",
+      "expr": {
+        "text": "<(boot_osfile_block)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "boot_osfile_block"
+          }
+        }
+      }
+    },
+    {
+      "addr": 1858,
+      "bytes": [
         160,
-        107,
+        107
+      ],
+      "image": 0,
+      "comment_inline": "...high byte",
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#>(boot_osfile_block)",
+      "expr": {
+        "text": ">(boot_osfile_block)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "boot_osfile_block"
+          }
+        }
+      }
+    },
+    {
+      "addr": 1860,
+      "bytes": [
         169,
-        240,
+        240
+      ],
+      "image": 0,
+      "comment_inline": "Filename address: boot_filename...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#<(boot_filename)",
+      "expr": {
+        "text": "<(boot_filename)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "ref": 2032,
+            "name": "boot_filename"
+          }
+        }
+      }
+    },
+    {
+      "addr": 1862,
+      "bytes": [
         141,
         0,
-        107,
+        107
+      ],
+      "image": 0,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "boot_osfile_block",
+      "expr": {
+        "text": "boot_osfile_block",
+        "tree": {
+          "sym": "boot_osfile_block"
+        }
+      },
+      "target": 27392,
+      "target_label": "level_object_x"
+    },
+    {
+      "addr": 1865,
+      "bytes": [
         169,
-        7,
+        7
+      ],
+      "image": 0,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#>(boot_filename)",
+      "expr": {
+        "text": ">(boot_filename)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "ref": 2032,
+            "name": "boot_filename"
+          }
+        }
+      }
+    },
+    {
+      "addr": 1867,
+      "bytes": [
         141,
         1,
-        107,
+        107
+      ],
+      "image": 0,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "boot_osfile_block + 1",
+      "expr": {
+        "text": "boot_osfile_block + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "boot_osfile_block"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      },
+      "target": 27393
+    },
+    {
+      "addr": 1870,
+      "bytes": [
         169,
-        0,
+        0
+      ],
+      "image": 0,
+      "comment_inline": "Load address &00002000...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#0"
+    },
+    {
+      "addr": 1872,
+      "bytes": [
         141,
         2,
-        107,
+        107
+      ],
+      "image": 0,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "boot_osfile_block + 2",
+      "expr": {
+        "text": "boot_osfile_block + 2",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "boot_osfile_block"
+          },
+          "right": {
+            "int": 2,
+            "radix": "auto"
+          }
+        }
+      },
+      "target": 27394
+    },
+    {
+      "addr": 1875,
+      "bytes": [
         141,
         4,
-        107,
+        107
+      ],
+      "image": 0,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "boot_osfile_block + 4",
+      "expr": {
+        "text": "boot_osfile_block + 4",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "boot_osfile_block"
+          },
+          "right": {
+            "int": 4,
+            "radix": "auto"
+          }
+        }
+      },
+      "target": 27396
+    },
+    {
+      "addr": 1878,
+      "bytes": [
         141,
         5,
-        107,
+        107
+      ],
+      "image": 0,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "boot_osfile_block + 5",
+      "expr": {
+        "text": "boot_osfile_block + 5",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "boot_osfile_block"
+          },
+          "right": {
+            "int": 5,
+            "radix": "auto"
+          }
+        }
+      },
+      "target": 27397
+    },
+    {
+      "addr": 1881,
+      "bytes": [
         169,
-        32,
+        32
+      ],
+      "image": 0,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&20"
+    },
+    {
+      "addr": 1883,
+      "bytes": [
         141,
         3,
-        107,
+        107
+      ],
+      "image": 0,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "boot_osfile_block + 3",
+      "expr": {
+        "text": "boot_osfile_block + 3",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "boot_osfile_block"
+          },
+          "right": {
+            "int": 3,
+            "radix": "auto"
+          }
+        }
+      },
+      "target": 27395
+    },
+    {
+      "addr": 1886,
+      "bytes": [
         173,
         18,
-        2,
+        2
+      ],
+      "image": 0,
+      "comment_inline": "Copy FILEV into the JSR below...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "filev",
+      "target": 530,
+      "target_label": "filev"
+    },
+    {
+      "addr": 1889,
+      "bytes": [
         141,
         109,
-        7,
+        7
+      ],
+      "image": 0,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "boot_load_call + 1",
+      "target": 1901
+    },
+    {
+      "addr": 1892,
+      "bytes": [
         173,
         19,
-        2,
+        2
+      ],
+      "image": 0,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "filev + 1",
+      "target": 531
+    },
+    {
+      "addr": 1895,
+      "bytes": [
         141,
         110,
-        7,
+        7
+      ],
+      "image": 0,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "boot_load_call + 2",
+      "target": 1902
+    },
+    {
+      "addr": 1898,
+      "bytes": [
         169,
-        255,
+        255
+      ],
+      "image": 0,
+      "comment_inline": "OSFILE &FF: load the file",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&ff"
+    },
+    {
+      "addr": 1900,
+      "bytes": [
         32,
         125,
-        242,
+        242
+      ],
+      "image": 0,
+      "labels": [
+        "boot_load_call"
+      ],
+      "comment_inline": "Call FILEV (operand patched above)",
+      "xref_summaries": [
+        "&076d referenced 1 time by &0761",
+        "&076e referenced 1 time by &0767"
+      ],
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "&f27d",
+      "expr": {
+        "text": "&f27d",
+        "tree": {
+          "int": 62077,
+          "radix": "hex"
+        }
+      },
+      "target": 62077
+    },
+    {
+      "addr": 1903,
+      "bytes": [
         76,
         0,
-        32,
+        32
+      ],
+      "image": 0,
+      "comment_inline": "Run the game",
+      "type": "code",
+      "mnemonic": "jmp",
+      "operand": "&2000",
+      "expr": {
+        "text": "&2000",
+        "tree": {
+          "int": 8192,
+          "radix": "hex"
+        }
+      },
+      "target": 8192
+    },
+    {
+      "addr": 1906,
+      "bytes": [
         0,
         0,
         0,
@@ -6196,56 +6569,6 @@
       "image": 0,
       "type": "byte",
       "values": [
-        162,
-        0,
-        160,
-        107,
-        169,
-        240,
-        141,
-        0,
-        107,
-        169,
-        7,
-        141,
-        1,
-        107,
-        169,
-        0,
-        141,
-        2,
-        107,
-        141,
-        4,
-        107,
-        141,
-        5,
-        107,
-        169,
-        32,
-        141,
-        3,
-        107,
-        173,
-        18,
-        2,
-        141,
-        109,
-        7,
-        173,
-        19,
-        2,
-        141,
-        110,
-        7,
-        169,
-        255,
-        32,
-        125,
-        242,
-        76,
-        0,
-        32,
         0,
         0,
         0,
@@ -6387,6 +6710,9 @@
         49
       ],
       "image": 0,
+      "labels": [
+        "boot_filename"
+      ],
       "type": "string",
       "string": "Dunjunz1"
     },
