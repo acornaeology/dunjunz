@@ -82,3 +82,95 @@ driver = "versions/dunjunz-disc/disassemble/disasm_dunjunz_disc.py"
 asm = "versions/dunjunz-disc/output/dunjunz-disc.asm"
 json = "versions/dunjunz-disc/output/dunjunz-disc.json"
 verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Coder" }
+
+# The official disc release, Master 128 side: the game in five files at
+# their run addresses, four files in the Master's private RAM (HAZEL), and
+# the two loaders, all in one listing.
+
+[[targets]]
+id = "disc_master"
+binary = "versions/dunjunz-disc_master/binary/Dunjunz"
+driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master.py"
+asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master.asm"
+json = "versions/dunjunz-disc_master/output/dunjunz-disc_master.json"
+verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunjunz" }
+
+[[targets]]
+id = "disc_master-coder2"
+binary = "versions/dunjunz-disc_master/binary/Coder2"
+driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master.py"
+asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master.asm"
+json = "versions/dunjunz-disc_master/output/dunjunz-disc_master.json"
+verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Coder2" }
+
+[[targets]]
+id = "disc_master-coder"
+binary = "versions/dunjunz-disc_master/binary/Coder"
+driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master.py"
+asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master.asm"
+json = "versions/dunjunz-disc_master/output/dunjunz-disc_master.json"
+verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Coder" }
+
+[[targets]]
+id = "disc_master-dunj3"
+binary = "versions/dunjunz-disc_master/binary/Dunj3"
+driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master.py"
+asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master.asm"
+json = "versions/dunjunz-disc_master/output/dunjunz-disc_master.json"
+verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunj3" }
+
+[[targets]]
+id = "disc_master-dunj4"
+binary = "versions/dunjunz-disc_master/binary/Dunj4"
+driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master.py"
+asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master.asm"
+json = "versions/dunjunz-disc_master/output/dunjunz-disc_master.json"
+verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunj4" }
+
+[[targets]]
+id = "disc_master-dunj5"
+binary = "versions/dunjunz-disc_master/binary/Dunj5"
+driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master.py"
+asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master.asm"
+json = "versions/dunjunz-disc_master/output/dunjunz-disc_master.json"
+verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunj5" }
+
+[[targets]]
+id = "disc_master-dunj2"
+binary = "versions/dunjunz-disc_master/binary/Dunj2"
+driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master.py"
+asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master.asm"
+json = "versions/dunjunz-disc_master/output/dunjunz-disc_master.json"
+verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunj2" }
+
+[[targets]]
+id = "disc_master-code"
+binary = "versions/dunjunz-disc_master/binary/Code"
+driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master.py"
+asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master.asm"
+json = "versions/dunjunz-disc_master/output/dunjunz-disc_master.json"
+verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Code" }
+
+[[targets]]
+id = "disc_master-table"
+binary = "versions/dunjunz-disc_master/binary/Table"
+driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master.py"
+asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master.asm"
+json = "versions/dunjunz-disc_master/output/dunjunz-disc_master.json"
+verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Table" }
+
+[[targets]]
+id = "disc_master-code2"
+binary = "versions/dunjunz-disc_master/binary/Code2"
+driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master.py"
+asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master.asm"
+json = "versions/dunjunz-disc_master/output/dunjunz-disc_master.json"
+verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Code2" }
+
+[[targets]]
+id = "disc_master-code3"
+binary = "versions/dunjunz-disc_master/binary/Code3"
+driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master.py"
+asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master.asm"
+json = "versions/dunjunz-disc_master/output/dunjunz-disc_master.json"
+verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Code3" }

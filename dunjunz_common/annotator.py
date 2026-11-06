@@ -8,6 +8,10 @@ including two alternative images of &0400-&07FF. An Annotator hides that: each c
 address, and the version's `placements` function says which move(s) the
 address lives in, and what suffix to give labels in each, so one set of
 shared annotations can be applied to all versions.
+
+A version whose code differs from the shared annotations' in places passes
+a `skip` predicate: every call naming an address it accepts is ignored, so
+the version's own driver can annotate those addresses instead.
 """
 
 from collections.abc import Callable, Iterable
@@ -31,12 +35,16 @@ class Annotator:
         d: dasmos.Disassembler,
         version: str,
         placements: Callable[[int], Iterable[Placement]] = identity_placements,
+        skip: Callable[[int], bool] | None = None,
     ):
         self.d = d
         self.version = version
         self.placements = placements
+        self.skip = skip
 
     def _each(self, addr):
+        if self.skip is not None and self.skip(addr):
+            return []
         return list(self.placements(addr))
 
     # -- code -----------------------------------------------------------
@@ -86,6 +94,8 @@ class Annotator:
         """Name an address. Outside the loaded images (zero page, OS
         workspace) this is an ordinary label; inside, it follows the
         version's placements."""
+        if self.skip is not None and self.skip(addr):
+            return
         if not self._loaded(addr):
             self.d.label(addr, name, **kwargs)
             return
@@ -97,6 +107,8 @@ class Annotator:
         """Name a table and render references within `window` (inclusive
         offsets) as name+k / name-k. Index regions cannot be declared in a
         dasmos move, so there each offset gets an expression label instead."""
+        if self.skip is not None and self.skip(addr):
+            return
         if self._each(addr) == [(None, "")]:
             self.d.index_region(addr, name, window=window, **kwargs)
             return
@@ -111,10 +123,12 @@ class Annotator:
                     self.d.expr_label(addr + k, expression, move=move)
 
     def optional_label(self, addr, name, **kwargs):
-        self.d.optional_label(addr, name, **kwargs)
+        if self.skip is None or not self.skip(addr):
+            self.d.optional_label(addr, name, **kwargs)
 
     def index_base(self, addr, name, **kwargs):
-        self.d.index_base(addr, name, **kwargs)
+        if self.skip is None or not self.skip(addr):
+            self.d.index_base(addr, name, **kwargs)
 
     def banner(self, addr, title, description=""):
         for move, _ in self._each(addr):
