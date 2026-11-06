@@ -171,7 +171,7 @@ match the tape release except for:
 `Dunjun6` is byte-identical to the first &1180 bytes of the tape's
 `DUNJ3`.
 
-## Official disc release (`Dunjunz.zip`, Model B side 0)
+## Official disc release (Model B side)
 
 ### The game is reloaded from disc for every level
 
@@ -227,6 +227,65 @@ The key numbers it answers are exactly the third player's keys in the
 workspace template (&B9 up K, &99 down `<`, &97 right `?`, &98 left `>`,
 &9D fire SPACE), so the joystick replaces the Barbarian's keys. Whether
 the &80 test detects a joystick reliably is to be confirmed.
+
+### The ten-thousands score digit is lost at each new level (bug)
+
+A score's ten-thousands digit is kept apart from the other digits, as a
+small digit sprite (&69 for none, &6A–&72 for 1–9). In the cassette
+lineage (the crack and the hack) the four heroes' digits are at
+&06F8–&06FB, and every routine uses that table. The disc release reloads
+&0400–&07FF for every level, so it moved the table to &08B0
+(`hero_score_ten_thousands`), and `reset_hero` (&0EF3) and
+`remove_absent_heroes` (&06B4, &06BF) use the new address.
+`add_thousand_points` (&040F, &0412, &041B, in both &0400 images) still
+uses &06F8. Searching all of `Dun1` for absolute operands confirms that
+no instruction writes &08B0–&08B3 except `reset_hero`.
+
+So in the official disc release:
+
+- while a level lasts, the digit is counted and drawn correctly from
+  &06F8;
+- at the next level, `Coder` reloads &06F8 with &69 ("none"), and
+  `remove_absent_heroes` redraws the digit from &08B0, which is still &69,
+  so the score shows only its last four digits;
+- the next time the thousands digit passes 9 the count starts again from
+  1, so a score of 20,000 or more is shown wrongly.
+
+This comes from reading the code; it has not yet been run in an emulator,
+which needs DFS 0.90. A fix is to change the three operands at &040F,
+&0412 and &041B, in both images, from &06F8 to &08B0. Those instructions
+are at `Dun1` file offsets &31BF, &31C2 and &31CB (keyboard image) and
+&35BF, &35C2 and &35CB (joystick image), each with its operand in the next
+two bytes (&F8 &06 to become &B0 &08).
+
+### Leftovers from development in page &07
+
+&0700–&07FF of every &0400 image is a snapshot of the development
+machine's memory: &0700 is MOS 1.20's line-input buffer. Each image holds
+the last command typed before it was saved, followed by a fragment of
+BBC BASIC assembler (`label+2:LDA#255:.label JSR&30`):
+
+| Image | Command in the buffer |
+|---|---|
+| Disc, keyboard (`Dun1` &51B0) | `*SA. DANK 400+3FF 740` |
+| Disc, joystick (`Dun1` &55B0) | `*SA. Control 400+3FF` |
+| Crack and hack | `*SAVE Dunjunz.K 400 7FF 740` |
+| Master side's `Coder` | `*SA. CODER 400+3FF 740` |
+
+So on the Model B side the keyboard image was saved as `DANK` and the
+joystick image as `Control`; the cassette's was `Dunjunz.K`.
+
+At &0740 each image also holds a short loader, which is the exec address
+of those saves. It builds an OSFILE block at &6B00 for the filename at
+&07F0 (`Dun1` on the disc, `Dunjunz1` in the cassette lineage), with
+load address &2000. It copies FILEV into its own `JSR` operand, calls it
+to load the file, and jumps to &2000. Nothing in the three releases'
+game code reaches it, and the listings show it as data.
+
+The Master side's `Coder` (load &0400, exec &0740, length &3FF) is
+another such image, with a different program at &0740. That program
+copies page &0D to &C400 (in the Master's private RAM), `*LOAD`s `DUNJ2`
+to `DUNJ5` through OSCLI, sends VDU 17,2 and jumps to &0E00.
 
 ## Dependence on MOS 1.20
 
