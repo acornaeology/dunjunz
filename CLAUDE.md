@@ -90,29 +90,31 @@ fixes) in `docs/findings.md` as it is found, with the evidence.
 We own beebium, dasmos and fantasm: file a GitHub issue for any missing
 feature or defect met along the way, and note the workaround here.
 
-- Multi-file output: `dunjunz_common.rendering.MultiFileBeebasmRenderer`
-  overrides the beebasm renderer's private `_save_directive` to save each
-  original file (acornaeology/dasmos#49), and `fantasm.toml` declares one
-  target per file sharing one driver and listing
+- Multi-file output: each driver loads every file with
+  `d.load(..., name=, exec_addr=)` and dasmos saves each (dasmos 4.3.0).
+  The disc's `Coder` is a part of `Dun1`, so it cannot be a second loaded
+  image; `dunjunz_common.rendering.ExtraSavesBeebasmRenderer` adds its
+  `save` through the public `disassembly_end` hook. `fantasm.toml`
+  declares one target per file sharing one driver and listing
   (acornaeology/fantasm#25). fantasm's version graph (annotation porting)
   also assumes one binary per version, so annotations shared between
   releases live in `dunjunz_common/`, keyed by runtime address.
-- Overlapping moves: the crack's `DUNJ4` stores &0400-&2FFF at &2400. A
-  dasmos move over that overlap breaks reassembly (acornaeology/dasmos#51,
-  #52), so the tape driver loads the image at its run address and emits a
-  `copyblock` before saving.
+- Index regions cannot be declared inside a dasmos move, so
+  `Annotator.region` gives each offset in a moved table an `expr_label`
+  instead (`trapdoor_x - 1`).
 - The official disc's two &0400-&07FF images are two moves to one run
-  address. dasmos renders every label at such an address in the first
-  move's section (acornaeology/dasmos#53), so labels go only in the
-  keyboard image; the joystick image gets comments, banners and entries
-  (placement suffix None in `dunjunz_common.annotator`).
+  address. Explicit labels with `move=` render in their own image (the
+  joystick image's carry a `_joystick` suffix), but auto-labels and
+  `expr_label`s referenced from both images render once, in the keyboard
+  image, and the joystick image's operands use them
+  (acornaeology/dasmos#54). So every branch target in &0400-&07FF is named
+  explicitly in `dunjunz_common/game.py`; `menu_text + 1` in the joystick
+  image still names the keyboard image's table.
 - fantasm adds a target for every `versions/dunjunz-<id>` directory even
   when `[[targets]]` is configured, and `verify --all` counts those as
   failures (acornaeology/fantasm#26). Each version's main target
   therefore carries the version id (`swram_hack`, `tape_crack_ole`,
   `disc`) so the two coincide.
-- Synthesised offset bases inside data are named `sub_XXXX`; they are not
-  subroutines (acornaeology/dasmos#50). Declaring the data removes them.
 - No execution coverage in beebium: `tools/coverage.py` uses range
   breakpoints over data plus single-stepping (rob-smallshire/beebium#268).
 - oaknut cannot open HFE captures (rob-smallshire/oaknut#93).

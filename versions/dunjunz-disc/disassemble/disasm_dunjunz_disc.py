@@ -26,7 +26,7 @@ sys.path.insert(0, str(REPO_DIRPATH))
 
 from dunjunz_common import game  # noqa: E402
 from dunjunz_common.annotator import Annotator  # noqa: E402
-from dunjunz_common.rendering import MultiFileBeebasmRenderer, SavedFile  # noqa: E402
+from dunjunz_common.rendering import ExtraSavesBeebasmRenderer, SavedFile  # noqa: E402
 
 BINARY_DIRPATH = VERSION_DIRPATH / "binary"
 OUTPUT_DIRPATH = VERSION_DIRPATH / "output"
@@ -34,13 +34,11 @@ OUTPUT_DIRPATH = VERSION_DIRPATH / "output"
 asm_filepath = Path(os.environ.get("FANTASM_ASM", OUTPUT_DIRPATH / "dunjunz-disc.asm"))
 json_filepath = Path(os.environ.get("FANTASM_JSON", OUTPUT_DIRPATH / "dunjunz-disc.json"))
 
-SAVED_FILES = [
-    SavedFile("Dun1", start=0x2000, end=0x8000, exec_addr=0x2000, load_addr=0x2000),
-    SavedFile("Coder", start=0x5000, end=0x59B0, exec_addr=0x5000, load_addr=0x5000),
-]
+# Coder is the &5000-&59AF part of Dun1, saved as a file of its own.
+CODER_FILE = SavedFile("Coder", start=0x5000, end=0x59B0, exec_addr=0x5000, load_addr=0x5000)
 
 d = dasmos.Disassembler.create(cpu="6502")
-d.load(BINARY_DIRPATH / "Dun1", 0x2000)
+d.load(BINARY_DIRPATH / "Dun1", 0x2000, name="Dun1", exec_addr=0x2000)
 d.use_environment("acorn_mos")
 d.use_environment("acorn_model_b_hardware")
 
@@ -62,13 +60,11 @@ d.entry(0x5000, "coder_start")
 
 def placements(addr):
     """Where runtime address addr lives in Dun1: which move(s), and the
-    suffix for labels in each (None for no labels)."""
+    suffix for labels in each."""
     if 0x0400 <= addr < 0x0800:
-        # Labels go in the keyboard image only: dasmos renders every label
-        # at a run address shared by two moves in the first move's section
-        # (acornaeology/dasmos#53). The joystick image gets the comments,
-        # banners and entry points.
-        return [(low_keyboard, ""), (low_joystick, None)]
+        # Both images of &0400-&07FF get every annotation; the joystick
+        # image's labels carry a suffix so that the names stay unique.
+        return [(low_keyboard, ""), (low_joystick, "_joystick")]
     if 0x08C0 <= addr < 0x2000:
         return [(game_core, "")]
     return [(None, "")]
@@ -81,6 +77,11 @@ game.annotate_level_check(annotator)
 game.annotate_start_level(annotator)
 game.annotate_level_end(annotator)
 game.annotate_menu_tables(annotator, 0x08B0)
+annotator.label(0x06F8, "page6_score_ten_thousands", length=4, group="game_state", description=(
+    "Each hero's score ten-thousands digit where add_thousand_points still "
+    "keeps it, at its cassette address. Every other routine uses "
+    "hero_score_ten_thousands at &08B0, and Coder reloads this page for "
+    "every level, so the digit is lost between levels."))
 
 # ---------------------------------------------------------------------------
 # Specific to the official disc release: Coder, and moving between levels
@@ -280,10 +281,8 @@ for addr, text in [
 ]:
     annotator.c(addr, text)
 
-# The handler exists only in the joystick image. It is given a banner but no
-# label: dasmos renders every label at a run address shared by two moves in
-# the first move's section (acornaeology/dasmos#53).
-joystick_only = Annotator(d, "disc", lambda addr: [(low_joystick, None)])
+# The handler exists only in the joystick image.
+joystick_only = Annotator(d, "disc", lambda addr: [(low_joystick, "")])
 joystick_only.sub(
     0x0780, "joystick_bytev", "BYTEV handler: read a joystick for the third player's keys",
     "Installed by Coder, in the joystick image of &0400-&07FF only. Answers "
@@ -327,5 +326,5 @@ for addr, text in [
 
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)
-asm_filepath.write_text(str(ir.render(MultiFileBeebasmRenderer(SAVED_FILES))), encoding="utf-8")
+asm_filepath.write_text(str(ir.render(ExtraSavesBeebasmRenderer([CODER_FILE]))), encoding="utf-8")
 json_filepath.write_text(str(ir.render("json")), encoding="utf-8")

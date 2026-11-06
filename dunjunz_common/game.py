@@ -594,6 +594,27 @@ def annotate_routines(a: Annotator) -> None:
           "off on the menu out of play, with a &64 entry in "
           "returning_hero_queue in their place.")
 
+    # Branch targets within the routines above
+    for addr, name in [
+        (0x041E, "draw_ten_thousands"),
+        (0x0437, "draw_ten_thousands_loop"),
+        (0x0447, "add_thousand_points_done"),
+        (0x0528, "print_menu_loop"),
+        (0x0540, "print_menu_string_loop"),
+        (0x05C0, "menu_hero_off"),
+        (0x05C3, "menu_reprint"),
+        (0x05C9, "menu_space"),
+        (0x05CB, "menu_space_check_hero"),
+        (0x05D6, "menu_done"),
+        (0x05D7, "menu_sound_key"),
+        (0x05E4, "menu_sound_off"),
+        (0x05E9, "menu_set_sound"),
+        (0x06B4, "remove_absent_heroes_loop"),
+        (0x06C9, "remove_absent_heroes_check"),
+        (0x06F0, "remove_absent_heroes_next"),
+    ]:
+        a.label(addr, name)
+
     # Levels
     a.sub(0x14A0, "reset_workspace", "Reset the game workspace for a new level",
           "Copy workspace_template into page &0D and clear the per-level "
@@ -833,6 +854,12 @@ def annotate_level_check(a: Annotator) -> None:
           "the sum does not match the level's entry in level_checksums, "
           "reset the machine.",
           on_entry={"level_number": "level loaded (1-25)"})
+    for addr, name in [
+        (0x045A, "decrypt_level_loop"),
+        (0x046B, "decrypt_level_next"),
+        (0x0484, "decrypt_level_done"),
+    ]:
+        a.label(addr, name)
     a.c(0x0450, "Point at &6B00, the start of the level...")
     a.c(0x0452, "...low byte")
     a.c(0x0454, "Start the sum at zero")

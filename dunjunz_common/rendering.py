@@ -1,4 +1,4 @@
-"""Rendering helpers for disassemblies made of several saved files."""
+"""Rendering helpers for a disassembly that saves extra files."""
 
 from dataclasses import dataclass
 
@@ -7,8 +7,9 @@ from dasmos.ext.renderers.beebasm.renderer import BeebasmRenderer
 
 @dataclass(frozen=True)
 class SavedFile:
-    """One file the listing saves: its DFS name, the assembled address
-    range it covers (end exclusive), and its DFS load and exec addresses."""
+    """A file saved from part of a loaded image: its DFS name, the
+    assembled address range it covers (end exclusive), and its DFS exec
+    and load addresses."""
 
     name: str
     start: int
@@ -17,25 +18,22 @@ class SavedFile:
     load_addr: int
 
 
-class MultiFileBeebasmRenderer(BeebasmRenderer):
-    """beebasm renderer that saves each original file under its own name.
+class ExtraSavesBeebasmRenderer(BeebasmRenderer):
+    """beebasm renderer that also saves files cut from a loaded image.
 
-    dasmos renders a single save of the whole loaded range, which cannot
-    reproduce several files with gaps between them or with their own DFS
-    addresses (acornaeology/dasmos#49).
+    dasmos saves each loaded image as its own file. A file whose bytes are
+    a part of another loaded file (the disc release's `Coder` is the
+    &5000-&59AF part of `Dun1`) cannot be loaded as a second image over the
+    same addresses, so its `save` is added after the images' saves.
     """
 
-    def __init__(self, saved_files, pre_save_lines=(), **kwargs):
-        """`pre_save_lines` are emitted before the save directives, e.g. a
-        copyblock that moves code assembled at its run address to where the
-        file stores it."""
+    def __init__(self, extra_saves, **kwargs):
         super().__init__(**kwargs)
-        self.saved_files = list(saved_files)
-        self.pre_save_lines = list(pre_save_lines)
+        self.extra_saves = list(extra_saves)
 
-    def _save_directive(self, load_start, load_end, program=None) -> str:
-        return "\n".join(self.pre_save_lines + [
+    def disassembly_end(self) -> list[str]:
+        return super().disassembly_end() + [
             f'save "{f.name}", {self.hex4(f.start)}, {self.hex4(f.end)}, '
             f"{self.hex4(f.exec_addr)}, {self.hex4(f.load_addr)}"
-            for f in self.saved_files
-        ])
+            for f in self.extra_saves
+        ]

@@ -2,10 +2,9 @@
 
 The resident game occupies the same runtime addresses in every release,
 but each release stores it differently: the sideways RAM hack loads it in
-place, Ole's crack loads its &0400-&2FFF image in place too (its driver
-loads the image at the run address), and the official disc release
-relocates parts of Dun1 with dasmos moves, including two alternative
-images of &0400-&07FF. An Annotator hides that: each call names a runtime
+place, Ole's crack stores its &0400-&2FFF image at &2400 (a dasmos move),
+and the official disc release relocates parts of Dun1 with dasmos moves,
+including two alternative images of &0400-&07FF. An Annotator hides that: each call names a runtime
 address, and the version's `placements` function says which move(s) the
 address lives in, and what suffix to give labels in each, so one set of
 shared annotations can be applied to all versions.
@@ -90,12 +89,20 @@ class Annotator:
 
     def region(self, addr, name, window, **kwargs):
         """Name a table and render references within `window` (inclusive
-        offsets) as name+k / name-k. Where the address lies in a dasmos
-        move, index regions are not available, so only the name is given."""
+        offsets) as name+k / name-k. Index regions cannot be declared in a
+        dasmos move, so there each offset gets an expression label instead."""
         if self._each(addr) == [(None, "")]:
             self.d.index_region(addr, name, window=window, **kwargs)
-        else:
-            self.label(addr, name, **kwargs)
+            return
+        self.label(addr, name, **kwargs)
+        lo, hi = window
+        for move, suffix in self._each(addr):
+            if suffix is None:
+                continue
+            for k in range(lo, hi + 1):
+                if k:
+                    expression = f"{name}{suffix}{'+' if k > 0 else '-'}{abs(k)}"
+                    self.d.expr_label(addr + k, expression, move=move)
 
     def optional_label(self, addr, name, **kwargs):
         self.d.optional_label(addr, name, **kwargs)

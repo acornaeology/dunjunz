@@ -25,7 +25,6 @@ sys.path.insert(0, str(REPO_DIRPATH))
 
 from dunjunz_common import game  # noqa: E402
 from dunjunz_common.annotator import Annotator  # noqa: E402
-from dunjunz_common.rendering import MultiFileBeebasmRenderer, SavedFile  # noqa: E402
 
 BINARY_DIRPATH = VERSION_DIRPATH / "binary"
 OUTPUT_DIRPATH = VERSION_DIRPATH / "output"
@@ -43,15 +42,9 @@ GAME_FILES = [
 
 GAME_ENTRY = 0x0D31
 
-
-SAVED_FILES = [
-    SavedFile(name, start=addr, end=addr + length, exec_addr=addr, load_addr=addr)
-    for name, addr, length in GAME_FILES
-]
-
 d = dasmos.Disassembler.create(cpu="6502")
 for name, addr, length in GAME_FILES:
-    d.load(BINARY_DIRPATH / name, addr)
+    d.load(BINARY_DIRPATH / name, addr, name=name, exec_addr=addr)
 d.use_environment("acorn_mos")
 d.use_environment("acorn_model_b_hardware")
 
@@ -118,5 +111,5 @@ annotator.label(0x149A, "load_level_call")
 
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)
-asm_filepath.write_text(str(ir.render(MultiFileBeebasmRenderer(SAVED_FILES))), encoding="utf-8")
+asm_filepath.write_text(str(ir.render("beebasm")), encoding="utf-8")
 json_filepath.write_text(str(ir.render("json")), encoding="utf-8")

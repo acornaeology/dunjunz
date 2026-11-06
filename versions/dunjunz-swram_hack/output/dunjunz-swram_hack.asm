@@ -124,7 +124,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 
     org &0400
 
-.dasmos_start
+.dasmos_dunjun4_start
 ; ***************************************************************************************
 ; Add 1000 to a hero's score
 ;
@@ -143,17 +143,17 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     inc hero_score_thousands,x          ; Add one to the thousands digit
     lda hero_score_thousands,x          ; ...
     cmp #&28 ; '('                      ; Past 9?
-    bne return_1                        ; No: return
+    bne add_thousand_points_done        ; No: return
     lda #&1e                            ; Yes: thousands 0...
     sta hero_score_thousands,x          ; ...
     inc hero_score_ten_thousands,x      ; ...and add one to the ten-thousands digit
     lda hero_score_ten_thousands,x      ; ...
     cmp #&73 ; 's'                      ; Past 9?
-    bne code_041e                       ; No
+    bne draw_ten_thousands              ; No
     lda #&72 ; 'r'                      ; Yes: keep it at 9
     sta hero_score_ten_thousands,x      ; ...
 ; &041e referenced 2 times by &0417, &06c2
-.code_041e
+.draw_ten_thousands
     sta sprite_number                   ; Plot it below the score...
     lda #&45 ; 'E'                      ; ...
     sta plot_x                          ; ...
@@ -168,7 +168,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     sta sprite_number                   ; ...
     ldy #4                              ; ...
 ; &0437 referenced 1 time by &0443
-.loop_0437
+.draw_ten_thousands_loop
     tya                                 ; ...
     pha                                 ; ...
     inc plot_x                          ; ...
@@ -177,11 +177,11 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     pla                                 ; ...
     tay                                 ; ...
     dey                                 ; ...
-    bne loop_0437                       ; ...
+    bne draw_ten_thousands_loop         ; ...
     pla                                 ; ...
     tax                                 ; ...
 ; &0447 referenced 1 time by &0408
-.return_1
+.add_thousand_points_done
     rts                                 ; Return
     equb &00, &00, &00, &00, &00, &00, &00, &00
 ; ***************************************************************************************
@@ -201,7 +201,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     lda #&6b ; 'k'                      ; ...
     sta plot_y                          ; ...high byte
 ; &045a referenced 2 times by &046f, &0475
-.code_045a
+.decrypt_level_loop
     lda (plot_x),y                      ; Fetch a byte...
     eor plot_x                          ; ...XOR it with the low byte of its address...
     sta (plot_x),y                      ; ...and store it back decrypted
@@ -209,23 +209,23 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     adc sprite_width                    ; ...
     sta sprite_width                    ; ...
     inc plot_x                          ; Next byte...
-    bne code_046b                       ; ...
+    bne decrypt_level_next              ; ...
     inc plot_y                          ; ...with carry into the high byte
 ; &046b referenced 1 time by &0467
-.code_046b
+.decrypt_level_next
     lda plot_x                          ; Stop at &6DB0, the end of the level...
     cmp #&b0                            ; ...
-    bne code_045a                       ; ...
+    bne decrypt_level_loop              ; ...
     lda plot_y                          ; ...
     cmp #&6d ; 'm'                      ; ...
-    bne code_045a                       ; ...
+    bne decrypt_level_loop              ; ...
     ldx level_number                    ; X = level number
     lda sprite_width                    ; Compare the sum...
     cmp level_checksums,x               ; ...with this level's checksum
-    beq return_2                        ; Match: return
+    beq decrypt_level_done              ; Match: return
     jsr mos_reset_entry                 ; No match: reset the machine (MOS 1.20 only)
 ; &0484 referenced 1 time by &047f
-.return_2
+.decrypt_level_done
     rts                                 ; Return
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00
@@ -291,10 +291,10 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     ldx #&0f                            ; Fifteen strings, then one more by falling through
     ldy #0                              ; ...
 ; &0528 referenced 1 time by &052c
-.loop_0528
+.print_menu_loop
     jsr print_menu_string               ; ...
     dex                                 ; ...
-    bne loop_0528                       ; ...
+    bne print_menu_loop                 ; ...
 ; ***************************************************************************************
 ; Print one menu string
 ;
@@ -316,12 +316,12 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     lda menu_text,y                     ; ...and row
     jsr oswrch                          ; ...
 ; &0540 referenced 1 time by &0549
-.loop_0540
+.print_menu_string_loop
     iny                                 ; Print the characters...
     lda menu_text,y                     ; ...
     jsr oswrch                          ; ...
     cmp #&0d                            ; ...up to and including the carriage return
-    bne loop_0540                       ; ...
+    bne print_menu_string_loop          ; ...
     iny                                 ; Point at the next string
     rts                                 ; Return
 ; ***************************************************************************************
@@ -393,7 +393,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     jsr osbyte                          ; ...  osbyte: kbd status
     jsr osrdch                          ; Wait for a key
     cmp #&20 ; ' '                      ; SPACE?
-    beq code_05c9                       ; Yes: start, if anyone is playing
+    beq menu_space                      ; Yes: start, if anyone is playing
     cmp #&31 ; '1'                      ; Ignore anything but 1-6
     bcc menu_key_loop                   ; ...
     cmp #&37 ; '7'                      ; ...
@@ -402,7 +402,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     sbc #&31 ; '1'                      ; ...
     tax                                 ; ...
     cmp #4                              ; 5 or 6: the sound
-    bcs code_05d7                       ; ...
+    bcs menu_sound_key                  ; ...
     asl a                               ; 1-4: Y = offset of the hero's YES/NO, 6 x X + &51...
     sta plot_x                          ; ...
     asl a                               ; ...
@@ -413,43 +413,43 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     lda hero_absent,x                   ; Toggle the hero
     eor #1                              ; ...
     sta hero_absent,x                   ; ...
-    bne code_05c0                       ; Now absent?
+    bne menu_hero_off                   ; Now absent?
     jsr set_menu_yes                    ; No: YES
-    jmp code_05c3                       ; ...
+    jmp menu_reprint                    ; ...
 ; &05c0 referenced 1 time by &05b8
-.code_05c0
+.menu_hero_off
     jsr set_menu_no                     ; Yes: NO
 ; &05c3 referenced 1 time by &05bd
-.code_05c3
+.menu_reprint
     jsr print_menu                      ; Reprint the menu
     jmp menu_key_loop                   ; Next key
 ; &05c9 referenced 1 time by &0594
-.code_05c9
+.menu_space
     ldx #3                              ; SPACE: is any hero playing?
 ; &05cb referenced 1 time by &05d1
-.loop_05cb
+.menu_space_check_hero
     lda hero_absent,x                   ; ...
-    beq return_3                        ; Yes: return and start
+    beq menu_done                       ; Yes: return and start
     dex                                 ; ...
-    bpl loop_05cb                       ; ...
+    bpl menu_space_check_hero           ; ...
     jmp menu_key_loop                   ; No: next key
 ; &05d6 referenced 1 time by &05ce
-.return_3
+.menu_done
     rts                                 ; Return
 ; &05d7 referenced 1 time by &05a4
-.code_05d7
+.menu_sound_key
     ldy #&99                            ; Sound: Y = offset of the second letter of ON/OFF
     cmp #5                              ; Key 6 (A = key - "1")?
-    beq code_05e4                       ; Yes
+    beq menu_sound_off                  ; Yes
     jsr set_menu_on                     ; Key 5: ON...
     ldx #0                              ; ...with X = 0 to enable the sound
-    beq code_05e9                       ; ...
+    beq menu_set_sound                  ; ...
 ; &05e4 referenced 1 time by &05db
-.code_05e4
+.menu_sound_off
     jsr set_menu_off                    ; Key 6: OFF...
     ldx #1                              ; ...with X = 1 to suppress it
 ; &05e9 referenced 1 time by &05e2
-.code_05e9
+.menu_set_sound
     lda #osbyte_sound_suppression       ; OSBYTE &D2: sound suppression
     ldy #0                              ; ...
     jsr osbyte                          ; ...  osbyte: sound suppression
@@ -524,24 +524,24 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     ldx #0                              ; For each hero, keeping a count of absent heroes in Y...
     ldy #0                              ; ...
 ; &06b4 referenced 1 time by &06f3
-.loop_06b4
+.remove_absent_heroes_loop
     lda hero_score_ten_thousands,x      ; Score of 10000 or more?
     cmp #&6a ; 'j'                      ; ...
-    bcc code_06c9                       ; No
+    bcc remove_absent_heroes_check      ; No
     txa                                 ; Yes: draw the ten-thousands digit
     pha                                 ; ...
     tya                                 ; ...
     pha                                 ; ...
     lda hero_score_ten_thousands,x      ; ...
-    jsr code_041e                       ; ...
+    jsr draw_ten_thousands              ; ...
     pla                                 ; ...
     tay                                 ; ...
     pla                                 ; ...
     tax                                 ; ...
 ; &06c9 referenced 1 time by &06b9
-.code_06c9
+.remove_absent_heroes_check
     lda hero_absent,x                   ; Switched off on the menu?
-    beq code_06f0                       ; No
+    beq remove_absent_heroes_next       ; No
     lda #0                              ; Yes: out of play...
     sta hero_direction,x                ; ...
     lda #&63 ; 'c'                      ; ...never to be animated (step &63)...
@@ -557,10 +557,10 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     sta returning_hero_queue,y          ; ...
     iny                                 ; ...
 ; &06f0 referenced 1 time by &06cc
-.code_06f0
+.remove_absent_heroes_next
     inx                                 ; Next hero
     cpx #4                              ; ...
-    bne loop_06b4                       ; ...
+    bne remove_absent_heroes_loop       ; ...
     rts                                 ; Return
     equb &00, &00
 ; &06f8 used as index base 6 times by &040f, &0412, &041b, &06b4, &06bf, &0ef3
@@ -764,10 +764,10 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     clc                                 ; ...
     adc screen_ptr                      ; ...
     sta screen_ptr                      ; ...
-    bcc return_4                        ; ...
+    bcc return_1                        ; ...
     inc screen_ptr_hi                   ; ...with carry into the high byte
 ; &099f referenced 1 time by &099b
-.return_4
+.return_1
     rts                                 ; Return
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -1027,6 +1027,11 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &06, &00
     equb &06, &00
     equb &12, &00, &03, &00, &c8, &00, &0a, &00
+.dasmos_dunjun4_end
+
+    org &0d00
+
+.dasmos_dunjun7_start
 ; &0d00 referenced 49 times by &1cc5, &1d00, &1d4e, &1d52, &1d55, &1d58, &1d77, &1d82, &2006, &200d, &201e, &205a, &2063, &2070, &6f19, &6f1e, &6f25, &6f71, &6fd7, &7002, &7007, &713c, &74b6, &74c3, &74d8, &77e6, &782c, &7857, &785b, &785e, &7861, &7886, &788b, &7901, &7905, &7908, &790b, &7926, &7931, &793d, &7941, &7944, &7947, &7962, &796d, &7976, &7990, &7a89, &7ce3; also used as index base 1 time by &14a5
 .scratch
     equb &a9
@@ -1115,9 +1120,9 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     lda wrchv + 1                       ; ...
     sta saved_wrchv + 1                 ; ...in saved_wrchv
     lda #&8f                            ; Point WRCHV at wrch_handler...
-.sub_0d63
+.code_0d63
 ; &0d64 used as index base 4 times by &6f53, &7209, &76b1, &7747
-missile_sprite_base = sub_0d63+1
+missile_sprite_base = code_0d63+1
     sta wrchv                           ; ...
     lda #&7f                            ; ...
     sta wrchv + 1                       ; ...
@@ -1454,12 +1459,12 @@ missile_sprite_base = sub_0d63+1
     equb &0d
     equs "MOOD TO RESURRECT"
     equb &0d
-.sub_0fea
+.data_0fea
 ; &0ff0 used as index base 1 time by &0ea8
 ; &0ff1 referenced 8 times by &0ef9, &0efc, &0f18, &0f28, &0f4d, &0f5d, &0f60, &0f6d
-panel_hero = sub_0fea+7
+panel_hero = data_0fea+7
 ; &0ff2 referenced 5 times by &0e6a, &0e77, &0e7f, &0f35, &0f48
-count = sub_0fea+8
+count = data_0fea+8
     equs "YOU ALL.         "
     equb &0d
     equs "NEW ADVENTURERS  "
@@ -1490,7 +1495,7 @@ count = sub_0fea+8
 .check_for_victory
     lda level_number                    ; Only on level 25
     cmp #&19                            ; ...
-    bne return_5                        ; ...
+    bne return_2                        ; ...
     ldx #0                              ; Is a hero on one of the Chalice's cells, x &1A or &1B...
 ; &1079 referenced 1 time by &1087
 .loop_1079
@@ -1505,7 +1510,7 @@ count = sub_0fea+8
     cpx #4                              ; ...
     bne loop_1079                       ; ...
 ; &1089 referenced 1 time by &1075
-.return_5
+.return_2
     rts                                 ; Return
 ; &108a referenced 2 times by &107e, &1082
 .code_108a
@@ -1575,6 +1580,11 @@ reset_call_address = reset_call+1
     lda #0                              ; Tone starts at pitch 0...
     sta victory_pitch                   ; ...
     lda #&e6                            ; ...with the frames &E6 units apart...
+.dasmos_dunjun7_end
+
+    org &1100
+
+.dasmos_dunjun5_start
     sta victory_delay                   ; ...
     lda #&32 ; '2'                      ; ...for &32 rises...
     sta victory_steps_left              ; ...
@@ -1705,13 +1715,13 @@ reset_call_address = reset_call+1
     eor os_irq_a                        ; ...
     eor os_zp_fa                        ; ...
     cmp #&c0                            ; ...if it is within the sprite
-    bcs return_6                        ; ...
+    bcs return_3                        ; ...
     tax                                 ; Clear it...
     lda #0                              ; ...
     sta sprite_chalice,x                ; ...
     jsr plot_chalice                    ; ...and redraw the Chalice
 ; &11d2 referenced 1 time by &11c7
-.return_6
+.return_3
     rts                                 ; Return
 ; &11d3 referenced 1 time by &1119
 .code_11d3
@@ -2911,7 +2921,7 @@ filev_call_address = load_level_call+1
     lda #osbyte_scan_keyboard_from_16   ; OSBYTE &7A: which key is pressed?
     jsr osbyte                          ; ...  Scan keyboard from key 16
     cpx #&71 ; 'q'                      ; f1 (internal key &71)?
-    bne return_7                        ; No: return
+    bne return_4                        ; No: return
 ; &1ee0 referenced 1 time by &1ee5
 .loop_1ee0
     jsr osbyte                          ; Paused: wait for f1 to be released...  Scan keyboard from key 16
@@ -2928,7 +2938,7 @@ filev_call_address = load_level_call+1
     cpx #&71 ; 'q'                      ; ...
     beq loop_1eee                       ; ...
 ; &1ef5 referenced 1 time by &1ede
-.return_7
+.return_4
     rts                                 ; Return
     equb &00, &00, &00, &00, &00, &00
     equs "<<<<"
@@ -2967,10 +2977,10 @@ filev_call_address = load_level_call+1
     dex                                 ; Next hero
     bne loop_1f17                       ; ...
     ldx shrunk_hero                     ; The level is over: restore the last exiting hero's sprites
-    bmi return_8                        ; ...
+    bmi return_5                        ; ...
     jsr restore_hero_sprites            ; ...
 ; &1f35 referenced 1 time by &1f30
-.return_8
+.return_5
     rts                                 ; Return
 ; &1f36 referenced 3 times by &1f13, &1f1a, &1f28
 .code_1f36
@@ -4297,8 +4307,11 @@ filev_call_address = load_level_call+1
     equb &00, &45, &34, &2c
     equb &00, &00, &1e, &28
     equb &00, &05, &1e, &00
+.dasmos_dunjun5_end
 
     org &6e80
+
+.dasmos_dunjun6_start
 ; ***************************************************************************************
 ; Move the heroes
 ;
@@ -4598,10 +4611,10 @@ filev_call_address = load_level_call+1
 .next_hero
     inx                                 ; Next hero
     cpx #4                              ; ...
-    beq return_9                        ; ...
+    beq return_6                        ; ...
     jmp code_6e82                       ; ...
 ; &70c9 referenced 1 time by &70c4
-.return_9
+.return_6
     rts                                 ; Return
 ; ***************************************************************************************
 ; Move the missiles
@@ -4819,10 +4832,10 @@ filev_call_address = load_level_call+1
 .next_missile
     inx                                 ; Next slot
     cpx #&0c                            ; ...
-    beq return_10                       ; ...
+    beq return_7                        ; ...
     jmp code_70d2                       ; ...
 ; &7220 referenced 1 time by &721b
-.return_10
+.return_7
     rts                                 ; Return
 ; ***************************************************************************************
 ; Take one health point from a hero
@@ -5207,10 +5220,10 @@ filev_call_address = load_level_call+1
 ; &7470 referenced 3 times by &733f, &734a, &747d
 .code_7470
     dey                                 ; Next object
-    beq return_11                       ; ...
+    beq return_8                        ; ...
     jmp code_7337                       ; ...
 ; &7476 referenced 1 time by &7471
-.return_11
+.return_8
     rts                                 ; Return
 ; &7477 referenced 1 time by &740f
 .code_7477
@@ -6007,7 +6020,7 @@ filev_call_address = load_level_call+1
 .code_78e1
     lda view_room + 6                   ; Does the bottom-right view show it?
     cmp cell_room                       ; ...
-    bne return_12                       ; No
+    bne return_9                        ; No
     clc                                 ; Yes: plot at column &23, row &67
     lda #&23 ; '#'                      ; ...
     adc cell_x                          ; ...
@@ -6017,7 +6030,7 @@ filev_call_address = load_level_call+1
     sta plot_y                          ; ...
     jsr plot_sprite                     ; ...
 ; &78fb referenced 1 time by &78e7
-.return_12
+.return_9
     rts                                 ; Return
 ; ***************************************************************************************
 ; Test for a wall at a map cell
@@ -6355,10 +6368,10 @@ filev_call_address = load_level_call+1
     pla                                 ; ...
     tax                                 ; ...
     dex                                 ; Next monster
-    beq return_13                       ; ...
+    beq return_10                       ; ...
     jmp next_monster_update             ; ...
 ; &7b30 referenced 1 time by &7b2b
-.return_13
+.return_10
     rts                                 ; Return
 ; &7b31 referenced 1 time by &7a14
 .advance_dying_monster
@@ -6584,13 +6597,13 @@ filev_call_address = load_level_call+1
 ; &7c6f referenced 2 times by &7c62, &7c69
 .code_7c6f
     lda monster_offset_y,x              ; Grow the vertical offset by three rows, away from zero
-    beq return_14                       ; ...
+    beq return_11                       ; ...
     bpl code_7c82                       ; ...
     sec                                 ; ...
     lda monster_offset_y,x              ; ...
     sbc #3                              ; ...
     sta monster_offset_y,x              ; ...
-    jmp return_14                       ; ...
+    jmp return_11                       ; ...
 ; &7c82 referenced 1 time by &7c74
 .code_7c82
     clc                                 ; ...
@@ -6598,7 +6611,7 @@ filev_call_address = load_level_call+1
     adc #3                              ; ...
     sta monster_offset_y,x              ; ...
 ; &7c8b referenced 2 times by &7c72, &7c7f
-.return_14
+.return_11
     rts                                 ; Return
     equb &de, &35, &0d, &bd, &35, &0d, &d0, &00
     equb &60
@@ -6914,603 +6927,593 @@ filev_call_address = load_level_call+1
     lda plot_x                          ; Recover the character
     jmp mos_oswrch_default              ; ...and print it through the MOS 1.20 OSWRCH routine
     equb &00
-.dasmos_end
+.dasmos_dunjun6_end
 
-save "Dunjun4", &0400, &0d00, &0400, &0400
-save "Dunjun7", &0d00, &1100, &0d00, &0d00
-save "Dunjun5", &1100, &3000, &1100, &1100
-save "Dunjun6", &6e80, &8000, &6e80, &6e80
+save "Dunjun4", dasmos_dunjun4_start, dasmos_dunjun4_end, &0400, &0400
+save "Dunjun7", dasmos_dunjun7_start, dasmos_dunjun7_end, &0d00, &0d00
+save "Dunjun5", dasmos_dunjun5_start, dasmos_dunjun5_end, &1100, &1100
+save "Dunjun6", dasmos_dunjun6_start, dasmos_dunjun6_end, &6e80, &6e80
 
 ; Label references by decreasing frequency:
-;     oswrch:                     66
-;     cell_x:                     59
-;     cell_y:                     55
-;     scratch:                    50
-;     plot_x:                     47
-;     sprite_number:              45
-;     hero_x:                     29
-;     plot_y:                     29
-;     hero_y:                     27
-;     map_ptr:                    21
-;     plot_sprite:                21
-;     hero_offset_y:              20
-;     hero_offset_x:              19
-;     monster_sprite:             19
-;     plot_at_cell:               19
-;     hero_direction:             18
-;     plot_offset_x:              18
-;     plot_offset_y:              18
-;     monster_offset_y:           17
-;     monster_x:                  17
-;     osbyte:                     17
-;     monster_y:                  16
-;     monster_offset_x:           15
-;     osword:                     15
-;     hero_frame:                 14
-;     screen_ptr:                 13
-;     hero_step:                  12
-;     missile_direction:          12
-;     plot_victory_sprite:        12
-;     previous_x:                 11
-;     previous_y:                 11
-;     hero_health_tens:           10
-;     hero_key:                   10
-;     hero_panel_y:               10
-;     hero_max_missiles:           9
-;     object_x:                    9
-;     object_y:                    9
-;     returning_hero_queue:        9
-;     screen_ptr_hi:               9
-;     lose_health_point:           8
-;     panel_hero:                  8
-;     ring_x:                      8
-;     scratch2:                    8
-;     test_wall:                   8
-;     cell_room:                   7
-;     hero_damage_taken:           7
-;     hero_health_units:           7
-;     hero_missile_damage:         7
-;     hero_score_units:            7
-;     key_x:                       7
-;     key_y:                       7
-;     menu_text:                   7
-;     monster_step:                7
-;     object_type:                 7
-;     play_level:                  7
-;     ring_y:                      7
-;     draw_monster:                6
-;     hero_score_ten_thousands:    6
-;     level_bcd:                   6
-;     level_number:                6
-;     menu_key_loop:               6
-;     missile_x:                   6
-;     missile_y:                   6
-;     os_vsync_counter:            6
-;     sprite_width:                6
-;     test_key:                    6
-;     victory_pitch:               6
-;     victory_sprite:              6
-;     add_point:                   5
-;     code_71d9:                   5
-;     count:                       5
-;     erase_hero:                  5
-;     exit_busy:                   5
-;     exit_spin:                   5
-;     hero_score_hundreds:         5
-;     hero_score_tens:             5
-;     hero_score_thousands:        5
-;     next_trapdoor:               5
-;     plot_panel_sprite:           5
-;     victory_delay:               5
-;     view_room:                   5
-;     add_ten_points:              4
-;     code_1ec6:                   4
-;     code_703b:                   4
-;     code_7aea:                   4
-;     code_7ff6:                   4
-;     door_x:                      4
-;     door_y:                      4
-;     draw_moved_hero:             4
-;     draw_room:                   4
-;     exit_saved_x:                4
-;     exit_saved_y:                4
-;     exit_x:                      4
-;     exit_y:                      4
-;     find_creature:               4
-;     hero_absent:                 4
-;     hero_door_x:                 4
-;     hero_door_y:                 4
-;     hero_key_dropped:            4
-;     hero_sprites:                4
-;     map_ptr_hi:                  4
-;     menu_text + 1:               4
-;     missile_sprite_base:         4
-;     monster_hit_points:          4
-;     next_hero:                   4
-;     plot_keeping_x:              4
-;     shrunk_hero:                 4
-;     sprite_heights:              4
-;     start_hero_step:             4
-;     step_hero:                   4
-;     wrchv:                       4
-;     wrchv + 1:                   4
-;     bit_masks:                   3
-;     code_1db2:                   3
-;     code_1f36:                   3
-;     code_7266:                   3
-;     code_72bc:                   3
-;     code_7470:                   3
-;     code_76d4:                   3
-;     code_798d:                   3
-;     exit_shrinks_left:           3
-;     exiting_hero:                3
-;     hero_has_boots:              3
-;     hero_magic_delay:            3
-;     magic_kill_count:            3
-;     missile_damage:              3
-;     monster_done:                3
-;     monster_frame:               3
-;     monster_start_hit_points:    3
-;     next_victory_sprite:         3
-;     osasci:                      3
-;     print_menu:                  3
-;     room_walls:                  3
-;     sprite_data_ptr:             3
-;     sprite_widths:               3
-;     system_via_t1c_l:            3
-;     victory_pitch_step:          3
-;     clear_text_area:             2
-;     code_041e:                   2
-;     code_045a:                   2
-;     code_0e00:                   2
-;     code_108a:                   2
-;     code_1097:                   2
-;     code_111c:                   2
-;     code_11bb:                   2
-;     code_1e28:                   2
-;     code_1ebe:                   2
-;     code_1f91:                   2
-;     code_2076:                   2
-;     code_7156:                   2
-;     code_71d4:                   2
-;     code_71d7:                   2
-;     code_7201:                   2
-;     code_73c7:                   2
-;     code_7467:                   2
-;     code_7652:                   2
-;     code_7692:                   2
-;     code_79b7:                   2
-;     code_7adc:                   2
-;     code_7af8:                   2
-;     code_7c6f:                   2
-;     code_7cae:                   2
-;     credit_missile_owner:        2
-;     door_sprite:                 2
-;     draw_hero:                   2
-;     draw_missile_damage:         2
-;     draw_victory_ring:           2
-;     draw_view_0:                 2
-;     draw_view_1:                 2
-;     draw_view_2:                 2
-;     draw_view_3:                 2
-;     exit_offsets_x:              2
-;     exit_offsets_y:              2
-;     food_sound + 4:              2
-;     get_hero_cell:               2
-;     hero_frame + 1:              2
-;     hero_frame + 2:              2
-;     hero_frame + 3:              2
-;     hit_sound + 4:               2
-;     level_filename_digits:       2
-;     menu_text + 2:               2
-;     missile_spent_pop:           2
-;     monster_x + 35:              2
-;     monster_y + 35:              2
-;     mos_oswrch_default:          2
-;     next_missile:                2
-;     osrdch:                      2
-;     play_pickup_sound:           2
-;     plot_chalice:                2
-;     point_at_boots_icon:         2
-;     previous_offset_x:           2
-;     previous_offset_y:           2
-;     read_hero_keys:              2
-;     reset_hero:                  2
-;     restore_hero_sprites:        2
-;     return_14:                   2
-;     returning_hero_queue + 1:    2
-;     returning_hero_queue + 2:    2
-;     returning_hero_queue + 3:    2
-;     row_start_ptr:               2
-;     row_start_ptr_hi:            2
-;     saved_wrchv:                 2
-;     saved_wrchv + 1:             2
-;     show_hero_room:              2
-;     sprite_data_ptr_hi:          2
-;     sprite_height:               2
-;     test_object_free:            2
-;     trapdoor_x:                  2
-;     trapdoor_y:                  2
-;     victory_steps_left:          2
-;     view_room + 2:               2
-;     view_room + 4:               2
-;     view_room + 6:               2
-;     workspace_template + 208:    2
-;     add_thousand_points:         1
-;     advance_dying_monster:       1
-;     animate_absent_hero:         1
-;     check_for_victory:           1
-;     check_hero_keys:             1
-;     check_magic:                 1
-;     code_046b:                   1
-;     code_05c0:                   1
-;     code_05c3:                   1
-;     code_05c9:                   1
-;     code_05d7:                   1
-;     code_05e4:                   1
-;     code_05e9:                   1
-;     code_06c9:                   1
-;     code_06f0:                   1
-;     code_0938:                   1
-;     code_093e:                   1
-;     code_0961:                   1
-;     code_0e34:                   1
-;     code_0e36:                   1
-;     code_0e52:                   1
-;     code_0e7a:                   1
-;     code_110a:                   1
-;     code_1124:                   1
-;     code_113c:                   1
-;     code_11d3:                   1
-;     code_16bf:                   1
-;     code_1cc5:                   1
-;     code_1cd8:                   1
-;     code_1ce3:                   1
-;     code_1cee:                   1
-;     code_1cfa:                   1
-;     code_1db8:                   1
-;     code_1dba:                   1
-;     code_1df3:                   1
-;     code_1e35:                   1
-;     code_1e45:                   1
-;     code_1ec4:                   1
-;     code_1f2a:                   1
-;     code_1f96:                   1
-;     code_1f9e:                   1
-;     code_1ff2:                   1
-;     code_2026:                   1
-;     code_20db:                   1
-;     code_20e9:                   1
-;     code_20f7:                   1
-;     code_6e82:                   1
-;     code_6e91:                   1
-;     code_6e97:                   1
-;     code_6eba:                   1
-;     code_6ed4:                   1
-;     code_6ee7:                   1
-;     code_6efa:                   1
-;     code_6f0d:                   1
-;     code_6f70:                   1
-;     code_6f83:                   1
-;     code_6f8a:                   1
-;     code_6f91:                   1
-;     code_6f98:                   1
-;     code_6fc7:                   1
-;     code_6fd5:                   1
-;     code_7002:                   1
-;     code_7053:                   1
-;     code_7069:                   1
-;     code_70d2:                   1
-;     code_70da:                   1
-;     code_70e7:                   1
-;     code_70fe:                   1
-;     code_7108:                   1
-;     code_710f:                   1
-;     code_7116:                   1
-;     code_711d:                   1
-;     code_713a:                   1
-;     code_7150:                   1
-;     code_71a0:                   1
-;     code_71b4:                   1
-;     code_71c0:                   1
-;     code_71cc:                   1
-;     code_7227:                   1
-;     code_7263:                   1
-;     code_7337:                   1
-;     code_7342:                   1
-;     code_734d:                   1
-;     code_738a:                   1
-;     code_73a0:                   1
-;     code_73c3:                   1
-;     code_73d9:                   1
-;     code_740d:                   1
-;     code_7429:                   1
-;     code_744c:                   1
-;     code_7464:                   1
-;     code_7477:                   1
-;     code_74b6:                   1
-;     code_74eb:                   1
-;     code_74fc:                   1
-;     code_74ff:                   1
-;     code_7516:                   1
-;     code_7529:                   1
-;     code_7551:                   1
-;     code_755b:                   1
-;     code_7565:                   1
-;     code_756b:                   1
-;     code_757c:                   1
-;     code_75a6:                   1
-;     code_761f:                   1
-;     code_7650:                   1
-;     code_769c:                   1
-;     code_76ab:                   1
-;     code_76ae:                   1
-;     code_76c0:                   1
-;     code_76c9:                   1
-;     code_76d2:                   1
-;     code_76e0:                   1
-;     code_770b:                   1
-;     code_772e:                   1
-;     code_7757:                   1
-;     code_7764:                   1
-;     code_7771:                   1
-;     code_783e:                   1
-;     code_7845:                   1
-;     code_78ad:                   1
-;     code_78c7:                   1
-;     code_78e1:                   1
-;     code_79bc:                   1
-;     code_7a17:                   1
-;     code_7a23:                   1
-;     code_7a2d:                   1
-;     code_7a34:                   1
-;     code_7a3b:                   1
-;     code_7a42:                   1
-;     code_7a81:                   1
-;     code_7a87:                   1
-;     code_7ac1:                   1
-;     code_7b3f:                   1
-;     code_7b79:                   1
-;     code_7b88:                   1
-;     code_7b97:                   1
-;     code_7bb9:                   1
-;     code_7bc0:                   1
-;     code_7bc7:                   1
-;     code_7bce:                   1
-;     code_7bd6:                   1
-;     code_7c02:                   1
-;     code_7c11:                   1
-;     code_7c20:                   1
-;     code_7c42:                   1
-;     code_7c49:                   1
-;     code_7c50:                   1
-;     code_7c57:                   1
-;     code_7c5f:                   1
-;     code_7c6c:                   1
-;     code_7c82:                   1
-;     code_7cc2:                   1
-;     code_7cfb:                   1
-;     code_7fb5:                   1
-;     code_7fb8:                   1
-;     code_7fbd:                   1
-;     code_7fda:                   1
-;     collect_objects:             1
-;     continue_hero_step:          1
-;     continue_monster_step:       1
-;     dasmos_start:                1
-;     data_0000:                   1
-;     data_3000:                   1
-;     decrypt_level:               1
-;     dissolve_chalice:            1
-;     draw_all_views:              1
-;     draw_armour_rating:          1
-;     draw_keys:                   1
-;     draw_new_missile_icon:       1
-;     draw_room_row:               1
-;     draw_status_panel:           1
-;     draw_view_frames:            1
-;     drop_key:                    1
-;     erase_boots_icon:            1
-;     exit_offset_x_1:             1
-;     exit_offset_x_2:             1
-;     exit_offset_x_3:             1
-;     exit_offset_y_1:             1
-;     exit_offset_y_2:             1
-;     exit_offset_y_3:             1
-;     exit_offset_y_4:             1
-;     filev:                       1
-;     filev + 1:                   1
-;     filev_call_address:          1
-;     filev_call_address + 1:      1
-;     find_open_neighbour:         1
-;     fire_missile:                1
-;     flip_firer_frame:            1
-;     font_digits:                 1
-;     font_letters:                1
-;     game_over_message:           1
-;     hero_appearance_sprites:     1
-;     hero_direction - 1:          1
-;     hero_enters_exit:            1
-;     hero_faces:                  1
-;     hero_frame - 1:              1
-;     hero_health_tens - 1:        1
-;     hero_key_down:               1
-;     hero_key_fire:               1
-;     hero_key_left:               1
-;     hero_key_right:              1
-;     hero_key_up:                 1
-;     hero_magic_key:              1
-;     hero_menu:                   1
-;     hero_missile_sprites:        1
-;     hero_start_damage_taken:     1
-;     hero_start_max_missiles:     1
-;     hero_start_missile_damage:   1
-;     level_checksums:             1
-;     level_door_sprite:           1
-;     level_door_x:                1
-;     level_door_y:                1
-;     level_filename_digits + 1:   1
-;     level_key_x:                 1
-;     level_key_y:                 1
-;     level_loop:                  1
-;     level_object_free_map:       1
-;     level_object_type:           1
-;     level_object_x:              1
-;     level_object_y:              1
-;     level_osfile_block:          1
-;     level_osfile_block + 1:      1
-;     level_osfile_block + 2:      1
-;     level_osfile_block + 3:      1
-;     level_osfile_block + 4:      1
-;     level_osfile_block + 5:      1
-;     level_trapdoor_x:            1
-;     level_trapdoor_y:            1
-;     level_wall_sprite:           1
-;     level_walls:                 1
-;     load_level:                  1
-;     loop_0437:                   1
-;     loop_0528:                   1
-;     loop_0540:                   1
-;     loop_05cb:                   1
-;     loop_06b4:                   1
-;     loop_091d:                   1
-;     loop_0929:                   1
-;     loop_0e09:                   1
-;     loop_0e6d:                   1
-;     loop_0ea8:                   1
-;     loop_0eae:                   1
-;     loop_0eb9:                   1
-;     loop_0efc:                   1
-;     loop_0f3a:                   1
-;     loop_1079:                   1
-;     loop_1084:                   1
-;     loop_10ba:                   1
-;     loop_10c7:                   1
-;     loop_113e:                   1
-;     loop_1140:                   1
-;     loop_11de:                   1
-;     loop_11ec:                   1
-;     loop_14a2:                   1
-;     loop_14e5:                   1
-;     loop_14ec:                   1
-;     loop_1512:                   1
-;     loop_1529:                   1
-;     loop_1540:                   1
-;     loop_1551:                   1
-;     loop_1564:                   1
-;     loop_1577:                   1
-;     loop_1585:                   1
-;     loop_159c:                   1
-;     loop_16b4:                   1
-;     loop_1d03:                   1
-;     loop_1dce:                   1
-;     loop_1ee0:                   1
-;     loop_1ee7:                   1
-;     loop_1eee:                   1
-;     loop_1f17:                   1
-;     loop_1f38:                   1
-;     loop_2009:                   1
-;     loop_2014:                   1
-;     loop_205f:                   1
-;     loop_206c:                   1
-;     loop_6f28:                   1
-;     loop_7007:                   1
-;     loop_7173:                   1
-;     loop_71dd:                   1
-;     loop_71f4:                   1
-;     loop_7256:                   1
-;     loop_730d:                   1
-;     loop_73a7:                   1
-;     loop_742b:                   1
-;     loop_7498:                   1
-;     loop_7667:                   1
-;     loop_77e4:                   1
-;     loop_77fe:                   1
-;     loop_7827:                   1
-;     loop_7976:                   1
-;     loop_7997:                   1
-;     loop_79aa:                   1
-;     loop_79cd:                   1
-;     loop_7fc5:                   1
-;     loop_7fd1:                   1
-;     loop_7fe8:                   1
-;     missile_spent:               1
-;     monster_reappears:           1
-;     mos_reset_entry:             1
-;     mos_row_offsets:             1
-;     mos_row_offsets_lo:          1
-;     move_heroes:                 1
-;     move_missiles:               1
-;     next_monster_update:         1
-;     object_free_map:             1
-;     object_free_map + 58:        1
-;     os_irq_a:                    1
-;     os_zp_fa:                    1
-;     panel_hero - 1:              1
-;     plot_boots_icon:             1
-;     print_menu_string:           1
-;     queue_exit_marker:           1
-;     remove_absent_heroes:        1
-;     reset_call_address:          1
-;     reset_call_address + 1:      1
-;     reset_monsters:              1
-;     reset_vector:                1
-;     reset_vector + 1:            1
-;     reset_workspace:             1
-;     return_1:                    1
-;     return_10:                   1
-;     return_11:                   1
-;     return_12:                   1
-;     return_13:                   1
-;     return_2:                    1
-;     return_3:                    1
-;     return_4:                    1
-;     return_5:                    1
-;     return_6:                    1
-;     return_7:                    1
-;     return_8:                    1
-;     return_9:                    1
-;     room_walls + 58:             1
-;     screen_address:              1
-;     set_menu_no:                 1
-;     set_menu_off:                1
-;     set_menu_on:                 1
-;     set_menu_yes:                1
-;     show_level_number:           1
-;     sprite_addr_hi:              1
-;     sprite_addr_lo:              1
-;     sprite_chalice:              1
-;     sprite_chalice - 1:          1
-;     start_level:                 1
-;     start_monster_step:          1
-;     sub_7305:                    1
-;     teleport_last:               1
-;     trapdoor_x - 1:              1
-;     trapdoor_y - 1:              1
-;     unpack_level:                1
-;     update_game:                 1
-;     update_monsters:             1
-;     update_rest:                 1
-;     victory_sequence:            1
-;     victory_sprite_copy:         1
-;     wall_sprite:                 1
-;     workspace_template:          1
+;     oswrch:                      66
+;     cell_x:                      59
+;     cell_y:                      55
+;     scratch:                     50
+;     plot_x:                      47
+;     sprite_number:               45
+;     hero_x:                      29
+;     plot_y:                      29
+;     hero_y:                      27
+;     map_ptr:                     21
+;     plot_sprite:                 21
+;     hero_offset_y:               20
+;     hero_offset_x:               19
+;     monster_sprite:              19
+;     plot_at_cell:                19
+;     hero_direction:              18
+;     plot_offset_x:               18
+;     plot_offset_y:               18
+;     monster_offset_y:            17
+;     monster_x:                   17
+;     osbyte:                      17
+;     monster_y:                   16
+;     monster_offset_x:            15
+;     osword:                      15
+;     hero_frame:                  14
+;     screen_ptr:                  13
+;     hero_step:                   12
+;     missile_direction:           12
+;     plot_victory_sprite:         12
+;     previous_x:                  11
+;     previous_y:                  11
+;     hero_health_tens:            10
+;     hero_key:                    10
+;     hero_panel_y:                10
+;     hero_max_missiles:            9
+;     object_x:                     9
+;     object_y:                     9
+;     returning_hero_queue:         9
+;     screen_ptr_hi:                9
+;     lose_health_point:            8
+;     panel_hero:                   8
+;     ring_x:                       8
+;     scratch2:                     8
+;     test_wall:                    8
+;     cell_room:                    7
+;     hero_damage_taken:            7
+;     hero_health_units:            7
+;     hero_missile_damage:          7
+;     hero_score_units:             7
+;     key_x:                        7
+;     key_y:                        7
+;     menu_text:                    7
+;     monster_step:                 7
+;     object_type:                  7
+;     play_level:                   7
+;     ring_y:                       7
+;     draw_monster:                 6
+;     hero_score_ten_thousands:     6
+;     level_bcd:                    6
+;     level_number:                 6
+;     menu_key_loop:                6
+;     missile_x:                    6
+;     missile_y:                    6
+;     os_vsync_counter:             6
+;     sprite_width:                 6
+;     test_key:                     6
+;     victory_pitch:                6
+;     victory_sprite:               6
+;     add_point:                    5
+;     code_71d9:                    5
+;     count:                        5
+;     erase_hero:                   5
+;     exit_busy:                    5
+;     exit_spin:                    5
+;     hero_score_hundreds:          5
+;     hero_score_tens:              5
+;     hero_score_thousands:         5
+;     next_trapdoor:                5
+;     plot_panel_sprite:            5
+;     victory_delay:                5
+;     view_room:                    5
+;     add_ten_points:               4
+;     code_1ec6:                    4
+;     code_703b:                    4
+;     code_7aea:                    4
+;     code_7ff6:                    4
+;     door_x:                       4
+;     door_y:                       4
+;     draw_moved_hero:              4
+;     draw_room:                    4
+;     exit_saved_x:                 4
+;     exit_saved_y:                 4
+;     exit_x:                       4
+;     exit_y:                       4
+;     find_creature:                4
+;     hero_absent:                  4
+;     hero_door_x:                  4
+;     hero_door_y:                  4
+;     hero_key_dropped:             4
+;     hero_sprites:                 4
+;     map_ptr_hi:                   4
+;     menu_text + 1:                4
+;     missile_sprite_base:          4
+;     monster_hit_points:           4
+;     next_hero:                    4
+;     plot_keeping_x:               4
+;     shrunk_hero:                  4
+;     sprite_heights:               4
+;     start_hero_step:              4
+;     step_hero:                    4
+;     wrchv:                        4
+;     wrchv + 1:                    4
+;     bit_masks:                    3
+;     code_1db2:                    3
+;     code_1f36:                    3
+;     code_7266:                    3
+;     code_72bc:                    3
+;     code_7470:                    3
+;     code_76d4:                    3
+;     code_798d:                    3
+;     exit_shrinks_left:            3
+;     exiting_hero:                 3
+;     hero_has_boots:               3
+;     hero_magic_delay:             3
+;     magic_kill_count:             3
+;     missile_damage:               3
+;     monster_done:                 3
+;     monster_frame:                3
+;     monster_start_hit_points:     3
+;     next_victory_sprite:          3
+;     osasci:                       3
+;     print_menu:                   3
+;     room_walls:                   3
+;     sprite_data_ptr:              3
+;     sprite_widths:                3
+;     system_via_t1c_l:             3
+;     victory_pitch_step:           3
+;     clear_text_area:              2
+;     code_0e00:                    2
+;     code_108a:                    2
+;     code_1097:                    2
+;     code_111c:                    2
+;     code_11bb:                    2
+;     code_1e28:                    2
+;     code_1ebe:                    2
+;     code_1f91:                    2
+;     code_2076:                    2
+;     code_7156:                    2
+;     code_71d4:                    2
+;     code_71d7:                    2
+;     code_7201:                    2
+;     code_73c7:                    2
+;     code_7467:                    2
+;     code_7652:                    2
+;     code_7692:                    2
+;     code_79b7:                    2
+;     code_7adc:                    2
+;     code_7af8:                    2
+;     code_7c6f:                    2
+;     code_7cae:                    2
+;     credit_missile_owner:         2
+;     decrypt_level_loop:           2
+;     door_sprite:                  2
+;     draw_hero:                    2
+;     draw_missile_damage:          2
+;     draw_ten_thousands:           2
+;     draw_victory_ring:            2
+;     draw_view_0:                  2
+;     draw_view_1:                  2
+;     draw_view_2:                  2
+;     draw_view_3:                  2
+;     exit_offsets_x:               2
+;     exit_offsets_y:               2
+;     food_sound + 4:               2
+;     get_hero_cell:                2
+;     hero_frame + 1:               2
+;     hero_frame + 2:               2
+;     hero_frame + 3:               2
+;     hit_sound + 4:                2
+;     level_filename_digits:        2
+;     menu_text + 2:                2
+;     missile_spent_pop:            2
+;     monster_x + 35:               2
+;     monster_y + 35:               2
+;     mos_oswrch_default:           2
+;     next_missile:                 2
+;     osrdch:                       2
+;     play_pickup_sound:            2
+;     plot_chalice:                 2
+;     point_at_boots_icon:          2
+;     previous_offset_x:            2
+;     previous_offset_y:            2
+;     read_hero_keys:               2
+;     reset_hero:                   2
+;     restore_hero_sprites:         2
+;     return_11:                    2
+;     returning_hero_queue + 1:     2
+;     returning_hero_queue + 2:     2
+;     returning_hero_queue + 3:     2
+;     row_start_ptr:                2
+;     row_start_ptr_hi:             2
+;     saved_wrchv:                  2
+;     saved_wrchv + 1:              2
+;     show_hero_room:               2
+;     sprite_data_ptr_hi:           2
+;     sprite_height:                2
+;     test_object_free:             2
+;     trapdoor_x:                   2
+;     trapdoor_y:                   2
+;     victory_steps_left:           2
+;     view_room + 2:                2
+;     view_room + 4:                2
+;     view_room + 6:                2
+;     workspace_template + 208:     2
+;     add_thousand_points:          1
+;     add_thousand_points_done:     1
+;     advance_dying_monster:        1
+;     animate_absent_hero:          1
+;     check_for_victory:            1
+;     check_hero_keys:              1
+;     check_magic:                  1
+;     code_0938:                    1
+;     code_093e:                    1
+;     code_0961:                    1
+;     code_0e34:                    1
+;     code_0e36:                    1
+;     code_0e52:                    1
+;     code_0e7a:                    1
+;     code_110a:                    1
+;     code_1124:                    1
+;     code_113c:                    1
+;     code_11d3:                    1
+;     code_16bf:                    1
+;     code_1cc5:                    1
+;     code_1cd8:                    1
+;     code_1ce3:                    1
+;     code_1cee:                    1
+;     code_1cfa:                    1
+;     code_1db8:                    1
+;     code_1dba:                    1
+;     code_1df3:                    1
+;     code_1e35:                    1
+;     code_1e45:                    1
+;     code_1ec4:                    1
+;     code_1f2a:                    1
+;     code_1f96:                    1
+;     code_1f9e:                    1
+;     code_1ff2:                    1
+;     code_2026:                    1
+;     code_20db:                    1
+;     code_20e9:                    1
+;     code_20f7:                    1
+;     code_6e82:                    1
+;     code_6e91:                    1
+;     code_6e97:                    1
+;     code_6eba:                    1
+;     code_6ed4:                    1
+;     code_6ee7:                    1
+;     code_6efa:                    1
+;     code_6f0d:                    1
+;     code_6f70:                    1
+;     code_6f83:                    1
+;     code_6f8a:                    1
+;     code_6f91:                    1
+;     code_6f98:                    1
+;     code_6fc7:                    1
+;     code_6fd5:                    1
+;     code_7002:                    1
+;     code_7053:                    1
+;     code_7069:                    1
+;     code_70d2:                    1
+;     code_70da:                    1
+;     code_70e7:                    1
+;     code_70fe:                    1
+;     code_7108:                    1
+;     code_710f:                    1
+;     code_7116:                    1
+;     code_711d:                    1
+;     code_713a:                    1
+;     code_7150:                    1
+;     code_71a0:                    1
+;     code_71b4:                    1
+;     code_71c0:                    1
+;     code_71cc:                    1
+;     code_7227:                    1
+;     code_7263:                    1
+;     code_7337:                    1
+;     code_7342:                    1
+;     code_734d:                    1
+;     code_738a:                    1
+;     code_73a0:                    1
+;     code_73c3:                    1
+;     code_73d9:                    1
+;     code_740d:                    1
+;     code_7429:                    1
+;     code_744c:                    1
+;     code_7464:                    1
+;     code_7477:                    1
+;     code_74b6:                    1
+;     code_74eb:                    1
+;     code_74fc:                    1
+;     code_74ff:                    1
+;     code_7516:                    1
+;     code_7529:                    1
+;     code_7551:                    1
+;     code_755b:                    1
+;     code_7565:                    1
+;     code_756b:                    1
+;     code_757c:                    1
+;     code_75a6:                    1
+;     code_761f:                    1
+;     code_7650:                    1
+;     code_769c:                    1
+;     code_76ab:                    1
+;     code_76ae:                    1
+;     code_76c0:                    1
+;     code_76c9:                    1
+;     code_76d2:                    1
+;     code_76e0:                    1
+;     code_770b:                    1
+;     code_772e:                    1
+;     code_7757:                    1
+;     code_7764:                    1
+;     code_7771:                    1
+;     code_783e:                    1
+;     code_7845:                    1
+;     code_78ad:                    1
+;     code_78c7:                    1
+;     code_78e1:                    1
+;     code_79bc:                    1
+;     code_7a17:                    1
+;     code_7a23:                    1
+;     code_7a2d:                    1
+;     code_7a34:                    1
+;     code_7a3b:                    1
+;     code_7a42:                    1
+;     code_7a81:                    1
+;     code_7a87:                    1
+;     code_7ac1:                    1
+;     code_7b3f:                    1
+;     code_7b79:                    1
+;     code_7b88:                    1
+;     code_7b97:                    1
+;     code_7bb9:                    1
+;     code_7bc0:                    1
+;     code_7bc7:                    1
+;     code_7bce:                    1
+;     code_7bd6:                    1
+;     code_7c02:                    1
+;     code_7c11:                    1
+;     code_7c20:                    1
+;     code_7c42:                    1
+;     code_7c49:                    1
+;     code_7c50:                    1
+;     code_7c57:                    1
+;     code_7c5f:                    1
+;     code_7c6c:                    1
+;     code_7c82:                    1
+;     code_7cc2:                    1
+;     code_7cfb:                    1
+;     code_7fb5:                    1
+;     code_7fb8:                    1
+;     code_7fbd:                    1
+;     code_7fda:                    1
+;     collect_objects:              1
+;     continue_hero_step:           1
+;     continue_monster_step:        1
+;     dasmos_start:                 1
+;     data_0000:                    1
+;     data_3000:                    1
+;     decrypt_level:                1
+;     decrypt_level_done:           1
+;     decrypt_level_next:           1
+;     dissolve_chalice:             1
+;     draw_all_views:               1
+;     draw_armour_rating:           1
+;     draw_keys:                    1
+;     draw_new_missile_icon:        1
+;     draw_room_row:                1
+;     draw_status_panel:            1
+;     draw_ten_thousands_loop:      1
+;     draw_view_frames:             1
+;     drop_key:                     1
+;     erase_boots_icon:             1
+;     exit_offset_x_1:              1
+;     exit_offset_x_2:              1
+;     exit_offset_x_3:              1
+;     exit_offset_y_1:              1
+;     exit_offset_y_2:              1
+;     exit_offset_y_3:              1
+;     exit_offset_y_4:              1
+;     filev:                        1
+;     filev + 1:                    1
+;     filev_call_address:           1
+;     filev_call_address + 1:       1
+;     find_open_neighbour:          1
+;     fire_missile:                 1
+;     flip_firer_frame:             1
+;     font_digits:                  1
+;     font_letters:                 1
+;     game_over_message:            1
+;     hero_appearance_sprites:      1
+;     hero_direction - 1:           1
+;     hero_enters_exit:             1
+;     hero_faces:                   1
+;     hero_frame - 1:               1
+;     hero_health_tens - 1:         1
+;     hero_key_down:                1
+;     hero_key_fire:                1
+;     hero_key_left:                1
+;     hero_key_right:               1
+;     hero_key_up:                  1
+;     hero_magic_key:               1
+;     hero_menu:                    1
+;     hero_missile_sprites:         1
+;     hero_start_damage_taken:      1
+;     hero_start_max_missiles:      1
+;     hero_start_missile_damage:    1
+;     level_checksums:              1
+;     level_door_sprite:            1
+;     level_door_x:                 1
+;     level_door_y:                 1
+;     level_filename_digits + 1:    1
+;     level_key_x:                  1
+;     level_key_y:                  1
+;     level_loop:                   1
+;     level_object_free_map:        1
+;     level_object_type:            1
+;     level_object_x:               1
+;     level_object_y:               1
+;     level_osfile_block:           1
+;     level_osfile_block + 1:       1
+;     level_osfile_block + 2:       1
+;     level_osfile_block + 3:       1
+;     level_osfile_block + 4:       1
+;     level_osfile_block + 5:       1
+;     level_trapdoor_x:             1
+;     level_trapdoor_y:             1
+;     level_wall_sprite:            1
+;     level_walls:                  1
+;     load_level:                   1
+;     loop_091d:                    1
+;     loop_0929:                    1
+;     loop_0e09:                    1
+;     loop_0e6d:                    1
+;     loop_0ea8:                    1
+;     loop_0eae:                    1
+;     loop_0eb9:                    1
+;     loop_0efc:                    1
+;     loop_0f3a:                    1
+;     loop_1079:                    1
+;     loop_1084:                    1
+;     loop_10ba:                    1
+;     loop_10c7:                    1
+;     loop_113e:                    1
+;     loop_1140:                    1
+;     loop_11de:                    1
+;     loop_11ec:                    1
+;     loop_14a2:                    1
+;     loop_14e5:                    1
+;     loop_14ec:                    1
+;     loop_1512:                    1
+;     loop_1529:                    1
+;     loop_1540:                    1
+;     loop_1551:                    1
+;     loop_1564:                    1
+;     loop_1577:                    1
+;     loop_1585:                    1
+;     loop_159c:                    1
+;     loop_16b4:                    1
+;     loop_1d03:                    1
+;     loop_1dce:                    1
+;     loop_1ee0:                    1
+;     loop_1ee7:                    1
+;     loop_1eee:                    1
+;     loop_1f17:                    1
+;     loop_1f38:                    1
+;     loop_2009:                    1
+;     loop_2014:                    1
+;     loop_205f:                    1
+;     loop_206c:                    1
+;     loop_6f28:                    1
+;     loop_7007:                    1
+;     loop_7173:                    1
+;     loop_71dd:                    1
+;     loop_71f4:                    1
+;     loop_7256:                    1
+;     loop_730d:                    1
+;     loop_73a7:                    1
+;     loop_742b:                    1
+;     loop_7498:                    1
+;     loop_7667:                    1
+;     loop_77e4:                    1
+;     loop_77fe:                    1
+;     loop_7827:                    1
+;     loop_7976:                    1
+;     loop_7997:                    1
+;     loop_79aa:                    1
+;     loop_79cd:                    1
+;     loop_7fc5:                    1
+;     loop_7fd1:                    1
+;     loop_7fe8:                    1
+;     menu_done:                    1
+;     menu_hero_off:                1
+;     menu_reprint:                 1
+;     menu_set_sound:               1
+;     menu_sound_key:               1
+;     menu_sound_off:               1
+;     menu_space:                   1
+;     menu_space_check_hero:        1
+;     missile_spent:                1
+;     monster_reappears:            1
+;     mos_reset_entry:              1
+;     mos_row_offsets:              1
+;     mos_row_offsets_lo:           1
+;     move_heroes:                  1
+;     move_missiles:                1
+;     next_monster_update:          1
+;     object_free_map:              1
+;     object_free_map + 58:         1
+;     os_irq_a:                     1
+;     os_zp_fa:                     1
+;     panel_hero - 1:               1
+;     plot_boots_icon:              1
+;     print_menu_loop:              1
+;     print_menu_string:            1
+;     print_menu_string_loop:       1
+;     queue_exit_marker:            1
+;     remove_absent_heroes:         1
+;     remove_absent_heroes_check:   1
+;     remove_absent_heroes_loop:    1
+;     remove_absent_heroes_next:    1
+;     reset_call_address:           1
+;     reset_call_address + 1:       1
+;     reset_monsters:               1
+;     reset_vector:                 1
+;     reset_vector + 1:             1
+;     reset_workspace:              1
+;     return_1:                     1
+;     return_10:                    1
+;     return_2:                     1
+;     return_3:                     1
+;     return_4:                     1
+;     return_5:                     1
+;     return_6:                     1
+;     return_7:                     1
+;     return_8:                     1
+;     return_9:                     1
+;     room_walls + 58:              1
+;     screen_address:               1
+;     set_menu_no:                  1
+;     set_menu_off:                 1
+;     set_menu_on:                  1
+;     set_menu_yes:                 1
+;     show_level_number:            1
+;     sprite_addr_hi:               1
+;     sprite_addr_lo:               1
+;     sprite_chalice:               1
+;     sprite_chalice - 1:           1
+;     start_level:                  1
+;     start_monster_step:           1
+;     sub_7305:                     1
+;     teleport_last:                1
+;     trapdoor_x - 1:               1
+;     trapdoor_y - 1:               1
+;     unpack_level:                 1
+;     update_game:                  1
+;     update_monsters:              1
+;     update_rest:                  1
+;     victory_sequence:             1
+;     victory_sprite_copy:          1
+;     wall_sprite:                  1
+;     workspace_template:           1
 
 ; Automatically generated labels:
-;     code_041e
-;     code_045a
-;     code_046b
-;     code_05c0
-;     code_05c3
-;     code_05c9
-;     code_05d7
-;     code_05e4
-;     code_05e9
-;     code_06c9
-;     code_06f0
 ;     code_0938
 ;     code_093e
 ;     code_0961
+;     code_0d63
 ;     code_0e00
 ;     code_0e34
 ;     code_0e36
@@ -7686,12 +7689,8 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     code_7fda
 ;     code_7ff6
 ;     data_0000
+;     data_0fea
 ;     data_3000
-;     loop_0437
-;     loop_0528
-;     loop_0540
-;     loop_05cb
-;     loop_06b4
 ;     loop_091d
 ;     loop_0929
 ;     loop_0e09
@@ -7756,9 +7755,6 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     return_1
 ;     return_10
 ;     return_11
-;     return_12
-;     return_13
-;     return_14
 ;     return_2
 ;     return_3
 ;     return_4
@@ -7767,8 +7763,6 @@ save "Dunjun6", &6e80, &8000, &6e80, &6e80
 ;     return_7
 ;     return_8
 ;     return_9
-;     sub_0d63
-;     sub_0fea
 ;     sub_7305
 
 ; Stats:

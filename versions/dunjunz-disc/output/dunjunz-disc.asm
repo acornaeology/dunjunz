@@ -419,13 +419,14 @@ reset_vector             = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &00, &10
 ; &0b2a referenced 3 times by &7421, &742b, &7432; also used as index base 7 times by &3cdc, &3df4, &3dfb, &549c, &589c, &7256, &725f
 .returning_hero_queue
-; &326b referenced 2 times by &742f, &7438
-data_0b2b = returning_hero_queue+1
-; &326c referenced 2 times by &7435, &743e
-data_0b2c = returning_hero_queue+2
-; &326d referenced 2 times by &743b, &7441
-data_0b2d = returning_hero_queue+3
-    equb &03, &02, &01, &04, &10
+    equb &03
+; &0b2b referenced 2 times by &742f, &7438
+    equb &02
+; &0b2c referenced 2 times by &7435, &743e
+    equb &01
+; &0b2d referenced 2 times by &743b, &7441
+    equb &04
+    equb &10
 ; &0b2f referenced 5 times by &3bf9, &7cb3, &7cb6, &7cbf, &7cc2
 .next_trapdoor
     equb &04
@@ -448,19 +449,31 @@ data_0b2d = returning_hero_queue+3
     equb &10, &10, &10, &10, &10, &10, &10, &10
 ; &0b80 used as index base 3 times by &6f4d, &71f0, &7591
 .missile_damage
-; &32cf used as index base 1 time by &79cd
-data_0b8f = missile_damage+15
     equb &02, &02, &02, &03, &03, &04, &09, &09
-    equb &10, &03, &03, &03, &10, &10, &10, &10
+    equb &10, &03, &03, &03, &10, &10, &10
+; &0b8f used as index base 1 time by &79cd
+    equb &10
 ; &0b90 used as index base 2 times by &3c94, &7cc5
 .trapdoor_x
-; &32d7 used as index base 1 time by &79d3
-data_0b97 = trapdoor_x+7
-    equb &0b, &15, &17, &10, &03, &17, &0d, &1a
+    equb &0b
+    equb &15
+    equb &17
+    equb &10
+    equb &03
+    equb &17
+    equb &0d
+; &0b97 used as index base 1 time by &79d3
+    equb &1a
 ; &0b98 used as index base 2 times by &3c9a, &7ccb
 .trapdoor_y
-    equb &04, &0c, &14, &1d
-    equs "% (,"
+    equb &04
+    equb &0c
+    equb &14
+    equb &1d
+    equb &25
+    equb &20
+    equb &28
+    equb &2c
 ; &0ba0 used as index base 5 times by &3626, &72aa, &72ad, &72b6, &72d4
 .hero_score_hundreds
     equb &1e, &1e, &1e, &1e
@@ -488,38 +501,213 @@ data_0b97 = trapdoor_x+7
     equb &1e, &00
 .food_sound
 ; &333c referenced 2 times by &444f, &445d
-data_0bfc = food_sound+4
     equb &13, &00
     equb &02, &00
     equb &c8, &00
     equb &02, &00
 ; &0c00 used as index base 3 times by &3ca7, &7fc8, &7feb
 .room_walls
-    equs "TIKP$UTHO[KF,D]/DYW3CZD\8V\;VHRVao"
+    equb &54
+    equb &49
+    equb &4b
+    equb &50
+    equb &24
+    equb &55
+    equb &54
+    equb &48
+    equb &4f
+    equb &5b
+    equb &4b
+    equb &46
+    equb &2c
+    equb &44
+    equb &5d
+    equb &2f
+    equb &44
+    equb &59
+    equb &57
+    equb &33
+    equb &43
+    equb &5a
+    equb &44
+    equb &5c
+    equb &38
+    equb &56
+    equb &5c
+    equb &3b
+    equb &56
+    equb &48
+    equb &52
+    equb &56
+    equb &61
+    equb &6f
     equb &02
-    equs "brlu"
-    equb &07, &00, &6a, &03, &0b, &1d, &14, &16
-    equb &19, &10
-    equs "pgtafb"
-    equb &19, &71, &19
+    equb &62
+    equb &72
+    equb &6c
+    equb &75
+    equb &07
+    equb &00
+    equb &6a
+    equb &03
+    equb &0b
+    equb &1d
+    equb &14
+    equb &16
+    equb &19
+    equb &10
+    equb &70
+    equb &67
+    equb &74
+    equb &61
+    equb &66
+    equb &62
+    equb &19
+    equb &71
+    equb &19
 ; &0c3a used as index base 1 time by &37fa
-.data_0c3a
-    equs "rzjx"
-    equb &1e, &78, &09, &17, &07, &0d, &64, &0b
-    equb &09, &05, &07, &0d, &13, &6b, &1c, &08
-    equb &1c, &02, &19, &02, &01, &1a, &1b, &1b
-    equb &76, &03, &17, &79, &17, &1a, &0e, &16
-    equb &1b, &0b
-    equs "@5**7E!&%,J2)9N.>5R2:,V86<Z)9<:6"
-    equb &ce, &c6, &a2, &d7, &cc, &cc, &d5, &a7
-    equb &c1, &da, &aa, &ca, &ac, &cb, &a4, &a5
-    equb &ba, &bb, &b8, &d4, &b4, &d7, &bc, &bd
-    equb &b2, &b3, &b0, &df, &bc, &d4, &d8, &bf
-    equb &f4, &e9, &e7, &fa, &84, &e4, &f4, &e2
-    equb &88, &ea, &e5, &e5, &ff, &e4, &ea, &ea
-    equb &e2, &f8, &fc, &f4, &94, &f0, &e4, &f6
-    equb &eb, &f0, &f4, &fc, &9c, &e9, &f6, &f6
-    equb &93, &e1, &8f, &86, &97, &96, &87, &80
+    equb &72
+    equb &7a
+    equb &6a
+    equb &78
+    equb &1e
+    equb &78
+    equb &09
+    equb &17
+    equb &07
+    equb &0d
+    equb &64
+    equb &0b
+    equb &09
+    equb &05
+    equb &07
+    equb &0d
+    equb &13
+    equb &6b
+    equb &1c
+    equb &08
+    equb &1c
+    equb &02
+    equb &19
+    equb &02
+    equb &01
+    equb &1a
+    equb &1b
+    equb &1b
+    equb &76
+    equb &03
+    equb &17
+    equb &79
+    equb &17
+    equb &1a
+    equb &0e
+    equb &16
+    equb &1b
+    equb &0b
+    equb &40
+    equb &35
+    equb &2a
+    equb &2a
+    equb &37
+    equb &45
+    equb &21
+    equb &26
+    equb &25
+    equb &2c
+    equb &4a
+    equb &32
+    equb &29
+    equb &39
+    equb &4e
+    equb &2e
+    equb &3e
+    equb &35
+    equb &52
+    equb &32
+    equb &3a
+    equb &2c
+    equb &56
+    equb &38
+    equb &36
+    equb &3c
+    equb &5a
+    equb &29
+    equb &39
+    equb &3c
+    equb &3a
+    equb &36
+    equb &ce
+    equb &c6
+    equb &a2
+    equb &d7
+    equb &cc
+    equb &cc
+    equb &d5
+    equb &a7
+    equb &c1
+    equb &da
+    equb &aa
+    equb &ca
+    equb &ac
+    equb &cb
+    equb &a4
+    equb &a5
+    equb &ba
+    equb &bb
+    equb &b8
+    equb &d4
+    equb &b4
+    equb &d7
+    equb &bc
+    equb &bd
+    equb &b2
+    equb &b3
+    equb &b0
+    equb &df
+    equb &bc
+    equb &d4
+    equb &d8
+    equb &bf
+    equb &f4
+    equb &e9
+    equb &e7
+    equb &fa
+    equb &84
+    equb &e4
+    equb &f4
+    equb &e2
+    equb &88
+    equb &ea
+    equb &e5
+    equb &e5
+    equb &ff
+    equb &e4
+    equb &ea
+    equb &ea
+    equb &e2
+    equb &f8
+    equb &fc
+    equb &f4
+    equb &94
+    equb &f0
+    equb &e4
+    equb &f6
+    equb &eb
+    equb &f0
+    equb &f4
+    equb &fc
+    equb &9c
+    equb &e9
+    equb &f6
+    equb &f6
+    equb &93
+    equb &e1
+    equb &8f
+    equb &86
+    equb &97
+    equb &96
+    equb &87
+    equb &80
     equb &8d, &e7, &9e, &83, &8d, &83, &85, &90
 ; &0cd0 used as index base 7 times by &361e, &365e, &74ef, &74f2, &74f9, &75bd, &79a7
 .hero_damage_taken
@@ -529,7 +717,6 @@ data_0bfc = food_sound+4
     equb &c9, &00, &00, &00, &00, &00, &00, &00
 .hit_sound
 ; &3434 referenced 2 times by &7481, &7491
-data_0cf4 = hit_sound+4
     equb &10, &00
     equb &01, &00
     equb &06, &00
@@ -567,23 +754,26 @@ data_0cf4 = hit_sound+4
     equb &4c, &10, &0d, &0d, &a2
 ; &0d15 used as index base 26 times by &4543, &457b, &45cf, &4680, &469b, &6e9d, &6f3f, &6f5f, &6f80, &6f8e, &6f9e, &6faa, &6fc4, &6fee, &7014, &702a, &7072, &70ad, &71e8, &732f, &73f9, &7532, &7780, &79a2, &7bb6, &7bc4
 .hero_y
-; &3459 used as index base 1 time by &4657
-data_0d19 = hero_y+4
-    equb &80, &a0, &0d, &a9, &00
+    equb &80, &a0, &0d, &a9
+; &0d19 used as index base 1 time by &4657
+    equb &00
 ; &0d1a used as index base 19 times by &4526, &4692, &5480, &5880, &6e82, &6ecb, &6ede, &6ef1, &6f04, &6f2d, &6f79, &701c, &7097, &7221, &7249, &7452, &7711, &7b67, &7baf
 .hero_direction
-; &345f used as index base 1 time by &4663
-data_0d1f = hero_direction+5
-    equb &8d, &84, &0d, &8d, &85, &0d
+    equb &8d
+    equb &84
+    equb &0d
+    equb &8d, &85
+; &0d1f used as index base 1 time by &4663
+    equb &0d
 ; &0d20 referenced 2 times by &774e, &7753; also used as index base 13 times by &4533, &548a, &588a, &6f62, &6f67, &709c, &7457, &76ee, &76ff, &771f, &772e, &7ba2, &7ba7
 .hero_frame
-; &3461 referenced 2 times by &775b, &7760
-data_0d21 = hero_frame+1
-; &3462 referenced 2 times by &7768, &776d
-data_0d22 = hero_frame+2
-; &3463 referenced 2 times by &7771, &7776
-data_0d23 = hero_frame+3
-    equb &ad, &12, &02, &8d, &2f
+    equb &ad
+; &0d21 referenced 2 times by &775b, &7760
+    equb &12
+; &0d22 referenced 2 times by &7768, &776d
+    equb &02
+; &0d23 referenced 2 times by &7771, &7776
+    equb &8d, &2f
 ; &0d25 used as index base 13 times by &468d, &5485, &5885, &6e87, &6eaf, &6fc9, &6ff3, &702f, &7063, &7401, &7716, &7b64, &7baa
 .hero_step
     equb &0d, &ad, &13, &02, &8d
@@ -627,11 +817,11 @@ data_0d23 = hero_frame+3
 .missile_direction
     sta saved_wrchv                     ; ...
     lda wrchv + 1                       ; ...
-    sta data_12d4                       ; ...in saved_wrchv
+    sta saved_wrchv + 1                 ; ...in saved_wrchv
     lda #&8f                            ; Point WRCHV at wrch_handler...
-.sub_0d63
+.code_0d63
 ; &34a4 used as index base 4 times by &6f53, &7209, &76b1, &7747
-missile_sprite_base = sub_0d63+1
+missile_sprite_base = code_0d63+1
     sta wrchv                           ; ...
     lda #&7f                            ; ...
     sta wrchv + 1                       ; ...
@@ -640,9 +830,9 @@ missile_sprite_base = sub_0d63+1
 ; &0d70 used as index base 1 time by &6ec1
 .hero_key_up
     lda victory_pitch                   ; ...and level_bcd
-.sub_0d72
+.code_0d72
 ; &34b4 used as index base 1 time by &6ed4
-hero_key_down = sub_0d72+2
+hero_key_down = code_0d72+2
     sta level_bcd                       ; ...
     lda levels_started                  ; First level?
 ; &0d78 used as index base 1 time by &6ee7
@@ -659,27 +849,33 @@ hero_key_fire = code_0d7f+1
     lda #0                              ; Yes: start a new game
     jmp code_0e08                       ; ...from new_game's second instruction
     equs "eon5"
-.sub_0d88
-; &34cf used as index base 1 time by &465c
-data_0d8f = sub_0d88+7
-    equb &0d, &18, &bd, &04, &0d, &69, &03, &9d
+    equb &0d, &18, &bd, &04, &0d, &69, &03
+; &0d8f used as index base 1 time by &465c
+    equb &9d
 ; &0d90 used as index base 11 times by &35ad, &548f, &588f, &7236, &7239, &726f, &738e, &7391, &739a, &7506, &7724
 .hero_health_tens
-    equb &1d, &1d, &1d, &1d, &d0
+    equb &1d
+    equb &1d
+    equb &1d
+    equb &1d, &d0
 ; &0d95 used as index base 7 times by &7227, &722a, &7233, &727b, &739d, &750f, &7727
 .hero_health_units
     equs "''''"
     equb &18, &bd, &08, &0d, &6d, &40, &0d
 ; &0da0 referenced 2 times by &779e, &7893; also used as index base 3 times by &7043, &7544, &767c
 .view_room
-; &34e2 referenced 2 times by &77b0, &78ad
-data_0da2 = view_room+2
-; &34e4 referenced 2 times by &77c2, &78c7
-data_0da4 = view_room+4
-; &34e6 referenced 2 times by &77d4, &78e1
-data_0da6 = view_room+6
-    equb &18, &0c, &68, &0c, &28, &0c, &30, &0c
-    equb &00, &00, &bd, &04, &0d, &85, &71, &8a
+    equb &18
+    equb &0c
+; &0da2 referenced 2 times by &77b0, &78ad
+    equb &68
+    equb &0c
+; &0da4 referenced 2 times by &77c2, &78c7
+    equb &28
+    equb &0c
+; &0da6 referenced 2 times by &77d4, &78e1
+    equb &30
+    equb &0c, &00, &00, &bd, &04, &0d, &85, &71
+    equb &8a
 ; &0db0 used as index base 1 time by &6f50
 .hero_missile_sprites
     equb &10
@@ -782,7 +978,7 @@ data_0da6 = view_room+6
     lda #&20 ; ' '                      ; ...
 ; &0ea8 referenced 1 time by &35ec
 .code_0ea8
-    sta data_0ff0,x                     ; ...
+    sta panel_hero - 1,x                ; ...
     dex                                 ; ...
     bne code_0ea8                       ; ...
 ; &0eae referenced 1 time by &35f7
@@ -956,13 +1152,12 @@ data_0da6 = view_room+6
     equb &0d
     equs "MOOD TO RESURRECT"
     equb &0d
-.sub_0fea
+.data_0fea
 ; &3730 used as index base 1 time by &35e8
-data_0ff0 = sub_0fea+6
 ; &3731 referenced 8 times by &3639, &363c, &3658, &3668, &368d, &369d, &36a0, &36ad
-panel_hero = sub_0fea+7
+panel_hero = data_0fea+7
 ; &3732 referenced 5 times by &35aa, &35b7, &35bf, &3675, &3688
-count = sub_0fea+8
+count = data_0fea+8
     equs "YOU ALL.         "
     equb &0d
     equs "NEW ADVENTURERS  "
@@ -1036,7 +1231,7 @@ count = sub_0fea+8
     ldx #0                              ; Print 140 bytes from room_walls + &3A...
 ; &10ba referenced 1 time by &3803
 .code_10ba
-    lda data_0c3a,x                     ; ...
+    lda room_walls + 58,x               ; ...
     jsr osasci                          ; ...
     inx                                 ; ...
     cpx #&8c                            ; ...
@@ -1055,12 +1250,11 @@ count = sub_0fea+8
     lda reset_vector                    ; Copy the RESET vector into the JSR below...
     sta reset_call_address              ; ...
     lda reset_vector + 1                ; ...
-    sta data_10e8                       ; ...
+    sta reset_call_address + 1          ; ...
 .reset_call
 ; &3827 referenced 1 time by &381d
 reset_call_address = reset_call+1
 ; &3828 referenced 1 time by &3823
-data_10e8 = reset_call+2
     jsr data_0000                       ; ...and call it: reset the machine
 ; ***************************************************************************************
 ; Play the victory sequence
@@ -1226,7 +1420,7 @@ data_10e8 = reset_call+2
     lda #0                              ; ...
 ; &11de referenced 1 time by &3922
 .code_11de
-    sta data_120f,x                     ; ...
+    sta sprite_chalice - 1,x            ; ...
     dex                                 ; ...
     bne code_11de                       ; ...
     jsr plot_chalice                    ; ...and redraw it, now blank
@@ -1251,10 +1445,9 @@ data_10e8 = reset_call+2
     sta sprite_number                   ; ...
     jsr plot_at_cell                    ; ...plotted in every view showing it
     rts                                 ; Return
-.sub_1204
-; &394f used as index base 1 time by &391e
-data_120f = sub_1204+11
-    equs "Rx`(&1900+F%"
+    equs "Rx`(&1900+F"
+; &120f used as index base 1 time by &391e
+    equb &25
 ; &1210 used as index base 1 time by &390c
 .sprite_chalice
     equb &00, &00, &05, &0f, &0f, &0a, &00, &00
@@ -1284,9 +1477,9 @@ data_120f = sub_1204+11
     equb &3d, &26, &00
 ; &12d3 referenced 2 times by &3498, &3c17
 .saved_wrchv
-; &3a14 referenced 2 times by &349e, &3c1d
-data_12d4 = saved_wrchv+1
-    equb &a4, &e0, &00, &73
+    equb &a4
+; &12d4 referenced 2 times by &349e, &3c1d
+    equb &e0, &00, &73
 ; ***************************************************************************************
 ; Font: letters A-Z
 ;
@@ -1504,7 +1697,7 @@ data_12d4 = saved_wrchv+1
 .draw_view_frames
     lda saved_wrchv                     ; Restore the MOS's own WRCHV for the PLOT commands...
     sta wrchv                           ; ...
-    lda data_12d4                       ; ...
+    lda saved_wrchv + 1                 ; ...
     sta wrchv + 1                       ; ...
     ldx #&14                            ; Twenty PLOT commands
 ; &14e5 referenced 1 time by &3c40
@@ -1681,9 +1874,9 @@ data_12d4 = saved_wrchv+1
     jsr oswrch                          ; ...
     lda #0                              ; ...
     jsr oswrch                          ; ...
-.sub_1624
+.code_1624
 ; &3d65 referenced 1 time by &3b8b
-data_1625 = sub_1624+1
+data_1625 = code_1624+1
     lda #&16                            ; ...
     jsr oswrch                          ; ...
     lda #&13                            ; ...
@@ -1752,8 +1945,9 @@ data_1625 = sub_1624+1
     equb &00, &00, &00, &31, &00, &8d
     equs "LEVEL"
 .level_filename_digits
-    equb &31, &0d, &0d, &70, &00, &8d, &35, &f8
-    equb &00, &00, &00, &00
+    equb &31
+    equb &0d, &0d, &70, &00, &8d, &35, &f8, &00
+    equb &00, &00, &00
     equs "code"
     equb &00, &54, &12, &03, &17, &74, &00, &8c
     equb &50, &00, &00, &00, &fa, &16, &78, &00
@@ -2173,13 +2367,13 @@ data_1625 = sub_1624+1
     dey                                 ; ...
     bne code_1d03                       ; ...
     lda #&96                            ; ...play the food sound at a lower pitch...
-    sta data_0bfc                       ; ...
+    sta food_sound + 4                  ; ...
     ldx #<(food_sound)                  ; ...
     ldy #>(food_sound)                  ; ...
     lda #osword_sound                   ; ...
     jsr osword                          ; ...  SOUND command
     lda #&c8                            ; ...and put its pitch back
-    sta data_0bfc                       ; ...
+    sta food_sound + 4                  ; ...
     lda cell_y                          ; Keep the door's cell in spare bytes beyond the monster tables, as plot_at_cell changes cell_x and cell_y...
     sta monster_y + 35                  ; ...
     lda cell_x                          ; ...
@@ -2462,12 +2656,12 @@ data_1625 = sub_1624+1
     ldx #4                              ; Is any hero in play, or still dying?
 ; &1f17 referenced 1 time by &466b
 .code_1f17
-    lda data_0d19,x                     ; In play?
+    lda hero_direction - 1,x            ; In play?
     bne code_1f36                       ; Yes: carry on
-    lda data_0d8f,x                     ; Dead...
+    lda hero_health_tens - 1,x          ; Dead...
     cmp #&1d                            ; ...
     bne code_1f2a                       ; ...
-    lda data_0d1f,x                     ; ...with the death animation unfinished?
+    lda hero_frame - 1,x                ; ...with the death animation unfinished?
     cmp #8                              ; ...
     bcc code_1f36                       ; Yes: carry on
 ; &1f2a referenced 1 time by &4661
@@ -2782,17 +2976,17 @@ data_1625 = sub_1624+1
     inc hero_score_thousands,x          ; Add one to the thousands digit
     lda hero_score_thousands,x          ; ...
     cmp #&28 ; '('                      ; Past 9?
-    bne data_0447                       ; No: return
+    bne add_thousand_points_done        ; No: return
     lda #&1e                            ; Yes: thousands 0...
     sta hero_score_thousands,x          ; ...
-    inc data_06f8,x                     ; ...and add one to the ten-thousands digit
-    lda data_06f8,x                     ; ...
+    inc page6_score_ten_thousands,x     ; ...and add one to the ten-thousands digit
+    lda page6_score_ten_thousands,x     ; ...
     cmp #&73 ; 's'                      ; Past 9?
-    bne data_041e                       ; No
+    bne draw_ten_thousands              ; No
     lda #&72 ; 'r'                      ; Yes: keep it at 9
-    sta data_06f8,x                     ; ...
+    sta page6_score_ten_thousands,x     ; ...
 ; &041e referenced 4 times by &51c7, &5472, &55c7, &5872
-.data_041e
+.draw_ten_thousands
     sta sprite_number                   ; Plot it below the score...
     lda #&45 ; 'E'                      ; ...
     sta plot_x                          ; ...
@@ -2807,7 +3001,7 @@ data_1625 = sub_1624+1
     sta sprite_number                   ; ...
     ldy #4                              ; ...
 ; &0437 referenced 2 times by &51f3, &55f3
-.data_0437
+.draw_ten_thousands_loop
     tya                                 ; ...
     pha                                 ; ...
     inc plot_x                          ; ...
@@ -2816,11 +3010,11 @@ data_1625 = sub_1624+1
     pla                                 ; ...
     tay                                 ; ...
     dey                                 ; ...
-    bne data_0437                       ; ...
+    bne draw_ten_thousands_loop         ; ...
     pla                                 ; ...
     tax                                 ; ...
 ; &0447 referenced 2 times by &51b8, &55b8
-.data_0447
+.add_thousand_points_done
     rts                                 ; Return
     equb &00, &00, &00, &00, &00, &00, &00, &00
 ; ***************************************************************************************
@@ -2840,7 +3034,7 @@ data_1625 = sub_1624+1
     lda #&6b ; 'k'                      ; ...
     sta plot_y                          ; ...high byte
 ; &045a referenced 4 times by &521f, &5225, &561f, &5625
-.data_045a
+.decrypt_level_loop
     lda (plot_x),y                      ; Fetch a byte...
     eor plot_x                          ; ...XOR it with the low byte of its address...
     sta (plot_x),y                      ; ...and store it back decrypted
@@ -2848,23 +3042,23 @@ data_1625 = sub_1624+1
     adc sprite_width                    ; ...
     sta sprite_width                    ; ...
     inc plot_x                          ; Next byte...
-    bne data_046b                       ; ...
+    bne decrypt_level_next              ; ...
     inc plot_y                          ; ...with carry into the high byte
 ; &046b referenced 2 times by &5217, &5617
-.data_046b
+.decrypt_level_next
     lda plot_x                          ; Stop at &6DB0, the end of the level...
     cmp #&b0                            ; ...
-    bne data_045a                       ; ...
+    bne decrypt_level_loop              ; ...
     lda plot_y                          ; ...
     cmp #&6d ; 'm'                      ; ...
-    bne data_045a                       ; ...
+    bne decrypt_level_loop              ; ...
     ldx level_number                    ; X = level number
     lda sprite_width                    ; Compare the sum...
     cmp level_checksums,x               ; ...with this level's checksum
-    beq data_0484                       ; Match: return
+    beq decrypt_level_done              ; Match: return
     jsr mos_reset_entry                 ; No match: reset the machine (MOS 1.20 only)
 ; &0484 referenced 2 times by &522f, &562f
-.data_0484
+.decrypt_level_done
     rts                                 ; Return
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00
@@ -2930,10 +3124,10 @@ data_1625 = sub_1624+1
     ldx #&0f                            ; Fifteen strings, then one more by falling through
     ldy #0                              ; ...
 ; &0528 referenced 2 times by &52dc, &56dc
-.data_0528
+.print_menu_loop
     jsr print_menu_string               ; ...
     dex                                 ; ...
-    bne data_0528                       ; ...
+    bne print_menu_loop                 ; ...
 ; ***************************************************************************************
 ; Print one menu string
 ;
@@ -2955,12 +3149,12 @@ data_1625 = sub_1624+1
     lda menu_text,y                     ; ...and row
     jsr oswrch                          ; ...
 ; &0540 referenced 2 times by &52f9, &56f9
-.data_0540
+.print_menu_string_loop
     iny                                 ; Print the characters...
     lda menu_text,y                     ; ...
     jsr oswrch                          ; ...
     cmp #&0d                            ; ...up to and including the carriage return
-    bne data_0540                       ; ...
+    bne print_menu_string_loop          ; ...
     iny                                 ; Point at the next string
     rts                                 ; Return
 ; ***************************************************************************************
@@ -2975,9 +3169,9 @@ data_1625 = sub_1624+1
     lda #&4e ; 'N'                      ; "NO "
     sta menu_text,y                     ; ...
     lda #&4f ; 'O'                      ; ...
-    sta data_0601,y                     ; ...
+    sta menu_text + 1,y                 ; ...
     lda #&20 ; ' '                      ; ...
-    sta data_0602,y                     ; ...
+    sta menu_text + 2,y                 ; ...
     rts                                 ; Return
 ; ***************************************************************************************
 ; Change a menu entry to YES
@@ -2991,9 +3185,9 @@ data_1625 = sub_1624+1
     lda #&59 ; 'Y'                      ; "YES"
     sta menu_text,y                     ; ...
     lda #&45 ; 'E'                      ; ...
-    sta data_0601,y                     ; ...
+    sta menu_text + 1,y                 ; ...
     lda #&53 ; 'S'                      ; ...
-    sta data_0602,y                     ; ...
+    sta menu_text + 2,y                 ; ...
     rts                                 ; Return
 ; ***************************************************************************************
 ; Change the sound entry to OFF
@@ -3006,7 +3200,7 @@ data_1625 = sub_1624+1
 .set_menu_off
     lda #&46 ; 'F'                      ; "FF" after the O
     sta menu_text,y                     ; ...
-    sta data_0601,y                     ; ...
+    sta menu_text + 1,y                 ; ...
     rts                                 ; Return
 ; ***************************************************************************************
 ; Change the sound entry to ON
@@ -3020,7 +3214,7 @@ data_1625 = sub_1624+1
     lda #&4e ; 'N'                      ; "N " after the O
     sta menu_text,y                     ; ...
     lda #&20 ; ' '                      ; ...
-    sta data_0601,y                     ; ...
+    sta menu_text + 1,y                 ; ...
     rts                                 ; Return
 ; &0581 referenced 12 times by &52d1, &5348, &534c, &5376, &5383, &53a3, &56d1, &5748, &574c, &5776, &5783, &57a3
 .menu_key_loop
@@ -3032,7 +3226,7 @@ data_1625 = sub_1624+1
     jsr osbyte                          ; ...  osbyte: kbd status
     jsr osrdch                          ; Wait for a key
     cmp #&20 ; ' '                      ; SPACE?
-    beq data_05c9                       ; Yes: start, if anyone is playing
+    beq menu_space                      ; Yes: start, if anyone is playing
     cmp #&31 ; '1'                      ; Ignore anything but 1-6
     bcc menu_key_loop                   ; ...
     cmp #&37 ; '7'                      ; ...
@@ -3041,7 +3235,7 @@ data_1625 = sub_1624+1
     sbc #&31 ; '1'                      ; ...
     tax                                 ; ...
     cmp #4                              ; 5 or 6: the sound
-    bcs data_05d7                       ; ...
+    bcs menu_sound_key                  ; ...
     asl a                               ; 1-4: Y = offset of the hero's YES/NO, 6 x X + &51...
     sta plot_x                          ; ...
     asl a                               ; ...
@@ -3052,43 +3246,43 @@ data_1625 = sub_1624+1
     lda hero_absent,x                   ; Toggle the hero
     eor #1                              ; ...
     sta hero_absent,x                   ; ...
-    bne data_05c0                       ; Now absent?
+    bne menu_hero_off                   ; Now absent?
     jsr set_menu_yes                    ; No: YES
-    jmp data_05c3                       ; ...
+    jmp menu_reprint                    ; ...
 ; &05c0 referenced 2 times by &5368, &5768
-.data_05c0
+.menu_hero_off
     jsr set_menu_no                     ; Yes: NO
 ; &05c3 referenced 2 times by &536d, &576d
-.data_05c3
+.menu_reprint
     jsr print_menu                      ; Reprint the menu
     jmp menu_key_loop                   ; Next key
 ; &05c9 referenced 2 times by &5344, &5744
-.data_05c9
+.menu_space
     ldx #3                              ; SPACE: is any hero playing?
 ; &05cb referenced 2 times by &5381, &5781
-.data_05cb
+.menu_space_check_hero
     lda hero_absent,x                   ; ...
-    beq data_05d6                       ; Yes: return and start
+    beq menu_done                       ; Yes: return and start
     dex                                 ; ...
-    bpl data_05cb                       ; ...
+    bpl menu_space_check_hero           ; ...
     jmp menu_key_loop                   ; No: next key
 ; &05d6 referenced 2 times by &537e, &577e
-.data_05d6
+.menu_done
     rts                                 ; Return
 ; &05d7 referenced 2 times by &5354, &5754
-.data_05d7
+.menu_sound_key
     ldy #&99                            ; Sound: Y = offset of the second letter of ON/OFF
     cmp #5                              ; Key 6 (A = key - "1")?
-    beq data_05e4                       ; Yes
+    beq menu_sound_off                  ; Yes
     jsr set_menu_on                     ; Key 5: ON...
     ldx #0                              ; ...with X = 0 to enable the sound
-    beq data_05e9                       ; ...
+    beq menu_set_sound                  ; ...
 ; &05e4 referenced 2 times by &538b, &578b
-.data_05e4
+.menu_sound_off
     jsr set_menu_off                    ; Key 6: OFF...
     ldx #1                              ; ...with X = 1 to suppress it
 ; &05e9 referenced 2 times by &5392, &5792
-.data_05e9
+.menu_set_sound
     lda #osbyte_sound_suppression       ; OSBYTE &D2: sound suppression
     ldy #0                              ; ...
     jsr osbyte                          ; ...  osbyte: sound suppression
@@ -3103,10 +3297,8 @@ data_1625 = sub_1624+1
 ; &0600 used as index base 14 times by &52e3, &52ea, &52f1, &52ff, &530f, &531f, &5328, &56e3, &56ea, &56f1, &56ff, &570f, &571f, &5728
 .menu_text
 ; &53b1 used as index base 8 times by &5304, &5314, &5322, &532d, &5704, &5714, &5722, &572d
-data_0601 = menu_text+1
     equb &06, &00
 ; &0602 used as index base 4 times by &5309, &5319, &5709, &5719
-.data_0602
     equs "DUNJUNZ"
     equb &0d
     equb &00, &02
@@ -3165,24 +3357,24 @@ data_0601 = menu_text+1
     ldx #0                              ; For each hero, keeping a count of absent heroes in Y...
     ldy #0                              ; ...
 ; &06b4 referenced 2 times by &54a3, &58a3
-.data_06b4
+.remove_absent_heroes_loop
     lda hero_score_ten_thousands,x      ; Score of 10000 or more?
     cmp #&6a ; 'j'                      ; ...
-    bcc data_06c9                       ; No
+    bcc remove_absent_heroes_check      ; No
     txa                                 ; Yes: draw the ten-thousands digit
     pha                                 ; ...
     tya                                 ; ...
     pha                                 ; ...
     lda hero_score_ten_thousands,x      ; ...
-    jsr data_041e                       ; ...
+    jsr draw_ten_thousands              ; ...
     pla                                 ; ...
     tay                                 ; ...
     pla                                 ; ...
     tax                                 ; ...
 ; &06c9 referenced 2 times by &5469, &5869
-.data_06c9
+.remove_absent_heroes_check
     lda hero_absent,x                   ; Switched off on the menu?
-    beq data_06f0                       ; No
+    beq remove_absent_heroes_next       ; No
     lda #0                              ; Yes: out of play...
     sta hero_direction,x                ; ...
     lda #&63 ; 'c'                      ; ...never to be animated (step &63)...
@@ -3198,14 +3390,14 @@ data_0601 = menu_text+1
     sta returning_hero_queue,y          ; ...
     iny                                 ; ...
 ; &06f0 referenced 2 times by &547c, &587c
-.data_06f0
+.remove_absent_heroes_next
     inx                                 ; Next hero
     cpx #4                              ; ...
-    bne data_06b4                       ; ...
+    bne remove_absent_heroes_loop       ; ...
     rts                                 ; Return
     equb &00, &00
 ; &06f8 used as index base 6 times by &51bf, &51c2, &51cb, &55bf, &55c2, &55cb
-.data_06f8
+.page6_score_ten_thousands
     equs "iiii"
     equb &00, &00, &00, &00
     equs "*SA. DANK 400+3FF 740"
@@ -3270,18 +3462,20 @@ data_0601 = menu_text+1
 ;
 ; On Exit:
 ;     X: preserved
+.add_thousand_points_joystick
     inc hero_score_thousands,x          ; Add one to the thousands digit
     lda hero_score_thousands,x          ; ...
     cmp #&28 ; '('                      ; Past 9?
-    bne data_0447                       ; No: return
+    bne add_thousand_points_done_joystick  ; No: return
     lda #&1e                            ; Yes: thousands 0...
     sta hero_score_thousands,x          ; ...
-    inc data_06f8,x                     ; ...and add one to the ten-thousands digit
-    lda data_06f8,x                     ; ...
+    inc page6_score_ten_thousands_joystick,x  ; ...and add one to the ten-thousands digit
+    lda page6_score_ten_thousands_joystick,x  ; ...
     cmp #&73 ; 's'                      ; Past 9?
-    bne data_041e                       ; No
+    bne draw_ten_thousands_joystick     ; No
     lda #&72 ; 'r'                      ; Yes: keep it at 9
-    sta data_06f8,x                     ; ...
+    sta page6_score_ten_thousands_joystick,x  ; ...
+.draw_ten_thousands_joystick
     sta sprite_number                   ; Plot it below the score...
     lda #&45 ; 'E'                      ; ...
     sta plot_x                          ; ...
@@ -3295,6 +3489,7 @@ data_0601 = menu_text+1
     lda #&71 ; 'q'                      ; ...with four of sprite &71 beside it
     sta sprite_number                   ; ...
     ldy #4                              ; ...
+.draw_ten_thousands_loop_joystick
     tya                                 ; ...
     pha                                 ; ...
     inc plot_x                          ; ...
@@ -3303,9 +3498,10 @@ data_0601 = menu_text+1
     pla                                 ; ...
     tay                                 ; ...
     dey                                 ; ...
-    bne data_0437                       ; ...
+    bne draw_ten_thousands_loop_joystick  ; ...
     pla                                 ; ...
     tax                                 ; ...
+.add_thousand_points_done_joystick
     rts                                 ; Return
     equb &00, &00, &00, &00, &00, &00, &00, &00
 ; ***************************************************************************************
@@ -3317,11 +3513,13 @@ data_0601 = menu_text+1
 ;
 ; On Entry:
 ;     LEVEL_NUMBER: level loaded (1-25)
+.decrypt_level_joystick
     ldy #0                              ; Point at &6B00, the start of the level...
     sty plot_x                          ; ...low byte
     sty sprite_width                    ; Start the sum at zero
     lda #&6b ; 'k'                      ; ...
     sta plot_y                          ; ...high byte
+.decrypt_level_loop_joystick
     lda (plot_x),y                      ; Fetch a byte...
     eor plot_x                          ; ...XOR it with the low byte of its address...
     sta (plot_x),y                      ; ...and store it back decrypted
@@ -3329,19 +3527,21 @@ data_0601 = menu_text+1
     adc sprite_width                    ; ...
     sta sprite_width                    ; ...
     inc plot_x                          ; Next byte...
-    bne data_046b                       ; ...
+    bne decrypt_level_next_joystick     ; ...
     inc plot_y                          ; ...with carry into the high byte
+.decrypt_level_next_joystick
     lda plot_x                          ; Stop at &6DB0, the end of the level...
     cmp #&b0                            ; ...
-    bne data_045a                       ; ...
+    bne decrypt_level_loop_joystick     ; ...
     lda plot_y                          ; ...
     cmp #&6d ; 'm'                      ; ...
-    bne data_045a                       ; ...
+    bne decrypt_level_loop_joystick     ; ...
     ldx level_number                    ; X = level number
     lda sprite_width                    ; Compare the sum...
     cmp level_checksums,x               ; ...with this level's checksum
-    beq data_0484                       ; Match: return
+    beq decrypt_level_done_joystick     ; Match: return
     jsr mos_reset_entry                 ; No match: reset the machine (MOS 1.20 only)
+.decrypt_level_done_joystick
     rts                                 ; Return
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00
@@ -3360,6 +3560,7 @@ data_0601 = menu_text+1
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00
+.sprite_blank_joystick
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
@@ -3379,6 +3580,7 @@ data_0601 = menu_text+1
 ; Clear the left of the screen, print the menu and let the players toggle each hero (keys
 ; 1-4) and the sound (5 on, 6 off). SPACE starts the game if at least one hero is
 ; playing.
+.hero_menu_joystick
     lda #&1c                            ; VDU 28: a text window over the left of the screen...
     jsr oswrch                          ; ...
     lda #0                              ; ...
@@ -3391,17 +3593,19 @@ data_0601 = menu_text+1
     jsr oswrch                          ; ...
     lda #&0c                            ; ...VDU 12 to clear it
     jsr oswrch                          ; ...
-    jsr print_menu                      ; Print the menu
-    jmp menu_key_loop                   ; Read the players' choices
+    jsr print_menu_joystick             ; Print the menu
+    jmp menu_key_loop_joystick          ; Read the players' choices
 ; ***************************************************************************************
 ; Print the menu text
 ;
 ; Print the sixteen positioned strings of menu_text.
+.print_menu_joystick
     ldx #&0f                            ; Fifteen strings, then one more by falling through
     ldy #0                              ; ...
-    jsr print_menu_string               ; ...
+.print_menu_loop_joystick
+    jsr print_menu_string_joystick      ; ...
     dex                                 ; ...
-    bne data_0528                       ; ...
+    bne print_menu_loop_joystick        ; ...
 ; ***************************************************************************************
 ; Print one menu string
 ;
@@ -3413,18 +3617,20 @@ data_0601 = menu_text+1
 ;
 ; On Exit:
 ;     Y: offset of the next string
+.print_menu_string_joystick
     lda #&1f                            ; VDU 31: move the text cursor...
     jsr oswrch                          ; ...
-    lda menu_text,y                     ; ...to the string's column...
+    lda menu_text_joystick,y            ; ...to the string's column...
     jsr oswrch                          ; ...
     iny                                 ; ...
-    lda menu_text,y                     ; ...and row
+    lda menu_text_joystick,y            ; ...and row
     jsr oswrch                          ; ...
+.print_menu_string_loop_joystick
     iny                                 ; Print the characters...
-    lda menu_text,y                     ; ...
+    lda menu_text_joystick,y            ; ...
     jsr oswrch                          ; ...
     cmp #&0d                            ; ...up to and including the carriage return
-    bne data_0540                       ; ...
+    bne print_menu_string_loop_joystick ; ...
     iny                                 ; Point at the next string
     rts                                 ; Return
 ; ***************************************************************************************
@@ -3434,12 +3640,13 @@ data_0601 = menu_text+1
 ;
 ; On Entry:
 ;     Y: offset of the entry
+.set_menu_no_joystick
     lda #&4e ; 'N'                      ; "NO "
-    sta menu_text,y                     ; ...
+    sta menu_text_joystick,y            ; ...
     lda #&4f ; 'O'                      ; ...
-    sta data_0601,y                     ; ...
+    sta menu_text + 1,y                 ; ...
     lda #&20 ; ' '                      ; ...
-    sta data_0602,y                     ; ...
+    sta menu_text + 2,y                 ; ...
     rts                                 ; Return
 ; ***************************************************************************************
 ; Change a menu entry to YES
@@ -3448,12 +3655,13 @@ data_0601 = menu_text+1
 ;
 ; On Entry:
 ;     Y: offset of the entry
+.set_menu_yes_joystick
     lda #&59 ; 'Y'                      ; "YES"
-    sta menu_text,y                     ; ...
+    sta menu_text_joystick,y            ; ...
     lda #&45 ; 'E'                      ; ...
-    sta data_0601,y                     ; ...
+    sta menu_text + 1,y                 ; ...
     lda #&53 ; 'S'                      ; ...
-    sta data_0602,y                     ; ...
+    sta menu_text + 2,y                 ; ...
     rts                                 ; Return
 ; ***************************************************************************************
 ; Change the sound entry to OFF
@@ -3462,9 +3670,10 @@ data_0601 = menu_text+1
 ;
 ; On Entry:
 ;     Y: offset of the entry's second character
+.set_menu_off_joystick
     lda #&46 ; 'F'                      ; "FF" after the O
-    sta menu_text,y                     ; ...
-    sta data_0601,y                     ; ...
+    sta menu_text_joystick,y            ; ...
+    sta menu_text + 1,y                 ; ...
     rts                                 ; Return
 ; ***************************************************************************************
 ; Change the sound entry to ON
@@ -3473,11 +3682,13 @@ data_0601 = menu_text+1
 ;
 ; On Entry:
 ;     Y: offset of the entry's second character
+.set_menu_on_joystick
     lda #&4e ; 'N'                      ; "N " after the O
-    sta menu_text,y                     ; ...
+    sta menu_text_joystick,y            ; ...
     lda #&20 ; ' '                      ; ...
-    sta data_0601,y                     ; ...
+    sta menu_text + 1,y                 ; ...
     rts                                 ; Return
+.menu_key_loop_joystick
     lda #osbyte_flush_buffer_class      ; Flush the input buffers
     jsr osbyte                          ; ...  Flush selected class of buffer
     lda #osbyte_kbd_status              ; OSBYTE &CA: keyboard status &20, CAPS LOCK on and SHIFT LOCK off
@@ -3486,16 +3697,16 @@ data_0601 = menu_text+1
     jsr osbyte                          ; ...  osbyte: kbd status
     jsr osrdch                          ; Wait for a key
     cmp #&20 ; ' '                      ; SPACE?
-    beq data_05c9                       ; Yes: start, if anyone is playing
+    beq menu_space_joystick             ; Yes: start, if anyone is playing
     cmp #&31 ; '1'                      ; Ignore anything but 1-6
-    bcc menu_key_loop                   ; ...
+    bcc menu_key_loop_joystick          ; ...
     cmp #&37 ; '7'                      ; ...
-    bcs menu_key_loop                   ; ...
+    bcs menu_key_loop_joystick          ; ...
     sec                                 ; X = 0-5
     sbc #&31 ; '1'                      ; ...
     tax                                 ; ...
     cmp #4                              ; 5 or 6: the sound
-    bcs data_05d7                       ; ...
+    bcs menu_sound_key_joystick         ; ...
     asl a                               ; 1-4: Y = offset of the hero's YES/NO, 6 x X + &51...
     sta plot_x                          ; ...
     asl a                               ; ...
@@ -3506,39 +3717,49 @@ data_0601 = menu_text+1
     lda hero_absent,x                   ; Toggle the hero
     eor #1                              ; ...
     sta hero_absent,x                   ; ...
-    bne data_05c0                       ; Now absent?
-    jsr set_menu_yes                    ; No: YES
-    jmp data_05c3                       ; ...
-    jsr set_menu_no                     ; Yes: NO
-    jsr print_menu                      ; Reprint the menu
-    jmp menu_key_loop                   ; Next key
+    bne menu_hero_off_joystick          ; Now absent?
+    jsr set_menu_yes_joystick           ; No: YES
+    jmp menu_reprint_joystick           ; ...
+.menu_hero_off_joystick
+    jsr set_menu_no_joystick            ; Yes: NO
+.menu_reprint_joystick
+    jsr print_menu_joystick             ; Reprint the menu
+    jmp menu_key_loop_joystick          ; Next key
+.menu_space_joystick
     ldx #3                              ; SPACE: is any hero playing?
+.menu_space_check_hero_joystick
     lda hero_absent,x                   ; ...
-    beq data_05d6                       ; Yes: return and start
+    beq menu_done_joystick              ; Yes: return and start
     dex                                 ; ...
-    bpl data_05cb                       ; ...
-    jmp menu_key_loop                   ; No: next key
+    bpl menu_space_check_hero_joystick  ; ...
+    jmp menu_key_loop_joystick          ; No: next key
+.menu_done_joystick
     rts                                 ; Return
+.menu_sound_key_joystick
     ldy #&99                            ; Sound: Y = offset of the second letter of ON/OFF
     cmp #5                              ; Key 6 (A = key - "1")?
-    beq data_05e4                       ; Yes
-    jsr set_menu_on                     ; Key 5: ON...
+    beq menu_sound_off_joystick         ; Yes
+    jsr set_menu_on_joystick            ; Key 5: ON...
     ldx #0                              ; ...with X = 0 to enable the sound
-    beq data_05e9                       ; ...
-    jsr set_menu_off                    ; Key 6: OFF...
+    beq menu_set_sound_joystick         ; ...
+.menu_sound_off_joystick
+    jsr set_menu_off_joystick           ; Key 6: OFF...
     ldx #1                              ; ...with X = 1 to suppress it
+.menu_set_sound_joystick
     lda #osbyte_sound_suppression       ; OSBYTE &D2: sound suppression
     ldy #0                              ; ...
     jsr osbyte                          ; ...  osbyte: sound suppression
-    jsr print_menu                      ; Reprint the menu
-    jmp menu_key_loop                   ; Next key
+    jsr print_menu_joystick             ; Reprint the menu
+    jmp menu_key_loop_joystick          ; Next key
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &4f
 ; ***************************************************************************************
 ; Hero menu text
 ;
 ; Sixteen entries of: column, row, text, carriage return; printed by print_menu.
+.menu_text_joystick
     equb &06, &00
+; &0602 used as index base 4 times by &5309, &5319, &5709, &5719
     equs "DUNJUNZ"
     equb &0d
     equb &00, &02
@@ -3592,23 +3813,26 @@ data_0601 = menu_text+1
 ;
 ; Draw any ten-thousands score digits, then put every hero switched off on the menu out
 ; of play, with a &64 entry in returning_hero_queue in their place.
+.remove_absent_heroes_joystick
     ldx #0                              ; For each hero, keeping a count of absent heroes in Y...
     ldy #0                              ; ...
+.remove_absent_heroes_loop_joystick
     lda hero_score_ten_thousands,x      ; Score of 10000 or more?
     cmp #&6a ; 'j'                      ; ...
-    bcc data_06c9                       ; No
+    bcc remove_absent_heroes_check_joystick  ; No
     txa                                 ; Yes: draw the ten-thousands digit
     pha                                 ; ...
     tya                                 ; ...
     pha                                 ; ...
     lda hero_score_ten_thousands,x      ; ...
-    jsr data_041e                       ; ...
+    jsr draw_ten_thousands_joystick     ; ...
     pla                                 ; ...
     tay                                 ; ...
     pla                                 ; ...
     tax                                 ; ...
+.remove_absent_heroes_check_joystick
     lda hero_absent,x                   ; Switched off on the menu?
-    beq data_06f0                       ; No
+    beq remove_absent_heroes_next_joystick  ; No
     lda #0                              ; Yes: out of play...
     sta hero_direction,x                ; ...
     lda #&63 ; 'c'                      ; ...never to be animated (step &63)...
@@ -3623,11 +3847,13 @@ data_0601 = menu_text+1
     lda #&64 ; 'd'                      ; ...and a &64 marker in the returning queue
     sta returning_hero_queue,y          ; ...
     iny                                 ; ...
+.remove_absent_heroes_next_joystick
     inx                                 ; Next hero
     cpx #4                              ; ...
-    bne data_06b4                       ; ...
+    bne remove_absent_heroes_loop_joystick  ; ...
     rts                                 ; Return
     equb &00, &00
+.page6_score_ten_thousands_joystick
     equs "iiii"
     equb &00, &00, &00, &00
     equs "*SA. Control 400+3FF"
@@ -3658,74 +3884,75 @@ data_0601 = menu_text+1
 ;
 ; On Exit:
 ;     X: &FF if the key is pressed, 0 if not
+.joystick_bytev
     cmp #&81                            ; OSBYTE &81 (INKEY)?
-    bne data_07e9                       ; No: pass it on
+    bne code_07e9                       ; No: pass it on
     cpx #&98                            ; Left key (>)?
-    beq data_079b                       ; ...
+    beq code_079b                       ; ...
     cpx #&99                            ; Down key (<)?
-    beq data_07c6                       ; ...
+    beq code_07c6                       ; ...
     cpx #&b9                            ; Up key (K)?
-    beq data_07b8                       ; ...
+    beq code_07b8                       ; ...
     cpx #&97                            ; Right key (?)?
-    beq data_07a9                       ; ...
+    beq code_07a9                       ; ...
     cpx #&9d                            ; Fire key (SPACE)?
-    beq data_07d5                       ; ...
+    beq code_07d5                       ; ...
     jmp mos_osbyte_default              ; Another key: pass it on
 ; &079b referenced 1 time by &5936
-.data_079b
+.code_079b
     ldx #1                              ; Left: channel 1 high byte &FF?
     lda #osbyte_read_adc_or_get_buffer_status  ; ...
     jsr osbyte                          ; Read ADC channel X or buffer status
     cpy #&ff                            ; ...
-    bne data_07e6                       ; No: not pressed
+    bne code_07e6                       ; No: not pressed
     ldx #&ff                            ; Yes: pressed
     rts                                 ; Return
 ; &07a9 referenced 1 time by &5942
-.data_07a9
+.code_07a9
     ldx #1                              ; Right: channel 1 high byte 0?
     lda #osbyte_read_adc_or_get_buffer_status  ; ...
     jsr osbyte                          ; Read ADC channel X or buffer status
     cpy #0                              ; ...
-    bne data_07e6                       ; No: not pressed
+    bne code_07e6                       ; No: not pressed
     dey                                 ; Yes: pressed (Y = &FF)
     ldx #&ff                            ; ...
     rts                                 ; Return
 ; &07b8 referenced 1 time by &593e
-.data_07b8
+.code_07b8
     ldx #2                              ; Up: channel 2 high byte &FF?
     lda #osbyte_read_adc_or_get_buffer_status  ; ...
     jsr osbyte                          ; Read ADC channel X or buffer status
     cpy #&ff                            ; ...
-    bne data_07e6                       ; No: not pressed
+    bne code_07e6                       ; No: not pressed
     ldx #&ff                            ; Yes: pressed
     rts                                 ; Return
 ; &07c6 referenced 1 time by &593a
-.data_07c6
+.code_07c6
     ldx #2                              ; Down: channel 2 high byte 0?
     lda #osbyte_read_adc_or_get_buffer_status  ; ...
     jsr osbyte                          ; Read ADC channel X or buffer status
     cpy #0                              ; ...
-    bne data_07e6                       ; No: not pressed
+    bne code_07e6                       ; No: not pressed
     dey                                 ; Yes: pressed (Y = &FF)
     ldx #&ff                            ; ...
     rts                                 ; Return
 ; &07d5 referenced 1 time by &5946
-.data_07d5
+.code_07d5
     ldx #0                              ; Fire: either fire button?
     lda #osbyte_read_adc_or_get_buffer_status  ; ...
     jsr osbyte                          ; Read ADC channel X or buffer status
     txa                                 ; ...
     and #3                              ; ...
-    beq data_07e6                       ; No: not pressed
+    beq code_07e6                       ; No: not pressed
     ldx #&ff                            ; Yes: pressed
     ldy #&ff                            ; ...
     rts                                 ; Return
 ; &07e6 referenced 5 times by &5954, &5962, &5971, &597f, &598f
-.data_07e6
+.code_07e6
     ldx #0                              ; Not pressed
     rts                                 ; Return
 ; &07e9 referenced 1 time by &5932
-.data_07e9
+.code_07e9
     jmp mos_osbyte_default              ; Pass the call on to the MOS 1.20 OSBYTE routine
     equb &00, &00, &00, &00
     equs "Dun1"
@@ -3736,14 +3963,14 @@ data_0601 = menu_text+1
     ; Copy the newly assembled block of code back to it's proper place in the binary
     ; file.
     ; (Note the parameter order: 'copyblock <start>,<end>,<dest>')
-    copyblock add_thousand_points, *, &55b0
+    copyblock add_thousand_points_joystick, *, &55b0
 
     ; Clear the area of memory we just temporarily used to assemble the new block,
     ; allowing us to assemble there again if needed
-    clear add_thousand_points, &0800
+    clear add_thousand_points_joystick, &0800
 
     ; Set the program counter to the next position in the binary file.
-    org &55b0 + (* - add_thousand_points)
+    org &55b0 + (* - add_thousand_points_joystick)
 
 
     org &2000
@@ -5285,18 +5512,19 @@ level_command_digits = level_command+10
 ; &5172 referenced 1 time by &506c
 data_5172 = level_command+11
     equs "LOAD LEVEL   6B00"
-.sub_5178
+    equb &0d
 ; &5179 used as index base 1 time by &504c
-data_5179 = sub_5178+1
+.data_5179
+    equb &17, &00, &01, &00, &00, &00, &00, &00
+    equb &00, &00, &17, &00, &0a, &20, &00, &00
+    equb &00, &00, &00, &00, &00
 ; &518e used as index base 1 time by &50f1
-data_518e = sub_5178+22
-    equb &0d, &17, &00, &01, &00, &00, &00, &00
-    equb &00, &00, &00, &17, &00, &0a, &20, &00
-    equb &00, &00, &00, &00, &00, &00, &17, &00
-    equb &01, &50, &00, &00, &00, &00, &00, &00
-    equb &17, &00, &06, &17, &00, &00, &00, &00
-    equb &00, &00, &85, &70, &bd, &d0, &7d, &18
-    equb &69, &18, &85, &71, &8a, &48, &20, &00
+.data_518e
+    equb &17, &00, &01, &50, &00, &00, &00, &00
+    equb &00, &00, &17, &00, &06, &17, &00, &00
+    equb &00, &00, &00, &00, &85, &70, &bd, &d0
+    equb &7d, &18, &69, &18, &85, &71, &8a, &48
+    equb &20, &00
 
     org &59b0
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -6864,13 +7092,13 @@ data_518e = sub_5178+22
 .loop_742b
     ldx returning_hero_queue            ; ...
     dex                                 ; ...
-    lda data_0b2b                       ; ...
+    lda returning_hero_queue + 1        ; ...
     sta returning_hero_queue            ; ...
-    lda data_0b2c                       ; ...
-    sta data_0b2b                       ; ...
-    lda data_0b2d                       ; ...
-    sta data_0b2c                       ; ...
-    sty data_0b2d                       ; ...
+    lda returning_hero_queue + 2        ; ...
+    sta returning_hero_queue + 1        ; ...
+    lda returning_hero_queue + 3        ; ...
+    sta returning_hero_queue + 2        ; ...
+    sty returning_hero_queue + 3        ; ...
     cpx #&63 ; 'c'                      ; A &64 marker?
     bne code_744c                       ; No
     ldy #&64 ; 'd'                      ; Yes: move it to the back and take the next entry
@@ -6913,7 +7141,7 @@ data_518e = sub_5178+22
     cmp #&51 ; 'Q'                      ; The exit? Nothing to do here
     beq code_7470                       ; ...
     lda #&32 ; '2'                      ; An energy drainer: play the hit sound louder...
-    sta data_0cf4                       ; ...
+    sta hit_sound + 4                   ; ...
     txa                                 ; ...
     pha                                 ; ...
     ldx #<(hit_sound)                   ; ...
@@ -6921,7 +7149,7 @@ data_518e = sub_5178+22
     lda #osword_sound                   ; ...
     jsr osword                          ; ...  SOUND command
     lda #6                              ; ...then put the volume back
-    sta data_0cf4                       ; ...
+    sta hit_sound + 4                   ; ...
     pla                                 ; ...
     tax                                 ; ...
     ldy #&0a                            ; ...and take 10 health
@@ -7432,23 +7660,23 @@ data_518e = sub_5178+22
 .code_7757
     cmp #&44 ; 'D'                      ; Fireballs: the Magic-User's
     bne code_7764                       ; ...
-    lda data_0d21                       ; ...
+    lda hero_frame + 1                  ; ...
     eor #1                              ; ...
-    sta data_0d21                       ; ...
+    sta hero_frame + 1                  ; ...
     rts                                 ; Return
 ; &7764 referenced 1 time by &7759
 .code_7764
     cmp #&4c ; 'L'                      ; Axes: the Barbarian's
     bne code_7771                       ; ...
-    lda data_0d22                       ; ...
+    lda hero_frame + 2                  ; ...
     eor #1                              ; ...
-    sta data_0d22                       ; ...
+    sta hero_frame + 2                  ; ...
     rts                                 ; Return
 ; &7771 referenced 1 time by &7766
 .code_7771
-    lda data_0d23                       ; Otherwise swords: the Fighter's
+    lda hero_frame + 3                  ; Otherwise swords: the Fighter's
     eor #1                              ; ...
-    sta data_0d23                       ; ...
+    sta hero_frame + 3                  ; ...
     rts                                 ; Return
 ; ***************************************************************************************
 ; Copy a hero's position to cell_x, cell_y
@@ -7501,7 +7729,7 @@ data_518e = sub_5178+22
     sta plot_y                          ; ...
     lda #&23 ; '#'                      ; ...column &23...
     sta cell_x                          ; ...
-    lda data_0da2                       ; ...hero 1's room
+    lda view_room + 2                   ; ...hero 1's room
     sta map_ptr                         ; ...
     jsr draw_room                       ; Draw it
     rts                                 ; Return
@@ -7515,7 +7743,7 @@ data_518e = sub_5178+22
     sta plot_y                          ; ...
     lda #1                              ; ...column 1...
     sta cell_x                          ; ...
-    lda data_0da4                       ; ...hero 2's room
+    lda view_room + 4                   ; ...hero 2's room
     sta map_ptr                         ; ...
     jsr draw_room                       ; Draw it
     rts                                 ; Return
@@ -7529,7 +7757,7 @@ data_518e = sub_5178+22
     sta plot_y                          ; ...
     lda #&23 ; '#'                      ; ...column &23...
     sta cell_x                          ; ...
-    lda data_0da6                       ; ...hero 3's room
+    lda view_room + 6                   ; ...hero 3's room
     sta map_ptr                         ; ...
     jsr draw_room                       ; Draw it
     rts                                 ; Return
@@ -7673,7 +7901,7 @@ data_518e = sub_5178+22
     jsr plot_sprite                     ; ...
 ; &78ad referenced 1 time by &7899
 .code_78ad
-    lda data_0da2                       ; Does the top-right view show it?
+    lda view_room + 2                   ; Does the top-right view show it?
     cmp cell_room                       ; ...
     bne code_78c7                       ; No
     clc                                 ; Yes: plot at column &23, row 1
@@ -7686,7 +7914,7 @@ data_518e = sub_5178+22
     jsr plot_sprite                     ; ...
 ; &78c7 referenced 1 time by &78b3
 .code_78c7
-    lda data_0da4                       ; Does the bottom-left view show it?
+    lda view_room + 4                   ; Does the bottom-left view show it?
     cmp cell_room                       ; ...
     bne code_78e1                       ; No
     clc                                 ; Yes: plot at column 1, row &67
@@ -7699,7 +7927,7 @@ data_518e = sub_5178+22
     jsr plot_sprite                     ; ...
 ; &78e1 referenced 1 time by &78cd
 .code_78e1
-    lda data_0da6                       ; Does the bottom-right view show it?
+    lda view_room + 6                   ; Does the bottom-right view show it?
     cmp cell_room                       ; ...
     bne return_11                       ; No
     clc                                 ; Yes: plot at column &23, row &67
@@ -7869,9 +8097,9 @@ data_518e = sub_5178+22
     sta sprite_number                   ; ...
 ; &79cd referenced 1 time by &79e1
 .loop_79cd
-    lda data_0b8f,x                     ; ...
+    lda trapdoor_x - 1,x                ; ...
     sta cell_x                          ; ...
-    lda data_0b97,x                     ; ...
+    lda trapdoor_y - 1,x                ; ...
     sta cell_y                          ; ...
     txa                                 ; ...
     pha                                 ; ...
@@ -8610,612 +8838,655 @@ data_518e = sub_5178+22
     equb &00
 .dasmos_end
 
-save "Dun1", &2000, &8000, &2000, &2000
+save "Dun1", dasmos_start, dasmos_end, &2000, &2000
 save "Coder", &5000, &59b0, &5000, &5000
 
 ; Label references by decreasing frequency:
-;     oswrch:                     63
-;     plot_x:                     63
-;     cell_x:                     54
-;     cell_y:                     49
-;     sprite_number:              45
-;     scratch:                    44
-;     plot_y:                     37
-;     hero_x:                     29
-;     osbyte:                     27
-;     hero_y:                     26
-;     map_ptr:                    21
-;     plot_sprite:                21
-;     hero_offset_y:              20
-;     hero_direction:             19
-;     hero_offset_x:              19
-;     monster_sprite:             19
-;     plot_at_cell:               19
-;     plot_offset_x:              18
-;     plot_offset_y:              18
-;     monster_offset_y:           17
-;     monster_x:                  17
-;     monster_y:                  16
-;     sprite_width:               16
-;     hero_frame:                 15
-;     monster_offset_x:           15
-;     osword:                     15
-;     menu_text:                  14
-;     hero_step:                  13
-;     screen_ptr:                 13
-;     menu_key_loop:              12
-;     missile_direction:          12
-;     plot_victory_sprite:        12
-;     ring_x:                     12
-;     hero_health_tens:           11
-;     previous_x:                 11
-;     previous_y:                 11
-;     ring_y:                     11
-;     returning_hero_queue:       10
-;     hero_max_missiles:           9
-;     hero_panel_y:                9
-;     object_x:                    9
-;     object_y:                    9
-;     screen_ptr_hi:               9
-;     data_0601:                   8
-;     hero_absent:                 8
-;     hero_key:                    8
-;     hero_score_thousands:        8
-;     hero_score_units:            8
-;     lose_health_point:           8
-;     panel_hero:                  8
-;     cell_room:                   7
-;     hero_damage_taken:           7
-;     hero_health_units:           7
-;     hero_missile_damage:         7
-;     monster_step:                7
-;     object_type:                 7
-;     os_vsync_counter:            7
-;     oscli:                       7
-;     sprite_height:               7
-;     victory_pitch:               7
-;     data_06f8:                   6
-;     draw_monster:                6
-;     key_x:                       6
-;     key_y:                       6
-;     levels_started:              6
-;     missile_x:                   6
-;     missile_y:                   6
-;     print_menu:                  6
-;     scratch2:                    6
-;     test_key:                    6
-;     victory_sprite:              6
-;     add_point:                   5
-;     code_71d9:                   5
-;     count:                       5
-;     data_07e6:                   5
-;     data_08be:                   5
-;     erase_hero:                  5
-;     hero_score_hundreds:         5
-;     hero_score_ten_thousands:    5
-;     hero_score_tens:             5
-;     level_digits:                5
-;     level_number:                5
-;     next_trapdoor:               5
-;     plot_panel_sprite:           5
-;     test_wall:                   5
-;     victory_delay:               5
-;     view_room:                   5
-;     add_ten_points:              4
-;     code_1ec6:                   4
-;     code_703b:                   4
-;     code_7aea:                   4
-;     code_7ff6:                   4
-;     data_041e:                   4
-;     data_045a:                   4
-;     data_0602:                   4
-;     door_x:                      4
-;     door_y:                      4
-;     draw_moved_hero:             4
-;     draw_room:                   4
-;     exit_spin:                   4
-;     find_creature:               4
-;     hero_door_x:                 4
-;     hero_door_y:                 4
-;     hero_key_dropped:            4
-;     level_count_copy:            4
-;     map_ptr_hi:                  4
-;     missile_sprite_base:         4
-;     monster_hit_points:          4
-;     next_hero:                   4
-;     play_level:                  4
-;     plot_keeping_x:              4
-;     start_hero_step:             4
-;     step_hero:                   4
-;     victory_steps_left:          4
-;     wrchv:                       4
-;     wrchv + 1:                   4
-;     bit_masks:                   3
-;     code_1db2:                   3
-;     code_1f36:                   3
-;     code_504a:                   3
-;     code_7266:                   3
-;     code_72bc:                   3
-;     code_7470:                   3
-;     code_76d4:                   3
-;     code_798d:                   3
-;     exit_busy:                   3
-;     exit_saved_x:                3
-;     exit_saved_y:                3
-;     exit_x:                      3
-;     exit_y:                      3
-;     hero_has_boots:              3
-;     hero_magic_delay:            3
-;     hero_sprites:                3
-;     magic_kill_count:            3
-;     missile_damage:              3
-;     monster_done:                3
-;     monster_frame:               3
-;     monster_start_hit_points:    3
-;     mos_reset_entry:             3
-;     next_victory_sprite:         3
-;     os_break_intercept:          3
-;     osasci:                      3
-;     osrdch:                      3
-;     room_walls:                  3
-;     sprite_data_ptr:             3
-;     system_via_t1c_l:            3
-;     victory_pitch_step:          3
-;     workspace_template + 208:    3
-;     clear_text_area:             2
-;     code_108a:                   2
-;     code_1097:                   2
-;     code_111c:                   2
-;     code_11bb:                   2
-;     code_1e28:                   2
-;     code_1ebe:                   2
-;     code_1f91:                   2
-;     code_512d:                   2
-;     code_7156:                   2
-;     code_71d4:                   2
-;     code_71d7:                   2
-;     code_7201:                   2
-;     code_73c7:                   2
-;     code_7467:                   2
-;     code_7652:                   2
-;     code_7692:                   2
-;     code_79b7:                   2
-;     code_7adc:                   2
-;     code_7af8:                   2
-;     code_7c6f:                   2
-;     code_7cae:                   2
-;     credit_missile_owner:        2
-;     data_0288:                   2
-;     data_0289:                   2
-;     data_0437:                   2
-;     data_0447:                   2
-;     data_046b:                   2
-;     data_0484:                   2
-;     data_0528:                   2
-;     data_0540:                   2
-;     data_05c0:                   2
-;     data_05c3:                   2
-;     data_05c9:                   2
-;     data_05cb:                   2
-;     data_05d6:                   2
-;     data_05d7:                   2
-;     data_05e4:                   2
-;     data_05e9:                   2
-;     data_06b4:                   2
-;     data_06c9:                   2
-;     data_06f0:                   2
-;     data_0b2b:                   2
-;     data_0b2c:                   2
-;     data_0b2d:                   2
-;     data_0bfc:                   2
-;     data_0cf4:                   2
-;     data_0d21:                   2
-;     data_0d22:                   2
-;     data_0d23:                   2
-;     data_0da2:                   2
-;     data_0da4:                   2
-;     data_0da6:                   2
-;     data_12d4:                   2
-;     door_sprite:                 2
-;     draw_hero:                   2
-;     draw_missile_damage:         2
-;     draw_victory_ring:           2
-;     draw_view_0:                 2
-;     draw_view_1:                 2
-;     draw_view_2:                 2
-;     draw_view_3:                 2
-;     exit_offsets_y:              2
-;     exit_shrinks_left:           2
-;     exiting_hero:                2
-;     get_hero_cell:               2
-;     level_checksums:             2
-;     missile_spent_pop:           2
-;     monster_x + 35:              2
-;     monster_y + 35:              2
-;     mos_osbyte_default:          2
-;     mos_oswrch_default:          2
-;     next_missile:                2
-;     play_pickup_sound:           2
-;     plot_chalice:                2
-;     point_at_boots_icon:         2
-;     previous_offset_x:           2
-;     previous_offset_y:           2
-;     print_menu_string:           2
-;     read_hero_keys:              2
-;     reset_hero:                  2
-;     return_13:                   2
-;     row_start_ptr:               2
-;     row_start_ptr_hi:            2
-;     saved_wrchv:                 2
-;     set_menu_no:                 2
-;     set_menu_off:                2
-;     set_menu_on:                 2
-;     set_menu_yes:                2
-;     show_hero_room:              2
-;     shrunk_hero:                 2
-;     sprite_data_ptr_hi:          2
-;     test_object_free:            2
-;     trapdoor_x:                  2
-;     trapdoor_y:                  2
-;     add_thousand_points:         1
-;     advance_dying_monster:       1
-;     animate_absent_hero:         1
-;     bytev:                       1
-;     bytev + 1:                   1
-;     check_for_victory:           1
-;     check_hero_keys:             1
-;     check_level:                 1
-;     check_magic:                 1
-;     code_091d:                   1
-;     code_0929:                   1
-;     code_0938:                   1
-;     code_093e:                   1
-;     code_0961:                   1
-;     code_0d7f:                   1
-;     code_0e08:                   1
-;     code_0e09:                   1
-;     code_0e45:                   1
-;     code_0e57:                   1
-;     code_0e6d:                   1
-;     code_0e7a:                   1
-;     code_0ea8:                   1
-;     code_0eae:                   1
-;     code_0eb9:                   1
-;     code_0efc:                   1
-;     code_0f3a:                   1
-;     code_1079:                   1
-;     code_1084:                   1
-;     code_10ba:                   1
-;     code_10c7:                   1
-;     code_110a:                   1
-;     code_1124:                   1
-;     code_113c:                   1
-;     code_113e:                   1
-;     code_1140:                   1
-;     code_11d3:                   1
-;     code_11de:                   1
-;     code_11ec:                   1
-;     code_146f:                   1
-;     code_14a2:                   1
-;     code_14e5:                   1
-;     code_14ec:                   1
-;     code_1512:                   1
-;     code_1529:                   1
-;     code_1540:                   1
-;     code_1551:                   1
-;     code_1564:                   1
-;     code_1577:                   1
-;     code_1585:                   1
-;     code_159c:                   1
-;     code_16b4:                   1
-;     code_16bf:                   1
-;     code_1cc5:                   1
-;     code_1cd8:                   1
-;     code_1ce3:                   1
-;     code_1cee:                   1
-;     code_1cfa:                   1
-;     code_1d03:                   1
-;     code_1db8:                   1
-;     code_1dba:                   1
-;     code_1dce:                   1
-;     code_1df3:                   1
-;     code_1e35:                   1
-;     code_1e45:                   1
-;     code_1ec4:                   1
-;     code_1ee0:                   1
-;     code_1ee7:                   1
-;     code_1f17:                   1
-;     code_1f2a:                   1
-;     code_1f38:                   1
-;     code_1f96:                   1
-;     code_1f9e:                   1
-;     code_1ff2:                   1
-;     code_2026:                   1
-;     code_5036:                   1
-;     code_508b:                   1
-;     code_5092:                   1
-;     code_50b4:                   1
-;     code_50b8:                   1
-;     code_50c4:                   1
-;     code_50ca:                   1
-;     code_50e5:                   1
-;     code_510b:                   1
-;     code_5113:                   1
-;     code_5137:                   1
-;     code_513d:                   1
-;     code_6e82:                   1
-;     code_6e91:                   1
-;     code_6e97:                   1
-;     code_6eba:                   1
-;     code_6ed4:                   1
-;     code_6ee7:                   1
-;     code_6efa:                   1
-;     code_6f0d:                   1
-;     code_6f70:                   1
-;     code_6f83:                   1
-;     code_6f8a:                   1
-;     code_6f91:                   1
-;     code_6f98:                   1
-;     code_6fc7:                   1
-;     code_6fd5:                   1
-;     code_7002:                   1
-;     code_7053:                   1
-;     code_7069:                   1
-;     code_70d2:                   1
-;     code_70da:                   1
-;     code_70e7:                   1
-;     code_70fe:                   1
-;     code_7108:                   1
-;     code_710f:                   1
-;     code_7116:                   1
-;     code_711d:                   1
-;     code_713a:                   1
-;     code_7150:                   1
-;     code_71a0:                   1
-;     code_71b4:                   1
-;     code_71c0:                   1
-;     code_71cc:                   1
-;     code_7227:                   1
-;     code_7263:                   1
-;     code_7337:                   1
-;     code_7342:                   1
-;     code_734d:                   1
-;     code_738a:                   1
-;     code_73a0:                   1
-;     code_73c3:                   1
-;     code_73d9:                   1
-;     code_740d:                   1
-;     code_7429:                   1
-;     code_744c:                   1
-;     code_7464:                   1
-;     code_7477:                   1
-;     code_74b6:                   1
-;     code_74eb:                   1
-;     code_74fc:                   1
-;     code_74ff:                   1
-;     code_7516:                   1
-;     code_7529:                   1
-;     code_7551:                   1
-;     code_755b:                   1
-;     code_7565:                   1
-;     code_756b:                   1
-;     code_757c:                   1
-;     code_75a6:                   1
-;     code_761f:                   1
-;     code_7650:                   1
-;     code_769c:                   1
-;     code_76ab:                   1
-;     code_76ae:                   1
-;     code_76c0:                   1
-;     code_76c9:                   1
-;     code_76d2:                   1
-;     code_76e0:                   1
-;     code_770b:                   1
-;     code_772e:                   1
-;     code_7757:                   1
-;     code_7764:                   1
-;     code_7771:                   1
-;     code_783e:                   1
-;     code_7845:                   1
-;     code_78ad:                   1
-;     code_78c7:                   1
-;     code_78e1:                   1
-;     code_79bc:                   1
-;     code_7a17:                   1
-;     code_7a23:                   1
-;     code_7a2d:                   1
-;     code_7a34:                   1
-;     code_7a3b:                   1
-;     code_7a42:                   1
-;     code_7a81:                   1
-;     code_7a87:                   1
-;     code_7ac1:                   1
-;     code_7b3f:                   1
-;     code_7b79:                   1
-;     code_7b88:                   1
-;     code_7b97:                   1
-;     code_7bb9:                   1
-;     code_7bc0:                   1
-;     code_7bc7:                   1
-;     code_7bce:                   1
-;     code_7bd6:                   1
-;     code_7c02:                   1
-;     code_7c11:                   1
-;     code_7c20:                   1
-;     code_7c42:                   1
-;     code_7c49:                   1
-;     code_7c50:                   1
-;     code_7c57:                   1
-;     code_7c5f:                   1
-;     code_7c6c:                   1
-;     code_7c82:                   1
-;     code_7cc2:                   1
-;     code_7cfb:                   1
-;     code_7fb5:                   1
-;     code_7fb8:                   1
-;     code_7fbd:                   1
-;     code_7fda:                   1
-;     collect_objects:             1
-;     continue_hero_step:          1
-;     continue_monster_step:       1
-;     data_0000:                   1
-;     data_079b:                   1
-;     data_07a9:                   1
-;     data_07b8:                   1
-;     data_07c6:                   1
-;     data_07d5:                   1
-;     data_07e9:                   1
-;     data_0b8f:                   1
-;     data_0b97:                   1
-;     data_0c3a:                   1
-;     data_0d19:                   1
-;     data_0d1f:                   1
-;     data_0d8f:                   1
-;     data_0ff0:                   1
-;     data_10e8:                   1
-;     data_120f:                   1
-;     data_1625:                   1
-;     data_5172:                   1
-;     data_5179:                   1
-;     data_518e:                   1
-;     decrypt_level:               1
-;     dissolve_chalice:            1
-;     draw_all_views:              1
-;     draw_armour_rating:          1
-;     draw_keys:                   1
-;     draw_new_missile_icon:       1
-;     draw_room_row:               1
-;     draw_status_panel:           1
-;     draw_view_frames:            1
-;     drop_key:                    1
-;     erase_boots_icon:            1
-;     exit_offset_x_1:             1
-;     exit_offset_x_2:             1
-;     exit_offset_x_3:             1
-;     exit_offset_y_1:             1
-;     exit_offset_y_2:             1
-;     exit_offset_y_3:             1
-;     exit_offset_y_4:             1
-;     exit_offsets_x:              1
-;     fire_missile:                1
-;     flip_firer_frame:            1
-;     font_digits:                 1
-;     font_letters:                1
-;     game_entry:                  1
-;     game_over_message:           1
-;     hero_appearance_sprites:     1
-;     hero_enters_exit:            1
-;     hero_faces:                  1
-;     hero_key_down:               1
-;     hero_key_fire:               1
-;     hero_key_left:               1
-;     hero_key_right:              1
-;     hero_key_up:                 1
-;     hero_magic_key:              1
-;     hero_menu:                   1
-;     hero_missile_sprites:        1
-;     hero_start_damage_taken:     1
-;     hero_start_max_missiles:     1
-;     hero_start_missile_damage:   1
-;     level_bcd:                   1
-;     level_command_digits:        1
-;     level_door_sprite:           1
-;     level_door_x:                1
-;     level_door_y:                1
-;     level_key_x:                 1
-;     level_key_y:                 1
-;     level_loop:                  1
-;     level_object_free_map:       1
-;     level_object_type:           1
-;     level_object_x:              1
-;     level_object_y:              1
-;     level_trapdoor_x:            1
-;     level_trapdoor_y:            1
-;     level_wall_sprite:           1
-;     level_walls:                 1
-;     loop_504c:                   1
-;     loop_50ba:                   1
-;     loop_50f1:                   1
-;     loop_6f28:                   1
-;     loop_7007:                   1
-;     loop_7173:                   1
-;     loop_71dd:                   1
-;     loop_71f4:                   1
-;     loop_7256:                   1
-;     loop_730d:                   1
-;     loop_73a7:                   1
-;     loop_742b:                   1
-;     loop_7498:                   1
-;     loop_7667:                   1
-;     loop_77e4:                   1
-;     loop_77fe:                   1
-;     loop_7827:                   1
-;     loop_7976:                   1
-;     loop_7997:                   1
-;     loop_79aa:                   1
-;     loop_79cd:                   1
-;     loop_7fc5:                   1
-;     loop_7fd1:                   1
-;     loop_7fe8:                   1
-;     missile_spent:               1
-;     monster_reappears:           1
-;     mos_row_offsets:             1
-;     mos_row_offsets_lo:          1
-;     move_heroes:                 1
-;     move_missiles:               1
-;     next_level_by_reset:         1
-;     next_monster_update:         1
-;     object_free_map:             1
-;     object_free_map + 58:        1
-;     os_irq_a:                    1
-;     os_zp_fa:                    1
-;     plot_boots_icon:             1
-;     remove_absent_heroes:        1
-;     reset_call_address:          1
-;     reset_monsters:              1
-;     reset_vector:                1
-;     reset_vector + 1:            1
-;     reset_workspace:             1
-;     restart_by_reset:            1
-;     restore_hero_sprites:        1
-;     return_1:                    1
-;     return_10:                   1
-;     return_11:                   1
-;     return_12:                   1
-;     return_2:                    1
-;     return_3:                    1
-;     return_4:                    1
-;     return_5:                    1
-;     return_6:                    1
-;     return_7:                    1
-;     return_8:                    1
-;     return_9:                    1
-;     screen_address:              1
-;     sprite_addr_hi:              1
-;     sprite_addr_lo:              1
-;     sprite_chalice:              1
-;     sprite_heights:              1
-;     sprite_widths:               1
-;     start_level:                 1
-;     start_monster_step:          1
-;     sub_15b1:                    1
-;     sub_7305:                    1
-;     teleport_last:               1
-;     unpack_level:                1
-;     update_game:                 1
-;     update_monsters:             1
-;     update_rest:                 1
-;     victory_sequence:            1
-;     victory_sprite_copy:         1
-;     wall_sprite:                 1
-;     workspace_template:          1
+;     oswrch:                               63
+;     plot_x:                               63
+;     cell_x:                               54
+;     cell_y:                               49
+;     sprite_number:                        45
+;     scratch:                              44
+;     plot_y:                               37
+;     hero_x:                               29
+;     osbyte:                               27
+;     hero_y:                               26
+;     map_ptr:                              21
+;     plot_sprite:                          21
+;     hero_offset_y:                        20
+;     hero_direction:                       19
+;     hero_offset_x:                        19
+;     monster_sprite:                       19
+;     plot_at_cell:                         19
+;     plot_offset_x:                        18
+;     plot_offset_y:                        18
+;     monster_offset_y:                     17
+;     monster_x:                            17
+;     monster_y:                            16
+;     sprite_width:                         16
+;     hero_frame:                           15
+;     monster_offset_x:                     15
+;     osword:                               15
+;     menu_text:                            14
+;     menu_text_joystick:                   14
+;     hero_step:                            13
+;     screen_ptr:                           13
+;     menu_key_loop:                        12
+;     menu_key_loop_joystick:               12
+;     missile_direction:                    12
+;     plot_victory_sprite:                  12
+;     ring_x:                               12
+;     hero_health_tens:                     11
+;     previous_x:                           11
+;     previous_y:                           11
+;     ring_y:                               11
+;     returning_hero_queue:                 10
+;     hero_max_missiles:                     9
+;     hero_panel_y:                          9
+;     object_x:                              9
+;     object_y:                              9
+;     screen_ptr_hi:                         9
+;     hero_absent:                           8
+;     hero_key:                              8
+;     hero_score_thousands:                  8
+;     hero_score_units:                      8
+;     lose_health_point:                     8
+;     menu_text + 1:                         8
+;     menu_text_joystick + 1:                8
+;     panel_hero:                            8
+;     cell_room:                             7
+;     hero_damage_taken:                     7
+;     hero_health_units:                     7
+;     hero_missile_damage:                   7
+;     monster_step:                          7
+;     object_type:                           7
+;     os_vsync_counter:                      7
+;     oscli:                                 7
+;     sprite_height:                         7
+;     victory_pitch:                         7
+;     draw_monster:                          6
+;     key_x:                                 6
+;     key_y:                                 6
+;     levels_started:                        6
+;     missile_x:                             6
+;     missile_y:                             6
+;     page6_score_ten_thousands:             6
+;     page6_score_ten_thousands_joystick:    6
+;     print_menu:                            6
+;     print_menu_joystick:                   6
+;     scratch2:                              6
+;     test_key:                              6
+;     victory_sprite:                        6
+;     add_point:                             5
+;     code_07e6:                             5
+;     code_71d9:                             5
+;     count:                                 5
+;     data_08be:                             5
+;     erase_hero:                            5
+;     hero_score_hundreds:                   5
+;     hero_score_ten_thousands:              5
+;     hero_score_tens:                       5
+;     level_digits:                          5
+;     level_number:                          5
+;     next_trapdoor:                         5
+;     plot_panel_sprite:                     5
+;     test_wall:                             5
+;     victory_delay:                         5
+;     view_room:                             5
+;     add_ten_points:                        4
+;     code_1ec6:                             4
+;     code_703b:                             4
+;     code_7aea:                             4
+;     code_7ff6:                             4
+;     decrypt_level_loop:                    4
+;     decrypt_level_loop_joystick:           4
+;     door_x:                                4
+;     door_y:                                4
+;     draw_moved_hero:                       4
+;     draw_room:                             4
+;     draw_ten_thousands:                    4
+;     draw_ten_thousands_joystick:           4
+;     exit_spin:                             4
+;     find_creature:                         4
+;     hero_door_x:                           4
+;     hero_door_y:                           4
+;     hero_key_dropped:                      4
+;     level_count_copy:                      4
+;     map_ptr_hi:                            4
+;     menu_text + 2:                         4
+;     menu_text_joystick + 2:                4
+;     missile_sprite_base:                   4
+;     monster_hit_points:                    4
+;     next_hero:                             4
+;     play_level:                            4
+;     plot_keeping_x:                        4
+;     start_hero_step:                       4
+;     step_hero:                             4
+;     victory_steps_left:                    4
+;     wrchv:                                 4
+;     wrchv + 1:                             4
+;     bit_masks:                             3
+;     code_1db2:                             3
+;     code_1f36:                             3
+;     code_504a:                             3
+;     code_7266:                             3
+;     code_72bc:                             3
+;     code_7470:                             3
+;     code_76d4:                             3
+;     code_798d:                             3
+;     exit_busy:                             3
+;     exit_saved_x:                          3
+;     exit_saved_y:                          3
+;     exit_x:                                3
+;     exit_y:                                3
+;     hero_has_boots:                        3
+;     hero_magic_delay:                      3
+;     hero_sprites:                          3
+;     magic_kill_count:                      3
+;     missile_damage:                        3
+;     monster_done:                          3
+;     monster_frame:                         3
+;     monster_start_hit_points:              3
+;     mos_reset_entry:                       3
+;     next_victory_sprite:                   3
+;     os_break_intercept:                    3
+;     osasci:                                3
+;     osrdch:                                3
+;     room_walls:                            3
+;     sprite_data_ptr:                       3
+;     system_via_t1c_l:                      3
+;     victory_pitch_step:                    3
+;     workspace_template + 208:              3
+;     add_thousand_points_done:              2
+;     add_thousand_points_done_joystick:     2
+;     clear_text_area:                       2
+;     code_108a:                             2
+;     code_1097:                             2
+;     code_111c:                             2
+;     code_11bb:                             2
+;     code_1e28:                             2
+;     code_1ebe:                             2
+;     code_1f91:                             2
+;     code_512d:                             2
+;     code_7156:                             2
+;     code_71d4:                             2
+;     code_71d7:                             2
+;     code_7201:                             2
+;     code_73c7:                             2
+;     code_7467:                             2
+;     code_7652:                             2
+;     code_7692:                             2
+;     code_79b7:                             2
+;     code_7adc:                             2
+;     code_7af8:                             2
+;     code_7c6f:                             2
+;     code_7cae:                             2
+;     credit_missile_owner:                  2
+;     data_0288:                             2
+;     data_0289:                             2
+;     decrypt_level_done:                    2
+;     decrypt_level_done_joystick:           2
+;     decrypt_level_next:                    2
+;     decrypt_level_next_joystick:           2
+;     door_sprite:                           2
+;     draw_hero:                             2
+;     draw_missile_damage:                   2
+;     draw_ten_thousands_loop:               2
+;     draw_ten_thousands_loop_joystick:      2
+;     draw_victory_ring:                     2
+;     draw_view_0:                           2
+;     draw_view_1:                           2
+;     draw_view_2:                           2
+;     draw_view_3:                           2
+;     exit_offsets_y:                        2
+;     exit_shrinks_left:                     2
+;     exiting_hero:                          2
+;     food_sound + 4:                        2
+;     get_hero_cell:                         2
+;     hero_frame + 1:                        2
+;     hero_frame + 2:                        2
+;     hero_frame + 3:                        2
+;     hit_sound + 4:                         2
+;     level_checksums:                       2
+;     menu_done:                             2
+;     menu_done_joystick:                    2
+;     menu_hero_off:                         2
+;     menu_hero_off_joystick:                2
+;     menu_reprint:                          2
+;     menu_reprint_joystick:                 2
+;     menu_set_sound:                        2
+;     menu_set_sound_joystick:               2
+;     menu_sound_key:                        2
+;     menu_sound_key_joystick:               2
+;     menu_sound_off:                        2
+;     menu_sound_off_joystick:               2
+;     menu_space:                            2
+;     menu_space_check_hero:                 2
+;     menu_space_check_hero_joystick:        2
+;     menu_space_joystick:                   2
+;     missile_spent_pop:                     2
+;     monster_x + 35:                        2
+;     monster_y + 35:                        2
+;     mos_osbyte_default:                    2
+;     mos_oswrch_default:                    2
+;     next_missile:                          2
+;     play_pickup_sound:                     2
+;     plot_chalice:                          2
+;     point_at_boots_icon:                   2
+;     previous_offset_x:                     2
+;     previous_offset_y:                     2
+;     print_menu_loop:                       2
+;     print_menu_loop_joystick:              2
+;     print_menu_string:                     2
+;     print_menu_string_joystick:            2
+;     print_menu_string_loop:                2
+;     print_menu_string_loop_joystick:       2
+;     read_hero_keys:                        2
+;     remove_absent_heroes_check:            2
+;     remove_absent_heroes_check_joystick:   2
+;     remove_absent_heroes_loop:             2
+;     remove_absent_heroes_loop_joystick:    2
+;     remove_absent_heroes_next:             2
+;     remove_absent_heroes_next_joystick:    2
+;     reset_hero:                            2
+;     return_13:                             2
+;     returning_hero_queue + 1:              2
+;     returning_hero_queue + 2:              2
+;     returning_hero_queue + 3:              2
+;     row_start_ptr:                         2
+;     row_start_ptr_hi:                      2
+;     saved_wrchv:                           2
+;     saved_wrchv + 1:                       2
+;     set_menu_no:                           2
+;     set_menu_no_joystick:                  2
+;     set_menu_off:                          2
+;     set_menu_off_joystick:                 2
+;     set_menu_on:                           2
+;     set_menu_on_joystick:                  2
+;     set_menu_yes:                          2
+;     set_menu_yes_joystick:                 2
+;     show_hero_room:                        2
+;     shrunk_hero:                           2
+;     sprite_data_ptr_hi:                    2
+;     test_object_free:                      2
+;     trapdoor_x:                            2
+;     trapdoor_y:                            2
+;     view_room + 2:                         2
+;     view_room + 4:                         2
+;     view_room + 6:                         2
+;     add_thousand_points:                   1
+;     add_thousand_points_joystick:          1
+;     advance_dying_monster:                 1
+;     animate_absent_hero:                   1
+;     bytev:                                 1
+;     bytev + 1:                             1
+;     check_for_victory:                     1
+;     check_hero_keys:                       1
+;     check_level:                           1
+;     check_magic:                           1
+;     code_079b:                             1
+;     code_07a9:                             1
+;     code_07b8:                             1
+;     code_07c6:                             1
+;     code_07d5:                             1
+;     code_07e9:                             1
+;     code_091d:                             1
+;     code_0929:                             1
+;     code_0938:                             1
+;     code_093e:                             1
+;     code_0961:                             1
+;     code_0d7f:                             1
+;     code_0e08:                             1
+;     code_0e09:                             1
+;     code_0e45:                             1
+;     code_0e57:                             1
+;     code_0e6d:                             1
+;     code_0e7a:                             1
+;     code_0ea8:                             1
+;     code_0eae:                             1
+;     code_0eb9:                             1
+;     code_0efc:                             1
+;     code_0f3a:                             1
+;     code_1079:                             1
+;     code_1084:                             1
+;     code_10ba:                             1
+;     code_10c7:                             1
+;     code_110a:                             1
+;     code_1124:                             1
+;     code_113c:                             1
+;     code_113e:                             1
+;     code_1140:                             1
+;     code_11d3:                             1
+;     code_11de:                             1
+;     code_11ec:                             1
+;     code_146f:                             1
+;     code_14a2:                             1
+;     code_14e5:                             1
+;     code_14ec:                             1
+;     code_1512:                             1
+;     code_1529:                             1
+;     code_1540:                             1
+;     code_1551:                             1
+;     code_1564:                             1
+;     code_1577:                             1
+;     code_1585:                             1
+;     code_159c:                             1
+;     code_16b4:                             1
+;     code_16bf:                             1
+;     code_1cc5:                             1
+;     code_1cd8:                             1
+;     code_1ce3:                             1
+;     code_1cee:                             1
+;     code_1cfa:                             1
+;     code_1d03:                             1
+;     code_1db8:                             1
+;     code_1dba:                             1
+;     code_1dce:                             1
+;     code_1df3:                             1
+;     code_1e35:                             1
+;     code_1e45:                             1
+;     code_1ec4:                             1
+;     code_1ee0:                             1
+;     code_1ee7:                             1
+;     code_1f17:                             1
+;     code_1f2a:                             1
+;     code_1f38:                             1
+;     code_1f96:                             1
+;     code_1f9e:                             1
+;     code_1ff2:                             1
+;     code_2026:                             1
+;     code_5036:                             1
+;     code_508b:                             1
+;     code_5092:                             1
+;     code_50b4:                             1
+;     code_50b8:                             1
+;     code_50c4:                             1
+;     code_50ca:                             1
+;     code_50e5:                             1
+;     code_510b:                             1
+;     code_5113:                             1
+;     code_5137:                             1
+;     code_513d:                             1
+;     code_6e82:                             1
+;     code_6e91:                             1
+;     code_6e97:                             1
+;     code_6eba:                             1
+;     code_6ed4:                             1
+;     code_6ee7:                             1
+;     code_6efa:                             1
+;     code_6f0d:                             1
+;     code_6f70:                             1
+;     code_6f83:                             1
+;     code_6f8a:                             1
+;     code_6f91:                             1
+;     code_6f98:                             1
+;     code_6fc7:                             1
+;     code_6fd5:                             1
+;     code_7002:                             1
+;     code_7053:                             1
+;     code_7069:                             1
+;     code_70d2:                             1
+;     code_70da:                             1
+;     code_70e7:                             1
+;     code_70fe:                             1
+;     code_7108:                             1
+;     code_710f:                             1
+;     code_7116:                             1
+;     code_711d:                             1
+;     code_713a:                             1
+;     code_7150:                             1
+;     code_71a0:                             1
+;     code_71b4:                             1
+;     code_71c0:                             1
+;     code_71cc:                             1
+;     code_7227:                             1
+;     code_7263:                             1
+;     code_7337:                             1
+;     code_7342:                             1
+;     code_734d:                             1
+;     code_738a:                             1
+;     code_73a0:                             1
+;     code_73c3:                             1
+;     code_73d9:                             1
+;     code_740d:                             1
+;     code_7429:                             1
+;     code_744c:                             1
+;     code_7464:                             1
+;     code_7477:                             1
+;     code_74b6:                             1
+;     code_74eb:                             1
+;     code_74fc:                             1
+;     code_74ff:                             1
+;     code_7516:                             1
+;     code_7529:                             1
+;     code_7551:                             1
+;     code_755b:                             1
+;     code_7565:                             1
+;     code_756b:                             1
+;     code_757c:                             1
+;     code_75a6:                             1
+;     code_761f:                             1
+;     code_7650:                             1
+;     code_769c:                             1
+;     code_76ab:                             1
+;     code_76ae:                             1
+;     code_76c0:                             1
+;     code_76c9:                             1
+;     code_76d2:                             1
+;     code_76e0:                             1
+;     code_770b:                             1
+;     code_772e:                             1
+;     code_7757:                             1
+;     code_7764:                             1
+;     code_7771:                             1
+;     code_783e:                             1
+;     code_7845:                             1
+;     code_78ad:                             1
+;     code_78c7:                             1
+;     code_78e1:                             1
+;     code_79bc:                             1
+;     code_7a17:                             1
+;     code_7a23:                             1
+;     code_7a2d:                             1
+;     code_7a34:                             1
+;     code_7a3b:                             1
+;     code_7a42:                             1
+;     code_7a81:                             1
+;     code_7a87:                             1
+;     code_7ac1:                             1
+;     code_7b3f:                             1
+;     code_7b79:                             1
+;     code_7b88:                             1
+;     code_7b97:                             1
+;     code_7bb9:                             1
+;     code_7bc0:                             1
+;     code_7bc7:                             1
+;     code_7bce:                             1
+;     code_7bd6:                             1
+;     code_7c02:                             1
+;     code_7c11:                             1
+;     code_7c20:                             1
+;     code_7c42:                             1
+;     code_7c49:                             1
+;     code_7c50:                             1
+;     code_7c57:                             1
+;     code_7c5f:                             1
+;     code_7c6c:                             1
+;     code_7c82:                             1
+;     code_7cc2:                             1
+;     code_7cfb:                             1
+;     code_7fb5:                             1
+;     code_7fb8:                             1
+;     code_7fbd:                             1
+;     code_7fda:                             1
+;     collect_objects:                       1
+;     continue_hero_step:                    1
+;     continue_monster_step:                 1
+;     data_0000:                             1
+;     data_1625:                             1
+;     data_5172:                             1
+;     data_5179:                             1
+;     data_518e:                             1
+;     decrypt_level:                         1
+;     decrypt_level_joystick:                1
+;     dissolve_chalice:                      1
+;     draw_all_views:                        1
+;     draw_armour_rating:                    1
+;     draw_keys:                             1
+;     draw_new_missile_icon:                 1
+;     draw_room_row:                         1
+;     draw_status_panel:                     1
+;     draw_view_frames:                      1
+;     drop_key:                              1
+;     erase_boots_icon:                      1
+;     exit_offset_x_1:                       1
+;     exit_offset_x_2:                       1
+;     exit_offset_x_3:                       1
+;     exit_offset_y_1:                       1
+;     exit_offset_y_2:                       1
+;     exit_offset_y_3:                       1
+;     exit_offset_y_4:                       1
+;     exit_offsets_x:                        1
+;     fire_missile:                          1
+;     flip_firer_frame:                      1
+;     font_digits:                           1
+;     font_letters:                          1
+;     game_entry:                            1
+;     game_over_message:                     1
+;     hero_appearance_sprites:               1
+;     hero_direction - 1:                    1
+;     hero_enters_exit:                      1
+;     hero_faces:                            1
+;     hero_frame - 1:                        1
+;     hero_health_tens - 1:                  1
+;     hero_key_down:                         1
+;     hero_key_fire:                         1
+;     hero_key_left:                         1
+;     hero_key_right:                        1
+;     hero_key_up:                           1
+;     hero_magic_key:                        1
+;     hero_menu:                             1
+;     hero_menu_joystick:                    1
+;     hero_missile_sprites:                  1
+;     hero_start_damage_taken:               1
+;     hero_start_max_missiles:               1
+;     hero_start_missile_damage:             1
+;     level_bcd:                             1
+;     level_command_digits:                  1
+;     level_door_sprite:                     1
+;     level_door_x:                          1
+;     level_door_y:                          1
+;     level_key_x:                           1
+;     level_key_y:                           1
+;     level_loop:                            1
+;     level_object_free_map:                 1
+;     level_object_type:                     1
+;     level_object_x:                        1
+;     level_object_y:                        1
+;     level_trapdoor_x:                      1
+;     level_trapdoor_y:                      1
+;     level_wall_sprite:                     1
+;     level_walls:                           1
+;     loop_504c:                             1
+;     loop_50ba:                             1
+;     loop_50f1:                             1
+;     loop_6f28:                             1
+;     loop_7007:                             1
+;     loop_7173:                             1
+;     loop_71dd:                             1
+;     loop_71f4:                             1
+;     loop_7256:                             1
+;     loop_730d:                             1
+;     loop_73a7:                             1
+;     loop_742b:                             1
+;     loop_7498:                             1
+;     loop_7667:                             1
+;     loop_77e4:                             1
+;     loop_77fe:                             1
+;     loop_7827:                             1
+;     loop_7976:                             1
+;     loop_7997:                             1
+;     loop_79aa:                             1
+;     loop_79cd:                             1
+;     loop_7fc5:                             1
+;     loop_7fd1:                             1
+;     loop_7fe8:                             1
+;     missile_spent:                         1
+;     monster_reappears:                     1
+;     mos_row_offsets:                       1
+;     mos_row_offsets_lo:                    1
+;     move_heroes:                           1
+;     move_missiles:                         1
+;     next_level_by_reset:                   1
+;     next_monster_update:                   1
+;     object_free_map:                       1
+;     object_free_map + 58:                  1
+;     os_irq_a:                              1
+;     os_zp_fa:                              1
+;     panel_hero - 1:                        1
+;     plot_boots_icon:                       1
+;     remove_absent_heroes:                  1
+;     remove_absent_heroes_joystick:         1
+;     reset_call_address:                    1
+;     reset_call_address + 1:                1
+;     reset_monsters:                        1
+;     reset_vector:                          1
+;     reset_vector + 1:                      1
+;     reset_workspace:                       1
+;     restart_by_reset:                      1
+;     restore_hero_sprites:                  1
+;     return_1:                              1
+;     return_10:                             1
+;     return_11:                             1
+;     return_12:                             1
+;     return_2:                              1
+;     return_3:                              1
+;     return_4:                              1
+;     return_5:                              1
+;     return_6:                              1
+;     return_7:                              1
+;     return_8:                              1
+;     return_9:                              1
+;     room_walls + 58:                       1
+;     screen_address:                        1
+;     sprite_addr_hi:                        1
+;     sprite_addr_lo:                        1
+;     sprite_chalice:                        1
+;     sprite_chalice - 1:                    1
+;     sprite_heights:                        1
+;     sprite_widths:                         1
+;     start_level:                           1
+;     start_monster_step:                    1
+;     sub_15b1:                              1
+;     sub_7305:                              1
+;     teleport_last:                         1
+;     trapdoor_x - 1:                        1
+;     trapdoor_y - 1:                        1
+;     unpack_level:                          1
+;     update_game:                           1
+;     update_monsters:                       1
+;     update_rest:                           1
+;     victory_sequence:                      1
+;     victory_sprite_copy:                   1
+;     wall_sprite:                           1
+;     workspace_template:                    1
 
 ; Automatically generated labels:
+;     code_079b
+;     code_07a9
+;     code_07b8
+;     code_07c6
+;     code_07d5
+;     code_07e6
+;     code_07e9
 ;     code_091d
 ;     code_0929
 ;     code_0938
 ;     code_093e
 ;     code_0961
+;     code_0d63
+;     code_0d72
 ;     code_0d7f
 ;     code_0e08
 ;     code_0e09
@@ -9256,6 +9527,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     code_1577
 ;     code_1585
 ;     code_159c
+;     code_1624
 ;     code_16b4
 ;     code_16bf
 ;     code_1cc5
@@ -9437,57 +9709,8 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     data_0000
 ;     data_0288
 ;     data_0289
-;     data_041e
-;     data_0437
-;     data_0447
-;     data_045a
-;     data_046b
-;     data_0484
-;     data_0528
-;     data_0540
-;     data_05c0
-;     data_05c3
-;     data_05c9
-;     data_05cb
-;     data_05d6
-;     data_05d7
-;     data_05e4
-;     data_05e9
-;     data_0601
-;     data_0602
-;     data_06b4
-;     data_06c9
-;     data_06f0
-;     data_06f8
-;     data_079b
-;     data_07a9
-;     data_07b8
-;     data_07c6
-;     data_07d5
-;     data_07e6
-;     data_07e9
 ;     data_08be
-;     data_0b2b
-;     data_0b2c
-;     data_0b2d
-;     data_0b8f
-;     data_0b97
-;     data_0bfc
-;     data_0c3a
-;     data_0cf4
-;     data_0d19
-;     data_0d1f
-;     data_0d21
-;     data_0d22
-;     data_0d23
-;     data_0d8f
-;     data_0da2
-;     data_0da4
-;     data_0da6
-;     data_0ff0
-;     data_10e8
-;     data_120f
-;     data_12d4
+;     data_0fea
 ;     data_1625
 ;     data_5172
 ;     data_5179
@@ -9529,14 +9752,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     return_7
 ;     return_8
 ;     return_9
-;     sub_0d63
-;     sub_0d72
-;     sub_0d88
-;     sub_0fea
-;     sub_1204
 ;     sub_15b1
-;     sub_1624
-;     sub_5178
 ;     sub_7305
 
 ; Stats:
@@ -9545,7 +9761,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     Data                     = 17146 bytes (70%)
 ;
 ;     Number of instructions   = 3424
-;     Number of data bytes     = 16112 bytes
+;     Number of data bytes     = 16197 bytes
 ;     Number of data words     = 0 bytes
-;     Number of string bytes   = 1034 bytes
-;     Number of strings        = 132
+;     Number of string bytes   = 949 bytes
+;     Number of strings        = 126
