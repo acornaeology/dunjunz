@@ -32,9 +32,12 @@ version on one side and the Model B version on the other
 **[reported: billcarr2005, stardot]**. The thread dates it to
 September 1987, from everygamegoing.com **[reported]**.
 
-No original image of this disc has been found either. The closest copy is
-`Dunjunz.zip` from the NVG archive (`versions/dunjunz-disc_nvg/`), which
-holds the two sides as directories `2/` and `0/` **[confirmed]**:
+Two copies have been examined. `Dunjunz.zip` from the NVG archive
+(`versions/dunjunz-disc_nvg/`) holds the files of the two sides as
+directories `2/` and `0/` **[confirmed]**. The flux captures in
+`versions/dunjunz-disc/` hold the same files as whole discs (see
+[The HFE captures](#the-hfe-captures) below). The contents of the two
+sides are:
 
 - **Side 2, the boot side, is the Master version.** Its `!BOOT` chains
   `BOOT`, whose first line reads "(c) Bug Byte 1987. Mastered by S
@@ -58,6 +61,49 @@ holds the two sides as directories `2/` and `0/` **[confirmed]**:
   sideways RAM hack (see below), and its game, `Coder` and `Editor` all
   carry the same checksum table. That table holds &4D for level 5
   **[confirmed]**.
+
+### The HFE captures
+
+`versions/dunjunz-disc/` holds two HFE v3 files, one per side, made on
+26 September 2020 and given to this project. Who made them, and from
+which disc, is not yet recorded. `D1S1` is the Master side and `D1S2` the
+Model B side. Each is a 41-track, single-sided FM capture at 250 kbit/s.
+`tools/read_disc_image.py` reads every track through beebium's emulated
+8271 (sector IDs, then data) and writes the `.ssd` and a per-track
+`.json` report beside each capture.
+
+What they show **[confirmed]**:
+
+- **No copy protection.** On both sides, tracks 0–39 are standard DFS
+  tracks: ten 256-byte sectors numbered 0–9, each ID carrying its own
+  track number. Every sector reads without error. Tracks 40 and 41 are
+  unformatted (8271 result &18, sector not found).
+- **The same files as the NVG archive.** All 19 files on the Master side
+  and all 31 on the Model B side are byte-identical to `Dunjunz.zip`'s
+  `2/` and `0/`, with the same load and exec addresses, and all are
+  locked.
+- **Catalogues.** The Master side is titled "MASTER 128 V", with boot
+  option 3 (EXEC) and 400 sectors. The Model B side is titled "Dunjunz",
+  with boot option 0. Its catalogue gives 800 sectors (80 tracks),
+  although the side is formatted with 40.
+- **Free space.** Sectors 362–399 on the Model B side and 282–399 on the
+  Master side hold &E5, the fill a fresh format leaves. On the Master
+  side, sectors 274–281 hold an earlier draft of `BOOT`. It has the same
+  logo procedure and flip-side message. Its Master test is the other way
+  round, though: it shows "BBC Version on the flip side" on a Master, and
+  has only a `REM **** MASTER MESSAGE ****` placeholder for the Master
+  path.
+- **Slack.** 26 files on the Model B side have non-zero bytes after their
+  end, in their last sector.
+
+Whether the captured disc is a Bug-Byte original is **[inference]**. A
+file-by-file copy would carry neither the draft `BOOT` nor the Model B
+side's catalogue, so the captures are at least a sector-level copy of the
+disc the Master side was written on. A commercial duplicate made from that
+master disc would look the same. So would a sector copy of one made later.
+Whatever this disc is, the NVG archive's files match it exactly.
+
+### DFS compatibility
 
 The disc version only runs on real hardware with DFS 0.90. With DFS 1.20
 and later it fails with "Bad command", and with Watford DFS it hangs
@@ -165,9 +211,11 @@ images needed to confirm them have not been found.
 
 - An image of the original protected cassette (reportedly
   `Dunjunz_B.uef` on bbcmicro.co.uk).
-- An image of the original flippy disc, both sides. The stardot thread
+- Who made the HFE captures, and from which disc: a shop copy, a
+  Bug-Byte duplicate or the publisher's master. The stardot thread also
   mentions STH archive images `Dunjunz-Master-side0_M.ssd` and
-  `Dunjunz-Master-side1_B.ssd` **[reported]**.
+  `Dunjunz-Master-side1_B.ssd` **[reported]**, which could be compared
+  with them.
 
 ## Sources
 

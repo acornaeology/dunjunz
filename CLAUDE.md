@@ -13,7 +13,10 @@ Follow the `disassembly-skills:6502-disassembly` skill's method.
 
 Three releases live under `versions/` (see `versions/README.md`): Ole's
 crack of the cassette, an archive of the 1987 flippy disc, and the
-unofficial sideways RAM hack. None is a pristine original. How they
+unofficial sideways RAM hack. None is a pristine original.
+`versions/dunjunz-disc/` adds HFE flux captures of both sides of a flippy
+disc, possibly an original, with SSDs derived from them; their files match
+the NVG archive's exactly. How they
 relate is written up in `docs/history-and-provenance.md`; keep it current
 as evidence accumulates, tagging statements [confirmed], [reported] or
 [inference].
@@ -100,5 +103,12 @@ feature or defect met along the way, and note the workaround here.
   subroutines (acornaeology/dasmos#50). Declaring the data removes them.
 - No execution coverage in beebium: `tools/coverage.py` uses range
   breakpoints over data plus single-stepping (rob-smallshire/beebium#268).
+- oaknut cannot open HFE captures (rob-smallshire/oaknut#93).
+  `tools/read_disc_image.py` reads them sector by sector through beebium's
+  8271 (preset `model-b-8271-disc`, which has DFS 1.20) and writes an SSD.
+  It uses a machine-code OSWORD &7F stub instead of typed BASIC, because
+  `basic.wait_for_prompt` returns while a line is still being typed
+  (rob-smallshire/beebium#270). With the 1770 preset (DFS 2.26), OSWORD
+  &7F read ID returns no IDs.
 - `Beebium.launch` needs `variant=` repeated alongside `preset=`
   (rob-smallshire/beebium#269).
