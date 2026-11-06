@@ -1,0 +1,53 @@
+name: Verify disassembly
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: ["disc", "tape_crack_ole", "swram_hack"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Install Python
+        run: uv python install 3.13
+
+      # The dev group (beebium) is only needed by the tools/ scripts.
+      - name: Install dependencies
+        run: uv sync --no-dev
+
+      - name: Build beebasm
+        uses: actions/cache@v4
+        id: beebasm-cache
+        with:
+          path: /usr/local/bin/beebasm
+          key: beebasm-v1.11-rebuild
+
+      - name: Build beebasm from source
+        if: steps.beebasm-cache.outputs.cache-hit != 'true'
+        run: |
+          git clone --depth 1 --branch v1.11 https://github.com/stardot/beebasm.git /tmp/beebasm
+          cmake -S /tmp/beebasm -B /tmp/beebasm/build
+          make -C /tmp/beebasm/build -j$(nproc)
+          sudo cp /tmp/beebasm/build/beebasm /usr/local/bin/
+
+      - name: Disassemble Dunjunz ${{ matrix.version }}
+        run: uv run --no-dev fantasm disassemble ${{ matrix.version }}
+
+      - name: Check the committed listing is current
+        run: git diff --exit-code -- versions/dunjunz-${{ matrix.version }}/output
+
+      - name: Lint
+        run: uv run --no-dev fantasm lint
+
+      # One driver saves every file of a version, so verify them all.
+      - name: Verify Dunjunz (all files)
+        run: uv run --no-dev fantasm verify --all

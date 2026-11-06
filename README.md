@@ -1,5 +1,7 @@
 # Dunjunz
 
+[![Verify disassembly](https://github.com/acornaeology/dunjunz/actions/workflows/verify.yml/badge.svg)](https://github.com/acornaeology/dunjunz/actions/workflows/verify.yml)
+
 Annotated disassembly of **Dunjunz** by Julian Avis (Bug-Byte, 1986), a
 four-player dungeon game for the BBC Micro Model B. The aim is to
 understand how the game works, so that emulators can support it better,
