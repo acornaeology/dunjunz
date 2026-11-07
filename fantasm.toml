@@ -45,6 +45,7 @@ asm = "versions/dunjunz-swram_hack/output/dunjunz-swram_hack.asm"
 json = "versions/dunjunz-swram_hack/output/dunjunz-swram_hack.json"
 verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunjun6" }
 
+
 # Ole's crack of the cassette: DUNJ4 (the &0400-&2FFF image stored at &2400,
 # plus start-up code at &5000) and DUNJ3 (&6E80 onwards).
 
@@ -64,6 +65,7 @@ asm = "versions/dunjunz-tape_crack_ole/output/dunjunz-tape_crack_ole.asm"
 json = "versions/dunjunz-tape_crack_ole/output/dunjunz-tape_crack_ole.json"
 verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "DUNJ3" }
 
+
 # The official disc release, Model B side: Dun1 (the game, reloaded every
 # level) and Coder (its per-level loader, also stored inside Dun1).
 
@@ -82,6 +84,34 @@ driver = "versions/dunjunz-disc/disassemble/disasm_dunjunz_disc.py"
 asm = "versions/dunjunz-disc/output/dunjunz-disc.asm"
 json = "versions/dunjunz-disc/output/dunjunz-disc.json"
 verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Coder" }
+
+# The Model B side's other programs, each with its own driver and listing:
+# Dunjunz (the loader and title screen), *EDITOR (Editor) and *DEFAULT
+# (Default).
+
+[[targets]]
+id = "disc-dunjunz"
+binary = "versions/dunjunz-disc/binary/Dunjunz"
+driver = "versions/dunjunz-disc/disassemble/disasm_dunjunz_disc_dunjunz.py"
+asm = "versions/dunjunz-disc/output/dunjunz-disc-dunjunz.asm"
+json = "versions/dunjunz-disc/output/dunjunz-disc-dunjunz.json"
+verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunjunz" }
+
+[[targets]]
+id = "disc-editor"
+binary = "versions/dunjunz-disc/binary/Editor"
+driver = "versions/dunjunz-disc/disassemble/disasm_dunjunz_disc_editor.py"
+asm = "versions/dunjunz-disc/output/dunjunz-disc-editor.asm"
+json = "versions/dunjunz-disc/output/dunjunz-disc-editor.json"
+verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Editor" }
+
+[[targets]]
+id = "disc-default"
+binary = "versions/dunjunz-disc/binary/Default"
+driver = "versions/dunjunz-disc/disassemble/disasm_dunjunz_disc_default.py"
+asm = "versions/dunjunz-disc/output/dunjunz-disc-default.asm"
+json = "versions/dunjunz-disc/output/dunjunz-disc-default.json"
+verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Default" }
 
 # The official disc release, Master 128 side. Each program has its own
 # driver and listing: *DUNJUNZ (Dunjunz), Coder2, *EDITOR (Editor),

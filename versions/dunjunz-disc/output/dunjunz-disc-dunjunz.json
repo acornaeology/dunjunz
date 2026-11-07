@@ -1,0 +1,8302 @@
+{
+  "meta": {
+    "schema_version": 4,
+    "load_addr": 9920,
+    "end_addr": 12124,
+    "program": {
+      "exec_addr": 9984
+    },
+    "images": [
+      {
+        "name": "Dunjunz",
+        "load_addr": 9920,
+        "end_addr": 12124,
+        "exec_addr": 9984
+      }
+    ],
+    "moves": []
+  },
+  "constants": [
+    {
+      "name": "title_plot_reversed",
+      "value": 123,
+      "comment": "Zero page flag for title_plot_star: non-zero plots each row right to left"
+    },
+    {
+      "name": "star_x",
+      "value": 128,
+      "comment": "Zero page: each star's byte column (three stars)"
+    },
+    {
+      "name": "star_y",
+      "value": 131,
+      "comment": "Zero page: each star's pixel row"
+    },
+    {
+      "name": "star_frame",
+      "value": 134,
+      "comment": "Zero page: each star's animation frame, 0-6"
+    },
+    {
+      "name": "star_frame_step",
+      "value": 137,
+      "comment": "Zero page: each star's frame step, +1 or -1"
+    },
+    {
+      "name": "star_place",
+      "value": 140,
+      "comment": "Zero page: each star's place in star_places_x"
+    },
+    {
+      "name": "osbyte_escape_break_effect",
+      "value": 200
+    },
+    {
+      "name": "osbyte_set_cursor_editing",
+      "value": 4
+    },
+    {
+      "name": "osbyte_flush_buffer",
+      "value": 21
+    },
+    {
+      "name": "osbyte_scan_keyboard_from_16",
+      "value": 122
+    }
+  ],
+  "macros": [],
+  "subroutines": [
+    {
+      "addr": 65465,
+      "name": "osrdsc"
+    },
+    {
+      "addr": 65468,
+      "name": "vduchr"
+    },
+    {
+      "addr": 65471,
+      "name": "oseven"
+    },
+    {
+      "addr": 65474,
+      "name": "gsinit"
+    },
+    {
+      "addr": 65477,
+      "name": "gsread"
+    },
+    {
+      "addr": 65480,
+      "name": "nvrdch"
+    },
+    {
+      "addr": 65483,
+      "name": "nvwrch"
+    },
+    {
+      "addr": 65486,
+      "name": "osfind"
+    },
+    {
+      "addr": 65489,
+      "name": "osgbpb"
+    },
+    {
+      "addr": 65492,
+      "name": "osbput"
+    },
+    {
+      "addr": 65495,
+      "name": "osbget"
+    },
+    {
+      "addr": 65498,
+      "name": "osargs"
+    },
+    {
+      "addr": 65501,
+      "name": "osfile"
+    },
+    {
+      "addr": 65504,
+      "name": "osrdch"
+    },
+    {
+      "addr": 65507,
+      "name": "osasci"
+    },
+    {
+      "addr": 65511,
+      "name": "osnewl"
+    },
+    {
+      "addr": 65516,
+      "name": "oswrcr"
+    },
+    {
+      "addr": 65518,
+      "name": "oswrch"
+    },
+    {
+      "addr": 65521,
+      "name": "osword"
+    },
+    {
+      "addr": 65524,
+      "name": "osbyte"
+    },
+    {
+      "addr": 65527,
+      "name": "oscli"
+    },
+    {
+      "addr": 9920,
+      "name": "load_title_screen",
+      "title": "Load the title screen while output is off",
+      "description": "VDU 21, *LOAD SCREEN (the MODE 2 picture, to &3280), VDU 6."
+    },
+    {
+      "addr": 9938,
+      "name": "leave_title",
+      "title": "Disable VDU output and run Coder",
+      "description": "VDU 21, then *CODER, which does not return.",
+      "fall_through": true
+    },
+    {
+      "addr": 9984,
+      "name": "title_start",
+      "title": "Set up, show the title and run Coder",
+      "description": "Disable ESCAPE, make the cursor keys return codes, set the level counter, the level digits and the menu tables in page &08 for Coder and the game, point the BREAK intercept at &15B5 (the game's next-level intercept), load and show the title screen, twinkle stars on it until a key is pressed, then select the game's display, arm the BREAK intercept and run Coder.",
+      "fall_through": true
+    },
+    {
+      "addr": 10175,
+      "name": "mode2_cursor_off",
+      "title": "Select MODE 2 and turn the cursor off",
+      "description": "VDU 22,2 then VDU 23,0,10,&20,0,0,0,0,0,0 (6845 register 10: no cursor), from cursor_off_vdu."
+    },
+    {
+      "addr": 10240,
+      "name": "title_plot_star",
+      "title": "Plot a star frame on the title screen",
+      "description": "Exclusive-OR a 7-byte by 28-row frame of the star animation onto the MODE 2 screen at byte column plot_x and pixel row plot_y, row by row and left to right (or right to left if title_plot_reversed is set). A version of the game's plot_sprite with its own frames.",
+      "on_entry": {
+        "plot_x": "byte column",
+        "plot_y": "pixel row",
+        "sprite_number": "frame, 0-6"
+      }
+    },
+    {
+      "addr": 10358,
+      "name": "title_screen_address",
+      "title": "Calculate a title screen address",
+      "description": "The game's screen_address, reading the row offsets from MOS 1.20's table at &C375.",
+      "on_entry": {
+        "plot_x": "byte column",
+        "plot_y": "pixel row"
+      },
+      "on_exit": {
+        "screen_ptr": "screen address",
+        "Y": "0"
+      }
+    },
+    {
+      "addr": 10496,
+      "name": "twinkle_stars",
+      "title": "Twinkle stars on the title screen until a key is pressed",
+      "description": "Up to three stars at once, each at one of the eight places in star_places_x and star_places_y, picked at random. A star grows through frames 0-6 and shrinks back through 5-0. When a key is pressed the stars still showing are erased."
+    },
+    {
+      "addr": 10542,
+      "name": "start_star",
+      "title": "Start a star at a free place",
+      "description": "Take the first star not showing, if any, give it frame 0 and step +1, choose a free place at random, mark the place taken and plot the first frame."
+    },
+    {
+      "addr": 10605,
+      "name": "advance_stars",
+      "title": "Advance each star by one frame",
+      "description": "For each showing star, erase the frame (exclusive-OR) and step it; past frame 6 it turns back at 5, and below 0 it is finished and its place freed. Then plot the new frame and pause, longer for a star not showing so the timing stays even."
+    },
+    {
+      "addr": 10681,
+      "name": "plot_star",
+      "title": "Plot star Y's current frame",
+      "description": "Call title_plot_star with the star's position and frame, keeping Y.",
+      "on_entry": {
+        "Y": "star, 0-2"
+      },
+      "on_exit": {
+        "Y": "preserved"
+      },
+      "fall_through": true
+    }
+  ],
+  "banners": [
+    {
+      "addr": 9950,
+      "title": "Unused",
+      "description": "Leftover bytes.",
+      "align": "before_label"
+    },
+    {
+      "addr": 10199,
+      "title": "Unused",
+      "description": "Leftover bytes.",
+      "align": "before_label"
+    },
+    {
+      "addr": 10417,
+      "title": "Unused",
+      "description": "Leftover bytes.",
+      "align": "before_label"
+    },
+    {
+      "addr": 10752,
+      "name": "star_frame_data",
+      "title": "Star frames",
+      "description": "Seven 7-byte by 28-row MODE 2 frames of the title screen's twinkling star, from small (frame 0) to large (frame 6).",
+      "align": "before_label"
+    }
+  ],
+  "external_labels": {
+    "plot_x": 112,
+    "plot_y": 113,
+    "sprite_width": 114,
+    "sprite_height": 115,
+    "screen_ptr": 116,
+    "screen_ptr_hi": 117,
+    "row_start_ptr": 118,
+    "row_start_ptr_hi": 119,
+    "sprite_data_ptr": 120,
+    "sprite_data_ptr_hi": 121,
+    "sprite_number": 122,
+    "os_text_ptr": 242,
+    "romsel_copy": 244,
+    "osrdsc_ptr": 246,
+    "os_zp_fa": 250,
+    "os_irq_a": 252,
+    "userv": 512,
+    "brkv": 514,
+    "irq1v": 516,
+    "irq2v": 518,
+    "cliv": 520,
+    "bytev": 522,
+    "wordv": 524,
+    "wrchv": 526,
+    "rdchv": 528,
+    "filev": 530,
+    "argsv": 532,
+    "bgetv": 534,
+    "bputv": 536,
+    "gbpbv": 538,
+    "findv": 540,
+    "fscv": 542,
+    "evntv": 544,
+    "uptv": 546,
+    "netv": 548,
+    "vduv": 550,
+    "keyv": 552,
+    "insv": 554,
+    "remv": 556,
+    "cnpv": 558,
+    "ind1v": 560,
+    "ind2v": 562,
+    "ind3v": 564,
+    "os_break_intercept": 647,
+    "hero_score_ten_thousands": 2224,
+    "hero_absent": 2228,
+    "levels_started": 2236,
+    "level_digits": 2237,
+    "mos_row_offsets": 50037,
+    "scsi_data": 64576,
+    "scsi_status": 64577,
+    "scsi_select": 64578,
+    "scsi_irq_enable": 64579,
+    "crtc_address_register": 65024,
+    "crtc_register_data": 65025,
+    "acia_control_or_status": 65032,
+    "acia_data": 65033,
+    "serial_ula_set_baud_cassette_and_motor": 65040,
+    "station_id_disable_net_nmis": 65048,
+    "video_ula_control": 65056,
+    "video_ula_palette": 65057,
+    "video_ula_border_colour_and_palette_control": 65058,
+    "video_ula_palette_selection": 65059,
+    "romsel": 65072,
+    "acccon": 65076,
+    "system_via_orb_irb": 65088,
+    "system_via_ora_ira": 65089,
+    "system_via_ddrb": 65090,
+    "system_via_ddra": 65091,
+    "system_via_t1c_l": 65092,
+    "system_via_t1c_h": 65093,
+    "system_via_t1l_l": 65094,
+    "system_via_t1l_h": 65095,
+    "system_via_t2c_l": 65096,
+    "system_via_t2c_h": 65097,
+    "system_via_sr": 65098,
+    "system_via_acr": 65099,
+    "system_via_pcr": 65100,
+    "system_via_ifr": 65101,
+    "system_via_ier": 65102,
+    "user_via_orb_irb": 65120,
+    "user_via_ora_ira": 65121,
+    "user_via_ddrb": 65122,
+    "user_via_ddra": 65123,
+    "user_via_t1c_l": 65124,
+    "user_via_t1c_h": 65125,
+    "user_via_t1l_l": 65126,
+    "user_via_t1l_h": 65127,
+    "user_via_t2c_l": 65128,
+    "user_via_t2c_h": 65129,
+    "user_via_sr": 65130,
+    "user_via_acr": 65131,
+    "user_via_pcr": 65132,
+    "user_via_ifr": 65133,
+    "user_via_ier": 65134,
+    "econet_control1_or_status1": 65184,
+    "econet_control23_or_status2": 65185,
+    "econet_data_continue_frame": 65186,
+    "econet_data_terminate_frame": 65187,
+    "adc_start_conversion_or_status": 65216,
+    "adc_read_data_high_byte": 65217,
+    "adc_read_data_low_byte": 65218,
+    "tube_status_1_and_tube_control": 65248,
+    "tube_data_register_1": 65249,
+    "tube_status_register_2": 65250,
+    "tube_data_register_2": 65251,
+    "tube_status_register_3": 65252,
+    "tube_data_register_3": 65253,
+    "tube_status_register_4_and_cpu_control": 65254,
+    "tube_data_register_4": 65255,
+    "cube_tube_data_out_from_host": 65264,
+    "cube_tube_data_in_to_host": 65265,
+    "cube_tube_status": 65277,
+    "osrdsc": 65465,
+    "vduchr": 65468,
+    "oseven": 65471,
+    "gsinit": 65474,
+    "gsread": 65477,
+    "nvrdch": 65480,
+    "nvwrch": 65483,
+    "osfind": 65486,
+    "osgbpb": 65489,
+    "osbput": 65492,
+    "osbget": 65495,
+    "osargs": 65498,
+    "osfile": 65501,
+    "osrdch": 65504,
+    "osasci": 65507,
+    "osnewl": 65511,
+    "oswrcr": 65516,
+    "oswrch": 65518,
+    "osword": 65521,
+    "osbyte": 65524,
+    "oscli": 65527
+  },
+  "memory_map": [
+    {
+      "addr": 112,
+      "name": "plot_x",
+      "group": "zero_page",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "Star position: screen byte column."
+    },
+    {
+      "addr": 113,
+      "name": "plot_y",
+      "group": "zero_page",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "Star position: pixel row."
+    },
+    {
+      "addr": 114,
+      "name": "sprite_width",
+      "group": "zero_page",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "Width of the frame being plotted, in screen bytes."
+    },
+    {
+      "addr": 115,
+      "name": "sprite_height",
+      "group": "zero_page",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "Height of the frame being plotted, in pixel rows."
+    },
+    {
+      "addr": 116,
+      "name": "screen_ptr",
+      "group": "zero_page",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "Screen address being written, low byte."
+    },
+    {
+      "addr": 117,
+      "name": "screen_ptr_hi",
+      "group": "zero_page",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "Screen address being written, high byte."
+    },
+    {
+      "addr": 118,
+      "name": "row_start_ptr",
+      "group": "zero_page",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "Screen address of the row being plotted, low byte."
+    },
+    {
+      "addr": 119,
+      "name": "row_start_ptr_hi",
+      "group": "zero_page",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "Screen address of the row being plotted, high byte."
+    },
+    {
+      "addr": 120,
+      "name": "sprite_data_ptr",
+      "group": "zero_page",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "Address of the next frame byte to plot, low byte."
+    },
+    {
+      "addr": 121,
+      "name": "sprite_data_ptr_hi",
+      "group": "zero_page",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "Address of the next frame byte to plot, high byte."
+    },
+    {
+      "addr": 122,
+      "name": "sprite_number",
+      "group": "zero_page",
+      "access": [
+        "r",
+        "w"
+      ],
+      "description": "Star frame to plot, 0-6."
+    },
+    {
+      "addr": 250,
+      "name": "os_zp_fa",
+      "group": "os_workspace",
+      "description": "MOS zero-page workspace, mixed into the choice of a star's place."
+    },
+    {
+      "addr": 252,
+      "name": "os_irq_a",
+      "group": "os_workspace",
+      "description": "The MOS's copy of A at the last interrupt, mixed into the choice of a star's place."
+    },
+    {
+      "addr": 647,
+      "name": "os_break_intercept",
+      "group": "os_workspace",
+      "access": [
+        "w"
+      ],
+      "description": "MOS BREAK intercept: a JMP here is called during a reset. Dunjunz points it at the game's next-level intercept and arms it before running Coder."
+    },
+    {
+      "addr": 2224,
+      "name": "hero_score_ten_thousands",
+      "group": "game_state",
+      "access": [
+        "w",
+        "b"
+      ],
+      "description": "Each hero's score ten-thousands digit, as a small digit sprite; &69 for none."
+    },
+    {
+      "addr": 2228,
+      "name": "hero_absent",
+      "group": "game_state",
+      "access": [
+        "w",
+        "b"
+      ],
+      "description": "Non-zero for each hero switched off on the menu."
+    },
+    {
+      "addr": 2236,
+      "name": "levels_started",
+      "group": "game_state",
+      "access": [
+        "w"
+      ],
+      "description": "Number of levels started, kept by Coder in page &08, which survives the reset between levels."
+    },
+    {
+      "addr": 2237,
+      "name": "level_digits",
+      "group": "game_state",
+      "access": [
+        "w"
+      ],
+      "description": "The level number as ASCII digits for the level's filename: one digit and a space, or two digits."
+    },
+    {
+      "addr": 50037,
+      "name": "mos_row_offsets",
+      "group": "mos_internals",
+      "access": [
+        "b"
+      ],
+      "description": "MOS 1.20's table of the offsets of the screen's character rows, high byte then low byte."
+    }
+  ],
+  "regions": [
+    {
+      "anchor": 647,
+      "name": "os_break_intercept",
+      "window": [
+        0,
+        2
+      ],
+      "named_slots": false,
+      "group": "os_workspace",
+      "description": "MOS BREAK intercept: a JMP here is called during a reset. Dunjunz points it at the game's next-level intercept and arms it before running Coder."
+    },
+    {
+      "anchor": 2237,
+      "name": "level_digits",
+      "window": [
+        0,
+        1
+      ],
+      "named_slots": false,
+      "group": "game_state",
+      "description": "The level number as ASCII digits for the level's filename: one digit and a space, or two digits."
+    },
+    {
+      "anchor": 50037,
+      "name": "mos_row_offsets",
+      "window": [
+        0,
+        1
+      ],
+      "named_slots": false,
+      "group": "mos_internals",
+      "description": "MOS 1.20's table of the offsets of the screen's character rows, high byte then low byte."
+    }
+  ],
+  "items": [
+    {
+      "addr": 9920,
+      "bytes": [
+        169,
+        21
+      ],
+      "labels": [
+        "load_title_screen"
+      ],
+      "comment_inline": "VDU 21: disable VDU output",
+      "xref_summaries": [
+        "&26c0 referenced 1 time by &2763"
+      ],
+      "references": [
+        {
+          "addr": 10083,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&15"
+    },
+    {
+      "addr": 9922,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 9925,
+      "bytes": [
+        162,
+        152
+      ],
+      "comment_inline": "*LOAD SCREEN",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#<(load_screen_command)",
+      "expr": {
+        "text": "<(load_screen_command)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "load_screen_command"
+          }
+        }
+      }
+    },
+    {
+      "addr": 9927,
+      "bytes": [
+        160,
+        39
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#>(load_screen_command)",
+      "expr": {
+        "text": ">(load_screen_command)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "load_screen_command"
+          }
+        }
+      }
+    },
+    {
+      "addr": 9929,
+      "bytes": [
+        32,
+        247,
+        255
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oscli",
+      "target": 65527,
+      "target_label": "oscli"
+    },
+    {
+      "addr": 9932,
+      "bytes": [
+        169,
+        6
+      ],
+      "comment_inline": "VDU 6: enable VDU output",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#6"
+    },
+    {
+      "addr": 9934,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 9937,
+      "bytes": [
+        96
+      ],
+      "comment_inline": "Return",
+      "type": "code",
+      "mnemonic": "rts"
+    },
+    {
+      "addr": 9938,
+      "bytes": [
+        169,
+        21
+      ],
+      "labels": [
+        "leave_title"
+      ],
+      "comment_inline": "VDU 21: disable VDU output",
+      "xref_summaries": [
+        "&26d2 referenced 1 time by &2791"
+      ],
+      "references": [
+        {
+          "addr": 10129,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&15"
+    },
+    {
+      "addr": 9940,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 9943,
+      "bytes": [
+        162,
+        169
+      ],
+      "comment_inline": "*CODER (no return)",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#<(coder_command)",
+      "expr": {
+        "text": "<(coder_command)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "coder_command"
+          }
+        }
+      }
+    },
+    {
+      "addr": 9945,
+      "bytes": [
+        160,
+        39
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#>(coder_command)",
+      "expr": {
+        "text": ">(coder_command)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "coder_command"
+          }
+        }
+      }
+    },
+    {
+      "addr": 9947,
+      "bytes": [
+        32,
+        247,
+        255
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oscli",
+      "target": 65527,
+      "target_label": "oscli"
+    },
+    {
+      "addr": 9950,
+      "bytes": [
+        13,
+        54,
+        23,
+        0,
+        13,
+        30,
+        0,
+        42,
+        5,
+        20,
+        0,
+        21,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        4,
+        8,
+        0,
+        42,
+        4,
+        8,
+        42,
+        21,
+        60,
+        61,
+        0,
+        51,
+        60,
+        57,
+        0
+      ],
+      "type": "byte",
+      "values": [
+        13,
+        54,
+        23,
+        0,
+        13,
+        30,
+        0,
+        42,
+        5,
+        20,
+        0,
+        21,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        4,
+        8,
+        0,
+        42,
+        4,
+        8,
+        42,
+        21,
+        60,
+        61,
+        0,
+        51,
+        60,
+        57,
+        0
+      ]
+    },
+    {
+      "addr": 9984,
+      "bytes": [
+        169,
+        200
+      ],
+      "labels": [
+        "title_start"
+      ],
+      "comment_inline": "OSBYTE &C8: ESCAPE disabled...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#osbyte_escape_break_effect",
+      "expr": {
+        "text": "osbyte_escape_break_effect",
+        "tree": {
+          "sym": "osbyte_escape_break_effect"
+        }
+      }
+    },
+    {
+      "addr": 9986,
+      "bytes": [
+        162,
+        1
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#1"
+    },
+    {
+      "addr": 9988,
+      "bytes": [
+        160,
+        0
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#0"
+    },
+    {
+      "addr": 9990,
+      "bytes": [
+        32,
+        244,
+        255
+      ],
+      "comment_inline": "... osbyte: escape break effect",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "osbyte",
+      "target": 65524,
+      "target_label": "osbyte"
+    },
+    {
+      "addr": 9993,
+      "bytes": [
+        169,
+        4
+      ],
+      "comment_inline": "OSBYTE 4, 1: cursor keys return codes",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#osbyte_set_cursor_editing",
+      "expr": {
+        "text": "osbyte_set_cursor_editing",
+        "tree": {
+          "sym": "osbyte_set_cursor_editing"
+        }
+      }
+    },
+    {
+      "addr": 9995,
+      "bytes": [
+        162,
+        1
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#1"
+    },
+    {
+      "addr": 9997,
+      "bytes": [
+        32,
+        244,
+        255
+      ],
+      "comment_inline": "... Set cursor editing keys",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "osbyte",
+      "target": 65524,
+      "target_label": "osbyte"
+    },
+    {
+      "addr": 10000,
+      "bytes": [
+        169,
+        0
+      ],
+      "comment_inline": "Levels started = 0, for Coder",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#0"
+    },
+    {
+      "addr": 10002,
+      "bytes": [
+        141,
+        188,
+        8
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "levels_started",
+      "target": 2236,
+      "target_label": "levels_started"
+    },
+    {
+      "addr": 10005,
+      "bytes": [
+        169,
+        48
+      ],
+      "comment_inline": "Level digits = \"0 \"...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&30"
+    },
+    {
+      "addr": 10007,
+      "bytes": [
+        141,
+        189,
+        8
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "level_digits",
+      "target": 2237,
+      "target_label": "level_digits"
+    },
+    {
+      "addr": 10010,
+      "bytes": [
+        169,
+        32
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&20"
+    },
+    {
+      "addr": 10012,
+      "bytes": [
+        141,
+        190,
+        8
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "level_digits + 1",
+      "target": 2238
+    },
+    {
+      "addr": 10015,
+      "bytes": [
+        162,
+        3
+      ],
+      "comment_inline": "For each hero...",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#3"
+    },
+    {
+      "addr": 10017,
+      "bytes": [
+        169,
+        105
+      ],
+      "labels": [
+        "init_hero_tables"
+      ],
+      "comment_inline": "...no ten-thousands digit (sprite &69)...",
+      "xref_summaries": [
+        "&2721 referenced 1 time by &272c"
+      ],
+      "references": [
+        {
+          "addr": 10028,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&69"
+    },
+    {
+      "addr": 10019,
+      "bytes": [
+        157,
+        176,
+        8
+      ],
+      "comment_inline": "...at &08B0...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "hero_score_ten_thousands,x",
+      "target": 2224,
+      "target_label": "hero_score_ten_thousands"
+    },
+    {
+      "addr": 10022,
+      "bytes": [
+        169,
+        0
+      ],
+      "comment_inline": "...and switched on...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#0"
+    },
+    {
+      "addr": 10024,
+      "bytes": [
+        157,
+        180,
+        8
+      ],
+      "comment_inline": "...at &08B4 (the menu tables)",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "hero_absent,x",
+      "target": 2228,
+      "target_label": "hero_absent"
+    },
+    {
+      "addr": 10027,
+      "bytes": [
+        202
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "dex"
+    },
+    {
+      "addr": 10028,
+      "bytes": [
+        16,
+        243
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bpl",
+      "operand": "init_hero_tables",
+      "target": 10017,
+      "target_label": "init_hero_tables"
+    },
+    {
+      "addr": 10030,
+      "bytes": [
+        169,
+        181
+      ],
+      "comment_inline": "BREAK intercept address = &15B5 (the game's next-level intercept)...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&b5"
+    },
+    {
+      "addr": 10032,
+      "bytes": [
+        141,
+        136,
+        2
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "os_break_intercept + 1",
+      "target": 648
+    },
+    {
+      "addr": 10035,
+      "bytes": [
+        169,
+        21
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&15"
+    },
+    {
+      "addr": 10037,
+      "bytes": [
+        141,
+        137,
+        2
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "os_break_intercept + 2",
+      "target": 649
+    },
+    {
+      "addr": 10040,
+      "bytes": [
+        169,
+        0
+      ],
+      "comment_inline": "...disabled for now: &0287 is not a JMP",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#0"
+    },
+    {
+      "addr": 10042,
+      "bytes": [
+        141,
+        135,
+        2
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "os_break_intercept",
+      "target": 647,
+      "target_label": "os_break_intercept"
+    },
+    {
+      "addr": 10045,
+      "bytes": [
+        162,
+        183
+      ],
+      "comment_inline": "*TV 255,1: vertical offset for the title's MODE 2",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#<(tv_title_command)",
+      "expr": {
+        "text": "<(tv_title_command)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "tv_title_command"
+          }
+        }
+      }
+    },
+    {
+      "addr": 10047,
+      "bytes": [
+        160,
+        39
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#>(tv_title_command)",
+      "expr": {
+        "text": ">(tv_title_command)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "tv_title_command"
+          }
+        }
+      }
+    },
+    {
+      "addr": 10049,
+      "bytes": [
+        32,
+        247,
+        255
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oscli",
+      "target": 65527,
+      "target_label": "oscli"
+    },
+    {
+      "addr": 10052,
+      "bytes": [
+        32,
+        191,
+        39
+      ],
+      "comment_inline": "MODE 2, cursor off",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "mode2_cursor_off",
+      "target": 10175,
+      "target_label": "mode2_cursor_off"
+    },
+    {
+      "addr": 10055,
+      "bytes": [
+        162,
+        15
+      ],
+      "comment_inline": "Make all sixteen logical colours black...",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#&0f"
+    },
+    {
+      "addr": 10057,
+      "bytes": [
+        169,
+        19
+      ],
+      "labels": [
+        "black_colours"
+      ],
+      "comment_inline": "...VDU 19, colour, 0, 0, 0, 0...",
+      "xref_summaries": [
+        "&2749 referenced 1 time by &2761"
+      ],
+      "references": [
+        {
+          "addr": 10081,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&13"
+    },
+    {
+      "addr": 10059,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 10062,
+      "bytes": [
+        138
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "txa"
+    },
+    {
+      "addr": 10063,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 10066,
+      "bytes": [
+        169,
+        0
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#0"
+    },
+    {
+      "addr": 10068,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 10071,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 10074,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 10077,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 10080,
+      "bytes": [
+        202
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "dex"
+    },
+    {
+      "addr": 10081,
+      "bytes": [
+        16,
+        230
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bpl",
+      "operand": "black_colours",
+      "target": 10057,
+      "target_label": "black_colours"
+    },
+    {
+      "addr": 10083,
+      "bytes": [
+        32,
+        192,
+        38
+      ],
+      "comment_inline": "Load the title screen unseen",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "load_title_screen",
+      "target": 9920,
+      "target_label": "load_title_screen"
+    },
+    {
+      "addr": 10086,
+      "bytes": [
+        234
+      ],
+      "comment_inline": "Padding",
+      "type": "code",
+      "mnemonic": "nop"
+    },
+    {
+      "addr": 10087,
+      "bytes": [
+        234
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "nop"
+    },
+    {
+      "addr": 10088,
+      "bytes": [
+        234
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "nop"
+    },
+    {
+      "addr": 10089,
+      "bytes": [
+        234
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "nop"
+    },
+    {
+      "addr": 10090,
+      "bytes": [
+        169,
+        20
+      ],
+      "comment_inline": "VDU 20: default colours, showing the picture",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&14"
+    },
+    {
+      "addr": 10092,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 10095,
+      "bytes": [
+        169,
+        0
+      ],
+      "comment_inline": "Plot the stars left to right",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#0"
+    },
+    {
+      "addr": 10097,
+      "bytes": [
+        133,
+        123
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "title_plot_reversed",
+      "expr": {
+        "text": "title_plot_reversed",
+        "tree": {
+          "sym": "title_plot_reversed"
+        }
+      },
+      "target": 123
+    },
+    {
+      "addr": 10099,
+      "bytes": [
+        169,
+        21
+      ],
+      "comment_inline": "OSBYTE &15: flush the buffer X",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#osbyte_flush_buffer",
+      "expr": {
+        "text": "osbyte_flush_buffer",
+        "tree": {
+          "sym": "osbyte_flush_buffer"
+        }
+      }
+    },
+    {
+      "addr": 10101,
+      "bytes": [
+        32,
+        244,
+        255
+      ],
+      "comment_inline": "... Flush specific buffer X",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "osbyte",
+      "target": 65524,
+      "target_label": "osbyte"
+    },
+    {
+      "addr": 10104,
+      "bytes": [
+        32,
+        0,
+        41
+      ],
+      "comment_inline": "Twinkle stars until a key is pressed",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "twinkle_stars",
+      "target": 10496,
+      "target_label": "twinkle_stars"
+    },
+    {
+      "addr": 10107,
+      "bytes": [
+        162,
+        175
+      ],
+      "comment_inline": "*TV 252,1: vertical offset for the game's display",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#<(tv_game_command)",
+      "expr": {
+        "text": "<(tv_game_command)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "tv_game_command"
+          }
+        }
+      }
+    },
+    {
+      "addr": 10109,
+      "bytes": [
+        160,
+        39
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#>(tv_game_command)",
+      "expr": {
+        "text": ">(tv_game_command)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "tv_game_command"
+          }
+        }
+      }
+    },
+    {
+      "addr": 10111,
+      "bytes": [
+        32,
+        247,
+        255
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oscli",
+      "target": 65527,
+      "target_label": "oscli"
+    },
+    {
+      "addr": 10114,
+      "bytes": [
+        32,
+        191,
+        39
+      ],
+      "comment_inline": "MODE 2, cursor off",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "mode2_cursor_off",
+      "target": 10175,
+      "target_label": "mode2_cursor_off"
+    },
+    {
+      "addr": 10117,
+      "bytes": [
+        162,
+        164
+      ],
+      "comment_inline": "*DISC",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#<(disc_command)",
+      "expr": {
+        "text": "<(disc_command)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "disc_command"
+          }
+        }
+      }
+    },
+    {
+      "addr": 10119,
+      "bytes": [
+        160,
+        39
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#>(disc_command)",
+      "expr": {
+        "text": ">(disc_command)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "disc_command"
+          }
+        }
+      }
+    },
+    {
+      "addr": 10121,
+      "bytes": [
+        32,
+        247,
+        255
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oscli",
+      "target": 65527,
+      "target_label": "oscli"
+    },
+    {
+      "addr": 10124,
+      "bytes": [
+        169,
+        76
+      ],
+      "comment_inline": "Arm the BREAK intercept: &0287 = JMP",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&4c"
+    },
+    {
+      "addr": 10126,
+      "bytes": [
+        141,
+        135,
+        2
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "os_break_intercept",
+      "target": 647,
+      "target_label": "os_break_intercept"
+    },
+    {
+      "addr": 10129,
+      "bytes": [
+        32,
+        210,
+        38
+      ],
+      "comment_inline": "Disable output and run Coder (no return)",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "leave_title",
+      "target": 9938,
+      "target_label": "leave_title"
+    },
+    {
+      "addr": 10132,
+      "bytes": [
+        234
+      ],
+      "comment_inline": "Padding",
+      "type": "byte",
+      "values": [
+        234
+      ]
+    },
+    {
+      "addr": 10133,
+      "bytes": [
+        234
+      ],
+      "comment_inline": "...",
+      "type": "byte",
+      "values": [
+        234
+      ]
+    },
+    {
+      "addr": 10134,
+      "bytes": [
+        234
+      ],
+      "comment_inline": "...",
+      "type": "byte",
+      "values": [
+        234
+      ]
+    },
+    {
+      "addr": 10135,
+      "bytes": [
+        234
+      ],
+      "comment_inline": "...",
+      "type": "byte",
+      "values": [
+        234
+      ]
+    },
+    {
+      "addr": 10136,
+      "bytes": [
+        76,
+        79,
+        65,
+        68,
+        32,
+        83,
+        67,
+        82,
+        69,
+        69,
+        78
+      ],
+      "labels": [
+        "load_screen_command"
+      ],
+      "type": "string",
+      "string": "LOAD SCREEN"
+    },
+    {
+      "addr": 10147,
+      "bytes": [
+        13
+      ],
+      "type": "byte",
+      "values": [
+        13
+      ]
+    },
+    {
+      "addr": 10148,
+      "bytes": [
+        68,
+        73,
+        83,
+        67
+      ],
+      "labels": [
+        "disc_command"
+      ],
+      "type": "string",
+      "string": "DISC"
+    },
+    {
+      "addr": 10152,
+      "bytes": [
+        13
+      ],
+      "type": "byte",
+      "values": [
+        13
+      ]
+    },
+    {
+      "addr": 10153,
+      "bytes": [
+        67,
+        79,
+        68,
+        69,
+        82
+      ],
+      "labels": [
+        "coder_command"
+      ],
+      "type": "string",
+      "string": "CODER"
+    },
+    {
+      "addr": 10158,
+      "bytes": [
+        13
+      ],
+      "type": "byte",
+      "values": [
+        13
+      ]
+    },
+    {
+      "addr": 10159,
+      "bytes": [
+        84,
+        86,
+        50,
+        53,
+        50,
+        32,
+        49
+      ],
+      "labels": [
+        "tv_game_command"
+      ],
+      "type": "string",
+      "string": "TV252 1"
+    },
+    {
+      "addr": 10166,
+      "bytes": [
+        13
+      ],
+      "type": "byte",
+      "values": [
+        13
+      ]
+    },
+    {
+      "addr": 10167,
+      "bytes": [
+        84,
+        86,
+        50,
+        53,
+        53,
+        32,
+        49
+      ],
+      "labels": [
+        "tv_title_command"
+      ],
+      "type": "string",
+      "string": "TV255 1"
+    },
+    {
+      "addr": 10174,
+      "bytes": [
+        13
+      ],
+      "type": "byte",
+      "values": [
+        13
+      ]
+    },
+    {
+      "addr": 10175,
+      "bytes": [
+        169,
+        22
+      ],
+      "labels": [
+        "mode2_cursor_off"
+      ],
+      "comment_inline": "VDU 22, 2: MODE 2",
+      "xref_summaries": [
+        "&27bf referenced 2 times by &2744, &2782"
+      ],
+      "references": [
+        {
+          "addr": 10052,
+          "kind": "direct"
+        },
+        {
+          "addr": 10114,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&16"
+    },
+    {
+      "addr": 10177,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 10180,
+      "bytes": [
+        169,
+        2
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#2"
+    },
+    {
+      "addr": 10182,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 10185,
+      "bytes": [
+        162,
+        0
+      ],
+      "comment_inline": "Send the eleven bytes of cursor_off_vdu",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#0"
+    },
+    {
+      "addr": 10187,
+      "bytes": [
+        189,
+        240,
+        39
+      ],
+      "labels": [
+        "send_cursor_off_vdu"
+      ],
+      "comment_inline": "...",
+      "xref_summaries": [
+        "&27cb referenced 1 time by &27d4"
+      ],
+      "references": [
+        {
+          "addr": 10196,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "cursor_off_vdu,x",
+      "target": 10224,
+      "target_label": "cursor_off_vdu"
+    },
+    {
+      "addr": 10190,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 10193,
+      "bytes": [
+        232
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "inx"
+    },
+    {
+      "addr": 10194,
+      "bytes": [
+        224,
+        11
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "cpx",
+      "operand": "#&0b"
+    },
+    {
+      "addr": 10196,
+      "bytes": [
+        208,
+        245
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "send_cursor_off_vdu",
+      "target": 10187,
+      "target_label": "send_cursor_off_vdu"
+    },
+    {
+      "addr": 10198,
+      "bytes": [
+        96
+      ],
+      "comment_inline": "Return",
+      "type": "code",
+      "mnemonic": "rts"
+    },
+    {
+      "addr": 10199,
+      "bytes": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        10,
+        0,
+        0,
+        0,
+        10,
+        0,
+        0,
+        0,
+        10,
+        0,
+        0,
+        0,
+        10,
+        0
+      ],
+      "type": "byte",
+      "values": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        10,
+        0,
+        0,
+        0,
+        10,
+        0,
+        0,
+        0,
+        10,
+        0,
+        0,
+        0,
+        10,
+        0
+      ]
+    },
+    {
+      "addr": 10224,
+      "bytes": [
+        23,
+        0,
+        10,
+        32,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "labels": [
+        "cursor_off_vdu"
+      ],
+      "xref_summaries": [
+        "&27f0 used as index base 1 time by &27cb"
+      ],
+      "references": [
+        {
+          "addr": 10187,
+          "kind": "indexed"
+        }
+      ],
+      "type": "byte",
+      "values": [
+        23,
+        0,
+        10,
+        32,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 10235,
+      "bytes": [
+        0,
+        0,
+        5,
+        7,
+        0
+      ],
+      "type": "byte",
+      "values": [
+        0,
+        0,
+        5,
+        7,
+        0
+      ]
+    },
+    {
+      "addr": 10240,
+      "bytes": [
+        169,
+        7
+      ],
+      "labels": [
+        "title_plot_star"
+      ],
+      "comment_inline": "Seven bytes wide...",
+      "xref_summaries": [
+        "&2800 referenced 1 time by &29ca"
+      ],
+      "references": [
+        {
+          "addr": 10698,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#7"
+    },
+    {
+      "addr": 10242,
+      "bytes": [
+        133,
+        114
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "sprite_width",
+      "target": 114,
+      "target_label": "sprite_width"
+    },
+    {
+      "addr": 10244,
+      "bytes": [
+        169,
+        28
+      ],
+      "comment_inline": "...and 28 rows high",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&1c"
+    },
+    {
+      "addr": 10246,
+      "bytes": [
+        133,
+        115
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "sprite_height",
+      "target": 115,
+      "target_label": "sprite_height"
+    },
+    {
+      "addr": 10248,
+      "bytes": [
+        166,
+        122
+      ],
+      "comment_inline": "Point at the frame's data...",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "sprite_number",
+      "target": 122,
+      "target_label": "sprite_number"
+    },
+    {
+      "addr": 10250,
+      "bytes": [
+        189,
+        192,
+        40
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "star_frames_lo,x",
+      "target": 10432,
+      "target_label": "star_frames_lo"
+    },
+    {
+      "addr": 10253,
+      "bytes": [
+        133,
+        120
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "sprite_data_ptr",
+      "target": 120,
+      "target_label": "sprite_data_ptr"
+    },
+    {
+      "addr": 10255,
+      "bytes": [
+        189,
+        208,
+        40
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "star_frames_hi,x",
+      "target": 10448,
+      "target_label": "star_frames_hi"
+    },
+    {
+      "addr": 10258,
+      "bytes": [
+        133,
+        121
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "sprite_data_ptr_hi",
+      "target": 121,
+      "target_label": "sprite_data_ptr_hi"
+    },
+    {
+      "addr": 10260,
+      "bytes": [
+        32,
+        118,
+        40
+      ],
+      "comment_inline": "Screen address of the top left",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "title_screen_address",
+      "target": 10358,
+      "target_label": "title_screen_address"
+    },
+    {
+      "addr": 10263,
+      "bytes": [
+        166,
+        115
+      ],
+      "comment_inline": "For each row...",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "sprite_height",
+      "target": 115,
+      "target_label": "sprite_height"
+    },
+    {
+      "addr": 10265,
+      "bytes": [
+        165,
+        116
+      ],
+      "labels": [
+        "plot_star_row"
+      ],
+      "comment_inline": "...remember its start...",
+      "xref_summaries": [
+        "&2819 referenced 1 time by &2873"
+      ],
+      "references": [
+        {
+          "addr": 10355,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "screen_ptr",
+      "target": 116,
+      "target_label": "screen_ptr"
+    },
+    {
+      "addr": 10267,
+      "bytes": [
+        133,
+        118
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "row_start_ptr",
+      "target": 118,
+      "target_label": "row_start_ptr"
+    },
+    {
+      "addr": 10269,
+      "bytes": [
+        165,
+        117
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "screen_ptr_hi",
+      "target": 117,
+      "target_label": "screen_ptr_hi"
+    },
+    {
+      "addr": 10271,
+      "bytes": [
+        133,
+        119
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "row_start_ptr_hi",
+      "target": 119,
+      "target_label": "row_start_ptr_hi"
+    },
+    {
+      "addr": 10273,
+      "bytes": [
+        138
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "txa"
+    },
+    {
+      "addr": 10274,
+      "bytes": [
+        72
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pha"
+    },
+    {
+      "addr": 10275,
+      "bytes": [
+        166,
+        114
+      ],
+      "comment_inline": "...for each byte across...",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "sprite_width",
+      "target": 114,
+      "target_label": "sprite_width"
+    },
+    {
+      "addr": 10277,
+      "bytes": [
+        177,
+        120
+      ],
+      "labels": [
+        "plot_star_byte"
+      ],
+      "comment_inline": "...exclusive-OR the frame onto the screen...",
+      "xref_summaries": [
+        "&2825 referenced 1 time by &284e"
+      ],
+      "references": [
+        {
+          "addr": 10318,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "(sprite_data_ptr),y",
+      "target": 120,
+      "target_label": "sprite_data_ptr"
+    },
+    {
+      "addr": 10279,
+      "bytes": [
+        81,
+        116
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "eor",
+      "operand": "(screen_ptr),y",
+      "target": 116,
+      "target_label": "screen_ptr"
+    },
+    {
+      "addr": 10281,
+      "bytes": [
+        145,
+        116
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "(screen_ptr),y",
+      "target": 116,
+      "target_label": "screen_ptr"
+    },
+    {
+      "addr": 10283,
+      "bytes": [
+        165,
+        123
+      ],
+      "comment_inline": "...and step a character cell (8 bytes) right or left",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "title_plot_reversed",
+      "expr": {
+        "text": "title_plot_reversed",
+        "tree": {
+          "sym": "title_plot_reversed"
+        }
+      },
+      "target": 123
+    },
+    {
+      "addr": 10285,
+      "bytes": [
+        208,
+        13
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "plot_star_left",
+      "target": 10300,
+      "target_label": "plot_star_left"
+    },
+    {
+      "addr": 10287,
+      "bytes": [
+        24
+      ],
+      "comment_inline": "Right...",
+      "type": "code",
+      "mnemonic": "clc"
+    },
+    {
+      "addr": 10288,
+      "bytes": [
+        165,
+        116
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "screen_ptr",
+      "target": 116,
+      "target_label": "screen_ptr"
+    },
+    {
+      "addr": 10290,
+      "bytes": [
+        105,
+        8
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "adc",
+      "operand": "#8"
+    },
+    {
+      "addr": 10292,
+      "bytes": [
+        133,
+        116
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "screen_ptr",
+      "target": 116,
+      "target_label": "screen_ptr"
+    },
+    {
+      "addr": 10294,
+      "bytes": [
+        144,
+        15
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bcc",
+      "operand": "plot_star_next_data",
+      "target": 10311,
+      "target_label": "plot_star_next_data"
+    },
+    {
+      "addr": 10296,
+      "bytes": [
+        230,
+        117
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "inc",
+      "operand": "screen_ptr_hi",
+      "target": 117,
+      "target_label": "screen_ptr_hi"
+    },
+    {
+      "addr": 10298,
+      "bytes": [
+        208,
+        11
+      ],
+      "comment_inline": "...(always branches)",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "plot_star_next_data",
+      "target": 10311,
+      "target_label": "plot_star_next_data"
+    },
+    {
+      "addr": 10300,
+      "bytes": [
+        56
+      ],
+      "labels": [
+        "plot_star_left"
+      ],
+      "comment_inline": "Left...",
+      "xref_summaries": [
+        "&283c referenced 1 time by &282d"
+      ],
+      "references": [
+        {
+          "addr": 10285,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "sec"
+    },
+    {
+      "addr": 10301,
+      "bytes": [
+        165,
+        116
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "screen_ptr",
+      "target": 116,
+      "target_label": "screen_ptr"
+    },
+    {
+      "addr": 10303,
+      "bytes": [
+        233,
+        8
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sbc",
+      "operand": "#8"
+    },
+    {
+      "addr": 10305,
+      "bytes": [
+        133,
+        116
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "screen_ptr",
+      "target": 116,
+      "target_label": "screen_ptr"
+    },
+    {
+      "addr": 10307,
+      "bytes": [
+        176,
+        2
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bcs",
+      "operand": "plot_star_next_data",
+      "target": 10311,
+      "target_label": "plot_star_next_data"
+    },
+    {
+      "addr": 10309,
+      "bytes": [
+        198,
+        117
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "dec",
+      "operand": "screen_ptr_hi",
+      "target": 117,
+      "target_label": "screen_ptr_hi"
+    },
+    {
+      "addr": 10311,
+      "bytes": [
+        230,
+        120
+      ],
+      "labels": [
+        "plot_star_next_data"
+      ],
+      "comment_inline": "Next byte of the frame",
+      "xref_summaries": [
+        "&2847 referenced 3 times by &2836, &283a, &2843"
+      ],
+      "references": [
+        {
+          "addr": 10294,
+          "kind": "direct"
+        },
+        {
+          "addr": 10298,
+          "kind": "direct"
+        },
+        {
+          "addr": 10307,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "inc",
+      "operand": "sprite_data_ptr",
+      "target": 120,
+      "target_label": "sprite_data_ptr"
+    },
+    {
+      "addr": 10313,
+      "bytes": [
+        208,
+        2
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "plot_star_next_byte",
+      "target": 10317,
+      "target_label": "plot_star_next_byte"
+    },
+    {
+      "addr": 10315,
+      "bytes": [
+        230,
+        121
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "inc",
+      "operand": "sprite_data_ptr_hi",
+      "target": 121,
+      "target_label": "sprite_data_ptr_hi"
+    },
+    {
+      "addr": 10317,
+      "bytes": [
+        202
+      ],
+      "labels": [
+        "plot_star_next_byte"
+      ],
+      "comment_inline": "Next byte across",
+      "xref_summaries": [
+        "&284d referenced 1 time by &2849"
+      ],
+      "references": [
+        {
+          "addr": 10313,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "dex"
+    },
+    {
+      "addr": 10318,
+      "bytes": [
+        208,
+        213
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "plot_star_byte",
+      "target": 10277,
+      "target_label": "plot_star_byte"
+    },
+    {
+      "addr": 10320,
+      "bytes": [
+        24
+      ],
+      "comment_inline": "Down one pixel row from the row's start...",
+      "type": "code",
+      "mnemonic": "clc"
+    },
+    {
+      "addr": 10321,
+      "bytes": [
+        165,
+        118
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "row_start_ptr",
+      "target": 118,
+      "target_label": "row_start_ptr"
+    },
+    {
+      "addr": 10323,
+      "bytes": [
+        105,
+        1
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "adc",
+      "operand": "#1"
+    },
+    {
+      "addr": 10325,
+      "bytes": [
+        133,
+        116
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "screen_ptr",
+      "target": 116,
+      "target_label": "screen_ptr"
+    },
+    {
+      "addr": 10327,
+      "bytes": [
+        165,
+        119
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "row_start_ptr_hi",
+      "target": 119,
+      "target_label": "row_start_ptr_hi"
+    },
+    {
+      "addr": 10329,
+      "bytes": [
+        105,
+        0
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "adc",
+      "operand": "#0"
+    },
+    {
+      "addr": 10331,
+      "bytes": [
+        133,
+        117
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "screen_ptr_hi",
+      "target": 117,
+      "target_label": "screen_ptr_hi"
+    },
+    {
+      "addr": 10333,
+      "bytes": [
+        165,
+        116
+      ],
+      "comment_inline": "...crossing into the next character row every eight (640 - 8 bytes on)",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "screen_ptr",
+      "target": 116,
+      "target_label": "screen_ptr"
+    },
+    {
+      "addr": 10335,
+      "bytes": [
+        41,
+        7
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "and",
+      "operand": "#7"
+    },
+    {
+      "addr": 10337,
+      "bytes": [
+        208,
+        13
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "plot_star_next_row",
+      "target": 10352,
+      "target_label": "plot_star_next_row"
+    },
+    {
+      "addr": 10339,
+      "bytes": [
+        24
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "clc"
+    },
+    {
+      "addr": 10340,
+      "bytes": [
+        165,
+        116
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "screen_ptr",
+      "target": 116,
+      "target_label": "screen_ptr"
+    },
+    {
+      "addr": 10342,
+      "bytes": [
+        105,
+        120
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "adc",
+      "operand": "#&78"
+    },
+    {
+      "addr": 10344,
+      "bytes": [
+        133,
+        116
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "screen_ptr",
+      "target": 116,
+      "target_label": "screen_ptr"
+    },
+    {
+      "addr": 10346,
+      "bytes": [
+        165,
+        117
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "screen_ptr_hi",
+      "target": 117,
+      "target_label": "screen_ptr_hi"
+    },
+    {
+      "addr": 10348,
+      "bytes": [
+        105,
+        2
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "adc",
+      "operand": "#2"
+    },
+    {
+      "addr": 10350,
+      "bytes": [
+        133,
+        117
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "screen_ptr_hi",
+      "target": 117,
+      "target_label": "screen_ptr_hi"
+    },
+    {
+      "addr": 10352,
+      "bytes": [
+        104
+      ],
+      "labels": [
+        "plot_star_next_row"
+      ],
+      "comment_inline": "Next row",
+      "xref_summaries": [
+        "&2870 referenced 1 time by &2861"
+      ],
+      "references": [
+        {
+          "addr": 10337,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 10353,
+      "bytes": [
+        170
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "tax"
+    },
+    {
+      "addr": 10354,
+      "bytes": [
+        202
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "dex"
+    },
+    {
+      "addr": 10355,
+      "bytes": [
+        208,
+        164
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "plot_star_row",
+      "target": 10265,
+      "target_label": "plot_star_row"
+    },
+    {
+      "addr": 10357,
+      "bytes": [
+        96
+      ],
+      "comment_inline": "Return",
+      "type": "code",
+      "mnemonic": "rts"
+    },
+    {
+      "addr": 10358,
+      "bytes": [
+        165,
+        113
+      ],
+      "labels": [
+        "title_screen_address"
+      ],
+      "comment_inline": "Character row x 2...",
+      "xref_summaries": [
+        "&2876 referenced 1 time by &2814"
+      ],
+      "references": [
+        {
+          "addr": 10260,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "plot_y",
+      "target": 113,
+      "target_label": "plot_y"
+    },
+    {
+      "addr": 10360,
+      "bytes": [
+        74
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lsr"
+    },
+    {
+      "addr": 10361,
+      "bytes": [
+        74
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lsr"
+    },
+    {
+      "addr": 10362,
+      "bytes": [
+        41,
+        254
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "and",
+      "operand": "#&fe"
+    },
+    {
+      "addr": 10364,
+      "bytes": [
+        168
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "tay"
+    },
+    {
+      "addr": 10365,
+      "bytes": [
+        185,
+        117,
+        195
+      ],
+      "comment_inline": "High byte of row x 640, from the MOS table...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "mos_row_offsets,y",
+      "target": 50037,
+      "target_label": "mos_row_offsets"
+    },
+    {
+      "addr": 10368,
+      "bytes": [
+        24
+      ],
+      "comment_inline": "...plus &3000, the screen start",
+      "type": "code",
+      "mnemonic": "clc"
+    },
+    {
+      "addr": 10369,
+      "bytes": [
+        105,
+        48
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "adc",
+      "operand": "#&30"
+    },
+    {
+      "addr": 10371,
+      "bytes": [
+        133,
+        117
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "screen_ptr_hi",
+      "target": 117,
+      "target_label": "screen_ptr_hi"
+    },
+    {
+      "addr": 10373,
+      "bytes": [
+        185,
+        118,
+        195
+      ],
+      "comment_inline": "Low byte of row x 640",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "mos_row_offsets + 1,y",
+      "target": 50038
+    },
+    {
+      "addr": 10376,
+      "bytes": [
+        133,
+        116
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "screen_ptr",
+      "target": 116,
+      "target_label": "screen_ptr"
+    },
+    {
+      "addr": 10378,
+      "bytes": [
+        165,
+        113
+      ],
+      "comment_inline": "Plus the pixel row within the character row",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "plot_y",
+      "target": 113,
+      "target_label": "plot_y"
+    },
+    {
+      "addr": 10380,
+      "bytes": [
+        41,
+        7
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "and",
+      "operand": "#7"
+    },
+    {
+      "addr": 10382,
+      "bytes": [
+        101,
+        116
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "adc",
+      "operand": "screen_ptr",
+      "target": 116,
+      "target_label": "screen_ptr"
+    },
+    {
+      "addr": 10384,
+      "bytes": [
+        133,
+        116
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "screen_ptr",
+      "target": 116,
+      "target_label": "screen_ptr"
+    },
+    {
+      "addr": 10386,
+      "bytes": [
+        24
+      ],
+      "comment_inline": "Plus 8 x byte column: high part...",
+      "type": "code",
+      "mnemonic": "clc"
+    },
+    {
+      "addr": 10387,
+      "bytes": [
+        165,
+        112
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "plot_x",
+      "target": 112,
+      "target_label": "plot_x"
+    },
+    {
+      "addr": 10389,
+      "bytes": [
+        41,
+        224
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "and",
+      "operand": "#&e0"
+    },
+    {
+      "addr": 10391,
+      "bytes": [
+        42
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "rol"
+    },
+    {
+      "addr": 10392,
+      "bytes": [
+        42
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "rol"
+    },
+    {
+      "addr": 10393,
+      "bytes": [
+        42
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "rol"
+    },
+    {
+      "addr": 10394,
+      "bytes": [
+        42
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "rol"
+    },
+    {
+      "addr": 10395,
+      "bytes": [
+        24
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "clc"
+    },
+    {
+      "addr": 10396,
+      "bytes": [
+        101,
+        117
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "adc",
+      "operand": "screen_ptr_hi",
+      "target": 117,
+      "target_label": "screen_ptr_hi"
+    },
+    {
+      "addr": 10398,
+      "bytes": [
+        133,
+        117
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "screen_ptr_hi",
+      "target": 117,
+      "target_label": "screen_ptr_hi"
+    },
+    {
+      "addr": 10400,
+      "bytes": [
+        165,
+        112
+      ],
+      "comment_inline": "...low part",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "plot_x",
+      "target": 112,
+      "target_label": "plot_x"
+    },
+    {
+      "addr": 10402,
+      "bytes": [
+        10
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "asl"
+    },
+    {
+      "addr": 10403,
+      "bytes": [
+        10
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "asl"
+    },
+    {
+      "addr": 10404,
+      "bytes": [
+        10
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "asl"
+    },
+    {
+      "addr": 10405,
+      "bytes": [
+        24
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "clc"
+    },
+    {
+      "addr": 10406,
+      "bytes": [
+        101,
+        116
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "adc",
+      "operand": "screen_ptr",
+      "target": 116,
+      "target_label": "screen_ptr"
+    },
+    {
+      "addr": 10408,
+      "bytes": [
+        133,
+        116
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "screen_ptr",
+      "target": 116,
+      "target_label": "screen_ptr"
+    },
+    {
+      "addr": 10410,
+      "bytes": [
+        144,
+        2
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bcc",
+      "operand": "title_screen_address_done",
+      "target": 10414,
+      "target_label": "title_screen_address_done"
+    },
+    {
+      "addr": 10412,
+      "bytes": [
+        230,
+        117
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "inc",
+      "operand": "screen_ptr_hi",
+      "target": 117,
+      "target_label": "screen_ptr_hi"
+    },
+    {
+      "addr": 10414,
+      "bytes": [
+        160,
+        0
+      ],
+      "labels": [
+        "title_screen_address_done"
+      ],
+      "comment_inline": "Y = 0 for the plotting loop",
+      "xref_summaries": [
+        "&28ae referenced 1 time by &28aa"
+      ],
+      "references": [
+        {
+          "addr": 10410,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#0"
+    },
+    {
+      "addr": 10416,
+      "bytes": [
+        96
+      ],
+      "comment_inline": "Return",
+      "type": "code",
+      "mnemonic": "rts"
+    },
+    {
+      "addr": 10417,
+      "bytes": [
+        13,
+        24,
+        165,
+        116,
+        105,
+        120,
+        133,
+        116,
+        165,
+        117,
+        105,
+        2,
+        133,
+        117,
+        104
+      ],
+      "type": "byte",
+      "values": [
+        13,
+        24,
+        165,
+        116,
+        105,
+        120,
+        133,
+        116,
+        165,
+        117,
+        105,
+        2,
+        133,
+        117,
+        104
+      ]
+    },
+    {
+      "addr": 10432,
+      "bytes": [
+        0,
+        196,
+        136,
+        76,
+        16,
+        212,
+        152
+      ],
+      "labels": [
+        "star_frames_lo"
+      ],
+      "xref_summaries": [
+        "&28c0 used as index base 1 time by &280a"
+      ],
+      "references": [
+        {
+          "addr": 10250,
+          "kind": "indexed"
+        }
+      ],
+      "type": "byte",
+      "values": [
+        0,
+        196,
+        136,
+        76,
+        16,
+        212,
+        152
+      ]
+    },
+    {
+      "addr": 10439,
+      "bytes": [
+        21,
+        74,
+        41,
+        254,
+        168,
+        185,
+        117,
+        195,
+        24
+      ],
+      "type": "byte",
+      "values": [
+        21,
+        74,
+        41,
+        254,
+        168,
+        185,
+        117,
+        195,
+        24
+      ]
+    },
+    {
+      "addr": 10448,
+      "bytes": [
+        42,
+        42,
+        43,
+        44,
+        45,
+        45,
+        46
+      ],
+      "labels": [
+        "star_frames_hi"
+      ],
+      "xref_summaries": [
+        "&28d0 used as index base 1 time by &280f"
+      ],
+      "references": [
+        {
+          "addr": 10255,
+          "kind": "indexed"
+        }
+      ],
+      "type": "byte",
+      "values": [
+        42,
+        42,
+        43,
+        44,
+        45,
+        45,
+        46
+      ]
+    },
+    {
+      "addr": 10455,
+      "bytes": [
+        34,
+        116,
+        165,
+        113,
+        41,
+        7,
+        101,
+        116,
+        133,
+        42,
+        42,
+        43,
+        44,
+        45,
+        45,
+        46,
+        34,
+        42,
+        42,
+        24,
+        101,
+        117,
+        133,
+        117,
+        165,
+        112,
+        10,
+        10,
+        10,
+        24,
+        101,
+        116,
+        133,
+        116,
+        144,
+        2,
+        230,
+        117,
+        160,
+        0,
+        0
+      ],
+      "type": "byte",
+      "values": [
+        34,
+        116,
+        165,
+        113,
+        41,
+        7,
+        101,
+        116,
+        133,
+        42,
+        42,
+        43,
+        44,
+        45,
+        45,
+        46,
+        34,
+        42,
+        42,
+        24,
+        101,
+        117,
+        133,
+        117,
+        165,
+        112,
+        10,
+        10,
+        10,
+        24,
+        101,
+        116,
+        133,
+        116,
+        144,
+        2,
+        230,
+        117,
+        160,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 10496,
+      "bytes": [
+        162,
+        2
+      ],
+      "labels": [
+        "twinkle_stars"
+      ],
+      "comment_inline": "No stars showing",
+      "xref_summaries": [
+        "&2900 referenced 1 time by &2778"
+      ],
+      "references": [
+        {
+          "addr": 10104,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#2"
+    },
+    {
+      "addr": 10498,
+      "bytes": [
+        169,
+        0
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#0"
+    },
+    {
+      "addr": 10500,
+      "bytes": [
+        157,
+        218,
+        41
+      ],
+      "labels": [
+        "clear_star_showing"
+      ],
+      "comment_inline": "...",
+      "xref_summaries": [
+        "&2904 referenced 1 time by &2908"
+      ],
+      "references": [
+        {
+          "addr": 10504,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "star_showing,x",
+      "target": 10714,
+      "target_label": "star_showing"
+    },
+    {
+      "addr": 10503,
+      "bytes": [
+        202
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "dex"
+    },
+    {
+      "addr": 10504,
+      "bytes": [
+        16,
+        250
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bpl",
+      "operand": "clear_star_showing",
+      "target": 10500,
+      "target_label": "clear_star_showing"
+    },
+    {
+      "addr": 10506,
+      "bytes": [
+        173,
+        68,
+        254
+      ],
+      "labels": [
+        "twinkle_loop"
+      ],
+      "comment_inline": "One time in four (System VIA timer 1, low bits)...",
+      "xref_summaries": [
+        "&290a referenced 1 time by &291e"
+      ],
+      "references": [
+        {
+          "addr": 10526,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "system_via_t1c_l",
+      "target": 65092,
+      "target_label": "system_via_t1c_l"
+    },
+    {
+      "addr": 10509,
+      "bytes": [
+        41,
+        3
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "and",
+      "operand": "#3"
+    },
+    {
+      "addr": 10511,
+      "bytes": [
+        208,
+        3
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "twinkle_advance",
+      "target": 10516,
+      "target_label": "twinkle_advance"
+    },
+    {
+      "addr": 10513,
+      "bytes": [
+        32,
+        46,
+        41
+      ],
+      "comment_inline": "...start a star",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "start_star",
+      "target": 10542,
+      "target_label": "start_star"
+    },
+    {
+      "addr": 10516,
+      "bytes": [
+        32,
+        109,
+        41
+      ],
+      "labels": [
+        "twinkle_advance"
+      ],
+      "comment_inline": "Advance every star",
+      "xref_summaries": [
+        "&2914 referenced 1 time by &290f"
+      ],
+      "references": [
+        {
+          "addr": 10511,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "advance_stars",
+      "target": 10605,
+      "target_label": "advance_stars"
+    },
+    {
+      "addr": 10519,
+      "bytes": [
+        169,
+        122
+      ],
+      "comment_inline": "OSBYTE &7A: any key pressed?",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#osbyte_scan_keyboard_from_16",
+      "expr": {
+        "text": "osbyte_scan_keyboard_from_16",
+        "tree": {
+          "sym": "osbyte_scan_keyboard_from_16"
+        }
+      }
+    },
+    {
+      "addr": 10521,
+      "bytes": [
+        32,
+        244,
+        255
+      ],
+      "comment_inline": "... Scan keyboard from key 16",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "osbyte",
+      "target": 65524,
+      "target_label": "osbyte"
+    },
+    {
+      "addr": 10524,
+      "bytes": [
+        224,
+        255
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "cpx",
+      "operand": "#&ff"
+    },
+    {
+      "addr": 10526,
+      "bytes": [
+        240,
+        234
+      ],
+      "comment_inline": "No: carry on",
+      "type": "code",
+      "mnemonic": "beq",
+      "operand": "twinkle_loop",
+      "target": 10506,
+      "target_label": "twinkle_loop"
+    },
+    {
+      "addr": 10528,
+      "bytes": [
+        160,
+        2
+      ],
+      "comment_inline": "Yes: erase the stars still showing...",
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#2"
+    },
+    {
+      "addr": 10530,
+      "bytes": [
+        185,
+        218,
+        41
+      ],
+      "labels": [
+        "erase_stars"
+      ],
+      "comment_inline": "...",
+      "xref_summaries": [
+        "&2922 referenced 1 time by &292b"
+      ],
+      "references": [
+        {
+          "addr": 10539,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "star_showing,y",
+      "target": 10714,
+      "target_label": "star_showing"
+    },
+    {
+      "addr": 10533,
+      "bytes": [
+        240,
+        3
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "beq",
+      "operand": "erase_next_star",
+      "target": 10538,
+      "target_label": "erase_next_star"
+    },
+    {
+      "addr": 10535,
+      "bytes": [
+        32,
+        185,
+        41
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "plot_star",
+      "target": 10681,
+      "target_label": "plot_star"
+    },
+    {
+      "addr": 10538,
+      "bytes": [
+        136
+      ],
+      "labels": [
+        "erase_next_star"
+      ],
+      "comment_inline": "...",
+      "xref_summaries": [
+        "&292a referenced 1 time by &2925"
+      ],
+      "references": [
+        {
+          "addr": 10533,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "dey"
+    },
+    {
+      "addr": 10539,
+      "bytes": [
+        16,
+        245
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bpl",
+      "operand": "erase_stars",
+      "target": 10530,
+      "target_label": "erase_stars"
+    },
+    {
+      "addr": 10541,
+      "bytes": [
+        96
+      ],
+      "comment_inline": "Return",
+      "type": "code",
+      "mnemonic": "rts"
+    },
+    {
+      "addr": 10542,
+      "bytes": [
+        160,
+        0
+      ],
+      "labels": [
+        "start_star"
+      ],
+      "comment_inline": "Find a star not showing...",
+      "xref_summaries": [
+        "&292e referenced 1 time by &2911"
+      ],
+      "references": [
+        {
+          "addr": 10513,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#0"
+    },
+    {
+      "addr": 10544,
+      "bytes": [
+        185,
+        218,
+        41
+      ],
+      "labels": [
+        "find_free_star"
+      ],
+      "comment_inline": "...",
+      "xref_summaries": [
+        "&2930 referenced 1 time by &2938"
+      ],
+      "references": [
+        {
+          "addr": 10552,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "star_showing,y",
+      "target": 10714,
+      "target_label": "star_showing"
+    },
+    {
+      "addr": 10547,
+      "bytes": [
+        240,
+        6
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "beq",
+      "operand": "star_found",
+      "target": 10555,
+      "target_label": "star_found"
+    },
+    {
+      "addr": 10549,
+      "bytes": [
+        200
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "iny"
+    },
+    {
+      "addr": 10550,
+      "bytes": [
+        192,
+        3
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "cpy",
+      "operand": "#3"
+    },
+    {
+      "addr": 10552,
+      "bytes": [
+        208,
+        246
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "find_free_star",
+      "target": 10544,
+      "target_label": "find_free_star"
+    },
+    {
+      "addr": 10554,
+      "bytes": [
+        96
+      ],
+      "comment_inline": "All three showing: return",
+      "type": "code",
+      "mnemonic": "rts"
+    },
+    {
+      "addr": 10555,
+      "bytes": [
+        169,
+        1
+      ],
+      "labels": [
+        "star_found"
+      ],
+      "comment_inline": "Mark it showing",
+      "xref_summaries": [
+        "&293b referenced 1 time by &2933"
+      ],
+      "references": [
+        {
+          "addr": 10547,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#1"
+    },
+    {
+      "addr": 10557,
+      "bytes": [
+        153,
+        218,
+        41
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "star_showing,y",
+      "target": 10714,
+      "target_label": "star_showing"
+    },
+    {
+      "addr": 10560,
+      "bytes": [
+        169,
+        1
+      ],
+      "comment_inline": "Frame step +1...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#1"
+    },
+    {
+      "addr": 10562,
+      "bytes": [
+        153,
+        137,
+        0
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "star_frame_step,y",
+      "expr": {
+        "text": "star_frame_step",
+        "tree": {
+          "sym": "star_frame_step"
+        }
+      },
+      "target": 137
+    },
+    {
+      "addr": 10565,
+      "bytes": [
+        169,
+        0
+      ],
+      "comment_inline": "...from frame 0",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#0"
+    },
+    {
+      "addr": 10567,
+      "bytes": [
+        153,
+        134,
+        0
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "star_frame,y",
+      "expr": {
+        "text": "star_frame",
+        "tree": {
+          "sym": "star_frame"
+        }
+      },
+      "target": 134
+    },
+    {
+      "addr": 10570,
+      "bytes": [
+        173,
+        68,
+        254
+      ],
+      "labels": [
+        "pick_place"
+      ],
+      "comment_inline": "Pick a place at random (timer, &FA and &FC mixed)...",
+      "xref_summaries": [
+        "&294a referenced 1 time by &2957"
+      ],
+      "references": [
+        {
+          "addr": 10583,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "system_via_t1c_l",
+      "target": 65092,
+      "target_label": "system_via_t1c_l"
+    },
+    {
+      "addr": 10573,
+      "bytes": [
+        69,
+        250
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "eor",
+      "operand": "os_zp_fa",
+      "target": 250,
+      "target_label": "os_zp_fa"
+    },
+    {
+      "addr": 10575,
+      "bytes": [
+        69,
+        252
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "eor",
+      "operand": "os_irq_a",
+      "target": 252,
+      "target_label": "os_irq_a"
+    },
+    {
+      "addr": 10577,
+      "bytes": [
+        41,
+        7
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "and",
+      "operand": "#7"
+    },
+    {
+      "addr": 10579,
+      "bytes": [
+        170
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "tax"
+    },
+    {
+      "addr": 10580,
+      "bytes": [
+        189,
+        224,
+        41
+      ],
+      "comment_inline": "...that is free",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "star_places_x,x",
+      "target": 10720,
+      "target_label": "star_places_x"
+    },
+    {
+      "addr": 10583,
+      "bytes": [
+        48,
+        241
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bmi",
+      "operand": "pick_place",
+      "target": 10570,
+      "target_label": "pick_place"
+    },
+    {
+      "addr": 10585,
+      "bytes": [
+        153,
+        128,
+        0
+      ],
+      "comment_inline": "Star position from the place...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "star_x,y",
+      "expr": {
+        "text": "star_x",
+        "tree": {
+          "sym": "star_x"
+        }
+      },
+      "target": 128
+    },
+    {
+      "addr": 10588,
+      "bytes": [
+        189,
+        240,
+        41
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "star_places_y,x",
+      "target": 10736,
+      "target_label": "star_places_y"
+    },
+    {
+      "addr": 10591,
+      "bytes": [
+        153,
+        131,
+        0
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "star_y,y",
+      "expr": {
+        "text": "star_y",
+        "tree": {
+          "sym": "star_y"
+        }
+      },
+      "target": 131
+    },
+    {
+      "addr": 10594,
+      "bytes": [
+        150,
+        140
+      ],
+      "comment_inline": "...remembering the place",
+      "type": "code",
+      "mnemonic": "stx",
+      "operand": "star_place,y",
+      "expr": {
+        "text": "star_place",
+        "tree": {
+          "sym": "star_place"
+        }
+      },
+      "target": 140
+    },
+    {
+      "addr": 10596,
+      "bytes": [
+        169,
+        255
+      ],
+      "comment_inline": "Mark the place taken",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&ff"
+    },
+    {
+      "addr": 10598,
+      "bytes": [
+        157,
+        224,
+        41
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "star_places_x,x",
+      "target": 10720,
+      "target_label": "star_places_x"
+    },
+    {
+      "addr": 10601,
+      "bytes": [
+        32,
+        185,
+        41
+      ],
+      "comment_inline": "Plot the first frame",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "plot_star",
+      "target": 10681,
+      "target_label": "plot_star"
+    },
+    {
+      "addr": 10604,
+      "bytes": [
+        96
+      ],
+      "comment_inline": "Return",
+      "type": "code",
+      "mnemonic": "rts"
+    },
+    {
+      "addr": 10605,
+      "bytes": [
+        160,
+        0
+      ],
+      "labels": [
+        "advance_stars"
+      ],
+      "comment_inline": "For each star...",
+      "xref_summaries": [
+        "&296d referenced 1 time by &2914"
+      ],
+      "references": [
+        {
+          "addr": 10516,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#0"
+    },
+    {
+      "addr": 10607,
+      "bytes": [
+        185,
+        218,
+        41
+      ],
+      "labels": [
+        "advance_star"
+      ],
+      "comment_inline": "...showing?",
+      "xref_summaries": [
+        "&296f referenced 1 time by &29b6"
+      ],
+      "references": [
+        {
+          "addr": 10678,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "star_showing,y",
+      "target": 10714,
+      "target_label": "star_showing"
+    },
+    {
+      "addr": 10610,
+      "bytes": [
+        240,
+        92
+      ],
+      "comment_inline": "No: just pause",
+      "type": "code",
+      "mnemonic": "beq",
+      "operand": "star_not_showing",
+      "target": 10704,
+      "target_label": "star_not_showing"
+    },
+    {
+      "addr": 10612,
+      "bytes": [
+        32,
+        185,
+        41
+      ],
+      "comment_inline": "Erase its frame",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "plot_star",
+      "target": 10681,
+      "target_label": "plot_star"
+    },
+    {
+      "addr": 10615,
+      "bytes": [
+        24
+      ],
+      "comment_inline": "Step the frame",
+      "type": "code",
+      "mnemonic": "clc"
+    },
+    {
+      "addr": 10616,
+      "bytes": [
+        185,
+        134,
+        0
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "star_frame,y",
+      "expr": {
+        "text": "star_frame",
+        "tree": {
+          "sym": "star_frame"
+        }
+      },
+      "target": 134
+    },
+    {
+      "addr": 10619,
+      "bytes": [
+        121,
+        137,
+        0
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "adc",
+      "operand": "star_frame_step,y",
+      "expr": {
+        "text": "star_frame_step",
+        "tree": {
+          "sym": "star_frame_step"
+        }
+      },
+      "target": 137
+    },
+    {
+      "addr": 10622,
+      "bytes": [
+        153,
+        134,
+        0
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "star_frame,y",
+      "expr": {
+        "text": "star_frame",
+        "tree": {
+          "sym": "star_frame"
+        }
+      },
+      "target": 134
+    },
+    {
+      "addr": 10625,
+      "bytes": [
+        48,
+        16
+      ],
+      "comment_inline": "Below 0: finished",
+      "type": "code",
+      "mnemonic": "bmi",
+      "operand": "star_finished",
+      "target": 10643,
+      "target_label": "star_finished"
+    },
+    {
+      "addr": 10627,
+      "bytes": [
+        201,
+        7
+      ],
+      "comment_inline": "Past 6?",
+      "type": "code",
+      "mnemonic": "cmp",
+      "operand": "#7"
+    },
+    {
+      "addr": 10629,
+      "bytes": [
+        144,
+        27
+      ],
+      "comment_inline": "No: plot it",
+      "type": "code",
+      "mnemonic": "bcc",
+      "operand": "plot_new_frame",
+      "target": 10658,
+      "target_label": "plot_new_frame"
+    },
+    {
+      "addr": 10631,
+      "bytes": [
+        169,
+        5
+      ],
+      "comment_inline": "Yes: frame 5...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#5"
+    },
+    {
+      "addr": 10633,
+      "bytes": [
+        153,
+        134,
+        0
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "star_frame,y",
+      "expr": {
+        "text": "star_frame",
+        "tree": {
+          "sym": "star_frame"
+        }
+      },
+      "target": 134
+    },
+    {
+      "addr": 10636,
+      "bytes": [
+        169,
+        255
+      ],
+      "comment_inline": "...stepping back",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&ff"
+    },
+    {
+      "addr": 10638,
+      "bytes": [
+        153,
+        137,
+        0
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "star_frame_step,y",
+      "expr": {
+        "text": "star_frame_step",
+        "tree": {
+          "sym": "star_frame_step"
+        }
+      },
+      "target": 137
+    },
+    {
+      "addr": 10641,
+      "bytes": [
+        48,
+        15
+      ],
+      "comment_inline": "...and plot it (always branches)",
+      "type": "code",
+      "mnemonic": "bmi",
+      "operand": "plot_new_frame",
+      "target": 10658,
+      "target_label": "plot_new_frame"
+    },
+    {
+      "addr": 10643,
+      "bytes": [
+        169,
+        0
+      ],
+      "labels": [
+        "star_finished"
+      ],
+      "comment_inline": "Finished: not showing...",
+      "xref_summaries": [
+        "&2993 referenced 1 time by &2981"
+      ],
+      "references": [
+        {
+          "addr": 10625,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#0"
+    },
+    {
+      "addr": 10645,
+      "bytes": [
+        153,
+        218,
+        41
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "star_showing,y",
+      "target": 10714,
+      "target_label": "star_showing"
+    },
+    {
+      "addr": 10648,
+      "bytes": [
+        185,
+        128,
+        0
+      ],
+      "comment_inline": "...and free its place",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "star_x,y",
+      "expr": {
+        "text": "star_x",
+        "tree": {
+          "sym": "star_x"
+        }
+      },
+      "target": 128
+    },
+    {
+      "addr": 10651,
+      "bytes": [
+        182,
+        140
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "star_place,y",
+      "expr": {
+        "text": "star_place",
+        "tree": {
+          "sym": "star_place"
+        }
+      },
+      "target": 140
+    },
+    {
+      "addr": 10653,
+      "bytes": [
+        157,
+        224,
+        41
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "star_places_x,x",
+      "target": 10720,
+      "target_label": "star_places_x"
+    },
+    {
+      "addr": 10656,
+      "bytes": [
+        16,
+        3
+      ],
+      "comment_inline": "...(always branches)",
+      "type": "code",
+      "mnemonic": "bpl",
+      "operand": "star_pause",
+      "target": 10661,
+      "target_label": "star_pause"
+    },
+    {
+      "addr": 10658,
+      "bytes": [
+        32,
+        185,
+        41
+      ],
+      "labels": [
+        "plot_new_frame"
+      ],
+      "comment_inline": "Plot the new frame",
+      "xref_summaries": [
+        "&29a2 referenced 2 times by &2985, &2991"
+      ],
+      "references": [
+        {
+          "addr": 10629,
+          "kind": "direct"
+        },
+        {
+          "addr": 10641,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "plot_star",
+      "target": 10681,
+      "target_label": "plot_star"
+    },
+    {
+      "addr": 10661,
+      "bytes": [
+        152
+      ],
+      "labels": [
+        "star_pause"
+      ],
+      "comment_inline": "Pause...",
+      "xref_summaries": [
+        "&29a5 referenced 1 time by &29a0"
+      ],
+      "references": [
+        {
+          "addr": 10656,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "tya"
+    },
+    {
+      "addr": 10662,
+      "bytes": [
+        72
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pha"
+    },
+    {
+      "addr": 10663,
+      "bytes": [
+        162,
+        5
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#5"
+    },
+    {
+      "addr": 10665,
+      "bytes": [
+        160,
+        255
+      ],
+      "labels": [
+        "star_pause_outer"
+      ],
+      "comment_inline": "...X x 256 iterations...",
+      "xref_summaries": [
+        "&29a9 referenced 2 times by &29af, &29d4"
+      ],
+      "references": [
+        {
+          "addr": 10671,
+          "kind": "direct"
+        },
+        {
+          "addr": 10708,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#&ff"
+    },
+    {
+      "addr": 10667,
+      "bytes": [
+        136
+      ],
+      "labels": [
+        "star_pause_inner"
+      ],
+      "comment_inline": "...",
+      "xref_summaries": [
+        "&29ab referenced 1 time by &29ac"
+      ],
+      "references": [
+        {
+          "addr": 10668,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "dey"
+    },
+    {
+      "addr": 10668,
+      "bytes": [
+        208,
+        253
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "star_pause_inner",
+      "target": 10667,
+      "target_label": "star_pause_inner"
+    },
+    {
+      "addr": 10670,
+      "bytes": [
+        202
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "dex"
+    },
+    {
+      "addr": 10671,
+      "bytes": [
+        208,
+        248
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "star_pause_outer",
+      "target": 10665,
+      "target_label": "star_pause_outer"
+    },
+    {
+      "addr": 10673,
+      "bytes": [
+        104
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 10674,
+      "bytes": [
+        168
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "tay"
+    },
+    {
+      "addr": 10675,
+      "bytes": [
+        200
+      ],
+      "comment_inline": "Next star",
+      "type": "code",
+      "mnemonic": "iny"
+    },
+    {
+      "addr": 10676,
+      "bytes": [
+        192,
+        3
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "cpy",
+      "operand": "#3"
+    },
+    {
+      "addr": 10678,
+      "bytes": [
+        208,
+        183
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "advance_star",
+      "target": 10607,
+      "target_label": "advance_star"
+    },
+    {
+      "addr": 10680,
+      "bytes": [
+        96
+      ],
+      "comment_inline": "Return",
+      "type": "code",
+      "mnemonic": "rts"
+    },
+    {
+      "addr": 10681,
+      "bytes": [
+        185,
+        128,
+        0
+      ],
+      "labels": [
+        "plot_star"
+      ],
+      "comment_inline": "plot_x = star's column",
+      "xref_summaries": [
+        "&29b9 referenced 4 times by &2927, &2969, &2974, &29a2"
+      ],
+      "references": [
+        {
+          "addr": 10535,
+          "kind": "direct"
+        },
+        {
+          "addr": 10601,
+          "kind": "direct"
+        },
+        {
+          "addr": 10612,
+          "kind": "direct"
+        },
+        {
+          "addr": 10658,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "star_x,y",
+      "expr": {
+        "text": "star_x",
+        "tree": {
+          "sym": "star_x"
+        }
+      },
+      "target": 128
+    },
+    {
+      "addr": 10684,
+      "bytes": [
+        133,
+        112
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "plot_x",
+      "target": 112,
+      "target_label": "plot_x"
+    },
+    {
+      "addr": 10686,
+      "bytes": [
+        185,
+        131,
+        0
+      ],
+      "comment_inline": "plot_y = star's row",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "star_y,y",
+      "expr": {
+        "text": "star_y",
+        "tree": {
+          "sym": "star_y"
+        }
+      },
+      "target": 131
+    },
+    {
+      "addr": 10689,
+      "bytes": [
+        133,
+        113
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "plot_y",
+      "target": 113,
+      "target_label": "plot_y"
+    },
+    {
+      "addr": 10691,
+      "bytes": [
+        185,
+        134,
+        0
+      ],
+      "comment_inline": "sprite_number = star's frame",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "star_frame,y",
+      "expr": {
+        "text": "star_frame",
+        "tree": {
+          "sym": "star_frame"
+        }
+      },
+      "target": 134
+    },
+    {
+      "addr": 10694,
+      "bytes": [
+        133,
+        122
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "sprite_number",
+      "target": 122,
+      "target_label": "sprite_number"
+    },
+    {
+      "addr": 10696,
+      "bytes": [
+        152
+      ],
+      "comment_inline": "Plot it, keeping Y",
+      "type": "code",
+      "mnemonic": "tya"
+    },
+    {
+      "addr": 10697,
+      "bytes": [
+        72
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pha"
+    },
+    {
+      "addr": 10698,
+      "bytes": [
+        32,
+        0,
+        40
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "title_plot_star",
+      "target": 10240,
+      "target_label": "title_plot_star"
+    },
+    {
+      "addr": 10701,
+      "bytes": [
+        104
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 10702,
+      "bytes": [
+        168
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "tay"
+    },
+    {
+      "addr": 10703,
+      "bytes": [
+        96
+      ],
+      "comment_inline": "Return",
+      "type": "code",
+      "mnemonic": "rts"
+    },
+    {
+      "addr": 10704,
+      "bytes": [
+        152
+      ],
+      "labels": [
+        "star_not_showing"
+      ],
+      "comment_inline": "Star not showing: pause for longer...",
+      "xref_summaries": [
+        "&29d0 referenced 1 time by &2972"
+      ],
+      "references": [
+        {
+          "addr": 10610,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "tya"
+    },
+    {
+      "addr": 10705,
+      "bytes": [
+        72
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pha"
+    },
+    {
+      "addr": 10706,
+      "bytes": [
+        162,
+        20
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#&14"
+    },
+    {
+      "addr": 10708,
+      "bytes": [
+        208,
+        211
+      ],
+      "comment_inline": "...(always branches)",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "star_pause_outer",
+      "target": 10665,
+      "target_label": "star_pause_outer"
+    },
+    {
+      "addr": 10710,
+      "bytes": [
+        56,
+        56,
+        62,
+        62
+      ],
+      "type": "byte",
+      "values": [
+        56,
+        56,
+        62,
+        62
+      ]
+    },
+    {
+      "addr": 10714,
+      "bytes": [
+        56,
+        56,
+        62
+      ],
+      "labels": [
+        "star_showing"
+      ],
+      "xref_summaries": [
+        "&29da used as index base 6 times by &2904, &2922, &2930, &293d, &296f, &2995"
+      ],
+      "references": [
+        {
+          "addr": 10500,
+          "kind": "indexed"
+        },
+        {
+          "addr": 10530,
+          "kind": "indexed"
+        },
+        {
+          "addr": 10544,
+          "kind": "indexed"
+        },
+        {
+          "addr": 10557,
+          "kind": "indexed"
+        },
+        {
+          "addr": 10607,
+          "kind": "indexed"
+        },
+        {
+          "addr": 10645,
+          "kind": "indexed"
+        }
+      ],
+      "type": "byte",
+      "values": [
+        56,
+        56,
+        62
+      ]
+    },
+    {
+      "addr": 10717,
+      "bytes": [
+        62,
+        56,
+        56
+      ],
+      "type": "byte",
+      "values": [
+        62,
+        56,
+        56
+      ]
+    },
+    {
+      "addr": 10720,
+      "bytes": [
+        47,
+        32,
+        5,
+        0,
+        31,
+        70,
+        70,
+        20
+      ],
+      "labels": [
+        "star_places_x"
+      ],
+      "xref_summaries": [
+        "&29e0 used as index base 3 times by &2954, &2966, &299d"
+      ],
+      "references": [
+        {
+          "addr": 10580,
+          "kind": "indexed"
+        },
+        {
+          "addr": 10598,
+          "kind": "indexed"
+        },
+        {
+          "addr": 10653,
+          "kind": "indexed"
+        }
+      ],
+      "type": "byte",
+      "values": [
+        47,
+        32,
+        5,
+        0,
+        31,
+        70,
+        70,
+        20
+      ]
+    },
+    {
+      "addr": 10728,
+      "bytes": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "type": "byte",
+      "values": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 10736,
+      "bytes": [
+        15,
+        15,
+        36,
+        66,
+        51,
+        15,
+        72,
+        21
+      ],
+      "labels": [
+        "star_places_y"
+      ],
+      "xref_summaries": [
+        "&29f0 used as index base 1 time by &295c"
+      ],
+      "references": [
+        {
+          "addr": 10588,
+          "kind": "indexed"
+        }
+      ],
+      "type": "byte",
+      "values": [
+        15,
+        15,
+        36,
+        66,
+        51,
+        15,
+        72,
+        21
+      ]
+    },
+    {
+      "addr": 10744,
+      "bytes": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "type": "byte",
+      "values": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 10752,
+      "bytes": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        21,
+        31,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "labels": [
+        "star_frame_data"
+      ],
+      "type": "byte",
+      "values": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        21,
+        31,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 10948,
+      "bytes": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        10,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "type": "byte",
+      "values": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        10,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 11144,
+      "bytes": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        21,
+        42,
+        0,
+        63,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "type": "byte",
+      "values": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        21,
+        42,
+        0,
+        63,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 11340,
+      "bytes": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        42,
+        42,
+        0,
+        42,
+        42,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "type": "byte",
+      "values": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        42,
+        42,
+        0,
+        42,
+        42,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 11536,
+      "bytes": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        21,
+        21,
+        42,
+        0,
+        63,
+        21,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "type": "byte",
+      "values": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        21,
+        21,
+        42,
+        0,
+        63,
+        21,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 11732,
+      "bytes": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        42,
+        42,
+        42,
+        0,
+        42,
+        42,
+        42,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "type": "byte",
+      "values": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        42,
+        42,
+        42,
+        0,
+        42,
+        42,
+        42,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 11928,
+      "bytes": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        63,
+        42,
+        0,
+        63,
+        42,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0
+      ],
+      "type": "byte",
+      "values": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        63,
+        42,
+        0,
+        63,
+        42,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        0,
+        0
+      ]
+    }
+  ]
+}

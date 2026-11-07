@@ -1,12 +1,13 @@
 {
     "title": "Dunjunz, official flippy disc (Bug-Byte, 1987), Model B side",
+    "label": "The game",
     "size": 24576,
     "load_address": "0x2000",
     "exec_address": "0x2000",
     "dfs_attributes": "03",
     "md5": "dcfa6146e2bb5c32559865337ef175c9",
     "sha256": "5f40fe371da5d4a388d6abfd0cda3c683992b363c425fb90746e02f505c77f31",
-    "notes": "Dun1 and Coder, exported with oaknut-disc from the Model B side of HFE flux captures of the 1987 flippy disc made by VectorEyes for the beeb_hfe archive of original discs (catalogued as Bug Byte, Dunjunz, variant 1, with identical copies owned by pumpkin and ip) and passed to the project by the stardot user Pernod; the files are byte-identical to the NVG archive's Dunjunz.zip. Dun1 (&2000-&7FFF, the figures above) holds the whole game. Coder (&5000-&59AF, 2480 bytes, exec &5000; SHA-256 2809c2aca27673963f795033190d0668c59789161483f173b331a8b468ae1775) is run for every level: it reloads Dun1, loads the level, copies &3000-&473F down to &08C0-&1FFF and one of two images of &0400-&07FF (keyboard only, or with a joystick handler) into place, and starts the game. The listing saves both files.",
+    "notes": "Dun1 and Coder, exported with oaknut-disc from the Model B side of HFE flux captures of the 1987 flippy disc made by VectorEyes for the beeb_hfe archive of original discs (catalogued as Bug Byte, Dunjunz, variant 1, with identical copies owned by pumpkin and ip) and passed to the project by the stardot user Pernod; the files are byte-identical to the NVG archive's Dunjunz.zip. Dun1 (&2000-&7FFF, the figures above) holds the whole game. Coder (&5000-&59AF, 2480 bytes, exec &5000; SHA-256 2809c2aca27673963f795033190d0668c59789161483f173b331a8b468ae1775) is run for every level: it reloads Dun1, loads the level, copies &3000-&473F down to &08C0-&1FFF and one of two images of &0400-&07FF (keyboard only, or with a joystick handler) into place, and starts the game. The game listing saves both files. The side holds three more programs, each disassembled on its own: Dunjunz (the title screen and loader, run as *DUNJUNZ), *EDITOR (Editor) and *DEFAULT (Default).",
     "memory_map_groups": {
         "zero_page": "Zero page",
         "os_vectors": "OS vectors",
@@ -22,7 +23,8 @@
         "text": "Text",
         "level_file": "Level file (&6B00)",
         "disc_state": "Disc release: level loading",
-        "leftovers": "Leftovers from development"
+        "leftovers": "Leftovers from development",
+        "editor_workspace": "Editor workspace"
     },
     "files": [
         {
@@ -38,6 +40,53 @@
             "exec": "0x5000",
             "size": 2480,
             "sha256": "2809c2aca27673963f795033190d0668c59789161483f173b331a8b468ae1775"
+        }
+    ],
+    "disassemblies": [
+        {
+            "label": "Dunjunz: title screen and loader",
+            "slug": "dunjunz",
+            "json": "output/dunjunz-disc-dunjunz.json",
+            "runtime": "Dunjunz, load &26C0, exec &2700, &89C bytes. Run as *DUNJUNZ by the other side's BOOT once the disc is turned over, and again by the game after game over: sets up page &08 for Coder and the game, points the BREAK intercept at the game's next-level intercept, shows the title screen with its twinkling stars, then arms the intercept and runs Coder.",
+            "files": [
+                {
+                    "name": "Dunjunz",
+                    "load": "0x26C0",
+                    "exec": "0x2700",
+                    "size": 2204,
+                    "sha256": "a1b8f4a91f0eb3f4a375eeb3f8ba17785ba5b0a2016637580bb899eec87c9570"
+                }
+            ]
+        },
+        {
+            "label": "*EDITOR: level editor",
+            "slug": "editor",
+            "json": "output/dunjunz-disc-editor.json",
+            "runtime": "Editor, load &1910, exec &239D, &158E bytes. The same level editor as the Master side's, using MOS 1.20's row offsets and reset entry: loads a level file (or starts an empty one), shows its map in MODE 2 to be edited with a cursor, and saves it with a wall block from Stones and its checksum balanced, encrypted as the game expects.",
+            "files": [
+                {
+                    "name": "Editor",
+                    "load": "0x1910",
+                    "exec": "0x239D",
+                    "size": 5518,
+                    "sha256": "38a2e784e20c2872166311ff5a3d7d791683073e8c7b803233debffb21188020"
+                }
+            ]
+        },
+        {
+            "label": "*DEFAULT: level restorer",
+            "slug": "default",
+            "json": "output/dunjunz-disc-default.json",
+            "runtime": "Default, load and exec &1900, &4530 bytes. Asks for a level number and saves that level's original file, from the copies of levels 1-24 it carries, over LevelN on the disc in the drive, undoing the level editor's changes.",
+            "files": [
+                {
+                    "name": "Default",
+                    "load": "0x1900",
+                    "exec": "0x1900",
+                    "size": 17712,
+                    "sha256": "cfea367743d7e1d5ee4e2f59985596349689d4b625f148cfdee01652ac67403d"
+                }
+            ]
         }
     ]
 }
