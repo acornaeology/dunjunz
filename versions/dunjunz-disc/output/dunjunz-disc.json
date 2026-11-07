@@ -655,7 +655,7 @@
       "addr": 32655,
       "name": "wrch_handler",
       "title": "WRCHV handler: print letters and digits in the game font",
-      "description": "Installed on WRCHV while the game runs. A letter (either case) or a digit is printed in the game's own font: its eight-byte glyph is copied over the definition of character 128 (user_char_128) and character 128 is printed instead. Every other character is printed unchanged. Both paths finish in the MOS 1.20 OSWRCH routine at mos_oswrch_default, jumped to directly rather than through the WRCHV value saved at start-up. Lower-case letters share the capitals' glyphs. The handler keeps the character in plot_x, the sprite plotter's zero-page column, and it looks at every byte alone, with no notion of a VDU sequence: a VDU parameter byte that falls in '0'-'9', 'A'-'Z' or 'a'-'z' is sent as &80 too.",
+      "description": "Installed on WRCHV while the game runs. A letter (either case) or a digit is printed in the game's own font: its eight-byte glyph is copied over the definition of character 128 (user_char_128) and character 128 is printed instead. Every other character is printed unchanged. Both paths finish in the MOS 1.20 OSWRCH routine at mos_oswrch_default, jumped to directly rather than through the WRCHV value saved at start-up. Lower-case letters share the capitals' glyphs. The handler keeps the character in plot_x, the sprite plotter's zero-page column, and it looks at every byte alone, with no notion of a VDU sequence: a VDU parameter byte that falls in '0'-'9', 'A'-'Z' or 'a'-'z' is sent as &80 too, so VDU sequences with such parameters go out with the MOS's own WRCHV: draw_view_frames puts it back around its PLOT commands. VDU 23,0,6,25 in start_level passes unharmed (25 is a control code). The glyph goes to &0C00 because MOS 1.20 keeps character 128's definition there, so room_walls must stay at &0C00 too.",
       "on_entry": {
         "A": "character to print"
       },
@@ -109283,7 +109283,7 @@
         "monster_x"
       ],
       "comments_before_label": [
-        "Map x of each monster (entries 1-30; entry 0 unused). During a step it stays the cell the monster is leaving until the step ends, so find_creature, the missiles and the magic all meet the monster there. &FF (off_map) after reset_monsters, and for a monster monster_reappears has parked. Written by update_monsters, continue_monster_step and monster_reappears."
+        "Map x of each monster (entries 1-30; entry 0 unused, and entries 31-40 spare, of which open_door uses entry 35). During a step it stays the cell the monster is leaving until the step ends, so find_creature, the missiles and the magic all meet the monster there. &FF (off_map) after reset_monsters, and for a monster monster_reappears has parked. Written by update_monsters, continue_monster_step and monster_reappears."
       ],
       "comment_inline": "Not read: reset_monsters and the trapdoors set the monsters",
       "xref_summaries": [
@@ -109476,7 +109476,7 @@
         "monster_y"
       ],
       "comments_before_label": [
-        "Map y of each monster, kept like monster_x."
+        "Map y of each monster, kept like monster_x (entries 1-30; entry 35 holds the cell open_door is erasing a door from)."
       ],
       "comment_inline": "Not read: reset_monsters and the trapdoors set the monsters",
       "xref_summaries": [
@@ -109867,7 +109867,7 @@
         "monster_frame"
       ],
       "comments_before_label": [
-        "Each monster's animation frame (0 or 1), added to its facing sprite; toggled on each frame of a step."
+        "Each monster's animation frame (0 or 1), added to its facing sprite; toggled on each frame of a step. Entries 1-30 are used. Nothing sets it at the start of a level, so each monster starts on whatever frame the table holds."
       ],
       "xref_summaries": [
         "&7e7b used as index base 3 times by &7b14, &7c2b, &7c30"

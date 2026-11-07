@@ -10483,13 +10483,13 @@ level_command_digits = level_command+10
     equb &1e                            ; teleport_last: object &1E, the last
     equb &fd                            ; Copied to &0DFE: no variable starts here
     equb &00                            ; victory_sprite_copy: set before use
-; Map x of each monster (entries 1-30; entry 0 unused). During a step it stays the cell the monster is leaving until the step ends, so find_creature, the missiles and the magic all meet the monster there. &FF (off_map) after reset_monsters, and for a monster monster_reappears has parked. Written by update_monsters, continue_monster_step and monster_reappears.
+; Map x of each monster (entries 1-30; entry 0 unused, and entries 31-40 spare, of which open_door uses entry 35). During a step it stays the cell the monster is leaving until the step ends, so find_creature, the missiles and the magic all meet the monster there. &FF (off_map) after reset_monsters, and for a monster monster_reappears has parked. Written by update_monsters, continue_monster_step and monster_reappears.
 ; &7e00 used as index base 17 times by &3ccc, &7667, &797e, &79e7, &7a31, &7a3f, &7a45, &7a5b, &7a98, &7ace, &7afb, &7b04, &7b41, &7c46, &7c54, &7cc8, &7cf2
 .monster_x
     equb &00, &04, &0b, &09, &1d, &08, &01, &06, &07, &0a, &01, &0b, &1a, &06, &0b, &16  ; Not read: reset_monsters and the trapdoors set the monsters
     equb &15, &0d, &1b, &14, &1a, &09, &1c, &0f, &1e, &02, &1a, &0b, &1c, &0e, &16, &00  ; ...entries 16-31, not read
     equb &00, &00, &00, &1a, &00, &00, &00, &00, &00  ; ...entries 32-40, not read
-; Map y of each monster, kept like monster_x.
+; Map y of each monster, kept like monster_x (entries 1-30; entry 35 holds the cell open_door is erasing a door from).
 ; &7e29 used as index base 16 times by &766d, &7986, &79f0, &7a2a, &7a38, &7a4b, &7a61, &7a9e, &7adc, &7b01, &7b0a, &7b47, &7c3f, &7c4d, &7cce, &7cf5
 .monster_y
     equb &00, &24, &17, &25, &20, &24, &22, &14, &27, &0d, &20, &01, &26, &0a, &01, &12  ; Not read: reset_monsters and the trapdoors set the monsters
@@ -10504,7 +10504,7 @@ level_command_digits = level_command+10
     equb &0d, &0f, &0b, &09, &0d, &0b, &09, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00
-; Each monster's animation frame (0 or 1), added to its facing sprite; toggled on each frame of a step.
+; Each monster's animation frame (0 or 1), added to its facing sprite; toggled on each frame of a step. Entries 1-30 are used. Nothing sets it at the start of a level, so each monster starts on whatever frame the table holds.
 ; &7e7b used as index base 3 times by &7b14, &7c2b, &7c30
 .monster_frame
     equb &00, &00, &01, &00, &00, &01, &01, &00
@@ -10578,7 +10578,11 @@ level_command_digits = level_command+10
 ; start-up. Lower-case letters share the capitals' glyphs. The handler keeps the
 ; character in plot_x, the sprite plotter's zero-page column, and it looks at every byte
 ; alone, with no notion of a VDU sequence: a VDU parameter byte that falls in '0'-'9',
-; 'A'-'Z' or 'a'-'z' is sent as &80 too.
+; 'A'-'Z' or 'a'-'z' is sent as &80 too, so VDU sequences with such parameters go out
+; with the MOS's own WRCHV: draw_view_frames puts it back around its PLOT commands. VDU
+; 23,0,6,25 in start_level passes unharmed (25 is a control code). The glyph goes to
+; &0C00 because MOS 1.20 keeps character 128's definition there, so room_walls must stay
+; at &0C00 too.
 ;
 ; On Entry:
 ;     A: character to print

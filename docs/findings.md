@@ -773,6 +773,21 @@ cell it is leaving and arrival is not tested, so creatures can end up
 sharing a cell; stacked monsters can slide out together **[inference
 from the code]**.
 
+### A monster's walking frame carries over between levels, except on the Model B disc
+
+`monster_frame` (&7E7B), the 0-or-1 frame each monster's sprite adds
+while it walks, is set by no routine at a level's start:
+`reset_monsters` sets only `monster_sprite`, `monster_x` and
+`monster_hit_points`, and `monster_reappears` sets the position, sprite,
+step and offsets but not the frame **[confirmed from the code]**. On the
+official disc's Model B side, `Coder` reloads Dun1 for every level, so
+every level begins with the frames as Dun1 stores them. Ole's crack, the
+sideways RAM hack and the Master side keep the game resident and load
+only the level, so each monster keeps the frame it had at the end of the
+last level. The only visible effect is which leg each monster leads
+with. A resident version wanting the disc's behaviour would copy the
+stored frames back, or clear the table, in `reset_monsters`.
+
 ### Each hero who leaves by the exit adds a frame to the level's end
 
 Each hero who goes down the exit leaves a return address on the stack,
@@ -984,6 +999,15 @@ game do not show in a byte comparison **[confirmed from the code]**:
   `update_game` build a pointer from the table's high byte (`#>`) and
   the room's offset (up to &BF) as the low byte, with no low byte of the
   table's own.
+- `room_walls` must stay at &0C00 itself, not just on a page boundary:
+  its first eight bytes are MOS 1.20's definition of character 128,
+  which `wrch_handler` overwrites with each glyph it prints.
+- `wrch_handler` turns any VDU parameter byte that is a letter or digit
+  into &80, so VDU sequences with such parameters must go out through the
+  MOS's own WRCHV. `draw_view_frames` restores it around its PLOTs, and on
+  the disc `Coder` sends `play_vdu` (VDU 23,0,1,80; 80 is "P") before
+  `game_entry` installs the handler. A resident version that installs it
+  once must keep doing the same.
 - The exit animation runs on from &1FFD (`lda hero_sprites,x`) into
   &2000 with no jump, so the two sides of &2000 must stay together.
 - `collect_objects` reaches `magic_sword` (&756B) with a branch at &7518,

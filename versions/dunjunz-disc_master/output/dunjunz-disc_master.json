@@ -80008,7 +80008,7 @@
         "monster_x"
       ],
       "comments_before_label": [
-        "Map x of each monster (entries 1-30; entry 0 unused). During a step it stays the cell the monster is leaving until the step ends, so find_creature, the missiles and the magic all meet the monster there. &FF (off_map) after reset_monsters, and for a monster monster_reappears has parked. Written by update_monsters, continue_monster_step and monster_reappears."
+        "Map x of each monster (entries 1-30; entry 0 unused, and entries 31-40 spare, of which open_door uses entry 35). During a step it stays the cell the monster is leaving until the step ends, so find_creature, the missiles and the magic all meet the monster there. &FF (off_map) after reset_monsters, and for a monster monster_reappears has parked. Written by update_monsters, continue_monster_step and monster_reappears."
       ],
       "comment_inline": "Not read: reset_monsters and the trapdoors set the monsters",
       "xref_summaries": [
@@ -80202,7 +80202,7 @@
         "monster_y"
       ],
       "comments_before_label": [
-        "Map y of each monster, kept like monster_x."
+        "Map y of each monster, kept like monster_x (entries 1-30; entry 35 holds the cell open_door is erasing a door from)."
       ],
       "comment_inline": "Not read: reset_monsters and the trapdoors set the monsters",
       "xref_summaries": [
@@ -80595,7 +80595,7 @@
         "monster_frame"
       ],
       "comments_before_label": [
-        "Each monster's animation frame (0 or 1), added to its facing sprite; toggled on each frame of a step."
+        "Each monster's animation frame (0 or 1), added to its facing sprite; toggled on each frame of a step. Entries 1-30 are used. Nothing sets it at the start of a level, so each monster starts on whatever frame the table holds."
       ],
       "xref_summaries": [
         "&7e7b used as index base 3 times by &7b14, &7c2b, &7c30"

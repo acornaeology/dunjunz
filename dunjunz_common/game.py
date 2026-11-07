@@ -291,7 +291,13 @@ def _text_output(a: Annotator) -> None:
               "sprite plotter's zero-page column, and it looks at every "
               "byte alone, with no notion of a VDU sequence: a VDU "
               "parameter byte that falls in '0'-'9', 'A'-'Z' or 'a'-'z' "
-              "is sent as &80 too."),
+              "is sent as &80 too, so VDU sequences with such parameters "
+              "go out with the MOS's own WRCHV: draw_view_frames puts it "
+              "back around its PLOT commands. VDU "
+              "23,0,6,25 in start_level passes unharmed (25 is a control "
+              "code). The glyph goes to &0C00 because MOS 1.20 keeps "
+              "character 128's definition there, so room_walls must stay "
+              "at &0C00 too."),
           on_entry={"A": "character to print"},
           on_exit={"A": "corrupted", "X": "preserved", "Y": "preserved",
                    "plot_x": "corrupted"})
@@ -522,14 +528,16 @@ def annotate_state(a: Annotator) -> None:
         "Initial contents of page &0D, copied there at the start of every "
         "level."))
     a.label(0x7E00, "monster_x", length=0x29, description=(
-        "Map x of each monster (entries 1-30; entry 0 unused). During a "
+        "Map x of each monster (entries 1-30; entry 0 unused, and entries "
+        "31-40 spare, of which open_door uses entry 35). During a "
         "step it stays the cell the monster is leaving until the step "
         "ends, so find_creature, the missiles and the magic all meet the "
         "monster there. &FF (off_map) after reset_monsters, and for a "
         "monster monster_reappears has parked. Written by update_monsters, "
         "continue_monster_step and monster_reappears."))
     a.label(0x7E29, "monster_y", length=0x29, description=(
-        "Map y of each monster, kept like monster_x."))
+        "Map y of each monster, kept like monster_x (entries 1-30; entry 35 "
+        "holds the cell open_door is erasing a door from)."))
     a.label(0x7E52, "monster_sprite", length=0x29, description=(
         "Each monster's state as a sprite number: 9, &0B, &0D or &0F facing "
         "up, right, down or left; &15 (the blank) when just killed, then "
@@ -537,7 +545,9 @@ def annotate_state(a: Annotator) -> None:
         "only for the moment before monster_reappears resets it to 9."))
     a.label(0x7E7B, "monster_frame", length=0x29, description=(
         "Each monster's animation frame (0 or 1), added to its facing "
-        "sprite; toggled on each frame of a step."))
+        "sprite; toggled on each frame of a step. Entries 1-30 are used. "
+        "Nothing sets it at the start of a level, so each monster starts "
+        "on whatever frame the table holds."))
     a.label(0x7EA4, "monster_offset_x", length=0x29, description=(
         "How far each monster is drawn across from its cell during a step, "
         "in byte columns: 0, or +/-1 to 3."))
