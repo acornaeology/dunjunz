@@ -3815,7 +3815,7 @@ SPRITE_OPERANDS = [
     (0x7A27, "monster_up_0", 0), (0x7AC7, "monster_up_0", 0),
     (0x7ACB, "monster_down_0", 0), (0x7B39, "sparkle_3", 1),
     (0x7BF4, "monster_up_0", 0), (0x7C3C, "monster_up_0", 0),
-    (0x7CD2, "monster_up_0", 0),
+    (0x7CD2, "monster_up_0", 0), (0x747C, "exit", 0),
 ]
 
 
@@ -3856,6 +3856,7 @@ COUNT_CONSTANTS = [
     (0x45, "panel_left", "The status panel's leftmost screen byte column"),
     (0x6DB0, "level_file_end", "The end of the level file at &6B00"),
     (25, "last_level", "The level with the Chalice"),
+    (0xC9, "map_bytes", "The length of the wall and object-free maps"),
     (0x1A, "chalice_x", "Map x of the Chalice's left cells"),
     (4, "chalice_y", "Map y of the Chalice's top cells"),
 ]
@@ -3873,6 +3874,7 @@ COUNT_OPERANDS += [(addr, "nobody_returns") for addr in (0x06EB, 0x16BA, 0x7449)
 COUNT_OPERANDS += [(addr, "step_out_of_play") for addr in (0x06D4, 0x1F4C, 0x6E8B)]
 COUNT_OPERANDS += [(addr, "view_right_column") for addr in (0x77AC, 0x77D0, 0x78B7, 0x78EB)]
 COUNT_OPERANDS += [(addr, "view_bottom_row") for addr in (0x77BA, 0x77CC, 0x78D8, 0x78F2)]
+COUNT_OPERANDS += [(0x1572, "map_bytes")]
 COUNT_OPERANDS += [(0x1074, "last_level"), (0x107D, "chalice_x"), (0x108E, "chalice_y"),
                    (0x11F3, "chalice_x"), (0x11F8, "chalice_y")]
 # Expressions: (operand address, symbol, offset).
@@ -3887,9 +3889,10 @@ OFFSET_OPERANDS = [
     (0x72C5, "panel_left", 0), (0x72DA, "panel_left", 3), (0x72EA, "panel_left", 6),
     (0x72FA, "panel_left", 9), (0x75B7, "panel_left", 9), (0x75D8, "panel_left", 6),
     (0x75E3, "panel_left", 7), (0x75FA, "panel_left", 5),
+    (0x0F1D, "spr_small_digit_1", 9),
 ]
 PAGE_OPERANDS = [(0x1D67, "room_walls"), (0x77DF, "room_walls"), (0x791A, "room_walls"),
-                 (0x0973, "screen_start")]
+                 (0x0973, "screen_start"), (0x7956, "object_free_map")]
 MONSTER_SPRITE_OPERANDS = [
     (0x7A2E, "monster_right_0"), (0x7A35, "monster_down_0"), (0x7A3C, "monster_left_0"),
     (0x7C03, "monster_right_0"), (0x7C12, "monster_down_0"),

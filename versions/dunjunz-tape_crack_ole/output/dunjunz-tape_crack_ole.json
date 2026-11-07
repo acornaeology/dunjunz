@@ -308,6 +308,11 @@
       "comment": "The level with the Chalice"
     },
     {
+      "name": "map_bytes",
+      "value": 201,
+      "comment": "The length of the wall and object-free maps"
+    },
+    {
       "name": "chalice_x",
       "value": 26,
       "comment": "Map x of the Chalice's left cells"
@@ -19717,7 +19722,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&73"
+      "operand": "#spr_small_digit_1 + 9",
+      "expr": {
+        "text": "spr_small_digit_1 + 9",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "spr_small_digit_1"
+          },
+          "right": {
+            "int": 9,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 3870,
@@ -32536,7 +32554,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
-      "operand": "#&c9"
+      "operand": "#map_bytes",
+      "expr": {
+        "text": "map_bytes",
+        "tree": {
+          "sym": "map_bytes"
+        }
+      }
     },
     {
       "addr": 5491,
@@ -68691,7 +68715,13 @@
       "comment_inline": "The exit? Nothing to do here",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&51"
+      "operand": "#spr_exit",
+      "expr": {
+        "text": "spr_exit",
+        "tree": {
+          "sym": "spr_exit"
+        }
+      }
     },
     {
       "addr": 29821,
@@ -77929,7 +77959,16 @@
       "comment_inline": "...into object_free_map at &2100",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&21"
+      "operand": "#>(object_free_map)",
+      "expr": {
+        "text": ">(object_free_map)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "object_free_map"
+          }
+        }
+      }
     },
     {
       "addr": 31063,
