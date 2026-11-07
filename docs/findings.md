@@ -334,8 +334,12 @@ So in the official disc release:
 - the next time the thousands digit passes 9 the count starts again from
   1, so a score of 20,000 or more is shown wrongly.
 
-This comes from reading the code; it has not yet been run in an emulator,
-which needs DFS 0.90. A fix is to change the three operands at &040F,
+**[confirmed in beebium]** `tools/disc_level_probe.py` boots the Model B
+side with DFS 0.90 on the 8271, plays into level 1, sets hero 0's digit
+at &06F8 to &6A (1), and takes the end-of-level path through
+`next_level_by_reset`. At level 2, after `remove_absent_heroes` has drawn
+the panel, &06F8-&06FB and &08B0-&08B3 all hold &69, and the panel shows
+no ten-thousands digit. A fix is to change the three operands at &040F,
 &0412 and &041B, in both images, from &06F8 to &08B0. Those instructions
 are at `Dun1` file offsets &31BF, &31C2 and &31CB (keyboard image) and
 &35BF, &35C2 and &35CB (joystick image), each with its operand in the next

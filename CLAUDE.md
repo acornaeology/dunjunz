@@ -105,6 +105,12 @@ on the official release.
   snapshots and frame captures. The variant must be passed alongside the
   preset or the server refuses to start.
 
+- `uv run python tools/disc_level_probe.py OUT_DIRPATH` runs the official
+  disc's Model B side in beebium with DFS 0.90 (a preset made on the fly
+  from the bundled `acorn-dfs_0_90.rom` and the 8271), plays into a level
+  and follows the end-of-level reset to the next: a pattern for testing
+  the disc release at run time.
+
 - `uv run python tools/master_probe.py BEEBJIT_FILEPATH ADDR [DUMP ...]
   [--then 'cmds']` runs the Master side in beebjit (beebium has no Master
   yet, rob-smallshire/beebium#189) and reports registers, ACCCON and
