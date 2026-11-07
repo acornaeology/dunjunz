@@ -1,5 +1,6 @@
 {
-    "title": "Dunjunz, official flippy disc (Bug-Byte, 1987), Master 128 side: the game",
+    "title": "Dunjunz, official flippy disc (Bug-Byte, 1987), Master 128 side",
+    "label": "The game",
     "size": 4608,
     "load_address": "0x0E00",
     "exec_address": "0x0E00",
@@ -30,13 +31,125 @@
             "label": "*DUNJUNZ: title screen and loader",
             "slug": "dunjunz",
             "json": "output/dunjunz-disc_master-dunjunz.json",
-            "runtime": "Dunjunz, load and exec &2649, &913 bytes. Run by BOOT: loads the music, the plotter copy and Table into private RAM, shows the title screen with its twinkling stars, and runs Coder, through Coder2 when a joystick is present."
+            "runtime": "Dunjunz, load and exec &2649, &913 bytes. Run by BOOT: loads the music, the plotter copy and Table into private RAM, shows the title screen with its twinkling stars, and runs Coder, through Coder2 when a joystick is present.",
+            "files": [
+                {
+                    "name": "Dunjunz",
+                    "load": "0x2649",
+                    "exec": "0x2649",
+                    "size": 2323,
+                    "sha256": "0aa7fe8a18a33d4a06fdbc24c0fdb1e73996cadc371c71f1d0045c9e6b025edc"
+                }
+            ]
         },
         {
             "label": "Coder2: joystick installer",
             "slug": "coder2",
             "json": "output/dunjunz-disc_master-coder2.json",
-            "runtime": "Coder2, load and exec &2000, &26 bytes. Run by *DUNJUNZ when a joystick is present: loads Code (the joystick handler) at &C500, points BYTEV at it and runs Coder."
+            "runtime": "Coder2, load and exec &2000, &26 bytes. Run by *DUNJUNZ when a joystick is present: loads Code (the joystick handler) at &C500, points BYTEV at it and runs Coder.",
+            "files": [
+                {
+                    "name": "Coder2",
+                    "load": "0x2000",
+                    "exec": "0x2000",
+                    "size": 38,
+                    "sha256": "a32ffa23236c7aae944d6d3201bf41ded524362436f8002ca9b1713a276c8770"
+                }
+            ]
+        },
+        {
+            "label": "*DEFAULT: level restorer",
+            "slug": "default",
+            "json": "output/dunjunz-disc_master-default.json",
+            "runtime": "Default, load and exec &0E00, &47E0 bytes. Asks for a level number and saves that level's original file, from the copies of all 25 levels it carries, over LevelN on the disc in the drive, undoing the level editor's changes.",
+            "files": [
+                {
+                    "name": "Default",
+                    "load": "0x0E00",
+                    "exec": "0x0E00",
+                    "size": 18400,
+                    "sha256": "5595a8c171a280816365f1654d0a7c76732382d398a8cb301ba7ae28e71c4873"
+                }
+            ]
+        }
+    ],
+    "files": [
+        {
+            "name": "Coder",
+            "load": "0x0400",
+            "exec": "0x0740",
+            "size": 1023,
+            "sha256": "5644ad487550f31773733036717cac829049c779f72c21ca61b00a5caccbd5da"
+        },
+        {
+            "name": "Dunj3",
+            "load": "0x08C0",
+            "exec": "0x08C0",
+            "size": 1087,
+            "sha256": "7bd2914816b9e7cd78c9d2e2c32476ca7a5b31ea0762f30f091d535d7b3bc09b"
+        },
+        {
+            "name": "Dunj4",
+            "load": "0x0E00",
+            "exec": "0x0E00",
+            "size": 4608,
+            "sha256": "eea3437a16b47ce67a0827624bcfd1423e18874c71bb44dac2381a5cfcc12fda"
+        },
+        {
+            "name": "Dunj5",
+            "load": "0x2000",
+            "exec": "0x2000",
+            "size": 4096,
+            "sha256": "9570db6679b6891014282d340787d1b285190c5e0a52e4bb2230928796f69599"
+        },
+        {
+            "name": "Dunj2",
+            "load": "0x6E80",
+            "exec": "0x6E80",
+            "size": 4480,
+            "sha256": "beaf537792185dd503fc75c7ee270031ea2419f320ae590afa6b48f9e183252b"
+        },
+        {
+            "name": "Code",
+            "load": "0xC500",
+            "exec": "0xC500",
+            "size": 108,
+            "sha256": "74334c347574b3ddde2453cff2af1407fff26c3df86935202c0913de8494ca46"
+        },
+        {
+            "name": "Table",
+            "load": "0xC5A0",
+            "exec": "0xC5A0",
+            "size": 344,
+            "sha256": "d1e827713b361d9aae10867625d720ee7a6ebf8886e27c8ee12fc61aaca766f6"
+        },
+        {
+            "name": "Code2",
+            "load": "0xC700",
+            "exec": "0xC700",
+            "size": 4186,
+            "sha256": "3932a404d63de87ab4a57a538cc0dff42baceff89a198d92ba8426eab2b8c565"
+        },
+        {
+            "name": "Code3",
+            "load": "0xD800",
+            "exec": "0xD800",
+            "size": 255,
+            "sha256": "6b928cb975a0c5b5b77b12ec0f114af0796cf97fde85e29054227dc7245c416f"
+        }
+    ],
+    "source_files": [
+        {
+            "label": "BOOT: the boot program (BBC BASIC)",
+            "slug": "boot",
+            "path": "basic/boot.bas",
+            "language": "BBC BASIC"
+        },
+        {
+            "label": "README: the notice BOOT shows",
+            "slug": "readme",
+            "path": "text/readme.txt",
+            "language": "Text"
         }
     ]
 }
