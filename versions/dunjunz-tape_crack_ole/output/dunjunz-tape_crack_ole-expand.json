@@ -1,0 +1,2919 @@
+{
+  "meta": {
+    "schema_version": 4,
+    "load_addr": 11776,
+    "end_addr": 12199,
+    "program": {
+      "exec_addr": 11776
+    },
+    "images": [
+      {
+        "name": "EXPAND",
+        "load_addr": 11776,
+        "end_addr": 12199,
+        "exec_addr": 11776
+      }
+    ],
+    "moves": []
+  },
+  "constants": [
+    {
+      "name": "osbyte_read_char_at_cursor",
+      "value": 135
+    },
+    {
+      "name": "osfind_open_input",
+      "value": 64
+    },
+    {
+      "name": "osfind_close",
+      "value": 0
+    },
+    {
+      "name": "osfile_load",
+      "value": 255
+    }
+  ],
+  "macros": [],
+  "subroutines": [
+    {
+      "addr": 65465,
+      "name": "osrdsc"
+    },
+    {
+      "addr": 65468,
+      "name": "vduchr"
+    },
+    {
+      "addr": 65471,
+      "name": "oseven"
+    },
+    {
+      "addr": 65474,
+      "name": "gsinit"
+    },
+    {
+      "addr": 65477,
+      "name": "gsread"
+    },
+    {
+      "addr": 65480,
+      "name": "nvrdch"
+    },
+    {
+      "addr": 65483,
+      "name": "nvwrch"
+    },
+    {
+      "addr": 65486,
+      "name": "osfind"
+    },
+    {
+      "addr": 65489,
+      "name": "osgbpb"
+    },
+    {
+      "addr": 65492,
+      "name": "osbput"
+    },
+    {
+      "addr": 65495,
+      "name": "osbget"
+    },
+    {
+      "addr": 65498,
+      "name": "osargs"
+    },
+    {
+      "addr": 65501,
+      "name": "osfile"
+    },
+    {
+      "addr": 65504,
+      "name": "osrdch"
+    },
+    {
+      "addr": 65507,
+      "name": "osasci"
+    },
+    {
+      "addr": 65511,
+      "name": "osnewl"
+    },
+    {
+      "addr": 65516,
+      "name": "oswrcr"
+    },
+    {
+      "addr": 65518,
+      "name": "oswrch"
+    },
+    {
+      "addr": 65521,
+      "name": "osword"
+    },
+    {
+      "addr": 65524,
+      "name": "osbyte"
+    },
+    {
+      "addr": 65527,
+      "name": "oscli"
+    },
+    {
+      "addr": 11776,
+      "name": "expand_start",
+      "title": "EXPAND: unpack a compressed MODE 2 picture",
+      "description": "*EXPAND <filename>. Entered at the load address, which jumps over the copyright notice."
+    },
+    {
+      "addr": 11803,
+      "name": "skip_separators",
+      "title": "Find the next argument on the command line",
+      "description": "Step command_ptr past spaces and commas. A carriage return (the end of the line) is left for the next call.",
+      "on_exit": {
+        "C": "set if the line has no more arguments; clear if command_ptr is one past the argument's first character"
+      }
+    },
+    {
+      "addr": 11839,
+      "name": "expand",
+      "title": "Load the named picture and unpack it onto the screen",
+      "description": "Refuses to run outside MODE 2. Finds the filename on the command line, opens the file to learn its length, and loads it so that it ends at &8000, with all sixteen logical colours black so that neither the packed bytes nor the unpacking show. Unpacks it from &3000 until the screen is full, restores the zero page and page &0C bytes it used, and resets the palette (VDU 20) to reveal the picture."
+    },
+    {
+      "addr": 12172,
+      "name": "read_packed_byte",
+      "title": "Read the next packed byte",
+      "on_entry": {
+        "Y": "0"
+      },
+      "on_exit": {
+        "A": "the byte at packed_ptr, which advances past it"
+      }
+    }
+  ],
+  "banners": [
+    {
+      "addr": 11779,
+      "name": "copyright_notice",
+      "title": "Copyright notice",
+      "align": "before_label"
+    },
+    {
+      "addr": 12181,
+      "name": "osfile_block_template",
+      "title": "OSFILE block template",
+      "description": "Copied to &0C00. The filename address (+0) and the low half of the load address (+2) are filled in; the high half, &FFFF, loads into the I/O processor, and exec address byte 0 (+6) tells OSFILE to use this load address. The start and end addresses (+10, +14) are unused by a load.",
+      "align": "before_label"
+    }
+  ],
+  "external_labels": {
+    "packed_ptr": 128,
+    "screen_ptr": 130,
+    "command_ptr": 132,
+    "os_text_ptr": 242,
+    "romsel_copy": 244,
+    "osrdsc_ptr": 246,
+    "userv": 512,
+    "brkv": 514,
+    "irq1v": 516,
+    "irq2v": 518,
+    "cliv": 520,
+    "bytev": 522,
+    "wordv": 524,
+    "wrchv": 526,
+    "rdchv": 528,
+    "filev": 530,
+    "argsv": 532,
+    "bgetv": 534,
+    "bputv": 536,
+    "gbpbv": 538,
+    "findv": 540,
+    "fscv": 542,
+    "evntv": 544,
+    "uptv": 546,
+    "netv": 548,
+    "vduv": 550,
+    "keyv": 552,
+    "insv": 554,
+    "remv": 556,
+    "cnpv": 558,
+    "ind1v": 560,
+    "ind2v": 562,
+    "ind3v": 564,
+    "osfile_block": 3072,
+    "osrdsc": 65465,
+    "vduchr": 65468,
+    "oseven": 65471,
+    "gsinit": 65474,
+    "gsread": 65477,
+    "nvrdch": 65480,
+    "nvwrch": 65483,
+    "osfind": 65486,
+    "osgbpb": 65489,
+    "osbput": 65492,
+    "osbget": 65495,
+    "osargs": 65498,
+    "osfile": 65501,
+    "osrdch": 65504,
+    "osasci": 65507,
+    "osnewl": 65511,
+    "oswrcr": 65516,
+    "oswrch": 65518,
+    "osword": 65521,
+    "osbyte": 65524,
+    "oscli": 65527
+  },
+  "memory_map": [
+    {
+      "addr": 128,
+      "name": "packed_ptr",
+      "group": "zero_page"
+    },
+    {
+      "addr": 130,
+      "name": "screen_ptr",
+      "group": "zero_page"
+    },
+    {
+      "addr": 132,
+      "name": "command_ptr",
+      "group": "zero_page"
+    },
+    {
+      "addr": 3072,
+      "name": "osfile_block",
+      "group": "expand_workspace",
+      "access": [
+        "b"
+      ]
+    }
+  ],
+  "regions": [
+    {
+      "anchor": 128,
+      "name": "packed_ptr",
+      "window": [
+        0,
+        1
+      ],
+      "named_slots": false,
+      "group": "zero_page"
+    },
+    {
+      "anchor": 130,
+      "name": "screen_ptr",
+      "window": [
+        0,
+        1
+      ],
+      "named_slots": false,
+      "group": "zero_page"
+    },
+    {
+      "anchor": 132,
+      "name": "command_ptr",
+      "window": [
+        0,
+        3
+      ],
+      "named_slots": false,
+      "group": "zero_page"
+    },
+    {
+      "anchor": 3072,
+      "name": "osfile_block",
+      "window": [
+        0,
+        17
+      ],
+      "named_slots": false,
+      "group": "expand_workspace"
+    }
+  ],
+  "items": [
+    {
+      "addr": 11776,
+      "bytes": [
+        76,
+        63,
+        46
+      ],
+      "labels": [
+        "expand_start"
+      ],
+      "comment_inline": "Skip the copyright notice",
+      "type": "code",
+      "mnemonic": "jmp",
+      "operand": "expand",
+      "target": 11839,
+      "target_label": "expand"
+    },
+    {
+      "addr": 11779,
+      "bytes": [
+        40,
+        67,
+        41,
+        32,
+        49,
+        57,
+        56,
+        53,
+        32,
+        82,
+        104,
+        121,
+        115,
+        32,
+        69,
+        46,
+        32,
+        68,
+        97,
+        118,
+        105,
+        101,
+        115,
+        46
+      ],
+      "labels": [
+        "copyright_notice"
+      ],
+      "comment_inline": "The author's copyright",
+      "type": "string",
+      "string": "(C) 1985 Rhys E. Davies."
+    },
+    {
+      "addr": 11803,
+      "bytes": [
+        160,
+        0
+      ],
+      "labels": [
+        "skip_separators"
+      ],
+      "comment_inline": "Y = 0 throughout: command_ptr itself advances",
+      "xref_summaries": [
+        "&2e1b referenced 1 time by &2e68"
+      ],
+      "references": [
+        {
+          "addr": 11880,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#0"
+    },
+    {
+      "addr": 11805,
+      "bytes": [
+        177,
+        132
+      ],
+      "labels": [
+        "skip_separators_loop"
+      ],
+      "comment_inline": "Read the next character of the command line",
+      "xref_summaries": [
+        "&2e1d referenced 2 times by &2e27, &2e2b"
+      ],
+      "references": [
+        {
+          "addr": 11815,
+          "kind": "direct"
+        },
+        {
+          "addr": 11819,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "(command_ptr),y",
+      "target": 132,
+      "target_label": "command_ptr"
+    },
+    {
+      "addr": 11807,
+      "bytes": [
+        230,
+        132
+      ],
+      "comment_inline": "Advance command_ptr past it...",
+      "type": "code",
+      "mnemonic": "inc",
+      "operand": "command_ptr",
+      "target": 132,
+      "target_label": "command_ptr"
+    },
+    {
+      "addr": 11809,
+      "bytes": [
+        208,
+        2
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "check_separator",
+      "target": 11813,
+      "target_label": "check_separator"
+    },
+    {
+      "addr": 11811,
+      "bytes": [
+        230,
+        133
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "inc",
+      "operand": "command_ptr + 1",
+      "target": 133
+    },
+    {
+      "addr": 11813,
+      "bytes": [
+        201,
+        32
+      ],
+      "labels": [
+        "check_separator"
+      ],
+      "comment_inline": "Skip spaces",
+      "xref_summaries": [
+        "&2e25 referenced 1 time by &2e21"
+      ],
+      "references": [
+        {
+          "addr": 11809,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "cmp",
+      "operand": "#&20"
+    },
+    {
+      "addr": 11815,
+      "bytes": [
+        240,
+        244
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "beq",
+      "operand": "skip_separators_loop",
+      "target": 11805,
+      "target_label": "skip_separators_loop"
+    },
+    {
+      "addr": 11817,
+      "bytes": [
+        201,
+        44
+      ],
+      "comment_inline": "Skip commas",
+      "type": "code",
+      "mnemonic": "cmp",
+      "operand": "#&2c"
+    },
+    {
+      "addr": 11819,
+      "bytes": [
+        240,
+        240
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "beq",
+      "operand": "skip_separators_loop",
+      "target": 11805,
+      "target_label": "skip_separators_loop"
+    },
+    {
+      "addr": 11821,
+      "bytes": [
+        201,
+        13
+      ],
+      "comment_inline": "The end of the line?",
+      "type": "code",
+      "mnemonic": "cmp",
+      "operand": "#&0d"
+    },
+    {
+      "addr": 11823,
+      "bytes": [
+        208,
+        12
+      ],
+      "comment_inline": "No: an argument starts here",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "argument_found",
+      "target": 11837,
+      "target_label": "argument_found"
+    },
+    {
+      "addr": 11825,
+      "bytes": [
+        198,
+        132
+      ],
+      "comment_inline": "Step command_ptr back onto the carriage return...",
+      "type": "code",
+      "mnemonic": "dec",
+      "operand": "command_ptr",
+      "target": 132,
+      "target_label": "command_ptr"
+    },
+    {
+      "addr": 11827,
+      "bytes": [
+        165,
+        132
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "command_ptr",
+      "target": 132,
+      "target_label": "command_ptr"
+    },
+    {
+      "addr": 11829,
+      "bytes": [
+        201,
+        255
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "cmp",
+      "operand": "#&ff"
+    },
+    {
+      "addr": 11831,
+      "bytes": [
+        208,
+        2
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "no_argument",
+      "target": 11835,
+      "target_label": "no_argument"
+    },
+    {
+      "addr": 11833,
+      "bytes": [
+        198,
+        133
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "dec",
+      "operand": "command_ptr + 1",
+      "target": 133
+    },
+    {
+      "addr": 11835,
+      "bytes": [
+        56
+      ],
+      "labels": [
+        "no_argument"
+      ],
+      "comment_inline": "Carry set: no argument",
+      "xref_summaries": [
+        "&2e3b referenced 1 time by &2e37"
+      ],
+      "references": [
+        {
+          "addr": 11831,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "sec"
+    },
+    {
+      "addr": 11836,
+      "bytes": [
+        96
+      ],
+      "comment_inline": "Return",
+      "type": "code",
+      "mnemonic": "rts"
+    },
+    {
+      "addr": 11837,
+      "bytes": [
+        24
+      ],
+      "labels": [
+        "argument_found"
+      ],
+      "comment_inline": "Carry clear: an argument found",
+      "xref_summaries": [
+        "&2e3d referenced 1 time by &2e2f"
+      ],
+      "references": [
+        {
+          "addr": 11823,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "clc"
+    },
+    {
+      "addr": 11838,
+      "bytes": [
+        96
+      ],
+      "comment_inline": "Return",
+      "type": "code",
+      "mnemonic": "rts"
+    },
+    {
+      "addr": 11839,
+      "bytes": [
+        169,
+        135
+      ],
+      "labels": [
+        "expand"
+      ],
+      "comment_inline": "Read the screen mode into Y",
+      "xref_summaries": [
+        "&2e3f referenced 1 time by &2e00"
+      ],
+      "references": [
+        {
+          "addr": 11776,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#osbyte_read_char_at_cursor",
+      "expr": {
+        "text": "osbyte_read_char_at_cursor",
+        "tree": {
+          "sym": "osbyte_read_char_at_cursor"
+        }
+      }
+    },
+    {
+      "addr": 11841,
+      "bytes": [
+        32,
+        244,
+        255
+      ],
+      "comment_inline": "... Read character at text cursor position and current screen MODE",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "osbyte",
+      "target": 65524,
+      "target_label": "osbyte"
+    },
+    {
+      "addr": 11844,
+      "bytes": [
+        192,
+        2
+      ],
+      "comment_inline": "MODE 2?",
+      "type": "code",
+      "mnemonic": "cpy",
+      "operand": "#2"
+    },
+    {
+      "addr": 11846,
+      "bytes": [
+        240,
+        11
+      ],
+      "comment_inline": "Yes: carry on",
+      "type": "code",
+      "mnemonic": "beq",
+      "operand": "mode_ok",
+      "target": 11859,
+      "target_label": "mode_ok"
+    },
+    {
+      "addr": 11848,
+      "bytes": [
+        0
+      ],
+      "comment_inline": "No: error 25, \"Bad Mode\"",
+      "type": "code",
+      "mnemonic": "brk"
+    },
+    {
+      "addr": 11849,
+      "bytes": [
+        25
+      ],
+      "comment_inline": "Error number 25 (BASIC's own \"Bad MODE\" number)",
+      "type": "byte",
+      "values": [
+        25
+      ]
+    },
+    {
+      "addr": 11850,
+      "bytes": [
+        66,
+        97,
+        100,
+        32,
+        77,
+        111,
+        100,
+        101
+      ],
+      "labels": [
+        "bad_mode_message"
+      ],
+      "comment_inline": "Error message",
+      "type": "string",
+      "string": "Bad Mode"
+    },
+    {
+      "addr": 11858,
+      "bytes": [
+        0
+      ],
+      "comment_inline": "End of the message",
+      "type": "byte",
+      "values": [
+        0
+      ]
+    },
+    {
+      "addr": 11859,
+      "bytes": [
+        165,
+        132
+      ],
+      "labels": [
+        "mode_ok"
+      ],
+      "comment_inline": "Save the four zero-page bytes OSARGS will overwrite...",
+      "xref_summaries": [
+        "&2e53 referenced 1 time by &2e46"
+      ],
+      "references": [
+        {
+          "addr": 11846,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "command_ptr",
+      "target": 132,
+      "target_label": "command_ptr"
+    },
+    {
+      "addr": 11861,
+      "bytes": [
+        72
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pha"
+    },
+    {
+      "addr": 11862,
+      "bytes": [
+        165,
+        133
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "command_ptr + 1",
+      "target": 133
+    },
+    {
+      "addr": 11864,
+      "bytes": [
+        72
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pha"
+    },
+    {
+      "addr": 11865,
+      "bytes": [
+        165,
+        134
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "command_ptr + 2",
+      "target": 134
+    },
+    {
+      "addr": 11867,
+      "bytes": [
+        72
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pha"
+    },
+    {
+      "addr": 11868,
+      "bytes": [
+        165,
+        135
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "command_ptr + 3",
+      "target": 135
+    },
+    {
+      "addr": 11870,
+      "bytes": [
+        72
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pha"
+    },
+    {
+      "addr": 11871,
+      "bytes": [
+        169,
+        1
+      ],
+      "comment_inline": "OSARGS 1: command_ptr = the address of the command line after \"EXPAND\"...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#1"
+    },
+    {
+      "addr": 11873,
+      "bytes": [
+        162,
+        132
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#command_ptr",
+      "expr": {
+        "text": "command_ptr",
+        "tree": {
+          "sym": "command_ptr"
+        }
+      }
+    },
+    {
+      "addr": 11875,
+      "bytes": [
+        160,
+        0
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#0"
+    },
+    {
+      "addr": 11877,
+      "bytes": [
+        32,
+        218,
+        255
+      ],
+      "comment_inline": "... Get address of remaining command line into zero page address X (A=1, Y=0)",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "osargs",
+      "target": 65498,
+      "target_label": "osargs"
+    },
+    {
+      "addr": 11880,
+      "bytes": [
+        32,
+        27,
+        46
+      ],
+      "comment_inline": "Find the filename",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "skip_separators",
+      "target": 11803,
+      "target_label": "skip_separators"
+    },
+    {
+      "addr": 11883,
+      "bytes": [
+        144,
+        32
+      ],
+      "comment_inline": "Found: open it",
+      "type": "code",
+      "mnemonic": "bcc",
+      "operand": "open_picture",
+      "target": 11917,
+      "target_label": "open_picture"
+    },
+    {
+      "addr": 11885,
+      "bytes": [
+        104
+      ],
+      "comment_inline": "None: restore command_ptr...",
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 11886,
+      "bytes": [
+        133,
+        135
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "command_ptr + 3",
+      "target": 135
+    },
+    {
+      "addr": 11888,
+      "bytes": [
+        104
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 11889,
+      "bytes": [
+        133,
+        134
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "command_ptr + 2",
+      "target": 134
+    },
+    {
+      "addr": 11891,
+      "bytes": [
+        104
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 11892,
+      "bytes": [
+        133,
+        133
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "command_ptr + 1",
+      "target": 133
+    },
+    {
+      "addr": 11894,
+      "bytes": [
+        104
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 11895,
+      "bytes": [
+        133,
+        132
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "command_ptr",
+      "target": 132,
+      "target_label": "command_ptr"
+    },
+    {
+      "addr": 11897,
+      "bytes": [
+        0
+      ],
+      "comment_inline": "...and give error 0, \"Filename expected\"",
+      "type": "code",
+      "mnemonic": "brk"
+    },
+    {
+      "addr": 11898,
+      "bytes": [
+        0
+      ],
+      "comment_inline": "Error number 0",
+      "type": "byte",
+      "values": [
+        0
+      ]
+    },
+    {
+      "addr": 11899,
+      "bytes": [
+        70,
+        105,
+        108,
+        101,
+        110,
+        97,
+        109,
+        101,
+        32,
+        101,
+        120,
+        112,
+        101,
+        99,
+        116,
+        101,
+        100
+      ],
+      "labels": [
+        "filename_expected_message"
+      ],
+      "comment_inline": "Error message",
+      "type": "string",
+      "string": "Filename expected"
+    },
+    {
+      "addr": 11916,
+      "bytes": [
+        0
+      ],
+      "comment_inline": "End of the message",
+      "type": "byte",
+      "values": [
+        0
+      ]
+    },
+    {
+      "addr": 11917,
+      "bytes": [
+        166,
+        132
+      ],
+      "labels": [
+        "open_picture"
+      ],
+      "comment_inline": "Step command_ptr back one, onto the filename's first character...",
+      "xref_summaries": [
+        "&2e8d referenced 1 time by &2e6b"
+      ],
+      "references": [
+        {
+          "addr": 11883,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "command_ptr",
+      "target": 132,
+      "target_label": "command_ptr"
+    },
+    {
+      "addr": 11919,
+      "bytes": [
+        164,
+        133
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "command_ptr + 1",
+      "target": 133
+    },
+    {
+      "addr": 11921,
+      "bytes": [
+        202
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "dex"
+    },
+    {
+      "addr": 11922,
+      "bytes": [
+        224,
+        255
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "cpx",
+      "operand": "#&ff"
+    },
+    {
+      "addr": 11924,
+      "bytes": [
+        208,
+        1
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "filename_found",
+      "target": 11927,
+      "target_label": "filename_found"
+    },
+    {
+      "addr": 11926,
+      "bytes": [
+        136
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "dey"
+    },
+    {
+      "addr": 11927,
+      "bytes": [
+        134,
+        132
+      ],
+      "labels": [
+        "filename_found"
+      ],
+      "comment_inline": "...",
+      "xref_summaries": [
+        "&2e97 referenced 1 time by &2e94"
+      ],
+      "references": [
+        {
+          "addr": 11924,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "stx",
+      "operand": "command_ptr",
+      "target": 132,
+      "target_label": "command_ptr"
+    },
+    {
+      "addr": 11929,
+      "bytes": [
+        132,
+        133
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sty",
+      "operand": "command_ptr + 1",
+      "target": 133
+    },
+    {
+      "addr": 11931,
+      "bytes": [
+        169,
+        64
+      ],
+      "comment_inline": "Open the file for input (X, Y = the filename)",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#osfind_open_input",
+      "expr": {
+        "text": "osfind_open_input",
+        "tree": {
+          "sym": "osfind_open_input"
+        }
+      }
+    },
+    {
+      "addr": 11933,
+      "bytes": [
+        32,
+        206,
+        255
+      ],
+      "comment_inline": "... osfind: open file for input",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "osfind",
+      "target": 65486,
+      "target_label": "osfind"
+    },
+    {
+      "addr": 11936,
+      "bytes": [
+        168
+      ],
+      "comment_inline": "Y = the file handle",
+      "type": "code",
+      "mnemonic": "tay"
+    },
+    {
+      "addr": 11937,
+      "bytes": [
+        208,
+        41
+      ],
+      "comment_inline": "Opened: go on",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "load_picture",
+      "target": 11980,
+      "target_label": "load_picture"
+    },
+    {
+      "addr": 11939,
+      "bytes": [
+        104
+      ],
+      "comment_inline": "Not found: restore command_ptr...",
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 11940,
+      "bytes": [
+        133,
+        135
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "command_ptr + 3",
+      "target": 135
+    },
+    {
+      "addr": 11942,
+      "bytes": [
+        104
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 11943,
+      "bytes": [
+        133,
+        134
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "command_ptr + 2",
+      "target": 134
+    },
+    {
+      "addr": 11945,
+      "bytes": [
+        104
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 11946,
+      "bytes": [
+        133,
+        133
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "command_ptr + 1",
+      "target": 133
+    },
+    {
+      "addr": 11948,
+      "bytes": [
+        104
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 11949,
+      "bytes": [
+        133,
+        132
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "command_ptr",
+      "target": 132,
+      "target_label": "command_ptr"
+    },
+    {
+      "addr": 11951,
+      "bytes": [
+        0
+      ],
+      "comment_inline": "...and give error 0, \"No such compressed picture\"",
+      "type": "code",
+      "mnemonic": "brk"
+    },
+    {
+      "addr": 11952,
+      "bytes": [
+        0
+      ],
+      "comment_inline": "Error number 0",
+      "type": "byte",
+      "values": [
+        0
+      ]
+    },
+    {
+      "addr": 11953,
+      "bytes": [
+        78,
+        111,
+        32,
+        115,
+        117,
+        99,
+        104,
+        32,
+        99,
+        111,
+        109,
+        112,
+        114,
+        101,
+        115,
+        115,
+        101,
+        100,
+        32,
+        112,
+        105,
+        99,
+        116,
+        117,
+        114,
+        101
+      ],
+      "labels": [
+        "no_such_picture_message"
+      ],
+      "comment_inline": "Error message",
+      "type": "string",
+      "string": "No such compressed picture"
+    },
+    {
+      "addr": 11979,
+      "bytes": [
+        0
+      ],
+      "comment_inline": "End of the message",
+      "type": "byte",
+      "values": [
+        0
+      ]
+    },
+    {
+      "addr": 11980,
+      "bytes": [
+        162,
+        17
+      ],
+      "labels": [
+        "load_picture"
+      ],
+      "comment_inline": "For each of the 18 bytes of the OSFILE block at &0C00, last first:",
+      "xref_summaries": [
+        "&2ecc referenced 1 time by &2ea1"
+      ],
+      "references": [
+        {
+          "addr": 11937,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#&11"
+    },
+    {
+      "addr": 11982,
+      "bytes": [
+        189,
+        0,
+        12
+      ],
+      "labels": [
+        "set_up_osfile_block"
+      ],
+      "comment_inline": "Save the byte already there",
+      "xref_summaries": [
+        "&2ece referenced 1 time by &2ed9"
+      ],
+      "references": [
+        {
+          "addr": 11993,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "osfile_block,x",
+      "target": 3072,
+      "target_label": "osfile_block"
+    },
+    {
+      "addr": 11985,
+      "bytes": [
+        72
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pha"
+    },
+    {
+      "addr": 11986,
+      "bytes": [
+        189,
+        149,
+        47
+      ],
+      "comment_inline": "Replace it with the template's",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "osfile_block_template,x",
+      "target": 12181,
+      "target_label": "osfile_block_template"
+    },
+    {
+      "addr": 11989,
+      "bytes": [
+        157,
+        0,
+        12
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "osfile_block,x",
+      "target": 3072,
+      "target_label": "osfile_block"
+    },
+    {
+      "addr": 11992,
+      "bytes": [
+        202
+      ],
+      "comment_inline": "Next byte",
+      "type": "code",
+      "mnemonic": "dex"
+    },
+    {
+      "addr": 11993,
+      "bytes": [
+        16,
+        243
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bpl",
+      "operand": "set_up_osfile_block",
+      "target": 11982,
+      "target_label": "set_up_osfile_block"
+    },
+    {
+      "addr": 11995,
+      "bytes": [
+        165,
+        132
+      ],
+      "comment_inline": "Point the block at the filename...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "command_ptr",
+      "target": 132,
+      "target_label": "command_ptr"
+    },
+    {
+      "addr": 11997,
+      "bytes": [
+        141,
+        0,
+        12
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "osfile_block",
+      "target": 3072,
+      "target_label": "osfile_block"
+    },
+    {
+      "addr": 12000,
+      "bytes": [
+        165,
+        133
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "command_ptr + 1",
+      "target": 133
+    },
+    {
+      "addr": 12002,
+      "bytes": [
+        141,
+        1,
+        12
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "osfile_block + 1",
+      "target": 3073
+    },
+    {
+      "addr": 12005,
+      "bytes": [
+        165,
+        128
+      ],
+      "comment_inline": "Save the four zero-page bytes OSARGS will overwrite...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "packed_ptr",
+      "target": 128,
+      "target_label": "packed_ptr"
+    },
+    {
+      "addr": 12007,
+      "bytes": [
+        72
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pha"
+    },
+    {
+      "addr": 12008,
+      "bytes": [
+        165,
+        129
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "packed_ptr + 1",
+      "target": 129
+    },
+    {
+      "addr": 12010,
+      "bytes": [
+        72
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pha"
+    },
+    {
+      "addr": 12011,
+      "bytes": [
+        165,
+        130
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "screen_ptr",
+      "target": 130,
+      "target_label": "screen_ptr"
+    },
+    {
+      "addr": 12013,
+      "bytes": [
+        72
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pha"
+    },
+    {
+      "addr": 12014,
+      "bytes": [
+        165,
+        131
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "screen_ptr + 1",
+      "target": 131
+    },
+    {
+      "addr": 12016,
+      "bytes": [
+        72
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pha"
+    },
+    {
+      "addr": 12017,
+      "bytes": [
+        162,
+        128
+      ],
+      "comment_inline": "OSARGS 2 (Y = the handle): packed_ptr = the file's length (EXT#)...",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#packed_ptr",
+      "expr": {
+        "text": "packed_ptr",
+        "tree": {
+          "sym": "packed_ptr"
+        }
+      }
+    },
+    {
+      "addr": 12019,
+      "bytes": [
+        169,
+        2
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#2"
+    },
+    {
+      "addr": 12021,
+      "bytes": [
+        32,
+        218,
+        255
+      ],
+      "comment_inline": "... Get length of file into zero page address X (A=2)",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "osargs",
+      "target": 65498,
+      "target_label": "osargs"
+    },
+    {
+      "addr": 12024,
+      "bytes": [
+        169,
+        0
+      ],
+      "comment_inline": "Load address = &8000 - length, so that the file ends at the top of screen memory...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#0"
+    },
+    {
+      "addr": 12026,
+      "bytes": [
+        56
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sec"
+    },
+    {
+      "addr": 12027,
+      "bytes": [
+        229,
+        128
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sbc",
+      "operand": "packed_ptr",
+      "target": 128,
+      "target_label": "packed_ptr"
+    },
+    {
+      "addr": 12029,
+      "bytes": [
+        141,
+        2,
+        12
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "osfile_block + 2",
+      "target": 3074
+    },
+    {
+      "addr": 12032,
+      "bytes": [
+        72
+      ],
+      "comment_inline": "...and keep it on the stack",
+      "type": "code",
+      "mnemonic": "pha"
+    },
+    {
+      "addr": 12033,
+      "bytes": [
+        169,
+        128
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&80"
+    },
+    {
+      "addr": 12035,
+      "bytes": [
+        229,
+        129
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sbc",
+      "operand": "packed_ptr + 1",
+      "target": 129
+    },
+    {
+      "addr": 12037,
+      "bytes": [
+        141,
+        3,
+        12
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "osfile_block + 3",
+      "target": 3075
+    },
+    {
+      "addr": 12040,
+      "bytes": [
+        72
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pha"
+    },
+    {
+      "addr": 12041,
+      "bytes": [
+        169,
+        0
+      ],
+      "comment_inline": "Close the file (Y = its handle)",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#osfind_close",
+      "expr": {
+        "text": "osfind_close",
+        "tree": {
+          "sym": "osfind_close"
+        }
+      }
+    },
+    {
+      "addr": 12043,
+      "bytes": [
+        32,
+        206,
+        255
+      ],
+      "comment_inline": "... osfind: close one or all files",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "osfind",
+      "target": 65486,
+      "target_label": "osfind"
+    },
+    {
+      "addr": 12046,
+      "bytes": [
+        162,
+        15
+      ],
+      "comment_inline": "For logical colours 15 down to 0:",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#&0f"
+    },
+    {
+      "addr": 12048,
+      "bytes": [
+        169,
+        19
+      ],
+      "labels": [
+        "blacken_colours"
+      ],
+      "comment_inline": "VDU 19,colour,0,0,0,0: make it black...",
+      "xref_summaries": [
+        "&2f10 referenced 1 time by &2f24"
+      ],
+      "references": [
+        {
+          "addr": 12068,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&13"
+    },
+    {
+      "addr": 12050,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 12053,
+      "bytes": [
+        138
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "txa"
+    },
+    {
+      "addr": 12054,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 12057,
+      "bytes": [
+        169,
+        0
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#0"
+    },
+    {
+      "addr": 12059,
+      "bytes": [
+        160,
+        4
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#4"
+    },
+    {
+      "addr": 12061,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "labels": [
+        "send_zeros"
+      ],
+      "comment_inline": "...",
+      "xref_summaries": [
+        "&2f1d referenced 1 time by &2f21"
+      ],
+      "references": [
+        {
+          "addr": 12065,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 12064,
+      "bytes": [
+        136
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "dey"
+    },
+    {
+      "addr": 12065,
+      "bytes": [
+        208,
+        250
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "send_zeros",
+      "target": 12061,
+      "target_label": "send_zeros"
+    },
+    {
+      "addr": 12067,
+      "bytes": [
+        202
+      ],
+      "comment_inline": "Next colour",
+      "type": "code",
+      "mnemonic": "dex"
+    },
+    {
+      "addr": 12068,
+      "bytes": [
+        16,
+        234
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bpl",
+      "operand": "blacken_colours",
+      "target": 12048,
+      "target_label": "blacken_colours"
+    },
+    {
+      "addr": 12070,
+      "bytes": [
+        169,
+        255
+      ],
+      "comment_inline": "Load the file at its load address in the block (exec byte 0: use the block's address)...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#osfile_load",
+      "expr": {
+        "text": "osfile_load",
+        "tree": {
+          "sym": "osfile_load"
+        }
+      }
+    },
+    {
+      "addr": 12072,
+      "bytes": [
+        162,
+        0
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#<(osfile_block)",
+      "expr": {
+        "text": "<(osfile_block)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "osfile_block"
+          }
+        }
+      }
+    },
+    {
+      "addr": 12074,
+      "bytes": [
+        160,
+        12
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#>(osfile_block)",
+      "expr": {
+        "text": ">(osfile_block)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "osfile_block"
+          }
+        }
+      }
+    },
+    {
+      "addr": 12076,
+      "bytes": [
+        32,
+        221,
+        255
+      ],
+      "comment_inline": "... osfile: load file",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "osfile",
+      "target": 65501,
+      "target_label": "osfile"
+    },
+    {
+      "addr": 12079,
+      "bytes": [
+        104
+      ],
+      "comment_inline": "packed_ptr = the load address, the first packed byte...",
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 12080,
+      "bytes": [
+        133,
+        129
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "packed_ptr + 1",
+      "target": 129
+    },
+    {
+      "addr": 12082,
+      "bytes": [
+        104
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 12083,
+      "bytes": [
+        133,
+        128
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "packed_ptr",
+      "target": 128,
+      "target_label": "packed_ptr"
+    },
+    {
+      "addr": 12085,
+      "bytes": [
+        169,
+        0
+      ],
+      "comment_inline": "screen_ptr = &3000, the start of the MODE 2 screen; Y = 0 throughout...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#0"
+    },
+    {
+      "addr": 12087,
+      "bytes": [
+        168
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "tay"
+    },
+    {
+      "addr": 12088,
+      "bytes": [
+        133,
+        130
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "screen_ptr",
+      "target": 130,
+      "target_label": "screen_ptr"
+    },
+    {
+      "addr": 12090,
+      "bytes": [
+        169,
+        48
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&30"
+    },
+    {
+      "addr": 12092,
+      "bytes": [
+        133,
+        131
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "screen_ptr + 1",
+      "target": 131
+    },
+    {
+      "addr": 12094,
+      "bytes": [
+        32,
+        140,
+        47
+      ],
+      "labels": [
+        "unpack_run"
+      ],
+      "comment_inline": "Read a packed byte",
+      "xref_summaries": [
+        "&2f3e referenced 1 time by &2f61"
+      ],
+      "references": [
+        {
+          "addr": 12129,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "read_packed_byte",
+      "target": 12172,
+      "target_label": "read_packed_byte"
+    },
+    {
+      "addr": 12097,
+      "bytes": [
+        72
+      ],
+      "comment_inline": "Keep it",
+      "type": "code",
+      "mnemonic": "pha"
+    },
+    {
+      "addr": 12098,
+      "bytes": [
+        41,
+        192
+      ],
+      "comment_inline": "Top two bits: the run length code...",
+      "type": "code",
+      "mnemonic": "and",
+      "operand": "#&c0"
+    },
+    {
+      "addr": 12100,
+      "bytes": [
+        24
+      ],
+      "comment_inline": "...moved down to bits 1-0 (through the carry)",
+      "type": "code",
+      "mnemonic": "clc"
+    },
+    {
+      "addr": 12101,
+      "bytes": [
+        42
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "rol"
+    },
+    {
+      "addr": 12102,
+      "bytes": [
+        42
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "rol"
+    },
+    {
+      "addr": 12103,
+      "bytes": [
+        42
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "rol"
+    },
+    {
+      "addr": 12104,
+      "bytes": [
+        201,
+        3
+      ],
+      "comment_inline": "Code 3?",
+      "type": "code",
+      "mnemonic": "cmp",
+      "operand": "#3"
+    },
+    {
+      "addr": 12106,
+      "bytes": [
+        208,
+        3
+      ],
+      "comment_inline": "No: the run is the code + 1 bytes",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "run_length_known",
+      "target": 12111,
+      "target_label": "run_length_known"
+    },
+    {
+      "addr": 12108,
+      "bytes": [
+        32,
+        140,
+        47
+      ],
+      "comment_inline": "Yes: the run is the next byte + 1 (0 = 256)",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "read_packed_byte",
+      "target": 12172,
+      "target_label": "read_packed_byte"
+    },
+    {
+      "addr": 12111,
+      "bytes": [
+        170
+      ],
+      "labels": [
+        "run_length_known"
+      ],
+      "comment_inline": "X = the run length...",
+      "xref_summaries": [
+        "&2f4f referenced 1 time by &2f4a"
+      ],
+      "references": [
+        {
+          "addr": 12106,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "tax"
+    },
+    {
+      "addr": 12112,
+      "bytes": [
+        232
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "inx"
+    },
+    {
+      "addr": 12113,
+      "bytes": [
+        104
+      ],
+      "comment_inline": "A = the screen byte, the low six bits (so each pixel is one of colours 0-7)",
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 12114,
+      "bytes": [
+        41,
+        63
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "and",
+      "operand": "#&3f"
+    },
+    {
+      "addr": 12116,
+      "bytes": [
+        145,
+        130
+      ],
+      "labels": [
+        "write_run"
+      ],
+      "comment_inline": "Write it to the screen",
+      "xref_summaries": [
+        "&2f54 referenced 1 time by &2f5f"
+      ],
+      "references": [
+        {
+          "addr": 12127,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "(screen_ptr),y",
+      "target": 130,
+      "target_label": "screen_ptr"
+    },
+    {
+      "addr": 12118,
+      "bytes": [
+        230,
+        130
+      ],
+      "comment_inline": "Advance screen_ptr...",
+      "type": "code",
+      "mnemonic": "inc",
+      "operand": "screen_ptr",
+      "target": 130,
+      "target_label": "screen_ptr"
+    },
+    {
+      "addr": 12120,
+      "bytes": [
+        208,
+        4
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "next_in_run",
+      "target": 12126,
+      "target_label": "next_in_run"
+    },
+    {
+      "addr": 12122,
+      "bytes": [
+        230,
+        131
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "inc",
+      "operand": "screen_ptr + 1",
+      "target": 131
+    },
+    {
+      "addr": 12124,
+      "bytes": [
+        48,
+        6
+      ],
+      "comment_inline": "Reached &8000: the screen is full",
+      "type": "code",
+      "mnemonic": "bmi",
+      "operand": "unpacked",
+      "target": 12132,
+      "target_label": "unpacked"
+    },
+    {
+      "addr": 12126,
+      "bytes": [
+        202
+      ],
+      "labels": [
+        "next_in_run"
+      ],
+      "comment_inline": "Count down the run",
+      "xref_summaries": [
+        "&2f5e referenced 1 time by &2f58"
+      ],
+      "references": [
+        {
+          "addr": 12120,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "dex"
+    },
+    {
+      "addr": 12127,
+      "bytes": [
+        208,
+        243
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "write_run",
+      "target": 12116,
+      "target_label": "write_run"
+    },
+    {
+      "addr": 12129,
+      "bytes": [
+        76,
+        62,
+        47
+      ],
+      "comment_inline": "Next packed byte",
+      "type": "code",
+      "mnemonic": "jmp",
+      "operand": "unpack_run",
+      "target": 12094,
+      "target_label": "unpack_run"
+    },
+    {
+      "addr": 12132,
+      "bytes": [
+        104
+      ],
+      "labels": [
+        "unpacked"
+      ],
+      "comment_inline": "Restore the zero-page bytes...",
+      "xref_summaries": [
+        "&2f64 referenced 1 time by &2f5c"
+      ],
+      "references": [
+        {
+          "addr": 12124,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 12133,
+      "bytes": [
+        133,
+        131
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "screen_ptr + 1",
+      "target": 131
+    },
+    {
+      "addr": 12135,
+      "bytes": [
+        104
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 12136,
+      "bytes": [
+        133,
+        130
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "screen_ptr",
+      "target": 130,
+      "target_label": "screen_ptr"
+    },
+    {
+      "addr": 12138,
+      "bytes": [
+        104
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 12139,
+      "bytes": [
+        133,
+        129
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "packed_ptr + 1",
+      "target": 129
+    },
+    {
+      "addr": 12141,
+      "bytes": [
+        104
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 12142,
+      "bytes": [
+        133,
+        128
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "packed_ptr",
+      "target": 128,
+      "target_label": "packed_ptr"
+    },
+    {
+      "addr": 12144,
+      "bytes": [
+        162,
+        0
+      ],
+      "comment_inline": "Restore the 18 bytes at &0C00...",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#0"
+    },
+    {
+      "addr": 12146,
+      "bytes": [
+        104
+      ],
+      "labels": [
+        "restore_osfile_block"
+      ],
+      "comment_inline": "...",
+      "xref_summaries": [
+        "&2f72 referenced 1 time by &2f79"
+      ],
+      "references": [
+        {
+          "addr": 12153,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 12147,
+      "bytes": [
+        157,
+        0,
+        12
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "osfile_block,x",
+      "target": 3072,
+      "target_label": "osfile_block"
+    },
+    {
+      "addr": 12150,
+      "bytes": [
+        232
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "inx"
+    },
+    {
+      "addr": 12151,
+      "bytes": [
+        224,
+        18
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "cpx",
+      "operand": "#&12"
+    },
+    {
+      "addr": 12153,
+      "bytes": [
+        208,
+        247
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "restore_osfile_block",
+      "target": 12146,
+      "target_label": "restore_osfile_block"
+    },
+    {
+      "addr": 12155,
+      "bytes": [
+        104
+      ],
+      "comment_inline": "Restore command_ptr...",
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 12156,
+      "bytes": [
+        133,
+        135
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "command_ptr + 3",
+      "target": 135
+    },
+    {
+      "addr": 12158,
+      "bytes": [
+        104
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 12159,
+      "bytes": [
+        133,
+        134
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "command_ptr + 2",
+      "target": 134
+    },
+    {
+      "addr": 12161,
+      "bytes": [
+        104
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 12162,
+      "bytes": [
+        133,
+        133
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "command_ptr + 1",
+      "target": 133
+    },
+    {
+      "addr": 12164,
+      "bytes": [
+        104
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 12165,
+      "bytes": [
+        133,
+        132
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "command_ptr",
+      "target": 132,
+      "target_label": "command_ptr"
+    },
+    {
+      "addr": 12167,
+      "bytes": [
+        169,
+        20
+      ],
+      "comment_inline": "VDU 20: restore the default colours, revealing the picture, and return",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&14"
+    },
+    {
+      "addr": 12169,
+      "bytes": [
+        76,
+        238,
+        255
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "jmp",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 12172,
+      "bytes": [
+        177,
+        128
+      ],
+      "labels": [
+        "read_packed_byte"
+      ],
+      "comment_inline": "Read the byte",
+      "xref_summaries": [
+        "&2f8c referenced 2 times by &2f3e, &2f4c"
+      ],
+      "references": [
+        {
+          "addr": 12094,
+          "kind": "direct"
+        },
+        {
+          "addr": 12108,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "(packed_ptr),y",
+      "target": 128,
+      "target_label": "packed_ptr"
+    },
+    {
+      "addr": 12174,
+      "bytes": [
+        230,
+        128
+      ],
+      "comment_inline": "Advance packed_ptr...",
+      "type": "code",
+      "mnemonic": "inc",
+      "operand": "packed_ptr",
+      "target": 128,
+      "target_label": "packed_ptr"
+    },
+    {
+      "addr": 12176,
+      "bytes": [
+        208,
+        2
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "read_packed_byte_done",
+      "target": 12180,
+      "target_label": "read_packed_byte_done"
+    },
+    {
+      "addr": 12178,
+      "bytes": [
+        230,
+        129
+      ],
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "inc",
+      "operand": "packed_ptr + 1",
+      "target": 129
+    },
+    {
+      "addr": 12180,
+      "bytes": [
+        96
+      ],
+      "labels": [
+        "read_packed_byte_done"
+      ],
+      "comment_inline": "Return",
+      "xref_summaries": [
+        "&2f94 referenced 1 time by &2f90"
+      ],
+      "references": [
+        {
+          "addr": 12176,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "rts"
+    },
+    {
+      "addr": 12181,
+      "bytes": [
+        0,
+        0
+      ],
+      "labels": [
+        "osfile_block_template"
+      ],
+      "comment_inline": "+0 filename address (filled in)",
+      "xref_summaries": [
+        "&2f95 used as index base 1 time by &2ed2"
+      ],
+      "references": [
+        {
+          "addr": 11986,
+          "kind": "indexed"
+        }
+      ],
+      "type": "byte",
+      "values": [
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 12183,
+      "bytes": [
+        0,
+        44,
+        255,
+        255
+      ],
+      "comment_inline": "+2 load address (low half filled in)",
+      "type": "byte",
+      "values": [
+        0,
+        44,
+        255,
+        255
+      ]
+    },
+    {
+      "addr": 12187,
+      "bytes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "comment_inline": "+6 exec address: low byte 0 means load at +2",
+      "type": "byte",
+      "values": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 12191,
+      "bytes": [
+        0,
+        44,
+        255,
+        255
+      ],
+      "comment_inline": "+10 start address (unused)",
+      "type": "byte",
+      "values": [
+        0,
+        44,
+        255,
+        255
+      ]
+    },
+    {
+      "addr": 12195,
+      "bytes": [
+        0,
+        124,
+        255,
+        255
+      ],
+      "comment_inline": "+14 end address (unused)",
+      "type": "byte",
+      "values": [
+        0,
+        124,
+        255,
+        255
+      ]
+    }
+  ]
+}

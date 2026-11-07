@@ -1,11 +1,12 @@
 {
     "title": "Dunjunz, Ole's crack of the cassette (1986)",
+    "label": "The game",
     "size": 11344,
     "load_address": "0x2400",
     "exec_address": "0x5000",
     "md5": "259f45bcefa8b34fea32f758a14d9865",
     "sha256": "11edee179e7ff74561c0131cf715a77635d1478106e45d83d96986e0d34dae83",
-    "notes": "DUNJ4 and DUNJ3 from Dunjunz-tape.zip in the NVG archive, a crack of the 1986 cassette by Ole (\"The great Demon from Denmark\"). DUNJ4 (the figures above) is the game's &0400-&2FFF image stored at &2400, followed by start-up code at &5000 that copies it into place and applies the cracker's start-level cheat. DUNJ3 (load &6E80, 11904 bytes; SHA-256 03d92abc11b36d22e2a9a7365ee90aa47f32aa6d2e243188e3f5fdc423abbd22) holds &6E80-&7FFF. The levels are stored decrypted and loaded with *LOAD. The listing saves both files.",
+    "notes": "DUNJ4 and DUNJ3 from Dunjunz-tape.zip in the NVG archive, a crack of the 1986 cassette by Ole (\"The great Demon from Denmark\"). DUNJ4 (the figures above) is the game's &0400-&2FFF image stored at &2400, followed by start-up code at &5000 that copies it into place and applies the cracker's start-level cheat. DUNJ3 (load &6E80, 11904 bytes; SHA-256 03d92abc11b36d22e2a9a7365ee90aa47f32aa6d2e243188e3f5fdc423abbd22) holds &6E80-&7FFF. The levels are stored decrypted and loaded with *LOAD. The game listing saves both files. EXPAND, the picture unpacker that PLOAD runs, is disassembled on its own; PLOAD and DUNJ are shown as source, with the manual that DUNJ carries after its program and prints when I is pressed.",
     "memory_map_groups": {
         "zero_page": "Zero page",
         "os_vectors": "OS vectors",
@@ -21,7 +22,8 @@
         "text": "Text",
         "level_file": "Level file (&6B00)",
         "disc_state": "Disc release: level loading",
-        "leftovers": "Leftovers from development"
+        "leftovers": "Leftovers from development",
+        "expand_workspace": "EXPAND workspace"
     },
     "files": [
         {
@@ -37,6 +39,43 @@
             "exec": "0x0000",
             "size": 11904,
             "sha256": "03d92abc11b36d22e2a9a7365ee90aa47f32aa6d2e243188e3f5fdc423abbd22"
+        }
+    ],
+    "disassemblies": [
+        {
+            "label": "*EXPAND: picture unpacker",
+            "slug": "expand",
+            "json": "output/dunjunz-tape_crack_ole-expand.json",
+            "runtime": "EXPAND, load and exec &2E00, &1A7 bytes, \"(C) 1985 Rhys E. Davies\". Run by PLOAD as *EXPAND GIRL1 in MODE 2: loads the packed picture so that it ends at &8000 and unpacks it onto the screen from &3000 with all the colours black, then reveals it with VDU 20. Each packed byte holds six bits of a screen byte and a run length of 1-3, or a count in the next byte.",
+            "files": [
+                {
+                    "name": "EXPAND",
+                    "load": "0x2E00",
+                    "exec": "0x2E00",
+                    "size": 423,
+                    "sha256": "6a18d63bf6abef3b2a5e8c65d9c886719c6eb203dfa24635d8f0271cd028e8d1"
+                }
+            ]
+        }
+    ],
+    "source_files": [
+        {
+            "label": "PLOAD: the intro (BBC BASIC)",
+            "slug": "pload",
+            "path": "basic/pload.bas",
+            "language": "BBC BASIC"
+        },
+        {
+            "label": "DUNJ: the loader (BBC BASIC)",
+            "slug": "dunj",
+            "path": "basic/dunj.bas",
+            "language": "BBC BASIC"
+        },
+        {
+            "label": "DUNJ's manual, as the loader prints it",
+            "slug": "manual",
+            "path": "text/manual.txt",
+            "language": "Text"
         }
     ]
 }

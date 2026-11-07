@@ -45,6 +45,16 @@ asm = "versions/dunjunz-swram_hack/output/dunjunz-swram_hack.asm"
 json = "versions/dunjunz-swram_hack/output/dunjunz-swram_hack.json"
 verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunjun6" }
 
+# TITLE, the hack's title page, is a separate program with its own driver
+# and listing.
+
+[[targets]]
+id = "swram_hack-title"
+binary = "versions/dunjunz-swram_hack/binary/TITLE"
+driver = "versions/dunjunz-swram_hack/disassemble/disasm_dunjunz_swram_hack_title.py"
+asm = "versions/dunjunz-swram_hack/output/dunjunz-swram_hack-title.asm"
+json = "versions/dunjunz-swram_hack/output/dunjunz-swram_hack-title.json"
+verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "TITLE" }
 
 # Ole's crack of the cassette: DUNJ4 (the &0400-&2FFF image stored at &2400,
 # plus start-up code at &5000) and DUNJ3 (&6E80 onwards).
@@ -65,6 +75,16 @@ asm = "versions/dunjunz-tape_crack_ole/output/dunjunz-tape_crack_ole.asm"
 json = "versions/dunjunz-tape_crack_ole/output/dunjunz-tape_crack_ole.json"
 verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "DUNJ3" }
 
+# EXPAND, the picture unpacker that PLOAD runs, is a separate program with
+# its own driver and listing.
+
+[[targets]]
+id = "tape_crack_ole-expand"
+binary = "versions/dunjunz-tape_crack_ole/binary/EXPAND"
+driver = "versions/dunjunz-tape_crack_ole/disassemble/disasm_dunjunz_tape_crack_ole_expand.py"
+asm = "versions/dunjunz-tape_crack_ole/output/dunjunz-tape_crack_ole-expand.asm"
+json = "versions/dunjunz-tape_crack_ole/output/dunjunz-tape_crack_ole-expand.json"
+verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "EXPAND" }
 
 # The official disc release, Model B side: Dun1 (the game, reloaded every
 # level) and Coder (its per-level loader, also stored inside Dun1).

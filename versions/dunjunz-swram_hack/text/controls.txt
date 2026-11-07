@@ -1,0 +1,22 @@
+  //////////////////////////////////////
+         D U N J U N Z - Bug Byte
+         D U N J U N Z - Bug Byte
+  ||||||||||||||||||||||||||||||||||||||
+
+
+                Controls:
+                Controls:
+
+        PLR-1    PLR-2    PLR-3    PLR-4
+
+  UP    CAPS/LK  ARROW-R    K        G
+  DOWN  SHIFT/LK ARROW UP   <        B
+  LEFT  SHIFT    DELETE     >        U
+  RIGHT   Z      COPY       ?        I
+  FIRE   TAB     ARROW-D  SPACE      O
+  MAGIC CTRL     RETURN     -        -
+
+
+
+
+              PRESS ANY KEY.

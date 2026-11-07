@@ -1,12 +1,13 @@
 {
     "title": "Dunjunz, unofficial sideways RAM hack",
+    "label": "The game",
     "size": 1024,
     "load_address": "0x0D00",
     "exec_address": "0x0D00",
     "dfs_attributes": "0B",
     "md5": "6db579fa721a4718bc44f0c5b020ae43",
     "sha256": "44dc3f0b221d28f72d7f9acb9ee6b78153fff91e71a04b6499b644fbe8192682",
-    "notes": "The four game files of Disc060-DunjunzRx2.ssd from the BBC Micro Games Archive, an unofficial conversion that keeps all 25 levels in two banks of sideways RAM as ROMFS images. Dunjun4 (&0400, 2304 bytes), Dunjun7 (&0D00, 1024 bytes, the figures above; the game starts at &0D31), Dunjun5 (&1100, 7936 bytes) and Dunjun6 (&6E80, 4480 bytes). Its code is Ole's crack's with the official disc's level check and a level loader that calls the ROM filing system's FILEV handler directly. The listing saves all four files.",
+    "notes": "The four game files of Disc060-DunjunzRx2.ssd from the BBC Micro Games Archive, an unofficial conversion that keeps all 25 levels in two banks of sideways RAM as ROMFS images. Dunjun4 (&0400, 2304 bytes), Dunjun7 (&0D00, 1024 bytes, the figures above; the game starts at &0D31), Dunjun5 (&1100, 7936 bytes) and Dunjun6 (&6E80, 4480 bytes). Its code is Ole's crack's with the official disc's level check and a level loader that calls the ROM filing system's FILEV handler directly. The game listing saves all four files. TITLE, the title page that the BASIC program DUNJUNZ runs, is disassembled on its own; !BOOT, DUNJUNZ and DUNK are shown as source. DUNJUNZ carries its MODE 7 controls page after the program, at &3700, and copies it to the screen at &7C00.",
     "memory_map_groups": {
         "zero_page": "Zero page",
         "os_vectors": "OS vectors",
@@ -22,7 +23,8 @@
         "text": "Text",
         "level_file": "Level file (&6B00)",
         "disc_state": "Disc release: level loading",
-        "leftovers": "Leftovers from development"
+        "leftovers": "Leftovers from development",
+        "screen": "Screen memory"
     },
     "files": [
         {
@@ -52,6 +54,49 @@
             "exec": "0x6E80",
             "size": 4480,
             "sha256": "b9ddb831abd82a11a3abd7bc874ca357655cdd360f5c992d366ef6f95e9c47c6"
+        }
+    ],
+    "disassemblies": [
+        {
+            "label": "TITLE: title page",
+            "slug": "title",
+            "json": "output/dunjunz-swram_hack-title.json",
+            "runtime": "TITLE, load &3800, exec &38C6, &C00 bytes. Run as */TITLE by the BASIC program DUNJUNZ after the intro: selects MODE 5, draws the picture it carries (a framed BUG BYTE logo and a face) and prints the author, the copyright and the keys (f1 Pause On/Off, 5 Sound On, 6 Sound Off), then waits up to 7.67 seconds for a key and returns to BASIC, which chains DUNK.",
+            "files": [
+                {
+                    "name": "TITLE",
+                    "load": "0x3800",
+                    "exec": "0x38C6",
+                    "size": 3072,
+                    "sha256": "113244818d180f139e3b1d8553776409a7ba9f7f7e60e34bc2f4c8d8ef16fe09"
+                }
+            ]
+        }
+    ],
+    "source_files": [
+        {
+            "label": "!BOOT: the boot file (*EXEC)",
+            "slug": "boot",
+            "path": "text/boot.txt",
+            "language": "Text"
+        },
+        {
+            "label": "DUNJUNZ: instructions and intro (BBC BASIC)",
+            "slug": "dunjunz",
+            "path": "basic/dunjunz.bas",
+            "language": "BBC BASIC"
+        },
+        {
+            "label": "DUNJUNZ's controls page (MODE 7, &3700)",
+            "slug": "controls",
+            "path": "text/controls.txt",
+            "language": "Text"
+        },
+        {
+            "label": "DUNK: sideways RAM set-up and game loader (BBC BASIC)",
+            "slug": "dunk",
+            "path": "basic/dunk.bas",
+            "language": "BBC BASIC"
         }
     ]
 }

@@ -1,0 +1,102 @@
+                MANUAL for DUNJUNZ
+                   by ------- E.S
+                The Ranger uses a bow, and his quiver has
+the power to produce an unlimited supply of arrows. He can
+cast 2 fireball at a time, and each one does the same damage
+as two arrows. A robe protects him and when hit he takes
+maximum damage. Not a good fighter. He can fire 3 arrows ar
+a time, but they are not that effective. He wears leather
+armour, which absorbs aboyt 1/3 dammage, he does have one
+advantage over the Barbarian and Warrior - he can use magic;
+all monsters in the vicinity are killed, it drains his
+energy badly.
+The Wizaed has been taught how to cast poweful fireballs. He
+can fire 3 arrows at a time, they are not that effective. He
+wears leather armour, which absorbs about 1/3 damage, he
+does have one advantage over the Barbarian and Warrior - he
+can use magic; all monsters in the vicinity are killed, it
+drains his energy badly.
+The Barbarian's axe can creats clones of itself. She is a
+born fighter with no magic. She begins with one axe which
+does horrific damage and can kill in one shot ! Here natural
+tough skin is better than any leather and nearly matches the
+Warriors' chain mail!
+The Warrior can draw an infinite amount of swords from her
+sheath. She can throw 3 swords at a time, and each equals a
+fireball in damage. She wears chainmail, carries a shield -
+maximum armour! But, shee has no magic.
+Each charactar can only fire a certain amount of weapons at
+any one time; you need magic to maintain the weapon's
+existence.
+----------------------------------------------------------------------
+       KEYES           UP      DOWN    LEFT    RIGHT   FIRE    MAGIC
+----------------------------------------------------------------------
+       RANGER          CAPSL.   SHIFTL. SKIFT   Z      TAB     CTRL
+       WIZARD          AROW     AROW    DELETE  COPY   AROW    RETURN
+       BARBARIAN       K         ,        .      /     SPACE     ~
+       WARRIOR         G         B        U      I      O        ~
+=======================================================================
+ CARACTER DISPLAY SCREEN
+-----------------------------------------------------------------------
+   PICTURE OF CHARACTER           IF THIS SYMBOL IS PRESENT THE
+  IN QUESTION.                    CHARACTER IS IN POSSESSION OF
+                                  A KEY ..
+                                        SHIELD BEARING CHARACTER'S
+                                        ARMOUR RATING (MAX 7)
+                                        ---------------------------------
+       HEALTH.                      Z   THIS SYMBOL MEANS CHARACTER HAS
+                                        DOUBLE SPEED ..
+                                        DAMAGE THAT EACH WEAPON INFLICTS.
+                                        NUMBER OF WEARPONS CHARACTER
+                                        CAN FIRE ..
+--------------------------------------------------------------------------
+                           ---- SCORE ----
+--------------------------------------------------------------------------
+
+       OPJECTS.
+*********************
+
+ EXIT. To go deeper, walk over a square hole.
+
+ TREASURE A square (med haandtag )
+
+ FOOT. Increases health by 10 points (max 99). Worth 5 points
+
+ TELEPORTER. A square with a square. Teleport on same level.
+
+ TRAP DOORS. A Square with a door. Where new monsters emerge from.
+
+ PILE OF WEAPONS. Alows a character to fire an extra weapon (max 3),
+ worth 10 points.
+
+ MAGIC HELMET. Increases armour raiting by 1 point. Less damage is
+ taken when hit. Worth 10 points.
+
+ CROSS OF RESURRECTION. Increases armour rauting by 1 point. Less
+ damage is taken when hit. Worth 10 points.
+
+ BOOTS OF SPEED. Moves you about twice the  normal speed. A lighting
+ bolt on the display shows the presence of the boots. Bumping into
+ anything apart from walls, doors and keys loses the boot. Worth 10
+ points.
+
+ ENERGY DRAINE. A square with 2 rektangel. Lose 20 health points.
+ They can be destroyed by repeatedly shooting them. BEWARE when a
+ weapon hits an energy drainer, it bounces back. Worth 1 point for
+ every hit.
+
+ MAGIC SWORD. Increases the damage a character's weapon does by 1.
+ Worth 10 points.
+
+ POTION OF HEALING. (Ligner en vase). A blessing or a curse. The
+ health of the character changes: Take the last digit (the right
+   most digit) of your score, duplicate it, and this value is the new
+ health value. Worth 10 points.
+
+ DOOR. Open by walking into it and by carrying the correct key, some
+ are hidden. Worth 7 points.
+
+ KEY. For each door there is a key. Only one key may be carried at a
+ time . If you go over another key, then the key lying on the floor
+ is picked up.
+                    ------- MCC ------
