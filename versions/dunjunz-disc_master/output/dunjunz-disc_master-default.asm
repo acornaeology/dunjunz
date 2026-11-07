@@ -50,36 +50,37 @@ reset_vector   = &fffc  ; The 6502 reset vector: the MOS's reset entry.
     ldx #1                              ; ...X = 1: ESCAPE disabled, BREAK as normal...
     ldy #0                              ; ...Y = 0: X replaces the old setting
     jsr osbyte                          ; ...so ESCAPE cannot interrupt a save  osbyte: escape break effect
-    lda #osbyte_flush_buffer_class      ; OSBYTE &0F: flush buffers (X is the old &C8 setting, normally 0: all)
+    lda #osbyte_flush_buffer_class      ; OSBYTE &0F: flush buffers, X = the old &C8 setting
     jsr osbyte                          ; ...so earlier key presses are not taken as input  Flush selected class of buffer
     lda #&0c                            ; VDU 12: clear the screen
-    jsr oswrch                          ; ...for a fresh prompt
-    ldx #0                              ; Print the prompt, up to and including its zero...
+    jsr oswrch                          ; ...for a fresh prompt for each level
+    ldx #0                              ; Print "Which level do you wish to reset ?"...
 ; &0e15 referenced 1 time by &0e1e
 .print_prompt
     lda level_prompt,x                  ; ...next character of level_prompt...
-    jsr oswrch                          ; ...printed...
+    jsr oswrch                          ; ...printed, the zero too (VDU 0 does nothing)...
     inx                                 ; ...on to the next
     cmp #0                              ; ...was it the zero that ends it?
     bne print_prompt                    ; No: print the next
     ldx #<(read_level_block)            ; Point XY at read_level_block...
-    ldy #>(read_level_block)            ; ...block's high byte
+    ldy #>(read_level_block)            ; ...for the OSWORD call below
     lda #<(level_digits)                ; ...and fill it in: the buffer is level_digits...
     sta read_level_block                ; ...buffer address low byte
     lda #>(level_digits)                ; ...high byte...
     sta read_level_block + 1            ; ...buffer address high byte
-    lda #2                              ; ...at most two characters...
+    lda #2                              ; ...at most two characters: levels 1-25...
     sta read_level_block + 2            ; ...as the maximum length
     lda #'0'                            ; ...from '0'...
     sta read_level_block + 3            ; ...as the lowest character accepted
-    lda #'9'                            ; ...to '9'
+    lda #'9'                            ; ...to '9': digits only
     sta read_level_block + 4            ; ...as the highest character accepted
     lda #osword_read_line               ; OSWORD 0: read the level number
     jsr osword                          ; ...Y = the number of characters typed  Read line from input stream (exits with C=1 if ESCAPE pressed)
     cpy #0                              ; Nothing typed (or ESCAPE)?
-    beq default_start                   ; Yes: ask again
+    beq default_start                   ; Yes: clear the screen and ask again
+; Turn the digits into the level number, and refuse 0 and anything above 25.
     cpy #1                              ; One digit?
-    beq one_digit                       ; Yes: one digit
+    beq one_digit                       ; Yes: levels 1-9
     lda level_digits                    ; Two: tens digit...
     sec                                 ; ...ready to subtract...
     sbc #'0'                            ; ...'0': the tens digit's value
@@ -95,7 +96,7 @@ reset_vector   = &fffc  ; The 6502 reset vector: the MOS's reset entry.
     sbc #'0'                            ; ...'0': the units digit's value
     clc                                 ; ...ready to add...
     adc tens_times_ten                  ; ...plus tens x 10: the level number
-    bne check_level                     ; Check it (falls through only for 00)
+    bne check_level                     ; Check it (00 falls through and is refused)
 ; &0e65 referenced 1 time by &0e48
 .one_digit
     lda #' '                            ; One digit: blank the second, for the filename...
@@ -105,12 +106,13 @@ reset_vector   = &fffc  ; The 6502 reset vector: the MOS's reset entry.
     sbc #'0'                            ; ...'0': the level number
 ; &0e70 referenced 1 time by &0e63
 .check_level
-    cmp #level_count + 1                ; 26 or more: ask again
-    bcs default_start                   ; Too high: ask again
-    cmp #0                              ; 0: ask again
-    beq default_start                   ; Level 0: ask again
-    tax                                 ; X = level
-    lda #<(level_1_original - level_length)  ; read_ptr = &1000...
+    cmp #level_count + 1                ; Beyond level 25, the last it carries?
+    bcs default_start                   ; Too high: clear the screen and ask again
+    cmp #0                              ; Level 0?
+    beq default_start                   ; Yes: no such level, ask again
+; Copy the level's original from *DEFAULT to the level buffer at &6B00.
+    tax                                 ; X = level, the count of copies to step
+    lda #<(level_1_original - level_length)  ; read_ptr = &1000, one copy before level 1...
     sta read_ptr                        ; ...low byte...
     lda #>(level_1_original - level_length)  ; ...high byte...
     sta read_ptr_hi                     ; ...so adding N x &2B0 reaches level N
@@ -119,20 +121,20 @@ reset_vector   = &fffc  ; The 6502 reset vector: the MOS's reset entry.
     lda read_ptr                        ; ...plus &2B0 for each level: level N's copy...
     clc                                 ; ...ready to add...
     adc #<(level_length)                ; ...one level's length, low byte...
-    sta read_ptr                        ; ...stored back
+    sta read_ptr                        ; ...one copy further on
     lda read_ptr_hi                     ; ...high byte...
     adc #>(level_length)                ; ...one level's length, high byte, with carry
-    sta read_ptr_hi                     ; ...stored back
+    sta read_ptr_hi                     ; ...completing the step
     dex                                 ; ...one level fewer to step over
     bne find_copy                       ; ...at &1000 + N x &2B0
     lda #0                              ; put_ptr = &6B00
     sta put_ptr                         ; ...low byte...
     lda #>(level_buffer)                ; ...high byte: the game's level buffer
-    sta put_ptr_hi                      ; ...stored
+    sta put_ptr_hi                      ; ...where the level is saved from
     ldy #0                              ; Y = 0: both pointers step instead
 ; &0e9b referenced 2 times by &0eaf, &0eb5
 .copy_level
-    lda (read_ptr),y                    ; Copy a byte
+    lda (read_ptr),y                    ; Copy a byte of the level, still encrypted
     sta (put_ptr),y                     ; ...into the level buffer
 .copy_read_next
     inc read_ptr                        ; Next byte to read
@@ -151,22 +153,23 @@ reset_vector   = &fffc  ; The 6502 reset vector: the MOS's reset entry.
     lda put_ptr_hi                      ; ...and high byte...
     cmp #>(level_buffer_end)            ; ...end of the level, high byte?
     bne copy_level                      ; No: copy the next byte
-    lda level_digits                    ; Put the digits into the SAVE command
+; Save it as LevelN, then offer another level or quit.
+    lda level_digits                    ; Put the digits typed into the SAVE command
     sta save_command + 10               ; ...first digit into the filename
     lda level_digits + 1                ; ...second digit (or a space)...
     sta save_command + 11               ; ...into the filename
     ldx #<(save_command)                ; *SAVE LevelN 6B00+2B0
-    ldy #>(save_command)                ; ...command's high byte
-    jsr oscli                           ; ...and run it: the level file is restored
+    ldy #>(save_command)                ; ...(X, Y) = the command line
+    jsr oscli                           ; ...replacing LevelN with the original
     lda #&0d                            ; New line
     jsr oswrch                          ; ...carriage return...
     lda #&0a                            ; ...line feed...
-    jsr oswrch                          ; ...after the SAVE's own output
-    ldx #0                              ; Print the question, up to and including its zero
+    jsr oswrch                          ; ...so the question starts a line of its own
+    ldx #0                              ; Print "Reset another level (A) or quit (Q)"
 ; &0ed6 referenced 1 time by &0edf
 .print_question
     lda another_question,x              ; ...next character of another_question...
-    jsr oswrch                          ; ...printed...
+    jsr oswrch                          ; ...printed, the zero too (VDU 0 does nothing)...
     inx                                 ; ...on to the next
     cmp #0                              ; ...was it the zero that ends it?
     bne print_question                  ; No: print the next
@@ -175,14 +178,14 @@ reset_vector   = &fffc  ; The 6502 reset vector: the MOS's reset entry.
 ; &0ee6 referenced 1 time by &0eef
 .wait_for_answer
     jsr osrdch                          ; Wait for a key
-    cmp #'A'                            ; A: another level
+    cmp #'A'                            ; A, capital only: another level?
     beq another_level                   ; Yes: ask for another level
-    cmp #'Q'                            ; Q?
-    bne wait_for_answer                 ; No: wait again
-    jmp (reset_vector)                  ; Yes: quit through the reset vector
+    cmp #'Q'                            ; Q, capital only: quit?
+    bne wait_for_answer                 ; Neither: wait for another key
+    jmp (reset_vector)                  ; Yes: quit by jumping into the MOS's reset code
 ; &0ef4 referenced 1 time by &0eeb
 .another_level
-    jmp default_start                   ; Another level
+    jmp default_start                   ; Back to the prompt for the next level
 ; ***************************************************************************************
 ; Prompts, the input block and the SAVE command
 ; &0ef7 used as index base 1 time by &0e15

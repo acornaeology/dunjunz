@@ -162,7 +162,7 @@
       "addr": 11839,
       "name": "expand",
       "title": "Load the named picture and unpack it onto the screen",
-      "description": "Refuses to run outside MODE 2. Finds the filename on the command line, opens the file to learn its length, and loads it so that it ends at &8000, with all sixteen logical colours black so that neither the packed bytes nor the unpacking show. Unpacks it from &3000 until the screen is full, restores the zero page and page &0C bytes it used, and resets the palette (VDU 20) to reveal the picture.",
+      "description": "Refuses to run outside MODE 2. Finds the filename on the command line, opens the file to learn its length, and loads it so that it ends at &8000, with all sixteen logical colours black so that neither the packed bytes nor the unpacking show. Unpacks it from &3000 until the screen is full, restores the zero page and page &0C bytes it used, and resets the palette (VDU 20) to reveal the picture. The packed bytes lie in the same screen memory that the picture is unpacked into, ending together at &8000, so the writing must never overtake the reading. Every packed byte gives at least one screen byte, except a code-3 pair for a run of one, so the writing stays behind unless the file holds such a pair; nothing checks this. All the state EXPAND saves is kept on the stack: 26 bytes during the unpacking.",
       "on_entry": {
         "command line": "the filename, after *EXPAND"
       },
@@ -813,6 +813,9 @@
       "labels": [
         "mode_ok"
       ],
+      "comments_before_label": [
+        "Find the filename on the command line and open the file."
+      ],
       "comment_inline": "Save the four zero-page bytes OSARGS will overwrite...",
       "xref_summaries": [
         "&2e53 referenced 1 time by &2e46"
@@ -855,7 +858,7 @@
       "bytes": [
         72
       ],
-      "comment_inline": "...pushed...",
+      "comment_inline": "...the caller's, kept...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -876,7 +879,7 @@
       "bytes": [
         72
       ],
-      "comment_inline": "...pushed...",
+      "comment_inline": "...kept...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -897,7 +900,7 @@
       "bytes": [
         72
       ],
-      "comment_inline": "...pushed, to restore before returning",
+      "comment_inline": "...kept, to restore before returning",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -907,7 +910,7 @@
         169,
         1
       ],
-      "comment_inline": "OSARGS 1: command_ptr = the address of the command line after \"EXPAND\"...",
+      "comment_inline": "OSARGS 1: command_ptr = the rest of the command line...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#1"
@@ -1017,7 +1020,7 @@
         133,
         134
       ],
-      "comment_inline": "...restored...",
+      "comment_inline": "...back in place...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "command_ptr + 2",
@@ -1038,7 +1041,7 @@
         133,
         133
       ],
-      "comment_inline": "...restored...",
+      "comment_inline": "...back in place...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "command_ptr + 1",
@@ -1330,7 +1333,7 @@
         133,
         134
       ],
-      "comment_inline": "...restored...",
+      "comment_inline": "...back in place...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "command_ptr + 2",
@@ -1351,7 +1354,7 @@
         133,
         133
       ],
-      "comment_inline": "...restored...",
+      "comment_inline": "...back in place...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "command_ptr + 1",
@@ -1455,6 +1458,9 @@
       ],
       "labels": [
         "load_picture"
+      ],
+      "comments_before_label": [
+        "Set up the OSFILE block at &0C00 and work out the load address from the file's length."
       ],
       "comment_inline": "For each of the 18 bytes of the OSFILE block at &0C00, last first:",
       "xref_summaries": [
@@ -1638,7 +1644,7 @@
       "bytes": [
         72
       ],
-      "comment_inline": "...packed_ptr low byte pushed...",
+      "comment_inline": "...packed_ptr low byte kept...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -1659,7 +1665,7 @@
       "bytes": [
         72
       ],
-      "comment_inline": "...pushed...",
+      "comment_inline": "...kept...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -1681,7 +1687,7 @@
       "bytes": [
         72
       ],
-      "comment_inline": "...pushed...",
+      "comment_inline": "...kept...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -1702,7 +1708,7 @@
       "bytes": [
         72
       ],
-      "comment_inline": "...pushed, to restore before returning",
+      "comment_inline": "...kept, to restore before returning",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -1754,7 +1760,7 @@
         169,
         0
       ],
-      "comment_inline": "Load address = &8000 - length, so that the file ends at the top of screen memory...",
+      "comment_inline": "Load address = &8000 - length: the file ends at the top...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -1799,7 +1805,7 @@
       "bytes": [
         72
       ],
-      "comment_inline": "...and keep it on the stack",
+      "comment_inline": "...and keep it on the stack, to start unpacking from",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -1894,6 +1900,9 @@
         162,
         15
       ],
+      "comments_before_label": [
+        "Black out the palette, then load the packed picture."
+      ],
       "comment_inline": "For logical colours 15 down to 0:",
       "type": "code",
       "mnemonic": "ldx",
@@ -1929,7 +1938,7 @@
         238,
         255
       ],
-      "comment_inline": "...starts a palette change...",
+      "comment_inline": "...VDU 19: redefine a logical colour...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -1952,7 +1961,7 @@
         238,
         255
       ],
-      "comment_inline": "...sent...",
+      "comment_inline": "...the colour being redefined",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -1991,7 +2000,7 @@
       "labels": [
         "send_zeros"
       ],
-      "comment_inline": "...each sent...",
+      "comment_inline": "...each a zero...",
       "xref_summaries": [
         "&2f1d referenced 1 time by &2f21"
       ],
@@ -2057,7 +2066,7 @@
         169,
         255
       ],
-      "comment_inline": "Load the file at its load address in the block (exec byte 0: use the block's address)...",
+      "comment_inline": "Load the file at the block's address (exec byte 0)...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osfile_load",
@@ -2171,7 +2180,10 @@
         169,
         0
       ],
-      "comment_inline": "screen_ptr = &3000, the start of the MODE 2 screen; Y = 0 throughout...",
+      "comments_before_label": [
+        "Unpack the runs from &3000 up to &8000."
+      ],
+      "comment_inline": "screen_ptr = &3000, the MODE 2 screen's start...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -2385,7 +2397,7 @@
       "bytes": [
         104
       ],
-      "comment_inline": "A = the screen byte, the low six bits (so each pixel is one of colours 0-7)",
+      "comment_inline": "A = the screen byte: six pixel bits, colours 0-7",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -2532,6 +2544,9 @@
       "labels": [
         "unpacked"
       ],
+      "comments_before_label": [
+        "Put back everything EXPAND used, and show the picture."
+      ],
       "comment_inline": "Restore the zero-page bytes...",
       "xref_summaries": [
         "&2f64 referenced 1 time by &2f5c"
@@ -2572,7 +2587,7 @@
         133,
         130
       ],
-      "comment_inline": "...restored...",
+      "comment_inline": "...back in place...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "screen_ptr",
@@ -2594,7 +2609,7 @@
         133,
         129
       ],
-      "comment_inline": "...restored...",
+      "comment_inline": "...back in place...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "packed_ptr + 1",
@@ -2615,7 +2630,7 @@
         133,
         128
       ],
-      "comment_inline": "...restored",
+      "comment_inline": "...the caller's values again",
       "type": "code",
       "mnemonic": "sta",
       "operand": "packed_ptr",
@@ -2641,7 +2656,7 @@
       "labels": [
         "restore_osfile_block"
       ],
-      "comment_inline": "...each from the stack...",
+      "comment_inline": "...each from the stack, byte 0 first...",
       "xref_summaries": [
         "&2f72 referenced 1 time by &2f79"
       ],
@@ -2743,7 +2758,7 @@
         133,
         134
       ],
-      "comment_inline": "...restored...",
+      "comment_inline": "...back in place...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "command_ptr + 2",
@@ -2764,7 +2779,7 @@
         133,
         133
       ],
-      "comment_inline": "...restored...",
+      "comment_inline": "...back in place...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "command_ptr + 1",
@@ -2785,7 +2800,7 @@
         133,
         132
       ],
-      "comment_inline": "...restored",
+      "comment_inline": "...the caller's zero page is intact",
       "type": "code",
       "mnemonic": "sta",
       "operand": "command_ptr",

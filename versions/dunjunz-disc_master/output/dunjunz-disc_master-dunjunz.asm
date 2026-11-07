@@ -75,12 +75,12 @@ oscli               = &fff7
 ; with the start-up at title_start.
 .dunjunz_start
     ldx #<(load_code2_command)          ; *LOAD Code2 (the music, at &C700)
-    ldy #>(load_code2_command)          ; ...command's high byte
-    jsr oscli                           ; ...and run it: Code2 into private RAM
+    ldy #>(load_code2_command)          ; ...(X, Y) = the command line
+    jsr oscli                           ; ...into HAZEL, at its own load address
     ldx #<(load_code3_command)          ; *LOAD Code3 (a copy of the sprite plotter, at &D800)
-    ldy #>(load_code3_command)          ; ...command's high byte
-    jsr oscli                           ; ...and run it: Code3 into private RAM
-    jmp load_table                      ; Load Table and start the title
+    ldy #>(load_code3_command)          ; ...(X, Y) = the command line
+    jsr oscli                           ; ...into HAZEL, at its own load address
+    jmp load_table                      ; Load Table, then the title
 .load_code2_command
     equs "LOAD Code2", &0d
 .load_code3_command
@@ -96,18 +96,18 @@ oscli               = &fff7
     lda #osbyte_read_adc_or_get_buffer_status  ; OSBYTE &80: read ADC channel 1 (joystick 1, horizontal)...
     ldx #1                              ; ...channel 1
     jsr osbyte                          ; ...Y = the reading's high byte  Read ADC channel X or buffer status
-    cpy #&80                            ; High byte &80 (at rest)?
+    cpy #&80                            ; High byte &80: a stick centred left-right?
     beq run_coder2                      ; Yes: a joystick
-    cpy #&81                            ; High byte &81?
+    cpy #&81                            ; High byte &81: just off centre?
     beq run_coder2                      ; Yes: a joystick
-    ldx #<(coder_command)               ; No joystick: *CODER, which does not return
-    ldy #>(coder_command)               ; ...command's high byte
-    jsr oscli                           ; ...and run it; the game takes over from here
+    ldx #<(coder_command)               ; No joystick: *CODER, keyboard only
+    ldy #>(coder_command)               ; ...(X, Y) = the command line
+    jsr oscli                           ; ...never returns: Coder takes over the machine
 ; &2686 referenced 2 times by &2679, &267d
 .run_coder2
-    ldx #<(coder2_command)              ; Joystick: *CODER2, which does not return
-    ldy #>(coder2_command)              ; ...command's high byte
-    jsr oscli                           ; ...and run it; the game takes over from here
+    ldx #<(coder2_command)              ; Joystick: *CODER2, which installs the handler
+    ldy #>(coder2_command)              ; ...(X, Y) = the command line
+    jsr oscli                           ; ...never returns: it runs *CODER in turn
 .coder2_command
     equs "CODER2", &0d
 ; ***************************************************************************************
@@ -122,10 +122,10 @@ oscli               = &fff7
 ;     Y: preserved
 ; &2694 referenced 1 time by &26d2
 .blank_display
-    ldx #0                              ; Send the eleven bytes of blank_display_vdu
+    ldx #0                              ; Send VDU 23,0,1,0,... then VDU 21
 ; &2696 referenced 1 time by &269f
 .blank_display_loop
-    lda blank_display_vdu,x             ; Next byte of the VDU sequence...
+    lda blank_display_vdu,x             ; Next byte of blank_display_vdu...
     jsr oswrch                          ; ...to the VDU drivers
     inx                                 ; ...on to the next
     cpx #&0b                            ; ...until all eleven are sent
@@ -137,15 +137,17 @@ oscli               = &fff7
 ; &26ad referenced 1 time by &2657
 .load_table
     ldx #<(load_table_command)          ; *L. TABLE (level 25, game over, row offsets, pause, at &C5A0)
-    ldy #>(load_table_command)          ; ...command's high byte
-    jsr oscli                           ; ...and run it: Table into private RAM
+    ldy #>(load_table_command)          ; ...(X, Y) = the command line
+    jsr oscli                           ; ...into HAZEL, at its own load address
     jmp title_start                     ; Carry on with the start-up at title_start
 .load_table_command
     equs "L. TABLE", &0d
 ; ***************************************************************************************
 ; Load the title screen while output is off
 ;
-; VDU 21, *LOAD SCREEN (the MODE 2 picture, to &3280), VDU 6.
+; VDU 21, *LOAD SCREEN (the MODE 2 picture, to &3280), VDU 6. Called by title_start with
+; every colour black, so the picture arrives unseen; VDU 21 keeps any filing system
+; messages off the screen.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -154,24 +156,25 @@ oscli               = &fff7
 ; &26c0 referenced 1 time by &2763
 .load_title_screen
     lda #&15                            ; VDU 21: disable VDU output
-    jsr oswrch                          ; ...so the load leaves no messages on screen
-    ldx #<(load_screen_command)         ; *LOAD SCREEN
-    ldy #>(load_screen_command)         ; ...command's high byte
-    jsr oscli                           ; ...and run it: the picture into screen memory
+    jsr oswrch                          ; ...so the load prints nothing over the picture
+    ldx #<(load_screen_command)         ; *LOAD SCREEN: the title picture...
+    ldy #>(load_screen_command)         ; ...(X, Y) = the command line
+    jsr oscli                           ; ...straight into screen memory at &3280
     lda #6                              ; VDU 6: enable VDU output
-    jsr oswrch                          ; ...so later text is seen again
+    jsr oswrch                          ; ...so the VDU calls that follow take effect
     rts                                 ; Return
 ; ***************************************************************************************
 ; Blank the display and run Coder
 ;
 ; Blank the display, then choose between CODER and CODER2 by whether a joystick is
-; present. It never returns.
+; present. It never returns. Called last by title_start, once the game's MODE 2 is
+; selected.
 ; &26d2 referenced 1 time by &2791
 .leave_title
-    jsr blank_display                   ; Blank the display and disable output
-    nop                                 ; Padding
-    nop                                 ; ...the second padding byte
-    jmp run_coder                       ; Run Coder (no return)
+    jsr blank_display                   ; No characters per row, no VDU output: nothing shows
+    nop                                 ; Padding: two NOPs that do nothing
+    nop                                 ; ...the second
+    jmp run_coder                       ; Run CODER, or CODER2 for a joystick (no return)
 ; ***************************************************************************************
 ; Unused
 ;
@@ -198,10 +201,11 @@ oscli               = &fff7
     lda #osbyte_escape_break_effect     ; OSBYTE &C8: ESCAPE disabled...
     ldx #1                              ; ...X = 1: ESCAPE disabled, BREAK as normal...
     ldy #0                              ; ...Y = 0: X replaces the old setting
-    jsr osbyte                          ; ...so ESCAPE cannot interrupt the title  osbyte: escape break effect
-    lda #osbyte_set_cursor_editing      ; OSBYTE 4, 1: cursor keys return codes
-    ldx #1                              ; ...X = 1: cursor keys return codes
-    jsr osbyte                          ; ...so the game can read them as keys  Set cursor editing keys
+    jsr osbyte                          ; ...so the ESCAPE key cannot stop the program  osbyte: escape break effect
+    lda #osbyte_set_cursor_editing      ; OSBYTE 4, 1: no cursor editing...
+    ldx #1                              ; ...X = 1: the arrow keys and COPY give codes
+    jsr osbyte                          ; ...instead of moving an editing cursor  Set cursor editing keys
+; Page &08 bytes that the game never reads.
     lda #0                              ; Level count = 0, in a byte the game does not read
     sta unread_level_count              ; ...in page &08, which survives a reset
     lda #'0'                            ; Level digits = "0 "...
@@ -217,35 +221,37 @@ oscli               = &fff7
     sta unread_hero_table,x             ; ...at &08B4, bytes the game does not read
     dex                                 ; Next hero
     bpl init_hero_tables                ; Until all four heroes are set
+; Point the BREAK intercept at &15B5, and disable it.
     lda #<(game_next_level_intercept)   ; BREAK intercept address = &15B5, which the game does not use...
-    sta os_break_intercept + 1          ; ...into the intercept's address low byte
-    lda #>(game_next_level_intercept)   ; ...high byte
-    sta os_break_intercept + 2          ; ...into the intercept's address high byte
+    sta os_break_intercept + 1          ; ...as the JMP's address, low byte
+    lda #>(game_next_level_intercept)   ; ...high byte...
+    sta os_break_intercept + 2          ; ...completing the JMP's address
     lda #0                              ; ...but disabled: &0287 is not a JMP
-    sta os_break_intercept              ; ...into &0287, so no JMP: the intercept is off
-    ldx #<(tv_title_command)            ; *TV 255,1: vertical offset for the title's MODE 2
-    ldy #>(tv_title_command)            ; ...command's high byte
-    jsr oscli                           ; ...and run it
-    jsr mode2_cursor_off                ; MODE 2, cursor off
-    ldx #&0f                            ; Make all sixteen logical colours black...
+    sta os_break_intercept              ; ...so a BREAK does not run it
+; Show the title picture: select MODE 2 with every colour black, load the picture, then restore the colours.
+    ldx #<(tv_title_command)            ; *TV 255,1: vertical shift -1 line, interlace off
+    ldy #>(tv_title_command)            ; ...(X, Y) = the command line
+    jsr oscli                           ; ...taking effect at the MODE change below
+    jsr mode2_cursor_off                ; MODE 2, cursor off, for the title picture
+    ldx #&0f                            ; Make all sixteen colours black, hiding the load...
 ; &2749 referenced 1 time by &2761
 .black_colours
     lda #&13                            ; ...VDU 19, colour, 0, 0, 0, 0...
-    jsr oswrch                          ; ...VDU 19 starts the palette change...
+    jsr oswrch                          ; ...VDU 19: redefine a logical colour...
     txa                                 ; ...logical colour X...
-    jsr oswrch                          ; ...sent as the first parameter
-    lda #0                              ; ...zero, for the rest of the command
+    jsr oswrch                          ; ...the colour being redefined
+    lda #0                              ; ...zero for the four remaining bytes
     jsr oswrch                          ; ...physical colour 0: black
-    jsr oswrch                          ; ...first padding byte
-    jsr oswrch                          ; ...second padding byte
-    jsr oswrch                          ; ...third padding byte
+    jsr oswrch                          ; ...then the three bytes VDU 19 also takes
+    jsr oswrch                          ; ...second of the three
+    jsr oswrch                          ; ...third of the three
     dex                                 ; Next logical colour
     bpl black_colours                   ; Until colours 15 to 0 are all black
-    jsr load_title_screen               ; Load the title screen unseen
-    nop                                 ; Padding
-    nop                                 ; ...second padding byte
-    nop                                 ; ...third padding byte
-    nop                                 ; ...fourth padding byte
+    jsr load_title_screen               ; Load the title picture, unseen in black
+    nop                                 ; Padding: four NOPs that do nothing
+    nop                                 ; ...second
+    nop                                 ; ...third
+    nop                                 ; ...fourth
     lda #&14                            ; VDU 20: default colours, showing the picture
     jsr oswrch                          ; ...so the loaded picture appears all at once
     lda #0                              ; Plot the stars left to right
@@ -253,15 +259,16 @@ oscli               = &fff7
     lda #osbyte_flush_buffer            ; OSBYTE &15: flush the buffer X
     jsr osbyte                          ; ...X is whatever OSCLI left: buffer unknown  Flush specific buffer X
     jsr twinkle_stars                   ; Twinkle stars until a key is pressed
-    ldx #<(tv_game_command)             ; *TV 252,1: vertical offset for the game's display
-    ldy #>(tv_game_command)             ; ...command's high byte
-    jsr oscli                           ; ...and run it
-    jsr mode2_cursor_off                ; MODE 2, cursor off
-    ldx #<(disc_command)                ; *DISC
-    ldy #>(disc_command)                ; ...command's high byte
-    jsr oscli                           ; ...and run it, so Coder loads from disc
+; A key was pressed: select the game's display, then run Coder.
+    ldx #<(tv_game_command)             ; *TV 252,1: vertical shift -4 lines, interlace off
+    ldy #>(tv_game_command)             ; ...(X, Y) = the command line
+    jsr oscli                           ; ...taking effect at the MODE change below
+    jsr mode2_cursor_off                ; MODE 2, cursor off: clears the title from the screen
+    ldx #<(disc_command)                ; *DISC: select DFS...
+    ldy #>(disc_command)                ; ...(X, Y) = the command line
+    jsr oscli                           ; ...so *CODER is looked for on the disc
     lda #0                              ; BREAK intercept stays disabled
-    sta os_break_intercept              ; ...into &0287, the intercept's opcode byte
+    sta os_break_intercept              ; ...&0287 = 0, not a JMP
     jsr leave_title                     ; Blank the display and run Coder (no return)
     equb &ea                            ; Padding
     equb &ea                            ; ...never run: leave_title does not return
@@ -290,13 +297,13 @@ oscli               = &fff7
 ; &27bf referenced 2 times by &2744, &2782
 .mode2_cursor_off
     lda #&16                            ; VDU 22, 2: MODE 2
-    jsr oswrch                          ; ...selects a mode...
+    jsr oswrch                          ; ...selects a mode, clearing the screen...
     lda #2                              ; ...mode 2: 16 colours, 20 columns
     jsr oswrch                          ; ...sent as the mode number
-    ldx #0                              ; Send the eleven bytes of cursor_off_vdu
+    ldx #0                              ; Send VDU 23,0,10,&20,...: cursor off
 ; &27cb referenced 1 time by &27d4
 .send_cursor_off_vdu
-    lda cursor_off_vdu,x                ; Next byte of the VDU sequence...
+    lda cursor_off_vdu,x                ; Next byte of cursor_off_vdu...
     jsr oswrch                          ; ...to the VDU drivers
     inx                                 ; ...on to the next
     cpx #&0b                            ; ...until all eleven are sent
@@ -328,21 +335,21 @@ oscli               = &fff7
 ;     SPRITE_NUMBER: frame, 0-6
 ; &2800 referenced 1 time by &29ca
 .title_plot_star
-    lda #7                              ; Seven bytes wide...
-    sta sprite_width                    ; ...as the plotter's width
-    lda #&1c                            ; ...and 28 rows high
-    sta sprite_height                   ; ...as the plotter's height
+    lda #7                              ; Every star frame is seven bytes wide...
+    sta sprite_width                    ; ...(14 MODE 2 pixels)...
+    lda #&1c                            ; ...and 28 pixel rows high...
+    sta sprite_height                   ; ...three and a half character rows
     ldx sprite_number                   ; Point at the frame's data...
     lda star_frames_lo,x                ; ...low byte from star_frames_lo
-    sta sprite_data_ptr                 ; ...into the data pointer
+    sta sprite_data_ptr                 ; ...for the byte loop below
     lda star_frames_hi,x                ; ...high byte from star_frames_hi
-    sta sprite_data_ptr_hi              ; ...into the data pointer
-    jsr title_screen_address            ; Screen address of the top left
-    ldx sprite_height                   ; For each row...
+    sta sprite_data_ptr_hi              ; ...the frames run on from &2A00
+    jsr title_screen_address            ; Screen address of the star's top left
+    ldx sprite_height                   ; For each pixel row of the frame...
 ; &2819 referenced 1 time by &2873
 .plot_star_row
-    lda screen_ptr                      ; ...remember its start...
-    sta row_start_ptr                   ; ...low byte, to step down from later
+    lda screen_ptr                      ; ...remember where the row starts...
+    sta row_start_ptr                   ; ...to step down one pixel row from later
     lda screen_ptr_hi                   ; ...high byte...
     sta row_start_ptr_hi                ; ...kept with the low byte
     txa                                 ; ...and keep the row count...
@@ -358,7 +365,7 @@ oscli               = &fff7
     clc                                 ; Right...
     lda screen_ptr                      ; ...screen pointer low byte...
     adc #8                              ; ...plus 8: the next cell to the right
-    sta screen_ptr                      ; ...stored back
+    sta screen_ptr                      ; ...where the next frame byte goes
     bcc plot_star_next_data             ; No carry: pointer done
     inc screen_ptr_hi                   ; Carry into the high byte
     bne plot_star_next_data             ; ...(always branches)
@@ -367,7 +374,7 @@ oscli               = &fff7
     sec                                 ; Left...
     lda screen_ptr                      ; ...screen pointer low byte...
     sbc #8                              ; ...minus 8: the next cell to the left
-    sta screen_ptr                      ; ...stored back
+    sta screen_ptr                      ; ...where the next frame byte goes
     bcs plot_star_next_data             ; No borrow: pointer done
     dec screen_ptr_hi                   ; Borrow from the high byte
 ; &2847 referenced 3 times by &2836, &283a, &2843
@@ -381,24 +388,24 @@ oscli               = &fff7
     bne plot_star_byte                  ; More bytes in this row: plot the next
     clc                                 ; Down one pixel row from the row's start...
     lda row_start_ptr                   ; ...from the row's start, low byte...
-    adc #1                              ; ...plus one pixel row
-    sta screen_ptr                      ; ...as the new screen pointer
+    adc #1                              ; ...plus one: the next byte in the cell
+    sta screen_ptr                      ; ...is the next row's first byte
     lda row_start_ptr_hi                ; ...high byte...
     adc #0                              ; ...with the carry
-    sta screen_ptr_hi                   ; ...as the new screen pointer
+    sta screen_ptr_hi                   ; ...completing the next row's address
     lda screen_ptr                      ; ...crossing into the next character row every eight (640 - 8 bytes on)
     and #7                              ; ...pixel row within the character row
     bne plot_star_next_row              ; Not 0: still in the same character row
     clc                                 ; Row 0: moved into the next character row...
     lda screen_ptr                      ; ...so add 640 - 8 to the pointer...
     adc #&78 ; 'x'                      ; ...low byte of &278...
-    sta screen_ptr                      ; ...stored back
+    sta screen_ptr                      ; ...the top of the cell below
     lda screen_ptr_hi                   ; ...high byte...
     adc #2                              ; ...plus &02 with the carry
-    sta screen_ptr_hi                   ; ...stored back
+    sta screen_ptr_hi                   ; ...completing the address in the next character row
 ; &2870 referenced 1 time by &2861
 .plot_star_next_row
-    pla                                 ; Next row
+    pla                                 ; Recover the row count...
     tax                                 ; ...into X...
     dex                                 ; ...one row fewer to go
     bne plot_star_row                   ; More rows: plot the next
@@ -422,7 +429,7 @@ oscli               = &fff7
     lsr a                               ; ...(character row x 2)...
     and #&fe                            ; ...even, to index the table's byte pairs
     tay                                 ; ...into Y
-    lda row_offsets,y                   ; High byte of row x 640, from Table's copy of the MOS table...
+    lda row_offsets,y                   ; High byte of row x 640, from Table's copy...
     clc                                 ; ...plus &3000, the screen start
     adc #>(screen_start)                ; ...the screen starts at &3000
     sta screen_ptr_hi                   ; ...as the high byte
@@ -431,7 +438,7 @@ oscli               = &fff7
     lda plot_y                          ; Plus the pixel row within the character row
     and #7                              ; ...plot_y MOD 8...
     adc screen_ptr                      ; ...added to the low byte (no carry out)
-    sta screen_ptr                      ; ...stored back
+    sta screen_ptr                      ; ...the row's byte within each cell
     clc                                 ; Plus 8 x byte column: high part...
     lda plot_x                          ; ...byte column...
     and #&e0                            ; ...top three bits, worth &100 each x 8...
@@ -441,19 +448,19 @@ oscli               = &fff7
     rol a                               ; ...as bits 2-0: the high byte's share
     clc                                 ; ...to add to the high byte...
     adc screen_ptr_hi                   ; ...added...
-    sta screen_ptr_hi                   ; ...stored back
+    sta screen_ptr_hi                   ; ...in the screen pointer
     lda plot_x                          ; ...low part
     asl a                               ; ...x 2...
     asl a                               ; ...x 4...
     asl a                               ; ...x 8: eight bytes per character cell
     clc                                 ; ...to add to the low byte...
     adc screen_ptr                      ; ...added...
-    sta screen_ptr                      ; ...stored back
+    sta screen_ptr                      ; ...in the screen pointer
     bcc title_screen_address_done       ; No carry: address done
     inc screen_ptr_hi                   ; Carry into the high byte
 ; &28ae referenced 1 time by &28aa
 .title_screen_address_done
-    ldy #0                              ; Y = 0 for the plotting loop
+    ldy #0                              ; Y = 0 for the plotter's (ptr),Y accesses
     rts                                 ; Return
 ; ***************************************************************************************
 ; Unused
@@ -479,7 +486,10 @@ oscli               = &fff7
 ;
 ; Up to three stars at once, each at one of the eight places in star_places_x and
 ; star_places_y, picked at random. A star grows through frames 0-6 and shrinks back
-; through 5-0. When a key is pressed the stars still showing are erased.
+; through 5-0. A new star is tried for about one pass in four, by the low bits of the
+; System VIA's timer 1. The keyboard is scanned from key 16 on, so SHIFT and CTRL alone
+; do not end the title. When a key is pressed the stars still showing are erased, though
+; the MODE change that title_start makes next clears the screen anyway.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -499,14 +509,14 @@ oscli               = &fff7
     lda system_via_t1c_l                ; One time in four (System VIA timer 1, low bits)...
     and #3                              ; ...lowest two bits, 0-3...
     bne twinkle_advance                 ; Not 0: no new star this time
-    jsr start_star                      ; ...start a star
+    jsr start_star                      ; ...start a star, if one of the three is free
 ; &2914 referenced 1 time by &290f
 .twinkle_advance
-    jsr advance_stars                   ; Advance every star
-    lda #osbyte_scan_keyboard_from_16   ; OSBYTE &7A: any key pressed?
-    jsr osbyte                          ; ...X = &FF if none  Scan keyboard from key 16
-    cpx #&ff                            ; ...no key?
-    beq twinkle_loop                    ; No: carry on
+    jsr advance_stars                   ; Grow or shrink every star a frame, then pause
+    lda #osbyte_scan_keyboard_from_16   ; OSBYTE &7A: any key other than SHIFT or CTRL?
+    jsr osbyte                          ; ...X = the key number, &FF if none  Scan keyboard from key 16
+    cpx #&ff                            ; ...none?
+    beq twinkle_loop                    ; No key: keep twinkling
     ldy #2                              ; Yes: erase the stars still showing...
 ; &2922 referenced 1 time by &292b
 .erase_stars
@@ -544,7 +554,7 @@ oscli               = &fff7
     lda #1                              ; Mark it showing
     sta star_showing,y                  ; ...in star_showing
     lda #1                              ; Frame step +1...
-    sta star_frame_step,y               ; ...the frame grows
+    sta star_frame_step,y               ; ...the star starts by growing
     lda #0                              ; ...from frame 0
     sta star_frame,y                    ; ...the smallest
 ; &294a referenced 1 time by &2957
@@ -554,12 +564,12 @@ oscli               = &fff7
     eor os_irq_a                        ; ...and the last interrupt's A...
     and #7                              ; ...one of the eight places
     tax                                 ; ...as the place index
-    lda star_places_x,x                 ; ...that is free
-    bmi pick_place                      ; Taken (&FF): pick again
-    sta star_x,y                        ; Star position from the place...
+    lda star_places_x,x                 ; ...that no other star is using
+    bmi pick_place                      ; Taken (&FF): pick again; three stars leave five free
+    sta star_x,y                        ; The star's byte column, from the place...
     lda star_places_y,x                 ; ...its pixel row...
     sta star_y,y                        ; ...as the star's row
-    stx star_place,y                    ; ...remembering the place
+    stx star_place,y                    ; ...remembering the place, to free it later
     lda #&ff                            ; Mark the place taken
     sta star_places_x,x                 ; ...by setting its column to &FF
     jsr plot_star                       ; Plot the first frame
@@ -581,39 +591,39 @@ oscli               = &fff7
 ; &296f referenced 1 time by &29b6
 .advance_star
     lda star_showing,y                  ; ...showing?
-    beq star_not_showing                ; No: just pause
-    jsr plot_star                       ; Erase its frame
+    beq star_not_showing                ; No: just pause, for longer
+    jsr plot_star                       ; Erase its frame (plotting it again)
     clc                                 ; Step the frame
     lda star_frame,y                    ; ...current frame...
     adc star_frame_step,y               ; ...plus the step, +1 or -1...
-    sta star_frame,y                    ; ...stored back
-    bmi star_finished                   ; Below 0: finished
-    cmp #7                              ; Past 6?
+    sta star_frame,y                    ; ...as the frame to show next
+    bmi star_finished                   ; Shrunk below frame 0: the star has gone
+    cmp #7                              ; Grown past frame 6, the largest?
     bcc plot_new_frame                  ; No: plot it
-    lda #5                              ; Yes: frame 5...
-    sta star_frame,y                    ; ...stored...
-    lda #&ff                            ; ...stepping back
+    lda #5                              ; Yes: frame 5 instead...
+    sta star_frame,y                    ; ...so frame 6 shows once at the peak...
+    lda #&ff                            ; ...and from now on...
     sta star_frame_step,y               ; ...step -1, so the star shrinks
     bmi plot_new_frame                  ; ...and plot it (always branches)
 ; &2993 referenced 1 time by &2981
 .star_finished
-    lda #0                              ; Finished: not showing...
+    lda #0                              ; Gone: not showing...
     sta star_showing,y                  ; ...cleared in star_showing...
     lda star_x,y                        ; ...and free its place
     ldx star_place,y                    ; ...by putting its column back...
     sta star_places_x,x                 ; ...into star_places_x
-    bpl star_pause                      ; ...(always branches)
+    bpl star_pause                      ; ...then pause (always branches: place 0-7)
 ; &29a2 referenced 2 times by &2985, &2991
 .plot_new_frame
     jsr plot_star                       ; Plot the new frame
 ; &29a5 referenced 1 time by &29a0
 .star_pause
-    tya                                 ; Pause...
+    tya                                 ; Pause, setting the twinkle's speed...
     pha                                 ; ...keeping Y, the star...
-    ldx #5                              ; ...5 x 256 loops between stars
+    ldx #5                              ; ...5 x 255 loops after a star is drawn
 ; &29a9 referenced 2 times by &29af, &29d4
 .star_pause_outer
-    ldy #&ff                            ; ...X x 256 iterations...
+    ldy #&ff                            ; ...X x 255 iterations...
 ; &29ab referenced 1 time by &29ac
 .star_pause_inner
     dey                                 ; ...count the inner loop...
@@ -639,11 +649,11 @@ oscli               = &fff7
 ; &29b9 referenced 4 times by &2927, &2969, &2974, &29a2
 .plot_star
     lda star_x,y                        ; plot_x = star's column
-    sta plot_x                          ; ...as the plotter's column
+    sta plot_x                          ; ...the left edge of the frame
     lda star_y,y                        ; plot_y = star's row
-    sta plot_y                          ; ...as the plotter's row
+    sta plot_y                          ; ...the top of the frame
     lda star_frame,y                    ; sprite_number = star's frame
-    sta sprite_number                   ; ...as the frame to plot
+    sta sprite_number                   ; ...selecting one of the seven sizes
     tya                                 ; Plot it, keeping Y
     pha                                 ; ...on the stack
     jsr title_plot_star                 ; ...exclusive-OR the frame on screen
@@ -654,7 +664,7 @@ oscli               = &fff7
 .star_not_showing
     tya                                 ; Star not showing: pause for longer...
     pha                                 ; ...keeping Y, the star...
-    ldx #&14                            ; ...20 x 256 loops instead of 5 x 256
+    ldx #&14                            ; ...20 x 255 loops instead of 5 x 255
     bne star_pause_outer                ; ...(always branches)
     equb &38, &38, &3e, &3e             ; Not used
 ; &29da used as index base 6 times by &2904, &2922, &2930, &293d, &296f, &2995

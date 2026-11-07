@@ -175,12 +175,12 @@ def annotate(d, model_b=False):
     reset_entry = "mos120_reset_entry" if model_b else "mos320_reset_entry"
     plotter = d.add_move(0x0900, 0x2700, 0x0200, name="plotter")
     unpack = d.add_move(0x7B00, 0x1910, 0xCE, name="unpack")
-    free_cell = d.add_move(0x7D80, 0x1A00, 0x43, name="free_cell")
+    mark_object_cell = d.add_move(0x7D80, 0x1A00, 0x43, name="mark_object_cell")
 
     main = Annotator(d, version, lambda addr: [(None, "")])
     in_plotter = Annotator(d, version, lambda addr: [(plotter, "")])
     in_unpack = Annotator(d, version, lambda addr: [(unpack, "")])
-    in_free_cell = Annotator(d, version, lambda addr: [(free_cell, "")])
+    in_mark_object_cell = Annotator(d, version, lambda addr: [(mark_object_cell, "")])
 
     # -----------------------------------------------------------------------
     # The plotter and screen_address at &0900: the game's code, but reading the
@@ -193,10 +193,10 @@ def annotate(d, model_b=False):
                        skip=lambda addr: not 0x0900 <= addr < 0x09A0 or addr in PLOTTER_DIFFERS)
     game.annotate(shared)
     comments(in_plotter, [
-        (0x0902, "Point sprite_data_ptr at the sprite's data..."),
-        (0x0907, "...high byte..."),
-        (0x090C, "Width in bytes..."),
-        (0x0911, "Height in pixel rows..."),
+        (0x0902, "Point sprite_data_ptr at the editor sprite's data..."),
+        (0x0907, "...high byte, from the editor's sprite tables..."),
+        (0x090C, "Width in screen bytes, from sprite_widths..."),
+        (0x0911, "Height in pixel rows, from sprite_heights..."),
     ])
     if model_b:
         # game.annotate's label for the MOS table lies outside the plotter.
@@ -213,7 +213,7 @@ def annotate(d, model_b=False):
                        on_exit={"screen_ptr": "screen address"})
         comments(in_plotter, [
             (0x0967, "Character row = plot_y / 8..."),
-            (0x096E, "High byte of row x 640, from Table's copy of the MOS table..."),
+            (0x096E, "High byte of row x 640, from Table's copy..."),
             (0x0976, "Low byte of row x 640"),
         ])
 
@@ -228,8 +228,8 @@ def annotate(d, model_b=False):
         main.label(0xC676, "row_offsets_lo", group="private_ram")
     main.label(0x1910, "unpack_level_image", description=(
         "unpack_level as stored, copied to &7B00 by start_editing."))
-    main.label(0x1A00, "free_cell_image", description=(
-        "free_cell as stored, copied to &7D80 by start_editing."))
+    main.label(0x1A00, "mark_object_cell_image", description=(
+        "mark_object_cell as stored, copied to &7D80 by start_editing."))
     main.label(0x2700, "plotter_image", description=(
         "The plotter page as stored, copied to &0900 by editor_start; the "
         "level file is loaded over it."))
@@ -417,32 +417,38 @@ def annotate(d, model_b=False):
                     (0x1C12, "First call: return")])
 
     main.sub(0x1C13, "editor_init", "Set up and choose a level",
-             "Disable ESCAPE, point the BREAK intercept at break_to_start and "
-             f"BRKV at {mos}'s reset entry (so any error restarts the "
-             "machine), " + ("" if model_b else "load Table the first time, ") +
-             "set the cursor keys and "
-             "*TV255 1, select MODE 7 and ask whether to edit a level or start "
-             "a new one. To edit, choose disc or tape and the file, and *LOAD "
-             "it at &2700.")
+             "Disable ESCAPE, point the BREAK intercept at break_to_start (so "
+             f"BREAK at a prompt starts again) and BRKV at {mos}'s reset entry "
+             "(so any error, such as a missing file, resets the machine), and "
+             "note that no level has been encrypted. " +
+             ("" if model_b else "Load Table the first time only, marking "
+              "table_loaded_flag so that a restart skips it. ") +
+             "Set the map cursor's keys to ',' '.' 'A' 'Z', *TV255 1 (applied "
+             "by the MODE 7 that follows) and ask whether to edit a level or "
+             "start a new one. A new level goes to new_level. To edit, choose "
+             "disc or tape (and the drive), read the filename into "
+             "load_command, *LOAD the file at &2700 and go to start_editing. "
+             "Reached from editor_start, from break_to_start and after a save "
+             "when another level is asked for.")
     comments(main, [
         (0x1C13, "OSBYTE &C8 with X=1, Y=0: disable ESCAPE"),
         (0x1C15, "X = 1: ESCAPE does nothing while editing"), (0x1C17, "Y = 0: replace the whole setting"), (0x1C19, "Set it, so ESCAPE cannot stop the editor"),
         (0x1C1C, "BREAK intercept = JMP break_to_start..."),
-        (0x1C1E, "Arm the intercept with a JMP..."), (0x1C21, "...whose target is break_to_start..."), (0x1C23, "...low byte..."), (0x1C26, "...high byte of the target..."),
-        (0x1C28, "...high byte: BREAK restarts the editor"),
+        (0x1C1E, "Arm the intercept with a JMP..."), (0x1C21, "...whose target is break_to_start..."), (0x1C23, "...its low byte..."), (0x1C26, "...high byte of the target..."),
+        (0x1C28, "...so BREAK at a prompt restarts the editor"),
         (0x1C2B, f"BRKV = {'&D9CD' if model_b else '&E364'}, {mos}'s reset entry: an error resets"),
-        (0x1C2D, "...low byte of the error handler..."), (0x1C30, "...high byte of the error handler..."), (0x1C32, "...high byte: a filing error resets"),
+        (0x1C2D, "...low byte of the error handler..."), (0x1C30, "...high byte of the error handler..."), (0x1C32, "...so any error (File not found...) resets"),
         (0x1C35, "No level saved yet (so the buffer is not encrypted)"),
-        (0x1C37, "Nothing has been encrypted for saving yet"),
-        (0x1C3A, "Table loaded already?"),
+        (0x1C37, "...so the level at &2700 is plain until saved"),
+        (0x1C3A, "Table loaded already (a restart)?"),
         (0x1C3D, "Table's mark there means it is loaded"),
-        (0x1C3F, "Yes: table loaded"),
+        (0x1C3F, "Yes: do not load it again"),
         (0x1C41, "No: mark it loaded..."),
-        (0x1C43, "Note Table as loaded for a restart..."),
+        (0x1C43, "...so a restart after BREAK skips the load..."),
         (0x1C46, "...and *L. TABLE (the row offsets and *FREE)"),
         (0x1C48, "...high byte of the command"), (0x1C4A, "Load Table into private RAM"),
-        (0x1C4D, "Cursor keys: left..."),
-        (0x1C4F, "Comma moves the cursor left"),
+        (0x1C4D, "Map cursor keys: left..."),
+        (0x1C4F, "Comma moves the map cursor left"),
         (0x1C51, "...right..."),
         (0x1C53, "Full stop moves it right"),
         (0x1C55, "...up..."),
@@ -451,8 +457,8 @@ def annotate(d, model_b=False):
         (0x1C5B, "Z moves it down"),
         (0x1C5D, "80 item slots, 0-&4F"),
         (0x1C5F, "Slots are searched from the last, &4F, down"),
-        (0x1C61, "*TV255 1: move the picture down a line, interlace off"),
-        (0x1C63, "...high byte of the command"), (0x1C65, "Steady the picture for MODE 7 prompts"),
+        (0x1C61, "*TV255 1: shift the picture a line, interlace off"),
+        (0x1C63, "...high byte of the command"), (0x1C65, "...taking effect at the MODE 7 change below"),
         (0x1C68, "VDU 3: printer off"),
         (0x1C6A, "Stop any printer output"),
         (0x1C6D, "VDU 22,7: MODE 7"),
@@ -460,25 +466,25 @@ def annotate(d, model_b=False):
         (0x1C77, "Ask: edit (E) or new level (N)"),
         (0x1C79, "...high byte of the prompt"), (0x1C7B, "Internal key &22, E: answer 0, edit..."), (0x1C7D, "...as ask_key's first key"), (0x1C7F, "Internal key &55, N: answer 1, new level..."),
         (0x1C81, "...as ask_key's second key"), (0x1C83, "A = 0: take one of the two keys"), (0x1C85, "Ask, and get 0 for edit or 1 for new"),
-        (0x1C88, "Remember the choice: 1 for a new level"),
-        (0x1C8B, "Edit?"),
-        (0x1C8D, "New: start with an empty level"),
-        (0x1C90, "Edit: new line"),
-        (0x1C93, "Choose disc or tape"),
+        (0x1C88, "Remember the choice for start_editing: 1 for new"),
+        (0x1C8B, "E: edit a level file"),
+        (0x1C8D, "N: start with an empty level"),
+        (0x1C90, "Leave a blank line under the question"),
+        (0x1C93, "Choose disc or tape (and the drive)"),
         (0x1C96, "Blank the filename in load_command..."),
         (0x1C98, "From the name field at load_command+5..."), (0x1C9A, "...put a space..."), (0x1C9D, "...in each character..."), (0x1C9E, "...up to load_command+11..."),
-        (0x1CA0, "...so no old name is left"),
-        (0x1CA2, "Ask for the filename"),
+        (0x1CA0, "...so no longer earlier name is left in it"),
+        (0x1CA2, "Read the filename (L if none is typed)"),
         (0x1CA5, "Line feed"),
-        (0x1CA7, "Move below the typed name"),
-        (0x1CAA, "End the filename field with a space"),
-        (0x1CAC, "...so *LOAD sees the address after it"),
+        (0x1CA7, "Leave a blank line under the typed name"),
+        (0x1CAA, "A space at the name's last character..."),
+        (0x1CAC, "...already blank: the space at +12 ends the name"),
         (0x1CAF, "Copy the filename typed into load_command..."),
-        (0x1CB1, "Take a character of the typed name..."), (0x1CB4, "...into the command's name field..."), (0x1CB7, "...the next character..."), (0x1CB8, "...for as many as were typed..."),
+        (0x1CB1, "Take a character of the typed name..."), (0x1CB4, "...into the command's name field..."), (0x1CB7, "...the next character..."), (0x1CB8, "...for the name's length, without its CR..."),
         (0x1CBA, "...until the name is copied"),
         (0x1CBC, "*LOAD name 2700"),
-        (0x1CBE, "...high byte of the command"), (0x1CC0, "Load the level file at &2700"),
-        (0x1CC3, "Edit it"),
+        (0x1CBE, "...high byte of the command"), (0x1CC0, "Load the level file at &2700, still encrypted"),
+        (0x1CC3, "Edit it: start_editing decrypts and draws it"),
     ])
     if not model_b:
         main.label(0x1C4D, "table_loaded")
@@ -491,14 +497,18 @@ def annotate(d, model_b=False):
              "scan the keyboard until an answer is pressed. With A=0 the "
              "answers are the two keys whose internal numbers are in scratch "
              "and scratch_hi, and A returns 0 or 1. Otherwise the answers are "
-             "the digits 0-3 (drive_keys), and the digit is printed.",
+             "the digits 0-3 (drive_keys), and the digit is printed. The keys "
+             "are read by scanning, so the key pressed is left in the input "
+             "buffer; ask_filename flushes it. Used for edit or new, disc or "
+             "tape, the drive, and another level or quit.",
              on_entry={"A": "0 for two keys, else a drive digit",
                        "X": "prompt address, low byte", "Y": "prompt address, high byte",
                        "scratch": "first key's internal number (A=0)",
                        "scratch_hi": "second key's internal number (A=0)"},
-             on_exit={"A": "0 or 1 for the key pressed (A=0 on entry)"})
+             on_exit={"A": "0 or 1 for the key pressed (A=0 on entry); else the digit's character",
+                      "Y": "the digit, 0-3 (A non-zero on entry)"})
     comments(main, [
-        (0x1CC6, "Keep the mode"),
+        (0x1CC6, "Keep the mode: 0 for two answer keys, else digits"),
         (0x1CC7, "Point plot_x/plot_y at the prompt..."),
         (0x1CC9, "...high byte: the prompt's address"),
         (0x1CCB, "Print it up to the '*'..."),
@@ -506,25 +516,25 @@ def annotate(d, model_b=False):
         (0x1CD5, "The '*' ends the prompt..."), (0x1CD7, "...so print until it"),
         (0x1CD9, "Flush the input buffer"),
         (0x1CDB, "Discard keys pressed before the prompt"),
-        (0x1CDE, "OSBYTE &7A: X = the internal number of a key pressed"),
-        (0x1CE0, "Scan: X = the internal number of a key held"),
+        (0x1CDE, "OSBYTE &7A: scan the keyboard from key 16..."),
+        (0x1CE0, "...X = the internal number of a key held, or &FF"),
         (0x1CE3, "Which mode?"),
         (0x1CE4, "...keeping the mode for the next pass"),
         (0x1CE5, "Two keys"),
         (0x1CE7, "Digits: is it 0, 1, 2 or 3?"),
         (0x1CE9, "The internal key number pressed..."), (0x1CEA, "...against digit Y's key..."), (0x1CED, "Match: digit Y was pressed"), (0x1CEF, "No: try the digit below..."),
         (0x1CF0, "...down to 0"),
-        (0x1CF2, "No: scan again"),
-        (0x1CF4, "Yes: print the digit"),
+        (0x1CF2, "Not a drive digit: scan again"),
+        (0x1CF4, "Drop the kept mode"),
         (0x1CF5, "The digit's value, 0-3..."), (0x1CF6, "...plus '0'..."), (0x1CF7, "...as its character..."), (0x1CF9, "...echoed after the prompt"),
-        (0x1CFC, "Return"),
+        (0x1CFC, "Return the digit's character, for *DRIVE"),
         (0x1CFD, "The first key?"),
         (0x1CFE, "Is it the first answer's key..."), (0x1D00, "Yes: first key"),
         (0x1D02, "The second key?"),
-        (0x1D04, "No: scan again"),
-        (0x1D06, "Second: A = 1"),
+        (0x1D04, "Neither answer: scan again"),
+        (0x1D06, "Second: drop the kept mode"),
         (0x1D07, "The second answer: 1"), (0x1D09, "Return the answer in A"),
-        (0x1D0A, "First: A = 0"),
+        (0x1D0A, "First: drop the kept mode"),
         (0x1D0B, "The first answer: 0"), (0x1D0D, "Return the answer in A"),
     ])
     for addr, name in [(0x1CCD, "print_prompt"), (0x1CDE, "scan_keys"),
@@ -541,14 +551,18 @@ def annotate(d, model_b=False):
                 "copied in from the filename buffer.")
     main.label(0x1D0E, "edit_or_new_prompt")
     main.string(0x1D0E, 0x21)
+    main.c(0x1D0E, "editor_init's first question, for ask_key")
     main.label(0x1D2F, "disc_or_tape_prompt")
     main.string(0x1D2F, 0x16)
+    main.c(0x1D2F, "choose_filing_system's question, for ask_key")
     main.label(0x1D45, "filename_prompt")
     main.string(0x1D45, 9)
+    main.c(0x1D45, "Printed by ask_filename; the name is typed after it")
     main.byte(0x1D4E)
     main.c(0x1D4E, "Zero: the end")
     main.label(0x1D4F, "drive_prompt")
     main.string(0x1D4F, 13)
+    main.c(0x1D4F, "Asked after *DISC; answered with a digit 0-3")
     main.label(0x1D5C, "drive_command", description="*DRIVE n, with the digit at +5.")
     main.string(0x1D5C, 5)
     main.byte(0x1D61)
@@ -613,16 +627,19 @@ def annotate(d, model_b=False):
     d.expr(0x215D, sym("edit_screen_vdu_end") - sym("edit_screen_vdu"))
     main.label(0x1DDC, "level_number_prompt")
     main.stringz(0x1DDC)
+    main.c(0x1DDC, "Asked when saving: the level number")
     main.label(0x1DFA, "save_command", description="*SAVE name 2700+2B0, the name at +5.")
     main.stringcr(0x1DFA)
+    main.c(0x1DFA, "*SAVE the &2B0-byte level file from &2700")
     d.expr_label(0x1DFF, "save_command+5")
     main.label(0x1E10, "another_prompt")
     main.string(0x1E10, 0x1F)
+    main.c(0x1E10, "Asked after a save, for ask_key")
 
     # -----------------------------------------------------------------------
 
     main.sub(0x1E2F, "new_lines", "Print a new line and a blank line",
-             "CR, LF, LF.",
+             "CR, LF, LF: spaces out the MODE 7 questions.",
               on_exit={"A": "corrupted", "X": "preserved", "Y": "preserved"})
     comments(main, [
         (0x1E2F, "CR"), (0x1E31, "Start a new line"),
@@ -631,17 +648,19 @@ def annotate(d, model_b=False):
     ])
 
     main.sub(0x1E3D, "ask_filename", "Ask for a filename",
-             "Pause, flush the input buffer, prompt and read up to seven "
-             "characters into filename_buffer. If nothing is typed, the name is "
-             "L.",
-             on_exit={"scratch": "the name's length, with its CR"})
+             "Pause, flush the input buffer (which still holds the key that "
+             "answered ask_key's last question), prompt and read up to seven "
+             "characters into filename_buffer with OSWORD 0. If only RETURN "
+             "is typed, write 'L' after the prompt and use the name L. Used "
+             "for both the file to load and the file to save.",
+             on_exit={"scratch": "the name's length, without its CR (at least 1)"})
     comments(main, [
         (0x1E3D, "Pause for 256 x 256 loops..."),
         (0x1E3F, "Each outer pass..."), (0x1E41, "...wastes time..."), (0x1E42, "...256 times..."), (0x1E43, "...in the inner loop..."),
-        (0x1E45, "...for 256 outer passes..."), (0x1E46, "...so the keys of the last answer are let go"),
+        (0x1E45, "...for 256 outer passes..."), (0x1E46, "...a short wait after the last answer"),
         (0x1E48, "Flush buffers (X = 0: all)"),
-        (0x1E4A, "Discard keys left from the last answer"),
-        (0x1E4D, "New line"),
+        (0x1E4A, "Drop the answer key, so it is not read as the name"),
+        (0x1E4D, "Leave a blank line before the prompt"),
         (0x1E50, "Print the filename prompt, up to and including its zero"),
         (0x1E52, "Take a character of the prompt..."), (0x1E55, "...show it..."), (0x1E58, "...the next..."), (0x1E59, "...the zero ends it..."),
         (0x1E5B, "...and is printed too"),
@@ -657,19 +676,19 @@ def annotate(d, model_b=False):
         (0x1E77, "...highest character accepted"),
         (0x1E7A, "OSWORD 0: read the name"),
         (0x1E7C, "Read the filename the user types"),
-        (0x1E7F, "Keep its length"),
+        (0x1E7F, "Keep its length, not counting the CR"),
         (0x1E81, "Anything typed?"),
-        (0x1E83, "Yes: return"),
-        (0x1E85, "No: move up a line..."),
+        (0x1E83, "A name was typed: return"),
+        (0x1E85, "Only RETURN: VDU 11, up a line..."),
         (0x1E87, "...back onto the prompt line"),
-        (0x1E8A, "...and right nine places..."),
-        (0x1E8C, "...nine times..."), (0x1E8E, "...stepping right..."), (0x1E91, "...counting the steps..."), (0x1E92, "...past the prompt"),
+        (0x1E8A, "...and VDU 9, right..."),
+        (0x1E8C, "...nine times..."), (0x1E8E, "...stepping right..."), (0x1E91, "...counting the steps..."), (0x1E92, "...past 'Filename '"),
         (0x1E94, "...show 'L'..."),
         (0x1E96, "...as if typed"),
         (0x1E99, "...and use it as the name"),
-        (0x1E9C, "Length 1"),
+        (0x1E9C, "Length 1 (Y is 0 after the loop)"),
         (0x1E9D, "...as the name's length"),
-        (0x1E9F, "New line"),
+        (0x1E9F, "New line, as RETURN gave before"),
         (0x1EA2, "Return"),
     ])
     for addr, name in [(0x1E3F, "pause_outer"), (0x1E41, "pause_inner"),
@@ -678,102 +697,113 @@ def annotate(d, model_b=False):
         main.label(addr, name)
 
     main.sub(0x1EA3, "new_level", "Start a new, empty level",
-             "Fill the level's wall block with &03, then set up the editing "
-             "screen as for a loaded level.",
+             "Reached from editor_init when N is chosen. Fill the level's "
+             "wall block (&30 bytes at &2980) with &03, which "
+             "choose_wall_block replaces with a block from Stones when the "
+             "level is saved, then fall into start_editing, which sees "
+             "new_level_flag set and draws an empty map.",
               on_exit={"A": "corrupted", "X": "corrupted", "Y": "preserved"})
     comments(main, [
         (0x1EA3, "Fill level_wall_block with &03..."),
-        (0x1EA5, "...for all its bytes..."), (0x1EA7, "...the block a new level starts with..."), (0x1EAA, "...from the last byte..."), (0x1EAB, "...to the first"),
+        (0x1EA5, "...for all &30 bytes..."), (0x1EA7, "...the block a new level starts with..."), (0x1EAA, "...from the last byte..."), (0x1EAB, "...to the first, then fall into start_editing"),
     ])
     main.label(0x1EA7, "fill_wall_block")
 
     main.sub(0x1EAD, "start_editing", "Set up the editing screen and edit",
-             "Clear the wall map and the item slots, select MODE 2 with no "
-             "cursor and 30 rows, copy unpack_level and free_cell to &7B00 and "
-             "&7D80, mark every cell object-free and every link unused, and "
-             "zero the counts. For a loaded level, decrypt it, drop any object "
-             "of type &73 (the Chalice, which only level 25 has and the editor "
-             "has no sprite for), unpack it and draw it. Then clear the level "
-             "file's tables, ready for saving, and run the editing loop.")
+             "Reached from editor_init once a level file is loaded, and from "
+             "new_level. Clear the wall map and the item slots, select MODE 2, "
+             "disarm the BREAK intercept, set up the edit screen (no cursor, "
+             "30 rows, colours 10 and 9), copy unpack_level and mark_object_cell to "
+             "&7B00 and &7D80, set every bit of the object-free map, free "
+             "every door-key link, set GCOL 3,3 for the link lines, zero the "
+             "counts and turn off cursor editing. For a loaded level, decrypt "
+             "it, take any object of type &73 off the map (the Chalice, which "
+             "only level 25 has and the editor has no item for), unpack it "
+             "into the slots and maps, plot every occupied cell and take the "
+             "exit as placed. Then fill the level file's object, door and key "
+             "tables with &FF, ready for pack_level to pack the slots into, "
+             "show the labels and counts, put the cursor at (11, 11) with the "
+             "wall as the item, the slow cursor on and colour 10 red, and fall "
+             "into edit_loop.")
     comments(main, [
         (0x1EAD, "Clear wall_map..."),
         (0x1EAF, "...from offset 0..."), (0x1EB0, "...no walls in this byte..."), (0x1EB3, "...the next byte down..."), (0x1EB4, "...through all 256"),
         (0x1EB6, "...and the item slots (&0C00-&0CFF)"),
         (0x1EB9, "...one byte of the slot tables..."), (0x1EBA, "...through all 256: every slot free"),
-        (0x1EBC, "Cursor showing"),
-        (0x1EBE, "...from the start"),
-        (0x1EC1, "First link"),
-        (0x1EC3, "...is filled first"),
+        (0x1EBC, "Cursor flash phase 0..."),
+        (0x1EBE, "...so the first wall pass plots the cursor"),
+        (0x1EC1, "Door-key link 0..."),
+        (0x1EC3, "...is the first to be made"),
         (0x1EC6, "VDU 22,2: MODE 2"),
-        (0x1EC8, "Send the mode change..."), (0x1ECB, "...for MODE 2..."), (0x1ECD, "...the map's colourful edit screen"),
-        (0x1ED0, "Disable the BREAK intercept"),
-        (0x1ED2, "...so BREAK now resets normally"),
+        (0x1EC8, "Send the mode change..."), (0x1ECB, "...for MODE 2..."), (0x1ECD, "...the 16-colour screen the map is drawn on"),
+        (0x1ED0, "Not a JMP: disarm the BREAK intercept..."),
+        (0x1ED2, "...so BREAK while editing is an ordinary reset"),
         (0x1ED5, "No cursor, 30 rows, colours 10 and 9"),
         (0x1ED8, "Copy unpack_level to &7B00..."),
-        (0x1EDA, "Take a byte of the stored routine..."), (0x1EDD, "...into the workspace it runs in..."), (0x1EE0, "...the next..."), (0x1EE1, "...for unpack_level's &CE bytes..."),
+        (0x1EDA, "Take a byte of the stored routine..."), (0x1EDD, "...to &7B00, where it runs..."), (0x1EE0, "...the next..."), (0x1EE1, "...for unpack_level's &CE bytes..."),
         (0x1EE3, "...until it is all copied"),
-        (0x1EE5, "...and free_cell to &7D80"),
-        (0x1EE7, "Take a byte of the stored routine..."), (0x1EEA, "...into the workspace it runs in..."), (0x1EED, "...the next..."), (0x1EEE, "...for free_cell's &43 bytes..."),
+        (0x1EE5, "...and mark_object_cell to &7D80"),
+        (0x1EE7, "Take a byte of the stored routine..."), (0x1EEA, "...to &7D80, where it runs..."), (0x1EED, "...the next..."), (0x1EEE, "...for mark_object_cell's &43 bytes..."),
         (0x1EF0, "...until it is all copied"),
         (0x1EF2, "Every cell object-free..."),
         (0x1EF4, "...from offset 0..."), (0x1EF6, "...set every bit: no object anywhere..."), (0x1EF9, "...the next byte down..."), (0x1EFA, "...through all 256"),
-        (0x1EFC, "...and all 20 links unused"),
+        (0x1EFC, "...and &FF: all 20 door-key links unused"),
         (0x1EFF, "...no key for it..."), (0x1F02, "...the next link..."), (0x1F03, "...all 20 of them..."), (0x1F05, "...until every link is free"),
-        (0x1F07, "No door waiting for a key"),
+        (0x1F07, "&FF: no door waiting for its key"),
         (0x1F0A, "VDU 18,3,3: GCOL 3,3 (exclusive-OR, for the link lines)"),
         (0x1F0C, "Send GCOL..."), (0x1F0F, "...mode 3: exclusive-OR, so a line..."), (0x1F11, "...drawn twice is erased..."), (0x1F14, "...in colour 3"),
         (0x1F17, "No trapdoors, objects, exit or doors"),
         (0x1F19, "No trapdoors yet"), (0x1F1B, "No doors yet"), (0x1F1D, "No exit yet"), (0x1F1F, "No objects yet"),
-        (0x1F21, "OSBYTE 4,1: cursor keys give codes"),
-        (0x1F23, "X = 1: so they move the cursor"), (0x1F25, "Set it, so the cursor keys can move the cursor"),
+        (0x1F21, "OSBYTE 4,1: cursor editing off..."),
+        (0x1F23, "...X = 1: the arrow keys give codes &88-&8B"), (0x1F25, "Set it; the editor reads the arrow keys by scanning"),
         (0x1F28, "New level?"),
         (0x1F2B, "No: unpack the loaded one"),
-        (0x1F2D, "Yes: first link"),
-        (0x1F2F, "...is joined first"),
-        (0x1F32, "...(always branches)"),
-        (0x1F34, "Decrypt the level"),
+        (0x1F2D, "Yes: link_index = 0..."),
+        (0x1F2F, "...again (it was set above)"),
+        (0x1F32, "...and clear the level tables (always branches)"),
+        (0x1F34, "Decrypt the loaded level in place at &2700"),
         (0x1F37, "Find an object of type &73 (the Chalice)..."),
         (0x1F39, "This object's type..."), (0x1F3C, "...the Chalice?"), (0x1F3E, "Yes: take it off the map"), (0x1F40, "No: the next object down..."),
         (0x1F41, "...to object 1 (not the exit, 30)"),
-        (0x1F43, "None"),
+        (0x1F43, "No Chalice: unpack the level as it is"),
         (0x1F45, "Drop it: x and y &FF"),
-        (0x1F47, "...so it is not unpacked: the editor..."), (0x1F4A, "...cannot place the Chalice"),
+        (0x1F47, "...so unpack_level skips it: the editor..."), (0x1F4A, "...has no item for the Chalice"),
         (0x1F4D, "Unpack the level into the slots and maps"),
         (0x1F50, "Show the labels..."),
-        (0x1F53, "...and the counts"),
+        (0x1F53, "...and the unpacked level's counts"),
         (0x1F56, "Draw every cell: rows 0-47..."),
         (0x1F58, "...from the top row"),
         (0x1F5A, "...columns 0-31..."),
         (0x1F5C, "...from the left column"),
-        (0x1F5E, "...what is here?"),
-        (0x1F61, "&FF: an empty cell"),
-        (0x1F63, "Nothing"),
-        (0x1F65, "Plot it"),
+        (0x1F5E, "...the item in this cell, if any"),
+        (0x1F61, "&FF: nothing here"),
+        (0x1F63, "Empty: nothing to plot"),
+        (0x1F65, "Plot the item's sprite in the cell"),
         (0x1F68, "Next column"),
         (0x1F6A, "Which column now?"), (0x1F6C, "Past the last column?"), (0x1F6E, "No: draw the next cell"),
         (0x1F70, "Next row"),
         (0x1F72, "Which row now?"), (0x1F74, "Past the last row?"), (0x1F76, "No: draw the next row"),
-        (0x1F78, "A loaded level has its exit"),
-        (0x1F7A, "...so the level can be saved"),
+        (0x1F78, "Take a loaded level to have its exit..."),
+        (0x1F7A, "...which SHIFT+S needs before it saves"),
         (0x1F7C, "Clear the level file's object tables..."),
         (0x1F7E, "...objects 29 to 1 (the exit is 30)..."), (0x1F80, "...off the map..."), (0x1F83, "...both x and y..."), (0x1F86, "...the next object down..."),
         (0x1F87, "...until all are cleared"),
-        (0x1F89, "...and its door and key tables, ready to be packed"),
+        (0x1F89, "...and the door and key tables, for pack_level"),
         (0x1F8B, "...door off the map..."), (0x1F8E, "...its y too..."), (0x1F91, "...its key off the map..."), (0x1F94, "...and its y"),
-        (0x1F97, "...the next door down..."), (0x1F98, "...until all 20 are cleared"),
-        (0x1F9A, "Show the labels..."),
+        (0x1F97, "...the next door down..."), (0x1F98, "...until doors 20 to 1 are cleared"),
+        (0x1F9A, "Show the labels (again, for a loaded level)..."),
         (0x1F9D, "...and the counts"),
         (0x1FA0, "Cursor at (11, 11)..."),
-        (0x1FA2, "...column 11..."), (0x1FA4, "...row 11, the heroes' start"),
+        (0x1FA2, "...column 11..."), (0x1FA4, "...row 11: a corner of the heroes' start"),
         (0x1FA6, "...placing walls"),
         (0x1FA8, "...item 0, the wall"),
         (0x1FAA, "Slow cursor on, colour 10 = 1"),
-        (0x1FAC, "Move the cursor every third frame"), (0x1FAF, "Logical colour 10 shows red"),
-        (0x1FB2, "OSBYTE 4,1 again"),
-        (0x1FB4, "X = 1: cursor keys give codes, not editing"), (0x1FB6, "Set it again, after the screen is redrawn"),
+        (0x1FAC, "Move the cursor every third frame"), (0x1FAF, "Logical colour 10 shows red, as set above"),
+        (0x1FB2, "OSBYTE 4,1 again..."),
+        (0x1FB4, "...X = 1: cursor editing off..."), (0x1FB6, "...a repeat of the call above"),
     ])
     for addr, name in [(0x1EB0, "clear_walls"), (0x1EB6, "clear_slots"),
-                       (0x1EDA, "copy_unpack"), (0x1EE7, "copy_free_cell"),
+                       (0x1EDA, "copy_unpack"), (0x1EE7, "copy_mark_object_cell"),
                        (0x1EF6, "clear_free_map"), (0x1EFC, "clear_links"),
                        (0x1F34, "unpack_loaded"), (0x1F39, "find_chalice"),
                        (0x1F45, "drop_chalice"), (0x1F4D, "draw_loaded"),
@@ -792,12 +822,12 @@ def annotate(d, model_b=False):
              "(TAB) and show the door-key links while CTRL is held.")
     comments(main, [
         (0x1FB9, "Slow cursor?"),
-        (0x1FBC, "No: no delay"),
+        (0x1FBC, "No: a pass as fast as it runs"),
         (0x1FBE, "Yes: wait for three frames..."),
-        (0x1FC0, "Keep the frame count..."), (0x1FC1, "...across the call..."), (0x1FC2, "OSBYTE &13: wait for the next frame"), (0x1FC4, "Pace the edit loop to the display"),
+        (0x1FC0, "Keep the frame count..."), (0x1FC1, "...across the call..."), (0x1FC2, "OSBYTE &13: wait for the next frame"), (0x1FC4, "...so the cursor steps one cell per three frames"),
         (0x1FC7, "Recover the frame count..."), (0x1FC8, "...into X"), (0x1FC9, "One frame done..."), (0x1FCA, "...until three have passed"),
         (0x1FCC, "f0?"),
-        (0x1FCE, "...held?"), (0x1FD1, "No: try S"),
+        (0x1FCE, "...held?"), (0x1FD1, "No: check for SHIFT+S"),
         (0x1FD3, "Yes: toggle the slow cursor..."),
         (0x1FD6, "...between on and off..."), (0x1FD8, "...and keep the new setting"),
         (0x1FDB, "...and wait for f0 to be released"),
@@ -813,23 +843,23 @@ def annotate(d, model_b=False):
         (0x1FF9, "...and are all 8 trapdoors placed?"),
         (0x1FFB, "...all 8?"), (0x1FFD, "No: cannot save yet"),
         (0x1FFF, "Yes: *DISC..."),
-        (0x2001, "...(Stones and the level go to disc)"), (0x2003, "...select the disc filing system"),
+        (0x2001, "...(Stones, the wall blocks, is read from disc)"), (0x2003, "...select the disc filing system"),
         (0x2006, "...*DRIVE 0"),
         (0x2008, "...high byte of the command's address"), (0x200A, "...select drive 0, where Stones is"),
-        (0x200D, "Wall the edges"),
-        (0x2010, "Pack the level into the file"),
-        (0x2013, "Choose its wall block"),
+        (0x200D, "Wall in the map's four edges"),
+        (0x2010, "Pack the slots and maps into the level file"),
+        (0x2013, "Choose its wall block from Stones"),
         (0x2016, "VDU 22,7: MODE 7"),
         (0x2018, "...send the MODE number"), (0x201B, "...7, so the save prompts are in text"), (0x201D, "...send it"),
-        (0x2020, "Save it"),
-        (0x2023, "(not reached)"),
-        (0x2024, "Move the cursor"),
+        (0x2020, "Save it: ends by restarting the editor or resetting"),
+        (0x2023, "Not reached: save_level never returns"),
+        (0x2024, "Move the cursor, redrawing the cell it leaves"),
         (0x2027, "Placing walls?"),
-        (0x2029, "Not walls: no flashing cursor"),
-        (0x202B, "Yes: flash the cursor..."),
-        (0x202E, "...toggling cursor_flash each pass..."), (0x2030, "...and keeping it"), (0x2033, "Cleared this pass: leave the cell as it is"),
-        (0x2035, "...plotting it every other pass"),
-        (0x2037, "...over the cell under the cursor"),
+        (0x2029, "Not walls: the item itself shows as the cursor"),
+        (0x202B, "Yes: flash the cursor sprite over the wall..."),
+        (0x202E, "...toggling cursor_flash each pass..."), (0x2030, "...and keeping it"), (0x2033, "Off this pass: move_cursor's wall sprite shows"),
+        (0x2035, "On: the cursor sprite..."),
+        (0x2037, "...over the wall move_cursor drew"),
         (0x203A, "Cursor up?"),
         (0x203C, "...(Z set if pressed)"), (0x203F, "Not pressed: try cursor down"),
         (0x2041, "Yes: colour 10 up, to at most 7..."),
@@ -844,7 +874,7 @@ def annotate(d, model_b=False):
         (0x2067, "...set it..."),
         (0x206A, "...and wait for the key to be released"),
         (0x206C, "...(Z set while held)"), (0x206F, "Still held: keep waiting, one step a press"),
-        (0x2071, "Show the cursor's position"),
+        (0x2071, "Print the cursor's x and y beside the map"),
         (0x2074, "'1'?"),
         (0x2076, "...(Z set if pressed)"), (0x2079, "Not pressed: try '2'"),
         (0x207B, "Yes: the previous item, to at least 0"),
@@ -858,21 +888,21 @@ def annotate(d, model_b=False):
         (0x209D, "Placing walls?"),
         (0x209F, "No: an item, which may not go on the edge"),
         (0x20A1, "Yes: place a wall, anywhere"),
-        (0x20A4, "Next pass"),
-        (0x20A7, "Other items: not on the edges..."),
+        (0x20A4, "Next pass: walls repeat while SPACE is held"),
+        (0x20A7, "Other items: not on the edges, which are walled..."),
         (0x20A9, "Column 0: refuse"), (0x20AB, "...the right-hand column?"), (0x20AD, "Yes: refuse"), (0x20AF, "...row 0..."),
         (0x20B1, "Row 0: refuse"), (0x20B3, "...or the bottom row?"), (0x20B5, "Yes: refuse"),
-        (0x20B7, "Place it"),
-        (0x20BA, "Show the counts"),
+        (0x20B7, "Place the item, within its limits"),
+        (0x20BA, "Update the counts beside the map"),
         (0x20BD, "Wait for SPACE to be released..."),
         (0x20BF, "...(Z set while held)"), (0x20C2, "Released: go on to TAB"),
-        (0x20C4, "...(always, for an item)"),
-        (0x20C6, "An item is chosen: keep waiting"),
+        (0x20C4, "...an item, never walls, is chosen here..."),
+        (0x20C6, "...so keep waiting: one item per press"),
         (0x20C8, "TAB?"),
         (0x20CA, "...(Z set if pressed)"), (0x20CD, "Not pressed: try CTRL"),
         (0x20CF, "Yes: delete what is under the cursor..."),
-        (0x20D2, "...and show the counts"),
-        (0x20D5, "While an item is chosen, wait for B (not TAB) to be released..."),
+        (0x20D2, "...and update the counts"),
+        (0x20D5, "Wait while B (not TAB) is held, with an item chosen..."),
         (0x20D7, "...(Z set while held)"), (0x20DA, "B not held: go on to CTRL"), (0x20DC, "...is an item chosen?"), (0x20DE, "Yes: keep waiting while B is held"),
         (0x20E0, "CTRL?"),
         (0x20E2, "...(Z set if pressed)"), (0x20E5, "Not pressed: next pass"),
@@ -896,7 +926,10 @@ def annotate(d, model_b=False):
         main.label(addr, name)
 
     main.sub(0x20F7, "check_door_keys", "Check that every door has its key",
-             "Count the links in use and compare with door_count.",
+             "Count the door-key links in use and compare with door_count. "
+             "A link is made only when a key is placed for a waiting door, "
+             "and each door has at most one, so equal counts mean that no "
+             "door lacks its key. The edit loop requires it before saving.",
              on_exit={"Z": "set if every door has a key"})
     comments(main, [
         (0x20F7, "Count the links in use..."),
@@ -909,7 +942,7 @@ def annotate(d, model_b=False):
     main.label(0x2104, "next_link")
 
     main.sub(0x210C, "key_pressed", "Test a key",
-             "OSBYTE &81 with the INKEY number in X.",
+             "The edit loop's key test: OSBYTE &81 with the INKEY number in X.",
              on_entry={"X": "INKEY number (negative, as a byte)"},
              on_exit={"Z": "set if the key is pressed"})
     comments(main, [
@@ -921,15 +954,16 @@ def annotate(d, model_b=False):
     main.label(0x2119, "key_pressed_done")
 
     main.sub(0x211A, "choose_filing_system", "Ask for disc or tape",
-             "Disc: *DISC, then ask for the drive (0-3) and *DRIVE it. Tape: "
-             "*TAPE.",
+             "Called before a level is loaded, by save_level before the "
+             "filename, and by catalogue before *CAT. Disc: *DISC, then ask for the drive (0-3) and *DRIVE it. "
+             "Tape: *TAPE.",
               on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x211A, "Ask: disc (D) or tape (T)"),
         (0x211C, "...high byte of the prompt"), (0x211E, "...first answer: D (internal key &32)..."), (0x2120, "...for ask_key"), (0x2122, "...second answer: T (internal key &23)"),
         (0x2124, "...for ask_key"), (0x2126, "...A = 0: one of two keys"), (0x2128, "...ask, A = 0 for D or 1 for T"),
-        (0x212B, "Tape"),
-        (0x212D, "Disc: *DISC"),
+        (0x212B, "T: tape"),
+        (0x212D, "D: *DISC"),
         (0x212F, "...high byte of the command"), (0x2131, "...select the disc filing system"),
         (0x2134, "New line"),
         (0x2137, "Ask which drive..."),
@@ -957,7 +991,9 @@ def annotate(d, model_b=False):
     main.sub(0x2161, "crypt_level", "Encrypt or decrypt the level file",
              "Exclusive-OR each byte of &2700-&29AF with the low byte of its "
              "address, as the game's decrypt_level does at &6B00. Doing it "
-             "twice restores the bytes.",
+             "twice restores the bytes. It decrypts a level once loaded, and "
+             "save_level uses it to encrypt the level (decrypting it first "
+             "when it was encrypted by an earlier save).",
               on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x2161, "Point at &2700, X counting the offset..."),
@@ -975,7 +1011,8 @@ def annotate(d, model_b=False):
     main.label(0x217A, "crypt_check_end")
 
     main.sub(0x2187, "set_colour_10", "Show logical colour 10 as the chosen colour",
-             "VDU 19,10,n,0,0,0 with n from colour_10.",
+             "VDU 19,10,n,0,0,0 with n from colour_10. The edit loop calls it "
+             "after cursor up or down changes colour_10.",
               on_entry={"colour_10": "the colour to show"}, on_exit={"A": "corrupted", "X": "preserved", "Y": "preserved"})
     comments(main, [
         (0x2187, "VDU 19,10..."),
@@ -988,7 +1025,9 @@ def annotate(d, model_b=False):
     ])
 
     main.sub(0x21A3, "show_labels", "Print the counts' labels",
-             "In colour 1, at column 16: Objs, Mons and Dors.",
+             "In colour 1, at column 16 beside the map, on rows 0, 4 and 8: "
+             "Objs, Mons (the trapdoors) and Dors, each above its count. "
+             "Leaves colour 7 set for the counts.",
               on_exit={"A": "corrupted", "X": "corrupted", "Y": "preserved"})
     comments(main, [
         (0x21A3, "COLOUR 1"),
@@ -1003,20 +1042,23 @@ def annotate(d, model_b=False):
     main.label(0x21AF, "print_labels")
 
     main.sub(0x21C5, "show_counts", "Print the counts",
-             "Objects at (17, 2), trapdoors at (17, 6) and doors at (17, 10).",
+             "Objects at (17, 2), trapdoors at (17, 6) and doors at (17, 10), "
+             "each under its label. Called when the editor starts and after "
+             "each SPACE or TAB in the edit loop.",
               on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x21C5, "Objects at (17, 2)"),
         (0x21C7, "...row 2"), (0x21C9, "...the number of objects placed"), (0x21CB, "...print it"),
         (0x21CE, "Trapdoors at (17, 6)"),
-        (0x21D0, "...row 6"), (0x21D2, "...the number of trapdoors placed"), (0x21D4, "...print it"),
+        (0x21D0, "...row 6"), (0x21D2, "...the trapdoors placed, under Mons"), (0x21D4, "...print it"),
         (0x21D7, "Doors at (17, 10)"),
         (0x21D9, "...row 10"), (0x21DB, "...the number of doors placed"), (0x21DD, "...print it"),
         (0x21E0, "Return"),
     ])
 
     main.sub(0x21E1, "show_cursor_position", "Print the cursor's cell",
-             "x at (17, 20) and y at (17, 21).",
+             "x at (17, 20) and y at (17, 21), beside the map. The edit loop "
+             "calls it every pass.",
               on_entry={"cursor_x": "the cell's column", "cursor_y": "the cell's row"}, on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x21E1, "x at (17, 20)"),
@@ -1053,24 +1095,28 @@ def annotate(d, model_b=False):
 
     main.sub(0x2225, "wall_edges", "Put walls round the edge of the map",
              "Place a wall in every cell of columns 0 and 31 and rows 0 and 47, "
-             "as every level has.",
+             "through place_item, before a level is packed for saving. It "
+             "leaves cursor_x, cursor_y and current_item changed. place_item "
+             "takes the top-left cell, (0, 0), for a wall already whenever a "
+             "slot is free (see item_at_cursor), so that cell's wall bit is "
+             "left to save_level.",
               on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x2225, "Walls..."),
-        (0x2227, "...are the item to place"),
+        (0x2227, "...are the item place_item puts down"),
         (0x2229, "...for rows 47 to 0..."),
-        (0x222B, "...the cursor row"),
+        (0x222B, "...moving the cursor to each in turn"),
         (0x222D, "...in column 0..."),
-        (0x222F, "...cursor column"), (0x2231, "...wall it"),
+        (0x222F, "...the left edge"), (0x2231, "...wall it"),
         (0x2234, "...and column 31"),
-        (0x2236, "...cursor column"), (0x2238, "...wall it"),
+        (0x2236, "...the right edge"), (0x2238, "...wall it"),
         (0x223B, "...row up"), (0x223D, "...until row 0 is done"),
         (0x223F, "For columns 31 to 0..."),
-        (0x2241, "...cursor column"),
+        (0x2241, "...moving the cursor to each in turn"),
         (0x2243, "...in row 0..."),
-        (0x2245, "...cursor row"), (0x2247, "...wall it"),
+        (0x2245, "...the top edge"), (0x2247, "...wall it"),
         (0x224A, "...and row 47"),
-        (0x224C, "...cursor row"), (0x224E, "...wall it"),
+        (0x224C, "...the bottom edge"), (0x224E, "...wall it"),
         (0x2251, "...column left"), (0x2253, "...until column 0 is done"),
         (0x2255, "Return"),
     ])
@@ -1088,12 +1134,17 @@ def annotate(d, model_b=False):
                     (0x2258, "First call: return")])
 
     main.sub(0x2259, "save_level", "Save the level",
-             "Point the BREAK intercept at break_to_save, ask for the level's "
-             "number (nothing typed: catalogue the disc), take its checksum "
-             "from level_checksums, set the level's first byte so that its "
-             "bytes sum to that, encrypt it, choose disc or tape and the "
-             "filename, *SAVE it and offer another level. Levels 1-24 can be "
-             "saved; level 25 is in Stones.")
+             "Reached from the edit loop once the level is walled in, packed "
+             "and given its wall block. Point the BREAK intercept at "
+             "break_to_save and BRKV at the reset entry, disable ESCAPE, ask "
+             "for the level's number (nothing typed: catalogue), take its "
+             "checksum from the game's level_checksums, wall the top-left "
+             "cell, set the level's first byte so that its bytes sum to that "
+             "checksum, encrypt it, choose disc or tape and the filename, "
+             "*SAVE it and offer another level. Levels 1-24 can be saved; "
+             "level 25 is in Stones. It never returns: another level "
+             "restarts the editor at editor_init, and quitting resets the "
+             "machine.")
     comments(main, [
         (0x2259, "BREAK intercept = JMP break_to_save..."),
         (0x225B, "...so BREAK while saving comes back here"), (0x225E, "...break_to_save's low byte..."), (0x2260, "...low byte of the intercept's address"), (0x2263, "...and high byte..."),
@@ -1123,7 +1174,7 @@ def annotate(d, model_b=False):
         (0x22B9, "Read the level number the user types"),
         (0x22BC, "Anything typed?"),
         (0x22BE, "Yes: level typed"),
-        (0x22C0, "No: catalogue the disc"),
+        (0x22C0, "Nothing: catalogue, then ask again"),
         (0x22C3, "One digit?"),
         (0x22C6, "...the second character a CR?"), (0x22C8, "No: two digits"),
         (0x22CA, "Yes: the level is the digit"),
@@ -1131,7 +1182,7 @@ def annotate(d, model_b=False):
         (0x22D0, "...(always branches)"),
         (0x22D2, "Two: tens..."),
         (0x22D5, "...a CR in the first place?"), (0x22D7, "Yes: ask again"), (0x22D9, "...C set for the subtraction"), (0x22DA, "...ASCII to its value"),
-        (0x22DC, "...x 10..."),
+        (0x22DC, "...x 2..."),
         (0x22DD, "...kept..."), (0x22DF, "...x 4..."), (0x22E0, "...x 8..."), (0x22E1, "...C clear for the addition"),
         (0x22E2, "...+ x 2: x 10"),
         (0x22E4, "...plus units"),
@@ -1140,18 +1191,18 @@ def annotate(d, model_b=False):
         (0x22EC, "No: check the top"),
         (0x22EE, "Yes: ask again"),
         (0x22F1, "25 or more?"),
-        (0x22F3, "No: a level the game has"),
+        (0x22F3, "No: 1-24, a level the game loads from a file"),
         (0x22F5, "Yes: ask again"),
         (0x22F8, "Keep the level number..."),
-        (0x22FB, "...and its checksum"),
-        (0x22FC, "...into the game's checksum table"), (0x22FF, "...kept for the first byte's sum"),
+        (0x22FB, "...X = level, to index the checksums"),
+        (0x22FC, "...the game's checksum for that level..."), (0x22FF, "...which the level's bytes must sum to"),
         (0x2302, "Line feed"),
         (0x2304, "...send it"),
         (0x2307, "Saved already (so encrypted)?"),
         (0x230A, "No: the level is still plain"),
         (0x230C, "Yes: decrypt it again"),
-        (0x230F, "Make the top-left cell of the wall map a wall"),
-        (0x2312, "...set its top-left bit..."), (0x2314, "...and keep it"),
+        (0x230F, "Wall cell (0, 0), which wall_edges may have missed"),
+        (0x2312, "...bit 7 of the wall map's first byte..."), (0x2314, "...set in the level file"),
         (0x2317, "Sum the level's bytes, with the first byte 0..."),
         (0x2319, "...Y = 0: scratch steps through the file"), (0x231A, "...first byte 0, so it adds nothing"), (0x231D, "...the sum starts at 0"), (0x231F, "...pointer at &2700, low byte..."),
         (0x2321, "...page &27, the level file"), (0x2323, "...high byte"),
@@ -1189,7 +1240,7 @@ def annotate(d, model_b=False):
         (0x2396, "...high byte of the prompt"), (0x2398, "...first answer: A (internal key &41)..."), (0x239A, "...for ask_key"), (0x239C, "...second answer: Q (internal key &10)"),
         (0x239E, "...for ask_key"), (0x23A0, "...A = 0: one of two keys"), (0x23A2, "...ask, A = 0 for A or 1 for Q"),
         (0x23A5, "Quit?"),
-        (0x23A7, "No: another level"),
+        (0x23A7, "A: restart the editor for another level"),
         (0x23AA, "Quit: disable the BREAK intercept..."),
         (0x23AC, "...so the reset starts the machine afresh"),
         (0x23AF, "...and reset"),
@@ -1205,13 +1256,15 @@ def annotate(d, model_b=False):
         main.label(addr, name)
 
     main.sub(0x23C9, "catalogue", "Catalogue the disc or tape",
-             "Show CAT after the prompt, choose disc or tape, *CAT, "
+             "Reached from save_level when RETURN is pressed with no level "
+             "number. Show CAT after the prompt, as the answer, choose disc "
+             "or tape, *CAT, "
              + ("" if model_b else "show the disc's free space with Table's routine, ")
              + "then ask for the level number again.")
     comments(main, [
         (0x23C9, "Move up a line..."),
         (0x23CB, "...back onto the prompt's line"),
-        (0x23CE, "...and right 29 places..."),
+        (0x23CE, "...and right past its 29 characters..."),
         (0x23D0, "...29 times..."), (0x23D2, "...one place right..."), (0x23D5, "...counted"), (0x23D6, "...until all 29 are done"),
         (0x23D8, "...and show CAT"),
         (0x23DA, "...print it"), (0x23DD, "...'A'..."), (0x23DF, "...print it"), (0x23E2, "...'T'"),
@@ -1231,15 +1284,17 @@ def annotate(d, model_b=False):
     # Choosing the wall block.
 
     main.sub(0x2400, "choose_wall_block", "Choose the level's wall block",
-             "Clear the screen, show 25 rows, load Stones (the 24 wall blocks) "
-             "at &6E80, draw them in a grid of four by six and frame the "
-             "chosen one. Move the frame with ',' '.' (one) and 'A' 'Z' (a "
-             "row); SPACE copies the chosen block into the level's wall block.",
+             "Called from the edit loop when saving, after the level is "
+             "packed. Clear the screen, show 25 rows, load Stones (the 24 wall "
+             "blocks) at &6E80, draw them in a grid of four by six and frame "
+             "block 0. Move the frame with ',' '.' (one) and 'A' 'Z' (a row), "
+             "paced by a delay loop; SPACE copies the chosen block into the "
+             "level's wall block and returns.",
               on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x2400, "VDU 12: clear the screen"),
         (0x2402, "...send it"),
-        (0x2405, "Show 25 rows"),
+        (0x2405, "Show 25 rows, hiding &6E80 on, where Stones goes"),
         (0x2408, "Load Stones"),
         (0x240B, "(padding)"),
         (0x240C, "Padding"), (0x240D, "Padding"), (0x240E, "Padding"),
@@ -1255,21 +1310,21 @@ def annotate(d, model_b=False):
         (0x2429, "SPACE?"),
         (0x242B, "...(Z set if pressed)"), (0x242E, "Not pressed: redraw if the choice moved"),
         (0x2430, "Yes: the block's address, &6E80 + block x &30..."),
-        (0x2432, "...high byte starts at 0"), (0x2434, "...the chosen block number..."), (0x2437, "...(x 16)..."),
+        (0x2432, "...high byte, in plot_y, starts at 0"), (0x2434, "...the chosen block number..."), (0x2437, "...x 2..."),
         (0x2438, "...x 4..."), (0x2439, "...x 8..."), (0x243A, "...x 16, the carry..."), (0x243B, "...into the high byte"),
         (0x243D, "...block x 16, low byte..."), (0x243F, "...and high byte..."), (0x2441, "...kept"),
-        (0x2443, "...(x 32)..."),
+        (0x2443, "...block x 16 again..."),
         (0x2445, "...x 2: block x 32..."), (0x2446, "...carry into the high byte"), (0x2448, "...C clear for the addition"),
-        (0x2449, "...(x 48)..."),
+        (0x2449, "...+ x 16: block x 48 (&30), low byte..."),
         (0x244B, "...kept in plot_x"), (0x244D, "...high byte..."), (0x244F, "...plus x 16's high byte, with the carry"), (0x2451, "...kept in plot_y"),
         (0x2453, "...C clear for the addition"), (0x2454, "...offset low byte..."), (0x2456, "...plus where Stones' blocks start..."), (0x2458, "...pointer low byte"),
         (0x245A, "...offset high byte..."), (0x245C, "...plus the start's high byte"), (0x245E, "...pointer high byte"),
         (0x2460, "Copy its &30 bytes into level_wall_block"),
         (0x2462, "Next byte of the chosen block..."), (0x2464, "...into the level file"), (0x2467, "...down to the first"), (0x2468, "...until all &30 are copied"),
         (0x246A, "Return"),
-        (0x246B, "Moved?"),
+        (0x246B, "Did the keys move the choice?"),
         (0x246E, "...still the block chosen before?"),
-        (0x2471, "No: carry on"),
+        (0x2471, "Not moved: pause and read the keys again"),
         (0x2473, "Yes: wait for the frame..."),
         (0x2475, "Pace the chooser to the display"),
         (0x2478, "...erase the old frame..."),
@@ -1277,7 +1332,7 @@ def annotate(d, model_b=False):
         (0x2484, "...rubbed out round the old block"), (0x2487, "...the new choice back"), (0x2488, "...as the chosen block"),
         (0x248B, "...and frame the new block"),
         (0x248D, "...drawn round it"),
-        (0x2490, "Carry on"),
+        (0x2490, "Pause and read the keys again"),
     ])
     for addr, name in [(0x241C, "chooser_loop"), (0x241E, "chooser_pause"),
                        (0x2420, "chooser_pause_inner"), (0x2462, "copy_wall_block"),
@@ -1301,33 +1356,35 @@ def annotate(d, model_b=False):
 
     main.sub(0x24A9, "move_chooser", "Move the chosen wall block",
              "'.' and ',' move one block on or back, 'Z' and 'A' a row of four; "
-             "a move off the grid is undone.",
+             "a move off the grid is undone. Only one key is taken each call. "
+             "choose_wall_block compares the two blocks afterwards to see "
+             "whether the frame must be moved.",
              on_exit={"chosen_block": "the block now chosen",
                       "previous_block": "the block chosen before"})
     comments(main, [
         (0x24A9, "Remember the block chosen"),
         (0x24AC, "...to compare after moving"),
-        (0x24AF, "Pressed?"),
+        (0x24AF, "'.' pressed?"),
         (0x24B1, "...(Z set if pressed)"), (0x24B4, "Not pressed: try ','"),
         (0x24B6, "Yes: the next block..."),
         (0x24B9, "...read it"), (0x24BC, "...past the last block?"), (0x24BE, "No: the move stands"),
-        (0x24C0, "...but not past 23"),
-        (0x24C2, "Pressed?"),
+        (0x24C0, "Past 23: undo it"),
+        (0x24C2, "',' pressed?"),
         (0x24C4, "...(Z set if pressed)"), (0x24C7, "Not pressed: try Z"),
         (0x24C9, "Yes: the previous block..."),
         (0x24CC, "Still 0 or more: the move stands"),
-        (0x24CE, "...but not before 0"),
-        (0x24D0, "Pressed?"),
+        (0x24CE, "Below 0: undo it"),
+        (0x24D0, "'Z' pressed?"),
         (0x24D2, "...(Z set if pressed)"), (0x24D5, "Not pressed: try A"),
         (0x24D7, "Yes: a row on..."),
         (0x24D8, "...the chosen block..."), (0x24DB, "...4 on, the block below in the grid"), (0x24DD, "...kept"), (0x24E0, "...past the last block?"),
         (0x24E2, "Within the 24: the move stands"),
-        (0x24E4, "...but not past 23"),
-        (0x24E6, "Pressed?"),
+        (0x24E4, "Past 23: undo it"),
+        (0x24E6, "'A' pressed?"),
         (0x24E8, "...(Z set if pressed)"), (0x24EB, "Not pressed: no move"),
         (0x24ED, "Yes: a row back..."),
         (0x24EE, "...the chosen block..."), (0x24F1, "...4 back, the block above in the grid"), (0x24F3, "...kept"), (0x24F6, "Still 0 or more: the move stands"),
-        (0x24F8, "...but not before 0"),
+        (0x24F8, "Below 0: undo it"),
         (0x24FA, "Return"),
         (0x24FB, "Off the grid: undo the move"),
         (0x24FE, "...restore the block chosen before"), (0x2501, "Return"),
@@ -1350,10 +1407,14 @@ def annotate(d, model_b=False):
 
     main.sub(0x2510, "block_place", "Find a wall block's place in the grid",
              "Block n is at column n mod 4, row n div 4: plot_x = 8 x column + "
-             "&1A, plot_y = 24 x row + &14.",
-             on_entry={"A": "block number"})
+             "&1A, plot_y = 24 x row + &14. Each block is 4 bytes by 12 rows, "
+             "so the grid leaves room for the frame between them.",
+             on_entry={"A": "block number"},
+             on_exit={"plot_x": "the block's screen byte column",
+                      "plot_y": "its pixel row", "X": "the block number",
+                      "C": "clear"})
     comments(main, [
-        (0x2510, "Keep it"),
+        (0x2510, "Keep the block number"),
         (0x2511, "plot_x = (n mod 4) x 8 + &1A"),
         (0x2513, "...x 2..."), (0x2514, "...x 4..."), (0x2515, "...x 8 bytes across..."), (0x2516, "...C clear for the addition"),
         (0x2517, "...from column &1A"), (0x2519, "...as plot_x"),
@@ -1364,16 +1425,18 @@ def annotate(d, model_b=False):
     ])
 
     main.sub(0x252A, "frame_block", "Draw or erase the frame round the chosen block",
-             "Plot sprite A (&2A the frame, &2B a blank) one byte left of and "
-             "two rows above the chosen block, then plot the block again.",
+             "Plot sprite A (&2A the frame, &2B a blank), 6 bytes by 18 rows, "
+             "one byte left of and three rows above the chosen block, so that "
+             "it surrounds the 4-byte by 12-row block, then plot the block "
+             "again inside it.",
              on_entry={"A": "&2A to frame, &2B to erase"})
     comments(main, [
         (0x252A, "The frame sprite..."),
         (0x252C, "...at the chosen block's place..."),
         (0x252F, "...set plot_x, plot_y"),
         (0x2532, "...one byte left..."),
-        (0x2534, "...and two rows up (C is clear: three, as the block is 18 rows)"),
-        (0x2536, "...three rows up, as C is clear"), (0x2538, "...kept"),
+        (0x2534, "...and up (C is clear from block_place)..."),
+        (0x2536, "...SBC #2 with C clear: three rows up"), (0x2538, "...kept"),
         (0x253A, "Plot it"),
         (0x253D, "Then the block itself"),
         (0x2540, "...set plot_x, plot_y"), (0x2543, "...its number..."), (0x2546, "...C clear for the addition"), (0x2547, "...as its sprite"),
@@ -1384,7 +1447,9 @@ def annotate(d, model_b=False):
     main.stringcr(0x254F)
 
     main.sub(0x255B, "show_25_rows", "Show 25 rows",
-             "Send VDU 23,0,6,25,0,0,0,0,0,0.",
+             "Send VDU 23,0,6,25,0,0,0,0,0,0: 6845 register 6, the rows "
+             "displayed, = 25. Row 25 starts at &6E80, where load_stones puts "
+             "Stones, so the wall-block chooser does not show it.",
               on_exit={"A": "corrupted", "X": "corrupted", "Y": "preserved"})
     comments(main, [
         (0x255B, "Send rows_25_vdu"),
@@ -1445,9 +1510,9 @@ def annotate(d, model_b=False):
         (0x2602, "...objects"), (0x2605, "...trapdoors"), (0x2608, "...doors"),
         (0x260B, "For slots &4F to 0..."),
         (0x260D, "...what is in it?"),
-        (0x2610, "Nothing"),
+        (0x2610, "Free slot: skip it"),
         (0x2612, "The exit?"),
-        (0x2614, "Yes: entry 30"),
+        (0x2614, "Yes: always object entry 30"),
         (0x2616, "A trapdoor?"),
         (0x2618, "Yes: the trapdoor table"),
         (0x261A, "A door or key?"),
@@ -1467,14 +1532,14 @@ def annotate(d, model_b=False):
         (0x2653, "...its x..."), (0x2656, "...into the level's trapdoor table"), (0x2659, "...its y..."), (0x265C, "...into the level's trapdoor table"),
         (0x265F, "...count it"),
         (0x2662, "Next slot (always branches)"),
-        (0x2664, "A key: skip it (it goes with its door)"),
-        (0x2666, "...so it goes with its door"),
+        (0x2664, "A key?"),
+        (0x2666, "Yes: skip it, as it is packed with its door"),
         (0x2668, "A door: the next door entry..."),
         (0x266B, "...its sprite..."),
         (0x266C, "...as the game's door sprite"), (0x266F, "...the entry number"), (0x2672, "...into the level's door sprites"),
         (0x2675, "...and position"),
         (0x2678, "...into the level's door x"), (0x267B, "...y..."), (0x267E, "...into the level's door y"),
-        (0x2681, "Find the door's link..."),
+        (0x2681, "Find the link whose door is this slot..."),
         (0x2683, "...over links 19 to 0"), (0x2685, "This link's door slot..."), (0x2688, "...the door's slot?"), (0x268A, "Yes: Y is its link"),
         (0x268C, "...next link"), (0x268D, "...until all 20 are tried"),
         (0x268F, "...and put its key's position in the same entry"),
@@ -1490,8 +1555,9 @@ def annotate(d, model_b=False):
         main.label(addr, name)
 
     main.sub(0x26A9, "pack_level", "Pack the level for saving",
-             "Pack the item slots, then copy the wall map and the object-free "
-             "map into the level file.",
+             "Called from the edit loop when saving, after wall_edges. Pack "
+             "the item slots, then copy the wall map and the object-free map "
+             "into the level file.",
               on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x26A9, "Pack the items"),
@@ -1506,7 +1572,8 @@ def annotate(d, model_b=False):
     main.c(0x26C0, "Not used")
 
     main.sub(0x26D0, "load_stones", "Load the wall blocks",
-             "*LOAD STONES (at its own address, &6E80) with VDU output off.",
+             "*LOAD STONES (at its own address, &6E80) with VDU output off. "
+             "Called by choose_wall_block, with the disc already selected.",
               on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x26D0, "VDU 21: output off"),
@@ -1554,9 +1621,11 @@ def annotate(d, model_b=False):
     # The cursor and items.
 
     main.sub(0x2B00, "move_cursor", "Move the cursor",
-             "Wait for the frame, rub out the cursor and put back what is "
-             "under it, move with ',' '.' 'A' 'Z' within the 32 by 48 map, and "
-             "plot the current item there as the cursor.",
+             "Called at the start of every edit-loop pass. Wait for the frame, "
+             "rub out the cursor and put back what is under it, move with ',' "
+             "'.' 'A' 'Z' within the 32 by 48 map (one step in x and one in y "
+             "at most), and plot the current item there as the cursor. So "
+             "the cursor shows what SPACE would place.",
               on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x2B00, "Wait for the frame"),
@@ -1564,30 +1633,30 @@ def annotate(d, model_b=False):
         (0x2B05, "Rub out the cursor (the blank sprite)"),
         (0x2B07, "...at the cursor's cell"),
         (0x2B0A, "Anything here?"),
-        (0x2B0D, "No: check right"),
-        (0x2B0F, "Yes: plot it again"),
-        (0x2B12, "Right key pressed?"),
+        (0x2B0D, "Empty: leave the cell blank"),
+        (0x2B0F, "Yes: redraw the wall or item the cursor covered"),
+        (0x2B12, "'.' (key_right) pressed?"),
         (0x2B14, "...(Z set if pressed)"), (0x2B17, "Not pressed: try left"),
-        (0x2B19, "Yes: right (always branches)"),
-        (0x2B1B, "...(the column stays below 128)"),
-        (0x2B1D, "Left key pressed?"),
+        (0x2B19, "Yes: one column right..."),
+        (0x2B1B, "...always branches; clamp_cursor limits it"),
+        (0x2B1D, "',' (key_left) pressed?"),
         (0x2B1F, "...(Z set if pressed)"), (0x2B22, "Not pressed: try up"),
         (0x2B24, "Yes: left, to at least 0"),
         (0x2B26, "Still 0 or more: done"), (0x2B28, "Off the left: back to column 0"), (0x2B2A, "...as the cursor's column"),
-        (0x2B2C, "Up key pressed?"),
+        (0x2B2C, "'A' (key_up) pressed?"),
         (0x2B2E, "...(Z set if pressed)"), (0x2B31, "Not pressed: try down"),
         (0x2B33, "Yes: up, to at least 0"),
         (0x2B35, "Still 0 or more: done"), (0x2B37, "Off the top: back to row 0"), (0x2B39, "...as the cursor's row"), (0x2B3B, "...(always branches)"),
-        (0x2B3D, "Down key pressed?"),
+        (0x2B3D, "'Z' (key_down) pressed?"),
         (0x2B3F, "...(Z set if pressed)"), (0x2B42, "Not pressed: done"),
-        (0x2B44, "Yes: down (always branches)"),
-        (0x2B46, "...(the row stays below 128)"),
+        (0x2B44, "Yes: one row down..."),
+        (0x2B46, "...always branches; clamp_y limits it"),
         (0x2B48, "At most column 31..."),
         (0x2B4A, "...one past the right-hand column?"), (0x2B4C, "No: keep it"), (0x2B4E, "Yes: back to the right-hand column"), (0x2B50, "...as the cursor's column"),
         (0x2B52, "...and row 47"),
         (0x2B54, "...one past the bottom row?"), (0x2B56, "No: keep it"), (0x2B58, "Yes: back to the bottom row"), (0x2B5A, "...as the cursor's row"),
-        (0x2B5C, "Plot the current item at the cursor"),
-        (0x2B5E, "...as the cursor"),
+        (0x2B5C, "Plot the current item at the cursor..."),
+        (0x2B5E, "...as the cursor, over whatever is there"),
         (0x2B61, "Return"),
     ])
     for addr, name in [(0x2B12, "check_right"), (0x2B1D, "check_left"),
@@ -1612,24 +1681,26 @@ def annotate(d, model_b=False):
 
     main.sub(0x2B76, "item_at_cursor", "Find what is in the cursor's cell",
              "Search the slots for an item at the cursor; failing that, look "
-             "at the wall map.",
+             "at the wall map. A free slot is item 0 at (0, 0) (see "
+             "free_slot), so whenever a slot is free the top-left cell "
+             "reports a wall, whatever the wall map holds there.",
              on_exit={"A": "the item's sprite and X its slot; 0 for a wall; &FF for nothing",
                       "N": "set for nothing"})
     comments(main, [
-        (0x2B76, "For slots &4F to 0..."),
+        (0x2B76, "For slots &4F to 0, free ones included..."),
         (0x2B78, "...x matches..."),
         (0x2B7B, "...the cursor's column?"), (0x2B7D, "No: next slot"),
         (0x2B7F, "...and y matches?"),
         (0x2B82, "...the cursor's row?"), (0x2B84, "No: next slot"),
-        (0x2B86, "Yes: return its item"),
-        (0x2B89, "...the slot's item number"),
+        (0x2B86, "Yes: return its item (0 for a free slot)..."),
+        (0x2B89, "...with X its slot"),
         (0x2B8A, "Next slot"),
         (0x2B8B, "...until slot 0 is tried"),
         (0x2B8D, "No item: is there a wall?"),
         (0x2B90, "...the map byte..."), (0x2B92, "...its bit for the cell"), (0x2B94, "Clear: nothing here"),
-        (0x2B96, "Yes: 0"),
+        (0x2B96, "Set: item 0, the wall"),
         (0x2B98, "...0: a wall (Z set)"),
-        (0x2B99, "No: &FF"),
+        (0x2B99, "No wall: &FF"),
         (0x2B9B, "...&FF: nothing (N set)"),
     ])
     for addr, name in [(0x2B78, "search_slots"), (0x2B8A, "next_slot"),
@@ -1638,7 +1709,8 @@ def annotate(d, model_b=False):
 
     main.sub(0x2B9C, "wall_bit", "Find the cursor's bit in the wall map",
              "As the game lays out its maps: the byte at (y AND &F8) x 4 + "
-             "(y AND 7) + (x AND &F8), bit 7 - (x AND 7).",
+             "(y AND 7) + (x AND &F8), bit 7 - (x AND 7). Used to test, set "
+             "and clear walls, a door's included.",
              on_exit={"map_ptr": "address of the byte", "bit_mask": "the bit",
                       "Y": "0"})
     comments(main, [
@@ -1666,12 +1738,14 @@ def annotate(d, model_b=False):
     main.label(0x2BD2, "bit_found")
 
     main.sub(0x2BD7, "put_item", "Put the current item in the cursor's cell",
-             "Clear the cell's object-free bit. A wall sets the wall map's "
-             "bit; anything else takes a free slot, and a key is recorded as "
-             "the key of the link being made.",
+             "place_item's last step, once the item is allowed. Clear the "
+             "cell's object-free bit, for every item, walls included; nothing "
+             "in the editor sets it again, so deleted items leave clear bits. "
+             "A wall sets the wall map's bit; anything else takes a free slot, "
+             "and a key is recorded as the key of the link being made.",
               on_entry={"cursor_x": "the cell's column", "cursor_y": "the cell's row", "current_item": "the item to put there", "link_index": "for a key, its door's link"}, on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
-        (0x2BD7, "Clear the cell's object-free bit"),
+        (0x2BD7, "Clear the cell's object-free bit, whatever the item"),
         (0x2BDA, "A wall?"),
         (0x2BDC, "No: put it in a slot"),
         (0x2BDE, "Yes: set its bit in the wall map"),
@@ -1684,7 +1758,7 @@ def annotate(d, model_b=False):
         (0x2BFE, "...in the slot"),
         (0x2C01, "A key?"),
         (0x2C03, "No: done"),
-        (0x2C05, "Yes: it is the link's key"),
+        (0x2C05, "Yes: this slot is the link's key..."),
         (0x2C06, "...of the link taken for the waiting door"), (0x2C09, "...the key's slot in the link"),
         (0x2C0C, "Return"),
     ])
@@ -1693,13 +1767,15 @@ def annotate(d, model_b=False):
         main.label(addr, name)
 
     main.sub(0x2C0D, "remove_at_cursor", "Remove what is in the cursor's cell",
-             "Free an item's slot, or clear a wall's bit in the wall map.",
+             "delete_item's last step. Free an item's slot, or clear a wall's "
+             "bit in the wall map. Freeing a door's slot leaves its wall bit "
+             "set, so the cell then shows a wall.",
               on_entry={"cursor_x": "the cell's column", "cursor_y": "the cell's row"}, on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x2C0D, "What is here?"),
-        (0x2C10, "A wall"),
-        (0x2C12, "Nothing"),
-        (0x2C14, "An item: free its slot"),
+        (0x2C10, "A wall: clear its bit"),
+        (0x2C12, "Nothing here: done"),
+        (0x2C14, "An item: free its slot, X from item_at_cursor"),
         (0x2C17, "Return (always branches)"),
     ])
     main.label(0x2C19, "clear_wall")
@@ -1717,15 +1793,18 @@ def annotate(d, model_b=False):
              "exit, eight trapdoors, 20 doors (a door is also a wall), 29 "
              "objects, and a key only when a door is waiting for one, which "
              "links the two. With a key chosen, SPACE on an unlinked door "
-             "makes it the door waiting for its key.",
+             "makes it the door waiting for its key (sprite &11), in place of "
+             "any door waiting before. A door sets its wall bit before its "
+             "count is checked, so a 21st door is refused but leaves a wall. "
+             "Called from the edit loop on SPACE and by wall_edges.",
               on_entry={"cursor_x": "the cell's column", "cursor_y": "the cell's row", "current_item": "the item to place"}, on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x2C29, "What is here?"),
         (0x2C2C, "Nothing: place the item"),
-        (0x2C2E, "A wall: leave it"),
+        (0x2C2E, "A wall: nothing more can go here"),
         (0x2C30, "A door?"),
-        (0x2C32, "Yes: link it to a key"), (0x2C34, "...the other door?"), (0x2C36, "Yes: link it to a key"),
-        (0x2C38, "Return"),
+        (0x2C32, "Yes: perhaps make it wait for a key"), (0x2C34, "...the other door?"), (0x2C36, "Yes: perhaps make it wait for a key"),
+        (0x2C38, "Occupied: refuse"),
         (0x2C39, "The current item: a wall?"),
         (0x2C3B, "Yes: put it in the map"),
         (0x2C3D, "The exit?"),
@@ -1740,36 +1819,36 @@ def annotate(d, model_b=False):
         (0x2C53, "...how many now?"), (0x2C55, "...30, one too many?"),
         (0x2C57, "...and place it if there are now at most 29"),
         (0x2C59, "Too many: uncount it"),
-        (0x2C5B, "Return"),
+        (0x2C5B, "...and refuse"),
         (0x2C5C, "The exit: only one"),
         (0x2C5E, "Placed already: refuse"),
         (0x2C60, "...it is placed now..."), (0x2C62, "...put it in (always branches)"),
-        (0x2C64, "Return"),
+        (0x2C64, "Refuse"),
         (0x2C65, "A trapdoor: at most 8"),
         (0x2C67, "...how many now?"), (0x2C69, "...9, one too many?"), (0x2C6B, "No: put it in"), (0x2C6D, "Yes: uncount it and refuse"),
-        (0x2C6F, "Return"),
-        (0x2C70, "A door: it is a wall too..."),
+        (0x2C6F, "...(refused)"),
+        (0x2C70, "A door: it is a wall too, set before the count..."),
         (0x2C73, "...the cell's map byte..."), (0x2C75, "...with its bit set..."), (0x2C77, "...back in the map"),
         (0x2C79, "...at most 20"),
-        (0x2C7B, "...how many now?"), (0x2C7D, "...21, one too many?"), (0x2C7F, "No: put it in"), (0x2C81, "Yes: uncount it and refuse"),
-        (0x2C83, "Return"),
+        (0x2C7B, "...how many now?"), (0x2C7D, "...21, one too many?"), (0x2C7F, "No: put it in"), (0x2C81, "Yes: uncount it and refuse..."),
+        (0x2C83, "...leaving its wall bit set"),
         (0x2C84, "A key: is a door waiting for one?"),
-        (0x2C87, "No: return"),
+        (0x2C87, "No door waiting: refuse"),
         (0x2C89, "Yes: take a free link..."),
         (0x2C8C, "...for the waiting door..."),
         (0x2C8F, "...the waiting door's slot..."), (0x2C92, "...as the link's door"),
-        (0x2C95, "...show the door as it was..."),
+        (0x2C95, "...give the door back its own sprite..."),
         (0x2C98, "...and nothing waiting"),
         (0x2C9A, "...no door is waiting now"),
-        (0x2C9D, "Place the key"),
-        (0x2CA0, "Put it in the cell"),
+        (0x2C9D, "Place the key, recorded in link_index's link"),
+        (0x2CA0, "Put the item in the wall map or a slot"),
         (0x2CA3, "A door with a key chosen?"),
         (0x2CA5, "...the key?"), (0x2CA7, "No: refuse"),
         (0x2CA9, "Yes: is the door linked already?"),
         (0x2CAB, "...over links 19 to 0"), (0x2CAD, "This link's door slot..."), (0x2CB0, "...this door's?"), (0x2CB2, "Yes: it is linked"),
         (0x2CB4, "...next link"), (0x2CB5, "...until all 20 are tried"),
         (0x2CB7, "No: door not linked"),
-        (0x2CB9, "Yes: return"),
+        (0x2CB9, "Linked already: nothing to do"),
         (0x2CBA, "Another door waiting?"),
         (0x2CBC, "...(the waiting door's sprite)"), (0x2CBF, "None: make this door wait"),
         (0x2CC1, "Yes: show it as it was"),
@@ -1790,7 +1869,9 @@ def annotate(d, model_b=False):
         main.label(addr, name)
 
     main.sub(0x2CD7, "restore_waiting_door", "Show the waiting door as it was",
-             "Put the waiting door's own sprite back in its slot and plot it.",
+             "Put the waiting door's own sprite back in its slot and plot it, "
+             "by falling into plot_slot. Used when its key is placed, and "
+             "when another door is chosen to wait instead.",
               on_exit={"A": "corrupted", "X": "corrupted", "Y": "preserved"})
     comments(main, [
         (0x2CD7, "The waiting door's slot..."),
@@ -1798,7 +1879,9 @@ def annotate(d, model_b=False):
         (0x2CDD, "...back in the slot"),
     ])
     main.sub(0x2CE0, "plot_slot", "Plot a sprite at a slot's cell",
-             "At screen byte column 2x and pixel row 5y of slot X's cell.",
+             "At screen byte column 2x and pixel row 5y of slot X's cell: "
+             "plot_at_cursor for a cell away from the cursor, such as a "
+             "deleted door's key.",
              on_entry={"A": "sprite number", "X": "slot"})
     comments(main, [
         (0x2CE0, "The sprite..."),
@@ -1812,7 +1895,8 @@ def annotate(d, model_b=False):
     ])
 
     main.sub(0x2CF7, "find_free_link", "Find a free door-key link",
-             "The highest link whose door is &FF.",
+             "The highest link whose door is &FF, for the key being placed for "
+             "the waiting door. Were none free, link_index would be &FF.",
              on_exit={"link_index": "the link"})
     comments(main, [
         (0x2CF7, "For links 19 down..."),
@@ -1825,42 +1909,46 @@ def annotate(d, model_b=False):
     main.label(0x2D01, "free_link_found")
 
     main.sub(0x2D05, "free_slot", "Free a slot",
-             "Zero its item and position.", on_entry={"X": "slot"},
+             "Zero its item and position. A free slot is therefore item 0 at "
+             "(0, 0), as start_editing leaves every slot; item_at_cursor "
+             "reads that as a wall in the top-left cell.", on_entry={"X": "slot"},
              on_exit={"A": "0", "Z": "set"})
     comments(main, [
         (0x2D05, "Zero its item..."),
         (0x2D07, "...so the slot is free"),
-        (0x2D0A, "...and position"),
+        (0x2D0A, "...and position: column 0..."),
         (0x2D0D, "...row 0"),
         (0x2D10, "Return"),
     ])
 
     main.sub(0x2D11, "delete_item", "Delete what is in the cursor's cell",
-             "Uncount the item and remove it. Deleting a door removes its key "
-             "too, and deleting a key removes its door (and the door's wall). "
-             "A waiting door is left alone. A wall is cleared.",
+             "TAB in the edit loop. Uncount the item and remove it. Deleting a "
+             "door removes its key too but leaves the door's wall bit, so a "
+             "wall shows where the door was; deleting a key removes its door "
+             "and the door's wall. A waiting door is left alone. A wall is "
+             "cleared.",
               on_entry={"cursor_x": "the cell's column", "cursor_y": "the cell's row"}, on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x2D11, "What is here?"),
-        (0x2D14, "Nothing: remove (nothing)"),
+        (0x2D14, "Nothing: remove_at_cursor finds nothing either"),
         (0x2D16, "A wall: clear it"),
         (0x2D18, "A waiting door?"),
         (0x2D1A, "No: delete the item"),
-        (0x2D1C, "Yes: leave it"),
-        (0x2D1D, "Keep the slot"),
+        (0x2D1C, "Yes: it cannot be deleted"),
+        (0x2D1D, "Keep the item's slot, to match against links"),
         (0x2D1F, "The exit?"),
         (0x2D21, "Yes: the exit is no longer placed"),
         (0x2D23, "A trapdoor?"),
         (0x2D25, "Yes: one fewer trapdoor"),
         (0x2D27, "A door?"),
-        (0x2D29, "Yes: unlink it"), (0x2D2B, "...the other door?"), (0x2D2D, "Yes: unlink it"),
+        (0x2D29, "Yes: unlink it and delete its key"), (0x2D2B, "...the other door?"), (0x2D2D, "Yes: unlink it and delete its key"),
         (0x2D2F, "A key?"),
         (0x2D31, "Yes: delete its door too"),
-        (0x2D33, "An object: uncount it (always branches)"),
+        (0x2D33, "An object: one fewer"),
         (0x2D35, "...(always branches)"),
         (0x2D37, "The exit: none placed"),
         (0x2D39, "...clear exit_placed"), (0x2D3B, "...(always branches)"),
-        (0x2D3D, "A trapdoor: uncount it (always branches)"),
+        (0x2D3D, "A trapdoor: one fewer"),
         (0x2D3F, "...(always branches)"),
         (0x2D41, "A door: uncount it..."),
         (0x2D43, "...find its link..."),
@@ -1874,8 +1962,8 @@ def annotate(d, model_b=False):
         (0x2D60, "...(always branches)"),
         (0x2D62, "Next link"),
         (0x2D63, "...until all 20 are tried"),
-        (0x2D65, "Remove the item itself"),
-        (0x2D68, "A key: keep the cursor's cell"),
+        (0x2D65, "Remove the item itself, or clear the wall"),
+        (0x2D68, "A key: keep its cell, the cursor's..."),
         (0x2D6A, "...in line_x..."), (0x2D6D, "...and row..."), (0x2D6F, "...in line_y"),
         (0x2D72, "Find the key's link..."),
         (0x2D74, "This link's key slot..."), (0x2D77, "...this key's?"), (0x2D79, "No: next link"),
@@ -1883,7 +1971,7 @@ def annotate(d, model_b=False):
         (0x2D7C, "...on the stack"),
         (0x2D7D, "...take its door's slot..."),
         (0x2D80, "...into X"), (0x2D81, "...kept"),
-        (0x2D82, "...and cell..."),
+        (0x2D82, "...and move the cursor to the door's cell..."),
         (0x2D85, "...as the cursor's column..."), (0x2D87, "...row..."), (0x2D8A, "...as the cursor's row"),
         (0x2D8C, "...rub out the door..."),
         (0x2D8E, "...in its cell"),
@@ -1893,12 +1981,12 @@ def annotate(d, model_b=False):
         (0x2D97, "...the link number back into X"), (0x2D98, "...one fewer door"),
         (0x2D9A, "...free the link..."),
         (0x2D9C, "...in the link table"),
-        (0x2D9F, "...clear the door's wall..."),
-        (0x2DA2, "...and go back to the key's cell"),
+        (0x2D9F, "...clear the door's wall, at the cursor..."),
+        (0x2DA2, "...and move the cursor back to the key's cell"),
         (0x2DA5, "...as the cursor's column"), (0x2DA7, "...the key's row..."), (0x2DAA, "...as the cursor's row"),
         (0x2DAC, "Remove the key"),
         (0x2DAF, "Next link"),
-        (0x2DB0, "...until all 20 are tried"),
+        (0x2DB0, "...until all 20 are tried; none: fall through"),
     ])
     for addr, name in [(0x2D1D, "delete_item_slot"), (0x2D37, "delete_exit"),
                        (0x2D3D, "delete_trapdoor"), (0x2D41, "delete_door"),
@@ -1933,9 +2021,9 @@ def annotate(d, model_b=False):
         (0x2DCF, "...low byte"), (0x2DD2, "...high byte"),
         (0x2DD5, "y x 4..."),
         (0x2DD8, "...x 2..."), (0x2DD9, "...x 4 (a row is below 48: no carry)"), (0x2DDA, "...kept"), (0x2DDC, "...C clear (the ASL sets it anyway)"),
-        (0x2DDD, "...x 16..."),
+        (0x2DDD, "...x 8..."),
         (0x2DDE, "...carry into the high byte"), (0x2DE1, "...x 16..."), (0x2DE2, "...carry into the high byte"), (0x2DE5, "...low byte kept"),
-        (0x2DE8, "...plus x 4: x 20"),
+        (0x2DE8, "...plus x 4: x 20 graphics units a row"),
         (0x2DE9, "...y x 4 added..."), (0x2DEB, "...low byte"), (0x2DEE, "...high byte..."), (0x2DF1, "...with the carry"),
         (0x2DF3, "...kept"),
         (0x2DF6, "&3FF - y x 20"),
@@ -1960,9 +2048,11 @@ def annotate(d, model_b=False):
     ])
 
     main.sub(0x2E36, "draw_links", "Draw each door-key link as a line",
-             "For each link in use, PLOT 68 at the door's cell and PLOT 5 to "
-             "its key's: exclusive-OR lines (GCOL 3), so drawing them again "
-             "rubs them out.",
+             "For each link in use, move to the door's cell (PLOT 68) and draw "
+             "a line to its key's (PLOT 5). The lines are exclusive-OR (GCOL "
+             "3, set at start-up), so the edit loop draws them when CTRL is "
+             "pressed and again, rubbing them out, when it is released. Each "
+             "line runs between the cells' top-left corners.",
               on_exit={"A": "corrupted", "X": "corrupted", "Y": "preserved"})
     comments(main, [
         (0x2E36, "For links 19 to 0..."),
@@ -1971,13 +2061,13 @@ def annotate(d, model_b=False):
         (0x2E3D, "Free: next link"),
         (0x2E3F, "Yes: from the door's cell..."),
         (0x2E40, "...its column..."), (0x2E43, "...as line_x"), (0x2E46, "...its row..."), (0x2E49, "...as line_y"),
-        (0x2E4C, "...(PLOT 68: a point)..."),
-        (0x2E4E, "...move there"),
+        (0x2E4C, "...PLOT 68: move absolute..."),
+        (0x2E4E, "...to the door's cell, drawing nothing"),
         (0x2E51, "...to the key's cell..."),
         (0x2E52, "...kept"), (0x2E53, "...link number into X"), (0x2E54, "...the key's slot..."), (0x2E57, "...into X"),
         (0x2E58, "...its column..."), (0x2E5B, "...as line_x"), (0x2E5E, "...its row..."), (0x2E61, "...as line_y"),
-        (0x2E64, "...(PLOT 5: a line)"),
-        (0x2E66, "...draw the link, exclusive-OR"),
+        (0x2E64, "...PLOT 5: line to there..."),
+        (0x2E66, "...draw the link, exclusive-OR (GCOL 3)"),
         (0x2E69, "Next link"),
         (0x2E6A, "...back into X"), (0x2E6B, "...the link before"), (0x2E6C, "...until link 0 is done"),
         (0x2E6E, "Return"),
@@ -2003,11 +2093,17 @@ def annotate(d, model_b=False):
     # unpack_level, run at &7B00.
 
     in_unpack.sub(0x7B00, "unpack_level", "Unpack the loaded level into the slots",
-                  "Read the level file's tables from the last entry back, "
-                  "putting each item in the next slot down from &4F: objects "
-                  "(with their editor items found from item_types), each door "
-                  "and then its key (linked), and the trapdoors. Copy the wall "
-                  "map and object-free map. Count the objects and doors.",
+                  "Called by start_editing for a loaded, decrypted level. Read "
+                  "the level file's tables from the last entry back, putting "
+                  "each item in the next slot down from &4F: objects 30 to 1 "
+                  "(the exit, 30, first, into slot &4F), skipping any whose x "
+                  "is &80 or more, with their editor items found from "
+                  "item_types; doors 20 to 1, each followed by its key in the "
+                  "slot below and the pair recorded as a door-key link, from "
+                  "link 19 down; then all eight trapdoors. Copy the wall map "
+                  "and object-free map into the editor's own. object_count "
+                  "leaves out the exit (it starts at -1), door_count counts the "
+                  "doors and trapdoor_count is set to 8.",
                    on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(in_unpack, [
         (0x7B00, "No doors..."),
@@ -2021,7 +2117,7 @@ def annotate(d, model_b=False):
         (0x7B11, "...links from 19 down"),
         (0x7B13, "...the next link to fill"),
         (0x7B16, "For objects 30 to 1..."),
-        (0x7B18, "...in use?"),
+        (0x7B18, "...its x: on the map?"),
         (0x7B1B, "&80 or more (&FF): not in this level"),
         (0x7B1D, "Yes: count it..."),
         (0x7B1F, "...and put it in the next slot..."),
@@ -2031,23 +2127,23 @@ def annotate(d, model_b=False):
         (0x7B3A, "Next object"),
         (0x7B3B, "...down to object 1"),
         (0x7B3D, "For doors 20 to 1..."),
-        (0x7B3F, "...in use?"),
-        (0x7B42, "&FF: no door here"),
+        (0x7B3F, "...its x: on the map?"),
+        (0x7B42, "&80 or more (&FF): no door here"),
         (0x7B44, "Yes: count it..."),
         (0x7B46, "...link it: the door's slot..."),
-        (0x7B49, "...in this link..."), (0x7B4C, "...the door's slot..."),
+        (0x7B49, "...in this link..."), (0x7B4C, "...recorded as the link's door..."),
         (0x7B4F, "...and the key's, the slot below..."),
         (0x7B50, "...one below..."), (0x7B52, "...is the key's slot..."), (0x7B55, "...and move to the next link down"),
         (0x7B58, "...put the door in its slot..."),
         (0x7B5B, "...in the slot being filled..."), (0x7B5E, "...its x..."), (0x7B61, "...then its y..."), (0x7B64, "...into the slot too"),
         (0x7B67, "...and its sprite..."), (0x7B6A, "...as the editor's door item..."), (0x7B6D, "...back to the slot being filled..."), (0x7B70, "...stored with it..."),
         (0x7B73, "...and move to the next slot down"),
-        (0x7B76, "...and the key in the next"),
+        (0x7B76, "Y = the door's slot - 1: the key's slot"),
         (0x7B77, "...its x..."), (0x7B7A, "...into the slot below..."), (0x7B7D, "...then its y..."), (0x7B80, "...stored with it, in the slot below..."),
         (0x7B83, "...the key item..."), (0x7B85, "...as the slot's item..."), (0x7B88, "...and move to the next slot down"),
         (0x7B8B, "Next door"),
         (0x7B8C, "...down to door 1"),
-        (0x7B8E, "For trapdoors 7 to 0..."),
+        (0x7B8E, "For trapdoors 7 to 0, all of them present..."),
         (0x7B90, "...put each in the next slot"),
         (0x7B93, "...in the slot being filled..."), (0x7B96, "...its x..."), (0x7B99, "...then its y..."), (0x7B9C, "...into the slot too"),
         (0x7B9F, "...as the trapdoor item..."), (0x7BA1, "...stored with it..."), (0x7BA4, "...and move to the next slot down"), (0x7BA7, "...the next trapdoor down..."),
@@ -2062,11 +2158,14 @@ def annotate(d, model_b=False):
                        (0x7B90, "unpack_trapdoor"), (0x7BAC, "unpack_maps")]:
         in_unpack.label(addr, name)
     in_unpack.sub(0x7BBE, "item_for_type", "Find the editor's item for a level type",
-                  "Search item_types from entry 1 for the type. A type with no "
-                  "item would search on into the bytes beyond.",
-                  on_entry={"A": "level type"}, on_exit={"A": "item"})
+                  "Search item_types from entry 1 for the type: an object's "
+                  "type, or a door's sprite &1C or &1D. A type with no item "
+                  "would be matched against the bytes beyond item_types (the "
+                  "checksums and sprite tables), and with no match at all Y "
+                  "would wrap to 0 and run on past the routine's end.",
+                  on_entry={"A": "level type"}, on_exit={"A": "item", "Y": "item"})
     comments(in_unpack, [
-        (0x7BBE, "Keep the type"),
+        (0x7BBE, "Keep the type to compare with"),
         (0x7BC0, "From item 1..."),
         (0x7BC2, "...a match?"),
         (0x7BC5, "...the type being looked up?"), (0x7BC7, "No: next type"),
@@ -2078,10 +2177,14 @@ def annotate(d, model_b=False):
     in_unpack.label(0x7BC2, "search_types")
     in_unpack.label(0x7BCB, "next_type")
 
-    in_free_cell.sub(0x7D80, "free_cell", "Mark the cursor's cell as holding an object",
-                     "Clear its bit in the object-free map (laid out as the wall map).",
+    in_mark_object_cell.sub(0x7D80, "mark_object_cell", "Mark the cursor's cell as holding an object",
+                     "Clear its bit in the object-free map (laid out as the wall "
+                     "map), so the game will look for an object there. put_item "
+                     "calls it for every item placed, walls included. It runs "
+                     "at &7D80, copied there by start_editing, in screen "
+                     "memory below the 30 rows shown (&3000-&7AFF).",
                       on_entry={"cursor_x": "the cell's column", "cursor_y": "the cell's row"}, on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
-    comments(in_free_cell, [
+    comments(in_mark_object_cell, [
         (0x7D80, "(y AND &F8) x 4..."),
         (0x7D82, "...the room row, as a multiple of 8..."), (0x7D84, "...x 2..."), (0x7D85, "...x 4: 32 bytes per row of rooms"), (0x7D86, "...kept"),
         (0x7D88, "...+ (y AND 7)..."),
@@ -2101,9 +2204,9 @@ def annotate(d, model_b=False):
         (0x7DC0, "...back in the map"),
         (0x7DC2, "Return"),
     ])
-    in_free_cell.label(0x7DAE, "free_shift_bit")
-    in_free_cell.label(0x7DB4, "free_bit_0")
-    in_free_cell.label(0x7DB6, "free_bit_found")
+    in_mark_object_cell.label(0x7DAE, "mark_shift_bit")
+    in_mark_object_cell.label(0x7DB4, "mark_bit_0")
+    in_mark_object_cell.label(0x7DB6, "mark_bit_found")
 
     main.banner(0x19DE, "Unused", "Leftover bytes after unpack_level's image.")
     main.byte(0x19DE, 0x22, cols=8)
@@ -2125,7 +2228,7 @@ def annotate(d, model_b=False):
         if 0x7B00 <= operand_addr < 0x7BCE:
             d.expr(operand_addr, expression, move=unpack)
         elif 0x7D80 <= operand_addr < 0x7DC3:
-            d.expr(operand_addr, expression, move=free_cell)
+            d.expr(operand_addr, expression, move=mark_object_cell)
         else:
             d.expr(operand_addr, expression)
     for operand_addr in EDITOR_CHAR_OPERANDS:

@@ -79,22 +79,26 @@ annotator.expr(0x149B, hexlit(0x3000))  # patched with FILEV before the call
 annotator.region(0x149B, "filev_call_address", (0, 1), description=(
     "Operand of the JSR at load_level_call, set to the contents of FILEV."))
 annotator.sub(0x1446, "load_level", "Load the level file",
-              "Show 23 character rows while loading, then load the file named "
-              "in level_filename at &6B00 by calling the filing system's FILEV "
-              "routine directly with an OSFILE block, and finally decrypt and "
-              "check it. The block's byte 6 (the exec address's low byte, "
-              "which must be 0 for the load address to be used) is not set "
-              "here: it relies on show_level_number having cleared the screen, "
-              "which the block lies in.",
+              "Called by start_level. Show only 23 character rows, so that "
+              "rows 23-24, where the level file (&6B00) and the OSFILE block "
+              "(&6E60) lie, are not seen. Then load the file named in "
+              "level_filename at &6B00 by calling the current filing "
+              "system's FILEV routine directly with an OSFILE block: the "
+              "levels are in a ROMFS image in sideways RAM, and the loader "
+              "leaves the ROM filing system selected. Finally decrypt and "
+              "check the level. The block's byte 6 (the exec address's low "
+              "byte, which must be 0 for the load address to be used) is not "
+              "set here: it relies on show_level_number having cleared the "
+              "screen, which the block lies in.",
                on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 for addr, text in [
-    (0x1446, "VDU 23,0,6,23,0,0,0,0,0,0: set 6845 register 6..."),
+    (0x1446, "VDU 23,0,6,23,0,0,0,0,0,0: hide rows 23-24 while loading..."),
     (0x1450, "...register 6, rows displayed..."),
     (0x1455, "...to 23 character rows displayed"),
     (0x145A, "...then six zeros to finish the command"),
-    (0x146E, "X, Y = address of the OSFILE block"),
+    (0x146E, "X, Y = address of the OSFILE block, in screen memory"),
     (0x1470, "...high byte"),
-    (0x1472, "Filename address = level_filename..."),
+    (0x1472, "Filename address = level_filename (\"LEVELn\")..."),
     (0x1474, "...low byte..."),
     (0x1477, "...high byte..."),
     (0x1479, "...in the block's first two bytes"),
@@ -107,9 +111,9 @@ for addr, text in [
     (0x148C, "Copy FILEV into the operand of the JSR below..."),
     (0x148F, "...low byte"),
     (0x1492, "...high byte"),
-    (0x1495, "...so the JSR goes straight to the filing system"),
-    (0x1498, "A = &FF: load the file"),
-    (0x149A, "Call the filing system's OSFILE routine directly"),
+    (0x1495, "...so the JSR goes straight to the ROM filing system"),
+    (0x1498, "A = &FF: load the file at the block's load address"),
+    (0x149A, "Load LEVELn from ROMFS through FILEV's routine"),
     (0x149D, "Decrypt and check the level, and return from there"),
 ]:
     annotator.c(addr, text)

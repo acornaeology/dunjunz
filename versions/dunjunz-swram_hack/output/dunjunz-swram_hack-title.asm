@@ -122,6 +122,7 @@ osbyte                = &fff4
     txa                                 ; ...count into A for the test
     cmp #page_text - mode_vdu           ; ...all eight sent?
     bne send_mode_vdu                   ; No: send the next
+; Stripe the whole MODE 5 screen, &5800-&7FFF, one character cell at a time.
     lda #>(stripe_pattern)              ; Point copy_from at stripe_pattern and copy_to at mode5_screen
     sta copy_from_high                  ; ...copy_from's high byte
     lda #0                              ; Both low bytes are 0
@@ -141,20 +142,21 @@ osbyte                = &fff4
     clc                                 ; copy_to += 8: on to the next cell
     lda copy_to                         ; ...low byte...
     adc #8                              ; ...plus 8: one character cell
-    sta copy_to                         ; ...stored back
+    sta copy_to                         ; ...the cell to the right, or the next row's first
     lda copy_to_high                    ; ...high byte...
     adc #0                              ; ...with the carry
-    sta copy_to_high                    ; ...stored back
+    sta copy_to_high                    ; ...completing the next cell's address
     ldy #0                              ; Back to the pattern's first byte
     lda copy_to_high                    ; Repeat until copy_to reaches &8000, the top of the screen
     cmp #>(screen_end)                  ; ...at the top of screen memory?
     bne fill_stripes                    ; No: stripe the next cell
+; Copy the logo picture, a byte at a time, over character rows 1-8.
     lda #>(title_picture)               ; copy_from = title_picture
     sta copy_from_high                  ; ...as copy_from's high byte
     lda #0                              ; ...page-aligned...
     sta copy_from                       ; ...so copy_from's low byte is 0
     lda #<(title_picture_screen)        ; copy_to = title_picture_screen (Y stays 0 from here)
-    sta copy_to                         ; ...low byte: character row 1
+    sta copy_to                         ; ...low byte: character row 1, below a striped row
     lda #>(title_picture_screen)        ; ...high byte...
     sta copy_to_high                    ; ...as copy_to's high byte
 ; &3913 referenced 1 time by &3935
@@ -164,20 +166,21 @@ osbyte                = &fff4
     clc                                 ; copy_from += 1
     lda copy_from                       ; ...low byte...
     adc #1                              ; ...plus one
-    sta copy_from                       ; ...stored back
+    sta copy_from                       ; ...the picture's next byte
     lda copy_from_high                  ; ...high byte...
     adc #0                              ; ...with the carry
-    sta copy_from_high                  ; ...stored back
+    sta copy_from_high                  ; ...crossing into its next page
     clc                                 ; copy_to += 1
     lda copy_to                         ; ...low byte...
     adc #1                              ; ...plus one
-    sta copy_to                         ; ...stored back
+    sta copy_to                         ; ...the screen's next byte
     lda copy_to_high                    ; ...high byte...
     adc #0                              ; ...with the carry
-    sta copy_to_high                    ; ...stored back
+    sta copy_to_high                    ; ...completing the next screen address
     lda copy_from_high                  ; Repeat until copy_from reaches the end of the file, &4400
     cmp #>(title_picture + &0a00)       ; ...past the picture's last page?
     bne copy_picture                    ; No: copy the next byte
+; Print the credits, title and keys, then (except on an Electron) a line of spaces, then open the black window.
     ldx #0                              ; Print page_text up to its &FF terminator
 ; &3939 referenced 1 time by &3945
 .print_page_text
@@ -191,8 +194,8 @@ osbyte                = &fff4
     ldx #0                              ; ...X = 0 and Y = &FF ask for the machine type...
     ldy #&ff                            ; ...rather than a key
     jsr osbyte                          ; ...X = 1 on an Electron  Read the OS version (INKEY(-256))
-    cpx #1                              ; 1 is an Electron: skip the line of spaces
-    beq open_black_window               ; ...so it skips the blank line
+    cpx #1                              ; 1: an Electron?
+    beq open_black_window               ; Yes: leave out the line of spaces
     ldx #0                              ; Print blank_line_text up to its &FF terminator
 ; &3956 referenced 1 time by &3962
 .print_blank_line
@@ -213,11 +216,12 @@ osbyte                = &fff4
     lda black_window_vdu,x              ; ...look at it...
     cmp #text_end                       ; ...is it the terminator?
     bne print_black_window              ; No: send it
+; Hide the cursor and wait for a key or the time limit.
     lda #&0a                            ; 6845 register 10 (cursor start) = &20: no cursor
     sta crtc_address_register           ; ...selected in the 6845...
     lda #&20 ; ' '                      ; ...&20: cursor display off...
-    sta crtc_register_data              ; ...written to it, so no cursor shows
-    lda #osbyte_flush_buffer_class      ; Flush the keyboard buffer (X is &0B, non-zero, from the loop above)
+    sta crtc_register_data              ; ...written straight to the 6845, not through VDU 23
+    lda #osbyte_flush_buffer_class      ; OSBYTE &0F, X = &0A from the loop above: flush input
     jsr osbyte                          ; ...so an early key press doesn't end the page  Flush selected class of buffer
     lda #osbyte_inkey                   ; Wait up to &2FF centiseconds (7.67 s) for a key
     ldx #&ff                            ; ...X and Y: the time limit, &2FF centiseconds...

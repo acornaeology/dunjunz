@@ -293,7 +293,7 @@
       "labels": [
         "default_start"
       ],
-      "comment_inline": "*TV255 1: move the picture down a line, interlace off",
+      "comment_inline": "*TV255 1: vertical shift -1 line, interlace off",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#<(tv_command)",
@@ -313,7 +313,7 @@
         160,
         26
       ],
-      "comment_inline": "...command's high byte",
+      "comment_inline": "...(X, Y) = the command line",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(tv_command)",
@@ -334,7 +334,7 @@
         247,
         255
       ],
-      "comment_inline": "...and run it",
+      "comment_inline": "...taking effect at the MODE change next",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -347,7 +347,7 @@
         169,
         22
       ],
-      "comment_inline": "VDU 22,7: MODE 7",
+      "comment_inline": "VDU 22,7: MODE 7, for the prompts",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&16"
@@ -359,7 +359,7 @@
         238,
         255
       ],
-      "comment_inline": "...selects a mode...",
+      "comment_inline": "...selects a mode, clearing the screen...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -409,7 +409,7 @@
         238,
         255
       ],
-      "comment_inline": "...so nothing goes to a printer",
+      "comment_inline": "...so the prompts go to the screen only",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -424,6 +424,9 @@
       ],
       "labels": [
         "ask_level"
+      ],
+      "comments_before_label": [
+        "Ask which level to reset, and read up to two digits."
       ],
       "comment_inline": "OSBYTE &C8 with X=1, Y=0: disable ESCAPE...",
       "xref_summaries": [
@@ -499,7 +502,7 @@
         169,
         15
       ],
-      "comment_inline": "OSBYTE &0F: flush buffers (X is the old &C8 setting, normally 0: all)",
+      "comment_inline": "OSBYTE &0F: flush buffers, X = the old &C8 setting",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osbyte_flush_buffer_class",
@@ -542,7 +545,7 @@
         238,
         255
       ],
-      "comment_inline": "...for a fresh prompt",
+      "comment_inline": "...for a fresh prompt for each level",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -555,7 +558,7 @@
         162,
         0
       ],
-      "comment_inline": "Print the prompt, up to and including its zero...",
+      "comment_inline": "Print \"Which level do you wish to reset ?\"...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#0"
@@ -593,7 +596,7 @@
         238,
         255
       ],
-      "comment_inline": "...printed...",
+      "comment_inline": "...printed, the zero too (VDU 0 does nothing)...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -659,7 +662,7 @@
         160,
         26
       ],
-      "comment_inline": "...block's high byte",
+      "comment_inline": "...for the OSWORD call below",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(read_level_block)",
@@ -746,7 +749,7 @@
         169,
         2
       ],
-      "comment_inline": "...at most two characters...",
+      "comment_inline": "...at most two characters: levels 1-24...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#2"
@@ -801,7 +804,7 @@
         169,
         57
       ],
-      "comment_inline": "...to '9'",
+      "comment_inline": "...to '9': digits only",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#'9'",
@@ -874,7 +877,7 @@
         240,
         186
       ],
-      "comment_inline": "Yes: ask again",
+      "comment_inline": "Yes: clear the screen and ask again",
       "type": "code",
       "mnemonic": "beq",
       "operand": "ask_level",
@@ -887,6 +890,9 @@
         192,
         1
       ],
+      "comments_before_label": [
+        "Turn the digits into the level number, and refuse 0 and anything above 24."
+      ],
       "comment_inline": "One digit?",
       "type": "code",
       "mnemonic": "cpy",
@@ -898,7 +904,7 @@
         240,
         27
       ],
-      "comment_inline": "Yes: one digit",
+      "comment_inline": "Yes: levels 1-9",
       "type": "code",
       "mnemonic": "beq",
       "operand": "one_digit",
@@ -1089,7 +1095,7 @@
         208,
         11
       ],
-      "comment_inline": "Check it (falls through only for 00)",
+      "comment_inline": "Check it (00 falls through and is refused)",
       "type": "code",
       "mnemonic": "bne",
       "operand": "check_level",
@@ -1189,7 +1195,7 @@
       "labels": [
         "check_level"
       ],
-      "comment_inline": "25 or more: ask again",
+      "comment_inline": "Beyond level 24, the last it carries?",
       "xref_summaries": [
         "&1986 referenced 1 time by &1979"
       ],
@@ -1222,7 +1228,7 @@
         176,
         140
       ],
-      "comment_inline": "Too high: ask again",
+      "comment_inline": "Too high: clear the screen and ask again",
       "type": "code",
       "mnemonic": "bcs",
       "operand": "ask_level",
@@ -1235,7 +1241,7 @@
         201,
         0
       ],
-      "comment_inline": "0: ask again",
+      "comment_inline": "Level 0?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#0"
@@ -1246,7 +1252,7 @@
         240,
         136
       ],
-      "comment_inline": "Level 0: ask again",
+      "comment_inline": "Yes: no such level, ask again",
       "type": "code",
       "mnemonic": "beq",
       "operand": "ask_level",
@@ -1258,7 +1264,10 @@
       "bytes": [
         170
       ],
-      "comment_inline": "X = level",
+      "comments_before_label": [
+        "Copy the level's original from *DEFAULT to the level buffer at &6B00."
+      ],
+      "comment_inline": "X = level, the count of copies to step",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -1268,7 +1277,7 @@
         169,
         0
       ],
-      "comment_inline": "read_ptr = &1B00...",
+      "comment_inline": "read_ptr = &1B00, one copy before level 1...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#<(level_1_original - level_length)",
@@ -1400,7 +1409,7 @@
         133,
         113
       ],
-      "comment_inline": "...stored back",
+      "comment_inline": "...one copy further on",
       "type": "code",
       "mnemonic": "sta",
       "operand": "read_ptr",
@@ -1446,7 +1455,7 @@
         133,
         114
       ],
-      "comment_inline": "...stored back",
+      "comment_inline": "...completing the step",
       "type": "code",
       "mnemonic": "sta",
       "operand": "read_ptr_hi",
@@ -1525,7 +1534,7 @@
         133,
         116
       ],
-      "comment_inline": "...stored",
+      "comment_inline": "...where the level is saved from",
       "type": "code",
       "mnemonic": "sta",
       "operand": "put_ptr_hi",
@@ -1552,7 +1561,7 @@
       "labels": [
         "copy_level"
       ],
-      "comment_inline": "Copy a byte",
+      "comment_inline": "Copy a byte of the level, still encrypted",
       "xref_summaries": [
         "&19b1 referenced 2 times by &19c5, &19cb"
       ],
@@ -1786,7 +1795,10 @@
         54,
         26
       ],
-      "comment_inline": "Put the digits into the SAVE command",
+      "comments_before_label": [
+        "Save it as LevelN, then offer another level or quit."
+      ],
+      "comment_inline": "Put the digits typed into the SAVE command",
       "type": "code",
       "mnemonic": "lda",
       "operand": "level_digits",
@@ -1858,7 +1870,7 @@
         160,
         26
       ],
-      "comment_inline": "...command's high byte",
+      "comment_inline": "...(X, Y) = the command line",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(save_command)",
@@ -1879,7 +1891,7 @@
         247,
         255
       ],
-      "comment_inline": "...and run it: the level file is restored",
+      "comment_inline": "...replacing LevelN with the original",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -1929,7 +1941,7 @@
         238,
         255
       ],
-      "comment_inline": "...after the SAVE's own output",
+      "comment_inline": "...so the question starts a line of its own",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -1942,7 +1954,7 @@
         162,
         0
       ],
-      "comment_inline": "Print the question, up to and including its zero",
+      "comment_inline": "Print \"Reset another level (A) or quit (Q)\"",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#0"
@@ -1980,7 +1992,7 @@
         238,
         255
       ],
-      "comment_inline": "...printed...",
+      "comment_inline": "...printed, the zero too (VDU 0 does nothing)...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -2083,7 +2095,7 @@
         201,
         65
       ],
-      "comment_inline": "A: another level",
+      "comment_inline": "A, capital only: another level?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#'A'",
@@ -2114,7 +2126,7 @@
         201,
         81
       ],
-      "comment_inline": "Q?",
+      "comment_inline": "Q, capital only: quit?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#'Q'",
@@ -2132,7 +2144,7 @@
         208,
         245
       ],
-      "comment_inline": "No: wait again",
+      "comment_inline": "Neither: wait for another key",
       "type": "code",
       "mnemonic": "bne",
       "operand": "wait_for_answer",
@@ -2146,7 +2158,7 @@
         252,
         255
       ],
-      "comment_inline": "Yes: quit through the reset vector",
+      "comment_inline": "Yes: quit by jumping into the MOS's reset code",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "(reset_vector)",
@@ -2163,7 +2175,7 @@
       "labels": [
         "another_level"
       ],
-      "comment_inline": "Another level",
+      "comment_inline": "Back to the prompt for the next level",
       "xref_summaries": [
         "&1a0a referenced 1 time by &1a01"
       ],

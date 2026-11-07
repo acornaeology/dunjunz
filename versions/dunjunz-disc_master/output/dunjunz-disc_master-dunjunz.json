@@ -202,7 +202,7 @@
       "addr": 9920,
       "name": "load_title_screen",
       "title": "Load the title screen while output is off",
-      "description": "VDU 21, *LOAD SCREEN (the MODE 2 picture, to &3280), VDU 6.",
+      "description": "VDU 21, *LOAD SCREEN (the MODE 2 picture, to &3280), VDU 6. Called by title_start with every colour black, so the picture arrives unseen; VDU 21 keeps any filing system messages off the screen.",
       "on_exit": {
         "A": "corrupted",
         "X": "corrupted",
@@ -213,7 +213,7 @@
       "addr": 9938,
       "name": "leave_title",
       "title": "Blank the display and run Coder",
-      "description": "Blank the display, then choose between CODER and CODER2 by whether a joystick is present. It never returns."
+      "description": "Blank the display, then choose between CODER and CODER2 by whether a joystick is present. It never returns. Called last by title_start, once the game's MODE 2 is selected."
     },
     {
       "addr": 9984,
@@ -267,7 +267,7 @@
       "addr": 10496,
       "name": "twinkle_stars",
       "title": "Twinkle stars on the title screen until a key is pressed",
-      "description": "Up to three stars at once, each at one of the eight places in star_places_x and star_places_y, picked at random. A star grows through frames 0-6 and shrinks back through 5-0. When a key is pressed the stars still showing are erased.",
+      "description": "Up to three stars at once, each at one of the eight places in star_places_x and star_places_y, picked at random. A star grows through frames 0-6 and shrinks back through 5-0. A new star is tried for about one pass in four, by the low bits of the System VIA's timer 1. The keyboard is scanned from key 16 on, so SHIFT and CTRL alone do not end the title. When a key is pressed the stars still showing are erased, though the MODE change that title_start makes next clears the screen anyway.",
       "on_exit": {
         "A": "corrupted",
         "X": "corrupted",
@@ -724,7 +724,7 @@
         160,
         38
       ],
-      "comment_inline": "...command's high byte",
+      "comment_inline": "...(X, Y) = the command line",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(load_code2_command)",
@@ -745,7 +745,7 @@
         247,
         255
       ],
-      "comment_inline": "...and run it: Code2 into private RAM",
+      "comment_inline": "...into HAZEL, at its own load address",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -778,7 +778,7 @@
         160,
         38
       ],
-      "comment_inline": "...command's high byte",
+      "comment_inline": "...(X, Y) = the command line",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(load_code3_command)",
@@ -799,7 +799,7 @@
         247,
         255
       ],
-      "comment_inline": "...and run it: Code3 into private RAM",
+      "comment_inline": "...into HAZEL, at its own load address",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -813,7 +813,7 @@
         173,
         38
       ],
-      "comment_inline": "Load Table and start the title",
+      "comment_inline": "Load Table, then the title",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "load_table",
@@ -922,7 +922,7 @@
         192,
         128
       ],
-      "comment_inline": "High byte &80 (at rest)?",
+      "comment_inline": "High byte &80: a stick centred left-right?",
       "type": "code",
       "mnemonic": "cpy",
       "operand": "#&80"
@@ -946,7 +946,7 @@
         192,
         129
       ],
-      "comment_inline": "High byte &81?",
+      "comment_inline": "High byte &81: just off centre?",
       "type": "code",
       "mnemonic": "cpy",
       "operand": "#&81"
@@ -970,7 +970,7 @@
         162,
         169
       ],
-      "comment_inline": "No joystick: *CODER, which does not return",
+      "comment_inline": "No joystick: *CODER, keyboard only",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#<(coder_command)",
@@ -990,7 +990,7 @@
         160,
         39
       ],
-      "comment_inline": "...command's high byte",
+      "comment_inline": "...(X, Y) = the command line",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(coder_command)",
@@ -1011,7 +1011,7 @@
         247,
         255
       ],
-      "comment_inline": "...and run it; the game takes over from here",
+      "comment_inline": "...never returns: Coder takes over the machine",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -1027,7 +1027,7 @@
       "labels": [
         "run_coder2"
       ],
-      "comment_inline": "Joystick: *CODER2, which does not return",
+      "comment_inline": "Joystick: *CODER2, which installs the handler",
       "xref_summaries": [
         "&2686 referenced 2 times by &2679, &267d"
       ],
@@ -1060,7 +1060,7 @@
         160,
         38
       ],
-      "comment_inline": "...command's high byte",
+      "comment_inline": "...(X, Y) = the command line",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(coder2_command)",
@@ -1081,7 +1081,7 @@
         247,
         255
       ],
-      "comment_inline": "...and run it; the game takes over from here",
+      "comment_inline": "...never returns: it runs *CODER in turn",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -1114,7 +1114,7 @@
       "labels": [
         "blank_display"
       ],
-      "comment_inline": "Send the eleven bytes of blank_display_vdu",
+      "comment_inline": "Send VDU 23,0,1,0,... then VDU 21",
       "xref_summaries": [
         "&2694 referenced 1 time by &26d2"
       ],
@@ -1138,7 +1138,7 @@
       "labels": [
         "blank_display_loop"
       ],
-      "comment_inline": "Next byte of the VDU sequence...",
+      "comment_inline": "Next byte of blank_display_vdu...",
       "xref_summaries": [
         "&2696 referenced 1 time by &269f"
       ],
@@ -1290,7 +1290,7 @@
         160,
         38
       ],
-      "comment_inline": "...command's high byte",
+      "comment_inline": "...(X, Y) = the command line",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(load_table_command)",
@@ -1311,7 +1311,7 @@
         247,
         255
       ],
-      "comment_inline": "...and run it: Table into private RAM",
+      "comment_inline": "...into HAZEL, at its own load address",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -1381,7 +1381,7 @@
         238,
         255
       ],
-      "comment_inline": "...so the load leaves no messages on screen",
+      "comment_inline": "...so the load prints nothing over the picture",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -1394,7 +1394,7 @@
         162,
         152
       ],
-      "comment_inline": "*LOAD SCREEN",
+      "comment_inline": "*LOAD SCREEN: the title picture...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#<(load_screen_command)",
@@ -1414,7 +1414,7 @@
         160,
         39
       ],
-      "comment_inline": "...command's high byte",
+      "comment_inline": "...(X, Y) = the command line",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(load_screen_command)",
@@ -1435,7 +1435,7 @@
         247,
         255
       ],
-      "comment_inline": "...and run it: the picture into screen memory",
+      "comment_inline": "...straight into screen memory at &3280",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -1460,7 +1460,7 @@
         238,
         255
       ],
-      "comment_inline": "...so later text is seen again",
+      "comment_inline": "...so the VDU calls that follow take effect",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -1486,7 +1486,7 @@
       "labels": [
         "leave_title"
       ],
-      "comment_inline": "Blank the display and disable output",
+      "comment_inline": "No characters per row, no VDU output: nothing shows",
       "xref_summaries": [
         "&26d2 referenced 1 time by &2791"
       ],
@@ -1507,7 +1507,7 @@
       "bytes": [
         234
       ],
-      "comment_inline": "Padding",
+      "comment_inline": "Padding: two NOPs that do nothing",
       "type": "code",
       "mnemonic": "nop"
     },
@@ -1516,7 +1516,7 @@
       "bytes": [
         234
       ],
-      "comment_inline": "...the second padding byte",
+      "comment_inline": "...the second",
       "type": "code",
       "mnemonic": "nop"
     },
@@ -1527,7 +1527,7 @@
         112,
         38
       ],
-      "comment_inline": "Run Coder (no return)",
+      "comment_inline": "Run CODER, or CODER2 for a joystick (no return)",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "run_coder",
@@ -1677,7 +1677,7 @@
         244,
         255
       ],
-      "comment_inline": "...so ESCAPE cannot interrupt the title osbyte: escape break effect",
+      "comment_inline": "...so the ESCAPE key cannot stop the program osbyte: escape break effect",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -1690,7 +1690,7 @@
         169,
         4
       ],
-      "comment_inline": "OSBYTE 4, 1: cursor keys return codes",
+      "comment_inline": "OSBYTE 4, 1: no cursor editing...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osbyte_set_cursor_editing",
@@ -1707,7 +1707,7 @@
         162,
         1
       ],
-      "comment_inline": "...X = 1: cursor keys return codes",
+      "comment_inline": "...X = 1: the arrow keys and COPY give codes",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#1"
@@ -1719,7 +1719,7 @@
         244,
         255
       ],
-      "comment_inline": "...so the game can read them as keys Set cursor editing keys",
+      "comment_inline": "...instead of moving an editing cursor Set cursor editing keys",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -1731,6 +1731,9 @@
       "bytes": [
         169,
         0
+      ],
+      "comments_before_label": [
+        "Page &08 bytes that the game never reads."
       ],
       "comment_inline": "Level count = 0, in a byte the game does not read",
       "type": "code",
@@ -1921,6 +1924,9 @@
         169,
         181
       ],
+      "comments_before_label": [
+        "Point the BREAK intercept at &15B5, and disable it."
+      ],
       "comment_inline": "BREAK intercept address = &15B5, which the game does not use...",
       "type": "code",
       "mnemonic": "lda",
@@ -1942,7 +1948,7 @@
         136,
         2
       ],
-      "comment_inline": "...into the intercept's address low byte",
+      "comment_inline": "...as the JMP's address, low byte",
       "type": "code",
       "mnemonic": "sta",
       "operand": "os_break_intercept + 1",
@@ -1954,7 +1960,7 @@
         169,
         21
       ],
-      "comment_inline": "...high byte",
+      "comment_inline": "...high byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#>(game_next_level_intercept)",
@@ -1975,7 +1981,7 @@
         137,
         2
       ],
-      "comment_inline": "...into the intercept's address high byte",
+      "comment_inline": "...completing the JMP's address",
       "type": "code",
       "mnemonic": "sta",
       "operand": "os_break_intercept + 2",
@@ -1999,7 +2005,7 @@
         135,
         2
       ],
-      "comment_inline": "...into &0287, so no JMP: the intercept is off",
+      "comment_inline": "...so a BREAK does not run it",
       "type": "code",
       "mnemonic": "sta",
       "operand": "os_break_intercept",
@@ -2012,7 +2018,10 @@
         162,
         183
       ],
-      "comment_inline": "*TV 255,1: vertical offset for the title's MODE 2",
+      "comments_before_label": [
+        "Show the title picture: select MODE 2 with every colour black, load the picture, then restore the colours."
+      ],
+      "comment_inline": "*TV 255,1: vertical shift -1 line, interlace off",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#<(tv_title_command)",
@@ -2032,7 +2041,7 @@
         160,
         39
       ],
-      "comment_inline": "...command's high byte",
+      "comment_inline": "...(X, Y) = the command line",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(tv_title_command)",
@@ -2053,7 +2062,7 @@
         247,
         255
       ],
-      "comment_inline": "...and run it",
+      "comment_inline": "...taking effect at the MODE change below",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -2067,7 +2076,7 @@
         191,
         39
       ],
-      "comment_inline": "MODE 2, cursor off",
+      "comment_inline": "MODE 2, cursor off, for the title picture",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "mode2_cursor_off",
@@ -2080,7 +2089,7 @@
         162,
         15
       ],
-      "comment_inline": "Make all sixteen logical colours black...",
+      "comment_inline": "Make all sixteen colours black, hiding the load...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&0f"
@@ -2115,7 +2124,7 @@
         238,
         255
       ],
-      "comment_inline": "...VDU 19 starts the palette change...",
+      "comment_inline": "...VDU 19: redefine a logical colour...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -2138,7 +2147,7 @@
         238,
         255
       ],
-      "comment_inline": "...sent as the first parameter",
+      "comment_inline": "...the colour being redefined",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -2151,7 +2160,7 @@
         169,
         0
       ],
-      "comment_inline": "...zero, for the rest of the command",
+      "comment_inline": "...zero for the four remaining bytes",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -2177,7 +2186,7 @@
         238,
         255
       ],
-      "comment_inline": "...first padding byte",
+      "comment_inline": "...then the three bytes VDU 19 also takes",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -2191,7 +2200,7 @@
         238,
         255
       ],
-      "comment_inline": "...second padding byte",
+      "comment_inline": "...second of the three",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -2205,7 +2214,7 @@
         238,
         255
       ],
-      "comment_inline": "...third padding byte",
+      "comment_inline": "...third of the three",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -2241,7 +2250,7 @@
         192,
         38
       ],
-      "comment_inline": "Load the title screen unseen",
+      "comment_inline": "Load the title picture, unseen in black",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "load_title_screen",
@@ -2253,7 +2262,7 @@
       "bytes": [
         234
       ],
-      "comment_inline": "Padding",
+      "comment_inline": "Padding: four NOPs that do nothing",
       "type": "code",
       "mnemonic": "nop"
     },
@@ -2262,7 +2271,7 @@
       "bytes": [
         234
       ],
-      "comment_inline": "...second padding byte",
+      "comment_inline": "...second",
       "type": "code",
       "mnemonic": "nop"
     },
@@ -2271,7 +2280,7 @@
       "bytes": [
         234
       ],
-      "comment_inline": "...third padding byte",
+      "comment_inline": "...third",
       "type": "code",
       "mnemonic": "nop"
     },
@@ -2280,7 +2289,7 @@
       "bytes": [
         234
       ],
-      "comment_inline": "...fourth padding byte",
+      "comment_inline": "...fourth",
       "type": "code",
       "mnemonic": "nop"
     },
@@ -2389,7 +2398,10 @@
         162,
         175
       ],
-      "comment_inline": "*TV 252,1: vertical offset for the game's display",
+      "comments_before_label": [
+        "A key was pressed: select the game's display, then run Coder."
+      ],
+      "comment_inline": "*TV 252,1: vertical shift -4 lines, interlace off",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#<(tv_game_command)",
@@ -2409,7 +2421,7 @@
         160,
         39
       ],
-      "comment_inline": "...command's high byte",
+      "comment_inline": "...(X, Y) = the command line",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(tv_game_command)",
@@ -2430,7 +2442,7 @@
         247,
         255
       ],
-      "comment_inline": "...and run it",
+      "comment_inline": "...taking effect at the MODE change below",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -2444,7 +2456,7 @@
         191,
         39
       ],
-      "comment_inline": "MODE 2, cursor off",
+      "comment_inline": "MODE 2, cursor off: clears the title from the screen",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "mode2_cursor_off",
@@ -2457,7 +2469,7 @@
         162,
         164
       ],
-      "comment_inline": "*DISC",
+      "comment_inline": "*DISC: select DFS...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#<(disc_command)",
@@ -2477,7 +2489,7 @@
         160,
         39
       ],
-      "comment_inline": "...command's high byte",
+      "comment_inline": "...(X, Y) = the command line",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(disc_command)",
@@ -2498,7 +2510,7 @@
         247,
         255
       ],
-      "comment_inline": "...and run it, so Coder loads from disc",
+      "comment_inline": "...so *CODER is looked for on the disc",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -2523,7 +2535,7 @@
         135,
         2
       ],
-      "comment_inline": "...into &0287, the intercept's opcode byte",
+      "comment_inline": "...&0287 = 0, not a JMP",
       "type": "code",
       "mnemonic": "sta",
       "operand": "os_break_intercept",
@@ -2711,7 +2723,7 @@
         238,
         255
       ],
-      "comment_inline": "...selects a mode...",
+      "comment_inline": "...selects a mode, clearing the screen...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -2749,7 +2761,7 @@
         162,
         0
       ],
-      "comment_inline": "Send the eleven bytes of cursor_off_vdu",
+      "comment_inline": "Send VDU 23,0,10,&20,...: cursor off",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#0"
@@ -2764,7 +2776,7 @@
       "labels": [
         "send_cursor_off_vdu"
       ],
-      "comment_inline": "Next byte of the VDU sequence...",
+      "comment_inline": "Next byte of cursor_off_vdu...",
       "xref_summaries": [
         "&27cb referenced 1 time by &27d4"
       ],
@@ -2965,7 +2977,7 @@
       "labels": [
         "title_plot_star"
       ],
-      "comment_inline": "Seven bytes wide...",
+      "comment_inline": "Every star frame is seven bytes wide...",
       "xref_summaries": [
         "&2800 referenced 1 time by &29ca"
       ],
@@ -2985,7 +2997,7 @@
         133,
         114
       ],
-      "comment_inline": "...as the plotter's width",
+      "comment_inline": "...(14 MODE 2 pixels)...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_width",
@@ -2998,7 +3010,7 @@
         169,
         28
       ],
-      "comment_inline": "...and 28 rows high",
+      "comment_inline": "...and 28 pixel rows high...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&1c"
@@ -3009,7 +3021,7 @@
         133,
         115
       ],
-      "comment_inline": "...as the plotter's height",
+      "comment_inline": "...three and a half character rows",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_height",
@@ -3049,7 +3061,7 @@
         133,
         120
       ],
-      "comment_inline": "...into the data pointer",
+      "comment_inline": "...for the byte loop below",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_data_ptr",
@@ -3076,7 +3088,7 @@
         133,
         121
       ],
-      "comment_inline": "...into the data pointer",
+      "comment_inline": "...the frames run on from &2A00",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_data_ptr_hi",
@@ -3090,7 +3102,7 @@
         118,
         40
       ],
-      "comment_inline": "Screen address of the top left",
+      "comment_inline": "Screen address of the star's top left",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "title_screen_address",
@@ -3103,7 +3115,7 @@
         166,
         115
       ],
-      "comment_inline": "For each row...",
+      "comment_inline": "For each pixel row of the frame...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "sprite_height",
@@ -3119,7 +3131,7 @@
       "labels": [
         "plot_star_row"
       ],
-      "comment_inline": "...remember its start...",
+      "comment_inline": "...remember where the row starts...",
       "xref_summaries": [
         "&2819 referenced 1 time by &2873"
       ],
@@ -3141,7 +3153,7 @@
         133,
         118
       ],
-      "comment_inline": "...low byte, to step down from later",
+      "comment_inline": "...to step down one pixel row from later",
       "type": "code",
       "mnemonic": "sta",
       "operand": "row_start_ptr",
@@ -3326,7 +3338,7 @@
         133,
         116
       ],
-      "comment_inline": "...stored back",
+      "comment_inline": "...where the next frame byte goes",
       "type": "code",
       "mnemonic": "sta",
       "operand": "screen_ptr",
@@ -3423,7 +3435,7 @@
         133,
         116
       ],
-      "comment_inline": "...stored back",
+      "comment_inline": "...where the next frame byte goes",
       "type": "code",
       "mnemonic": "sta",
       "operand": "screen_ptr",
@@ -3577,7 +3589,7 @@
         105,
         1
       ],
-      "comment_inline": "...plus one pixel row",
+      "comment_inline": "...plus one: the next byte in the cell",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#1"
@@ -3588,7 +3600,7 @@
         133,
         116
       ],
-      "comment_inline": "...as the new screen pointer",
+      "comment_inline": "...is the next row's first byte",
       "type": "code",
       "mnemonic": "sta",
       "operand": "screen_ptr",
@@ -3625,7 +3637,7 @@
         133,
         117
       ],
-      "comment_inline": "...as the new screen pointer",
+      "comment_inline": "...completing the next row's address",
       "type": "code",
       "mnemonic": "sta",
       "operand": "screen_ptr_hi",
@@ -3708,7 +3720,7 @@
         133,
         116
       ],
-      "comment_inline": "...stored back",
+      "comment_inline": "...the top of the cell below",
       "type": "code",
       "mnemonic": "sta",
       "operand": "screen_ptr",
@@ -3745,7 +3757,7 @@
         133,
         117
       ],
-      "comment_inline": "...stored back",
+      "comment_inline": "...completing the address in the next character row",
       "type": "code",
       "mnemonic": "sta",
       "operand": "screen_ptr_hi",
@@ -3760,7 +3772,7 @@
       "labels": [
         "plot_star_next_row"
       ],
-      "comment_inline": "Next row",
+      "comment_inline": "Recover the row count...",
       "xref_summaries": [
         "&2870 referenced 1 time by &2861"
       ],
@@ -3883,7 +3895,7 @@
         117,
         198
       ],
-      "comment_inline": "High byte of row x 640, from Table's copy of the MOS table...",
+      "comment_inline": "High byte of row x 640, from Table's copy...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "row_offsets,y",
@@ -4001,7 +4013,7 @@
         133,
         116
       ],
-      "comment_inline": "...stored back",
+      "comment_inline": "...the row's byte within each cell",
       "type": "code",
       "mnemonic": "sta",
       "operand": "screen_ptr",
@@ -4105,7 +4117,7 @@
         133,
         117
       ],
-      "comment_inline": "...stored back",
+      "comment_inline": "...in the screen pointer",
       "type": "code",
       "mnemonic": "sta",
       "operand": "screen_ptr_hi",
@@ -4180,7 +4192,7 @@
         133,
         116
       ],
-      "comment_inline": "...stored back",
+      "comment_inline": "...in the screen pointer",
       "type": "code",
       "mnemonic": "sta",
       "operand": "screen_ptr",
@@ -4222,7 +4234,7 @@
       "labels": [
         "title_screen_address_done"
       ],
-      "comment_inline": "Y = 0 for the plotting loop",
+      "comment_inline": "Y = 0 for the plotter's (ptr),Y accesses",
       "xref_summaries": [
         "&28ae referenced 1 time by &28aa"
       ],
@@ -4609,7 +4621,7 @@
         46,
         41
       ],
-      "comment_inline": "...start a star",
+      "comment_inline": "...start a star, if one of the three is free",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "start_star",
@@ -4626,7 +4638,7 @@
       "labels": [
         "twinkle_advance"
       ],
-      "comment_inline": "Advance every star",
+      "comment_inline": "Grow or shrink every star a frame, then pause",
       "xref_summaries": [
         "&2914 referenced 1 time by &290f"
       ],
@@ -4648,7 +4660,7 @@
         169,
         122
       ],
-      "comment_inline": "OSBYTE &7A: any key pressed?",
+      "comment_inline": "OSBYTE &7A: any key other than SHIFT or CTRL?",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osbyte_scan_keyboard_from_16",
@@ -4666,7 +4678,7 @@
         244,
         255
       ],
-      "comment_inline": "...X = &FF if none Scan keyboard from key 16",
+      "comment_inline": "...X = the key number, &FF if none Scan keyboard from key 16",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -4679,7 +4691,7 @@
         224,
         255
       ],
-      "comment_inline": "...no key?",
+      "comment_inline": "...none?",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#&ff"
@@ -4690,7 +4702,7 @@
         240,
         234
       ],
-      "comment_inline": "No: carry on",
+      "comment_inline": "No key: keep twinkling",
       "type": "code",
       "mnemonic": "beq",
       "operand": "twinkle_loop",
@@ -4963,7 +4975,7 @@
         137,
         0
       ],
-      "comment_inline": "...the frame grows",
+      "comment_inline": "...the star starts by growing",
       "type": "code",
       "mnemonic": "sta",
       "operand": "star_frame_step,y",
@@ -5084,7 +5096,7 @@
         224,
         41
       ],
-      "comment_inline": "...that is free",
+      "comment_inline": "...that no other star is using",
       "type": "code",
       "mnemonic": "lda",
       "operand": "star_places_x,x",
@@ -5097,7 +5109,7 @@
         48,
         241
       ],
-      "comment_inline": "Taken (&FF): pick again",
+      "comment_inline": "Taken (&FF): pick again; three stars leave five free",
       "type": "code",
       "mnemonic": "bmi",
       "operand": "pick_place",
@@ -5111,7 +5123,7 @@
         128,
         0
       ],
-      "comment_inline": "Star position from the place...",
+      "comment_inline": "The star's byte column, from the place...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "star_x,y",
@@ -5162,7 +5174,7 @@
         150,
         140
       ],
-      "comment_inline": "...remembering the place",
+      "comment_inline": "...remembering the place, to free it later",
       "type": "code",
       "mnemonic": "stx",
       "operand": "star_place,y",
@@ -5277,7 +5289,7 @@
         240,
         92
       ],
-      "comment_inline": "No: just pause",
+      "comment_inline": "No: just pause, for longer",
       "type": "code",
       "mnemonic": "beq",
       "operand": "star_not_showing",
@@ -5291,7 +5303,7 @@
         185,
         41
       ],
-      "comment_inline": "Erase its frame",
+      "comment_inline": "Erase its frame (plotting it again)",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_star",
@@ -5352,7 +5364,7 @@
         134,
         0
       ],
-      "comment_inline": "...stored back",
+      "comment_inline": "...as the frame to show next",
       "type": "code",
       "mnemonic": "sta",
       "operand": "star_frame,y",
@@ -5370,7 +5382,7 @@
         48,
         16
       ],
-      "comment_inline": "Below 0: finished",
+      "comment_inline": "Shrunk below frame 0: the star has gone",
       "type": "code",
       "mnemonic": "bmi",
       "operand": "star_finished",
@@ -5383,7 +5395,7 @@
         201,
         7
       ],
-      "comment_inline": "Past 6?",
+      "comment_inline": "Grown past frame 6, the largest?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#7"
@@ -5407,7 +5419,7 @@
         169,
         5
       ],
-      "comment_inline": "Yes: frame 5...",
+      "comment_inline": "Yes: frame 5 instead...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#5"
@@ -5419,7 +5431,7 @@
         134,
         0
       ],
-      "comment_inline": "...stored...",
+      "comment_inline": "...so frame 6 shows once at the peak...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "star_frame,y",
@@ -5437,7 +5449,7 @@
         169,
         255
       ],
-      "comment_inline": "...stepping back",
+      "comment_inline": "...and from now on...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&ff"
@@ -5483,7 +5495,7 @@
       "labels": [
         "star_finished"
       ],
-      "comment_inline": "Finished: not showing...",
+      "comment_inline": "Gone: not showing...",
       "xref_summaries": [
         "&2993 referenced 1 time by &2981"
       ],
@@ -5568,7 +5580,7 @@
         16,
         3
       ],
-      "comment_inline": "...(always branches)",
+      "comment_inline": "...then pause (always branches: place 0-7)",
       "type": "code",
       "mnemonic": "bpl",
       "operand": "star_pause",
@@ -5613,7 +5625,7 @@
       "labels": [
         "star_pause"
       ],
-      "comment_inline": "Pause...",
+      "comment_inline": "Pause, setting the twinkle's speed...",
       "xref_summaries": [
         "&29a5 referenced 1 time by &29a0"
       ],
@@ -5641,7 +5653,7 @@
         162,
         5
       ],
-      "comment_inline": "...5 x 256 loops between stars",
+      "comment_inline": "...5 x 255 loops after a star is drawn",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#5"
@@ -5655,7 +5667,7 @@
       "labels": [
         "star_pause_outer"
       ],
-      "comment_inline": "...X x 256 iterations...",
+      "comment_inline": "...X x 255 iterations...",
       "xref_summaries": [
         "&29a9 referenced 2 times by &29af, &29d4"
       ],
@@ -5838,7 +5850,7 @@
         133,
         112
       ],
-      "comment_inline": "...as the plotter's column",
+      "comment_inline": "...the left edge of the frame",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -5870,7 +5882,7 @@
         133,
         113
       ],
-      "comment_inline": "...as the plotter's row",
+      "comment_inline": "...the top of the frame",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -5902,7 +5914,7 @@
         133,
         122
       ],
-      "comment_inline": "...as the frame to plot",
+      "comment_inline": "...selecting one of the seven sizes",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -6004,7 +6016,7 @@
         162,
         20
       ],
-      "comment_inline": "...20 x 256 loops instead of 5 x 256",
+      "comment_inline": "...20 x 255 loops instead of 5 x 255",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&14"

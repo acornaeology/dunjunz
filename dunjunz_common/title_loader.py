@@ -52,25 +52,30 @@ def annotate(d, model_b=False):
         annotate_master_prefix(loader)
 
     loader.sub(0x26C0, "load_title_screen", "Load the title screen while output is off",
-               "VDU 21, *LOAD SCREEN (the MODE 2 picture, to &3280), VDU 6.",
+               "VDU 21, *LOAD SCREEN (the MODE 2 picture, to &3280), VDU 6. "
+               "Called by title_start with every colour black, so the picture "
+               "arrives unseen; VDU 21 keeps any filing system messages off "
+               "the screen.",
                 on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(loader, [
         (0x26C0, "VDU 21: disable VDU output"),
-        (0x26C2, "...so the load leaves no messages on screen"),
-        (0x26C5, "*LOAD SCREEN"),
-        (0x26C7, "...command's high byte"), (0x26C9, "...and run it: the picture into screen memory"),
+        (0x26C2, "...so the load prints nothing over the picture"),
+        (0x26C5, "*LOAD SCREEN: the title picture..."),
+        (0x26C7, "...(X, Y) = the command line"), (0x26C9, "...straight into screen memory at &3280"),
         (0x26CC, "VDU 6: enable VDU output"),
-        (0x26CE, "...so later text is seen again"), (0x26D1, "Return"),
+        (0x26CE, "...so the VDU calls that follow take effect"), (0x26D1, "Return"),
     ])
     d.hook_subroutine(0x26D2, "leave_title", no_return)
     if model_b:
         loader.sub(0x26D2, "leave_title", "Disable VDU output and run Coder",
-                   "VDU 21, then *CODER, which does not return.")
+                   "VDU 21, then *CODER, which does not return. Called last "
+                   "by title_start, after the BREAK intercept is armed. VDU "
+                   "output stays disabled when Coder starts.")
         comments(loader, [
             (0x26D2, "VDU 21: disable VDU output"),
-            (0x26D4, "...so the CODER command's messages stay hidden"),
-            (0x26D7, "*CODER (no return)"),
-            (0x26D9, "...command's high byte"), (0x26DB, "...and run it; the game takes over from here"),
+            (0x26D4, "...so loading Coder prints nothing on the game screen"),
+            (0x26D7, "*CODER: load and run the level loader"),
+            (0x26D9, "...(X, Y) = the command line"), (0x26DB, "...never returns: Coder takes over the machine"),
         ])
         loader.banner(0x26DE, "Unused", "Leftover bytes.")
         loader.byte(0x26DE, 0x22, cols=8)
@@ -78,11 +83,13 @@ def annotate(d, model_b=False):
     else:
         loader.sub(0x26D2, "leave_title", "Blank the display and run Coder",
                    "Blank the display, then choose between CODER and CODER2 "
-                   "by whether a joystick is present. It never returns.")
+                   "by whether a joystick is present. It never returns. "
+                   "Called last by title_start, once the game's MODE 2 is "
+                   "selected.")
         comments(loader, [
-            (0x26D2, "Blank the display and disable output"),
-            (0x26D5, "Padding"), (0x26D6, "...the second padding byte"),
-            (0x26D7, "Run Coder (no return)"),
+            (0x26D2, "No characters per row, no VDU output: nothing shows"),
+            (0x26D5, "Padding: two NOPs that do nothing"), (0x26D6, "...the second"),
+            (0x26D7, "Run CODER, or CODER2 for a joystick (no return)"),
         ])
         loader.banner(0x26DA, "Unused",
                       "Leftover bytes, never run: the tail of a *CODER call "
@@ -111,9 +118,9 @@ def annotate(d, model_b=False):
                 on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(loader, [
         (0x2700, "OSBYTE &C8: ESCAPE disabled..."),
-        (0x2702, "...X = 1: ESCAPE disabled, BREAK as normal..."), (0x2704, "...Y = 0: X replaces the old setting"), (0x2706, "...so ESCAPE cannot interrupt the title"),
-        (0x2709, "OSBYTE 4, 1: cursor keys return codes"),
-        (0x270B, "...X = 1: cursor keys return codes"), (0x270D, "...so the game can read them as keys"),
+        (0x2702, "...X = 1: ESCAPE disabled, BREAK as normal..."), (0x2704, "...Y = 0: X replaces the old setting"), (0x2706, "...so the ESCAPE key cannot stop the program"),
+        (0x2709, "OSBYTE 4, 1: no cursor editing..."),
+        (0x270B, "...X = 1: the arrow keys and COPY give codes"), (0x270D, "...instead of moving an editing cursor"),
         (0x2710, "Levels started = 0, for Coder" if model_b
                  else "Level count = 0, in a byte the game does not read"),
         (0x2712, "...in page &08, which survives a reset"),
@@ -130,20 +137,21 @@ def annotate(d, model_b=False):
                  "intercept)..." if model_b else
                  "BREAK intercept address = &15B5, which the game does "
                  "not use..."),
-        (0x2730, "...into the intercept's address low byte"), (0x2733, "...high byte"), (0x2735, "...into the intercept's address high byte"),
+        (0x2730, "...as the JMP's address, low byte"), (0x2733, "...high byte..."), (0x2735, "...completing the JMP's address"),
         (0x2738, "...disabled for now: &0287 is not a JMP" if model_b
                  else "...but disabled: &0287 is not a JMP"),
-        (0x273A, "...into &0287, so no JMP: the intercept is off"),
-        (0x273D, "*TV 255,1: vertical offset for the title's MODE 2"),
-        (0x273F, "...command's high byte"), (0x2741, "...and run it"),
-        (0x2744, "MODE 2, cursor off"),
-        (0x2747, "Make all sixteen logical colours black..."),
+        (0x273A, "...so a BREAK now does not run the game's code"
+                 if model_b else "...so a BREAK does not run it"),
+        (0x273D, "*TV 255,1: vertical shift -1 line, interlace off"),
+        (0x273F, "...(X, Y) = the command line"), (0x2741, "...taking effect at the MODE change below"),
+        (0x2744, "MODE 2, cursor off, for the title picture"),
+        (0x2747, "Make all sixteen colours black, hiding the load..."),
         (0x2749, "...VDU 19, colour, 0, 0, 0, 0..."),
-        (0x274B, "...VDU 19 starts the palette change..."), (0x274E, "...logical colour X..."), (0x274F, "...sent as the first parameter"), (0x2752, "...zero, for the rest of the command"),
-        (0x2754, "...physical colour 0: black"), (0x2757, "...first padding byte"), (0x275A, "...second padding byte"), (0x275D, "...third padding byte"),
+        (0x274B, "...VDU 19: redefine a logical colour..."), (0x274E, "...logical colour X..."), (0x274F, "...the colour being redefined"), (0x2752, "...zero for the four remaining bytes"),
+        (0x2754, "...physical colour 0: black"), (0x2757, "...then the three bytes VDU 19 also takes"), (0x275A, "...second of the three"), (0x275D, "...third of the three"),
         (0x2760, "Next logical colour"), (0x2761, "Until colours 15 to 0 are all black"),
-        (0x2763, "Load the title screen unseen"),
-        (0x2766, "Padding"), (0x2767, "...second padding byte"), (0x2768, "...third padding byte"), (0x2769, "...fourth padding byte"),
+        (0x2763, "Load the title picture, unseen in black"),
+        (0x2766, "Padding: four NOPs that do nothing"), (0x2767, "...second"), (0x2768, "...third"), (0x2769, "...fourth"),
         (0x276A, "VDU 20: default colours, showing the picture"),
         (0x276C, "...so the loaded picture appears all at once"),
         (0x276F, "Plot the stars left to right"),
@@ -151,18 +159,29 @@ def annotate(d, model_b=False):
         (0x2773, "OSBYTE &15: flush the buffer X"),
         (0x2775, "...X is whatever OSCLI left: buffer unknown"),
         (0x2778, "Twinkle stars until a key is pressed"),
-        (0x277B, "*TV 252,1: vertical offset for the game's display"),
-        (0x277D, "...command's high byte"), (0x277F, "...and run it"),
-        (0x2782, "MODE 2, cursor off"),
-        (0x2785, "*DISC"),
-        (0x2787, "...command's high byte"), (0x2789, "...and run it, so Coder loads from disc"),
-        (0x278C, "Arm the BREAK intercept: &0287 = JMP" if model_b
-                 else "BREAK intercept stays disabled"),
-        (0x278E, "...into &0287, the intercept's opcode byte"),
+        (0x277B, "*TV 252,1: vertical shift -4 lines, interlace off"),
+        (0x277D, "...(X, Y) = the command line"), (0x277F, "...taking effect at the MODE change below"),
+        (0x2782, "MODE 2, cursor off: clears the title from the screen"),
+        (0x2785, "*DISC: select DFS..."),
+        (0x2787, "...(X, Y) = the command line"), (0x2789, "...so *CODER is looked for on the disc"),
+        (0x278C, "Arm the BREAK intercept: &0287 = JMP, so a BREAK..."
+                 if model_b else "BREAK intercept stays disabled"),
+        (0x278E, "...now runs the game's next-level code at &15B5"
+                 if model_b else "...&0287 = 0, not a JMP"),
         (0x2791, ("Disable output" if model_b else "Blank the display")
                  + " and run Coder (no return)"),
         (0x2794, "Padding"), (0x2795, "...never run: leave_title does not return"), (0x2796, "...never run"), (0x2797, "...never run"),
     ])
+    loader.block(0x2710, "Page &08 values for Coder and the game." if model_b
+                 else "Page &08 bytes that the game never reads.")
+    loader.block(0x272E, "Point the BREAK intercept at the game's next-level "
+                 "code, but leave it disabled until Coder is about to run."
+                 if model_b else
+                 "Point the BREAK intercept at &15B5, and disable it.")
+    loader.block(0x273D, "Show the title picture: select MODE 2 with every "
+                 "colour black, load the picture, then restore the colours.")
+    loader.block(0x277B, "A key was pressed: select the game's display, then "
+                 "run Coder.")
     for addr, name, length in [
         (0x2798, "load_screen_command", 11),
         (0x27A4, "disc_command", 4),
@@ -179,9 +198,9 @@ def annotate(d, model_b=False):
                 on_exit={"A": "corrupted", "X": "corrupted", "Y": "preserved"})
     comments(loader, [
         (0x27BF, "VDU 22, 2: MODE 2"),
-        (0x27C1, "...selects a mode..."), (0x27C4, "...mode 2: 16 colours, 20 columns"), (0x27C6, "...sent as the mode number"),
-        (0x27C9, "Send the eleven bytes of cursor_off_vdu"),
-        (0x27CB, "Next byte of the VDU sequence..."), (0x27CE, "...to the VDU drivers"), (0x27D1, "...on to the next"), (0x27D2, "...until all eleven are sent"),
+        (0x27C1, "...selects a mode, clearing the screen..."), (0x27C4, "...mode 2: 16 colours, 20 columns"), (0x27C6, "...sent as the mode number"),
+        (0x27C9, "Send VDU 23,0,10,&20,...: cursor off"),
+        (0x27CB, "Next byte of cursor_off_vdu..."), (0x27CE, "...to the VDU drivers"), (0x27D1, "...on to the next"), (0x27D2, "...until all eleven are sent"),
         (0x27D4, "Not yet: send the next"), (0x27D6, "Return"),
     ])
     loader.banner(0x27D7, "Unused", "Leftover bytes.")
@@ -201,16 +220,16 @@ def annotate(d, model_b=False):
                on_entry={"plot_x": "byte column", "plot_y": "pixel row",
                          "sprite_number": "frame, 0-6"})
     comments(loader, [
-        (0x2800, "Seven bytes wide..."),
-        (0x2802, "...as the plotter's width"),
-        (0x2804, "...and 28 rows high"),
-        (0x2806, "...as the plotter's height"),
+        (0x2800, "Every star frame is seven bytes wide..."),
+        (0x2802, "...(14 MODE 2 pixels)..."),
+        (0x2804, "...and 28 pixel rows high..."),
+        (0x2806, "...three and a half character rows"),
         (0x2808, "Point at the frame's data..."),
-        (0x280A, "...low byte from star_frames_lo"), (0x280D, "...into the data pointer"), (0x280F, "...high byte from star_frames_hi"), (0x2812, "...into the data pointer"),
-        (0x2814, "Screen address of the top left"),
-        (0x2817, "For each row..."),
-        (0x2819, "...remember its start..."),
-        (0x281B, "...low byte, to step down from later"), (0x281D, "...high byte..."), (0x281F, "...kept with the low byte"),
+        (0x280A, "...low byte from star_frames_lo"), (0x280D, "...for the byte loop below"), (0x280F, "...high byte from star_frames_hi"), (0x2812, "...the frames run on from &2A00"),
+        (0x2814, "Screen address of the star's top left"),
+        (0x2817, "For each pixel row of the frame..."),
+        (0x2819, "...remember where the row starts..."),
+        (0x281B, "...to step down one pixel row from later"), (0x281D, "...high byte..."), (0x281F, "...kept with the low byte"),
         (0x2821, "...and keep the row count..."), (0x2822, "...on the stack while X counts bytes"),
         (0x2823, "...for each byte across..."),
         (0x2825, "...exclusive-OR the frame onto the screen..."),
@@ -218,24 +237,24 @@ def annotate(d, model_b=False):
         (0x282B, "...and step a character cell (8 bytes) right or left"),
         (0x282D, "Non-zero: step left instead"),
         (0x282F, "Right..."),
-        (0x2830, "...screen pointer low byte..."), (0x2832, "...plus 8: the next cell to the right"), (0x2834, "...stored back"), (0x2836, "No carry: pointer done"),
+        (0x2830, "...screen pointer low byte..."), (0x2832, "...plus 8: the next cell to the right"), (0x2834, "...where the next frame byte goes"), (0x2836, "No carry: pointer done"),
         (0x2838, "Carry into the high byte"), (0x283A, "...(always branches)"),
         (0x283C, "Left..."),
-        (0x283D, "...screen pointer low byte..."), (0x283F, "...minus 8: the next cell to the left"), (0x2841, "...stored back"), (0x2843, "No borrow: pointer done"),
+        (0x283D, "...screen pointer low byte..."), (0x283F, "...minus 8: the next cell to the left"), (0x2841, "...where the next frame byte goes"), (0x2843, "No borrow: pointer done"),
         (0x2845, "Borrow from the high byte"),
         (0x2847, "Next byte of the frame"),
         (0x2849, "No carry: pointer done"), (0x284B, "Carry into the high byte"),
         (0x284D, "Next byte across"),
         (0x284E, "More bytes in this row: plot the next"),
         (0x2850, "Down one pixel row from the row's start..."),
-        (0x2851, "...from the row's start, low byte..."), (0x2853, "...plus one pixel row"), (0x2855, "...as the new screen pointer"), (0x2857, "...high byte..."),
-        (0x2859, "...with the carry"), (0x285B, "...as the new screen pointer"),
+        (0x2851, "...from the row's start, low byte..."), (0x2853, "...plus one: the next byte in the cell"), (0x2855, "...is the next row's first byte"), (0x2857, "...high byte..."),
+        (0x2859, "...with the carry"), (0x285B, "...completing the next row's address"),
         (0x285D, "...crossing into the next character row every eight "
                  "(640 - 8 bytes on)"),
         (0x285F, "...pixel row within the character row"), (0x2861, "Not 0: still in the same character row"), (0x2863, "Row 0: moved into the next character row..."), (0x2864, "...so add 640 - 8 to the pointer..."),
-        (0x2866, "...low byte of &278..."), (0x2868, "...stored back"), (0x286A, "...high byte..."), (0x286C, "...plus &02 with the carry"),
-        (0x286E, "...stored back"),
-        (0x2870, "Next row"),
+        (0x2866, "...low byte of &278..."), (0x2868, "...the top of the cell below"), (0x286A, "...high byte..."), (0x286C, "...plus &02 with the carry"),
+        (0x286E, "...completing the address in the next character row"),
+        (0x2870, "Recover the row count..."),
         (0x2871, "...into X..."), (0x2872, "...one row fewer to go"), (0x2873, "More rows: plot the next"),
         (0x2875, "Return"),
     ])
@@ -252,21 +271,21 @@ def annotate(d, model_b=False):
         (0x2876, "Character row x 2..."),
         (0x2878, "...divide plot_y by 4..."), (0x2879, "...(character row x 2)..."), (0x287A, "...even, to index the table's byte pairs"), (0x287C, "...into Y"),
         (0x287D, "High byte of row x 640, from the MOS table..." if model_b
-                 else "High byte of row x 640, from Table's copy of the MOS table..."),
+                 else "High byte of row x 640, from Table's copy..."),
         (0x2880, "...plus &3000, the screen start"),
         (0x2881, "...the screen starts at &3000"), (0x2883, "...as the high byte"),
         (0x2885, "Low byte of row x 640"),
         (0x2888, "...as the low byte"),
         (0x288A, "Plus the pixel row within the character row"),
-        (0x288C, "...plot_y MOD 8..."), (0x288E, "...added to the low byte (no carry out)"), (0x2890, "...stored back"),
+        (0x288C, "...plot_y MOD 8..."), (0x288E, "...added to the low byte (no carry out)"), (0x2890, "...the row's byte within each cell"),
         (0x2892, "Plus 8 x byte column: high part..."),
         (0x2893, "...byte column..."), (0x2895, "...top three bits, worth &100 each x 8..."), (0x2897, "...rotated down..."), (0x2898, "...towards the bottom..."),
         (0x2899, "...of the byte..."), (0x289A, "...as bits 2-0: the high byte's share"), (0x289B, "...to add to the high byte..."), (0x289C, "...added..."),
-        (0x289E, "...stored back"),
+        (0x289E, "...in the screen pointer"),
         (0x28A0, "...low part"),
         (0x28A2, "...x 2..."), (0x28A3, "...x 4..."), (0x28A4, "...x 8: eight bytes per character cell"), (0x28A5, "...to add to the low byte..."),
-        (0x28A6, "...added..."), (0x28A8, "...stored back"), (0x28AA, "No carry: address done"), (0x28AC, "Carry into the high byte"),
-        (0x28AE, "Y = 0 for the plotting loop"),
+        (0x28A6, "...added..."), (0x28A8, "...in the screen pointer"), (0x28AA, "No carry: address done"), (0x28AC, "Carry into the high byte"),
+        (0x28AE, "Y = 0 for the plotter's (ptr),Y accesses"),
         (0x28B0, "Return"),
     ])
     loader.banner(0x28B1, "Unused", "Leftover bytes.")
@@ -286,19 +305,23 @@ def annotate(d, model_b=False):
     loader.sub(0x2900, "twinkle_stars", "Twinkle stars on the title screen until a key is pressed",
                "Up to three stars at once, each at one of the eight places in "
                "star_places_x and star_places_y, picked at random. A star grows "
-               "through frames 0-6 and shrinks back through 5-0. When a key is "
-               "pressed the stars still showing are erased.",
+               "through frames 0-6 and shrinks back through 5-0. A new star "
+               "is tried for about one pass in four, by the low bits of the "
+               "System VIA's timer 1. The keyboard is scanned from key 16 on, "
+               "so SHIFT and CTRL alone do not end the title. When a key is "
+               "pressed the stars still showing are erased, though the MODE "
+               "change that title_start makes next clears the screen anyway.",
                 on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(loader, [
         (0x2900, "No stars showing"),
         (0x2902, "...0 for every star"), (0x2904, "...cleared..."), (0x2907, "...next star"), (0x2908, "Until stars 2 to 0 are cleared"),
         (0x290A, "One time in four (System VIA timer 1, low bits)..."),
         (0x290D, "...lowest two bits, 0-3..."), (0x290F, "Not 0: no new star this time"),
-        (0x2911, "...start a star"),
-        (0x2914, "Advance every star"),
-        (0x2917, "OSBYTE &7A: any key pressed?"),
-        (0x2919, "...X = &FF if none"), (0x291C, "...no key?"),
-        (0x291E, "No: carry on"),
+        (0x2911, "...start a star, if one of the three is free"),
+        (0x2914, "Grow or shrink every star a frame, then pause"),
+        (0x2917, "OSBYTE &7A: any key other than SHIFT or CTRL?"),
+        (0x2919, "...X = the key number, &FF if none"), (0x291C, "...none?"),
+        (0x291E, "No key: keep twinkling"),
         (0x2920, "Yes: erase the stars still showing..."),
         (0x2922, "...star Y showing?"), (0x2925, "No: nothing to erase"), (0x2927, "Yes: plot it again to erase it"), (0x292A, "Next star"),
         (0x292B, "Until stars 2 to 0 are done"),
@@ -317,16 +340,16 @@ def annotate(d, model_b=False):
         (0x293B, "Mark it showing"),
         (0x293D, "...in star_showing"),
         (0x2940, "Frame step +1..."),
-        (0x2942, "...the frame grows"),
+        (0x2942, "...the star starts by growing"),
         (0x2945, "...from frame 0"),
         (0x2947, "...the smallest"),
         (0x294A, "Pick a place at random (timer, &FA and &FC mixed)..."),
         (0x294D, "...mixed with OS workspace..."), (0x294F, "...and the last interrupt's A..."), (0x2951, "...one of the eight places"), (0x2953, "...as the place index"),
-        (0x2954, "...that is free"),
-        (0x2957, "Taken (&FF): pick again"),
-        (0x2959, "Star position from the place..."),
+        (0x2954, "...that no other star is using"),
+        (0x2957, "Taken (&FF): pick again; three stars leave five free"),
+        (0x2959, "The star's byte column, from the place..."),
         (0x295C, "...its pixel row..."), (0x295F, "...as the star's row"),
-        (0x2962, "...remembering the place"),
+        (0x2962, "...remembering the place, to free it later"),
         (0x2964, "Mark the place taken"),
         (0x2966, "...by setting its column to &FF"),
         (0x2969, "Plot the first frame"),
@@ -341,27 +364,27 @@ def annotate(d, model_b=False):
     comments(loader, [
         (0x296D, "For each star..."),
         (0x296F, "...showing?"),
-        (0x2972, "No: just pause"),
-        (0x2974, "Erase its frame"),
+        (0x2972, "No: just pause, for longer"),
+        (0x2974, "Erase its frame (plotting it again)"),
         (0x2977, "Step the frame"),
-        (0x2978, "...current frame..."), (0x297B, "...plus the step, +1 or -1..."), (0x297E, "...stored back"),
-        (0x2981, "Below 0: finished"),
-        (0x2983, "Past 6?"),
+        (0x2978, "...current frame..."), (0x297B, "...plus the step, +1 or -1..."), (0x297E, "...as the frame to show next"),
+        (0x2981, "Shrunk below frame 0: the star has gone"),
+        (0x2983, "Grown past frame 6, the largest?"),
         (0x2985, "No: plot it"),
-        (0x2987, "Yes: frame 5..."),
-        (0x2989, "...stored..."),
-        (0x298C, "...stepping back"),
+        (0x2987, "Yes: frame 5 instead..."),
+        (0x2989, "...so frame 6 shows once at the peak..."),
+        (0x298C, "...and from now on..."),
         (0x298E, "...step -1, so the star shrinks"),
         (0x2991, "...and plot it (always branches)"),
-        (0x2993, "Finished: not showing..."),
+        (0x2993, "Gone: not showing..."),
         (0x2995, "...cleared in star_showing..."),
         (0x2998, "...and free its place"),
         (0x299B, "...by putting its column back..."), (0x299D, "...into star_places_x"),
-        (0x29A0, "...(always branches)"),
+        (0x29A0, "...then pause (always branches: place 0-7)"),
         (0x29A2, "Plot the new frame"),
-        (0x29A5, "Pause..."),
-        (0x29A6, "...keeping Y, the star..."), (0x29A7, "...5 x 256 loops between stars"),
-        (0x29A9, "...X x 256 iterations..."),
+        (0x29A5, "Pause, setting the twinkle's speed..."),
+        (0x29A6, "...keeping Y, the star..."), (0x29A7, "...5 x 255 loops after a star is drawn"),
+        (0x29A9, "...X x 255 iterations..."),
         (0x29AB, "...count the inner loop..."), (0x29AC, "Inner loop not done: keep waiting"), (0x29AE, "...count the outer loop..."), (0x29AF, "Outer loop not done: keep waiting"),
         (0x29B1, "...recover the star..."), (0x29B2, "...into Y"),
         (0x29B3, "Next star"),
@@ -374,16 +397,16 @@ def annotate(d, model_b=False):
                on_entry={"Y": "star, 0-2"}, on_exit={"Y": "preserved"})
     comments(loader, [
         (0x29B9, "plot_x = star's column"),
-        (0x29BC, "...as the plotter's column"),
+        (0x29BC, "...the left edge of the frame"),
         (0x29BE, "plot_y = star's row"),
-        (0x29C1, "...as the plotter's row"),
+        (0x29C1, "...the top of the frame"),
         (0x29C3, "sprite_number = star's frame"),
-        (0x29C6, "...as the frame to plot"),
+        (0x29C6, "...selecting one of the seven sizes"),
         (0x29C8, "Plot it, keeping Y"),
         (0x29C9, "...on the stack"), (0x29CA, "...exclusive-OR the frame on screen"), (0x29CD, "...recover the star..."), (0x29CE, "...into Y"),
         (0x29CF, "Return"),
         (0x29D0, "Star not showing: pause for longer..."),
-        (0x29D1, "...keeping Y, the star..."), (0x29D2, "...20 x 256 loops instead of 5 x 256"),
+        (0x29D1, "...keeping Y, the star..."), (0x29D2, "...20 x 255 loops instead of 5 x 255"),
         (0x29D4, "...(always branches)"),
     ])
     for operand_addr, name in [
@@ -542,10 +565,10 @@ def annotate_master_prefix(loader):
                "start-up at title_start.")
     comments(loader, [
         (0x2649, "*LOAD Code2 (the music, at &C700)"),
-        (0x264B, "...command's high byte"), (0x264D, "...and run it: Code2 into private RAM"),
+        (0x264B, "...(X, Y) = the command line"), (0x264D, "...into HAZEL, at its own load address"),
         (0x2650, "*LOAD Code3 (a copy of the sprite plotter, at &D800)"),
-        (0x2652, "...command's high byte"), (0x2654, "...and run it: Code3 into private RAM"),
-        (0x2657, "Load Table and start the title"),
+        (0x2652, "...(X, Y) = the command line"), (0x2654, "...into HAZEL, at its own load address"),
+        (0x2657, "Load Table, then the title"),
     ])
     loader.label(0x265A, "load_code2_command")
     loader.stringcr(0x265A)
@@ -560,14 +583,14 @@ def annotate_master_prefix(loader):
     comments(loader, [
         (0x2670, "OSBYTE &80: read ADC channel 1 (joystick 1, horizontal)..."),
         (0x2672, "...channel 1"), (0x2674, "...Y = the reading's high byte"),
-        (0x2677, "High byte &80 (at rest)?"),
+        (0x2677, "High byte &80: a stick centred left-right?"),
         (0x2679, "Yes: a joystick"),
-        (0x267B, "High byte &81?"),
+        (0x267B, "High byte &81: just off centre?"),
         (0x267D, "Yes: a joystick"),
-        (0x267F, "No joystick: *CODER, which does not return"),
-        (0x2681, "...command's high byte"), (0x2683, "...and run it; the game takes over from here"),
-        (0x2686, "Joystick: *CODER2, which does not return"),
-        (0x2688, "...command's high byte"), (0x268A, "...and run it; the game takes over from here"),
+        (0x267F, "No joystick: *CODER, keyboard only"),
+        (0x2681, "...(X, Y) = the command line"), (0x2683, "...never returns: Coder takes over the machine"),
+        (0x2686, "Joystick: *CODER2, which installs the handler"),
+        (0x2688, "...(X, Y) = the command line"), (0x268A, "...never returns: it runs *CODER in turn"),
     ])
     loader.label(0x268D, "coder2_command")
     loader.stringcr(0x268D)
@@ -577,8 +600,8 @@ def annotate_master_prefix(loader):
                "row, set to 0) and VDU 21, from blank_display_vdu.",
                 on_exit={"A": "corrupted", "X": "11", "Y": "preserved"})
     comments(loader, [
-        (0x2694, "Send the eleven bytes of blank_display_vdu"),
-        (0x2696, "Next byte of the VDU sequence..."), (0x2699, "...to the VDU drivers"), (0x269C, "...on to the next"), (0x269D, "...until all eleven are sent"),
+        (0x2694, "Send VDU 23,0,1,0,... then VDU 21"),
+        (0x2696, "Next byte of blank_display_vdu..."), (0x2699, "...to the VDU drivers"), (0x269C, "...on to the next"), (0x269D, "...until all eleven are sent"),
         (0x269F, "Not yet: send the next"), (0x26A1, "Return"),
     ])
     loader.label(0x26A2, "blank_display_vdu", length=11)
@@ -586,7 +609,7 @@ def annotate_master_prefix(loader):
 
     comments(loader, [
         (0x26AD, "*L. TABLE (level 25, game over, row offsets, pause, at &C5A0)"),
-        (0x26AF, "...command's high byte"), (0x26B1, "...and run it: Table into private RAM"),
+        (0x26AF, "...(X, Y) = the command line"), (0x26B1, "...into HAZEL, at its own load address"),
         (0x26B4, "Carry on with the start-up at title_start"),
     ])
     loader.label(0x26B7, "load_table_command")

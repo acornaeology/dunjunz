@@ -28,7 +28,7 @@
         "length": 206
       },
       {
-        "name": "free_cell",
+        "name": "mark_object_cell",
         "dest": 32128,
         "src": 6656,
         "length": 67
@@ -452,13 +452,13 @@
       "addr": 7187,
       "name": "editor_init",
       "title": "Set up and choose a level",
-      "description": "Disable ESCAPE, point the BREAK intercept at break_to_start and BRKV at MOS 1.20's reset entry (so any error restarts the machine), set the cursor keys and *TV255 1, select MODE 7 and ask whether to edit a level or start a new one. To edit, choose disc or tape and the file, and *LOAD it at &2700."
+      "description": "Disable ESCAPE, point the BREAK intercept at break_to_start (so BREAK at a prompt starts again) and BRKV at MOS 1.20's reset entry (so any error, such as a missing file, resets the machine), and note that no level has been encrypted. Set the map cursor's keys to ',' '.' 'A' 'Z', *TV255 1 (applied by the MODE 7 that follows) and ask whether to edit a level or start a new one. A new level goes to new_level. To edit, choose disc or tape (and the drive), read the filename into load_command, *LOAD the file at &2700 and go to start_editing. Reached from editor_start, from break_to_start and after a save when another level is asked for."
     },
     {
       "addr": 7347,
       "name": "ask_key",
       "title": "Print a prompt and wait for one of its keys",
-      "description": "Print the text at XY up to its '*', flush the input buffer and scan the keyboard until an answer is pressed. With A=0 the answers are the two keys whose internal numbers are in scratch and scratch_hi, and A returns 0 or 1. Otherwise the answers are the digits 0-3 (drive_keys), and the digit is printed.",
+      "description": "Print the text at XY up to its '*', flush the input buffer and scan the keyboard until an answer is pressed. With A=0 the answers are the two keys whose internal numbers are in scratch and scratch_hi, and A returns 0 or 1. Otherwise the answers are the digits 0-3 (drive_keys), and the digit is printed. The keys are read by scanning, so the key pressed is left in the input buffer; ask_filename flushes it. Used for edit or new, disc or tape, the drive, and another level or quit.",
       "on_entry": {
         "A": "0 for two keys, else a drive digit",
         "X": "prompt address, low byte",
@@ -467,14 +467,15 @@
         "scratch_hi": "second key's internal number (A=0)"
       },
       "on_exit": {
-        "A": "0 or 1 for the key pressed (A=0 on entry)"
+        "A": "0 or 1 for the key pressed (A=0 on entry); else the digit's character",
+        "Y": "the digit, 0-3 (A non-zero on entry)"
       }
     },
     {
       "addr": 7706,
       "name": "new_lines",
       "title": "Print a new line and a blank line",
-      "description": "CR, LF, LF.",
+      "description": "CR, LF, LF: spaces out the MODE 7 questions.",
       "on_exit": {
         "A": "corrupted",
         "X": "preserved",
@@ -485,16 +486,16 @@
       "addr": 7720,
       "name": "ask_filename",
       "title": "Ask for a filename",
-      "description": "Pause, flush the input buffer, prompt and read up to seven characters into filename_buffer. If nothing is typed, the name is L.",
+      "description": "Pause, flush the input buffer (which still holds the key that answered ask_key's last question), prompt and read up to seven characters into filename_buffer with OSWORD 0. If only RETURN is typed, write 'L' after the prompt and use the name L. Used for both the file to load and the file to save.",
       "on_exit": {
-        "scratch": "the name's length, with its CR"
+        "scratch": "the name's length, without its CR (at least 1)"
       }
     },
     {
       "addr": 7822,
       "name": "new_level",
       "title": "Start a new, empty level",
-      "description": "Fill the level's wall block with &03, then set up the editing screen as for a loaded level.",
+      "description": "Reached from editor_init when N is chosen. Fill the level's wall block (&30 bytes at &2980) with &03, which choose_wall_block replaces with a block from Stones when the level is saved, then fall into start_editing, which sees new_level_flag set and draws an empty map.",
       "on_exit": {
         "A": "corrupted",
         "X": "corrupted",
@@ -506,7 +507,7 @@
       "addr": 7832,
       "name": "start_editing",
       "title": "Set up the editing screen and edit",
-      "description": "Clear the wall map and the item slots, select MODE 2 with no cursor and 30 rows, copy unpack_level and free_cell to &7B00 and &7D80, mark every cell object-free and every link unused, and zero the counts. For a loaded level, decrypt it, drop any object of type &73 (the Chalice, which only level 25 has and the editor has no sprite for), unpack it and draw it. Then clear the level file's tables, ready for saving, and run the editing loop.",
+      "description": "Reached from editor_init once a level file is loaded, and from new_level. Clear the wall map and the item slots, select MODE 2, disarm the BREAK intercept, set up the edit screen (no cursor, 30 rows, colours 10 and 9), copy unpack_level and mark_object_cell to &7B00 and &7D80, set every bit of the object-free map, free every door-key link, set GCOL 3,3 for the link lines, zero the counts and turn off cursor editing. For a loaded level, decrypt it, take any object of type &73 off the map (the Chalice, which only level 25 has and the editor has no item for), unpack it into the slots and maps, plot every occupied cell and take the exit as placed. Then fill the level file's object, door and key tables with &FF, ready for pack_level to pack the slots into, show the labels and counts, put the cursor at (11, 11) with the wall as the item, the slow cursor on and colour 10 red, and fall into edit_loop.",
       "fall_through": true
     },
     {
@@ -519,7 +520,7 @@
       "addr": 8418,
       "name": "check_door_keys",
       "title": "Check that every door has its key",
-      "description": "Count the links in use and compare with door_count.",
+      "description": "Count the door-key links in use and compare with door_count. A link is made only when a key is placed for a waiting door, and each door has at most one, so equal counts mean that no door lacks its key. The edit loop requires it before saving.",
       "on_exit": {
         "Z": "set if every door has a key"
       }
@@ -528,7 +529,7 @@
       "addr": 8439,
       "name": "key_pressed",
       "title": "Test a key",
-      "description": "OSBYTE &81 with the INKEY number in X.",
+      "description": "The edit loop's key test: OSBYTE &81 with the INKEY number in X.",
       "on_entry": {
         "X": "INKEY number (negative, as a byte)"
       },
@@ -540,7 +541,7 @@
       "addr": 8453,
       "name": "choose_filing_system",
       "title": "Ask for disc or tape",
-      "description": "Disc: *DISC, then ask for the drive (0-3) and *DRIVE it. Tape: *TAPE.",
+      "description": "Called before a level is loaded, by save_level before the filename, and by catalogue before *CAT. Disc: *DISC, then ask for the drive (0-3) and *DRIVE it. Tape: *TAPE.",
       "on_exit": {
         "A": "corrupted",
         "X": "corrupted",
@@ -562,7 +563,7 @@
       "addr": 8524,
       "name": "crypt_level",
       "title": "Encrypt or decrypt the level file",
-      "description": "Exclusive-OR each byte of &2700-&29AF with the low byte of its address, as the game's decrypt_level does at &6B00. Doing it twice restores the bytes.",
+      "description": "Exclusive-OR each byte of &2700-&29AF with the low byte of its address, as the game's decrypt_level does at &6B00. Doing it twice restores the bytes. It decrypts a level once loaded, and save_level uses it to encrypt the level (decrypting it first when it was encrypted by an earlier save).",
       "on_exit": {
         "A": "corrupted",
         "X": "corrupted",
@@ -573,7 +574,7 @@
       "addr": 8562,
       "name": "set_colour_10",
       "title": "Show logical colour 10 as the chosen colour",
-      "description": "VDU 19,10,n,0,0,0 with n from colour_10.",
+      "description": "VDU 19,10,n,0,0,0 with n from colour_10. The edit loop calls it after cursor up or down changes colour_10.",
       "on_entry": {
         "colour_10": "the colour to show"
       },
@@ -587,7 +588,7 @@
       "addr": 8590,
       "name": "show_labels",
       "title": "Print the counts' labels",
-      "description": "In colour 1, at column 16: Objs, Mons and Dors.",
+      "description": "In colour 1, at column 16 beside the map, on rows 0, 4 and 8: Objs, Mons (the trapdoors) and Dors, each above its count. Leaves colour 7 set for the counts.",
       "on_exit": {
         "A": "corrupted",
         "X": "corrupted",
@@ -598,7 +599,7 @@
       "addr": 8624,
       "name": "show_counts",
       "title": "Print the counts",
-      "description": "Objects at (17, 2), trapdoors at (17, 6) and doors at (17, 10).",
+      "description": "Objects at (17, 2), trapdoors at (17, 6) and doors at (17, 10), each under its label. Called when the editor starts and after each SPACE or TAB in the edit loop.",
       "on_exit": {
         "A": "corrupted",
         "X": "corrupted",
@@ -609,7 +610,7 @@
       "addr": 8652,
       "name": "show_cursor_position",
       "title": "Print the cursor's cell",
-      "description": "x at (17, 20) and y at (17, 21).",
+      "description": "x at (17, 20) and y at (17, 21), beside the map. The edit loop calls it every pass.",
       "on_entry": {
         "cursor_x": "the cell's column",
         "cursor_y": "the cell's row"
@@ -635,7 +636,7 @@
       "addr": 8720,
       "name": "wall_edges",
       "title": "Put walls round the edge of the map",
-      "description": "Place a wall in every cell of columns 0 and 31 and rows 0 and 47, as every level has.",
+      "description": "Place a wall in every cell of columns 0 and 31 and rows 0 and 47, through place_item, before a level is packed for saving. It leaves cursor_x, cursor_y and current_item changed. place_item takes the top-left cell, (0, 0), for a wall already whenever a slot is free (see item_at_cursor), so that cell's wall bit is left to save_level.",
       "on_exit": {
         "A": "corrupted",
         "X": "corrupted",
@@ -646,19 +647,19 @@
       "addr": 8772,
       "name": "save_level",
       "title": "Save the level",
-      "description": "Point the BREAK intercept at break_to_save, ask for the level's number (nothing typed: catalogue the disc), take its checksum from level_checksums, set the level's first byte so that its bytes sum to that, encrypt it, choose disc or tape and the filename, *SAVE it and offer another level. Levels 1-24 can be saved; level 25 is in Stones."
+      "description": "Reached from the edit loop once the level is walled in, packed and given its wall block. Point the BREAK intercept at break_to_save and BRKV at the reset entry, disable ESCAPE, ask for the level's number (nothing typed: catalogue), take its checksum from the game's level_checksums, wall the top-left cell, set the level's first byte so that its bytes sum to that checksum, encrypt it, choose disc or tape and the filename, *SAVE it and offer another level. Levels 1-24 can be saved; level 25 is in Stones. It never returns: another level restarts the editor at editor_init, and quitting resets the machine."
     },
     {
       "addr": 9140,
       "name": "catalogue",
       "title": "Catalogue the disc or tape",
-      "description": "Show CAT after the prompt, choose disc or tape, *CAT, then ask for the level number again."
+      "description": "Reached from save_level when RETURN is pressed with no level number. Show CAT after the prompt, as the answer, choose disc or tape, *CAT, then ask for the level number again."
     },
     {
       "addr": 9216,
       "name": "choose_wall_block",
       "title": "Choose the level's wall block",
-      "description": "Clear the screen, show 25 rows, load Stones (the 24 wall blocks) at &6E80, draw them in a grid of four by six and frame the chosen one. Move the frame with ',' '.' (one) and 'A' 'Z' (a row); SPACE copies the chosen block into the level's wall block.",
+      "description": "Called from the edit loop when saving, after the level is packed. Clear the screen, show 25 rows, load Stones (the 24 wall blocks) at &6E80, draw them in a grid of four by six and frame block 0. Move the frame with ',' '.' (one) and 'A' 'Z' (a row), paced by a delay loop; SPACE copies the chosen block into the level's wall block and returns.",
       "on_exit": {
         "A": "corrupted",
         "X": "corrupted",
@@ -680,7 +681,7 @@
       "addr": 9385,
       "name": "move_chooser",
       "title": "Move the chosen wall block",
-      "description": "'.' and ',' move one block on or back, 'Z' and 'A' a row of four; a move off the grid is undone.",
+      "description": "'.' and ',' move one block on or back, 'Z' and 'A' a row of four; a move off the grid is undone. Only one key is taken each call. choose_wall_block compares the two blocks afterwards to see whether the frame must be moved.",
       "on_exit": {
         "chosen_block": "the block now chosen",
         "previous_block": "the block chosen before"
@@ -702,16 +703,22 @@
       "addr": 9488,
       "name": "block_place",
       "title": "Find a wall block's place in the grid",
-      "description": "Block n is at column n mod 4, row n div 4: plot_x = 8 x column + &1A, plot_y = 24 x row + &14.",
+      "description": "Block n is at column n mod 4, row n div 4: plot_x = 8 x column + &1A, plot_y = 24 x row + &14. Each block is 4 bytes by 12 rows, so the grid leaves room for the frame between them.",
       "on_entry": {
         "A": "block number"
+      },
+      "on_exit": {
+        "plot_x": "the block's screen byte column",
+        "plot_y": "its pixel row",
+        "X": "the block number",
+        "C": "clear"
       }
     },
     {
       "addr": 9514,
       "name": "frame_block",
       "title": "Draw or erase the frame round the chosen block",
-      "description": "Plot sprite A (&2A the frame, &2B a blank) one byte left of and two rows above the chosen block, then plot the block again.",
+      "description": "Plot sprite A (&2A the frame, &2B a blank), 6 bytes by 18 rows, one byte left of and three rows above the chosen block, so that it surrounds the 4-byte by 12-row block, then plot the block again inside it.",
       "on_entry": {
         "A": "&2A to frame, &2B to erase"
       }
@@ -720,7 +727,7 @@
       "addr": 9563,
       "name": "show_25_rows",
       "title": "Show 25 rows",
-      "description": "Send VDU 23,0,6,25,0,0,0,0,0,0.",
+      "description": "Send VDU 23,0,6,25,0,0,0,0,0,0: 6845 register 6, the rows displayed, = 25. Row 25 starts at &6E80, where load_stones puts Stones, so the wall-block chooser does not show it.",
       "on_exit": {
         "A": "corrupted",
         "X": "corrupted",
@@ -742,7 +749,7 @@
       "addr": 9897,
       "name": "pack_level",
       "title": "Pack the level for saving",
-      "description": "Pack the item slots, then copy the wall map and the object-free map into the level file.",
+      "description": "Called from the edit loop when saving, after wall_edges. Pack the item slots, then copy the wall map and the object-free map into the level file.",
       "on_exit": {
         "A": "corrupted",
         "X": "corrupted",
@@ -753,7 +760,7 @@
       "addr": 9936,
       "name": "load_stones",
       "title": "Load the wall blocks",
-      "description": "*LOAD STONES (at its own address, &6E80) with VDU output off.",
+      "description": "*LOAD STONES (at its own address, &6E80) with VDU output off. Called by choose_wall_block, with the disc already selected.",
       "on_exit": {
         "A": "corrupted",
         "X": "corrupted",
@@ -764,7 +771,7 @@
       "addr": 11008,
       "name": "move_cursor",
       "title": "Move the cursor",
-      "description": "Wait for the frame, rub out the cursor and put back what is under it, move with ',' '.' 'A' 'Z' within the 32 by 48 map, and plot the current item there as the cursor.",
+      "description": "Called at the start of every edit-loop pass. Wait for the frame, rub out the cursor and put back what is under it, move with ',' '.' 'A' 'Z' within the 32 by 48 map (one step in x and one in y at most), and plot the current item there as the cursor. So the cursor shows what SPACE would place.",
       "on_exit": {
         "A": "corrupted",
         "X": "corrupted",
@@ -784,7 +791,7 @@
       "addr": 11126,
       "name": "item_at_cursor",
       "title": "Find what is in the cursor's cell",
-      "description": "Search the slots for an item at the cursor; failing that, look at the wall map.",
+      "description": "Search the slots for an item at the cursor; failing that, look at the wall map. A free slot is item 0 at (0, 0) (see free_slot), so whenever a slot is free the top-left cell reports a wall, whatever the wall map holds there.",
       "on_exit": {
         "A": "the item's sprite and X its slot; 0 for a wall; &FF for nothing",
         "N": "set for nothing"
@@ -794,7 +801,7 @@
       "addr": 11164,
       "name": "wall_bit",
       "title": "Find the cursor's bit in the wall map",
-      "description": "As the game lays out its maps: the byte at (y AND &F8) x 4 + (y AND 7) + (x AND &F8), bit 7 - (x AND 7).",
+      "description": "As the game lays out its maps: the byte at (y AND &F8) x 4 + (y AND 7) + (x AND &F8), bit 7 - (x AND 7). Used to test, set and clear walls, a door's included.",
       "on_exit": {
         "map_ptr": "address of the byte",
         "bit_mask": "the bit",
@@ -805,7 +812,7 @@
       "addr": 11223,
       "name": "put_item",
       "title": "Put the current item in the cursor's cell",
-      "description": "Clear the cell's object-free bit. A wall sets the wall map's bit; anything else takes a free slot, and a key is recorded as the key of the link being made.",
+      "description": "place_item's last step, once the item is allowed. Clear the cell's object-free bit, for every item, walls included; nothing in the editor sets it again, so deleted items leave clear bits. A wall sets the wall map's bit; anything else takes a free slot, and a key is recorded as the key of the link being made.",
       "on_entry": {
         "cursor_x": "the cell's column",
         "cursor_y": "the cell's row",
@@ -822,7 +829,7 @@
       "addr": 11277,
       "name": "remove_at_cursor",
       "title": "Remove what is in the cursor's cell",
-      "description": "Free an item's slot, or clear a wall's bit in the wall map.",
+      "description": "delete_item's last step. Free an item's slot, or clear a wall's bit in the wall map. Freeing a door's slot leaves its wall bit set, so the cell then shows a wall.",
       "on_entry": {
         "cursor_x": "the cell's column",
         "cursor_y": "the cell's row"
@@ -837,7 +844,7 @@
       "addr": 11305,
       "name": "place_item",
       "title": "Place the current item at the cursor",
-      "description": "In an empty cell, place the current item within the limits: one exit, eight trapdoors, 20 doors (a door is also a wall), 29 objects, and a key only when a door is waiting for one, which links the two. With a key chosen, SPACE on an unlinked door makes it the door waiting for its key.",
+      "description": "In an empty cell, place the current item within the limits: one exit, eight trapdoors, 20 doors (a door is also a wall), 29 objects, and a key only when a door is waiting for one, which links the two. With a key chosen, SPACE on an unlinked door makes it the door waiting for its key (sprite &11), in place of any door waiting before. A door sets its wall bit before its count is checked, so a 21st door is refused but leaves a wall. Called from the edit loop on SPACE and by wall_edges.",
       "on_entry": {
         "cursor_x": "the cell's column",
         "cursor_y": "the cell's row",
@@ -853,7 +860,7 @@
       "addr": 11479,
       "name": "restore_waiting_door",
       "title": "Show the waiting door as it was",
-      "description": "Put the waiting door's own sprite back in its slot and plot it.",
+      "description": "Put the waiting door's own sprite back in its slot and plot it, by falling into plot_slot. Used when its key is placed, and when another door is chosen to wait instead.",
       "on_exit": {
         "A": "corrupted",
         "X": "corrupted",
@@ -865,7 +872,7 @@
       "addr": 11488,
       "name": "plot_slot",
       "title": "Plot a sprite at a slot's cell",
-      "description": "At screen byte column 2x and pixel row 5y of slot X's cell.",
+      "description": "At screen byte column 2x and pixel row 5y of slot X's cell: plot_at_cursor for a cell away from the cursor, such as a deleted door's key.",
       "on_entry": {
         "A": "sprite number",
         "X": "slot"
@@ -875,7 +882,7 @@
       "addr": 11511,
       "name": "find_free_link",
       "title": "Find a free door-key link",
-      "description": "The highest link whose door is &FF.",
+      "description": "The highest link whose door is &FF, for the key being placed for the waiting door. Were none free, link_index would be &FF.",
       "on_exit": {
         "link_index": "the link"
       }
@@ -884,7 +891,7 @@
       "addr": 11525,
       "name": "free_slot",
       "title": "Free a slot",
-      "description": "Zero its item and position.",
+      "description": "Zero its item and position. A free slot is therefore item 0 at (0, 0), as start_editing leaves every slot; item_at_cursor reads that as a wall in the top-left cell.",
       "on_entry": {
         "X": "slot"
       },
@@ -897,7 +904,7 @@
       "addr": 11537,
       "name": "delete_item",
       "title": "Delete what is in the cursor's cell",
-      "description": "Uncount the item and remove it. Deleting a door removes its key too, and deleting a key removes its door (and the door's wall). A waiting door is left alone. A wall is cleared.",
+      "description": "TAB in the edit loop. Uncount the item and remove it. Deleting a door removes its key too but leaves the door's wall bit, so a wall shows where the door was; deleting a key removes its door and the door's wall. A waiting door is left alone. A wall is cleared.",
       "on_entry": {
         "cursor_x": "the cell's column",
         "cursor_y": "the cell's row"
@@ -952,7 +959,7 @@
       "addr": 11830,
       "name": "draw_links",
       "title": "Draw each door-key link as a line",
-      "description": "For each link in use, PLOT 68 at the door's cell and PLOT 5 to its key's: exclusive-OR lines (GCOL 3), so drawing them again rubs them out.",
+      "description": "For each link in use, move to the door's cell (PLOT 68) and draw a line to its key's (PLOT 5). The lines are exclusive-OR (GCOL 3, set at start-up), so the edit loop draws them when CTRL is pressed and again, rubbing them out, when it is released. Each line runs between the cells' top-left corners.",
       "on_exit": {
         "A": "corrupted",
         "X": "corrupted",
@@ -977,7 +984,7 @@
       "move": "unpack",
       "name": "unpack_level",
       "title": "Unpack the loaded level into the slots",
-      "description": "Read the level file's tables from the last entry back, putting each item in the next slot down from &4F: objects (with their editor items found from item_types), each door and then its key (linked), and the trapdoors. Copy the wall map and object-free map. Count the objects and doors.",
+      "description": "Called by start_editing for a loaded, decrypted level. Read the level file's tables from the last entry back, putting each item in the next slot down from &4F: objects 30 to 1 (the exit, 30, first, into slot &4F), skipping any whose x is &80 or more, with their editor items found from item_types; doors 20 to 1, each followed by its key in the slot below and the pair recorded as a door-key link, from link 19 down; then all eight trapdoors. Copy the wall map and object-free map into the editor's own. object_count leaves out the exit (it starts at -1), door_count counts the doors and trapdoor_count is set to 8.",
       "on_exit": {
         "A": "corrupted",
         "X": "corrupted",
@@ -990,21 +997,22 @@
       "move": "unpack",
       "name": "item_for_type",
       "title": "Find the editor's item for a level type",
-      "description": "Search item_types from entry 1 for the type. A type with no item would search on into the bytes beyond.",
+      "description": "Search item_types from entry 1 for the type: an object's type, or a door's sprite &1C or &1D. A type with no item would be matched against the bytes beyond item_types (the checksums and sprite tables), and with no match at all Y would wrap to 0 and run on past the routine's end.",
       "on_entry": {
         "A": "level type"
       },
       "on_exit": {
-        "A": "item"
+        "A": "item",
+        "Y": "item"
       }
     },
     {
       "addr": 32128,
       "binary_addr": 6656,
-      "move": "free_cell",
-      "name": "free_cell",
+      "move": "mark_object_cell",
+      "name": "mark_object_cell",
       "title": "Mark the cursor's cell as holding an object",
-      "description": "Clear its bit in the object-free map (laid out as the wall map).",
+      "description": "Clear its bit in the object-free map (laid out as the wall map), so the game will look for an object there. put_item calls it for every item placed, walls included. It runs at &7D80, copied there by start_editing, in screen memory below the 30 rows shown (&3000-&7AFF).",
       "on_entry": {
         "cursor_x": "the cell's column",
         "cursor_y": "the cell's row"
@@ -1991,7 +1999,7 @@
       "labels": [
         "unpack_object"
       ],
-      "comment_inline": "...in use?",
+      "comment_inline": "...its x: on the map?",
       "xref_summaries": [
         "&1928 referenced 1 time by &7b3b[2]"
       ],
@@ -2263,7 +2271,7 @@
       "labels": [
         "unpack_door"
       ],
-      "comment_inline": "...in use?",
+      "comment_inline": "...its x: on the map?",
       "xref_summaries": [
         "&194f referenced 1 time by &7b8c[2]"
       ],
@@ -2289,7 +2297,7 @@
       ],
       "binary_addr": 6482,
       "move": "unpack",
-      "comment_inline": "&FF: no door here",
+      "comment_inline": "&80 or more (&FF): no door here",
       "type": "code",
       "mnemonic": "bmi",
       "operand": "next_door",
@@ -2353,7 +2361,7 @@
       ],
       "binary_addr": 6492,
       "move": "unpack",
-      "comment_inline": "...the door's slot...",
+      "comment_inline": "...recorded as the link's door...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "link_door,y",
@@ -2584,7 +2592,7 @@
       ],
       "binary_addr": 6534,
       "move": "unpack",
-      "comment_inline": "...and the key in the next",
+      "comment_inline": "Y = the door's slot - 1: the key's slot",
       "type": "code",
       "mnemonic": "dey"
     },
@@ -2752,7 +2760,7 @@
       ],
       "binary_addr": 6558,
       "move": "unpack",
-      "comment_inline": "For trapdoors 7 to 0...",
+      "comment_inline": "For trapdoors 7 to 0, all of them present...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#7"
@@ -3082,7 +3090,7 @@
       "labels": [
         "item_for_type"
       ],
-      "comment_inline": "Keep the type",
+      "comment_inline": "Keep the type to compare with",
       "xref_summaries": [
         "&19ce referenced 2 times by &7b2e[2], &7b6a[2]"
       ],
@@ -3328,9 +3336,9 @@
         129
       ],
       "binary_addr": 6656,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "labels": [
-        "free_cell"
+        "mark_object_cell"
       ],
       "comment_inline": "(y AND &F8) x 4...",
       "xref_summaries": [
@@ -3359,7 +3367,7 @@
         248
       ],
       "binary_addr": 6658,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...the room row, as a multiple of 8...",
       "type": "code",
       "mnemonic": "and",
@@ -3371,7 +3379,7 @@
         10
       ],
       "binary_addr": 6660,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...x 2...",
       "type": "code",
       "mnemonic": "asl"
@@ -3382,7 +3390,7 @@
         10
       ],
       "binary_addr": 6661,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...x 4: 32 bytes per row of rooms",
       "type": "code",
       "mnemonic": "asl"
@@ -3394,7 +3402,7 @@
         133
       ],
       "binary_addr": 6662,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...kept",
       "type": "code",
       "mnemonic": "sta",
@@ -3409,7 +3417,7 @@
         129
       ],
       "binary_addr": 6664,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...+ (y AND 7)...",
       "type": "code",
       "mnemonic": "lda",
@@ -3424,7 +3432,7 @@
         7
       ],
       "binary_addr": 6666,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...the cell's row within the room",
       "type": "code",
       "mnemonic": "and",
@@ -3436,7 +3444,7 @@
         24
       ],
       "binary_addr": 6668,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...C clear for the addition",
       "type": "code",
       "mnemonic": "clc"
@@ -3448,7 +3456,7 @@
         133
       ],
       "binary_addr": 6669,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...added",
       "type": "code",
       "mnemonic": "adc",
@@ -3463,7 +3471,7 @@
         133
       ],
       "binary_addr": 6671,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...kept",
       "type": "code",
       "mnemonic": "sta",
@@ -3478,7 +3486,7 @@
         128
       ],
       "binary_addr": 6673,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...+ (x AND &F8)...",
       "type": "code",
       "mnemonic": "lda",
@@ -3493,7 +3501,7 @@
         248
       ],
       "binary_addr": 6675,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...the room's column x 8: its 8 bytes",
       "type": "code",
       "mnemonic": "and",
@@ -3505,7 +3513,7 @@
         24
       ],
       "binary_addr": 6677,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...C clear for the addition",
       "type": "code",
       "mnemonic": "clc"
@@ -3517,7 +3525,7 @@
         133
       ],
       "binary_addr": 6678,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...added",
       "type": "code",
       "mnemonic": "adc",
@@ -3532,7 +3540,7 @@
         133
       ],
       "binary_addr": 6680,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...map_ptr: the cell's byte",
       "type": "code",
       "mnemonic": "sta",
@@ -3547,7 +3555,7 @@
         126
       ],
       "binary_addr": 6682,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...in object_free_map",
       "type": "code",
       "mnemonic": "lda",
@@ -3569,7 +3577,7 @@
         134
       ],
       "binary_addr": 6684,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...high byte",
       "type": "code",
       "mnemonic": "sta",
@@ -3584,7 +3592,7 @@
         128
       ],
       "binary_addr": 6686,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "Bit 7 - (x AND 7)...",
       "type": "code",
       "mnemonic": "lda",
@@ -3599,7 +3607,7 @@
         7
       ],
       "binary_addr": 6688,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...the cell's column within the room...",
       "type": "code",
       "mnemonic": "and",
@@ -3612,7 +3620,7 @@
         132
       ],
       "binary_addr": 6690,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...kept...",
       "type": "code",
       "mnemonic": "sta",
@@ -3627,7 +3635,7 @@
         7
       ],
       "binary_addr": 6692,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...from 7...",
       "type": "code",
       "mnemonic": "lda",
@@ -3639,7 +3647,7 @@
         56
       ],
       "binary_addr": 6694,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...C set for the subtraction",
       "type": "code",
       "mnemonic": "sec"
@@ -3651,7 +3659,7 @@
         132
       ],
       "binary_addr": 6695,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...7 - it: the bit, leftmost cell in bit 7",
       "type": "code",
       "mnemonic": "sbc",
@@ -3666,14 +3674,14 @@
         9
       ],
       "binary_addr": 6697,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "Bit 0: the mask is 1",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "free_bit_0",
+      "operand": "mark_bit_0",
       "target": 32180,
-      "target_move": "free_cell",
-      "target_label": "free_bit_0"
+      "target_move": "mark_object_cell",
+      "target_label": "mark_bit_0"
     },
     {
       "addr": 32171,
@@ -3681,7 +3689,7 @@
         170
       ],
       "binary_addr": 6699,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...as a count...",
       "type": "code",
       "mnemonic": "tax"
@@ -3693,7 +3701,7 @@
         1
       ],
       "binary_addr": 6700,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...from bit 0...",
       "type": "code",
       "mnemonic": "lda",
@@ -3705,9 +3713,9 @@
         10
       ],
       "binary_addr": 6702,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "labels": [
-        "free_shift_bit"
+        "mark_shift_bit"
       ],
       "comment_inline": "Shift the mask up a bit...",
       "xref_summaries": [
@@ -3717,7 +3725,7 @@
         {
           "addr": 32176,
           "kind": "direct",
-          "move": "free_cell",
+          "move": "mark_object_cell",
           "move_id": 3
         }
       ],
@@ -3730,7 +3738,7 @@
         202
       ],
       "binary_addr": 6703,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...counted",
       "type": "code",
       "mnemonic": "dex"
@@ -3742,14 +3750,14 @@
         252
       ],
       "binary_addr": 6704,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...until it is in place",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "free_shift_bit",
+      "operand": "mark_shift_bit",
       "target": 32174,
-      "target_move": "free_cell",
-      "target_label": "free_shift_bit"
+      "target_move": "mark_object_cell",
+      "target_label": "mark_shift_bit"
     },
     {
       "addr": 32178,
@@ -3758,14 +3766,14 @@
         2
       ],
       "binary_addr": 6706,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...(always branches)",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "free_bit_found",
+      "operand": "mark_bit_found",
       "target": 32182,
-      "target_move": "free_cell",
-      "target_label": "free_bit_found"
+      "target_move": "mark_object_cell",
+      "target_label": "mark_bit_found"
     },
     {
       "addr": 32180,
@@ -3774,9 +3782,9 @@
         1
       ],
       "binary_addr": 6708,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "labels": [
-        "free_bit_0"
+        "mark_bit_0"
       ],
       "comment_inline": "...mask 1",
       "xref_summaries": [
@@ -3786,7 +3794,7 @@
         {
           "addr": 32169,
           "kind": "direct",
-          "move": "free_cell",
+          "move": "mark_object_cell",
           "move_id": 3
         }
       ],
@@ -3801,9 +3809,9 @@
         255
       ],
       "binary_addr": 6710,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "labels": [
-        "free_bit_found"
+        "mark_bit_found"
       ],
       "comment_inline": "Clear it",
       "xref_summaries": [
@@ -3813,7 +3821,7 @@
         {
           "addr": 32178,
           "kind": "direct",
-          "move": "free_cell",
+          "move": "mark_object_cell",
           "move_id": 3
         }
       ],
@@ -3828,7 +3836,7 @@
         132
       ],
       "binary_addr": 6712,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...as a mask",
       "type": "code",
       "mnemonic": "sta",
@@ -3843,7 +3851,7 @@
         0
       ],
       "binary_addr": 6714,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...Y = 0",
       "type": "code",
       "mnemonic": "ldy",
@@ -3856,7 +3864,7 @@
         133
       ],
       "binary_addr": 6716,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...the map byte...",
       "type": "code",
       "mnemonic": "lda",
@@ -3871,7 +3879,7 @@
         132
       ],
       "binary_addr": 6718,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...with the cell's bit cleared: objects may lie here",
       "type": "code",
       "mnemonic": "and",
@@ -3886,7 +3894,7 @@
         133
       ],
       "binary_addr": 6720,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "...back in the map",
       "type": "code",
       "mnemonic": "sta",
@@ -3900,7 +3908,7 @@
         96
       ],
       "binary_addr": 6722,
-      "move": "free_cell",
+      "move": "mark_object_cell",
       "comment_inline": "Return",
       "type": "code",
       "mnemonic": "rts"
@@ -4992,7 +5000,7 @@
         136,
         2
       ],
-      "comment_inline": "...low byte...",
+      "comment_inline": "...its low byte...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "os_break_intercept_lo",
@@ -5026,7 +5034,7 @@
         137,
         2
       ],
-      "comment_inline": "...high byte: BREAK restarts the editor",
+      "comment_inline": "...so BREAK at a prompt restarts the editor",
       "type": "code",
       "mnemonic": "sta",
       "operand": "os_break_intercept_hi",
@@ -5094,7 +5102,7 @@
         3,
         2
       ],
-      "comment_inline": "...high byte: a filing error resets",
+      "comment_inline": "...so any error (File not found...) resets",
       "type": "code",
       "mnemonic": "sta",
       "operand": "brkv + 1",
@@ -5118,7 +5126,7 @@
         250,
         37
       ],
-      "comment_inline": "Nothing has been encrypted for saving yet",
+      "comment_inline": "...so the level at &2700 is plain until saved",
       "type": "code",
       "mnemonic": "sta",
       "operand": "level_encrypted",
@@ -5131,7 +5139,7 @@
         169,
         153
       ],
-      "comment_inline": "Cursor keys: left...",
+      "comment_inline": "Map cursor keys: left...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#inkey_key_comma",
@@ -5143,7 +5151,7 @@
         133,
         135
       ],
-      "comment_inline": "Comma moves the cursor left",
+      "comment_inline": "Comma moves the map cursor left",
       "type": "code",
       "mnemonic": "sta",
       "operand": "key_left",
@@ -5261,7 +5269,7 @@
         162,
         123
       ],
-      "comment_inline": "*TV255 1: move the picture down a line, interlace off",
+      "comment_inline": "*TV255 1: shift the picture a line, interlace off",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#<(tv_command)",
@@ -5302,7 +5310,7 @@
         247,
         255
       ],
-      "comment_inline": "Steady the picture for MODE 7 prompts",
+      "comment_inline": "...taking effect at the MODE 7 change below",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -5504,7 +5512,7 @@
         240,
         37
       ],
-      "comment_inline": "Remember the choice: 1 for a new level",
+      "comment_inline": "Remember the choice for start_editing: 1 for new",
       "type": "code",
       "mnemonic": "sta",
       "operand": "new_level_flag",
@@ -5517,7 +5525,7 @@
         240,
         3
       ],
-      "comment_inline": "Edit?",
+      "comment_inline": "E: edit a level file",
       "type": "code",
       "mnemonic": "beq",
       "operand": "edit_level",
@@ -5531,7 +5539,7 @@
         142,
         30
       ],
-      "comment_inline": "New: start with an empty level",
+      "comment_inline": "N: start with an empty level",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "new_level",
@@ -5548,7 +5556,7 @@
       "labels": [
         "edit_level"
       ],
-      "comment_inline": "Edit: new line",
+      "comment_inline": "Leave a blank line under the question",
       "xref_summaries": [
         "&1c7d referenced 1 time by &1c78"
       ],
@@ -5571,7 +5579,7 @@
         5,
         33
       ],
-      "comment_inline": "Choose disc or tape",
+      "comment_inline": "Choose disc or tape (and the drive)",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "choose_filing_system",
@@ -5659,7 +5667,7 @@
         208,
         248
       ],
-      "comment_inline": "...so no old name is left",
+      "comment_inline": "...so no longer earlier name is left in it",
       "type": "code",
       "mnemonic": "bne",
       "operand": "blank_load_name",
@@ -5673,7 +5681,7 @@
         40,
         30
       ],
-      "comment_inline": "Ask for the filename",
+      "comment_inline": "Read the filename (L if none is typed)",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "ask_filename",
@@ -5698,7 +5706,7 @@
         238,
         255
       ],
-      "comment_inline": "Move below the typed name",
+      "comment_inline": "Leave a blank line under the typed name",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -5711,7 +5719,7 @@
         169,
         32
       ],
-      "comment_inline": "End the filename field with a space",
+      "comment_inline": "A space at the name's last character...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#' '",
@@ -5730,7 +5738,7 @@
         104,
         29
       ],
-      "comment_inline": "...so *LOAD sees the address after it",
+      "comment_inline": "...already blank: the space at +12 ends the name",
       "type": "code",
       "mnemonic": "sta",
       "operand": "load_command + 11",
@@ -5801,7 +5809,7 @@
         228,
         114
       ],
-      "comment_inline": "...for as many as were typed...",
+      "comment_inline": "...for the name's length, without its CR...",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "scratch",
@@ -5868,7 +5876,7 @@
         247,
         255
       ],
-      "comment_inline": "Load the level file at &2700",
+      "comment_inline": "Load the level file at &2700, still encrypted",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -5882,7 +5890,7 @@
         152,
         30
       ],
-      "comment_inline": "Edit it",
+      "comment_inline": "Edit it: start_editing decrypts and draws it",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "start_editing",
@@ -5897,7 +5905,7 @@
       "labels": [
         "ask_key"
       ],
-      "comment_inline": "Keep the mode",
+      "comment_inline": "Keep the mode: 0 for two answer keys, else digits",
       "xref_summaries": [
         "&1cb3 referenced 4 times by &1c72, &2113, &2128, &238d"
       ],
@@ -6091,7 +6099,7 @@
       "labels": [
         "scan_keys"
       ],
-      "comment_inline": "OSBYTE &7A: X = the internal number of a key pressed",
+      "comment_inline": "OSBYTE &7A: scan the keyboard from key 16...",
       "xref_summaries": [
         "&1ccb referenced 2 times by &1cdf, &1cf1"
       ],
@@ -6122,7 +6130,7 @@
         244,
         255
       ],
-      "comment_inline": "Scan: X = the internal number of a key held Scan keyboard from key 16",
+      "comment_inline": "...X = the internal number of a key held, or &FF Scan keyboard from key 16",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -6247,7 +6255,7 @@
         48,
         234
       ],
-      "comment_inline": "No: scan again",
+      "comment_inline": "Not a drive digit: scan again",
       "type": "code",
       "mnemonic": "bmi",
       "operand": "scan_keys",
@@ -6262,7 +6270,7 @@
       "labels": [
         "digit_pressed"
       ],
-      "comment_inline": "Yes: print the digit",
+      "comment_inline": "Drop the kept mode",
       "xref_summaries": [
         "&1ce1 referenced 1 time by &1cda"
       ],
@@ -6330,7 +6338,7 @@
       "bytes": [
         96
       ],
-      "comment_inline": "Return",
+      "comment_inline": "Return the digit's character, for *DRIVE",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -6400,7 +6408,7 @@
         208,
         216
       ],
-      "comment_inline": "No: scan again",
+      "comment_inline": "Neither answer: scan again",
       "type": "code",
       "mnemonic": "bne",
       "operand": "scan_keys",
@@ -6412,7 +6420,7 @@
       "bytes": [
         104
       ],
-      "comment_inline": "Second: A = 1",
+      "comment_inline": "Second: drop the kept mode",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -6444,7 +6452,7 @@
       "labels": [
         "first_key"
       ],
-      "comment_inline": "First: A = 0",
+      "comment_inline": "First: drop the kept mode",
       "xref_summaries": [
         "&1cf7 referenced 1 time by &1ced"
       ],
@@ -6517,6 +6525,7 @@
       "labels": [
         "edit_or_new_prompt"
       ],
+      "comment_inline": "editor_init's first question, for ask_key",
       "type": "string",
       "string": "Edit (E) or start new level (N) *"
     },
@@ -6549,6 +6558,7 @@
       "labels": [
         "disc_or_tape_prompt"
       ],
+      "comment_inline": "choose_filing_system's question, for ask_key",
       "type": "string",
       "string": "Disc (D) or tape (T) *"
     },
@@ -6568,6 +6578,7 @@
       "labels": [
         "filename_prompt"
       ],
+      "comment_inline": "Printed by ask_filename; the name is typed after it",
       "xref_summaries": [
         "&1d32 used as index base 1 time by &1e3d"
       ],
@@ -6611,6 +6622,7 @@
       "labels": [
         "drive_prompt"
       ],
+      "comment_inline": "Asked after *DISC; answered with a digit 0-3",
       "type": "string",
       "string": "Which drive *"
     },
@@ -7157,6 +7169,7 @@
       "labels": [
         "level_number_prompt"
       ],
+      "comment_inline": "Asked when saving: the level number",
       "xref_summaries": [
         "&1dc7 used as index base 1 time by &2272"
       ],
@@ -7198,6 +7211,7 @@
       "labels": [
         "save_command"
       ],
+      "comment_inline": "*SAVE the &2B0-byte level file from &2700",
       "xref_summaries": [
         "&1de5 used as index base 1 time by &2356",
         "&1dea used as index base 1 time by &236b"
@@ -7249,6 +7263,7 @@
       "labels": [
         "another_prompt"
       ],
+      "comment_inline": "Asked after a save, for ask_key",
       "type": "string",
       "string": "Another level (A) or quit (Q) *"
     },
@@ -7465,7 +7480,7 @@
         208,
         247
       ],
-      "comment_inline": "...so the keys of the last answer are let go",
+      "comment_inline": "...a short wait after the last answer",
       "type": "code",
       "mnemonic": "bne",
       "operand": "pause_outer",
@@ -7496,7 +7511,7 @@
         244,
         255
       ],
-      "comment_inline": "Discard keys left from the last answer Flush selected class of buffer",
+      "comment_inline": "Drop the answer key, so it is not read as the name Flush selected class of buffer",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -7510,7 +7525,7 @@
         26,
         30
       ],
-      "comment_inline": "New line",
+      "comment_inline": "Leave a blank line before the prompt",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "new_lines",
@@ -7831,7 +7846,7 @@
         132,
         114
       ],
-      "comment_inline": "Keep its length",
+      "comment_inline": "Keep its length, not counting the CR",
       "type": "code",
       "mnemonic": "sty",
       "operand": "scratch",
@@ -7855,7 +7870,7 @@
         208,
         29
       ],
-      "comment_inline": "Yes: return",
+      "comment_inline": "A name was typed: return",
       "type": "code",
       "mnemonic": "bne",
       "operand": "filename_read",
@@ -7868,7 +7883,7 @@
         169,
         11
       ],
-      "comment_inline": "No: move up a line...",
+      "comment_inline": "Only RETURN: VDU 11, up a line...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&0b"
@@ -7893,7 +7908,7 @@
         169,
         9
       ],
-      "comment_inline": "...and right nine places...",
+      "comment_inline": "...and VDU 9, right...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#9"
@@ -7950,7 +7965,7 @@
         208,
         250
       ],
-      "comment_inline": "...past the prompt",
+      "comment_inline": "...past 'Filename '",
       "type": "code",
       "mnemonic": "bne",
       "operand": "move_right",
@@ -8008,7 +8023,7 @@
       "bytes": [
         200
       ],
-      "comment_inline": "Length 1",
+      "comment_inline": "Length 1 (Y is 0 after the loop)",
       "type": "code",
       "mnemonic": "iny"
     },
@@ -8032,7 +8047,7 @@
         231,
         255
       ],
-      "comment_inline": "New line",
+      "comment_inline": "New line, as RETURN gave before",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osnewl",
@@ -8089,7 +8104,7 @@
         162,
         47
       ],
-      "comment_inline": "...for all its bytes...",
+      "comment_inline": "...for all &30 bytes...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#wall_block_bytes - 1",
@@ -8148,7 +8163,7 @@
         16,
         250
       ],
-      "comment_inline": "...to the first",
+      "comment_inline": "...to the first, then fall into start_editing",
       "type": "code",
       "mnemonic": "bpl",
       "operand": "fill_wall_block",
@@ -8289,7 +8304,7 @@
         169,
         0
       ],
-      "comment_inline": "Cursor showing",
+      "comment_inline": "Cursor flash phase 0...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -8301,7 +8316,7 @@
         245,
         37
       ],
-      "comment_inline": "...from the start",
+      "comment_inline": "...so the first wall pass plots the cursor",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cursor_flash",
@@ -8314,7 +8329,7 @@
         169,
         0
       ],
-      "comment_inline": "First link",
+      "comment_inline": "Door-key link 0...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -8326,7 +8341,7 @@
         216,
         13
       ],
-      "comment_inline": "...is filled first",
+      "comment_inline": "...is the first to be made",
       "type": "code",
       "mnemonic": "sta",
       "operand": "link_index",
@@ -8376,7 +8391,7 @@
         238,
         255
       ],
-      "comment_inline": "...the map's colourful edit screen",
+      "comment_inline": "...the 16-colour screen the map is drawn on",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -8389,7 +8404,7 @@
         169,
         0
       ],
-      "comment_inline": "Disable the BREAK intercept",
+      "comment_inline": "Not a JMP: disarm the BREAK intercept...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -8401,7 +8416,7 @@
         135,
         2
       ],
-      "comment_inline": "...so BREAK now resets normally",
+      "comment_inline": "...so BREAK while editing is an ordinary reset",
       "type": "code",
       "mnemonic": "sta",
       "operand": "os_break_intercept",
@@ -8466,7 +8481,7 @@
         0,
         123
       ],
-      "comment_inline": "...into the workspace it runs in...",
+      "comment_inline": "...to &7B00, where it runs...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "unpack_level,x",
@@ -8513,7 +8528,7 @@
         162,
         0
       ],
-      "comment_inline": "...and free_cell to &7D80",
+      "comment_inline": "...and mark_object_cell to &7D80",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#0"
@@ -8526,7 +8541,7 @@
         26
       ],
       "labels": [
-        "copy_free_cell"
+        "copy_mark_object_cell"
       ],
       "comment_inline": "Take a byte of the stored routine...",
       "xref_summaries": [
@@ -8540,9 +8555,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "free_cell_image,x",
+      "operand": "mark_object_cell_image,x",
       "target": 6656,
-      "target_label": "free_cell_image"
+      "target_label": "mark_object_cell_image"
     },
     {
       "addr": 7893,
@@ -8551,13 +8566,13 @@
         128,
         125
       ],
-      "comment_inline": "...into the workspace it runs in...",
+      "comment_inline": "...to &7D80, where it runs...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "free_cell,x",
+      "operand": "mark_object_cell,x",
       "target": 32128,
-      "target_move": "free_cell",
-      "target_label": "free_cell"
+      "target_move": "mark_object_cell",
+      "target_label": "mark_object_cell"
     },
     {
       "addr": 7896,
@@ -8574,7 +8589,7 @@
         224,
         67
       ],
-      "comment_inline": "...for free_cell's &43 bytes...",
+      "comment_inline": "...for mark_object_cell's &43 bytes...",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#&43"
@@ -8588,9 +8603,9 @@
       "comment_inline": "...until it is all copied",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "copy_free_cell",
+      "operand": "copy_mark_object_cell",
       "target": 7890,
-      "target_label": "copy_free_cell"
+      "target_label": "copy_mark_object_cell"
     },
     {
       "addr": 7901,
@@ -8672,7 +8687,7 @@
       "labels": [
         "clear_links"
       ],
-      "comment_inline": "...and all 20 links unused",
+      "comment_inline": "...and &FF: all 20 door-key links unused",
       "xref_summaries": [
         "&1ee7 referenced 1 time by &1ef0"
       ],
@@ -8755,7 +8770,7 @@
         214,
         13
       ],
-      "comment_inline": "No door waiting for a key",
+      "comment_inline": "&FF: no door waiting for its key",
       "type": "code",
       "mnemonic": "sta",
       "operand": "pending_door_item",
@@ -8895,7 +8910,7 @@
         169,
         4
       ],
-      "comment_inline": "OSBYTE 4,1: cursor keys give codes",
+      "comment_inline": "OSBYTE 4,1: cursor editing off...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osbyte_set_cursor_editing",
@@ -8912,7 +8927,7 @@
         162,
         1
       ],
-      "comment_inline": "X = 1: so they move the cursor",
+      "comment_inline": "...X = 1: the arrow keys give codes &88-&8B",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#1"
@@ -8924,7 +8939,7 @@
         244,
         255
       ],
-      "comment_inline": "Set it, so the cursor keys can move the cursor Set cursor editing keys",
+      "comment_inline": "Set it; the editor reads the arrow keys by scanning Set cursor editing keys",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -8964,7 +8979,7 @@
         169,
         0
       ],
-      "comment_inline": "Yes: first link",
+      "comment_inline": "Yes: link_index = 0...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -8976,7 +8991,7 @@
         216,
         13
       ],
-      "comment_inline": "...is joined first",
+      "comment_inline": "...again (it was set above)",
       "type": "code",
       "mnemonic": "sta",
       "operand": "link_index",
@@ -8989,7 +9004,7 @@
         240,
         72
       ],
-      "comment_inline": "...(always branches)",
+      "comment_inline": "...and clear the level tables (always branches)",
       "type": "code",
       "mnemonic": "beq",
       "operand": "clear_level_tables",
@@ -9006,7 +9021,7 @@
       "labels": [
         "unpack_loaded"
       ],
-      "comment_inline": "Decrypt the level",
+      "comment_inline": "Decrypt the loaded level in place at &2700",
       "xref_summaries": [
         "&1f1f referenced 1 time by &1f16"
       ],
@@ -9130,7 +9145,7 @@
         240,
         8
       ],
-      "comment_inline": "None",
+      "comment_inline": "No Chalice: unpack the level as it is",
       "type": "code",
       "mnemonic": "beq",
       "operand": "draw_loaded",
@@ -9173,7 +9188,7 @@
         0,
         39
       ],
-      "comment_inline": "...so it is not unpacked: the editor...",
+      "comment_inline": "...so unpack_level skips it: the editor...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "level_object_x,x",
@@ -9193,7 +9208,7 @@
         32,
         39
       ],
-      "comment_inline": "...cannot place the Chalice",
+      "comment_inline": "...has no item for the Chalice",
       "type": "code",
       "mnemonic": "sta",
       "operand": "level_object_y,x",
@@ -9248,7 +9263,7 @@
         176,
         33
       ],
-      "comment_inline": "...and the counts",
+      "comment_inline": "...and the unpacked level's counts",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "show_counts",
@@ -9325,7 +9340,7 @@
       "labels": [
         "draw_cell"
       ],
-      "comment_inline": "...what is here?",
+      "comment_inline": "...the item in this cell, if any",
       "xref_summaries": [
         "&1f49 referenced 1 time by &1f59"
       ],
@@ -9347,7 +9362,7 @@
         201,
         255
       ],
-      "comment_inline": "&FF: an empty cell",
+      "comment_inline": "&FF: nothing here",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&ff"
@@ -9358,7 +9373,7 @@
         240,
         3
       ],
-      "comment_inline": "Nothing",
+      "comment_inline": "Empty: nothing to plot",
       "type": "code",
       "mnemonic": "beq",
       "operand": "next_cell",
@@ -9372,7 +9387,7 @@
         98,
         43
       ],
-      "comment_inline": "Plot it",
+      "comment_inline": "Plot the item's sprite in the cell",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_at_cursor",
@@ -9509,7 +9524,7 @@
         169,
         1
       ],
-      "comment_inline": "A loaded level has its exit",
+      "comment_inline": "Take a loaded level to have its exit...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#1"
@@ -9520,7 +9535,7 @@
         133,
         141
       ],
-      "comment_inline": "...so the level can be saved",
+      "comment_inline": "...which SHIFT+S needs before it saves",
       "type": "code",
       "mnemonic": "sta",
       "operand": "exit_placed",
@@ -9654,7 +9669,7 @@
         162,
         20
       ],
-      "comment_inline": "...and its door and key tables, ready to be packed",
+      "comment_inline": "...and the door and key tables, for pack_level",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#max_door",
@@ -9748,7 +9763,7 @@
         208,
         241
       ],
-      "comment_inline": "...until all 20 are cleared",
+      "comment_inline": "...until doors 20 to 1 are cleared",
       "type": "code",
       "mnemonic": "bne",
       "operand": "clear_door_entries",
@@ -9762,7 +9777,7 @@
         142,
         33
       ],
-      "comment_inline": "Show the labels...",
+      "comment_inline": "Show the labels (again, for a loaded level)...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "show_labels",
@@ -9813,7 +9828,7 @@
         133,
         129
       ],
-      "comment_inline": "...row 11, the heroes' start",
+      "comment_inline": "...row 11: a corner of the heroes' start",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cursor_y",
@@ -9876,7 +9891,7 @@
         244,
         37
       ],
-      "comment_inline": "Logical colour 10 shows red",
+      "comment_inline": "Logical colour 10 shows red, as set above",
       "type": "code",
       "mnemonic": "sta",
       "operand": "colour_10",
@@ -9889,7 +9904,7 @@
         169,
         4
       ],
-      "comment_inline": "OSBYTE 4,1 again",
+      "comment_inline": "OSBYTE 4,1 again...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#osbyte_set_cursor_editing",
@@ -9906,7 +9921,7 @@
         162,
         1
       ],
-      "comment_inline": "X = 1: cursor keys give codes, not editing",
+      "comment_inline": "...X = 1: cursor editing off...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#1"
@@ -9918,7 +9933,7 @@
         244,
         255
       ],
-      "comment_inline": "Set it again, after the screen is redrawn Set cursor editing keys",
+      "comment_inline": "...a repeat of the call above Set cursor editing keys",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -9961,7 +9976,7 @@
         240,
         14
       ],
-      "comment_inline": "No: no delay",
+      "comment_inline": "No: a pass as fast as it runs",
       "type": "code",
       "mnemonic": "beq",
       "operand": "check_f0",
@@ -10033,7 +10048,7 @@
         244,
         255
       ],
-      "comment_inline": "Pace the edit loop to the display Wait for vertical sync",
+      "comment_inline": "...so the cursor steps one cell per three frames Wait for vertical sync",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -10124,7 +10139,7 @@
         208,
         15
       ],
-      "comment_inline": "No: try S",
+      "comment_inline": "No: check for SHIFT+S",
       "type": "code",
       "mnemonic": "bne",
       "operand": "check_save",
@@ -10427,7 +10442,7 @@
         160,
         29
       ],
-      "comment_inline": "...(Stones and the level go to disc)",
+      "comment_inline": "...(Stones, the wall blocks, is read from disc)",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(disc_command)",
@@ -10516,7 +10531,7 @@
         16,
         34
       ],
-      "comment_inline": "Wall the edges",
+      "comment_inline": "Wall in the map's four edges",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "wall_edges",
@@ -10530,7 +10545,7 @@
         169,
         38
       ],
-      "comment_inline": "Pack the level into the file",
+      "comment_inline": "Pack the slots and maps into the level file",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "pack_level",
@@ -10544,7 +10559,7 @@
         0,
         36
       ],
-      "comment_inline": "Choose its wall block",
+      "comment_inline": "Choose its wall block from Stones",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "choose_wall_block",
@@ -10608,7 +10623,7 @@
         68,
         34
       ],
-      "comment_inline": "Save it",
+      "comment_inline": "Save it: ends by restarting the editor or resetting",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "save_level",
@@ -10620,7 +10635,7 @@
       "bytes": [
         96
       ],
-      "comment_inline": "(not reached)",
+      "comment_inline": "Not reached: save_level never returns",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -10634,7 +10649,7 @@
       "labels": [
         "edit_keys"
       ],
-      "comment_inline": "Move the cursor",
+      "comment_inline": "Move the cursor, redrawing the cell it leaves",
       "xref_summaries": [
         "&200f referenced 5 times by &1fd2, &1fd9, &1fdd, &1fe2, &1fe8"
       ],
@@ -10685,7 +10700,7 @@
         208,
         15
       ],
-      "comment_inline": "Not walls: no flashing cursor",
+      "comment_inline": "Not walls: the item itself shows as the cursor",
       "type": "code",
       "mnemonic": "bne",
       "operand": "check_cursor_up",
@@ -10699,7 +10714,7 @@
         245,
         37
       ],
-      "comment_inline": "Yes: flash the cursor...",
+      "comment_inline": "Yes: flash the cursor sprite over the wall...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "cursor_flash",
@@ -10737,7 +10752,7 @@
         240,
         5
       ],
-      "comment_inline": "Cleared this pass: leave the cell as it is",
+      "comment_inline": "Off this pass: move_cursor's wall sprite shows",
       "type": "code",
       "mnemonic": "beq",
       "operand": "check_cursor_up",
@@ -10750,7 +10765,7 @@
         169,
         44
       ],
-      "comment_inline": "...plotting it every other pass",
+      "comment_inline": "On: the cursor sprite...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#spr_cursor",
@@ -10768,7 +10783,7 @@
         98,
         43
       ],
-      "comment_inline": "...over the cell under the cursor",
+      "comment_inline": "...over the wall move_cursor drew",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_at_cursor",
@@ -11152,7 +11167,7 @@
       "labels": [
         "check_item_keys"
       ],
-      "comment_inline": "Show the cursor's position",
+      "comment_inline": "Print the cursor's x and y beside the map",
       "xref_summaries": [
         "&205c referenced 1 time by &2048"
       ],
@@ -11500,7 +11515,7 @@
         164,
         31
       ],
-      "comment_inline": "Next pass",
+      "comment_inline": "Next pass: walls repeat while SPACE is held",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "edit_loop",
@@ -11516,7 +11531,7 @@
       "labels": [
         "place_not_edge"
       ],
-      "comment_inline": "Other items: not on the edges...",
+      "comment_inline": "Other items: not on the edges, which are walled...",
       "xref_summaries": [
         "&2092 referenced 1 time by &208a"
       ],
@@ -11652,7 +11667,7 @@
         41,
         44
       ],
-      "comment_inline": "Place it",
+      "comment_inline": "Place the item, within its limits",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "place_item",
@@ -11666,7 +11681,7 @@
         176,
         33
       ],
-      "comment_inline": "Show the counts",
+      "comment_inline": "Update the counts beside the map",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "show_counts",
@@ -11730,7 +11745,7 @@
         165,
         130
       ],
-      "comment_inline": "...(always, for an item)",
+      "comment_inline": "...an item, never walls, is chosen here...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "current_item",
@@ -11743,7 +11758,7 @@
         208,
         245
       ],
-      "comment_inline": "An item is chosen: keep waiting",
+      "comment_inline": "...so keep waiting: one item per press",
       "type": "code",
       "mnemonic": "bne",
       "operand": "wait_space_released",
@@ -11826,7 +11841,7 @@
         176,
         33
       ],
-      "comment_inline": "...and show the counts",
+      "comment_inline": "...and update the counts",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "show_counts",
@@ -11842,7 +11857,7 @@
       "labels": [
         "wait_b_released"
       ],
-      "comment_inline": "While an item is chosen, wait for B (not TAB) to be released...",
+      "comment_inline": "Wait while B (not TAB) is held, with an item chosen...",
       "xref_summaries": [
         "&20c0 referenced 1 time by &20c9"
       ],
@@ -12569,7 +12584,7 @@
         208,
         30
       ],
-      "comment_inline": "Tape",
+      "comment_inline": "T: tape",
       "type": "code",
       "mnemonic": "bne",
       "operand": "choose_tape",
@@ -12582,7 +12597,7 @@
         162,
         118
       ],
-      "comment_inline": "Disc: *DISC",
+      "comment_inline": "D: *DISC",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#<(disc_command)",
@@ -13768,7 +13783,7 @@
         165,
         140
       ],
-      "comment_inline": "...the number of trapdoors placed",
+      "comment_inline": "...the trapdoors placed, under Mons",
       "type": "code",
       "mnemonic": "lda",
       "operand": "trapdoor_count",
@@ -14375,7 +14390,7 @@
         133,
         130
       ],
-      "comment_inline": "...are the item to place",
+      "comment_inline": "...are the item place_item puts down",
       "type": "code",
       "mnemonic": "sta",
       "operand": "current_item",
@@ -14412,7 +14427,7 @@
         133,
         129
       ],
-      "comment_inline": "...the cursor row",
+      "comment_inline": "...moving the cursor to each in turn",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cursor_y",
@@ -14448,7 +14463,7 @@
         133,
         128
       ],
-      "comment_inline": "...cursor column",
+      "comment_inline": "...the left edge",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cursor_x",
@@ -14499,7 +14514,7 @@
         133,
         128
       ],
-      "comment_inline": "...cursor column",
+      "comment_inline": "...the right edge",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cursor_x",
@@ -14576,7 +14591,7 @@
         133,
         128
       ],
-      "comment_inline": "...cursor column",
+      "comment_inline": "...moving the cursor to each in turn",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cursor_x",
@@ -14612,7 +14627,7 @@
         133,
         129
       ],
-      "comment_inline": "...cursor row",
+      "comment_inline": "...the top edge",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cursor_y",
@@ -14663,7 +14678,7 @@
         133,
         129
       ],
-      "comment_inline": "...cursor row",
+      "comment_inline": "...the bottom edge",
       "type": "code",
       "mnemonic": "sta",
       "operand": "cursor_y",
@@ -15443,7 +15458,7 @@
         180,
         35
       ],
-      "comment_inline": "No: catalogue the disc",
+      "comment_inline": "Nothing: catalogue, then ask again",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "catalogue",
@@ -15635,7 +15650,7 @@
       "bytes": [
         10
       ],
-      "comment_inline": "...x 10...",
+      "comment_inline": "...x 2...",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -15824,7 +15839,7 @@
         144,
         3
       ],
-      "comment_inline": "No: a level the game has",
+      "comment_inline": "No: 1-24, a level the game loads from a file",
       "type": "code",
       "mnemonic": "bcc",
       "operand": "level_number_ok",
@@ -15876,7 +15891,7 @@
       "bytes": [
         170
       ],
-      "comment_inline": "...and its checksum",
+      "comment_inline": "...X = level, to index the checksums",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -15887,7 +15902,7 @@
         207,
         9
       ],
-      "comment_inline": "...into the game's checksum table",
+      "comment_inline": "...the game's checksum for that level...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "level_checksums - 1,x",
@@ -15901,7 +15916,7 @@
         242,
         37
       ],
-      "comment_inline": "...kept for the first byte's sum",
+      "comment_inline": "...which the level's bytes must sum to",
       "type": "code",
       "mnemonic": "sta",
       "operand": "level_checksum",
@@ -15984,7 +15999,7 @@
       "labels": [
         "set_checksum"
       ],
-      "comment_inline": "Make the top-left cell of the wall map a wall",
+      "comment_inline": "Wall cell (0, 0), which wall_edges may have missed",
       "xref_summaries": [
         "&22fa referenced 1 time by &22f5"
       ],
@@ -16006,7 +16021,7 @@
         9,
         128
       ],
-      "comment_inline": "...set its top-left bit...",
+      "comment_inline": "...bit 7 of the wall map's first byte...",
       "type": "code",
       "mnemonic": "ora",
       "operand": "#&80"
@@ -16018,7 +16033,7 @@
         224,
         39
       ],
-      "comment_inline": "...and keep it",
+      "comment_inline": "...set in the level file",
       "type": "code",
       "mnemonic": "sta",
       "operand": "level_walls",
@@ -17009,7 +17024,7 @@
         19,
         28
       ],
-      "comment_inline": "No: another level",
+      "comment_inline": "A: restart the editor for another level",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "editor_init",
@@ -17264,7 +17279,7 @@
         169,
         9
       ],
-      "comment_inline": "...and right 29 places...",
+      "comment_inline": "...and right past its 29 characters...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#9"
@@ -17649,7 +17664,7 @@
         91,
         37
       ],
-      "comment_inline": "Show 25 rows",
+      "comment_inline": "Show 25 rows, hiding &6E80 on, where Stones goes",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "show_25_rows",
@@ -17952,7 +17967,7 @@
         133,
         113
       ],
-      "comment_inline": "...high byte starts at 0",
+      "comment_inline": "...high byte, in plot_y, starts at 0",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -17978,7 +17993,7 @@
       "bytes": [
         10
       ],
-      "comment_inline": "...(x 16)...",
+      "comment_inline": "...x 2...",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -18067,7 +18082,7 @@
         165,
         114
       ],
-      "comment_inline": "...(x 32)...",
+      "comment_inline": "...block x 16 again...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "scratch",
@@ -18111,7 +18126,7 @@
         101,
         114
       ],
-      "comment_inline": "...(x 48)...",
+      "comment_inline": "...+ x 16: block x 48 (&30), low byte...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "scratch",
@@ -18375,7 +18390,7 @@
       "labels": [
         "chooser_moved"
       ],
-      "comment_inline": "Moved?",
+      "comment_inline": "Did the keys move the choice?",
       "xref_summaries": [
         "&246b referenced 1 time by &242e"
       ],
@@ -18411,7 +18426,7 @@
         240,
         169
       ],
-      "comment_inline": "No: carry on",
+      "comment_inline": "Not moved: pause and read the keys again",
       "type": "code",
       "mnemonic": "beq",
       "operand": "chooser_loop",
@@ -18592,7 +18607,7 @@
         28,
         36
       ],
-      "comment_inline": "Carry on",
+      "comment_inline": "Pause and read the keys again",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "chooser_loop",
@@ -18837,7 +18852,7 @@
         162,
         152
       ],
-      "comment_inline": "Pressed?",
+      "comment_inline": "'.' pressed?",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#inkey_key_full_stop",
@@ -18934,7 +18949,7 @@
         240,
         57
       ],
-      "comment_inline": "...but not past 23",
+      "comment_inline": "Past 23: undo it",
       "type": "code",
       "mnemonic": "beq",
       "operand": "undo_move",
@@ -18950,7 +18965,7 @@
       "labels": [
         "check_back"
       ],
-      "comment_inline": "Pressed?",
+      "comment_inline": "',' pressed?",
       "xref_summaries": [
         "&24c2 referenced 1 time by &24b4"
       ],
@@ -19025,7 +19040,7 @@
         48,
         43
       ],
-      "comment_inline": "...but not before 0",
+      "comment_inline": "Below 0: undo it",
       "type": "code",
       "mnemonic": "bmi",
       "operand": "undo_move",
@@ -19041,7 +19056,7 @@
       "labels": [
         "check_row_on"
       ],
-      "comment_inline": "Pressed?",
+      "comment_inline": "'Z' pressed?",
       "xref_summaries": [
         "&24d0 referenced 1 time by &24c7"
       ],
@@ -19167,7 +19182,7 @@
         176,
         21
       ],
-      "comment_inline": "...but not past 23",
+      "comment_inline": "Past 23: undo it",
       "type": "code",
       "mnemonic": "bcs",
       "operand": "undo_move",
@@ -19183,7 +19198,7 @@
       "labels": [
         "check_row_back"
       ],
-      "comment_inline": "Pressed?",
+      "comment_inline": "'A' pressed?",
       "xref_summaries": [
         "&24e6 referenced 1 time by &24d5"
       ],
@@ -19292,7 +19307,7 @@
         48,
         1
       ],
-      "comment_inline": "...but not before 0",
+      "comment_inline": "Below 0: undo it",
       "type": "code",
       "mnemonic": "bmi",
       "operand": "undo_move",
@@ -19531,7 +19546,7 @@
       "labels": [
         "block_place"
       ],
-      "comment_inline": "Keep it",
+      "comment_inline": "Keep the block number",
       "xref_summaries": [
         "&2510 referenced 3 times by &249d, &252f, &2540"
       ],
@@ -19809,7 +19824,7 @@
         165,
         113
       ],
-      "comment_inline": "...and two rows up (C is clear: three, as the block is 18 rows)",
+      "comment_inline": "...and up (C is clear from block_place)...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "plot_y",
@@ -19822,7 +19837,7 @@
         233,
         2
       ],
-      "comment_inline": "...three rows up, as C is clear",
+      "comment_inline": "...SBC #2 with C clear: three rows up",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "#2"
@@ -20906,7 +20921,7 @@
         240,
         37
       ],
-      "comment_inline": "Nothing",
+      "comment_inline": "Free slot: skip it",
       "type": "code",
       "mnemonic": "beq",
       "operand": "pack_next",
@@ -20930,7 +20945,7 @@
         240,
         37
       ],
-      "comment_inline": "Yes: entry 30",
+      "comment_inline": "Yes: always object entry 30",
       "type": "code",
       "mnemonic": "beq",
       "operand": "pack_exit",
@@ -21435,7 +21450,7 @@
       "labels": [
         "pack_door"
       ],
-      "comment_inline": "A key: skip it (it goes with its door)",
+      "comment_inline": "A key?",
       "xref_summaries": [
         "&2664 referenced 1 time by &261c"
       ],
@@ -21461,7 +21476,7 @@
         240,
         207
       ],
-      "comment_inline": "...so it goes with its door",
+      "comment_inline": "Yes: skip it, as it is packed with its door",
       "type": "code",
       "mnemonic": "beq",
       "operand": "pack_next",
@@ -21598,7 +21613,7 @@
         134,
         132
       ],
-      "comment_inline": "Find the door's link...",
+      "comment_inline": "Find the link whose door is this slot...",
       "type": "code",
       "mnemonic": "stx",
       "operand": "bit_mask",
@@ -22251,7 +22266,7 @@
       "labels": [
         "plot_sprite"
       ],
-      "comment_inline": "X = sprite number",
+      "comment_inline": "X = sprite number, indexing the four sprite tables",
       "xref_summaries": [
         "&2700 referenced 5 times by &24a0, &253a, &254b, &2b72, &2cf3; also used as index base 1 time by &23a2"
       ],
@@ -22296,7 +22311,7 @@
       ],
       "binary_addr": 9986,
       "move": "plotter",
-      "comment_inline": "Point sprite_data_ptr at the sprite's data...",
+      "comment_inline": "Point sprite_data_ptr at the editor sprite's data...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "sprite_addr_lo,x",
@@ -22328,7 +22343,7 @@
       ],
       "binary_addr": 9991,
       "move": "plotter",
-      "comment_inline": "...high byte...",
+      "comment_inline": "...high byte, from the editor's sprite tables...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "sprite_addr_hi,x",
@@ -22344,7 +22359,7 @@
       ],
       "binary_addr": 9994,
       "move": "plotter",
-      "comment_inline": "...into sprite_data_ptr",
+      "comment_inline": "...so sprite_data_ptr walks through the data",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_data_ptr_hi",
@@ -22360,7 +22375,7 @@
       ],
       "binary_addr": 9996,
       "move": "plotter",
-      "comment_inline": "Width in bytes...",
+      "comment_inline": "Width in screen bytes, from sprite_widths...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "sprite_widths,x",
@@ -22376,7 +22391,7 @@
       ],
       "binary_addr": 9999,
       "move": "plotter",
-      "comment_inline": "...for the inner loop",
+      "comment_inline": "...counted across each row",
       "type": "code",
       "mnemonic": "sta",
       "operand": "scratch",
@@ -22392,7 +22407,7 @@
       ],
       "binary_addr": 10001,
       "move": "plotter",
-      "comment_inline": "Height in pixel rows...",
+      "comment_inline": "Height in pixel rows, from sprite_heights...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "sprite_heights,x",
@@ -22408,7 +22423,7 @@
       ],
       "binary_addr": 10004,
       "move": "plotter",
-      "comment_inline": "...for the outer loop",
+      "comment_inline": "...counted down the sprite",
       "type": "code",
       "mnemonic": "sta",
       "operand": "scratch_hi",
@@ -22528,7 +22543,7 @@
       ],
       "binary_addr": 10019,
       "move": "plotter",
-      "comment_inline": "...in row_start_ptr",
+      "comment_inline": "...in row_start_ptr, to step down from later",
       "type": "code",
       "mnemonic": "sta",
       "operand": "row_start_ptr_hi",
@@ -22610,7 +22625,7 @@
       ],
       "binary_addr": 10027,
       "move": "plotter",
-      "comment_inline": "...to the screen",
+      "comment_inline": "...to the screen, over whatever was there",
       "type": "code",
       "mnemonic": "sta",
       "operand": "(screen_ptr),y",
@@ -22774,7 +22789,7 @@
         "plot_sprite_count_byte",
         "plot_count_byte"
       ],
-      "comment_inline": "Count the bytes across",
+      "comment_inline": "One byte fewer left in this row",
       "xref_summaries": [
         "&273e referenced 1 time by &093a[1]"
       ],
@@ -22797,7 +22812,7 @@
       ],
       "binary_addr": 10047,
       "move": "plotter",
-      "comment_inline": "Loop until the row is done",
+      "comment_inline": "More of the row: plot the next byte",
       "type": "code",
       "mnemonic": "bne",
       "operand": "plot_sprite_byte",
@@ -22938,7 +22953,7 @@
       ],
       "binary_addr": 10066,
       "move": "plotter",
-      "comment_inline": "No: carry on",
+      "comment_inline": "No: still within the character row",
       "type": "code",
       "mnemonic": "bne",
       "operand": "plot_sprite_next_row",
@@ -22953,7 +22968,7 @@
       ],
       "binary_addr": 10068,
       "move": "plotter",
-      "comment_inline": "Yes: add 640-8 to reach the top pixel row of the...",
+      "comment_inline": "Yes: add &278 more, to the top of the character...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -22965,7 +22980,7 @@
       ],
       "binary_addr": 10069,
       "move": "plotter",
-      "comment_inline": "...character row below",
+      "comment_inline": "...row below (row start + 1 + &278 = + 640 - 7)",
       "type": "code",
       "mnemonic": "lda",
       "operand": "screen_ptr",
@@ -23087,7 +23102,7 @@
       ],
       "binary_addr": 10083,
       "move": "plotter",
-      "comment_inline": "Count the pixel rows",
+      "comment_inline": "One pixel row fewer to plot",
       "type": "code",
       "mnemonic": "dex"
     },
@@ -23099,7 +23114,7 @@
       ],
       "binary_addr": 10084,
       "move": "plotter",
-      "comment_inline": "Loop until the sprite is done",
+      "comment_inline": "More rows: plot the next",
       "type": "code",
       "mnemonic": "bne",
       "operand": "plot_sprite_row",
@@ -23129,7 +23144,7 @@
       "labels": [
         "screen_address"
       ],
-      "comment_inline": "Character row = plot_y DIV 8...",
+      "comment_inline": "Table index = 2 x (plot_y DIV 8), the character row...",
       "xref_summaries": [
         "&2767 referenced 1 time by &0916[1]"
       ],
@@ -23154,7 +23169,7 @@
       ],
       "binary_addr": 10089,
       "move": "plotter",
-      "comment_inline": "...halved...",
+      "comment_inline": "...plot_y / 2...",
       "type": "code",
       "mnemonic": "lsr"
     },
@@ -23165,7 +23180,7 @@
       ],
       "binary_addr": 10090,
       "move": "plotter",
-      "comment_inline": "...and halved again...",
+      "comment_inline": "...plot_y / 4...",
       "type": "code",
       "mnemonic": "lsr"
     },
@@ -23177,7 +23192,7 @@
       ],
       "binary_addr": 10091,
       "move": "plotter",
-      "comment_inline": "...times 2 to index the table's byte pairs",
+      "comment_inline": "...bit 0 cleared: the row's pair of table bytes",
       "type": "code",
       "mnemonic": "and",
       "operand": "#&fe"
@@ -23324,7 +23339,7 @@
       ],
       "binary_addr": 10111,
       "move": "plotter",
-      "comment_inline": "...(no carry: the low byte is &00 or &80)",
+      "comment_inline": "...(carry clear: adding &30 to the high byte cannot carry)",
       "type": "code",
       "mnemonic": "adc",
       "operand": "screen_ptr",
@@ -23353,7 +23368,7 @@
       ],
       "binary_addr": 10115,
       "move": "plotter",
-      "comment_inline": "Add 8 x plot_x: first its top three bits...",
+      "comment_inline": "Add 8 x plot_x: its high byte is plot_x DIV 32...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -23392,7 +23407,7 @@
       ],
       "binary_addr": 10120,
       "move": "plotter",
-      "comment_inline": "...rotated down to bits 0-2...",
+      "comment_inline": "...four ROLs through the carry: bit 7 out...",
       "type": "code",
       "mnemonic": "rol"
     },
@@ -23403,7 +23418,7 @@
       ],
       "binary_addr": 10121,
       "move": "plotter",
-      "comment_inline": "...bit 7 into bit 0 via the carry",
+      "comment_inline": "...bit 7 in at bit 0, bit 6 out",
       "type": "code",
       "mnemonic": "rol"
     },
@@ -23414,7 +23429,7 @@
       ],
       "binary_addr": 10122,
       "move": "plotter",
-      "comment_inline": "...then bit 6; bit 7 to bit 1",
+      "comment_inline": "...bits 7-6 at bits 1-0, bit 5 out",
       "type": "code",
       "mnemonic": "rol"
     },
@@ -23448,7 +23463,7 @@
       ],
       "binary_addr": 10125,
       "move": "plotter",
-      "comment_inline": "...into the high byte",
+      "comment_inline": "...added to the high byte",
       "type": "code",
       "mnemonic": "adc",
       "operand": "screen_ptr_hi",
@@ -25942,7 +25957,7 @@
         48,
         3
       ],
-      "comment_inline": "No: check right",
+      "comment_inline": "Empty: leave the cell blank",
       "type": "code",
       "mnemonic": "bmi",
       "operand": "check_right",
@@ -25956,7 +25971,7 @@
         98,
         43
       ],
-      "comment_inline": "Yes: plot it again",
+      "comment_inline": "Yes: redraw the wall or item the cursor covered",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_at_cursor",
@@ -25972,7 +25987,7 @@
       "labels": [
         "check_right"
       ],
-      "comment_inline": "Right key pressed?",
+      "comment_inline": "'.' (key_right) pressed?",
       "xref_summaries": [
         "&2b12 referenced 1 time by &2b0d"
       ],
@@ -26021,7 +26036,7 @@
         230,
         128
       ],
-      "comment_inline": "Yes: right (always branches)",
+      "comment_inline": "Yes: one column right...",
       "type": "code",
       "mnemonic": "inc",
       "operand": "cursor_x",
@@ -26034,7 +26049,7 @@
         16,
         15
       ],
-      "comment_inline": "...(the column stays below 128)",
+      "comment_inline": "...always branches; clamp_cursor limits it",
       "type": "code",
       "mnemonic": "bpl",
       "operand": "check_up",
@@ -26050,7 +26065,7 @@
       "labels": [
         "check_left"
       ],
-      "comment_inline": "Left key pressed?",
+      "comment_inline": "',' (key_left) pressed?",
       "xref_summaries": [
         "&2b1d referenced 1 time by &2b17"
       ],
@@ -26152,7 +26167,7 @@
       "labels": [
         "check_up"
       ],
-      "comment_inline": "Up key pressed?",
+      "comment_inline": "'A' (key_up) pressed?",
       "xref_summaries": [
         "&2b2c referenced 3 times by &2b1b, &2b22, &2b26"
       ],
@@ -26275,7 +26290,7 @@
       "labels": [
         "check_down"
       ],
-      "comment_inline": "Down key pressed?",
+      "comment_inline": "'Z' (key_down) pressed?",
       "xref_summaries": [
         "&2b3d referenced 1 time by &2b31"
       ],
@@ -26324,7 +26339,7 @@
         230,
         129
       ],
-      "comment_inline": "Yes: down (always branches)",
+      "comment_inline": "Yes: one row down...",
       "type": "code",
       "mnemonic": "inc",
       "operand": "cursor_y",
@@ -26337,7 +26352,7 @@
         16,
         0
       ],
-      "comment_inline": "...(the row stays below 128)",
+      "comment_inline": "...always branches; clamp_y limits it",
       "type": "code",
       "mnemonic": "bpl",
       "operand": "clamp_cursor",
@@ -26549,7 +26564,7 @@
       "labels": [
         "plot_cursor"
       ],
-      "comment_inline": "Plot the current item at the cursor",
+      "comment_inline": "Plot the current item at the cursor...",
       "xref_summaries": [
         "&2b5c referenced 1 time by &2b56"
       ],
@@ -26572,7 +26587,7 @@
         98,
         43
       ],
-      "comment_inline": "...as the cursor",
+      "comment_inline": "...as the cursor, over whatever is there",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_at_cursor",
@@ -26763,7 +26778,7 @@
       "labels": [
         "item_at_cursor"
       ],
-      "comment_inline": "For slots &4F to 0...",
+      "comment_inline": "For slots &4F to 0, free ones included...",
       "xref_summaries": [
         "&2b76 referenced 5 times by &1f49, &2b0a, &2c0d, &2c29, &2d11"
       ],
@@ -26894,7 +26909,7 @@
         176,
         12
       ],
-      "comment_inline": "Yes: return its item",
+      "comment_inline": "Yes: return its item (0 for a free slot)...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "slot_item,x",
@@ -26906,7 +26921,7 @@
       "bytes": [
         96
       ],
-      "comment_inline": "...the slot's item number",
+      "comment_inline": "...with X its slot",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -27007,7 +27022,7 @@
         169,
         0
       ],
-      "comment_inline": "Yes: 0",
+      "comment_inline": "Set: item 0, the wall",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -27030,7 +27045,7 @@
       "labels": [
         "nothing_here"
       ],
-      "comment_inline": "No: &FF",
+      "comment_inline": "No wall: &FF",
       "xref_summaries": [
         "&2b99 referenced 1 time by &2b94"
       ],
@@ -27520,7 +27535,7 @@
       "labels": [
         "put_item"
       ],
-      "comment_inline": "Clear the cell's object-free bit",
+      "comment_inline": "Clear the cell's object-free bit, whatever the item",
       "xref_summaries": [
         "&2bd7 referenced 1 time by &2ca0"
       ],
@@ -27532,10 +27547,10 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "free_cell",
+      "operand": "mark_object_cell",
       "target": 32128,
-      "target_move": "free_cell",
-      "target_label": "free_cell"
+      "target_move": "mark_object_cell",
+      "target_label": "mark_object_cell"
     },
     {
       "addr": 11226,
@@ -27839,7 +27854,7 @@
       "bytes": [
         138
       ],
-      "comment_inline": "Yes: it is the link's key",
+      "comment_inline": "Yes: this slot is the link's key...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -27924,7 +27939,7 @@
         240,
         7
       ],
-      "comment_inline": "A wall",
+      "comment_inline": "A wall: clear its bit",
       "type": "code",
       "mnemonic": "beq",
       "operand": "clear_wall",
@@ -27937,7 +27952,7 @@
         48,
         20
       ],
-      "comment_inline": "Nothing",
+      "comment_inline": "Nothing here: done",
       "type": "code",
       "mnemonic": "bmi",
       "operand": "remove_done",
@@ -27951,7 +27966,7 @@
         5,
         45
       ],
-      "comment_inline": "An item: free its slot",
+      "comment_inline": "An item: free its slot, X from item_at_cursor",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "free_slot",
@@ -28167,7 +28182,7 @@
         240,
         8
       ],
-      "comment_inline": "A wall: leave it",
+      "comment_inline": "A wall: nothing more can go here",
       "type": "code",
       "mnemonic": "beq",
       "operand": "place_done",
@@ -28197,7 +28212,7 @@
         240,
         111
       ],
-      "comment_inline": "Yes: link it to a key",
+      "comment_inline": "Yes: perhaps make it wait for a key",
       "type": "code",
       "mnemonic": "beq",
       "operand": "choose_door",
@@ -28227,7 +28242,7 @@
         240,
         107
       ],
-      "comment_inline": "Yes: link it to a key",
+      "comment_inline": "Yes: perhaps make it wait for a key",
       "type": "code",
       "mnemonic": "beq",
       "operand": "choose_door",
@@ -28242,7 +28257,7 @@
       "labels": [
         "place_done"
       ],
-      "comment_inline": "Return",
+      "comment_inline": "Occupied: refuse",
       "xref_summaries": [
         "&2c38 referenced 1 time by &2c2e"
       ],
@@ -28505,7 +28520,7 @@
       "bytes": [
         96
       ],
-      "comment_inline": "Return",
+      "comment_inline": "...and refuse",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -28581,7 +28596,7 @@
       "labels": [
         "place_refused"
       ],
-      "comment_inline": "Return",
+      "comment_inline": "Refuse",
       "xref_summaries": [
         "&2c64 referenced 3 times by &2c5e, &2c87, &2ca7"
       ],
@@ -28682,7 +28697,7 @@
       "bytes": [
         96
       ],
-      "comment_inline": "Return",
+      "comment_inline": "...(refused)",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -28696,7 +28711,7 @@
       "labels": [
         "place_door"
       ],
-      "comment_inline": "A door: it is a wall too...",
+      "comment_inline": "A door: it is a wall too, set before the count...",
       "xref_summaries": [
         "&2c70 referenced 2 times by &2c47, &2c4b"
       ],
@@ -28824,7 +28839,7 @@
         198,
         142
       ],
-      "comment_inline": "Yes: uncount it and refuse",
+      "comment_inline": "Yes: uncount it and refuse...",
       "type": "code",
       "mnemonic": "dec",
       "operand": "door_count",
@@ -28836,7 +28851,7 @@
       "bytes": [
         96
       ],
-      "comment_inline": "Return",
+      "comment_inline": "...leaving its wall bit set",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -28872,7 +28887,7 @@
         48,
         219
       ],
-      "comment_inline": "No: return",
+      "comment_inline": "No door waiting: refuse",
       "type": "code",
       "mnemonic": "bmi",
       "operand": "place_refused",
@@ -28942,7 +28957,7 @@
         215,
         44
       ],
-      "comment_inline": "...show the door as it was...",
+      "comment_inline": "...give the door back its own sprite...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "restore_waiting_door",
@@ -28987,7 +29002,7 @@
         160,
         44
       ],
-      "comment_inline": "Place the key",
+      "comment_inline": "Place the key, recorded in link_index's link",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "place_put",
@@ -29004,7 +29019,7 @@
       "labels": [
         "place_put"
       ],
-      "comment_inline": "Put it in the cell",
+      "comment_inline": "Put the item in the wall map or a slot",
       "xref_summaries": [
         "&2ca0 referenced 6 times by &2c3b, &2c57, &2c62, &2c6b, &2c7f, &2c9d"
       ],
@@ -29224,7 +29239,7 @@
       "labels": [
         "door_linked"
       ],
-      "comment_inline": "Yes: return",
+      "comment_inline": "Linked already: nothing to do",
       "xref_summaries": [
         "&2cb9 referenced 1 time by &2cb2"
       ],
@@ -29825,7 +29840,7 @@
         0,
         12
       ],
-      "comment_inline": "...and position",
+      "comment_inline": "...and position: column 0...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "slot_x,x",
@@ -29887,7 +29902,7 @@
         48,
         79
       ],
-      "comment_inline": "Nothing: remove (nothing)",
+      "comment_inline": "Nothing: remove_at_cursor finds nothing either",
       "type": "code",
       "mnemonic": "bmi",
       "operand": "delete_remove",
@@ -29942,7 +29957,7 @@
       "bytes": [
         96
       ],
-      "comment_inline": "Yes: leave it",
+      "comment_inline": "Yes: it cannot be deleted",
       "type": "code",
       "mnemonic": "rts"
     },
@@ -29955,7 +29970,7 @@
       "labels": [
         "delete_item_slot"
       ],
-      "comment_inline": "Keep the slot",
+      "comment_inline": "Keep the item's slot, to match against links",
       "xref_summaries": [
         "&2d1d referenced 1 time by &2d1a"
       ],
@@ -30042,7 +30057,7 @@
         240,
         22
       ],
-      "comment_inline": "Yes: unlink it",
+      "comment_inline": "Yes: unlink it and delete its key",
       "type": "code",
       "mnemonic": "beq",
       "operand": "delete_door",
@@ -30072,7 +30087,7 @@
         240,
         18
       ],
-      "comment_inline": "Yes: unlink it",
+      "comment_inline": "Yes: unlink it and delete its key",
       "type": "code",
       "mnemonic": "beq",
       "operand": "delete_door",
@@ -30115,7 +30130,7 @@
         198,
         139
       ],
-      "comment_inline": "An object: uncount it (always branches)",
+      "comment_inline": "An object: one fewer",
       "type": "code",
       "mnemonic": "dec",
       "operand": "object_count",
@@ -30193,7 +30208,7 @@
       "labels": [
         "delete_trapdoor"
       ],
-      "comment_inline": "A trapdoor: uncount it (always branches)",
+      "comment_inline": "A trapdoor: one fewer",
       "xref_summaries": [
         "&2d3d referenced 1 time by &2d25"
       ],
@@ -30503,7 +30518,7 @@
       "labels": [
         "delete_remove"
       ],
-      "comment_inline": "Remove the item itself",
+      "comment_inline": "Remove the item itself, or clear the wall",
       "xref_summaries": [
         "&2d65 referenced 7 times by &2d14, &2d16, &2d35, &2d3b, &2d3f, &2d60, &2dac"
       ],
@@ -30552,7 +30567,7 @@
       "labels": [
         "delete_key"
       ],
-      "comment_inline": "A key: keep the cursor's cell",
+      "comment_inline": "A key: keep its cell, the cursor's...",
       "xref_summaries": [
         "&2d68 referenced 1 time by &2d31"
       ],
@@ -30735,7 +30750,7 @@
         0,
         12
       ],
-      "comment_inline": "...and cell...",
+      "comment_inline": "...and move the cursor to the door's cell...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "slot_x,x",
@@ -30914,7 +30929,7 @@
         25,
         44
       ],
-      "comment_inline": "...clear the door's wall...",
+      "comment_inline": "...clear the door's wall, at the cursor...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "clear_wall",
@@ -30928,7 +30943,7 @@
         208,
         13
       ],
-      "comment_inline": "...and go back to the key's cell",
+      "comment_inline": "...and move the cursor back to the key's cell",
       "type": "code",
       "mnemonic": "lda",
       "operand": "line_x",
@@ -31016,7 +31031,7 @@
         16,
         194
       ],
-      "comment_inline": "...until all 20 are tried",
+      "comment_inline": "...until all 20 are tried; none: fall through",
       "type": "code",
       "mnemonic": "bpl",
       "operand": "find_key_link",
@@ -31303,7 +31318,7 @@
       "bytes": [
         10
       ],
-      "comment_inline": "...x 16...",
+      "comment_inline": "...x 8...",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -31363,7 +31378,7 @@
       "bytes": [
         24
       ],
-      "comment_inline": "...plus x 4: x 20",
+      "comment_inline": "...plus x 4: x 20 graphics units a row",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -31931,7 +31946,7 @@
         162,
         68
       ],
-      "comment_inline": "...(PLOT 68: a point)...",
+      "comment_inline": "...PLOT 68: move absolute...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&44"
@@ -31943,7 +31958,7 @@
         8,
         46
       ],
-      "comment_inline": "...move there",
+      "comment_inline": "...to the door's cell, drawing nothing",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_line_point",
@@ -32062,7 +32077,7 @@
         162,
         5
       ],
-      "comment_inline": "...(PLOT 5: a line)",
+      "comment_inline": "...PLOT 5: line to there...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#5"
@@ -32074,7 +32089,7 @@
         8,
         46
       ],
-      "comment_inline": "...draw the link, exclusive-OR",
+      "comment_inline": "...draw the link, exclusive-OR (GCOL 3)",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_line_point",

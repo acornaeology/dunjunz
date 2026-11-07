@@ -44,14 +44,19 @@ coder2 = Annotator(d, "disc_master", lambda addr: [(None, "")],
 coder2.sub(0x2000, "coder2_start", "Coder2: install the joystick handler and run Coder",
            "Run by *DUNJUNZ when a joystick is present. *L. Code loads the "
            "joystick handler into private RAM at &C500, BYTEV is pointed at "
-           "it, and *CODER is run, which does not return.")
+           "it, and *CODER is run, which does not return. From then on every "
+           "OSBYTE call passes through the handler, which answers the "
+           "game's INKEY scans of one hero's movement and fire keys from "
+           "the joystick and passes every other call on to the MOS. "
+           "BYTEV's old value is not saved: the handler passes calls on "
+           "through a fixed address.")
 comments(coder2, [
     (0x2000, "*L. Code: load the joystick handler at &C500"),
-    (0x2002, "...command's high byte"), (0x2004, "...and run it: Code into private RAM"),
-    (0x2007, "BYTEV = &C500, the joystick handler..."),
-    (0x2009, "...low byte, so OSBYTE calls reach it..."), (0x200C, "...high byte..."), (0x200E, "...and the game's key scans read the joystick"),
-    (0x2011, "*CODER: load and start the game (no return)"),
-    (0x2013, "...command's high byte"), (0x2015, "...and run it; the game takes over from here"),
+    (0x2002, "...(X, Y) = the command line"), (0x2004, "...loaded into HAZEL, which MOS 3.20 leaves paged in"),
+    (0x2007, "Point BYTEV at the handler, so every OSBYTE..."),
+    (0x2009, "...goes through it first..."), (0x200C, "...(the handler's page)..."), (0x200E, "...and INKEY scans for the hero's keys read the stick"),
+    (0x2011, "*CODER: load and start the game"),
+    (0x2013, "...(X, Y) = the command line"), (0x2015, "...never returns: the game takes over the machine"),
 ])
 coder2.label(0x2018, "load_code_command")
 coder2.stringcr(0x2018)

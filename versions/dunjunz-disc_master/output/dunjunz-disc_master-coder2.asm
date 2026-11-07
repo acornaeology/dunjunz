@@ -14,17 +14,21 @@ oscli            = &fff7
 ;
 ; Run by *DUNJUNZ when a joystick is present. *L. Code loads the joystick handler into
 ; private RAM at &C500, BYTEV is pointed at it, and *CODER is run, which does not return.
+; From then on every OSBYTE call passes through the handler, which answers the game's
+; INKEY scans of one hero's movement and fire keys from the joystick and passes every
+; other call on to the MOS. BYTEV's old value is not saved: the handler passes calls on
+; through a fixed address.
 .coder2_start
     ldx #<(load_code_command)           ; *L. Code: load the joystick handler at &C500
-    ldy #>(load_code_command)           ; ...command's high byte
-    jsr oscli                           ; ...and run it: Code into private RAM
-    lda #<(joystick_handler)            ; BYTEV = &C500, the joystick handler...
-    sta bytev                           ; ...low byte, so OSBYTE calls reach it...
-    lda #>(joystick_handler)            ; ...high byte...
-    sta bytev + 1                       ; ...and the game's key scans read the joystick
-    ldx #<(coder_command)               ; *CODER: load and start the game (no return)
-    ldy #>(coder_command)               ; ...command's high byte
-    jsr oscli                           ; ...and run it; the game takes over from here
+    ldy #>(load_code_command)           ; ...(X, Y) = the command line
+    jsr oscli                           ; ...loaded into HAZEL, which MOS 3.20 leaves paged in
+    lda #<(joystick_handler)            ; Point BYTEV at the handler, so every OSBYTE...
+    sta bytev                           ; ...goes through it first...
+    lda #>(joystick_handler)            ; ...(the handler's page)...
+    sta bytev + 1                       ; ...and INKEY scans for the hero's keys read the stick
+    ldx #<(coder_command)               ; *CODER: load and start the game
+    ldy #>(coder_command)               ; ...(X, Y) = the command line
+    jsr oscli                           ; ...never returns: the game takes over the machine
 .load_code_command
     equs "L. Code", &0d
 .coder_command

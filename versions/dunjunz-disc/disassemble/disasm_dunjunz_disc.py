@@ -125,158 +125,187 @@ annotator.stringcr(0x515D)
 annotator.stringcr(0x5167)
 
 annotator.sub(0x5000, "coder_start", "Coder: load the game and the next level",
-              "Run with *RUN CODER at the start of every level. Count the "
-              "level, reload Dun1 (which contains this code, so the bytes "
-              "being run are rewritten with identical ones), load the level "
-              "file at &6B00 (level 25 comes from the end of Stones), copy "
-              "one of the two &0400-&07FF images and the &08C0-&1FFF image "
-              "into place, and enter the game.")
+              "Run for every level: first by *DUNJUNZ, then by "
+              "next_level_intercept during the reset that ends each level. "
+              "Disable ESCAPE, cancel the BREAK intercept, count the level in "
+              "levels_started and advance the filename digits in "
+              "level_digits (both in page &08, which the reset leaves "
+              "alone), and blank the display. Reload Dun1, which contains "
+              "this code, so the bytes being run are rewritten with "
+              "identical ones, and load the level file at &6B00 (level 25 "
+              "comes from the end of Stones). Copy one of the two "
+              "&0400-&07FF images into place: the one with the joystick "
+              "handler only if joystick channel 1 reads with a high byte of "
+              "exactly &80. Restore the display, then copy the game core: "
+              "all of &08C0-&1FFF for the first level, but only &0D00-&1FFF "
+              "for later ones, so that the heroes' state in &08C0-&0CFF "
+              "carries over. Leave levels_started in &8E and enter "
+              "game_entry.")
 for addr, text in [
-    (0x5000, "OSBYTE &C8: set the ESCAPE and BREAK effect..."),
-    (0x5009, "VDU 6, 3: enable the screen, disable the printer"),
-    (0x5013, "Cancel the BREAK intercept"),
-    (0x5015, "...&0287 not a JMP, so BREAK now resets plainly"),
-    (0x5018, "Count the level"),
-    (0x501B, "Advance the ASCII level number..."),
-    (0x504A, "VDU 23 commands that set up the 6845 for loading"),
-    (0x5057, "VDU 21: disable the screen..."),
-    (0x505C, "...and reload Dun1"),
-    (0x5063, "Put the level number's digits in level_command"),
-    (0x506F, "Leave the level count in level_count_copy for game_entry"),
-    (0x5074, "level_number = levels started - 1 (game_entry counts it again)"),
-    (0x507D, "Level 25?"),
-    (0x5081, "Yes: load Stones, which ends with level 25..."),
+    (0x5000, "Disable ESCAPE for the whole game..."),
+    (0x5009, "VDU 6, 3: text to the screen, none to a printer"),
+    (0x5013, "Cancel the BREAK intercept *DUNJUNZ armed..."),
+    (0x5015, "...so a BREAK now resets plainly until a level ends"),
+    (0x5018, "One more level started (1 for the first)"),
+    (0x501B, "Advance level_digits, the filename's level number..."),
+    (0x504A, "Blank the display while the files load"),
+    (0x5057, "VDU 21: stop all VDU output..."),
+    (0x505C, "Reload Dun1: a fresh game, and this code over itself"),
+    (0x5063, "Copy the level's digits into level_command"),
+    (0x506F, "Hand levels_started to game_entry in &8E..."),
+    (0x5074, "A = levels started - 1, to pick the level's file"),
+    (0x507D, "Levels started 25: the last level?"),
+    (0x5081, "Yes: *LOAD STONES 6680, whose end is level 25..."),
     (0x5088, "...and skip the LEVELnn load"),
-    (0x508B, "No: load LEVELnn"),
-    (0x5092, "VDU 6: enable the screen"),
-    (0x5097, "Copy to &0400..."),
-    (0x509F, "...from &51B0 or &55B0"),
-    (0x50A3, "Read the joystick's horizontal channel"),
-    (0x50AA, "High byte &80 (a joystick at rest?)..."),
-    (0x50AE, "...yes: copy the image with the joystick handler, at &55B0"),
-    (0x50B4, "...no: copy the keyboard-only image at &51B0"),
+    (0x508B, "No: *LOAD LEVELnn 6B00"),
+    (0x5092, "VDU 6: VDU output on again"),
+    (0x5097, "Copy one &0400-&07FF image into place..."),
+    (0x509F, "...source low byte &B0, for &51B0 or &55B0"),
+    (0x50A3, "Is a joystick there? Read ADC channel 1..."),
+    (0x50AA, "...high byte exactly &80?"),
+    (0x50AE, "Yes: the image with the joystick handler, &55B0"),
+    (0x50B4, "No: the keyboard-only image, &51B0"),
 ]:
     annotator.c(addr, text)
-annotator.c(0x5002, "...with X = 1: ESCAPE disabled")
+annotator.c(0x5002, "...X = 1: ESCAPE disabled, BREAK as normal")
 
 annotator.label(0x0E14, "level_loop")
-annotator.c(0x0D6B, "Recover the level count Coder left in level_count_copy")
-annotator.c(0x0D6D, "...as level_number")
-annotator.c(0x0D70, "...and level_bcd")
-annotator.c(0x0D72, "...from the BCD copy Coder left in &8F")
-annotator.c(0x0D75, "First level?")
-annotator.c(0x0D7A, "Yes: the first level, so a new game")
-annotator.c(0x0D7C, "No: carry on with the heroes as they were")
-annotator.c(0x0D7F, "Yes: start a new game")
+annotator.c(0x0D6B, "levels_started, which Coder left in &8E...")
+annotator.c(0x0D6D, "...is level_number, 1-25, for the checksum and Chalice")
+annotator.c(0x0D70, "Copy &8F, which Coder does not set...")
+annotator.c(0x0D72, "...into level_bcd, which nothing here reads")
+annotator.c(0x0D75, "First level of a game?")
+annotator.c(0x0D7A, "Yes: reset the heroes and run the hero menu")
+annotator.c(0x0D7C, "No: the heroes carry over; straight to the level")
+annotator.c(0x0D7F, "A = 0, for new_game_reset_heroes' first hero")
 annotator.c(0x0E14, "Monster hit points = 6 + 2 x levels started...")
-annotator.c(0x0E1E, "...and play the level")
-annotator.c(0x0E45, "Next level: reset the machine and run Coder")
-annotator.c(0x0EC3, "Wait up to &246 centiseconds for a key...")
-annotator.c(0x0ECC, "...then restart the game by resetting the machine")
+annotator.c(0x0E1E, "Start the level Coder has loaded")
+annotator.c(0x0E45, "A hero survived: reset the machine and run Coder")
+annotator.c(0x0EC3, "Game over: wait up to &246 cs (5.8 s) for a key...")
+annotator.c(0x0ECC, "...then reset and reload the game with *DUNJUNZ")
 
 annotator.sub(0x1460, "next_level_by_reset", "Move on to the next level by resetting the machine",
-              "Set the BREAK intercept to next_level_intercept and jump to "
-              "the MOS 1.20 reset entry.")
-annotator.c(0x1460, "BREAK intercept = JMP next_level_intercept...")
-annotator.c(0x146F, "Reset the machine")
+              "Reached through to_next_level when a level ends with at least "
+              "one hero alive. Arm the BREAK intercept with a JMP to "
+              "next_level_intercept and jump to the MOS 1.20 reset entry, so "
+              "that the reset runs Coder, which reloads the game and the "
+              "next level. Never returns.")
+annotator.c(0x1460, "Arm the BREAK intercept: a JMP opcode...")
+annotator.c(0x146F, "Reset: the MOS calls the intercept on the way")
 annotator.sub(0x144F, "restart_by_reset", "Restart the game by resetting the machine",
-              "Set the BREAK intercept to restart_intercept and reset the "
-              "machine.")
-annotator.c(0x144F, "BREAK intercept = JMP restart_intercept...")
-annotator.c(0x145E, "...and reset (always branches)")
+              "Reached after the game-over message and its wait. Arm the "
+              "BREAK intercept with a JMP to restart_intercept and reset the "
+              "machine, so that *DUNJUNZ loads the game afresh for a new "
+              "game. Never returns.")
+annotator.c(0x144F, "Arm the BREAK intercept: JMP restart_intercept...")
+annotator.c(0x145E, "...and reset (always taken: A = &4C)")
 annotator.entry(0x1472)
 annotator.sub(0x1472, "restart_intercept", "BREAK intercept: reload the game",
-              "Called by the MOS during the reset. On the second call (carry "
-              "set) clear the screen and issue *DISC and *DUNJUNZ.",
+              "Called twice by the MOS during the reset that restart_by_reset "
+              "makes. The first call (carry clear) comes before the filing "
+              "system is initialised and does nothing. On the second, clear "
+              "the screen, select the disc filing system and *DUNJUNZ, "
+              "which takes over and never returns.",
               on_entry={"C": "set on the second call, after the filing "
                              "system is initialised"})
 annotator.entry(0x15B5)
 annotator.sub(0x15B5, "next_level_intercept", "BREAK intercept: run Coder for the next level",
-              "Called by the MOS during the reset. On the second call (carry "
-              "set) select MODE 2 and issue *DISC and *RUN CODER.",
+              "Called twice by the MOS during the reset that "
+              "next_level_by_reset makes. The first call (carry clear) comes "
+              "before the filing system is initialised and does nothing. On "
+              "the second, select MODE 2, the disc filing system and *RUN "
+              "CODER, which loads the next level and never returns.",
               on_entry={"C": "set on the second call, after the filing "
                              "system is initialised"})
 annotator.sub(0x1446, "check_level", "Check the level and set the text window",
-              "Decrypt and check the level (Coder has already loaded it), and "
-              "set the bottom row used by clear_text_area.",
+              "Called from start_level where the level would be loaded: "
+              "Coder has already loaded it at &6B00. Decrypt it and check "
+              "its checksum (decrypt_level resets the machine on a "
+              "mismatch), then set the bottom row of clear_text_area's text "
+              "window to 24.",
                on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 
-annotator.c(0x1ED7, "OSBYTE &7A: is a key pressed?")
+annotator.block(0x1ED7, "The pause key, last in each frame's update. OSBYTE &7A "
+                        "reports a single key, so P is seen only when the "
+                        "scan finds it rather than another key held with "
+                        "it. Play resumes as soon as P is pressed again; if "
+                        "it is still held at the next frame's check, the "
+                        "game pauses again.")
+annotator.c(0x1ED7, "OSBYTE &7A: which key is held, if any?")
 annotator.c(0x1EDC, "P (internal key &37)?")
-annotator.c(0x1EDE, "No: return")
+annotator.c(0x1EDE, "No: on with play")
 annotator.c(0x1EE0, "Paused: wait for P to be released...")
 annotator.c(0x1EE7, "...then pressed again")
-annotator.c(0x1EEE, "Restart the frame timing")
+annotator.c(0x1EEE, "Next frame in 17 vsyncs, not the usual 3...")
 
 for addr, text in [
-    (0x0D78, "...only this one?"), (0x0D81, "...from new_game's second instruction"),
-    (0x0E17, "...2 x levels started..."), (0x0E18, "...ready to add..."), (0x0E19, "...6"), (0x0E1B, "...for every monster on this level"),
-    (0x0EC5, "...Y = &02: the time limit's high byte"), (0x0EC7, "...with OSBYTE &81, INKEY"),
-    (0x1446, "Decrypt and check the level Coder loaded"),
-    (0x1449, "Bottom row &18 for clear_text_area's window"),
-    (0x144B, "...patched into clear_text_area's VDU 28"), (0x144E, "Return"),
-    (0x1451, "...low byte of the intercept's JMP address"), (0x1454, "...high byte..."), (0x1456, "...into the JMP's high byte"), (0x1459, "...and a JMP opcode..."),
-    (0x145B, "...at &0287 arms it for the reset"),
-    (0x1462, "...at &0287 arms it..."), (0x1465, "...JMP to next_level_intercept: low byte..."), (0x1467, "...into the JMP's operand"), (0x146A, "...high byte..."),
-    (0x146C, "...completes the jump"),
+    (0x0D78, "...levels_started 1?"), (0x0D81, "...past the stores that zero the level counts"),
+    (0x0E17, "...2 x levels started..."), (0x0E18, "...ready to add..."), (0x0E19, "...+ 6: 8 on level 1, 56 on level 25"), (0x0E1B, "...for every monster on this level"),
+    (0x0EC5, "...Y = &02: the time limit's high byte"), (0x0EC7, "...OSBYTE &81: INKEY with a time limit"),
+    (0x1446, "Decrypt and check the level Coder loaded at &6B00"),
+    (0x1449, "Bottom row 24 for clear_text_area's window..."),
+    (0x144B, "...over the &16 in its VDU 28: the full 25 rows"), (0x144E, "Return"),
+    (0x1451, "...address low byte into &0288..."), (0x1454, "...high byte..."), (0x1456, "...into &0289"), (0x1459, "...then the JMP opcode..."),
+    (0x145B, "...into &0287, which arms the intercept"),
+    (0x1462, "...into &0287..."), (0x1465, "...JMP to next_level_intercept: low byte..."), (0x1467, "...into &0288"), (0x146A, "...high byte..."),
+    (0x146C, "...into &0289: the intercept is armed"),
     (0x1472, "First call (before the filing system): nothing to do"),
-    (0x1474, "Clear the screen"), (0x1476, "...VDU 12, so the reset shows a clear screen"),
-    (0x1479, "*DISC"), (0x147B, "...high byte of the command"), (0x147D, "...back on the disc filing system"),
-    (0x1480, "*DUNJUNZ: run the loader again"), (0x1482, "...high byte of the command"),
-    (0x1484, "...the loader takes over; it never returns"), (0x1487, "Return to the MOS"),
-    (0x15B1, "Clear the text area (Coder has shown the level number)"),
+    (0x1474, "VDU 12: clear the screen..."), (0x1476, "...of the game-over message"),
+    (0x1479, "*DISC..."), (0x147B, "...high byte of the command"), (0x147D, "...so that *DUNJUNZ comes from the disc"),
+    (0x1480, "*DUNJUNZ: load the game afresh..."), (0x1482, "...high byte of the command"),
+    (0x1484, "...which takes over and never returns"), (0x1487, "Return to the MOS"),
+    (0x15B1, "Clear the text area: no level number is shown"),
     (0x15B4, "Return"),
     (0x15B5, "First call (before the filing system): nothing to do"),
-    (0x15B7, "MODE 2"), (0x15B9, "...VDU 22..."), (0x15BC, "...mode 2..."), (0x15BE, "...the game's mode, for Coder's screen"),
-    (0x15C1, "*DISC"), (0x15C3, "...high byte of the command"), (0x15C5, "...back on the disc filing system"),
-    (0x15C8, "*RUN CODER"), (0x15CA, "...high byte of the command"), (0x15CC, "...load the next level; it never returns"),
+    (0x15B7, "MODE 2, the game's mode, for Coder..."), (0x15B9, "...VDU 22..."), (0x15BC, "...mode 2..."), (0x15BE, "...sent"),
+    (0x15C1, "*DISC..."), (0x15C3, "...high byte of the command"), (0x15C5, "...so that Coder comes from the disc"),
+    (0x15C8, "*RUN CODER: reload the game and the next level..."), (0x15CA, "...high byte of the command"), (0x15CC, "...which never returns"),
     (0x15CF, "Return to the MOS"),
     (0x1EE3, "...still P?"), (0x1EE5, "Yes: keep waiting"), (0x1EEA, "...P yet?"), (0x1EEC, "No: stay paused"),
-    (0x1EF0, "...so play resumes with a full frame delay"), (0x1EF3, "Return"),
+    (0x1EF0, "...about a third of a second before play resumes"), (0x1EF3, "Return"),
     (0x5004, "...Y = 0: X replaces the old setting"),
-    (0x500B, "...VDU 6 lets text reach the screen..."), (0x500E, "...VDU 3..."), (0x5010, "...keeps output off any printer"),
-    (0x501E, "Units digit a space (levels 1-9)?"),
+    (0x500B, "...VDU 6 undoes the VDU 21 *DUNJUNZ sends..."), (0x500E, "...VDU 3..."), (0x5010, "...keeps output off any printer"),
+    (0x501E, "Second digit a space (levels 1-9)?"),
     (0x5020, "Yes: advance the single digit"),
-    (0x5022, "No: advance the units digit..."), (0x5023, "...add one to the units digit"),
-    (0x5025, "...back into the filename digits"), (0x5028, "...past 9?"), (0x502A, "Still a digit: the number is ready"),
-    (0x502C, "Yes: units 0 and carry into the tens"), (0x502E, "...units '0'..."),
+    (0x5022, "No: advance the units digit..."), (0x5023, "...by one"),
+    (0x5025, "...back into level_digits"), (0x5028, "...past '9'?"), (0x502A, "No: the number is ready"),
+    (0x502C, "Yes: units '0' and carry into the tens"), (0x502E, "...units '0'..."),
     (0x5031, "...and one more tens"), (0x5034, "Always taken: the number is ready"),
-    (0x5036, "Advance the single digit..."), (0x5039, "...to check it"),
-    (0x503C, "...past 9?"), (0x503E, "1-9: the number is ready"),
+    (0x5036, "Advance the single digit ('0 ' becomes '1 ')..."), (0x5039, "...to check it"),
+    (0x503C, "...past '9'?"), (0x503E, "No: levels 1-9 are ready"),
     (0x5040, "Yes: level 10, \"10\""), (0x5042, "...tens '1'..."), (0x5045, "...units '0'..."),
     (0x5047, "...in place of the space"),
-    (0x504C, "...the next byte of the 6845 set-up..."), (0x504F, "...to the VDU"), (0x5052, "...on to the next"), (0x5053, "...until all of loading_vdu is sent"),
+    (0x504C, "...the next byte of loading_vdu..."), (0x504F, "...to the VDU"), (0x5052, "...on to the next"), (0x5053, "...until all 21 are sent"),
     (0x5055, "More to send"),
-    (0x5059, "...so the loads leave no trace on screen"), (0x505E, "...high byte of the command"), (0x5060, "...a fresh copy of the whole game image"),
-    (0x5066, "...first digit..."), (0x5069, "...second digit, or a space..."), (0x506C, "...into the filename"),
-    (0x5072, "...in &8E"),
-    (0x5077, "...less one..."), (0x5078, "...for the 0-based level number"), (0x507A, "...as game_entry expects it"),
-    (0x507F, "Not level 25: load its LEVELnn file"), (0x5083, "...high byte of the command"), (0x5085, "...level 25 is at the end of Stones"),
-    (0x508D, "...high byte of the command"), (0x508F, "...*LOAD the level to &6B00"),
-    (0x5094, "...so the game can print again"),
+    (0x5059, "...so the *LOADs print nothing"), (0x505E, "...high byte of the command"), (0x5060, "...*LOAD DUN1 to &2000-&7FFF"),
+    (0x5066, "...first digit..."), (0x5069, "...second digit, or a space..."), (0x506C, "...at level_command+10"),
+    (0x5072, "...which game_entry makes level_number"),
+    (0x5077, "...less one..."), (0x5078, "...24 for level 25"), (0x507A, "...in level_number (the core copy overwrites it)"),
+    (0x507F, "Not level 25: load its LEVELnn file"), (0x5083, "...high byte of the command"), (0x5085, "...putting level 25 at &6B00"),
+    (0x508D, "...high byte of the command"), (0x508F, "...to &6B00, where check_level decrypts it"),
+    (0x5094, "...so the game's text can appear"),
     (0x5099, "...destination pointer in coder_dest..."),
     (0x509B, "...high byte..."), (0x509D, "...destination &0400 complete"),
     (0x50A1, "...source pointer in coder_source"),
-    (0x50A5, "...channel 1"),
-    (0x50AC, "Not at rest: no joystick fitted"), (0x50B0, "...source &55B0"), (0x50B2, "Always taken: copy it"), (0x50B6, "...source &51B0"),
+    (0x50A5, "...channel 1: the joystick's left-right axis"),
+    (0x50AC, "Not &80: use the keyboard-only image"), (0x50B0, "...source &55B0"), (0x50B2, "Always taken: copy it"), (0x50B6, "...source &51B0"),
     (0x50B8, "Copy a kilobyte, up to &0800..."),
     (0x50BA, "...take the next byte..."), (0x50BC, "...into the game's &0400-&07FF"), (0x50BE, "Step the destination..."), (0x50C0, "...within the page"),
     (0x50C2, "...or on to the next page"), (0x50C4, "Step the source..."), (0x50C6, "...within the page"), (0x50C8, "...or on to the next page"),
     (0x50CA, "Destination page..."), (0x50CC, "...reached &08?"), (0x50CE, "No: copy more"),
-    (0x50D0, "Joystick at rest again?"),
-    (0x50D2, "...channel 1 again"), (0x50D7, "...high byte &80?"), (0x50D9, "No: set up screen for play"),
-    (0x50DB, "Yes: point BYTEV at the joystick handler at &0780"),
-    (0x50DD, "...low byte"), (0x50E0, "...high byte"), (0x50E2, "...so INKEY scans reach the joystick handler"),
+    (0x50D0, "Read channel 1 again: install the handler?"),
+    (0x50D2, "...channel 1 again"), (0x50D7, "...high byte exactly &80?"), (0x50D9, "No: keep the MOS's BYTEV"),
+    (0x50DB, "Yes: point BYTEV at joystick_bytev (&0780)"),
+    (0x50DD, "...low byte"), (0x50E0, "...high byte"), (0x50E2, "...so the Barbarian's key scans read the joystick"),
     (0x50E5, "COLOUR 2"), (0x50E7, "...VDU 17..."), (0x50EA, "...text colour 2..."), (0x50EC, "...for the game's messages"),
-    (0x50EF, "VDU commands to set up the screen for play"),
-    (0x50F1, "...the next byte of the 6845 set-up..."), (0x50F4, "...to the VDU"), (0x50F7, "...on to the next"), (0x50F8, "...until all of play_vdu is sent"),
+    (0x50EF, "Show the display again, 23 rows, for play"),
+    (0x50F1, "...the next byte of play_vdu..."), (0x50F4, "...to the VDU"), (0x50F7, "...on to the next"), (0x50F8, "...until all 20 are sent"),
     (0x50FA, "More to send"),
-    (0x50FC, "First level?"),
-    (0x50FF, "...fewer than 2 levels started?"), (0x5101, "No: keep heroes"),
+    (0x50FC, "First level of a game?"),
+    (0x50FF, "...fewer than 2 levels started?"), (0x5101, "No: keep the heroes"),
     (0x5103, "Yes: copy all of &3000-&473F to &08C0-&1FFF"),
     (0x5105, "...offset &0000: low byte..."), (0x5107, "...and high byte"), (0x5109, "Always taken: copy from the start"),
-    (0x510B, "No: copy only &3440-&473F to &0D00-&1FFF, keeping the "
-             "heroes' state in &08C0-&0CFF"),
+    (0x510B, "No: copy &3440-&473F to &0D00, keeping the heroes' state"),
     (0x510D, "...offset &0440: low byte..."), (0x510F, "...high byte &04..."), (0x5111, "...so &08C0-&0CFF is left as it is"),
     (0x5113, "Source = &3000 + offset..."), (0x5115, "...source low byte"),
     (0x5117, "...page &30..."), (0x5119, "...plus..."), (0x511A, "...the offset's high byte..."), (0x511C, "...source high byte"),
@@ -288,41 +317,46 @@ for addr, text in [
     (0x5135, "...or on to the next page"), (0x5137, "Step the destination..."), (0x5139, "...within the page"), (0x513B, "...or on to the next page"),
     (0x513D, "Source low byte..."), (0x513F, "...at &40?"), (0x5141, "No: copy more"), (0x5143, "...and high byte..."),
     (0x5145, "...at &47?"), (0x5147, "No: copy more"),
-    (0x5149, "Start the game"),
+    (0x5149, "Enter the game at game_entry"),
 ]:
     annotator.c(addr, text)
 
 # The handler exists only in the joystick image.
 joystick_only = Annotator(d, "disc", lambda addr: [(low_joystick, "")])
 joystick_only.sub(
-    0x0780, "joystick_bytev", "BYTEV handler: read a joystick for the third player's keys",
-    "Installed by Coder, in the joystick image of &0400-&07FF only. Answers "
-    "OSBYTE &81 scans of the third player's keys from the analogue port: left "
-    "(&98) and right (&97) from channel 1 at its extremes, up (&B9) and down "
-    "(&99) from channel 2, and fire (&9D) from the fire buttons. Every other "
-    "call goes to the MOS 1.20 OSBYTE routine at &E772 directly.",
+    0x0780, "joystick_bytev", "BYTEV handler: read a joystick for the Barbarian's keys",
+    "Installed on BYTEV by Coder, in the joystick image of &0400-&07FF "
+    "only. Answers test_key's OSBYTE &81 scans of the Barbarian's (hero "
+    "2's) keys from the analogue port, so that a joystick plays the "
+    "Barbarian: left (. &98) and right (/ &97) from channel 1, up (K &B9) "
+    "and down (, &99) from channel 2, and fire (SPACE &9D) from either fire "
+    "button. A direction counts only at the stick's extreme, when the "
+    "channel's high byte is &FF or 0, so the stick works as a switch. Every "
+    "other call goes to the MOS 1.20 OSBYTE routine at &E772 directly, "
+    "skipping any other BYTEV claimant.",
     on_entry={"A": "OSBYTE number", "X": "OSBYTE X"},
-    on_exit={"X": "&FF if the key is pressed, 0 if not"})
+    on_exit={"X": "&FF if the key is pressed, 0 if not",
+             "Y": "&FF if the key is pressed"})
 annotator.label(0xE772, "mos_osbyte_default", group="mos_internals",
                 description="MOS 1.20 default OSBYTE routine, BYTEV's initial value.")
 for addr, text in [
     (0x0780, "OSBYTE &81 (INKEY)?"),
-    (0x0782, "No: pass it on"),
-    (0x0784, "Left key (>)?"), (0x0786, "Yes: read the stick for left"),
-    (0x0788, "Down key (<)?"), (0x078A, "Yes: read the stick for down"),
-    (0x078C, "Up key (K)?"), (0x078E, "Yes: read the stick for up"),
-    (0x0790, "Right key (?)?"), (0x0792, "Yes: read the stick for right"),
-    (0x0794, "Fire key (SPACE)?"), (0x0796, "Yes: read the fire buttons"),
-    (0x0798, "Another key: pass it on"),
+    (0x0782, "No: let the MOS handle it"),
+    (0x0784, "The Barbarian's left key (.)?"), (0x0786, "Yes: read the stick for left"),
+    (0x0788, "The Barbarian's down key (,)?"), (0x078A, "Yes: read the stick for down"),
+    (0x078C, "The Barbarian's up key (K)?"), (0x078E, "Yes: read the stick for up"),
+    (0x0790, "The Barbarian's right key (/)?"), (0x0792, "Yes: read the stick for right"),
+    (0x0794, "The Barbarian's fire key (SPACE)?"), (0x0796, "Yes: read the fire buttons"),
+    (0x0798, "Any other key: scan the keyboard as usual"),
     (0x079B, "Left: channel 1 high byte &FF?"),
     (0x079D, "...with OSBYTE &80, reading the ADC"), (0x07A2, "...high byte &FF: pushed fully left?"), (0x07A4, "No: not pressed"),
-    (0x07A6, "Yes: pressed"), (0x07A8, "Return"),
+    (0x07A6, "Yes: pressed (Y is already &FF)"), (0x07A8, "Return"),
     (0x07A9, "Right: channel 1 high byte 0?"),
     (0x07AB, "...with OSBYTE &80, reading the ADC"), (0x07B0, "...high byte 0: pushed fully right?"), (0x07B2, "No: not pressed"),
     (0x07B4, "Yes: pressed (Y = &FF)"), (0x07B5, "...X = Y = &FF, as INKEY reports a key held"), (0x07B7, "Return"),
     (0x07B8, "Up: channel 2 high byte &FF?"),
     (0x07BA, "...with OSBYTE &80, reading the ADC"), (0x07BF, "...high byte &FF: pushed fully up?"), (0x07C1, "No: not pressed"),
-    (0x07C3, "Yes: pressed"), (0x07C5, "Return"),
+    (0x07C3, "Yes: pressed (Y is already &FF)"), (0x07C5, "Return"),
     (0x07C6, "Down: channel 2 high byte 0?"),
     (0x07C8, "...with OSBYTE &80, reading the ADC"), (0x07CD, "...high byte 0: pushed fully down?"), (0x07CF, "No: not pressed"),
     (0x07D1, "Yes: pressed (Y = &FF)"), (0x07D2, "...X = Y = &FF, as INKEY reports a key held"), (0x07D4, "Return"),
@@ -330,8 +364,8 @@ for addr, text in [
     (0x07D7, "...OSBYTE &80, X = 0: the fire buttons in X"), (0x07DC, "...the button bits..."), (0x07DD, "...bits 0-1: either button held?"),
     (0x07DF, "No: not pressed"),
     (0x07E1, "Yes: pressed"), (0x07E3, "...X = Y = &FF, as INKEY reports a key held"), (0x07E5, "Return"),
-    (0x07E6, "Not pressed"), (0x07E8, "Return"),
-    (0x07E9, "Pass the call on to the MOS 1.20 OSBYTE routine"),
+    (0x07E6, "Not pressed: X = 0, which test_key reads as not held"), (0x07E8, "Return"),
+    (0x07E9, "Not INKEY: on to the MOS 1.20 OSBYTE routine"),
 ]:
     joystick_only.c(addr, text)
 
@@ -426,9 +460,10 @@ d.expr(0x50F9, sym("coder_leftovers") - sym("play_vdu"))
 # ---------------------------------------------------------------------------
 # The disc's own branch targets and patched operands.
 
-annotator.sub(0x15B1, "show_level_number", "Clear the text area before a level",
-              "Coder has already shown the level number, so this only clears "
-              "the text area.",
+annotator.sub(0x15B1, "clear_text_for_level", "Clear the text area before a level",
+              "start_level's first call. Only clears the text area: no level "
+              "number is shown, and level_number is not counted here (game_entry "
+              "sets it from levels_started).",
               on_exit={"A": "corrupted"})
 for addr, name in [(0x0D72, "store_level_bcd"), (0x0D7F, "start_new_game"),
                    (0x0E08, "new_game_reset_heroes"), (0x0E45, "to_next_level"),

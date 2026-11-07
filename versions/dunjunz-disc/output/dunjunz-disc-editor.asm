@@ -212,10 +212,14 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Unpack the loaded level into the slots
 ;
-; Read the level file's tables from the last entry back, putting each item in the next
-; slot down from &4F: objects (with their editor items found from item_types), each door
-; and then its key (linked), and the trapdoors. Copy the wall map and object-free map.
-; Count the objects and doors.
+; Called by start_editing for a loaded, decrypted level. Read the level file's tables
+; from the last entry back, putting each item in the next slot down from &4F: objects 30
+; to 1 (the exit, 30, first, into slot &4F), skipping any whose x is &80 or more, with
+; their editor items found from item_types; doors 20 to 1, each followed by its key in
+; the slot below and the pair recorded as a door-key link, from link 19 down; then all
+; eight trapdoors. Copy the wall map and object-free map into the editor's own.
+; object_count leaves out the exit (it starts at -1), door_count counts the doors and
+; trapdoor_count is set to 8.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -236,7 +240,7 @@ oscli                 = &fff7
     ldx #max_object                     ; For objects 30 to 1...
 ; &7b18 referenced 1 time by &194b
 .unpack_object
-    lda level_object_x,x                ; ...in use?
+    lda level_object_x,x                ; ...its x: on the map?
     bmi next_object                     ; &80 or more (&FF): not in this level
     inc object_count                    ; Yes: count it...
     ldy unpack_slot                     ; ...and put it in the next slot...
@@ -255,12 +259,12 @@ oscli                 = &fff7
     ldx #max_door                       ; For doors 20 to 1...
 ; &7b3f referenced 1 time by &199c
 .unpack_door
-    lda level_door_x,x                  ; ...in use?
-    bmi next_door                       ; &FF: no door here
+    lda level_door_x,x                  ; ...its x: on the map?
+    bmi next_door                       ; &80 or more (&FF): no door here
     inc door_count                      ; Yes: count it...
     lda unpack_slot                     ; ...link it: the door's slot...
     ldy unpack_link                     ; ...in this link...
-    sta link_door,y                     ; ...the door's slot...
+    sta link_door,y                     ; ...recorded as the link's door...
     sec                                 ; ...and the key's, the slot below...
     sbc #1                              ; ...one below...
     sta link_key,y                      ; ...is the key's slot...
@@ -275,7 +279,7 @@ oscli                 = &fff7
     ldy unpack_slot                     ; ...back to the slot being filled...
     sta slot_item,y                     ; ...stored with it...
     dec unpack_slot                     ; ...and move to the next slot down
-    dey                                 ; ...and the key in the next
+    dey                                 ; Y = the door's slot - 1: the key's slot
     lda level_key_x,x                   ; ...its x...
     sta slot_x,y                        ; ...into the slot below...
     lda level_key_y,x                   ; ...then its y...
@@ -287,7 +291,7 @@ oscli                 = &fff7
 .next_door
     dex                                 ; Next door
     bne unpack_door                     ; ...down to door 1
-    ldx #7                              ; For trapdoors 7 to 0...
+    ldx #7                              ; For trapdoors 7 to 0, all of them present...
 ; &7b90 referenced 1 time by &19b8
 .unpack_trapdoor
     lda level_trapdoor_x,x              ; ...put each in the next slot
@@ -314,17 +318,20 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Find the editor's item for a level type
 ;
-; Search item_types from entry 1 for the type. A type with no item would search on into
-; the bytes beyond.
+; Search item_types from entry 1 for the type: an object's type, or a door's sprite &1C
+; or &1D. A type with no item would be matched against the bytes beyond item_types (the
+; checksums and sprite tables), and with no match at all Y would wrap to 0 and run on
+; past the routine's end.
 ;
 ; On Entry:
 ;     A: level type
 ;
 ; On Exit:
 ;     A: item
+;     Y: item
 ; &7bbe referenced 2 times by &193e, &197a
 .item_for_type
-    sta bit_mask                        ; Keep the type
+    sta bit_mask                        ; Keep the type to compare with
     ldy #1                              ; From item 1...
 ; &7bc2 referenced 1 time by &19dc
 .search_types
@@ -353,14 +360,17 @@ oscli                 = &fff7
 
 
     org &1a00
-.free_cell_image
+.mark_object_cell_image
 
 ; Move 2: &1a00 to &7d80 for length 67
     org &7d80
 ; ***************************************************************************************
 ; Mark the cursor's cell as holding an object
 ;
-; Clear its bit in the object-free map (laid out as the wall map).
+; Clear its bit in the object-free map (laid out as the wall map), so the game will look
+; for an object there. put_item calls it for every item placed, walls included. It runs
+; at &7D80, copied there by start_editing, in screen memory below the 30 rows shown
+; (&3000-&7AFF).
 ;
 ; On Entry:
 ;     CURSOR_X: the cell's column
@@ -371,7 +381,7 @@ oscli                 = &fff7
 ;     X: corrupted
 ;     Y: corrupted
 ; &7d80 referenced 1 time by &2bd7; also used as index base 1 time by &1ed5
-.free_cell
+.mark_object_cell
     lda cursor_y                        ; (y AND &F8) x 4...
     and #&f8                            ; ...the room row, as a multiple of 8...
     asl a                               ; ...x 2...
@@ -395,20 +405,20 @@ oscli                 = &fff7
     lda #7                              ; ...from 7...
     sec                                 ; ...C set for the subtraction
     sbc bit_mask                        ; ...7 - it: the bit, leftmost cell in bit 7
-    beq free_bit_0                      ; Bit 0: the mask is 1
+    beq mark_bit_0                      ; Bit 0: the mask is 1
     tax                                 ; ...as a count...
     lda #1                              ; ...from bit 0...
 ; &7dae referenced 1 time by &1a30
-.free_shift_bit
+.mark_shift_bit
     asl a                               ; Shift the mask up a bit...
     dex                                 ; ...counted
-    bne free_shift_bit                  ; ...until it is in place
-    beq free_bit_found                  ; ...(always branches)
+    bne mark_shift_bit                  ; ...until it is in place
+    beq mark_bit_found                  ; ...(always branches)
 ; &7db4 referenced 1 time by &1a29
-.free_bit_0
+.mark_bit_0
     lda #1                              ; ...mask 1
 ; &7db6 referenced 1 time by &1a32
-.free_bit_found
+.mark_bit_found
     eor #&ff                            ; Clear it
     sta bit_mask                        ; ...as a mask
     ldy #0                              ; ...Y = 0
@@ -421,14 +431,14 @@ oscli                 = &fff7
     ; Copy the newly assembled block of code back to it's proper place in the binary
     ; file.
     ; (Note the parameter order: 'copyblock <start>,<end>,<dest>')
-    copyblock free_cell, *, free_cell_image
+    copyblock mark_object_cell, *, mark_object_cell_image
 
     ; Clear the area of memory we just temporarily used to assemble the new block,
     ; allowing us to assemble there again if needed
-    clear free_cell, &7dc3
+    clear mark_object_cell, &7dc3
 
     ; Set the program counter to the next position in the binary file.
-    org free_cell_image + (* - free_cell)
+    org mark_object_cell_image + (* - mark_object_cell)
 
 
     org &2700
@@ -458,15 +468,15 @@ oscli                 = &fff7
 ;     Y: 0
 ; &0900 referenced 5 times by &24a0, &253a, &254b, &2b72, &2cf3; also used as index base 1 time by &23a2
 .plot_sprite
-    ldx sprite_number                   ; X = sprite number
-    lda sprite_addr_lo,x                ; Point sprite_data_ptr at the sprite's data...
+    ldx sprite_number                   ; X = sprite number, indexing the four sprite tables
+    lda sprite_addr_lo,x                ; Point sprite_data_ptr at the editor sprite's data...
     sta sprite_data_ptr                 ; ...low byte
-    lda sprite_addr_hi,x                ; ...high byte...
-    sta sprite_data_ptr_hi              ; ...into sprite_data_ptr
-    lda sprite_widths,x                 ; Width in bytes...
-    sta scratch                         ; ...for the inner loop
-    lda sprite_heights,x                ; Height in pixel rows...
-    sta scratch_hi                      ; ...for the outer loop
+    lda sprite_addr_hi,x                ; ...high byte, from the editor's sprite tables...
+    sta sprite_data_ptr_hi              ; ...so sprite_data_ptr walks through the data
+    lda sprite_widths,x                 ; Width in screen bytes, from sprite_widths...
+    sta scratch                         ; ...counted across each row
+    lda sprite_heights,x                ; Height in pixel rows, from sprite_heights...
+    sta scratch_hi                      ; ...counted down the sprite
     jsr screen_address                  ; screen_ptr = address of the top-left byte
     ldy #0                              ; Index stays 0: the pointers themselves advance
     ldx scratch_hi                      ; X counts the pixel rows still to plot
@@ -476,7 +486,7 @@ oscli                 = &fff7
     lda screen_ptr                      ; Remember where this pixel row starts...
     sta row_start_ptr                   ; ...low byte
     lda screen_ptr_hi                   ; ...and high byte...
-    sta row_start_ptr_hi                ; ...in row_start_ptr
+    sta row_start_ptr_hi                ; ...in row_start_ptr, to step down from later
     txa                                 ; Save the row count
     pha                                 ; ...on the stack: X now counts bytes
     ldx scratch                         ; X counts the bytes across this row
@@ -484,7 +494,7 @@ oscli                 = &fff7
 .plot_sprite_byte
 .plot_byte
     lda (sprite_data_ptr),y             ; Copy one sprite byte...
-    sta (screen_ptr),y                  ; ...to the screen
+    sta (screen_ptr),y                  ; ...to the screen, over whatever was there
     clc                                 ; Step screen_ptr right one byte column: 8 bytes on
     lda screen_ptr                      ; ...the screen address's low byte...
     adc #8                              ; ...+ 8, the next byte column...
@@ -500,8 +510,8 @@ oscli                 = &fff7
 ; &093e referenced 1 time by &273a
 .plot_sprite_count_byte
 .plot_count_byte
-    dex                                 ; Count the bytes across
-    bne plot_sprite_byte                ; Loop until the row is done
+    dex                                 ; One byte fewer left in this row
+    bne plot_sprite_byte                ; More of the row: plot the next byte
     clc                                 ; screen_ptr = row start + 1: the next pixel row down
     lda row_start_ptr                   ; The row start's low byte...
     adc #1                              ; ...+ 1...
@@ -511,9 +521,9 @@ oscli                 = &fff7
     sta screen_ptr_hi                   ; ...is the new high byte
     lda screen_ptr                      ; Has it crossed into the next character row?
     and #7                              ; ...(pixel row within the character now 0)
-    bne plot_sprite_next_row            ; No: carry on
-    clc                                 ; Yes: add 640-8 to reach the top pixel row of the...
-    lda screen_ptr                      ; ...character row below
+    bne plot_sprite_next_row            ; No: still within the character row
+    clc                                 ; Yes: add &278 more, to the top of the character...
+    lda screen_ptr                      ; ...row below (row start + 1 + &278 = + 640 - 7)
     adc #&78 ; 'x'                      ; ...low byte + &78 (640 - 8 = &278)...
     sta screen_ptr                      ; ...stored
     lda screen_ptr_hi                   ; ...high byte...
@@ -524,8 +534,8 @@ oscli                 = &fff7
 .plot_next_row
     pla                                 ; Recover the row count
     tax                                 ; ...back into X
-    dex                                 ; Count the pixel rows
-    bne plot_sprite_row                 ; Loop until the sprite is done
+    dex                                 ; One pixel row fewer to plot
+    bne plot_sprite_row                 ; More rows: plot the next
     rts                                 ; Return
 ; ***************************************************************************************
 ; Calculate a screen address
@@ -545,10 +555,10 @@ oscli                 = &fff7
 ;     X: preserved
 ; &0967 referenced 1 time by &2716
 .screen_address
-    lda plot_y                          ; Character row = plot_y DIV 8...
-    lsr a                               ; ...halved...
-    lsr a                               ; ...and halved again...
-    and #&fe                            ; ...times 2 to index the table's byte pairs
+    lda plot_y                          ; Table index = 2 x (plot_y DIV 8), the character row...
+    lsr a                               ; ...plot_y / 2...
+    lsr a                               ; ...plot_y / 4...
+    and #&fe                            ; ...bit 0 cleared: the row's pair of table bytes
     tay                                 ; ...as the index into the MOS table
     lda mos_row_offsets,y               ; High byte of row x 640, from the MOS table...
     clc                                 ; ...(carry clear for the add)
@@ -558,17 +568,17 @@ oscli                 = &fff7
     sta screen_ptr                      ; ...as the low byte
     lda plot_y                          ; Add the pixel row within the character...
     and #7                              ; ...plot_y MOD 8...
-    adc screen_ptr                      ; ...(no carry: the low byte is &00 or &80)
+    adc screen_ptr                      ; ...(carry clear: adding &30 to the high byte cannot carry)
     sta screen_ptr                      ; ...stored in the low byte
-    clc                                 ; Add 8 x plot_x: first its top three bits...
+    clc                                 ; Add 8 x plot_x: its high byte is plot_x DIV 32...
     lda plot_x                          ; ...from plot_x...
     and #&e0                            ; ...bits 7-5 kept...
-    rol a                               ; ...rotated down to bits 0-2...
-    rol a                               ; ...bit 7 into bit 0 via the carry
-    rol a                               ; ...then bit 6; bit 7 to bit 1
+    rol a                               ; ...four ROLs through the carry: bit 7 out...
+    rol a                               ; ...bit 7 in at bit 0, bit 6 out
+    rol a                               ; ...bits 7-6 at bits 1-0, bit 5 out
     rol a                               ; ...bits 7-5 now in bits 2-0
     clc                                 ; ...(carry clear for the add)
-    adc screen_ptr_hi                   ; ...into the high byte
+    adc screen_ptr_hi                   ; ...added to the high byte
     sta screen_ptr_hi                   ; ...stored
     lda plot_x                          ; ...then plot_x x 8 into the low byte
     asl a                               ; ...x 2...
@@ -732,10 +742,14 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Set up and choose a level
 ;
-; Disable ESCAPE, point the BREAK intercept at break_to_start and BRKV at MOS 1.20's
-; reset entry (so any error restarts the machine), set the cursor keys and *TV255 1,
-; select MODE 7 and ask whether to edit a level or start a new one. To edit, choose disc
-; or tape and the file, and *LOAD it at &2700.
+; Disable ESCAPE, point the BREAK intercept at break_to_start (so BREAK at a prompt
+; starts again) and BRKV at MOS 1.20's reset entry (so any error, such as a missing file,
+; resets the machine), and note that no level has been encrypted. Set the map cursor's
+; keys to ',' '.' 'A' 'Z', *TV255 1 (applied by the MODE 7 that follows) and ask whether
+; to edit a level or start a new one. A new level goes to new_level. To edit, choose disc
+; or tape (and the drive), read the filename into load_command, *LOAD the file at &2700
+; and go to start_editing. Reached from editor_start, from break_to_start and after a
+; save when another level is asked for.
 ; &1c13 referenced 3 times by &1c10, &2392, &23b1
 .editor_init
     lda #osbyte_escape_break_effect     ; OSBYTE &C8 with X=1, Y=0: disable ESCAPE
@@ -745,17 +759,17 @@ oscli                 = &fff7
     lda #opcode_jmp                     ; BREAK intercept = JMP break_to_start...
     sta os_break_intercept              ; Arm the intercept with a JMP...
     lda #<(break_to_start)              ; ...whose target is break_to_start...
-    sta os_break_intercept_lo           ; ...low byte...
+    sta os_break_intercept_lo           ; ...its low byte...
     lda #>(break_to_start)              ; ...high byte of the target...
-    sta os_break_intercept_hi           ; ...high byte: BREAK restarts the editor
+    sta os_break_intercept_hi           ; ...so BREAK at a prompt restarts the editor
     lda #<(mos120_reset_entry)          ; BRKV = &D9CD, MOS 1.20's reset entry: an error resets
     sta brkv                            ; ...low byte of the error handler...
     lda #>(mos120_reset_entry)          ; ...high byte of the error handler...
-    sta brkv + 1                        ; ...high byte: a filing error resets
+    sta brkv + 1                        ; ...so any error (File not found...) resets
     lda #0                              ; No level saved yet (so the buffer is not encrypted)
-    sta level_encrypted                 ; Nothing has been encrypted for saving yet
-    lda #inkey_key_comma                ; Cursor keys: left...
-    sta key_left                        ; Comma moves the cursor left
+    sta level_encrypted                 ; ...so the level at &2700 is plain until saved
+    lda #inkey_key_comma                ; Map cursor keys: left...
+    sta key_left                        ; Comma moves the map cursor left
     lda #inkey_key_full_stop            ; ...right...
     sta key_right                       ; Full stop moves it right
     lda #inkey_key_a                    ; ...up...
@@ -764,9 +778,9 @@ oscli                 = &fff7
     sta key_down                        ; Z moves it down
     lda #max_slot                       ; 80 item slots, 0-&4F
     sta last_slot                       ; Slots are searched from the last, &4F, down
-    ldx #<(tv_command)                  ; *TV255 1: move the picture down a line, interlace off
+    ldx #<(tv_command)                  ; *TV255 1: shift the picture a line, interlace off
     ldy #>(tv_command)                  ; ...high byte of the command
-    jsr oscli                           ; Steady the picture for MODE 7 prompts
+    jsr oscli                           ; ...taking effect at the MODE 7 change below
     lda #3                              ; VDU 3: printer off
     jsr oswrch                          ; Stop any printer output
     lda #&16                            ; VDU 22,7: MODE 7
@@ -781,13 +795,13 @@ oscli                 = &fff7
     sta scratch_hi                      ; ...as ask_key's second key
     lda #0                              ; A = 0: take one of the two keys
     jsr ask_key                         ; Ask, and get 0 for edit or 1 for new
-    sta new_level_flag                  ; Remember the choice: 1 for a new level
-    beq edit_level                      ; Edit?
-    jmp new_level                       ; New: start with an empty level
+    sta new_level_flag                  ; Remember the choice for start_editing: 1 for new
+    beq edit_level                      ; E: edit a level file
+    jmp new_level                       ; N: start with an empty level
 ; &1c7d referenced 1 time by &1c78
 .edit_level
-    jsr new_lines                       ; Edit: new line
-    jsr choose_filing_system            ; Choose disc or tape
+    jsr new_lines                       ; Leave a blank line under the question
+    jsr choose_filing_system            ; Choose disc or tape (and the drive)
     lda #' '                            ; Blank the filename in load_command...
     ldx #5                              ; From the name field at load_command+5...
 ; &1c87 referenced 1 time by &1c8d
@@ -795,31 +809,33 @@ oscli                 = &fff7
     sta load_command,x                  ; ...put a space...
     inx                                 ; ...in each character...
     cpx #&0c                            ; ...up to load_command+11...
-    bne blank_load_name                 ; ...so no old name is left
-    jsr ask_filename                    ; Ask for the filename
+    bne blank_load_name                 ; ...so no longer earlier name is left in it
+    jsr ask_filename                    ; Read the filename (L if none is typed)
     lda #&0a                            ; Line feed
-    jsr oswrch                          ; Move below the typed name
-    lda #' '                            ; End the filename field with a space
-    sta load_command + 11               ; ...so *LOAD sees the address after it
+    jsr oswrch                          ; Leave a blank line under the typed name
+    lda #' '                            ; A space at the name's last character...
+    sta load_command + 11               ; ...already blank: the space at +12 ends the name
     ldx #0                              ; Copy the filename typed into load_command...
 ; &1c9e referenced 1 time by &1ca7
 .copy_load_name
     lda filename_buffer,x               ; Take a character of the typed name...
     sta load_command + 5,x              ; ...into the command's name field...
     inx                                 ; ...the next character...
-    cpx scratch                         ; ...for as many as were typed...
+    cpx scratch                         ; ...for the name's length, without its CR...
     bne copy_load_name                  ; ...until the name is copied
     ldx #<(load_command)                ; *LOAD name 2700
     ldy #>(load_command)                ; ...high byte of the command
-    jsr oscli                           ; Load the level file at &2700
-    jmp start_editing                   ; Edit it
+    jsr oscli                           ; Load the level file at &2700, still encrypted
+    jmp start_editing                   ; Edit it: start_editing decrypts and draws it
 ; ***************************************************************************************
 ; Print a prompt and wait for one of its keys
 ;
 ; Print the text at XY up to its '*', flush the input buffer and scan the keyboard until
 ; an answer is pressed. With A=0 the answers are the two keys whose internal numbers are
 ; in scratch and scratch_hi, and A returns 0 or 1. Otherwise the answers are the digits
-; 0-3 (drive_keys), and the digit is printed.
+; 0-3 (drive_keys), and the digit is printed. The keys are read by scanning, so the key
+; pressed is left in the input buffer; ask_filename flushes it. Used for edit or new,
+; disc or tape, the drive, and another level or quit.
 ;
 ; On Entry:
 ;     A: 0 for two keys, else a drive digit
@@ -829,10 +845,11 @@ oscli                 = &fff7
 ;     SCRATCH_HI: second key's internal number (A=0)
 ;
 ; On Exit:
-;     A: 0 or 1 for the key pressed (A=0 on entry)
+;     A: 0 or 1 for the key pressed (A=0 on entry); else the digit's character
+;     Y: the digit, 0-3 (A non-zero on entry)
 ; &1cb3 referenced 4 times by &1c72, &2113, &2128, &238d
 .ask_key
-    pha                                 ; Keep the mode
+    pha                                 ; Keep the mode: 0 for two answer keys, else digits
     stx plot_x                          ; Point plot_x/plot_y at the prompt...
     sty plot_y                          ; ...high byte: the prompt's address
     ldy #0                              ; Print it up to the '*'...
@@ -848,8 +865,8 @@ oscli                 = &fff7
     jsr osbyte                          ; Discard keys pressed before the prompt  Flush selected class of buffer
 ; &1ccb referenced 2 times by &1cdf, &1cf1
 .scan_keys
-    lda #osbyte_scan_keyboard_from_16   ; OSBYTE &7A: X = the internal number of a key pressed
-    jsr osbyte                          ; Scan: X = the internal number of a key held  Scan keyboard from key 16
+    lda #osbyte_scan_keyboard_from_16   ; OSBYTE &7A: scan the keyboard from key 16...
+    jsr osbyte                          ; ...X = the internal number of a key held, or &FF  Scan keyboard from key 16
     pla                                 ; Which mode?
     pha                                 ; ...keeping the mode for the next pass
     beq check_two_keys                  ; Two keys
@@ -861,28 +878,28 @@ oscli                 = &fff7
     beq digit_pressed                   ; Match: digit Y was pressed
     dey                                 ; No: try the digit below...
     bpl check_digit                     ; ...down to 0
-    bmi scan_keys                       ; No: scan again
+    bmi scan_keys                       ; Not a drive digit: scan again
 ; &1ce1 referenced 1 time by &1cda
 .digit_pressed
-    pla                                 ; Yes: print the digit
+    pla                                 ; Drop the kept mode
     tya                                 ; The digit's value, 0-3...
     clc                                 ; ...plus '0'...
     adc #'0'                            ; ...as its character...
     jsr oswrch                          ; ...echoed after the prompt
-    rts                                 ; Return
+    rts                                 ; Return the digit's character, for *DRIVE
 ; &1cea referenced 1 time by &1cd2
 .check_two_keys
     txa                                 ; The first key?
     cmp scratch                         ; Is it the first answer's key...
     beq first_key                       ; Yes: first key
     cmp scratch_hi                      ; The second key?
-    bne scan_keys                       ; No: scan again
-    pla                                 ; Second: A = 1
+    bne scan_keys                       ; Neither answer: scan again
+    pla                                 ; Second: drop the kept mode
     lda #1                              ; The second answer: 1
     rts                                 ; Return the answer in A
 ; &1cf7 referenced 1 time by &1ced
 .first_key
-    pla                                 ; First: A = 0
+    pla                                 ; First: drop the kept mode
     lda #0                              ; The first answer: 0
     rts                                 ; Return the answer in A
 ; ***************************************************************************************
@@ -891,15 +908,15 @@ oscli                 = &fff7
 ; Prompts end with '*' (for ask_key) or a zero (printed by callers); commands end with
 ; CR. load_command's filename is copied in from the filename buffer.
 .edit_or_new_prompt
-    equs "Edit (E) or start new level (N) *"
+    equs "Edit (E) or start new level (N) *"  ; editor_init's first question, for ask_key
 .disc_or_tape_prompt
-    equs "Disc (D) or tape (T) *"
+    equs "Disc (D) or tape (T) *"       ; choose_filing_system's question, for ask_key
 ; &1d32 used as index base 1 time by &1e3d
 .filename_prompt
-    equs "Filename "
+    equs "Filename "                    ; Printed by ask_filename; the name is typed after it
     equb &00                            ; Zero: the end
 .drive_prompt
-    equs "Which drive *"
+    equs "Which drive *"                ; Asked after *DISC; answered with a digit 0-3
 .drive_command
     equs "DRIVE"
 ; &1d4e referenced 1 time by &212b
@@ -956,17 +973,17 @@ oscli                 = &fff7
     equb &2a, &2a, &2a, &2a             ; Not used
 ; &1dc7 used as index base 1 time by &2272
 .level_number_prompt
-    equs "Level in the Dunjunz complex ", &00
+    equs "Level in the Dunjunz complex ", &00  ; Asked when saving: the level number
 ; &1de5 used as index base 1 time by &2356
 .save_command
 ; &1dea used as index base 1 time by &236b
-    equs "SAVE LEVEL22 2700+2B0", &0d
+    equs "SAVE LEVEL22 2700+2B0", &0d   ; *SAVE the &2B0-byte level file from &2700
 .another_prompt
-    equs "Another level (A) or quit (Q) *"
+    equs "Another level (A) or quit (Q) *"  ; Asked after a save, for ask_key
 ; ***************************************************************************************
 ; Print a new line and a blank line
 ;
-; CR, LF, LF.
+; CR, LF, LF: spaces out the MODE 7 questions.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -983,11 +1000,13 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Ask for a filename
 ;
-; Pause, flush the input buffer, prompt and read up to seven characters into
-; filename_buffer. If nothing is typed, the name is L.
+; Pause, flush the input buffer (which still holds the key that answered ask_key's last
+; question), prompt and read up to seven characters into filename_buffer with OSWORD 0.
+; If only RETURN is typed, write 'L' after the prompt and use the name L. Used for both
+; the file to load and the file to save.
 ;
 ; On Exit:
-;     SCRATCH: the name's length, with its CR
+;     SCRATCH: the name's length, without its CR (at least 1)
 ; &1e28 referenced 2 times by &1c8f, &235e
 .ask_filename
     ldx #0                              ; Pause for 256 x 256 loops...
@@ -1000,10 +1019,10 @@ oscli                 = &fff7
     dey                                 ; ...256 times...
     bne pause_inner                     ; ...in the inner loop...
     dex                                 ; ...for 256 outer passes...
-    bne pause_outer                     ; ...so the keys of the last answer are let go
+    bne pause_outer                     ; ...a short wait after the last answer
     lda #osbyte_flush_buffer_class      ; Flush buffers (X = 0: all)
-    jsr osbyte                          ; Discard keys left from the last answer  Flush selected class of buffer
-    jsr new_lines                       ; New line
+    jsr osbyte                          ; Drop the answer key, so it is not read as the name  Flush selected class of buffer
+    jsr new_lines                       ; Leave a blank line before the prompt
     ldx #0                              ; Print the filename prompt, up to and including its zero
 ; &1e3d referenced 1 time by &1e46
 .print_filename_prompt
@@ -1026,32 +1045,34 @@ oscli                 = &fff7
     sta read_line_block + 4             ; ...highest character accepted
     lda #osword_read_line               ; OSWORD 0: read the name
     jsr osword                          ; Read the filename the user types  Read line from input stream (exits with C=1 if ESCAPE pressed)
-    sty scratch                         ; Keep its length
+    sty scratch                         ; Keep its length, not counting the CR
     cpy #0                              ; Anything typed?
-    bne filename_read                   ; Yes: return
-    lda #&0b                            ; No: move up a line...
+    bne filename_read                   ; A name was typed: return
+    lda #&0b                            ; Only RETURN: VDU 11, up a line...
     jsr oswrch                          ; ...back onto the prompt line
-    lda #9                              ; ...and right nine places...
+    lda #9                              ; ...and VDU 9, right...
     ldy #9                              ; ...nine times...
 ; &1e79 referenced 1 time by &1e7d
 .move_right
     jsr oswrch                          ; ...stepping right...
     dey                                 ; ...counting the steps...
-    bne move_right                      ; ...past the prompt
+    bne move_right                      ; ...past 'Filename '
     lda #'L'                            ; ...show 'L'...
     jsr oswrch                          ; ...as if typed
     sta filename_buffer                 ; ...and use it as the name
-    iny                                 ; Length 1
+    iny                                 ; Length 1 (Y is 0 after the loop)
     sty scratch                         ; ...as the name's length
-    jsr osnewl                          ; New line
+    jsr osnewl                          ; New line, as RETURN gave before
 ; &1e8d referenced 1 time by &1e6e
 .filename_read
     rts                                 ; Return
 ; ***************************************************************************************
 ; Start a new, empty level
 ;
-; Fill the level's wall block with &03, then set up the editing screen as for a loaded
-; level.
+; Reached from editor_init when N is chosen. Fill the level's wall block (&30 bytes at
+; &2980) with &03, which choose_wall_block replaces with a block from Stones when the
+; level is saved, then fall into start_editing, which sees new_level_flag set and draws
+; an empty map.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -1060,21 +1081,26 @@ oscli                 = &fff7
 ; &1e8e referenced 1 time by &1c7a
 .new_level
     lda #3                              ; Fill level_wall_block with &03...
-    ldx #wall_block_bytes - 1           ; ...for all its bytes...
+    ldx #wall_block_bytes - 1           ; ...for all &30 bytes...
 ; &1e92 referenced 1 time by &1e96
 .fill_wall_block
     sta level_wall_block,x              ; ...the block a new level starts with...
     dex                                 ; ...from the last byte...
-    bpl fill_wall_block                 ; ...to the first
+    bpl fill_wall_block                 ; ...to the first, then fall into start_editing
 ; ***************************************************************************************
 ; Set up the editing screen and edit
 ;
-; Clear the wall map and the item slots, select MODE 2 with no cursor and 30 rows, copy
-; unpack_level and free_cell to &7B00 and &7D80, mark every cell object-free and every
-; link unused, and zero the counts. For a loaded level, decrypt it, drop any object of
-; type &73 (the Chalice, which only level 25 has and the editor has no sprite for),
-; unpack it and draw it. Then clear the level file's tables, ready for saving, and run
-; the editing loop.
+; Reached from editor_init once a level file is loaded, and from new_level. Clear the
+; wall map and the item slots, select MODE 2, disarm the BREAK intercept, set up the edit
+; screen (no cursor, 30 rows, colours 10 and 9), copy unpack_level and mark_object_cell
+; to &7B00 and &7D80, set every bit of the object-free map, free every door-key link, set
+; GCOL 3,3 for the link lines, zero the counts and turn off cursor editing. For a loaded
+; level, decrypt it, take any object of type &73 off the map (the Chalice, which only
+; level 25 has and the editor has no item for), unpack it into the slots and maps, plot
+; every occupied cell and take the exit as placed. Then fill the level file's object,
+; door and key tables with &FF, ready for pack_level to pack the slots into, show the
+; labels and counts, put the cursor at (11, 11) with the wall as the item, the slow
+; cursor on and colour 10 red, and fall into edit_loop.
 ; &1e98 referenced 1 time by &1cb0
 .start_editing
     lda #0                              ; Clear wall_map...
@@ -1089,33 +1115,33 @@ oscli                 = &fff7
     sta slot_x,x                        ; ...and the item slots (&0C00-&0CFF)
     dex                                 ; ...one byte of the slot tables...
     bne clear_slots                     ; ...through all 256: every slot free
-    lda #0                              ; Cursor showing
-    sta cursor_flash                    ; ...from the start
-    lda #0                              ; First link
-    sta link_index                      ; ...is filled first
+    lda #0                              ; Cursor flash phase 0...
+    sta cursor_flash                    ; ...so the first wall pass plots the cursor
+    lda #0                              ; Door-key link 0...
+    sta link_index                      ; ...is the first to be made
     lda #&16                            ; VDU 22,2: MODE 2
     jsr oswrch                          ; Send the mode change...
     lda #2                              ; ...for MODE 2...
-    jsr oswrch                          ; ...the map's colourful edit screen
-    lda #0                              ; Disable the BREAK intercept
-    sta os_break_intercept              ; ...so BREAK now resets normally
+    jsr oswrch                          ; ...the 16-colour screen the map is drawn on
+    lda #0                              ; Not a JMP: disarm the BREAK intercept...
+    sta os_break_intercept              ; ...so BREAK while editing is an ordinary reset
     jsr set_edit_screen                 ; No cursor, 30 rows, colours 10 and 9
     ldx #0                              ; Copy unpack_level to &7B00...
 ; &1ec5 referenced 1 time by &1ece
 .copy_unpack
     lda unpack_level_image,x            ; Take a byte of the stored routine...
-    sta unpack_level,x                  ; ...into the workspace it runs in...
+    sta unpack_level,x                  ; ...to &7B00, where it runs...
     inx                                 ; ...the next...
     cpx #&ce                            ; ...for unpack_level's &CE bytes...
     bne copy_unpack                     ; ...until it is all copied
-    ldx #0                              ; ...and free_cell to &7D80
+    ldx #0                              ; ...and mark_object_cell to &7D80
 ; &1ed2 referenced 1 time by &1edb
-.copy_free_cell
-    lda free_cell_image,x               ; Take a byte of the stored routine...
-    sta free_cell,x                     ; ...into the workspace it runs in...
+.copy_mark_object_cell
+    lda mark_object_cell_image,x        ; Take a byte of the stored routine...
+    sta mark_object_cell,x              ; ...to &7D80, where it runs...
     inx                                 ; ...the next...
-    cpx #&43 ; 'C'                      ; ...for free_cell's &43 bytes...
-    bne copy_free_cell                  ; ...until it is all copied
+    cpx #&43 ; 'C'                      ; ...for mark_object_cell's &43 bytes...
+    bne copy_mark_object_cell           ; ...until it is all copied
     lda #&ff                            ; Every cell object-free...
     ldx #0                              ; ...from offset 0...
 ; &1ee1 referenced 1 time by &1ee5
@@ -1125,12 +1151,12 @@ oscli                 = &fff7
     bne clear_free_map                  ; ...through all 256
 ; &1ee7 referenced 1 time by &1ef0
 .clear_links
-    sta link_door,x                     ; ...and all 20 links unused
+    sta link_door,x                     ; ...and &FF: all 20 door-key links unused
     sta link_key,x                      ; ...no key for it...
     inx                                 ; ...the next link...
     cpx #max_link + 1                   ; ...all 20 of them...
     bne clear_links                     ; ...until every link is free
-    sta pending_door_item               ; No door waiting for a key
+    sta pending_door_item               ; &FF: no door waiting for its key
     lda #&12                            ; VDU 18,3,3: GCOL 3,3 (exclusive-OR, for the link lines)
     jsr oswrch                          ; Send GCOL...
     lda #3                              ; ...mode 3: exclusive-OR, so a line...
@@ -1141,17 +1167,17 @@ oscli                 = &fff7
     sta door_count                      ; No doors yet
     sta exit_placed                     ; No exit yet
     sta object_count                    ; No objects yet
-    lda #osbyte_set_cursor_editing      ; OSBYTE 4,1: cursor keys give codes
-    ldx #1                              ; X = 1: so they move the cursor
-    jsr osbyte                          ; Set it, so the cursor keys can move the cursor  Set cursor editing keys
+    lda #osbyte_set_cursor_editing      ; OSBYTE 4,1: cursor editing off...
+    ldx #1                              ; ...X = 1: the arrow keys give codes &88-&8B
+    jsr osbyte                          ; Set it; the editor reads the arrow keys by scanning  Set cursor editing keys
     lda new_level_flag                  ; New level?
     beq unpack_loaded                   ; No: unpack the loaded one
-    lda #0                              ; Yes: first link
-    sta link_index                      ; ...is joined first
-    beq clear_level_tables              ; ...(always branches)
+    lda #0                              ; Yes: link_index = 0...
+    sta link_index                      ; ...again (it was set above)
+    beq clear_level_tables              ; ...and clear the level tables (always branches)
 ; &1f1f referenced 1 time by &1f16
 .unpack_loaded
-    jsr crypt_level                     ; Decrypt the level
+    jsr crypt_level                     ; Decrypt the loaded level in place at &2700
     ldx #max_object - 1                 ; Find an object of type &73 (the Chalice)...
 ; &1f24 referenced 1 time by &1f2c
 .find_chalice
@@ -1160,17 +1186,17 @@ oscli                 = &fff7
     beq drop_chalice                    ; Yes: take it off the map
     dex                                 ; No: the next object down...
     bne find_chalice                    ; ...to object 1 (not the exit, 30)
-    beq draw_loaded                     ; None
+    beq draw_loaded                     ; No Chalice: unpack the level as it is
 ; &1f30 referenced 1 time by &1f29
 .drop_chalice
     lda #off_map                        ; Drop it: x and y &FF
-    sta level_object_x,x                ; ...so it is not unpacked: the editor...
-    sta level_object_y,x                ; ...cannot place the Chalice
+    sta level_object_x,x                ; ...so unpack_level skips it: the editor...
+    sta level_object_y,x                ; ...has no item for the Chalice
 ; &1f38 referenced 1 time by &1f2e
 .draw_loaded
     jsr unpack_level                    ; Unpack the level into the slots and maps
     jsr show_labels                     ; Show the labels...
-    jsr show_counts                     ; ...and the counts
+    jsr show_counts                     ; ...and the unpacked level's counts
     lda #0                              ; Draw every cell: rows 0-47...
     sta cursor_y                        ; ...from the top row
 ; &1f45 referenced 1 time by &1f61
@@ -1179,10 +1205,10 @@ oscli                 = &fff7
     sta cursor_x                        ; ...from the left column
 ; &1f49 referenced 1 time by &1f59
 .draw_cell
-    jsr item_at_cursor                  ; ...what is here?
-    cmp #&ff                            ; &FF: an empty cell
-    beq next_cell                       ; Nothing
-    jsr plot_at_cursor                  ; Plot it
+    jsr item_at_cursor                  ; ...the item in this cell, if any
+    cmp #&ff                            ; &FF: nothing here
+    beq next_cell                       ; Empty: nothing to plot
+    jsr plot_at_cursor                  ; Plot the item's sprite in the cell
 ; &1f53 referenced 1 time by &1f4e
 .next_cell
     inc cursor_x                        ; Next column
@@ -1193,8 +1219,8 @@ oscli                 = &fff7
     lda cursor_y                        ; Which row now?
     cmp #map_height                     ; Past the last row?
     bne draw_row                        ; No: draw the next row
-    lda #1                              ; A loaded level has its exit
-    sta exit_placed                     ; ...so the level can be saved
+    lda #1                              ; Take a loaded level to have its exit...
+    sta exit_placed                     ; ...which SHIFT+S needs before it saves
 ; &1f67 referenced 1 time by &1f1d
 .clear_level_tables
     lda #off_map                        ; Clear the level file's object tables...
@@ -1205,7 +1231,7 @@ oscli                 = &fff7
     sta level_object_y,x                ; ...both x and y...
     dex                                 ; ...the next object down...
     bne clear_object_entries            ; ...until all are cleared
-    ldx #max_door                       ; ...and its door and key tables, ready to be packed
+    ldx #max_door                       ; ...and the door and key tables, for pack_level
 ; &1f76 referenced 1 time by &1f83
 .clear_door_entries
     sta level_door_x,x                  ; ...door off the map...
@@ -1213,20 +1239,20 @@ oscli                 = &fff7
     sta level_key_x,x                   ; ...its key off the map...
     sta level_key_y,x                   ; ...and its y
     dex                                 ; ...the next door down...
-    bne clear_door_entries              ; ...until all 20 are cleared
-    jsr show_labels                     ; Show the labels...
+    bne clear_door_entries              ; ...until doors 20 to 1 are cleared
+    jsr show_labels                     ; Show the labels (again, for a loaded level)...
     jsr show_counts                     ; ...and the counts
     lda #&0b                            ; Cursor at (11, 11)...
     sta cursor_x                        ; ...column 11...
-    sta cursor_y                        ; ...row 11, the heroes' start
+    sta cursor_y                        ; ...row 11: a corner of the heroes' start
     lda #0                              ; ...placing walls
     sta current_item                    ; ...item 0, the wall
     lda #1                              ; Slow cursor on, colour 10 = 1
     sta slow_cursor                     ; Move the cursor every third frame
-    sta colour_10                       ; Logical colour 10 shows red
-    lda #osbyte_set_cursor_editing      ; OSBYTE 4,1 again
-    ldx #1                              ; X = 1: cursor keys give codes, not editing
-    jsr osbyte                          ; Set it again, after the screen is redrawn  Set cursor editing keys
+    sta colour_10                       ; Logical colour 10 shows red, as set above
+    lda #osbyte_set_cursor_editing      ; OSBYTE 4,1 again...
+    ldx #1                              ; ...X = 1: cursor editing off...
+    jsr osbyte                          ; ...a repeat of the call above  Set cursor editing keys
 ; ***************************************************************************************
 ; The editing loop
 ;
@@ -1238,14 +1264,14 @@ oscli                 = &fff7
 ; &1fa4 referenced 2 times by &208f, &20df
 .edit_loop
     lda slow_cursor                     ; Slow cursor?
-    beq check_f0                        ; No: no delay
+    beq check_f0                        ; No: a pass as fast as it runs
     ldx #3                              ; Yes: wait for three frames...
 ; &1fab referenced 1 time by &1fb5
 .slow_wait
     txa                                 ; Keep the frame count...
     pha                                 ; ...across the call...
     lda #osbyte_vsync                   ; OSBYTE &13: wait for the next frame
-    jsr osbyte                          ; Pace the edit loop to the display  Wait for vertical sync
+    jsr osbyte                          ; ...so the cursor steps one cell per three frames  Wait for vertical sync
     pla                                 ; Recover the frame count...
     tax                                 ; ...into X
     dex                                 ; One frame done...
@@ -1254,7 +1280,7 @@ oscli                 = &fff7
 .check_f0
     ldx #inkey_key_f0                   ; f0?
     jsr key_pressed                     ; ...held?
-    bne check_save                      ; No: try S
+    bne check_save                      ; No: check for SHIFT+S
     lda slow_cursor                     ; Yes: toggle the slow cursor...
     eor #1                              ; ...between on and off...
     sta slow_cursor                     ; ...and keep the new setting
@@ -1279,31 +1305,31 @@ oscli                 = &fff7
     cmp #8                              ; ...all 8?
     bne edit_keys                       ; No: cannot save yet
     ldx #<(disc_command)                ; Yes: *DISC...
-    ldy #>(disc_command)                ; ...(Stones and the level go to disc)
+    ldy #>(disc_command)                ; ...(Stones, the wall blocks, is read from disc)
     jsr oscli                           ; ...select the disc filing system
     ldx #<(drive_0_command)             ; ...*DRIVE 0
     ldy #>(drive_0_command)             ; ...high byte of the command's address
     jsr oscli                           ; ...select drive 0, where Stones is
-    jsr wall_edges                      ; Wall the edges
-    jsr pack_level                      ; Pack the level into the file
-    jsr choose_wall_block               ; Choose its wall block
+    jsr wall_edges                      ; Wall in the map's four edges
+    jsr pack_level                      ; Pack the slots and maps into the level file
+    jsr choose_wall_block               ; Choose its wall block from Stones
     lda #&16                            ; VDU 22,7: MODE 7
     jsr oswrch                          ; ...send the MODE number
     lda #7                              ; ...7, so the save prompts are in text
     jsr oswrch                          ; ...send it
-    jsr save_level                      ; Save it
-    rts                                 ; (not reached)
+    jsr save_level                      ; Save it: ends by restarting the editor or resetting
+    rts                                 ; Not reached: save_level never returns
 ; &200f referenced 5 times by &1fd2, &1fd9, &1fdd, &1fe2, &1fe8
 .edit_keys
-    jsr move_cursor                     ; Move the cursor
+    jsr move_cursor                     ; Move the cursor, redrawing the cell it leaves
     lda current_item                    ; Placing walls?
-    bne check_cursor_up                 ; Not walls: no flashing cursor
-    lda cursor_flash                    ; Yes: flash the cursor...
+    bne check_cursor_up                 ; Not walls: the item itself shows as the cursor
+    lda cursor_flash                    ; Yes: flash the cursor sprite over the wall...
     eor #1                              ; ...toggling cursor_flash each pass...
     sta cursor_flash                    ; ...and keeping it
-    beq check_cursor_up                 ; Cleared this pass: leave the cell as it is
-    lda #spr_cursor                     ; ...plotting it every other pass
-    jsr plot_at_cursor                  ; ...over the cell under the cursor
+    beq check_cursor_up                 ; Off this pass: move_cursor's wall sprite shows
+    lda #spr_cursor                     ; On: the cursor sprite...
+    jsr plot_at_cursor                  ; ...over the wall move_cursor drew
 ; &2025 referenced 2 times by &2014, &201e
 .check_cursor_up
     ldx #inkey_key_up                   ; Cursor up?
@@ -1340,7 +1366,7 @@ oscli                 = &fff7
     beq wait_down_released              ; Still held: keep waiting, one step a press
 ; &205c referenced 1 time by &2048
 .check_item_keys
-    jsr show_cursor_position            ; Show the cursor's position
+    jsr show_cursor_position            ; Print the cursor's x and y beside the map
     ldx #inkey_key_1                    ; '1'?
     jsr key_pressed                     ; ...(Z set if pressed)
     bne check_next_item                 ; Not pressed: try '2'
@@ -1367,10 +1393,10 @@ oscli                 = &fff7
     lda current_item                    ; Placing walls?
     bne place_not_edge                  ; No: an item, which may not go on the edge
     jsr place_item                      ; Yes: place a wall, anywhere
-    jmp edit_loop                       ; Next pass
+    jmp edit_loop                       ; Next pass: walls repeat while SPACE is held
 ; &2092 referenced 1 time by &208a
 .place_not_edge
-    lda cursor_x                        ; Other items: not on the edges...
+    lda cursor_x                        ; Other items: not on the edges, which are walled...
     beq next_pass                       ; Column 0: refuse
     cmp #map_width - 1                  ; ...the right-hand column?
     beq next_pass                       ; Yes: refuse
@@ -1378,25 +1404,25 @@ oscli                 = &fff7
     beq next_pass                       ; Row 0: refuse
     cmp #map_height - 1                 ; ...or the bottom row?
     beq next_pass                       ; Yes: refuse
-    jsr place_item                      ; Place it
-    jsr show_counts                     ; Show the counts
+    jsr place_item                      ; Place the item, within its limits
+    jsr show_counts                     ; Update the counts beside the map
 ; &20a8 referenced 1 time by &20b1
 .wait_space_released
     ldx #inkey_key_space                ; Wait for SPACE to be released...
     jsr key_pressed                     ; ...(Z set while held)
     bne check_tab                       ; Released: go on to TAB
-    lda current_item                    ; ...(always, for an item)
-    bne wait_space_released             ; An item is chosen: keep waiting
+    lda current_item                    ; ...an item, never walls, is chosen here...
+    bne wait_space_released             ; ...so keep waiting: one item per press
 ; &20b3 referenced 2 times by &2086, &20ad
 .check_tab
     ldx #inkey_key_tab                  ; TAB?
     jsr key_pressed                     ; ...(Z set if pressed)
     bne check_ctrl                      ; Not pressed: try CTRL
     jsr delete_item                     ; Yes: delete what is under the cursor...
-    jsr show_counts                     ; ...and show the counts
+    jsr show_counts                     ; ...and update the counts
 ; &20c0 referenced 1 time by &20c9
 .wait_b_released
-    ldx #inkey_key_b                    ; While an item is chosen, wait for B (not TAB) to be released...
+    ldx #inkey_key_b                    ; Wait while B (not TAB) is held, with an item chosen...
     jsr key_pressed                     ; ...(Z set while held)
     bne check_ctrl                      ; B not held: go on to CTRL
     lda current_item                    ; ...is an item chosen?
@@ -1419,7 +1445,9 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Check that every door has its key
 ;
-; Count the links in use and compare with door_count.
+; Count the door-key links in use and compare with door_count. A link is made only when a
+; key is placed for a waiting door, and each door has at most one, so equal counts mean
+; that no door lacks its key. The edit loop requires it before saving.
 ;
 ; On Exit:
 ;     Z: set if every door has a key
@@ -1443,7 +1471,7 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Test a key
 ;
-; OSBYTE &81 with the INKEY number in X.
+; The edit loop's key test: OSBYTE &81 with the INKEY number in X.
 ;
 ; On Entry:
 ;     X: INKEY number (negative, as a byte)
@@ -1464,7 +1492,8 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Ask for disc or tape
 ;
-; Disc: *DISC, then ask for the drive (0-3) and *DRIVE it. Tape: *TAPE.
+; Called before a level is loaded, by save_level before the filename, and by catalogue
+; before *CAT. Disc: *DISC, then ask for the drive (0-3) and *DRIVE it. Tape: *TAPE.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -1480,8 +1509,8 @@ oscli                 = &fff7
     sta scratch_hi                      ; ...for ask_key
     lda #0                              ; ...A = 0: one of two keys
     jsr ask_key                         ; ...ask, A = 0 for D or 1 for T
-    bne choose_tape                     ; Tape
-    ldx #<(disc_command)                ; Disc: *DISC
+    bne choose_tape                     ; T: tape
+    ldx #<(disc_command)                ; D: *DISC
     ldy #>(disc_command)                ; ...high byte of the command
     jsr oscli                           ; ...select the disc filing system
     jsr new_lines                       ; New line
@@ -1524,7 +1553,9 @@ oscli                 = &fff7
 ; Encrypt or decrypt the level file
 ;
 ; Exclusive-OR each byte of &2700-&29AF with the low byte of its address, as the game's
-; decrypt_level does at &6B00. Doing it twice restores the bytes.
+; decrypt_level does at &6B00. Doing it twice restores the bytes. It decrypts a level
+; once loaded, and save_level uses it to encrypt the level (decrypting it first when it
+; was encrypted by an earlier save).
 ;
 ; On Exit:
 ;     A: corrupted
@@ -1560,7 +1591,8 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Show logical colour 10 as the chosen colour
 ;
-; VDU 19,10,n,0,0,0 with n from colour_10.
+; VDU 19,10,n,0,0,0 with n from colour_10. The edit loop calls it after cursor up or down
+; changes colour_10.
 ;
 ; On Entry:
 ;     COLOUR_10: the colour to show
@@ -1585,7 +1617,8 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Print the counts' labels
 ;
-; In colour 1, at column 16: Objs, Mons and Dors.
+; In colour 1, at column 16 beside the map, on rows 0, 4 and 8: Objs, Mons (the
+; trapdoors) and Dors, each above its count. Leaves colour 7 set for the counts.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -1613,7 +1646,8 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Print the counts
 ;
-; Objects at (17, 2), trapdoors at (17, 6) and doors at (17, 10).
+; Objects at (17, 2), trapdoors at (17, 6) and doors at (17, 10), each under its label.
+; Called when the editor starts and after each SPACE or TAB in the edit loop.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -1627,7 +1661,7 @@ oscli                 = &fff7
     jsr print_number                    ; ...print it
     ldx #&11                            ; Trapdoors at (17, 6)
     ldy #6                              ; ...row 6
-    lda trapdoor_count                  ; ...the number of trapdoors placed
+    lda trapdoor_count                  ; ...the trapdoors placed, under Mons
     jsr print_number                    ; ...print it
     ldx #&11                            ; Doors at (17, 10)
     ldy #&0a                            ; ...row 10
@@ -1637,7 +1671,7 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Print the cursor's cell
 ;
-; x at (17, 20) and y at (17, 21).
+; x at (17, 20) and y at (17, 21), beside the map. The edit loop calls it every pass.
 ;
 ; On Entry:
 ;     CURSOR_X: the cell's column
@@ -1705,7 +1739,10 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Put walls round the edge of the map
 ;
-; Place a wall in every cell of columns 0 and 31 and rows 0 and 47, as every level has.
+; Place a wall in every cell of columns 0 and 31 and rows 0 and 47, through place_item,
+; before a level is packed for saving. It leaves cursor_x, cursor_y and current_item
+; changed. place_item takes the top-left cell, (0, 0), for a wall already whenever a slot
+; is free (see item_at_cursor), so that cell's wall bit is left to save_level.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -1714,28 +1751,28 @@ oscli                 = &fff7
 ; &2210 referenced 1 time by &1ff8
 .wall_edges
     lda #0                              ; Walls...
-    sta current_item                    ; ...are the item to place
+    sta current_item                    ; ...are the item place_item puts down
     lda #map_height - 1                 ; ...for rows 47 to 0...
-    sta cursor_y                        ; ...the cursor row
+    sta cursor_y                        ; ...moving the cursor to each in turn
 ; &2218 referenced 1 time by &2228
 .wall_left_right
     lda #0                              ; ...in column 0...
-    sta cursor_x                        ; ...cursor column
+    sta cursor_x                        ; ...the left edge
     jsr place_item                      ; ...wall it
     lda #map_width - 1                  ; ...and column 31
-    sta cursor_x                        ; ...cursor column
+    sta cursor_x                        ; ...the right edge
     jsr place_item                      ; ...wall it
     dec cursor_y                        ; ...row up
     bpl wall_left_right                 ; ...until row 0 is done
     lda #map_width - 1                  ; For columns 31 to 0...
-    sta cursor_x                        ; ...cursor column
+    sta cursor_x                        ; ...moving the cursor to each in turn
 ; &222e referenced 1 time by &223e
 .wall_top_bottom
     lda #0                              ; ...in row 0...
-    sta cursor_y                        ; ...cursor row
+    sta cursor_y                        ; ...the top edge
     jsr place_item                      ; ...wall it
     lda #map_height - 1                 ; ...and row 47
-    sta cursor_y                        ; ...cursor row
+    sta cursor_y                        ; ...the bottom edge
     jsr place_item                      ; ...wall it
     dec cursor_x                        ; ...column left
     bpl wall_top_bottom                 ; ...until column 0 is done
@@ -1751,10 +1788,14 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Save the level
 ;
-; Point the BREAK intercept at break_to_save, ask for the level's number (nothing typed:
-; catalogue the disc), take its checksum from level_checksums, set the level's first byte
-; so that its bytes sum to that, encrypt it, choose disc or tape and the filename, *SAVE
-; it and offer another level. Levels 1-24 can be saved; level 25 is in Stones.
+; Reached from the edit loop once the level is walled in, packed and given its wall
+; block. Point the BREAK intercept at break_to_save and BRKV at the reset entry, disable
+; ESCAPE, ask for the level's number (nothing typed: catalogue), take its checksum from
+; the game's level_checksums, wall the top-left cell, set the level's first byte so that
+; its bytes sum to that checksum, encrypt it, choose disc or tape and the filename, *SAVE
+; it and offer another level. Levels 1-24 can be saved; level 25 is in Stones. It never
+; returns: another level restarts the editor at editor_init, and quitting resets the
+; machine.
 ; &2244 referenced 5 times by &200b, &2241, &22c2, &22d9, &22e0
 .save_level
     lda #opcode_jmp                     ; BREAK intercept = JMP break_to_save...
@@ -1804,7 +1845,7 @@ oscli                 = &fff7
     jsr osword                          ; Read the level number the user types  Read line from input stream (exits with C=1 if ESCAPE pressed)
     cpy #0                              ; Anything typed?
     bne level_typed                     ; Yes: level typed
-    jmp catalogue                       ; No: catalogue the disc
+    jmp catalogue                       ; Nothing: catalogue, then ask again
 ; &22ae referenced 1 time by &22a9
 .level_typed
     lda filename_buffer + 1             ; One digit?
@@ -1821,7 +1862,7 @@ oscli                 = &fff7
     beq save_level                      ; Yes: ask again
     sec                                 ; ...C set for the subtraction
     sbc #'0'                            ; ...ASCII to its value
-    asl a                               ; ...x 10...
+    asl a                               ; ...x 2...
     sta scratch                         ; ...kept...
     asl a                               ; ...x 4...
     asl a                               ; ...x 8...
@@ -1838,14 +1879,14 @@ oscli                 = &fff7
 ; &22dc referenced 1 time by &22d7
 .level_not_zero
     cmp #max_level + 1                  ; 25 or more?
-    bcc level_number_ok                 ; No: a level the game has
+    bcc level_number_ok                 ; No: 1-24, a level the game loads from a file
     jmp save_level                      ; Yes: ask again
 ; &22e3 referenced 1 time by &22de
 .level_number_ok
     sta level_number                    ; Keep the level number...
-    tax                                 ; ...and its checksum
-    lda level_checksums - 1,x           ; ...into the game's checksum table
-    sta level_checksum                  ; ...kept for the first byte's sum
+    tax                                 ; ...X = level, to index the checksums
+    lda level_checksums - 1,x           ; ...the game's checksum for that level...
+    sta level_checksum                  ; ...which the level's bytes must sum to
     lda #&0a                            ; Line feed
     jsr oswrch                          ; ...send it
     lda level_encrypted                 ; Saved already (so encrypted)?
@@ -1853,9 +1894,9 @@ oscli                 = &fff7
     jsr crypt_level                     ; Yes: decrypt it again
 ; &22fa referenced 1 time by &22f5
 .set_checksum
-    lda level_walls                     ; Make the top-left cell of the wall map a wall
-    ora #&80                            ; ...set its top-left bit...
-    sta level_walls                     ; ...and keep it
+    lda level_walls                     ; Wall cell (0, 0), which wall_edges may have missed
+    ora #&80                            ; ...bit 7 of the wall map's first byte...
+    sta level_walls                     ; ...set in the level file
     lda #0                              ; Sum the level's bytes, with the first byte 0...
     tay                                 ; ...Y = 0: scratch steps through the file
     sta level_object_x                  ; ...first byte 0, so it adds nothing
@@ -1935,7 +1976,7 @@ oscli                 = &fff7
     lda #0                              ; ...A = 0: one of two keys
     jsr ask_key                         ; ...ask, A = 0 for A or 1 for Q
     bne quit                            ; Quit?
-    jmp editor_init                     ; No: another level
+    jmp editor_init                     ; A: restart the editor for another level
 ; &2395 referenced 1 time by &2390
 .quit
     lda #0                              ; Quit: disable the BREAK intercept...
@@ -1964,13 +2005,13 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Catalogue the disc or tape
 ;
-; Show CAT after the prompt, choose disc or tape, *CAT, then ask for the level number
-; again.
+; Reached from save_level when RETURN is pressed with no level number. Show CAT after the
+; prompt, as the answer, choose disc or tape, *CAT, then ask for the level number again.
 ; &23b4 referenced 1 time by &22ab
 .catalogue
     lda #&0b                            ; Move up a line...
     jsr oswrch                          ; ...back onto the prompt's line
-    lda #9                              ; ...and right 29 places...
+    lda #9                              ; ...and right past its 29 characters...
     ldx #&1d                            ; ...29 times...
 ; &23bd referenced 1 time by &23c1
 .move_right_29
@@ -2003,9 +2044,10 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Choose the level's wall block
 ;
-; Clear the screen, show 25 rows, load Stones (the 24 wall blocks) at &6E80, draw them in
-; a grid of four by six and frame the chosen one. Move the frame with ',' '.' (one) and
-; 'A' 'Z' (a row); SPACE copies the chosen block into the level's wall block.
+; Called from the edit loop when saving, after the level is packed. Clear the screen,
+; show 25 rows, load Stones (the 24 wall blocks) at &6E80, draw them in a grid of four by
+; six and frame block 0. Move the frame with ',' '.' (one) and 'A' 'Z' (a row), paced by
+; a delay loop; SPACE copies the chosen block into the level's wall block and returns.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -2015,7 +2057,7 @@ oscli                 = &fff7
 .choose_wall_block
     lda #&0c                            ; VDU 12: clear the screen
     jsr oswrch                          ; ...send it
-    jsr show_25_rows                    ; Show 25 rows
+    jsr show_25_rows                    ; Show 25 rows, hiding &6E80 on, where Stones goes
     jsr load_stones                     ; Load Stones
     nop                                 ; (padding)
     nop                                 ; Padding
@@ -2043,9 +2085,9 @@ oscli                 = &fff7
     jsr chooser_key_pressed             ; ...(Z set if pressed)
     bne chooser_moved                   ; Not pressed: redraw if the choice moved
     lda #0                              ; Yes: the block's address, &6E80 + block x &30...
-    sta plot_y                          ; ...high byte starts at 0
+    sta plot_y                          ; ...high byte, in plot_y, starts at 0
     lda chosen_block                    ; ...the chosen block number...
-    asl a                               ; ...(x 16)...
+    asl a                               ; ...x 2...
     asl a                               ; ...x 4...
     asl a                               ; ...x 8...
     asl a                               ; ...x 16, the carry...
@@ -2053,11 +2095,11 @@ oscli                 = &fff7
     sta scratch                         ; ...block x 16, low byte...
     lda plot_y                          ; ...and high byte...
     sta scratch_hi                      ; ...kept
-    lda scratch                         ; ...(x 32)...
+    lda scratch                         ; ...block x 16 again...
     asl a                               ; ...x 2: block x 32...
     rol plot_y                          ; ...carry into the high byte
     clc                                 ; ...C clear for the addition
-    adc scratch                         ; ...(x 48)...
+    adc scratch                         ; ...+ x 16: block x 48 (&30), low byte...
     sta plot_x                          ; ...kept in plot_x
     lda plot_y                          ; ...high byte...
     adc scratch_hi                      ; ...plus x 16's high byte, with the carry
@@ -2079,9 +2121,9 @@ oscli                 = &fff7
     rts                                 ; Return
 ; &246b referenced 1 time by &242e
 .chooser_moved
-    lda previous_block                  ; Moved?
+    lda previous_block                  ; Did the keys move the choice?
     cmp chosen_block                    ; ...still the block chosen before?
-    beq chooser_loop                    ; No: carry on
+    beq chooser_loop                    ; Not moved: pause and read the keys again
     lda #osbyte_vsync                   ; Yes: wait for the frame...
     jsr osbyte                          ; Pace the chooser to the display  Wait for vertical sync
     lda chosen_block                    ; ...erase the old frame...
@@ -2094,7 +2136,7 @@ oscli                 = &fff7
     sta chosen_block                    ; ...as the chosen block
     lda #spr_chooser_frame              ; ...and frame the new block
     jsr frame_block                     ; ...drawn round it
-    jmp chooser_loop                    ; Carry on
+    jmp chooser_loop                    ; Pause and read the keys again
 ; ***************************************************************************************
 ; Draw the 24 wall blocks
 ;
@@ -2126,7 +2168,8 @@ oscli                 = &fff7
 ; Move the chosen wall block
 ;
 ; '.' and ',' move one block on or back, 'Z' and 'A' a row of four; a move off the grid
-; is undone.
+; is undone. Only one key is taken each call. choose_wall_block compares the two blocks
+; afterwards to see whether the frame must be moved.
 ;
 ; On Exit:
 ;     CHOSEN_BLOCK: the block now chosen
@@ -2135,25 +2178,25 @@ oscli                 = &fff7
 .move_chooser
     lda chosen_block                    ; Remember the block chosen
     sta previous_block                  ; ...to compare after moving
-    ldx #inkey_key_full_stop            ; Pressed?
+    ldx #inkey_key_full_stop            ; '.' pressed?
     jsr chooser_key_pressed             ; ...(Z set if pressed)
     bne check_back                      ; Not pressed: try ','
     inc chosen_block                    ; Yes: the next block...
     lda chosen_block                    ; ...read it
     cmp #wall_block_count               ; ...past the last block?
     bne chooser_moved_ok                ; No: the move stands
-    beq undo_move                       ; ...but not past 23
+    beq undo_move                       ; Past 23: undo it
 ; &24c2 referenced 1 time by &24b4
 .check_back
-    ldx #inkey_key_comma                ; Pressed?
+    ldx #inkey_key_comma                ; ',' pressed?
     jsr chooser_key_pressed             ; ...(Z set if pressed)
     bne check_row_on                    ; Not pressed: try Z
     dec chosen_block                    ; Yes: the previous block...
     bpl chooser_moved_ok                ; Still 0 or more: the move stands
-    bmi undo_move                       ; ...but not before 0
+    bmi undo_move                       ; Below 0: undo it
 ; &24d0 referenced 1 time by &24c7
 .check_row_on
-    ldx #inkey_key_z                    ; Pressed?
+    ldx #inkey_key_z                    ; 'Z' pressed?
     jsr chooser_key_pressed             ; ...(Z set if pressed)
     bne check_row_back                  ; Not pressed: try A
     clc                                 ; Yes: a row on...
@@ -2162,10 +2205,10 @@ oscli                 = &fff7
     sta chosen_block                    ; ...kept
     cmp #wall_block_count               ; ...past the last block?
     bcc chooser_moved_ok                ; Within the 24: the move stands
-    bcs undo_move                       ; ...but not past 23
+    bcs undo_move                       ; Past 23: undo it
 ; &24e6 referenced 1 time by &24d5
 .check_row_back
-    ldx #inkey_key_a                    ; Pressed?
+    ldx #inkey_key_a                    ; 'A' pressed?
     jsr chooser_key_pressed             ; ...(Z set if pressed)
     bne chooser_moved_ok                ; Not pressed: no move
     sec                                 ; Yes: a row back...
@@ -2173,7 +2216,7 @@ oscli                 = &fff7
     sbc #4                              ; ...4 back, the block above in the grid
     sta chosen_block                    ; ...kept
     bpl chooser_moved_ok                ; Still 0 or more: the move stands
-    bmi undo_move                       ; ...but not before 0
+    bmi undo_move                       ; Below 0: undo it
 ; &24fa referenced 5 times by &24be, &24cc, &24e2, &24eb, &24f6
 .chooser_moved_ok
     rts                                 ; Return
@@ -2207,13 +2250,20 @@ oscli                 = &fff7
 ; Find a wall block's place in the grid
 ;
 ; Block n is at column n mod 4, row n div 4: plot_x = 8 x column + &1A, plot_y = 24 x row
-; + &14.
+; + &14. Each block is 4 bytes by 12 rows, so the grid leaves room for the frame between
+; them.
 ;
 ; On Entry:
 ;     A: block number
+;
+; On Exit:
+;     PLOT_X: the block's screen byte column
+;     PLOT_Y: its pixel row
+;     X: the block number
+;     C: clear
 ; &2510 referenced 3 times by &249d, &252f, &2540
 .block_place
-    tax                                 ; Keep it
+    tax                                 ; Keep the block number
     and #3                              ; plot_x = (n mod 4) x 8 + &1A
     asl a                               ; ...x 2...
     asl a                               ; ...x 4...
@@ -2234,8 +2284,9 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Draw or erase the frame round the chosen block
 ;
-; Plot sprite A (&2A the frame, &2B a blank) one byte left of and two rows above the
-; chosen block, then plot the block again.
+; Plot sprite A (&2A the frame, &2B a blank), 6 bytes by 18 rows, one byte left of and
+; three rows above the chosen block, so that it surrounds the 4-byte by 12-row block,
+; then plot the block again inside it.
 ;
 ; On Entry:
 ;     A: &2A to frame, &2B to erase
@@ -2245,8 +2296,8 @@ oscli                 = &fff7
     lda chosen_block                    ; ...at the chosen block's place...
     jsr block_place                     ; ...set plot_x, plot_y
     dec plot_x                          ; ...one byte left...
-    lda plot_y                          ; ...and two rows up (C is clear: three, as the block is 18 rows)
-    sbc #2                              ; ...three rows up, as C is clear
+    lda plot_y                          ; ...and up (C is clear from block_place)...
+    sbc #2                              ; ...SBC #2 with C clear: three rows up
     sta plot_y                          ; ...kept
     jsr plot_sprite                     ; Plot it
     lda chosen_block                    ; Then the block itself
@@ -2262,7 +2313,9 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Show 25 rows
 ;
-; Send VDU 23,0,6,25,0,0,0,0,0,0.
+; Send VDU 23,0,6,25,0,0,0,0,0,0: 6845 register 6, the rows displayed, = 25. Row 25
+; starts at &6E80, where load_stones puts Stones, so the wall-block chooser does not show
+; it.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -2371,9 +2424,9 @@ oscli                 = &fff7
 ; &260d referenced 1 time by &2638
 .pack_slot
     lda slot_item,x                     ; ...what is in it?
-    beq pack_next                       ; Nothing
+    beq pack_next                       ; Free slot: skip it
     cmp #1                              ; The exit?
-    beq pack_exit                       ; Yes: entry 30
+    beq pack_exit                       ; Yes: always object entry 30
     cmp #3                              ; A trapdoor?
     beq pack_trapdoor                   ; Yes: the trapdoor table
     cmp #spr_door_vertical              ; A door or key?
@@ -2413,8 +2466,8 @@ oscli                 = &fff7
     bne pack_next                       ; Next slot (always branches)
 ; &2664 referenced 1 time by &261c
 .pack_door
-    cmp #spr_key                        ; A key: skip it (it goes with its door)
-    beq pack_next                       ; ...so it goes with its door
+    cmp #spr_key                        ; A key?
+    beq pack_next                       ; Yes: skip it, as it is packed with its door
     inc packed_doors                    ; A door: the next door entry...
     tay                                 ; ...its sprite...
     lda item_types,y                    ; ...as the game's door sprite
@@ -2424,7 +2477,7 @@ oscli                 = &fff7
     sta level_door_x,y                  ; ...into the level's door x
     lda slot_y,x                        ; ...y...
     sta level_door_y,y                  ; ...into the level's door y
-    stx bit_mask                        ; Find the door's link...
+    stx bit_mask                        ; Find the link whose door is this slot...
     ldy #max_link                       ; ...over links 19 to 0
 ; &2685 referenced 1 time by &268d
 .find_door_link
@@ -2450,8 +2503,8 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Pack the level for saving
 ;
-; Pack the item slots, then copy the wall map and the object-free map into the level
-; file.
+; Called from the edit loop when saving, after wall_edges. Pack the item slots, then copy
+; the wall map and the object-free map into the level file.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -2480,7 +2533,8 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Load the wall blocks
 ;
-; *LOAD STONES (at its own address, &6E80) with VDU output off.
+; *LOAD STONES (at its own address, &6E80) with VDU output off. Called by
+; choose_wall_block, with the disc already selected.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -2651,8 +2705,10 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Move the cursor
 ;
-; Wait for the frame, rub out the cursor and put back what is under it, move with ',' '.'
-; 'A' 'Z' within the 32 by 48 map, and plot the current item there as the cursor.
+; Called at the start of every edit-loop pass. Wait for the frame, rub out the cursor and
+; put back what is under it, move with ',' '.' 'A' 'Z' within the 32 by 48 map (one step
+; in x and one in y at most), and plot the current item there as the cursor. So the
+; cursor shows what SPACE would place.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -2665,18 +2721,18 @@ oscli                 = &fff7
     lda #spr_blank                      ; Rub out the cursor (the blank sprite)
     jsr plot_at_cursor                  ; ...at the cursor's cell
     jsr item_at_cursor                  ; Anything here?
-    bmi check_right                     ; No: check right
-    jsr plot_at_cursor                  ; Yes: plot it again
+    bmi check_right                     ; Empty: leave the cell blank
+    jsr plot_at_cursor                  ; Yes: redraw the wall or item the cursor covered
 ; &2b12 referenced 1 time by &2b0d
 .check_right
-    ldx key_right                       ; Right key pressed?
+    ldx key_right                       ; '.' (key_right) pressed?
     jsr cursor_key_pressed              ; ...(Z set if pressed)
     bne check_left                      ; Not pressed: try left
-    inc cursor_x                        ; Yes: right (always branches)
-    bpl check_up                        ; ...(the column stays below 128)
+    inc cursor_x                        ; Yes: one column right...
+    bpl check_up                        ; ...always branches; clamp_cursor limits it
 ; &2b1d referenced 1 time by &2b17
 .check_left
-    ldx key_left                        ; Left key pressed?
+    ldx key_left                        ; ',' (key_left) pressed?
     jsr cursor_key_pressed              ; ...(Z set if pressed)
     bne check_up                        ; Not pressed: try up
     dec cursor_x                        ; Yes: left, to at least 0
@@ -2685,7 +2741,7 @@ oscli                 = &fff7
     sta cursor_x                        ; ...as the cursor's column
 ; &2b2c referenced 3 times by &2b1b, &2b22, &2b26
 .check_up
-    ldx key_up                          ; Up key pressed?
+    ldx key_up                          ; 'A' (key_up) pressed?
     jsr cursor_key_pressed              ; ...(Z set if pressed)
     bne check_down                      ; Not pressed: try down
     dec cursor_y                        ; Yes: up, to at least 0
@@ -2695,11 +2751,11 @@ oscli                 = &fff7
     beq clamp_cursor                    ; ...(always branches)
 ; &2b3d referenced 1 time by &2b31
 .check_down
-    ldx key_down                        ; Down key pressed?
+    ldx key_down                        ; 'Z' (key_down) pressed?
     jsr cursor_key_pressed              ; ...(Z set if pressed)
     bne clamp_cursor                    ; Not pressed: done
-    inc cursor_y                        ; Yes: down (always branches)
-    bpl clamp_cursor                    ; ...(the row stays below 128)
+    inc cursor_y                        ; Yes: one row down...
+    bpl clamp_cursor                    ; ...always branches; clamp_y limits it
 ; &2b48 referenced 4 times by &2b35, &2b3b, &2b42, &2b46
 .clamp_cursor
     lda cursor_x                        ; At most column 31...
@@ -2716,8 +2772,8 @@ oscli                 = &fff7
     sta cursor_y                        ; ...as the cursor's row
 ; &2b5c referenced 1 time by &2b56
 .plot_cursor
-    lda current_item                    ; Plot the current item at the cursor
-    jsr plot_at_cursor                  ; ...as the cursor
+    lda current_item                    ; Plot the current item at the cursor...
+    jsr plot_at_cursor                  ; ...as the cursor, over whatever is there
     rts                                 ; Return
 ; ***************************************************************************************
 ; Plot a sprite in the cursor's cell
@@ -2743,14 +2799,16 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Find what is in the cursor's cell
 ;
-; Search the slots for an item at the cursor; failing that, look at the wall map.
+; Search the slots for an item at the cursor; failing that, look at the wall map. A free
+; slot is item 0 at (0, 0) (see free_slot), so whenever a slot is free the top-left cell
+; reports a wall, whatever the wall map holds there.
 ;
 ; On Exit:
 ;     A: the item's sprite and X its slot; 0 for a wall; &FF for nothing
 ;     N: set for nothing
 ; &2b76 referenced 5 times by &1f49, &2b0a, &2c0d, &2c29, &2d11
 .item_at_cursor
-    ldx last_slot                       ; For slots &4F to 0...
+    ldx last_slot                       ; For slots &4F to 0, free ones included...
 ; &2b78 referenced 1 time by &2b8b
 .search_slots
     lda slot_x,x                        ; ...x matches...
@@ -2759,8 +2817,8 @@ oscli                 = &fff7
     lda slot_y,x                        ; ...and y matches?
     cmp cursor_y                        ; ...the cursor's row?
     bne next_slot                       ; No: next slot
-    lda slot_item,x                     ; Yes: return its item
-    rts                                 ; ...the slot's item number
+    lda slot_item,x                     ; Yes: return its item (0 for a free slot)...
+    rts                                 ; ...with X its slot
 ; &2b8a referenced 2 times by &2b7d, &2b84
 .next_slot
     dex                                 ; Next slot
@@ -2769,17 +2827,17 @@ oscli                 = &fff7
     lda (map_ptr),y                     ; ...the map byte...
     and bit_mask                        ; ...its bit for the cell
     beq nothing_here                    ; Clear: nothing here
-    lda #0                              ; Yes: 0
+    lda #0                              ; Set: item 0, the wall
     rts                                 ; ...0: a wall (Z set)
 ; &2b99 referenced 1 time by &2b94
 .nothing_here
-    ora #&ff                            ; No: &FF
+    ora #&ff                            ; No wall: &FF
     rts                                 ; ...&FF: nothing (N set)
 ; ***************************************************************************************
 ; Find the cursor's bit in the wall map
 ;
 ; As the game lays out its maps: the byte at (y AND &F8) x 4 + (y AND 7) + (x AND &F8),
-; bit 7 - (x AND 7).
+; bit 7 - (x AND 7). Used to test, set and clear walls, a door's included.
 ;
 ; On Exit:
 ;     MAP_PTR: address of the byte
@@ -2830,8 +2888,10 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Put the current item in the cursor's cell
 ;
-; Clear the cell's object-free bit. A wall sets the wall map's bit; anything else takes a
-; free slot, and a key is recorded as the key of the link being made.
+; place_item's last step, once the item is allowed. Clear the cell's object-free bit, for
+; every item, walls included; nothing in the editor sets it again, so deleted items leave
+; clear bits. A wall sets the wall map's bit; anything else takes a free slot, and a key
+; is recorded as the key of the link being made.
 ;
 ; On Entry:
 ;     CURSOR_X: the cell's column
@@ -2845,7 +2905,7 @@ oscli                 = &fff7
 ;     Y: corrupted
 ; &2bd7 referenced 1 time by &2ca0
 .put_item
-    jsr free_cell                       ; Clear the cell's object-free bit
+    jsr mark_object_cell                ; Clear the cell's object-free bit, whatever the item
     lda current_item                    ; A wall?
     bne put_in_slot                     ; No: put it in a slot
     jsr wall_bit                        ; Yes: set its bit in the wall map
@@ -2872,7 +2932,7 @@ oscli                 = &fff7
     sta slot_item,x                     ; ...in the slot
     cmp #spr_key                        ; A key?
     bne put_item_done                   ; No: done
-    txa                                 ; Yes: it is the link's key
+    txa                                 ; Yes: this slot is the link's key...
     ldx link_index                      ; ...of the link taken for the waiting door
     sta link_key,x                      ; ...the key's slot in the link
 ; &2c0c referenced 1 time by &2c03
@@ -2881,7 +2941,8 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Remove what is in the cursor's cell
 ;
-; Free an item's slot, or clear a wall's bit in the wall map.
+; delete_item's last step. Free an item's slot, or clear a wall's bit in the wall map.
+; Freeing a door's slot leaves its wall bit set, so the cell then shows a wall.
 ;
 ; On Entry:
 ;     CURSOR_X: the cell's column
@@ -2894,9 +2955,9 @@ oscli                 = &fff7
 ; &2c0d referenced 1 time by &2d65
 .remove_at_cursor
     jsr item_at_cursor                  ; What is here?
-    beq clear_wall                      ; A wall
-    bmi remove_done                     ; Nothing
-    jsr free_slot                       ; An item: free its slot
+    beq clear_wall                      ; A wall: clear its bit
+    bmi remove_done                     ; Nothing here: done
+    jsr free_slot                       ; An item: free its slot, X from item_at_cursor
     beq remove_done                     ; Return (always branches)
 ; ***************************************************************************************
 ; Clear the cursor's wall
@@ -2920,7 +2981,9 @@ oscli                 = &fff7
 ; In an empty cell, place the current item within the limits: one exit, eight trapdoors,
 ; 20 doors (a door is also a wall), 29 objects, and a key only when a door is waiting for
 ; one, which links the two. With a key chosen, SPACE on an unlinked door makes it the
-; door waiting for its key.
+; door waiting for its key (sprite &11), in place of any door waiting before. A door sets
+; its wall bit before its count is checked, so a 21st door is refused but leaves a wall.
+; Called from the edit loop on SPACE and by wall_edges.
 ;
 ; On Entry:
 ;     CURSOR_X: the cell's column
@@ -2935,14 +2998,14 @@ oscli                 = &fff7
 .place_item
     jsr item_at_cursor                  ; What is here?
     bmi place_in_empty                  ; Nothing: place the item
-    beq place_done                      ; A wall: leave it
+    beq place_done                      ; A wall: nothing more can go here
     cmp #spr_door_vertical              ; A door?
-    beq choose_door                     ; Yes: link it to a key
+    beq choose_door                     ; Yes: perhaps make it wait for a key
     cmp #spr_door_horizontal            ; ...the other door?
-    beq choose_door                     ; Yes: link it to a key
+    beq choose_door                     ; Yes: perhaps make it wait for a key
 ; &2c38 referenced 1 time by &2c2e
 .place_done
-    rts                                 ; Return
+    rts                                 ; Occupied: refuse
 ; &2c39 referenced 1 time by &2c2c
 .place_in_empty
     lda current_item                    ; The current item: a wall?
@@ -2962,7 +3025,7 @@ oscli                 = &fff7
     cmp #max_object                     ; ...30, one too many?
     bne place_put                       ; ...and place it if there are now at most 29
     dec object_count                    ; Too many: uncount it
-    rts                                 ; Return
+    rts                                 ; ...and refuse
 ; &2c5c referenced 1 time by &2c3f
 .place_exit
     lda exit_placed                     ; The exit: only one
@@ -2971,7 +3034,7 @@ oscli                 = &fff7
     bne place_put                       ; ...put it in (always branches)
 ; &2c64 referenced 3 times by &2c5e, &2c87, &2ca7
 .place_refused
-    rts                                 ; Return
+    rts                                 ; Refuse
 ; &2c65 referenced 1 time by &2c43
 .place_trapdoor
     inc trapdoor_count                  ; A trapdoor: at most 8
@@ -2979,10 +3042,10 @@ oscli                 = &fff7
     cmp #9                              ; ...9, one too many?
     bne place_put                       ; No: put it in
     dec trapdoor_count                  ; Yes: uncount it and refuse
-    rts                                 ; Return
+    rts                                 ; ...(refused)
 ; &2c70 referenced 2 times by &2c47, &2c4b
 .place_door
-    jsr wall_bit                        ; A door: it is a wall too...
+    jsr wall_bit                        ; A door: it is a wall too, set before the count...
     lda (map_ptr),y                     ; ...the cell's map byte...
     ora bit_mask                        ; ...with its bit set...
     sta (map_ptr),y                     ; ...back in the map
@@ -2990,23 +3053,23 @@ oscli                 = &fff7
     lda door_count                      ; ...how many now?
     cmp #max_door + 1                   ; ...21, one too many?
     bne place_put                       ; No: put it in
-    dec door_count                      ; Yes: uncount it and refuse
-    rts                                 ; Return
+    dec door_count                      ; Yes: uncount it and refuse...
+    rts                                 ; ...leaving its wall bit set
 ; &2c84 referenced 1 time by &2c4f
 .place_key
     lda pending_door_item               ; A key: is a door waiting for one?
-    bmi place_refused                   ; No: return
+    bmi place_refused                   ; No door waiting: refuse
     jsr find_free_link                  ; Yes: take a free link...
     ldx link_index                      ; ...for the waiting door...
     lda pending_door_slot               ; ...the waiting door's slot...
     sta link_door,x                     ; ...as the link's door
-    jsr restore_waiting_door            ; ...show the door as it was...
+    jsr restore_waiting_door            ; ...give the door back its own sprite...
     lda #no_link                        ; ...and nothing waiting
     sta pending_door_item               ; ...no door is waiting now
-    jmp place_put                       ; Place the key
+    jmp place_put                       ; Place the key, recorded in link_index's link
 ; &2ca0 referenced 6 times by &2c3b, &2c57, &2c62, &2c6b, &2c7f, &2c9d
 .place_put
-    jmp put_item                        ; Put it in the cell
+    jmp put_item                        ; Put the item in the wall map or a slot
 ; &2ca3 referenced 2 times by &2c32, &2c36
 .choose_door
     lda current_item                    ; A door with a key chosen?
@@ -3024,7 +3087,7 @@ oscli                 = &fff7
     bmi door_not_linked                 ; No: door not linked
 ; &2cb9 referenced 1 time by &2cb2
 .door_linked
-    rts                                 ; Yes: return
+    rts                                 ; Linked already: nothing to do
 ; &2cba referenced 1 time by &2cb7
 .door_not_linked
     ldx bit_mask                        ; Another door waiting?
@@ -3046,7 +3109,9 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Show the waiting door as it was
 ;
-; Put the waiting door's own sprite back in its slot and plot it.
+; Put the waiting door's own sprite back in its slot and plot it, by falling into
+; plot_slot. Used when its key is placed, and when another door is chosen to wait
+; instead.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -3060,7 +3125,8 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Plot a sprite at a slot's cell
 ;
-; At screen byte column 2x and pixel row 5y of slot X's cell.
+; At screen byte column 2x and pixel row 5y of slot X's cell: plot_at_cursor for a cell
+; away from the cursor, such as a deleted door's key.
 ;
 ; On Entry:
 ;     A: sprite number
@@ -3082,7 +3148,8 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Find a free door-key link
 ;
-; The highest link whose door is &FF.
+; The highest link whose door is &FF, for the key being placed for the waiting door. Were
+; none free, link_index would be &FF.
 ;
 ; On Exit:
 ;     LINK_INDEX: the link
@@ -3102,7 +3169,8 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Free a slot
 ;
-; Zero its item and position.
+; Zero its item and position. A free slot is therefore item 0 at (0, 0), as start_editing
+; leaves every slot; item_at_cursor reads that as a wall in the top-left cell.
 ;
 ; On Entry:
 ;     X: slot
@@ -3114,15 +3182,15 @@ oscli                 = &fff7
 .free_slot
     lda #0                              ; Zero its item...
     sta slot_item,x                     ; ...so the slot is free
-    sta slot_x,x                        ; ...and position
+    sta slot_x,x                        ; ...and position: column 0...
     sta slot_y,x                        ; ...row 0
     rts                                 ; Return
 ; ***************************************************************************************
 ; Delete what is in the cursor's cell
 ;
-; Uncount the item and remove it. Deleting a door removes its key too, and deleting a key
-; removes its door (and the door's wall). A waiting door is left alone. A wall is
-; cleared.
+; TAB in the edit loop. Uncount the item and remove it. Deleting a door removes its key
+; too but leaves the door's wall bit, so a wall shows where the door was; deleting a key
+; removes its door and the door's wall. A waiting door is left alone. A wall is cleared.
 ;
 ; On Entry:
 ;     CURSOR_X: the cell's column
@@ -3135,25 +3203,25 @@ oscli                 = &fff7
 ; &2d11 referenced 1 time by &20ba
 .delete_item
     jsr item_at_cursor                  ; What is here?
-    bmi delete_remove                   ; Nothing: remove (nothing)
+    bmi delete_remove                   ; Nothing: remove_at_cursor finds nothing either
     beq delete_remove                   ; A wall: clear it
     cmp #spr_waiting_door               ; A waiting door?
     bne delete_item_slot                ; No: delete the item
-    rts                                 ; Yes: leave it
+    rts                                 ; Yes: it cannot be deleted
 ; &2d1d referenced 1 time by &2d1a
 .delete_item_slot
-    stx bit_mask                        ; Keep the slot
+    stx bit_mask                        ; Keep the item's slot, to match against links
     cmp #1                              ; The exit?
     beq delete_exit                     ; Yes: the exit is no longer placed
     cmp #3                              ; A trapdoor?
     beq delete_trapdoor                 ; Yes: one fewer trapdoor
     cmp #spr_door_vertical              ; A door?
-    beq delete_door                     ; Yes: unlink it
+    beq delete_door                     ; Yes: unlink it and delete its key
     cmp #spr_door_horizontal            ; ...the other door?
-    beq delete_door                     ; Yes: unlink it
+    beq delete_door                     ; Yes: unlink it and delete its key
     cmp #spr_key                        ; A key?
     beq delete_key                      ; Yes: delete its door too
-    dec object_count                    ; An object: uncount it (always branches)
+    dec object_count                    ; An object: one fewer
     bpl delete_remove                   ; ...(always branches)
 ; &2d37 referenced 1 time by &2d21
 .delete_exit
@@ -3162,7 +3230,7 @@ oscli                 = &fff7
     beq delete_remove                   ; ...(always branches)
 ; &2d3d referenced 1 time by &2d25
 .delete_trapdoor
-    dec trapdoor_count                  ; A trapdoor: uncount it (always branches)
+    dec trapdoor_count                  ; A trapdoor: one fewer
     bpl delete_remove                   ; ...(always branches)
 ; &2d41 referenced 2 times by &2d29, &2d2d
 .delete_door
@@ -3190,10 +3258,10 @@ oscli                 = &fff7
     bpl find_door_link_to_delete        ; ...until all 20 are tried
 ; &2d65 referenced 7 times by &2d14, &2d16, &2d35, &2d3b, &2d3f, &2d60, &2dac
 .delete_remove
-    jmp remove_at_cursor                ; Remove the item itself
+    jmp remove_at_cursor                ; Remove the item itself, or clear the wall
 ; &2d68 referenced 1 time by &2d31
 .delete_key
-    lda cursor_x                        ; A key: keep the cursor's cell
+    lda cursor_x                        ; A key: keep its cell, the cursor's...
     sta line_x                          ; ...in line_x...
     lda cursor_y                        ; ...and row...
     sta line_y                          ; ...in line_y
@@ -3208,7 +3276,7 @@ oscli                 = &fff7
     lda link_door,x                     ; ...take its door's slot...
     tax                                 ; ...into X
     pha                                 ; ...kept
-    lda slot_x,x                        ; ...and cell...
+    lda slot_x,x                        ; ...and move the cursor to the door's cell...
     sta cursor_x                        ; ...as the cursor's column...
     lda slot_y,x                        ; ...row...
     sta cursor_y                        ; ...as the cursor's row
@@ -3222,8 +3290,8 @@ oscli                 = &fff7
     dec door_count                      ; ...one fewer door
     lda #no_link                        ; ...free the link...
     sta link_door,x                     ; ...in the link table
-    jsr clear_wall                      ; ...clear the door's wall...
-    lda line_x                          ; ...and go back to the key's cell
+    jsr clear_wall                      ; ...clear the door's wall, at the cursor...
+    lda line_x                          ; ...and move the cursor back to the key's cell
     sta cursor_x                        ; ...as the cursor's column
     lda line_y                          ; ...the key's row...
     sta cursor_y                        ; ...as the cursor's row
@@ -3231,7 +3299,7 @@ oscli                 = &fff7
 ; &2daf referenced 1 time by &2d79
 .next_key_link
     dex                                 ; Next link
-    bpl find_key_link                   ; ...until all 20 are tried
+    bpl find_key_link                   ; ...until all 20 are tried; none: fall through
 ; ***************************************************************************************
 ; Convert line_x to graphics x
 ;
@@ -3286,12 +3354,12 @@ oscli                 = &fff7
     asl a                               ; ...x 4 (a row is below 48: no carry)
     sta bit_mask                        ; ...kept
     clc                                 ; ...C clear (the ASL sets it anyway)
-    asl a                               ; ...x 16...
+    asl a                               ; ...x 8...
     rol line_gy_hi                      ; ...carry into the high byte
     asl a                               ; ...x 16...
     rol line_gy_hi                      ; ...carry into the high byte
     sta line_gy                         ; ...low byte kept
-    clc                                 ; ...plus x 4: x 20
+    clc                                 ; ...plus x 4: x 20 graphics units a row
     adc bit_mask                        ; ...y x 4 added...
     sta line_gy                         ; ...low byte
     lda line_gy_hi                      ; ...high byte...
@@ -3334,8 +3402,10 @@ oscli                 = &fff7
 ; ***************************************************************************************
 ; Draw each door-key link as a line
 ;
-; For each link in use, PLOT 68 at the door's cell and PLOT 5 to its key's: exclusive-OR
-; lines (GCOL 3), so drawing them again rubs them out.
+; For each link in use, move to the door's cell (PLOT 68) and draw a line to its key's
+; (PLOT 5). The lines are exclusive-OR (GCOL 3, set at start-up), so the edit loop draws
+; them when CTRL is pressed and again, rubbing them out, when it is released. Each line
+; runs between the cells' top-left corners.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -3355,8 +3425,8 @@ oscli                 = &fff7
     sta line_x                          ; ...as line_x
     lda slot_y,x                        ; ...its row...
     sta line_y                          ; ...as line_y
-    ldx #&44 ; 'D'                      ; ...(PLOT 68: a point)...
-    jsr plot_line_point                 ; ...move there
+    ldx #&44 ; 'D'                      ; ...PLOT 68: move absolute...
+    jsr plot_line_point                 ; ...to the door's cell, drawing nothing
     pla                                 ; ...to the key's cell...
     pha                                 ; ...kept
     tax                                 ; ...link number into X
@@ -3366,8 +3436,8 @@ oscli                 = &fff7
     sta line_x                          ; ...as line_x
     lda slot_y,x                        ; ...its row...
     sta line_y                          ; ...as line_y
-    ldx #5                              ; ...(PLOT 5: a line)
-    jsr plot_line_point                 ; ...draw the link, exclusive-OR
+    ldx #5                              ; ...PLOT 5: line to there...
+    jsr plot_line_point                 ; ...draw the link, exclusive-OR (GCOL 3)
 ; &2e69 referenced 1 time by &2e3d
 .next_drawn_link
     pla                                 ; Next link
@@ -3513,7 +3583,6 @@ save "Editor", dasmos_start, dasmos_end, &239d, &1910
 ;     delete_door:                2
 ;     draw_links:                 2
 ;     edit_loop:                  2
-;     free_cell:                  2
 ;     item_for_type:              2
 ;     key_down:                   2
 ;     key_left:                   2
@@ -3525,6 +3594,7 @@ save "Editor", dasmos_start, dasmos_end, &239d, &1910
 ;     level_trapdoor_y:           2
 ;     level_wall_block:           2
 ;     map_ptr_hi:                 2
+;     mark_object_cell:           2
 ;     new_level_flag:             2
 ;     next_slot:                  2
 ;     os_break_intercept_hi:      2
@@ -3584,9 +3654,9 @@ save "Editor", dasmos_start, dasmos_end, &239d, &1910
 ;     clear_object_entries:       1
 ;     clear_slots:                1
 ;     clear_walls:                1
-;     copy_free_cell:             1
 ;     copy_load_name:             1
 ;     copy_maps:                  1
+;     copy_mark_object_cell:      1
 ;     copy_plotter_hi:            1
 ;     copy_plotter_lo:            1
 ;     copy_save_name:             1
@@ -3629,11 +3699,7 @@ save "Editor", dasmos_start, dasmos_end, &239d, &1910
 ;     find_key_link:              1
 ;     find_linked_door:           1
 ;     first_key:                  1
-;     free_bit_0:                 1
-;     free_bit_found:             1
-;     free_cell_image:            1
 ;     free_link_found:            1
-;     free_shift_bit:             1
 ;     free_slot_found:            1
 ;     key_pressed_done:           1
 ;     level_checksums - 1:        1
@@ -3649,6 +3715,10 @@ save "Editor", dasmos_start, dasmos_end, &239d, &1910
 ;     load_command + 11:          1
 ;     load_command + 5:           1
 ;     load_stones:                1
+;     mark_bit_0:                 1
+;     mark_bit_found:             1
+;     mark_object_cell_image:     1
+;     mark_shift_bit:             1
 ;     mos120_reset_entry:         1
 ;     mos_row_offsets:            1
 ;     mos_row_offsets_lo:         1

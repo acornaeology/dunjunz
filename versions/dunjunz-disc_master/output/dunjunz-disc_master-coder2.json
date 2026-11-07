@@ -107,7 +107,7 @@
       "addr": 8192,
       "name": "coder2_start",
       "title": "Coder2: install the joystick handler and run Coder",
-      "description": "Run by *DUNJUNZ when a joystick is present. *L. Code loads the joystick handler into private RAM at &C500, BYTEV is pointed at it, and *CODER is run, which does not return.",
+      "description": "Run by *DUNJUNZ when a joystick is present. *L. Code loads the joystick handler into private RAM at &C500, BYTEV is pointed at it, and *CODER is run, which does not return. From then on every OSBYTE call passes through the handler, which answers the game's INKEY scans of one hero's movement and fire keys from the joystick and passes every other call on to the MOS. BYTEV's old value is not saved: the handler passes calls on through a fixed address.",
       "fall_through": true
     }
   ],
@@ -275,7 +275,7 @@
         160,
         32
       ],
-      "comment_inline": "...command's high byte",
+      "comment_inline": "...(X, Y) = the command line",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(load_code_command)",
@@ -296,7 +296,7 @@
         247,
         255
       ],
-      "comment_inline": "...and run it: Code into private RAM",
+      "comment_inline": "...loaded into HAZEL, which MOS 3.20 leaves paged in",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -309,7 +309,7 @@
         169,
         0
       ],
-      "comment_inline": "BYTEV = &C500, the joystick handler...",
+      "comment_inline": "Point BYTEV at the handler, so every OSBYTE...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#<(joystick_handler)",
@@ -330,7 +330,7 @@
         10,
         2
       ],
-      "comment_inline": "...low byte, so OSBYTE calls reach it...",
+      "comment_inline": "...goes through it first...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "bytev",
@@ -343,7 +343,7 @@
         169,
         197
       ],
-      "comment_inline": "...high byte...",
+      "comment_inline": "...(the handler's page)...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#>(joystick_handler)",
@@ -364,7 +364,7 @@
         11,
         2
       ],
-      "comment_inline": "...and the game's key scans read the joystick",
+      "comment_inline": "...and INKEY scans for the hero's keys read the stick",
       "type": "code",
       "mnemonic": "sta",
       "operand": "bytev + 1",
@@ -376,7 +376,7 @@
         162,
         32
       ],
-      "comment_inline": "*CODER: load and start the game (no return)",
+      "comment_inline": "*CODER: load and start the game",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#<(coder_command)",
@@ -396,7 +396,7 @@
         160,
         32
       ],
-      "comment_inline": "...command's high byte",
+      "comment_inline": "...(X, Y) = the command line",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(coder_command)",
@@ -417,7 +417,7 @@
         247,
         255
       ],
-      "comment_inline": "...and run it; the game takes over from here",
+      "comment_inline": "...never returns: the game takes over the machine",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",

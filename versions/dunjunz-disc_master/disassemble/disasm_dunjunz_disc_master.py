@@ -210,30 +210,34 @@ master.c(0x071B, "Ends of shorter lines")
 master.string(0x0722, 30)
 
 master.sub(0x0740, "coder_start", "Coder: save the MOS's page &0D, load the game and start it",
-           "Run with *RUN CODER (or from Coder2). Set the bell sound, copy "
-           "page &0D, which the MOS and the filing system use for their NMI "
-           "code and workspace, to &C400 in private RAM so that start_level "
-           "can put it back before each level is loaded, *LOAD the four "
-           "other game files, restore the display that *DUNJUNZ blanked, "
-           "select COLOUR 2 and start a new game at &0E00.")
+           "Run with *RUN CODER (or from Coder2), once per game session: "
+           "the game then stays resident and loads each level itself. Set "
+           "the bell sound. Copy page &0D, which the MOS and the filing "
+           "system use for their NMI code and workspace, to &C400 in "
+           "private RAM: the game's per-level workspace lives in page &0D, "
+           "so load_level puts the MOS's copy back before each level is "
+           "loaded. *LOAD the four other game files, restore the display "
+           "that *DUNJUNZ blanked, select COLOUR 2 and start a new game at "
+           "&0E00. Page &0D is saved before any file is loaded, while it "
+           "still holds the filing system's own contents.")
 comments(master, [
-    (0x0740, "Set the bell sound"),
-    (0x0743, "Copy page &0D..."),
+    (0x0740, "BEL's sound, used by the game's VDU 7s"),
+    (0x0743, "Save the MOS's page &0D..."),
     (0x0745, "...each byte the filing system uses..."),
-    (0x0748, "...to &C400 in private RAM"),
+    (0x0748, "...to &C400 in private RAM, for load_level"),
     (0x074B, "...next byte (X wraps from 0)"), (0x074C, "Until all 256 are saved"),
-    (0x074E, "*L. DUNJ2 (&6E80-&7FFF)"),
-    (0x0750, "...high byte of the command"), (0x0752, "...load &6E80-&7FFF"),
-    (0x0755, "*L. DUNJ3 (&08C0-&0CFE)"),
-    (0x0757, "...high byte of the command"), (0x0759, "...load &08C0-&0CFE"),
-    (0x075C, "*L. DUNJ4 (&0E00-&1FFF)"),
-    (0x075E, "...high byte of the command"), (0x0760, "...load &0E00-&1FFF"),
-    (0x0763, "*L. DUNJ5 (&2000-&2FFF)"),
-    (0x0765, "...high byte of the command"), (0x0767, "...load &2000-&2FFF"),
-    (0x076A, "Send the 21 bytes of coder_display_vdu"),
+    (0x074E, "*L. DUNJ2: heroes, monsters, views (&6E80-&7FFF)"),
+    (0x0750, "...high byte of the command"), (0x0752, "...loaded"),
+    (0x0755, "*L. DUNJ3: hero attributes, room_walls (&08C0-&0CFE)"),
+    (0x0757, "...high byte of the command"), (0x0759, "...loaded"),
+    (0x075C, "*L. DUNJ4: level loop to frame update (&0E00-&1FFF)"),
+    (0x075E, "...high byte of the command"), (0x0760, "...loaded"),
+    (0x0763, "*L. DUNJ5: object_free_map, sprites (&2000-&2FFF)"),
+    (0x0765, "...high byte of the command"), (0x0767, "...loaded"),
+    (0x076A, "Show the display again: coder_display_vdu's 21 bytes"),
     (0x076C, "...the next VDU byte..."), (0x076F, "...to the VDU"), (0x0772, "...on to the next"), (0x0773, "...until all of coder_display_vdu is sent"),
     (0x0775, "More to send"),
-    (0x0777, "...then colour 2 and a new game"),
+    (0x0777, "Over the leftovers to colour 2 and a new game"),
 ])
 for addr in (0x077A, 0x0783, 0x078C, 0x0795):
     master.stringcr(addr)
@@ -259,7 +263,7 @@ master.expr(0x0774, sym("coder_leftovers") - sym("coder_display_vdu"))
 comments(master, [
     (0x07C0, "COLOUR 2..."),
     (0x07C2, "...VDU 17..."), (0x07C5, "...text colour 2..."), (0x07C7, "...for the game's messages"),
-    (0x07CA, "...and start a new game"),
+    (0x07CA, "...and start a new game: the hero menu, then level 1"),
 ])
 master.byte(0x07CD, 3, cols=3)
 master.sub(0x07D0, "set_bell", "Set the bell sound",
@@ -303,11 +307,9 @@ for addr, suffix in [(0x0967, ""), (0xD867, "_hazel")]:
                on_exit={"screen_ptr": "screen address", "A": "corrupted",
                         "Y": "corrupted", "X": "preserved"})
     master.c(addr, "Character row = plot_y DIV 8...")
-master.c(0x096E, "High byte of row x 640, from Table's copy of the MOS 1.20 "
-                 "table in private RAM...")
+master.c(0x096E, "High byte of row x 640, from Table's copy in HAZEL...")
 master.c(0x0976, "Low byte of row x 640")
-master.c(0xD86E, "High byte of row x 640, from Table's copy of the MOS 1.20 "
-                 "table...")
+master.c(0xD86E, "High byte of row x 640, from Table's copy...")
 master.c(0xD876, "Low byte of row x 640")
 master.banner(0xD8A0, "Copied data",
               "The rest of the copy of the game's &0900-&09FE: the bytes "
@@ -318,11 +320,10 @@ master.c(0xD8A0, "Not used")
 
 master.c(0x0481, "No match: call &D9CD, private RAM that no file fills")
 
-master.c(0x0E86, "All dead: stop the music and start VDU 28,0,24,16,0, a text "
-                 "window on the left...")
+master.c(0x0E86, "All dead: stop the music; VDU 28,0,24,16,0 on the left...")
 master.c(0x0E89, "Padding")
 master.c(0x0E8A, "...a second padding byte")
-master.c(0x0EC3, "Wait up to &1F4 centiseconds (5 s) for a key...")
+master.c(0x0EC3, "Game over: wait up to &1F4 cs (5 s) for a key...")
 master.c(0x0EC5, "...Y = &01: the time limit's high byte")
 
 master.c(0x1ED7, "Check the pause key (the routine is in Table)")
@@ -383,15 +384,21 @@ master.label(0xEEB1, "mos320_osbyte_default", group="mos_internals", description
 # through the filing system with the MOS's page &0D put back first.
 
 master.sub(0x1400, "start_level", "Set up and draw a new level",
-           "Stop the music (saving its place after the first level), count "
-           "the level, put the MOS's page &0D back and load the level, "
-           "unpack it, reset the workspace and monsters, clear the text "
-           "area, show 25 rows, draw the view frames and views, and restart "
-           "the music, from where it was after the first level.",
+           "Called by level_loop for every level. Stop the music, which "
+           "plays on the interval timer event, until the level is drawn; after the "
+           "first level its place (rhythm step, "
+           "transposition, section and tune_ptr) is kept on the stack. "
+           "Count the level, put the MOS's page &0D back and load the "
+           "level, unpack it, reset the workspace and monsters, clear the "
+           "text area, show 25 rows, and draw the view frames and views. "
+           "Then restart the music: start_music always plays the tune's "
+           "first step, after which the saved place, if any, is put back, "
+           "so that the tune carries on from where the last level left "
+           "it. first_level_flag tells the two cases apart.",
             on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 comments(master, [
-    (0x1400, "First level?"),
-    (0x1403, "...&7B once the first level is done"), (0x1405, "First level: no music to save"),
+    (0x1400, "First level of the session?"),
+    (0x1403, "...&7B once the first level is done"), (0x1405, "Yes: no music playing to save"),
     (0x1407, "No: keep the music's place on the stack: its step..."),
     (0x140A, "...pushed"),
     (0x140B, "...transposition..."),
@@ -400,11 +407,11 @@ comments(master, [
     (0x1412, "...pushed"),
     (0x1413, "...and tune pointer (zero page &00-&01)"),
     (0x1415, "...low byte pushed"), (0x1416, "...high byte..."), (0x1418, "...pushed last"),
-    (0x1419, "Stop the music"),
+    (0x1419, "Silence the music while the level loads"),
     (0x141C, "Clear the text area and count the level"),
-    (0x141F, "Put page &0D back and load the level"),
+    (0x141F, "Put the MOS's page &0D back and load the level"),
     (0x1422, "Copy it into the game's tables"),
-    (0x1425, "Reset page &0D for play"),
+    (0x1425, "Page &0D back to the game's workspace"),
     (0x1428, "Reset the monsters and keys"),
     (0x142B, "Clear the text area"),
     (0x142E, "VDU 23,0,6,25,0,0,0,0,0,0: set 6845 register 6..."),
@@ -416,9 +423,9 @@ comments(master, [
     (0x1456, "Point at view_frame_plots..."),
     (0x1458, "...low byte in plot_x"), (0x145A, "...high byte..."), (0x145C, "...in plot_y, as draw_view_frames expects"),
     (0x145E, "...and draw the frames and the views"),
-    (0x1461, "Start the music"),
-    (0x1464, "First level?"),
-    (0x1467, "...&7B once the first level is done"), (0x1469, "First level: no music to restore"),
+    (0x1461, "Start the music from the top (plays its first step)"),
+    (0x1464, "First level of the session?"),
+    (0x1467, "...&7B once the first level is done"), (0x1469, "Yes: nothing saved; the tune plays from the top"),
     (0x146B, "No: put the music's place back: tune pointer..."),
     (0x146C, "...high byte..."), (0x146E, "...then the low byte..."), (0x146F, "...restored"),
     (0x1471, "...section..."),
@@ -427,8 +434,8 @@ comments(master, [
     (0x1476, "...restored"),
     (0x1479, "...and rhythm step"),
     (0x147A, "...restored: the tune resumes where it was"),
-    (0x147D, "Mark the first level done"),
-    (0x147F, "...so later levels keep the music's place"),
+    (0x147D, "Mark the first level done..."),
+    (0x147F, "...so later levels, and later games, keep the music's place"),
     (0x1482, "Return"),
 ])
 master.label(0x1638, "first_level_flag", description=(
@@ -438,15 +445,18 @@ master.byte(0x1639)
 
 master.sub(0x1483, "load_level", "Put the MOS's page &0D back and load the level",
            "Copy the MOS's page &0D back from &C400 (Coder saved it there), "
-           "so that the filing system's NMI code and workspace are intact, "
-           "write the level number's digits into level_command, show 15 "
-           "rows while loading, and *LOAD LEVELnn 6B00 (level 25 comes from "
-           "Stones, via load_stones in Table). Then decrypt and check it.",
+           "over the game's workspace, so that the filing system's NMI code "
+           "and workspace are intact for the load; reset_workspace gives "
+           "the page back to the game afterwards. Write level_bcd's digits "
+           "into level_command, show only 15 character rows, so that the "
+           "level file arriving at &6B00 (rows 23-24 of the screen) is not "
+           "seen, and *LOAD LEVELnn 6B00 (level 25 comes from Stones, via "
+           "load_stones in Table). Then decrypt and check it.",
             on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 comments(master, [
     (0x1483, "Copy &C400-&C4FF back to page &0D..."),
     (0x1485, "...each byte saved at &C400..."), (0x1488, "...back where the filing system needs it"), (0x148B, "...next byte (X wraps from 0)"), (0x148C, "Until all 256 are back"),
-    (0x148E, "Level 10 or more (in BCD)?"),
+    (0x148E, "Level 10 or more? (level_bcd &01-&09 or &10-&25)"),
     (0x1491, "...&0A or more means two digits"), (0x1493, "Yes: two digits"),
     (0x1495, "No: units digit then a space"),
     (0x1497, "...second digit a space"),
@@ -461,14 +471,14 @@ comments(master, [
     (0x14BF, "VDU 23,0,6,15,0,0,0,0,0,0: show 15 character rows while "
              "loading..."),
     (0x14C1, "...VDU 23..."), (0x14C4, "...0: write a 6845 register..."), (0x14C6, "...sent"), (0x14C9, "...register 6, rows displayed..."),
-    (0x14CB, "...sent"), (0x14CE, "...15 rows..."), (0x14D0, "...hiding the lower rows while loading"), (0x14D3, "...then six zeros to finish the command"),
+    (0x14CB, "...sent"), (0x14CE, "...15 rows..."), (0x14D0, "...hiding rows 15-24, where &6B00 lies"), (0x14D3, "...then six zeros to finish the command"),
     (0x14D5, "...zero 1 of 6 ending the VDU 23"), (0x14D8, "...zero 2 of 6 ending the VDU 23"), (0x14DB, "...zero 3 of 6 ending the VDU 23"), (0x14DE, "...zero 4 of 6 ending the VDU 23"),
     (0x14E1, "...zero 5 of 6 ending the VDU 23"), (0x14E4, "...zero 6 of 6: the VDU 23 is complete"),
-    (0x14E7, "Level 25?"),
-    (0x14EA, "...0-based 25?"), (0x14EC, "No: load its LEVELnn file"),
+    (0x14E7, "Level 25, the last, with no file of its own?"),
+    (0x14EA, "...level_number &19 (counted by count_level)?"), (0x14EC, "No: load its LEVELnn file"),
     (0x14EE, "Yes: load it from Stones (and check it there)"),
     (0x14F1, "No: *LOAD LEVELnn 6B00"),
-    (0x14F3, "...high byte of the command"), (0x14F5, "...*LOAD the level to &6B00"),
+    (0x14F3, "...high byte of the command"), (0x14F5, "...the level file to &6B00, for decrypt_level"),
     (0x14F8, "Decrypt and check it, and return from there"),
 ])
 master.label(0x14FB, "level_command", description=(
@@ -477,11 +487,13 @@ master.label(0x14FB, "level_command", description=(
 master.region(0x1505, "level_command_digits", (0, 1))
 master.stringcr(0x14FB)
 master.sub(0x1612, "count_level", "Clear the text area and count the level",
-           "No level number is shown.",
+           "start_level's first call after the music stops. Count the level "
+           "in level_number (1-25), which picks the level's checksum, Stones "
+           "for level 25 and the Chalice. No level number is shown.",
             on_exit={"A": "corrupted", "X": "preserved", "Y": "preserved"})
 comments(master, [
     (0x1612, "Clear the text area"),
-    (0x1615, "Count the level"),
+    (0x1615, "level_number + 1: the level about to load"),
     (0x1618, "Return"),
 ])
 
@@ -493,26 +505,30 @@ master.label(0x16D5, "level_filename_digits", description=(
 # Code, &C500: the joystick handler, in private RAM.
 
 master.sub(0xC500, "joystick_bytev", "BYTEV handler: read a joystick for the Barbarian's keys",
-           "Installed by Coder2. Answers OSBYTE &81 scans of the third "
-           "hero's keys from the analogue port: N (&AA) and M (&9A) from "
-           "channel 1 at its extremes, B (&9B) and G (&AC) from channel 2, "
-           "and fire (SPACE, &9D) from the fire buttons. Every other call "
-           "goes to the MOS 3.20 OSBYTE routine at &EEB1 directly.",
+           "Installed on BYTEV by Coder2. Answers test_key's OSBYTE &81 "
+           "scans of the Barbarian's (hero 2's) keys from the analogue port, "
+           "so that a joystick plays the Barbarian: left (N &AA) and right "
+           "(M &9A) from channel 1, up (G &AC) and down (B &9B) from "
+           "channel 2, and fire (SPACE &9D) from either fire button. A "
+           "direction counts only at the stick's extreme, when the channel's "
+           "high byte is &FF or 0. Every other call goes to the MOS 3.20 "
+           "OSBYTE routine at &EEB1 directly.",
            on_entry={"A": "OSBYTE number", "X": "OSBYTE X"},
-           on_exit={"X": "&FF if the key is pressed, 0 if not"})
+           on_exit={"X": "&FF if the key is pressed, 0 if not",
+                    "Y": "&FF if the key is pressed"})
 comments(master, [
     (0xC500, "OSBYTE &81 (INKEY)?"),
-    (0xC502, "No: pass it on"),
-    (0xC504, "N (left)?"), (0xC506, "Yes: read the stick for left"),
-    (0xC508, "B (down)?"), (0xC50A, "Yes: read the stick for down"),
-    (0xC50C, "G (up)?"), (0xC50E, "Yes: read the stick for up"),
-    (0xC510, "M (right)?"), (0xC512, "Yes: read the stick for right"),
-    (0xC514, "SPACE (fire)?"), (0xC516, "Yes: read the fire buttons"),
-    (0xC518, "Another key: pass it on"),
+    (0xC502, "No: let the MOS handle it"),
+    (0xC504, "The Barbarian's left key (N)?"), (0xC506, "Yes: read the stick for left"),
+    (0xC508, "The Barbarian's down key (B)?"), (0xC50A, "Yes: read the stick for down"),
+    (0xC50C, "The Barbarian's up key (G)?"), (0xC50E, "Yes: read the stick for up"),
+    (0xC510, "The Barbarian's right key (M)?"), (0xC512, "Yes: read the stick for right"),
+    (0xC514, "The Barbarian's fire key (SPACE)?"), (0xC516, "Yes: read the fire buttons"),
+    (0xC518, "Any other key: scan the keyboard as usual"),
     (0xC51B, "N: channel 1 high byte &FF?"),
     (0xC51D, "...with OSBYTE &80, reading the ADC"), (0xC51F, "...the stick's left-right position"), (0xC522, "...high byte &FF: pushed fully left?"),
     (0xC524, "No: not pressed"),
-    (0xC526, "Yes: pressed"), (0xC528, "Return"),
+    (0xC526, "Yes: pressed (Y is already &FF)"), (0xC528, "Return"),
     (0xC529, "M: channel 1 high byte 0?"),
     (0xC52B, "...with OSBYTE &80, reading the ADC"), (0xC52D, "...the stick's left-right position"), (0xC530, "...high byte 0: pushed fully right?"),
     (0xC532, "No: not pressed"),
@@ -520,7 +536,7 @@ comments(master, [
     (0xC538, "G: channel 2 high byte &FF?"),
     (0xC53A, "...with OSBYTE &80, reading the ADC"), (0xC53C, "...the stick's up-down position"), (0xC53F, "...high byte &FF: pushed fully up?"),
     (0xC541, "No: not pressed"),
-    (0xC543, "Yes: pressed"), (0xC545, "Return"),
+    (0xC543, "Yes: pressed (Y is already &FF)"), (0xC545, "Return"),
     (0xC546, "B: channel 2 high byte 0?"),
     (0xC548, "...with OSBYTE &80, reading the ADC"), (0xC54A, "...the stick's up-down position"), (0xC54D, "...high byte 0: pushed fully down?"),
     (0xC54F, "No: not pressed"),
@@ -529,8 +545,8 @@ comments(master, [
     (0xC557, "...OSBYTE &80, X = 0: the fire buttons in X"), (0xC559, "...read them"), (0xC55C, "...the button bits..."), (0xC55D, "...bits 0-1: either button held?"),
     (0xC55F, "No: not pressed"),
     (0xC561, "Yes: pressed"), (0xC563, "...X = Y = &FF, as INKEY reports a key held"), (0xC565, "Return"),
-    (0xC566, "Not pressed"), (0xC568, "Return"),
-    (0xC569, "Pass the call on to the MOS 3.20 OSBYTE routine"),
+    (0xC566, "Not pressed: X = 0, which test_key reads as not held"), (0xC568, "Return"),
+    (0xC569, "Not INKEY: on to the MOS 3.20 OSBYTE routine"),
 ])
 
 # ---------------------------------------------------------------------------
@@ -549,16 +565,19 @@ master.label(0xC5AA, "stones_command")
 master.string(0xC5AA, 16)
 master.byte(0xC5BA, 0x46, cols=8)
 master.sub(0xC600, "game_over_music", "Stop the music for the game-over message",
-           "Stop the music, send the VDU 28 that the game-over code's text "
-           "window begins with, and set the top row in clear_text_area's "
-           "window to 0.",
+           "Called by level_loop's game-over code when all four heroes are "
+           "dead. Stop the music, "
+           "send the VDU 28 that the game-over text window begins with "
+           "(the caller sends its four edges), and write 0 into the top-row "
+           "operand of clear_text_area's VDU 28. That operand already holds "
+           "0 and nothing else writes it, so the store changes nothing.",
             on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 comments(master, [
-    (0xC600, "Stop the music"),
+    (0xC600, "Silence the music for the game-over message"),
     (0xC603, "VDU 28: the game-over text window..."),
-    (0xC605, "...game_entry sends its four edges next"),
-    (0xC608, "Top row 0 in clear_text_area's window"),
-    (0xC60A, "...patched into clear_text_area's VDU 28"),
+    (0xC605, "...whose four edges the caller sends next"),
+    (0xC608, "Top row 0 in clear_text_area's window..."),
+    (0xC60A, "...where it is already 0"),
     (0xC60D, "Return"),
 ])
 master.label(0x162E, "clear_text_area_top", description=(
@@ -598,21 +617,24 @@ d.expr(0xC6C3, hi(sym("free_command")))
 
 master.label(0x1ED7, "check_pause")
 master.sub(0xC6D0, "pause_check", "Pause while P is pressed",
-           "Called from check_pause in the game's update. If P (internal "
-           "key &37) is held, wait for it to be released, pressed again and "
-           "released, then restart the frame timing.",
+           "Reached by check_pause's JMP, last in each frame's update, so "
+           "its RTS returns from update_game. If P (internal key &37) is "
+           "held, wait for it to be released, pressed again and released, "
+           "then give the next frame its usual three vertical syncs. "
+           "OSBYTE &7A reports a single key, so P is seen only when the "
+           "scan finds it rather than another key held with it.",
             on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 comments(master, [
     (0xC6D0, "OSBYTE &7A: which key is pressed?"),
     (0xC6D2, "...X = the key held, if any"),
     (0xC6D5, "P?"),
-    (0xC6D7, "No: return"),
+    (0xC6D7, "No: on with play"),
     (0xC6D9, "Paused: wait for P to be released..."),
     (0xC6DC, "...pressed again..."),
     (0xC6DE, "...X = the key held"), (0xC6E1, "...P?"), (0xC6E3, "No: stay paused"),
-    (0xC6E5, "...and released"),
-    (0xC6E8, "Restart the frame timing"),
-    (0xC6EA, "...so play resumes with a full frame delay"),
+    (0xC6E5, "...and released, so the next frame cannot re-pause"),
+    (0xC6E8, "Restart the frame timing: 2..."),
+    (0xC6EA, "...gives the next frame the usual three vsyncs"),
     (0xC6ED, "Return"),
 ])
 master.sub(0xC6EE, "wait_p_released", "Wait until P is not pressed",
@@ -631,10 +653,13 @@ comments(master, [
 # Code2, &C700: the music.
 
 master.sub(0xC700, "start_music", "Start the music",
-           "Define envelopes 6-9, redirect the game's plot_sprite to the "
-           "copy in Code3, point the tune at its first section, and play it "
+           "Called by start_level once each level is drawn. Define "
+           "envelopes 6-9, redirect the game's plot_sprite to the copy in "
+           "Code3 (from the first level on, so the hero menu before it uses "
+           "the original), point the tune at its first section, and play it "
            "on the interval timer: EVNTV is pointed at music_event and the "
-           "interval timer event enabled. Then play the first step.",
+           "interval timer event enabled. Then play the first step, which "
+           "also sets the timer for the next.",
             on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 comments(master, [
     (0xC700, "ENVELOPE 6..."),
@@ -683,8 +708,11 @@ master.region(0x0000, "tune_ptr", (0, 1), group="zero_page", description=(
     "The music's place in the tune: the current three-byte step."))
 
 master.sub(0xC76C, "music_event", "Event handler: play one step of the music",
-           "Called through EVNTV for the interval timer event, which "
-           "start_music sets to recur every 12 centiseconds. A tune step is "
+           "Called through EVNTV for the interval timer event, and once "
+           "directly by start_music. Each call sets the interval timer to "
+           "fire again 12 centiseconds later, so a step plays every 12 cs "
+           "until stop_music disables the event. The event number in A is "
+           "not checked: the game enables no other event. A tune step is "
            "three bytes: a transposition for the rhythm (0 for no change) "
            "or &FF to end the section, a pitch for channel 2 and a pitch "
            "for channel 3 (0 for silence). Each step also plays the next of "
@@ -738,9 +766,9 @@ comments(master, [
     (0xC7F0, "End of section: the next byte is channel 3's envelope"),
     (0xC7F2, "...read"), (0xC7F4, "...into its SOUND block"),
     (0xC7F7, "Next section..."),
-    (0xC7FA, "...the new section..."), (0xC7FD, "...25?"),
-    (0xC7FF, "...past 24?"),
-    (0xC801, "Yes: back to section 1, with the rhythm restarting"),
+    (0xC7FA, "...the new section..."), (0xC7FD, "...25, past the last?"),
+    (0xC7FF, "No: start it"),
+    (0xC801, "Yes: loop to section 1 (0 plays only once), rhythm too"),
     (0xC803, "...rhythm step -1 again..."), (0xC806, "...section 1..."), (0xC808, "...stored"),
     (0xC80B, "Point tune_ptr at the section..."),
     (0xC80C, "...address low byte..."), (0xC80F, "...into tune_ptr"), (0xC811, "...high byte..."), (0xC814, "...complete"),
@@ -748,7 +776,7 @@ comments(master, [
     (0xC818, "...its first byte, the transposition"), (0xC81A, "...played as any other step"),
 ])
 for addr, name, text in [
-    (0xC81D, "channel_1_sound", "SOUND &11, -9 (envelope 9), pitch, 1: the rhythm"),
+    (0xC81D, "channel_1_sound", "SOUND &11, 9 (envelope 9), pitch, 1: the rhythm"),
     (0xC825, "noise_sound", "SOUND &10, envelope 7, 3, 3: noise with the rhythm"),
     (0xC82D, "channel_2_sound", "SOUND &12, envelope 8, pitch, 10"),
     (0xC835, "channel_3_sound", "SOUND &13, envelope (set per section), pitch, 8"),

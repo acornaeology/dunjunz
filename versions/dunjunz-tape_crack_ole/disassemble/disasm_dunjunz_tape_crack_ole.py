@@ -72,35 +72,41 @@ game.annotate_cassette_level_loop(annotator)
 # Specific to Ole's crack: start-up and loading a level from disc.
 
 annotator.sub(0x5000, "start", "Start the game (DUNJ4's execution address)",
-              "Select the cassette filing system and apply the start-level "
-              "cheat, copy the game image from &2400-&4FFF down to "
-              "&0400-&2FFF, point WRCHV at wrch_handler and start a new game.")
+              "Run by DUNJ once DUNJ3 and DUNJ4 are loaded. Select the "
+              "cassette filing system, so that the disc filing system is "
+              "selected only while load_level_from_copy loads a level, and "
+              "apply the start-level cheat. Copy the game image from "
+              "&2400-&4FFF down to &0400-&2FFF: the ranges overlap, but an "
+              "ascending copy downwards reads each byte before it is "
+              "overwritten. Point WRCHV at wrch_handler, the game's font, "
+              "and start a new game. game_entry's start-up at &0D31 is never "
+              "run.")
 for addr, text in [
-    (0x5000, "Select *TAPE and apply the cheat"),
+    (0x5000, "Select *TAPE and patch the cheat's start level in"),
     (0x5003, ""),
     (0x5004, "Destination &0400..."),
     (0x5006, "...as the destination pointer's page"),
     (0x5008, "...source &2400 (both low bytes 0)"),
     (0x500A, "...as the source pointer's page"),
     (0x500C, "...source low byte 0 (Y = 0)"),
-    (0x500E, "Copy a page..."),
-    (0x5010, "...to where the game runs"),
+    (0x500E, "Copy a page of the game..."),
+    (0x5010, "...&2000 lower, to where it runs"),
     (0x5012, "...next byte"),
     (0x5013, "Until the page is done"),
     (0x5015, "Next page"),
     (0x5017, "...and the source's"),
-    (0x5019, "Until the source reaches &5000..."),
+    (0x5019, "Until the source reaches &5000, this code..."),
     (0x501B, "...source page &50?"),
     (0x501D, "No: copy the next page"),
     (0x501F, "Save WRCHV..."),
     (0x5022, "...low byte"),
     (0x5025, "...high byte"),
-    (0x5028, "...in saved_wrchv"),
+    (0x5028, "...in saved_wrchv, for draw_view_frames' PLOTs"),
     (0x502B, "Point WRCHV at wrch_handler..."),
     (0x502D, "...low byte"),
     (0x5030, "...high byte"),
     (0x5032, "...so text prints in the game's font"),
-    (0x5035, "Start a new game"),
+    (0x5035, "Start a new game: the hero menu, then the first level"),
 ]:
     if text:
         annotator.c(addr, text)
@@ -112,57 +118,73 @@ annotator.sub(0x5038, "select_tape_and_cheat", "Select *TAPE and apply the start
                on_exit={"A": "corrupted", "X": "corrupted", "Y": "0", "plot_x": "0, for start's copy"})
 annotator.c(0x5038, "OSBYTE &8C: *TAPE...")
 annotator.c(0x503A, "...at 1200 baud")
-annotator.c(0x503F, "Start level chosen with the loader's cheat...")
-annotator.c(0x5042, "...into the operand of first_level's LDA, at its stored address")
+annotator.c(0x503F, "Start level - 1, poked here by DUNJ's cheat...")
+annotator.c(0x5042, "...into first_level's LDA operand, before the copy")
 annotator.c(0x5045, "Y = 0 and plot_x = 0 for the copy")
 annotator.c(0x5047, "...destination low byte 0")
 annotator.c(0x5049, "Return")
 
 annotator.sub(0x148B, "first_level", "Set the starting level",
-              "Set level_bcd to the level before the first one played. The "
+              "Called by new_game. Set level_bcd to the level before the "
+              "first one played; level_loop adds one before each level. The "
               "operand of the LDA is 0 unless the loader's start-level cheat "
-              "has patched it.",
+              "has patched it. DUNJ pokes the start level less one in binary, "
+              "while level_bcd is binary-coded decimal, so the value is right "
+              "only for start levels 1-10: 11-16 give digits that are not "
+              "decimal, and 17 gives &10, level 11. The cheat moves only "
+              "level_bcd: new_game still sets level_number to 0, so it counts "
+              "levels played, and it is level_number that decides whether "
+              "the level's filename has two digits (from the tenth level "
+              "played on) and whether the Chalice is checked for (on the "
+              "25th level played).",
                on_exit={"A": "the level before the first to play (0, or the cheat's choice)", "X": "preserved", "Y": "preserved"})
 annotator.c(0x148B, "Level before the first (patched by the cheat)")
-annotator.c(0x148D, "...as level_bcd: new_game adds one")
+annotator.c(0x148D, "...as level_bcd: level_loop adds one")
 annotator.c(0x1490, "Return")
 
 annotator.label(0x16D0, "level_command", length=8, description=(
     "The command that loads a level, \"L.$.L\" followed by the level number "
     "and a carriage return; level_loop writes the number."))
 annotator.sub(0x1446, "load_level", "Load the level file",
-              "Reset the page numbers in the self-modifying copy loops, then "
-              "move pages &0E-&18 out of the filing system's way and load the "
-              "level from disc (save_game_pages, continuing in "
-              "load_level_from_copy).",
+              "Called by start_level. The disc filing system needs pages "
+              "&0E-&18, where the game lives, so move them out of the way, "
+              "load the level from disc and put them back (save_game_pages, "
+              "continuing in load_level_from_copy). The page operands of "
+              "those self-modifying copy loops are left at other values by "
+              "the last load, so first reset them; the restore loop's are "
+              "set here so that the copy at &545C carries them.",
                on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 annotator.sub(0x0450, "save_game_pages", "Move the game out of the way and load a level",
-              "Keep the level number's digits on the stack, copy pages &0E-&18 "
-              "to &4E-&58 and clear the originals for the filing system's use, "
-              "put the digits into the moved copy of level_command, and jump "
-              "to the moved copy of load_level_from_copy.",
+              "Reached by load_level's JMP. Keep the filename's digits from "
+              "level_command on the stack, copy pages &0E-&18 to &4E-&58 and "
+              "clear the originals for the disc filing system's use, put the "
+              "digits into the second L.$.L command (&1495, now at &5495), "
+              "and jump to the moved copy of load_level_from_copy. This "
+              "routine is in page &04, outside the pages it moves, so it can "
+              "run throughout.",
                on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 annotator.entry(0x145C)
 annotator.sub(0x145C, "load_level_from_copy", "Load a level, running from the copy at &545C",
               "Runs only from its copy at &545C, made by save_game_pages, so "
-              "its addresses are those of the copy. Select the disc filing "
-              "system, *LOAD the level, reselect *TAPE, and copy pages &4E-&58 "
-              "back to &0E-&18 before returning to start_level.",
+              "its addresses are those of the copy, outside the pages it "
+              "restores. Select the disc filing system, *LOAD the level to "
+              "&6B00, reselect *TAPE, and copy pages &4E-&58 back to "
+              "&0E-&18, then return to start_level, whose return address "
+              "the stack still holds.",
                on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 
 for addr, text in [
-    (0x5003, "(unused)"),
+    (0x5003, "Padding: does nothing"),
     (0x0E00, "New game: level_bcd = the level before the first played"),
-    (0x0E03, "level_number = 0"),
-    (0x0E05, "...counting from the first level played"),
+    (0x0E03, "level_number = 0, even when the cheat has moved level_bcd"),
+    (0x0E05, "...so it counts levels played, not the level"),
     (0x1446, "Reset the page numbers of the copy loops below to &0E and "
              "&4E..."),
-    (0x1448, "...for save_game_pages' source..."), (0x144B, "...its cleared page..."), (0x144E, "...(in the copy at &545C)"),
-    (0x1451, "...and &4E..."), (0x1453, "...for save_game_pages' destination..."), (0x1456, "...(in the copy at &545C)"),
+    (0x1448, "...for save_game_pages' source..."), (0x144B, "...its cleared page..."), (0x144E, "...and the restore's destination"),
+    (0x1451, "...and &4E..."), (0x1453, "...for save_game_pages' destination..."), (0x1456, "...and the restore's source"),
     (0x1459, "...and move the game out of the way"),
-    (0x0450, "Keep the level number's digits, which are about to be "
-             "cleared..."),
-    (0x0453, "...tens digit pushed"), (0x0454, "...units digit..."), (0x0457, "...pushed"),
+    (0x0450, "Keep the filename's digits, in page &16, before clearing..."),
+    (0x0453, "...first digit pushed"), (0x0454, "...second digit, or the CR after one digit..."), (0x0457, "...pushed"),
     (0x0458, "Copy pages &0E-&18 to &4E-&58, clearing the originals"),
     (0x045A, "...take a byte of the game..."), (0x045D, "...kept"), (0x045E, "...zero..."), (0x0460, "...cleared for the filing system"),
     (0x0463, "...the byte again..."), (0x0464, "...saved above &4E00"), (0x0467, "...next byte"), (0x0468, "Until the page is done"),
@@ -170,12 +192,12 @@ for addr, text in [
     (0x046D, "...the cleared page..."), (0x0470, "...and the save page"),
     (0x0473, "Until page &19"),
     (0x0476, "...page &19 reached?"), (0x0478, "No: the next page"),
-    (0x047A, "Put the digits into the moved copy of level_command"),
-    (0x047B, "...units digit into the moved command"), (0x047E, "...tens digit..."), (0x047F, "...into the moved command"),
+    (0x047A, "Put the digits into the moved copy of the L.$.L command"),
+    (0x047B, "...second digit or CR into the moved command"), (0x047E, "...first digit..."), (0x047F, "...into the moved command"),
     (0x0482, "Continue in the moved copy of load_level_from_copy"),
     (0x145C, "*D. (*DISC), from the moved copy of the command at &149D"),
     (0x145E, "...high byte of the command"), (0x1460, "...on the disc filing system"),
-    (0x1463, "*L.$.Ln (*LOAD), from the moved copy of level_command"),
+    (0x1463, "*L.$.Ln (*LOAD), from the moved command at &5495"),
     (0x1465, "...high byte of the command"), (0x1467, "...load the level file to &6B00"),
     (0x146A, "OSBYTE &8C: back to *TAPE..."),
     (0x146C, "...at 1200 baud"),

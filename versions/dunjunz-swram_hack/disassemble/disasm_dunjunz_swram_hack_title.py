@@ -201,23 +201,23 @@ comments([
     (0x38E6, "...stripes on alternate pixel rows"), (0x38E8, "...next byte of the cell"), (0x38E9, "...count into A for the test"),
     (0x38EA, "...all eight rows of the cell?"), (0x38EC, "No: copy the next row"),
     (0x38EE, "copy_to += 8: on to the next cell"),
-    (0x38EF, "...low byte..."), (0x38F1, "...plus 8: one character cell"), (0x38F3, "...stored back"),
-    (0x38F5, "...high byte..."), (0x38F7, "...with the carry"), (0x38F9, "...stored back"),
+    (0x38EF, "...low byte..."), (0x38F1, "...plus 8: one character cell"), (0x38F3, "...the cell to the right, or the next row's first"),
+    (0x38F5, "...high byte..."), (0x38F7, "...with the carry"), (0x38F9, "...completing the next cell's address"),
     (0x38FB, "Back to the pattern's first byte"),
     (0x38FD, "Repeat until copy_to reaches &8000, the top of the screen"),
     (0x38FF, "...at the top of screen memory?"), (0x3901, "No: stripe the next cell"),
     (0x3903, "copy_from = title_picture"),
     (0x3905, "...as copy_from's high byte"), (0x3907, "...page-aligned..."), (0x3909, "...so copy_from's low byte is 0"),
     (0x390B, "copy_to = title_picture_screen (Y stays 0 from here)"),
-    (0x390D, "...low byte: character row 1"), (0x390F, "...high byte..."), (0x3911, "...as copy_to's high byte"),
+    (0x390D, "...low byte: character row 1, below a striped row"), (0x390F, "...high byte..."), (0x3911, "...as copy_to's high byte"),
     (0x3913, "Copy one byte of the picture to the screen"),
     (0x3915, "...over the stripes"),
     (0x3917, "copy_from += 1"),
-    (0x3918, "...low byte..."), (0x391A, "...plus one"), (0x391C, "...stored back"),
-    (0x391E, "...high byte..."), (0x3920, "...with the carry"), (0x3922, "...stored back"),
+    (0x3918, "...low byte..."), (0x391A, "...plus one"), (0x391C, "...the picture's next byte"),
+    (0x391E, "...high byte..."), (0x3920, "...with the carry"), (0x3922, "...crossing into its next page"),
     (0x3924, "copy_to += 1"),
-    (0x3925, "...low byte..."), (0x3927, "...plus one"), (0x3929, "...stored back"),
-    (0x392B, "...high byte..."), (0x392D, "...with the carry"), (0x392F, "...stored back"),
+    (0x3925, "...low byte..."), (0x3927, "...plus one"), (0x3929, "...the screen's next byte"),
+    (0x392B, "...high byte..."), (0x392D, "...with the carry"), (0x392F, "...completing the next screen address"),
     (0x3931, "Repeat until copy_from reaches the end of the file, &4400"),
     (0x3933, "...past the picture's last page?"), (0x3935, "No: copy the next byte"),
     (0x3937, "Print page_text up to its &FF terminator"),
@@ -225,8 +225,8 @@ comments([
     (0x3940, "...look at it..."), (0x3943, "...is it the terminator?"), (0x3945, "No: print it"),
     (0x3947, "Read the machine type, INKEY(-256)"),
     (0x3949, "...X = 0 and Y = &FF ask for the machine type..."), (0x394B, "...rather than a key"), (0x394D, "...X = 1 on an Electron"),
-    (0x3950, "1 is an Electron: skip the line of spaces"),
-    (0x3952, "...so it skips the blank line"),
+    (0x3950, "1: an Electron?"),
+    (0x3952, "Yes: leave out the line of spaces"),
     (0x3954, "Print blank_line_text up to its &FF terminator"),
     (0x3956, "...this byte of the line..."), (0x3959, "...printed"), (0x395C, "...on to the next"),
     (0x395D, "...look at it..."), (0x3960, "...is it the terminator?"), (0x3962, "No: print it"),
@@ -234,13 +234,23 @@ comments([
     (0x3966, "...this byte of the window set-up..."), (0x3969, "...obeyed as VDU codes"), (0x396C, "...on to the next"),
     (0x396D, "...look at it..."), (0x3970, "...is it the terminator?"), (0x3972, "No: send it"),
     (0x3974, "6845 register 10 (cursor start) = &20: no cursor"),
-    (0x3976, "...selected in the 6845..."), (0x3979, "...&20: cursor display off..."), (0x397B, "...written to it, so no cursor shows"),
-    (0x397E, "Flush the keyboard buffer (X is &0B, non-zero, from the loop above)"),
+    (0x3976, "...selected in the 6845..."), (0x3979, "...&20: cursor display off..."), (0x397B, "...written straight to the 6845, not through VDU 23"),
+    (0x397E, "OSBYTE &0F, X = &0A from the loop above: flush input"),
     (0x3980, "...so an early key press doesn't end the page"),
     (0x3983, "Wait up to &2FF centiseconds (7.67 s) for a key"),
     (0x3985, "...X and Y: the time limit, &2FF centiseconds..."), (0x3987, "...high byte of the limit"), (0x3989, "...a key, or the time, ends the title page"),
     (0x398C, "Return to BASIC, which chains DUNK"),
 ])
+for addr, text in [
+    (0x38D4, "Stripe the whole MODE 5 screen, &5800-&7FFF, one character "
+             "cell at a time."),
+    (0x3903, "Copy the logo picture, a byte at a time, over character rows "
+             "1-8."),
+    (0x3937, "Print the credits, title and keys, then (except on an "
+             "Electron) a line of spaces, then open the black window."),
+    (0x3974, "Hide the cursor and wait for a key or the time limit."),
+]:
+    d.comment(addr, text)
 
 # ---------------------------------------------------------------------------
 # Data after the code.
