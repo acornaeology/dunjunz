@@ -7647,6 +7647,9 @@ row_offsets_lo = row_offsets+1
 ; ***************************************************************************************
 ; Wait until P is not pressed
 ;
+; Scan the keyboard with OSBYTE &7A until the key found is no longer P (internal key
+; &37).
+;
 ; On Exit:
 ;     A: corrupted
 ;     X: corrupted

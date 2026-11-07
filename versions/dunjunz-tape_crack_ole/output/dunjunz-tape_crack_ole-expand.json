@@ -145,6 +145,7 @@
       "addr": 12172,
       "name": "read_packed_byte",
       "title": "Read the next packed byte",
+      "description": "Read the byte at packed_ptr and step packed_ptr past it.",
       "on_entry": {
         "Y": "0"
       },

@@ -280,6 +280,8 @@ osbyte       = &fff4
 ; ***************************************************************************************
 ; Read the next packed byte
 ;
+; Read the byte at packed_ptr and step packed_ptr past it.
+;
 ; On Entry:
 ;     Y: 0
 ;

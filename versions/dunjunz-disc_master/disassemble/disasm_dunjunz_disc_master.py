@@ -619,7 +619,9 @@ comments(master, [
     (0xC6EA, "..."),
     (0xC6ED, "Return"),
 ])
-master.sub(0xC6EE, "wait_p_released", "Wait until P is not pressed", "",
+master.sub(0xC6EE, "wait_p_released", "Wait until P is not pressed",
+           "Scan the keyboard with OSBYTE &7A until the key found is no "
+           "longer P (internal key &37).",
             on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 comments(master, [
     (0xC6EE, "OSBYTE &7A: which key is pressed?"),

@@ -230,6 +230,7 @@ d.expr(0x2F2B, hi(sym("osfile_block")))
 # read_packed_byte
 
 d.subroutine(0x2F8C, "read_packed_byte", title="Read the next packed byte",
+             description="Read the byte at packed_ptr and step packed_ptr past it.",
              on_entry={"Y": "0"},
              on_exit={"A": "the byte at packed_ptr, which advances past it"})
 comments([
