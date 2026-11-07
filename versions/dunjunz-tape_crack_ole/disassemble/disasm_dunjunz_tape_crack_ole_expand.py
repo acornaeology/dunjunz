@@ -267,6 +267,15 @@ comments([
 for operand_addr in (0x2E26, 0x2E2A):  # ' ' and ','
     d.expr(operand_addr, char(d.memory.get_u8(operand_addr)))
 
+# Lengths and pages written from names.
+d.constant(18, "osfile_block_length", comment="An OSFILE control block's length")
+d.constant(0x3000, "screen_start", comment="The start of MODE 2 screen memory")
+d.constant(0x8000, "screen_end", comment="The top of screen memory, where the packed file ends")
+d.expr(0x2ECD, sym("osfile_block_length") - 1)
+d.expr(0x2F78, sym("osfile_block_length"))
+d.expr(0x2F02, hi(sym("screen_end")))
+d.expr(0x2F3B, hi(sym("screen_start")))
+
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)
 asm_filepath.write_text(str(ir.render("beebasm")), encoding="utf-8")

@@ -18,6 +18,21 @@
   },
   "constants": [
     {
+      "name": "osfile_block_length",
+      "value": 18,
+      "comment": "An OSFILE control block's length"
+    },
+    {
+      "name": "screen_start",
+      "value": 12288,
+      "comment": "The start of MODE 2 screen memory"
+    },
+    {
+      "name": "screen_end",
+      "value": 32768,
+      "comment": "The top of screen memory, where the packed file ends"
+    },
+    {
       "name": "osbyte_read_char_at_cursor",
       "value": 135
     },
@@ -1437,7 +1452,20 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&11"
+      "operand": "#osfile_block_length - 1",
+      "expr": {
+        "text": "osfile_block_length - 1",
+        "tree": {
+          "op": "sub",
+          "left": {
+            "sym": "osfile_block_length"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 11982,
@@ -1768,7 +1796,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&80"
+      "operand": "#>(screen_end)",
+      "expr": {
+        "text": ">(screen_end)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "screen_end"
+          }
+        }
+      }
     },
     {
       "addr": 12035,
@@ -2154,7 +2191,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&30"
+      "operand": "#>(screen_start)",
+      "expr": {
+        "text": ">(screen_start)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "screen_start"
+          }
+        }
+      }
     },
     {
       "addr": 12092,
@@ -2624,7 +2670,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
-      "operand": "#&12"
+      "operand": "#osfile_block_length",
+      "expr": {
+        "text": "osfile_block_length",
+        "tree": {
+          "sym": "osfile_block_length"
+        }
+      }
     },
     {
       "addr": 12153,
