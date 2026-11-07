@@ -79,7 +79,7 @@ DIFFERENT_RANGES = [
     (0x1400, 0x163A),  # starting a level: rewritten for DFS loading
     (0x1ED7, 0x1EF7),  # the pause key, moved to Table
     (0x6F45, 0x6F4A),  # the bell, removed
-    (0x7F8F, 0x7F92),  # WRCHV handler: straight to the MOS
+    (0x7F8F, 0x7F93),  # WRCHV handler: straight to the MOS
     (0xC375, 0xC377),  # MOS 1.20 addresses this side does not use
     (0xD9CD, 0xD9CE),
     (0xE0A4, 0xE0A5),
@@ -330,7 +330,11 @@ master.banner(0x7F92, "The game-font WRCHV handler, unused",
               "letters and digits in the game's own font. On this side "
               "WRCHV's entry at &7F8F jumps straight to the MOS, so none of "
               "this runs and text appears in the MOS font.")
-master.byte(0x7F92, 0x6E, cols=8)
+master.entry(0x7F92)  # never run, but decoded: the Model B side's code
+master.c(0x7F92, "Save X (the TXA before it is now the JMP's operand)...")
+master.label(0xE0A4, "mos120_oswrch_default", group="mos_internals", description=(
+    "MOS 1.20's default OSWRCH routine, where the unused handler would pass "
+    "characters on; MOS 3.20's is elsewhere."))
 master.label(0xD9CD, "mos120_reset_entry", group="mos_internals", description=(
     "The MOS 1.20 reset entry, which decrypt_level calls on a failed "
     "checksum. On a Master, with private RAM paged in, it is HAZEL."))
@@ -757,6 +761,29 @@ master.banner(0xC8CC, "The tune",
               "or &FF, channel 2 pitch, channel 3 pitch), reached through "
               "section_ptrs_lo and section_ptrs_hi.")
 master.byte(0xC8CD, 0xD75A - 0xC8CD, cols=12)
+
+# ---------------------------------------------------------------------------
+# Branch targets in the Master's own code.
+
+for addr, name in [
+    (0x0745, "save_page_0d_byte"), (0x076C, "send_coder_vdu"),
+    (0x07C0, "select_colour_2"), (0x1419, "stop_music_and_load"),
+    (0x147D, "mark_first_level_done"), (0x1485, "restore_page_0d_byte"),
+    (0x14A7, "level_command_two_digits"), (0x14BF, "shrink_display_for_loading"),
+    (0x14F1, "load_level_file"), (0x162D, "set_text_window_top"),
+    (0xC51B, "joystick_left"), (0xC529, "joystick_right"),
+    (0xC538, "joystick_up"), (0xC546, "joystick_down"),
+    (0xC555, "joystick_fire"), (0xC566, "joystick_not_pressed"),
+    (0xC569, "joystick_pass_on"), (0xC6DC, "wait_p_pressed"),
+    (0xC77A, "play_step"), (0xC781, "play_channel_2"),
+    (0xC793, "play_channel_3"), (0xC7A5, "next_step"),
+    (0xC7BE, "store_rhythm_step"), (0xC7E0, "set_step_timer"),
+    (0xC7F0, "end_of_section"), (0xC80B, "start_section"),
+]:
+    master.label(addr, name)
+master.label(0x7F92, "unused_font_handler")
+for operand_addr in (0xC505, 0xC509, 0xC50D, 0xC511, 0xC515):
+    master.inkey_number(operand_addr)
 
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)

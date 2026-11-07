@@ -1107,7 +1107,7 @@
     },
     {
       "addr": 32658,
-      "name": "data_7f92",
+      "name": "unused_font_handler",
       "title": "The game-font WRCHV handler, unused",
       "description": "The rest of the cassette game's wrch_handler, which prints letters and digits in the game's own font. On this side WRCHV's entry at &7F8F jumps straight to the MOS, so none of this runs and text appears in the MOS font.",
       "align": "before_label"
@@ -1251,6 +1251,7 @@
     "level_wall_sprite": 28032,
     "saved_page_0d": 50176,
     "mos120_reset_entry": 55757,
+    "mos120_oswrch_default": 57508,
     "mos320_oswrch_default": 59426,
     "mos320_osbyte_default": 61105,
     "scsi_data": 64576,
@@ -2087,6 +2088,12 @@
       "name": "mos120_reset_entry",
       "group": "mos_internals",
       "description": "The MOS 1.20 reset entry, which decrypt_level calls on a failed checksum. On a Master, with private RAM paged in, it is HAZEL."
+    },
+    {
+      "addr": 57508,
+      "name": "mos120_oswrch_default",
+      "group": "mos_internals",
+      "description": "MOS 1.20's default OSWRCH routine, where the unused handler would pass characters on; MOS 3.20's is elsewhere."
     },
     {
       "addr": 59426,
@@ -6817,7 +6824,7 @@
       ],
       "image": 0,
       "labels": [
-        "loop_0745"
+        "save_page_0d_byte"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -6870,9 +6877,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_0745",
+      "operand": "save_page_0d_byte",
       "target": 1861,
-      "target_label": "loop_0745"
+      "target_label": "save_page_0d_byte"
     },
     {
       "addr": 1870,
@@ -7051,7 +7058,7 @@
       ],
       "image": 0,
       "labels": [
-        "loop_076c"
+        "send_coder_vdu"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -7116,9 +7123,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_076c",
+      "operand": "send_coder_vdu",
       "target": 1900,
-      "target_label": "loop_076c"
+      "target_label": "send_coder_vdu"
     },
     {
       "addr": 1911,
@@ -7131,9 +7138,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_07c0",
+      "operand": "select_colour_2",
       "target": 1984,
-      "target_label": "code_07c0"
+      "target_label": "select_colour_2"
     },
     {
       "addr": 1914,
@@ -7352,7 +7359,7 @@
       ],
       "image": 0,
       "labels": [
-        "code_07c0"
+        "select_colour_2"
       ],
       "comment_inline": "COLOUR 2...",
       "xref_summaries": [
@@ -11557,11 +11564,19 @@
         "room_walls"
       ],
       "xref_summaries": [
-        "&0c00 used as index base 1 time by &15c8"
+        "&0c00 used as index base 3 times by &15c8, &7fc8, &7feb"
       ],
       "references": [
         {
           "addr": 5576,
+          "kind": "indexed"
+        },
+        {
+          "addr": 32712,
+          "kind": "indexed"
+        },
+        {
+          "addr": 32747,
           "kind": "indexed"
         }
       ],
@@ -18532,6 +18547,15 @@
       "labels": [
         "font_letters"
       ],
+      "xref_summaries": [
+        "&12d7 used as index base 1 time by &7fc5"
+      ],
+      "references": [
+        {
+          "addr": 32709,
+          "kind": "indexed"
+        }
+      ],
       "type": "string",
       "string": "<BB"
     },
@@ -19202,6 +19226,15 @@
       "labels": [
         "font_digits"
       ],
+      "xref_summaries": [
+        "&13a7 used as index base 1 time by &7fe8"
+      ],
+      "references": [
+        {
+          "addr": 32744,
+          "kind": "indexed"
+        }
+      ],
       "type": "string",
       "string": "<FJ"
     },
@@ -19475,9 +19508,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_1419",
+      "operand": "stop_music_and_load",
       "target": 5145,
-      "target_label": "code_1419"
+      "target_label": "stop_music_and_load"
     },
     {
       "addr": 5127,
@@ -19610,7 +19643,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_1419"
+        "stop_music_and_load"
       ],
       "comment_inline": "Stop the music",
       "xref_summaries": [
@@ -20047,9 +20080,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_147d",
+      "operand": "mark_first_level_done",
       "target": 5245,
-      "target_label": "code_147d"
+      "target_label": "mark_first_level_done"
     },
     {
       "addr": 5227,
@@ -20181,7 +20214,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_147d"
+        "mark_first_level_done"
       ],
       "comment_inline": "Mark the first level done",
       "xref_summaries": [
@@ -20255,7 +20288,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_1485"
+        "restore_page_0d_byte"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -20308,9 +20341,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_1485",
+      "operand": "restore_page_0d_byte",
       "target": 5253,
-      "target_label": "loop_1485"
+      "target_label": "restore_page_0d_byte"
     },
     {
       "addr": 5262,
@@ -20349,9 +20382,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcs",
-      "operand": "code_14a7",
+      "operand": "level_command_two_digits",
       "target": 5287,
-      "target_label": "code_14a7"
+      "target_label": "level_command_two_digits"
     },
     {
       "addr": 5269,
@@ -20453,9 +20486,9 @@
       "comment_inline": "...(always branches)",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_14bf",
+      "operand": "shrink_display_for_loading",
       "target": 5311,
-      "target_label": "code_14bf"
+      "target_label": "shrink_display_for_loading"
     },
     {
       "addr": 5287,
@@ -20466,7 +20499,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_14a7"
+        "level_command_two_digits"
       ],
       "comment_inline": "Yes: tens digit...",
       "xref_summaries": [
@@ -20632,7 +20665,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_14bf"
+        "shrink_display_for_loading"
       ],
       "comment_inline": "VDU 23,0,6,15,0,0,0,0,0,0: show 15 character rows while loading...",
       "xref_summaries": [
@@ -20883,9 +20916,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_14f1",
+      "operand": "load_level_file",
       "target": 5361,
-      "target_label": "code_14f1"
+      "target_label": "load_level_file"
     },
     {
       "addr": 5358,
@@ -20910,7 +20943,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_14f1"
+        "load_level_file"
       ],
       "comment_inline": "No: *LOAD LEVELnn 6B00",
       "xref_summaries": [
@@ -22878,7 +22911,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_162d"
+        "set_text_window_top"
       ],
       "sub_labels": {
         "5678": [
@@ -71298,259 +71331,899 @@
     {
       "addr": 32658,
       "bytes": [
-        72,
-        152,
-        72,
-        165,
-        112,
-        201,
-        48,
-        144,
-        91,
-        201,
-        58,
-        144,
-        59,
-        201,
-        65,
-        144,
-        83,
-        201,
-        91,
-        144,
-        14,
-        201,
-        97,
-        144,
-        75,
-        201,
-        123,
-        176,
-        71,
-        56,
-        233,
-        97,
-        76,
-        184,
-        127,
-        56,
-        233,
-        65,
-        10,
-        10,
-        10,
-        208,
-        0,
-        170,
-        24,
-        105,
-        8,
-        133,
-        112,
-        160,
-        0,
-        189,
-        215,
-        18,
-        153,
-        0,
-        12,
-        200,
-        232,
-        228,
-        112,
-        208,
-        244,
-        104,
-        168,
-        104,
-        170,
-        169,
-        128,
-        76,
-        164,
-        224,
-        56,
-        233,
-        48,
-        10,
-        10,
-        10,
-        170,
-        24,
-        105,
-        8,
-        133,
-        112,
-        160,
-        0,
-        189,
-        167,
-        19,
-        153,
-        0,
-        12,
-        200,
-        232,
-        228,
-        112,
-        208,
-        244,
-        240,
-        219,
-        104,
-        168,
-        104,
-        170,
-        165,
-        112,
-        76,
-        164,
-        224,
-        0
+        72
       ],
       "image": 4,
       "labels": [
-        "data_7f92"
+        "unused_font_handler"
       ],
-      "sub_labels": {
-        "32693": [
-          "capital_letter"
-        ],
-        "32696": [
-          "glyph_offset"
-        ],
-        "32701": [
-          "copy_glyph"
-        ],
-        "32709": [
-          "copy_letter_glyph"
-        ],
-        "32721": [
-          "restore_registers"
-        ],
-        "32730": [
-          "digit_glyph"
-        ],
-        "32744": [
-          "copy_digit_glyph"
-        ],
-        "32758": [
-          "pass_character"
-        ]
-      },
-      "comment_inline": "... ...and Y ... Classify the character Below '0': print it unchanged ... '0'-'9': a digit ... ':'-'@': print it unchanged ... 'A'-'Z': a capital letter ... '['-'`': print it unchanged ... Above 'z': print it unchanged ... A lower-case letter: letter number 0-25 ... ... A capital letter: letter number 0-25 ... x 8: offset of the glyph in font_letters ... ... Branch to the next instruction either way X = offset of the first glyph byte Stop after eight bytes ... ... Y indexes the character 128 definition Copy a glyph byte... ...into the character 128 definition ... ... ... Loop for eight bytes Restore Y... ... ...and X ... Print character 128, now showing the glyph... ...through the MOS 1.20 OSWRCH routine A digit: digit number 0-9 ... x 8: offset of the glyph in font_digits ... ... X = offset of the first glyph byte Stop after eight bytes ... ... Y indexes the character 128 definition Copy a glyph byte... ...into the character 128 definition ... ... ... Loop for eight bytes Print character 128 (always branches) Any other character: restore Y... ... ...and X ... Recover the character ...and print it through the MOS 1.20 OSWRCH routine",
-      "type": "byte",
-      "values": [
-        72,
-        152,
-        72,
+      "comment_inline": "Save X (the TXA before it is now the JMP's operand)...",
+      "type": "code",
+      "mnemonic": "pha"
+    },
+    {
+      "addr": 32659,
+      "bytes": [
+        152
+      ],
+      "image": 4,
+      "comment_inline": "...and Y",
+      "type": "code",
+      "mnemonic": "tya"
+    },
+    {
+      "addr": 32660,
+      "bytes": [
+        72
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "pha"
+    },
+    {
+      "addr": 32661,
+      "bytes": [
         165,
-        112,
+        112
+      ],
+      "image": 4,
+      "comment_inline": "Classify the character",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "plot_x",
+      "target": 112,
+      "target_label": "plot_x"
+    },
+    {
+      "addr": 32663,
+      "bytes": [
         201,
-        48,
+        48
+      ],
+      "image": 4,
+      "comment_inline": "Below '0': print it unchanged",
+      "type": "code",
+      "mnemonic": "cmp",
+      "operand": "#&30"
+    },
+    {
+      "addr": 32665,
+      "bytes": [
         144,
-        91,
+        91
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bcc",
+      "operand": "pass_character",
+      "target": 32758,
+      "target_label": "pass_character"
+    },
+    {
+      "addr": 32667,
+      "bytes": [
         201,
-        58,
+        58
+      ],
+      "image": 4,
+      "comment_inline": "'0'-'9': a digit",
+      "type": "code",
+      "mnemonic": "cmp",
+      "operand": "#&3a"
+    },
+    {
+      "addr": 32669,
+      "bytes": [
         144,
-        59,
+        59
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bcc",
+      "operand": "digit_glyph",
+      "target": 32730,
+      "target_label": "digit_glyph"
+    },
+    {
+      "addr": 32671,
+      "bytes": [
         201,
-        65,
+        65
+      ],
+      "image": 4,
+      "comment_inline": "':'-'@': print it unchanged",
+      "type": "code",
+      "mnemonic": "cmp",
+      "operand": "#&41"
+    },
+    {
+      "addr": 32673,
+      "bytes": [
         144,
-        83,
+        83
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bcc",
+      "operand": "pass_character",
+      "target": 32758,
+      "target_label": "pass_character"
+    },
+    {
+      "addr": 32675,
+      "bytes": [
         201,
-        91,
+        91
+      ],
+      "image": 4,
+      "comment_inline": "'A'-'Z': a capital letter",
+      "type": "code",
+      "mnemonic": "cmp",
+      "operand": "#&5b"
+    },
+    {
+      "addr": 32677,
+      "bytes": [
         144,
-        14,
+        14
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bcc",
+      "operand": "capital_letter",
+      "target": 32693,
+      "target_label": "capital_letter"
+    },
+    {
+      "addr": 32679,
+      "bytes": [
         201,
-        97,
+        97
+      ],
+      "image": 4,
+      "comment_inline": "'['-'`': print it unchanged",
+      "type": "code",
+      "mnemonic": "cmp",
+      "operand": "#&61"
+    },
+    {
+      "addr": 32681,
+      "bytes": [
         144,
-        75,
+        75
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bcc",
+      "operand": "pass_character",
+      "target": 32758,
+      "target_label": "pass_character"
+    },
+    {
+      "addr": 32683,
+      "bytes": [
         201,
-        123,
+        123
+      ],
+      "image": 4,
+      "comment_inline": "Above 'z': print it unchanged",
+      "type": "code",
+      "mnemonic": "cmp",
+      "operand": "#&7b"
+    },
+    {
+      "addr": 32685,
+      "bytes": [
         176,
-        71,
-        56,
+        71
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "bcs",
+      "operand": "pass_character",
+      "target": 32758,
+      "target_label": "pass_character"
+    },
+    {
+      "addr": 32687,
+      "bytes": [
+        56
+      ],
+      "image": 4,
+      "comment_inline": "A lower-case letter: letter number 0-25",
+      "type": "code",
+      "mnemonic": "sec"
+    },
+    {
+      "addr": 32688,
+      "bytes": [
         233,
-        97,
+        97
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sbc",
+      "operand": "#&61"
+    },
+    {
+      "addr": 32690,
+      "bytes": [
         76,
         184,
-        127,
-        56,
+        127
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "jmp",
+      "operand": "glyph_offset",
+      "target": 32696,
+      "target_label": "glyph_offset"
+    },
+    {
+      "addr": 32693,
+      "bytes": [
+        56
+      ],
+      "image": 4,
+      "labels": [
+        "capital_letter"
+      ],
+      "comment_inline": "A capital letter: letter number 0-25",
+      "xref_summaries": [
+        "&7fb5 referenced 1 time by &7fa5"
+      ],
+      "references": [
+        {
+          "addr": 32677,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "sec"
+    },
+    {
+      "addr": 32694,
+      "bytes": [
         233,
-        65,
-        10,
-        10,
-        10,
+        65
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sbc",
+      "operand": "#&41"
+    },
+    {
+      "addr": 32696,
+      "bytes": [
+        10
+      ],
+      "image": 4,
+      "labels": [
+        "glyph_offset"
+      ],
+      "comment_inline": "x 8: offset of the glyph in font_letters",
+      "xref_summaries": [
+        "&7fb8 referenced 1 time by &7fb2"
+      ],
+      "references": [
+        {
+          "addr": 32690,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "asl"
+    },
+    {
+      "addr": 32697,
+      "bytes": [
+        10
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "asl"
+    },
+    {
+      "addr": 32698,
+      "bytes": [
+        10
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "asl"
+    },
+    {
+      "addr": 32699,
+      "bytes": [
         208,
-        0,
-        170,
-        24,
+        0
+      ],
+      "image": 4,
+      "comment_inline": "Branch to the next instruction either way",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "copy_glyph",
+      "target": 32701,
+      "target_label": "copy_glyph"
+    },
+    {
+      "addr": 32701,
+      "bytes": [
+        170
+      ],
+      "image": 4,
+      "labels": [
+        "copy_glyph"
+      ],
+      "comment_inline": "X = offset of the first glyph byte",
+      "xref_summaries": [
+        "&7fbd referenced 1 time by &7fbb"
+      ],
+      "references": [
+        {
+          "addr": 32699,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "tax"
+    },
+    {
+      "addr": 32702,
+      "bytes": [
+        24
+      ],
+      "image": 4,
+      "comment_inline": "Stop after eight bytes",
+      "type": "code",
+      "mnemonic": "clc"
+    },
+    {
+      "addr": 32703,
+      "bytes": [
         105,
-        8,
+        8
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "adc",
+      "operand": "#8"
+    },
+    {
+      "addr": 32705,
+      "bytes": [
         133,
-        112,
+        112
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "plot_x",
+      "target": 112,
+      "target_label": "plot_x"
+    },
+    {
+      "addr": 32707,
+      "bytes": [
         160,
-        0,
+        0
+      ],
+      "image": 4,
+      "comment_inline": "Y indexes the character 128 definition",
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#0"
+    },
+    {
+      "addr": 32709,
+      "bytes": [
         189,
         215,
-        18,
+        18
+      ],
+      "image": 4,
+      "labels": [
+        "copy_letter_glyph"
+      ],
+      "comment_inline": "Copy a glyph byte...",
+      "xref_summaries": [
+        "&7fc5 referenced 1 time by &7fcf"
+      ],
+      "references": [
+        {
+          "addr": 32719,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "font_letters,x",
+      "target": 4823,
+      "target_label": "font_letters"
+    },
+    {
+      "addr": 32712,
+      "bytes": [
         153,
         0,
-        12,
-        200,
-        232,
+        12
+      ],
+      "image": 4,
+      "comment_inline": "...into the character 128 definition",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "room_walls,y",
+      "target": 3072,
+      "target_label": "room_walls"
+    },
+    {
+      "addr": 32715,
+      "bytes": [
+        200
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "iny"
+    },
+    {
+      "addr": 32716,
+      "bytes": [
+        232
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "inx"
+    },
+    {
+      "addr": 32717,
+      "bytes": [
         228,
-        112,
+        112
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "cpx",
+      "operand": "plot_x",
+      "target": 112,
+      "target_label": "plot_x"
+    },
+    {
+      "addr": 32719,
+      "bytes": [
         208,
-        244,
-        104,
-        168,
-        104,
-        170,
+        244
+      ],
+      "image": 4,
+      "comment_inline": "Loop for eight bytes",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "copy_letter_glyph",
+      "target": 32709,
+      "target_label": "copy_letter_glyph"
+    },
+    {
+      "addr": 32721,
+      "bytes": [
+        104
+      ],
+      "image": 4,
+      "labels": [
+        "restore_registers"
+      ],
+      "comment_inline": "Restore Y...",
+      "xref_summaries": [
+        "&7fd1 referenced 1 time by &7ff4"
+      ],
+      "references": [
+        {
+          "addr": 32756,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 32722,
+      "bytes": [
+        168
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "tay"
+    },
+    {
+      "addr": 32723,
+      "bytes": [
+        104
+      ],
+      "image": 4,
+      "comment_inline": "...and X",
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 32724,
+      "bytes": [
+        170
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "tax"
+    },
+    {
+      "addr": 32725,
+      "bytes": [
         169,
-        128,
+        128
+      ],
+      "image": 4,
+      "comment_inline": "Print character 128, now showing the glyph...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&80"
+    },
+    {
+      "addr": 32727,
+      "bytes": [
         76,
         164,
-        224,
-        56,
+        224
+      ],
+      "image": 4,
+      "comment_inline": "...through the MOS 1.20 OSWRCH routine",
+      "type": "code",
+      "mnemonic": "jmp",
+      "operand": "mos120_oswrch_default",
+      "target": 57508,
+      "target_label": "mos120_oswrch_default"
+    },
+    {
+      "addr": 32730,
+      "bytes": [
+        56
+      ],
+      "image": 4,
+      "labels": [
+        "digit_glyph"
+      ],
+      "comment_inline": "A digit: digit number 0-9",
+      "xref_summaries": [
+        "&7fda referenced 1 time by &7f9d"
+      ],
+      "references": [
+        {
+          "addr": 32669,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "sec"
+    },
+    {
+      "addr": 32731,
+      "bytes": [
         233,
-        48,
-        10,
-        10,
-        10,
-        170,
-        24,
+        48
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sbc",
+      "operand": "#&30"
+    },
+    {
+      "addr": 32733,
+      "bytes": [
+        10
+      ],
+      "image": 4,
+      "comment_inline": "x 8: offset of the glyph in font_digits",
+      "type": "code",
+      "mnemonic": "asl"
+    },
+    {
+      "addr": 32734,
+      "bytes": [
+        10
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "asl"
+    },
+    {
+      "addr": 32735,
+      "bytes": [
+        10
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "asl"
+    },
+    {
+      "addr": 32736,
+      "bytes": [
+        170
+      ],
+      "image": 4,
+      "comment_inline": "X = offset of the first glyph byte",
+      "type": "code",
+      "mnemonic": "tax"
+    },
+    {
+      "addr": 32737,
+      "bytes": [
+        24
+      ],
+      "image": 4,
+      "comment_inline": "Stop after eight bytes",
+      "type": "code",
+      "mnemonic": "clc"
+    },
+    {
+      "addr": 32738,
+      "bytes": [
         105,
-        8,
+        8
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "adc",
+      "operand": "#8"
+    },
+    {
+      "addr": 32740,
+      "bytes": [
         133,
-        112,
+        112
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "plot_x",
+      "target": 112,
+      "target_label": "plot_x"
+    },
+    {
+      "addr": 32742,
+      "bytes": [
         160,
-        0,
+        0
+      ],
+      "image": 4,
+      "comment_inline": "Y indexes the character 128 definition",
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#0"
+    },
+    {
+      "addr": 32744,
+      "bytes": [
         189,
         167,
-        19,
+        19
+      ],
+      "image": 4,
+      "labels": [
+        "copy_digit_glyph"
+      ],
+      "comment_inline": "Copy a glyph byte...",
+      "xref_summaries": [
+        "&7fe8 referenced 1 time by &7ff2"
+      ],
+      "references": [
+        {
+          "addr": 32754,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "font_digits,x",
+      "target": 5031,
+      "target_label": "font_digits"
+    },
+    {
+      "addr": 32747,
+      "bytes": [
         153,
         0,
-        12,
-        200,
-        232,
+        12
+      ],
+      "image": 4,
+      "comment_inline": "...into the character 128 definition",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "room_walls,y",
+      "target": 3072,
+      "target_label": "room_walls"
+    },
+    {
+      "addr": 32750,
+      "bytes": [
+        200
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "iny"
+    },
+    {
+      "addr": 32751,
+      "bytes": [
+        232
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "inx"
+    },
+    {
+      "addr": 32752,
+      "bytes": [
         228,
-        112,
+        112
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "cpx",
+      "operand": "plot_x",
+      "target": 112,
+      "target_label": "plot_x"
+    },
+    {
+      "addr": 32754,
+      "bytes": [
         208,
-        244,
+        244
+      ],
+      "image": 4,
+      "comment_inline": "Loop for eight bytes",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "copy_digit_glyph",
+      "target": 32744,
+      "target_label": "copy_digit_glyph"
+    },
+    {
+      "addr": 32756,
+      "bytes": [
         240,
-        219,
-        104,
-        168,
-        104,
-        170,
+        219
+      ],
+      "image": 4,
+      "comment_inline": "Print character 128 (always branches)",
+      "type": "code",
+      "mnemonic": "beq",
+      "operand": "restore_registers",
+      "target": 32721,
+      "target_label": "restore_registers"
+    },
+    {
+      "addr": 32758,
+      "bytes": [
+        104
+      ],
+      "image": 4,
+      "labels": [
+        "pass_character"
+      ],
+      "comment_inline": "Any other character: restore Y...",
+      "xref_summaries": [
+        "&7ff6 referenced 4 times by &7f99, &7fa1, &7fa9, &7fad"
+      ],
+      "references": [
+        {
+          "addr": 32665,
+          "kind": "direct"
+        },
+        {
+          "addr": 32673,
+          "kind": "direct"
+        },
+        {
+          "addr": 32681,
+          "kind": "direct"
+        },
+        {
+          "addr": 32685,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 32759,
+      "bytes": [
+        168
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "tay"
+    },
+    {
+      "addr": 32760,
+      "bytes": [
+        104
+      ],
+      "image": 4,
+      "comment_inline": "...and X",
+      "type": "code",
+      "mnemonic": "pla"
+    },
+    {
+      "addr": 32761,
+      "bytes": [
+        170
+      ],
+      "image": 4,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "tax"
+    },
+    {
+      "addr": 32762,
+      "bytes": [
         165,
-        112,
+        112
+      ],
+      "image": 4,
+      "comment_inline": "Recover the character",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "plot_x",
+      "target": 112,
+      "target_label": "plot_x"
+    },
+    {
+      "addr": 32764,
+      "bytes": [
         76,
         164,
-        224,
+        224
+      ],
+      "image": 4,
+      "comment_inline": "...and print it through the MOS 1.20 OSWRCH routine",
+      "type": "code",
+      "mnemonic": "jmp",
+      "operand": "mos120_oswrch_default",
+      "target": 57508,
+      "target_label": "mos120_oswrch_default"
+    },
+    {
+      "addr": 32767,
+      "bytes": [
+        0
+      ],
+      "image": 4,
+      "type": "byte",
+      "values": [
         0
       ]
     },
@@ -71579,9 +72252,9 @@
       "comment_inline": "No: pass it on",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_c569",
+      "operand": "joystick_pass_on",
       "target": 50537,
-      "target_label": "code_c569"
+      "target_label": "joystick_pass_on"
     },
     {
       "addr": 50436,
@@ -71593,7 +72266,8 @@
       "comment_inline": "N (left)?",
       "type": "code",
       "mnemonic": "cpx",
-      "operand": "#&aa"
+      "operand": "#inkey_key_n",
+      "format_hint": "inkey_number"
     },
     {
       "addr": 50438,
@@ -71605,9 +72279,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_c51b",
+      "operand": "joystick_left",
       "target": 50459,
-      "target_label": "code_c51b"
+      "target_label": "joystick_left"
     },
     {
       "addr": 50440,
@@ -71619,7 +72293,8 @@
       "comment_inline": "B (down)?",
       "type": "code",
       "mnemonic": "cpx",
-      "operand": "#&9b"
+      "operand": "#inkey_key_b",
+      "format_hint": "inkey_number"
     },
     {
       "addr": 50442,
@@ -71631,9 +72306,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_c546",
+      "operand": "joystick_down",
       "target": 50502,
-      "target_label": "code_c546"
+      "target_label": "joystick_down"
     },
     {
       "addr": 50444,
@@ -71645,7 +72320,8 @@
       "comment_inline": "G (up)?",
       "type": "code",
       "mnemonic": "cpx",
-      "operand": "#&ac"
+      "operand": "#inkey_key_g",
+      "format_hint": "inkey_number"
     },
     {
       "addr": 50446,
@@ -71657,9 +72333,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_c538",
+      "operand": "joystick_up",
       "target": 50488,
-      "target_label": "code_c538"
+      "target_label": "joystick_up"
     },
     {
       "addr": 50448,
@@ -71671,7 +72347,8 @@
       "comment_inline": "M (right)?",
       "type": "code",
       "mnemonic": "cpx",
-      "operand": "#&9a"
+      "operand": "#inkey_key_m",
+      "format_hint": "inkey_number"
     },
     {
       "addr": 50450,
@@ -71683,9 +72360,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_c529",
+      "operand": "joystick_right",
       "target": 50473,
-      "target_label": "code_c529"
+      "target_label": "joystick_right"
     },
     {
       "addr": 50452,
@@ -71697,7 +72374,8 @@
       "comment_inline": "SPACE (fire)?",
       "type": "code",
       "mnemonic": "cpx",
-      "operand": "#&9d"
+      "operand": "#inkey_key_space",
+      "format_hint": "inkey_number"
     },
     {
       "addr": 50454,
@@ -71709,9 +72387,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_c555",
+      "operand": "joystick_fire",
       "target": 50517,
-      "target_label": "code_c555"
+      "target_label": "joystick_fire"
     },
     {
       "addr": 50456,
@@ -71736,7 +72414,7 @@
       ],
       "image": 5,
       "labels": [
-        "code_c51b"
+        "joystick_left"
       ],
       "comment_inline": "N: channel 1 high byte &FF?",
       "xref_summaries": [
@@ -71807,9 +72485,9 @@
       "comment_inline": "No: not pressed",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_c566",
+      "operand": "joystick_not_pressed",
       "target": 50534,
-      "target_label": "code_c566"
+      "target_label": "joystick_not_pressed"
     },
     {
       "addr": 50470,
@@ -71841,7 +72519,7 @@
       ],
       "image": 5,
       "labels": [
-        "code_c529"
+        "joystick_right"
       ],
       "comment_inline": "M: channel 1 high byte 0?",
       "xref_summaries": [
@@ -71912,9 +72590,9 @@
       "comment_inline": "No: not pressed",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_c566",
+      "operand": "joystick_not_pressed",
       "target": 50534,
-      "target_label": "code_c566"
+      "target_label": "joystick_not_pressed"
     },
     {
       "addr": 50484,
@@ -71956,7 +72634,7 @@
       ],
       "image": 5,
       "labels": [
-        "code_c538"
+        "joystick_up"
       ],
       "comment_inline": "G: channel 2 high byte &FF?",
       "xref_summaries": [
@@ -72027,9 +72705,9 @@
       "comment_inline": "No: not pressed",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_c566",
+      "operand": "joystick_not_pressed",
       "target": 50534,
-      "target_label": "code_c566"
+      "target_label": "joystick_not_pressed"
     },
     {
       "addr": 50499,
@@ -72061,7 +72739,7 @@
       ],
       "image": 5,
       "labels": [
-        "code_c546"
+        "joystick_down"
       ],
       "comment_inline": "B: channel 2 high byte 0?",
       "xref_summaries": [
@@ -72132,9 +72810,9 @@
       "comment_inline": "No: not pressed",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_c566",
+      "operand": "joystick_not_pressed",
       "target": 50534,
-      "target_label": "code_c566"
+      "target_label": "joystick_not_pressed"
     },
     {
       "addr": 50513,
@@ -72176,7 +72854,7 @@
       ],
       "image": 5,
       "labels": [
-        "code_c555"
+        "joystick_fire"
       ],
       "comment_inline": "Fire: either fire button?",
       "xref_summaries": [
@@ -72257,9 +72935,9 @@
       "comment_inline": "No: not pressed",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_c566",
+      "operand": "joystick_not_pressed",
       "target": 50534,
-      "target_label": "code_c566"
+      "target_label": "joystick_not_pressed"
     },
     {
       "addr": 50529,
@@ -72303,7 +72981,7 @@
       ],
       "image": 5,
       "labels": [
-        "code_c566"
+        "joystick_not_pressed"
       ],
       "comment_inline": "Not pressed",
       "xref_summaries": [
@@ -72354,7 +73032,7 @@
       ],
       "image": 5,
       "labels": [
-        "code_c569"
+        "joystick_pass_on"
       ],
       "comment_inline": "Pass the call on to the MOS 3.20 OSBYTE routine",
       "xref_summaries": [
@@ -73325,7 +74003,7 @@
       ],
       "image": 6,
       "labels": [
-        "loop_c6dc"
+        "wait_p_pressed"
       ],
       "comment_inline": "...pressed again...",
       "xref_summaries": [
@@ -73384,9 +74062,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_c6dc",
+      "operand": "wait_p_pressed",
       "target": 50908,
-      "target_label": "loop_c6dc"
+      "target_label": "wait_p_pressed"
     },
     {
       "addr": 50917,
@@ -74519,9 +75197,9 @@
       "comment_inline": "Yes: end of the section",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_c7f0",
+      "operand": "end_of_section",
       "target": 51184,
-      "target_label": "code_c7f0"
+      "target_label": "end_of_section"
     },
     {
       "addr": 51066,
@@ -74531,7 +75209,7 @@
       ],
       "image": 7,
       "labels": [
-        "code_c77a"
+        "play_step"
       ],
       "comment_inline": "Non-zero: a new transposition",
       "xref_summaries": [
@@ -74557,9 +75235,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_c781",
+      "operand": "play_channel_2",
       "target": 51073,
-      "target_label": "code_c781"
+      "target_label": "play_channel_2"
     },
     {
       "addr": 51070,
@@ -74584,7 +75262,7 @@
       ],
       "image": 7,
       "labels": [
-        "code_c781"
+        "play_channel_2"
       ],
       "comment_inline": "Second byte: channel 2's pitch...",
       "xref_summaries": [
@@ -74624,9 +75302,9 @@
       "comment_inline": "...0 for none",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_c793",
+      "operand": "play_channel_3",
       "target": 51091,
-      "target_label": "code_c793"
+      "target_label": "play_channel_3"
     },
     {
       "addr": 51079,
@@ -74725,7 +75403,7 @@
       ],
       "image": 7,
       "labels": [
-        "code_c793"
+        "play_channel_3"
       ],
       "comment_inline": "Third byte: channel 3's pitch...",
       "xref_summaries": [
@@ -74765,9 +75443,9 @@
       "comment_inline": "...0 for none",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_c7a5",
+      "operand": "next_step",
       "target": 51109,
-      "target_label": "code_c7a5"
+      "target_label": "next_step"
     },
     {
       "addr": 51097,
@@ -74866,7 +75544,7 @@
       ],
       "image": 7,
       "labels": [
-        "code_c7a5"
+        "next_step"
       ],
       "comment_inline": "Next step: tune_ptr += 3...",
       "xref_summaries": [
@@ -75017,9 +75695,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bmi",
-      "operand": "code_c7be",
+      "operand": "store_rhythm_step",
       "target": 51134,
-      "target_label": "code_c7be"
+      "target_label": "store_rhythm_step"
     },
     {
       "addr": 51132,
@@ -75042,7 +75720,7 @@
       ],
       "image": 7,
       "labels": [
-        "code_c7be"
+        "store_rhythm_step"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -75095,9 +75773,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_c7e0",
+      "operand": "set_step_timer",
       "target": 51168,
-      "target_label": "code_c7e0"
+      "target_label": "set_step_timer"
     },
     {
       "addr": 51143,
@@ -75296,7 +75974,7 @@
       ],
       "image": 7,
       "labels": [
-        "code_c7e0"
+        "set_step_timer"
       ],
       "comment_inline": "OSWORD 4: interval timer = -12 centiseconds, for the next step",
       "xref_summaries": [
@@ -75453,7 +76131,7 @@
       ],
       "image": 7,
       "labels": [
-        "code_c7f0"
+        "end_of_section"
       ],
       "comment_inline": "End of section: the next byte is channel 3's envelope",
       "xref_summaries": [
@@ -75549,9 +76227,9 @@
       "comment_inline": "...past 24?",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_c80b",
+      "operand": "start_section",
       "target": 51211,
-      "target_label": "code_c80b"
+      "target_label": "start_section"
     },
     {
       "addr": 51201,
@@ -75614,7 +76292,7 @@
       ],
       "image": 7,
       "labels": [
-        "code_c80b"
+        "start_section"
       ],
       "comment_inline": "Point tune_ptr at the section...",
       "xref_summaries": [
@@ -75723,9 +76401,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_c77a",
+      "operand": "play_step",
       "target": 51066,
-      "target_label": "code_c77a"
+      "target_label": "play_step"
     },
     {
       "addr": 51229,

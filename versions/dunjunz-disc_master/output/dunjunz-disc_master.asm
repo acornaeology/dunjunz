@@ -42,7 +42,7 @@ inkey_key_left_square_bracket        = &c7
 tune_ptr                        = &00  ; The music's place in the tune: the current three-byte step.
 ; &00 referenced 11 times by &1413, &146f, &c735, &c774, &c783, &c795, &c7a5, &c7aa, &c7f2, &c80f, &c818
 plot_x                          = &70  ; Sprite position: screen byte column, 0-79 (two MODE 2 pixels per byte). Also used as a scratch byte and pointer low byte by other routines.
-; &70 referenced 41 times by &0422, &0439, &043b, &0452, &045a, &045c, &045e, &0465, &046b, &05a7, &05ab, &0984, &0991, &0f68, &1458, &154d, &1558, &155c, &1da6, &1e1c, &1e77, &20c6, &726d, &7282, &72c6, &72db, &72eb, &72fb, &75b8, &75d9, &75e4, &75fb, &7823, &7846, &784a, &78a1, &78bb, &78d5, &78ef, &d884, &d891
+; &70 referenced 47 times by &0422, &0439, &043b, &0452, &045a, &045c, &045e, &0465, &046b, &05a7, &05ab, &0984, &0991, &0f68, &1458, &154d, &1558, &155c, &1da6, &1e1c, &1e77, &20c6, &726d, &7282, &72c6, &72db, &72eb, &72fb, &75b8, &75d9, &75e4, &75fb, &7823, &7846, &784a, &78a1, &78bb, &78d5, &78ef, &7f95, &7fc1, &7fcd, &7fe4, &7ff0, &7ffa, &d884, &d891
 plot_y                          = &71  ; Sprite position: pixel row from the top of the screen. Also used as a pointer high byte by other routines.
 ; &71 referenced 30 times by &042a, &0458, &0469, &0471, &0967, &097b, &0f77, &145c, &1da2, &1e18, &1e73, &20c2, &7269, &72c2, &75b4, &75d5, &75ec, &7603, &7797, &77a9, &77bb, &77cd, &77ef, &77f3, &78a8, &78c2, &78dc, &78f6, &d867, &d87b
 sprite_width                    = &72  ; Width of the sprite being plotted, in screen bytes.
@@ -201,6 +201,8 @@ saved_page_0d                   = &c400  ; The MOS's page &0D (the filing system
 ; &c400 used as index base 2 times by &0748, &1485
 mos120_reset_entry              = &d9cd  ; The MOS 1.20 reset entry, which decrypt_level calls on a failed checksum. On a Master, with private RAM paged in, it is HAZEL.
 ; &d9cd referenced 1 time by &0481
+mos120_oswrch_default           = &e0a4  ; MOS 1.20's default OSWRCH routine, where the unused handler would pass characters on; MOS 3.20's is elsewhere.
+; &e0a4 referenced 2 times by &7fd7, &7ffc
 mos320_oswrch_default           = &e822  ; MOS 3.20's default OSWRCH routine, WRCHV's initial value.
 mos320_osbyte_default           = &eeb1  ; MOS 3.20's default OSBYTE routine, BYTEV's initial value.
 ; &eeb1 referenced 2 times by &c518, &c569
@@ -694,11 +696,11 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
     jsr set_bell                        ; Set the bell sound
     ldx #0                              ; Copy page &0D...
 ; &0745 referenced 1 time by &074c
-.loop_0745
+.save_page_0d_byte
     lda scratch,x                       ; ...
     sta saved_page_0d,x                 ; ...to &C400 in private RAM
     dex                                 ; ...
-    bne loop_0745                       ; ...
+    bne save_page_0d_byte               ; ...
     ldx #&7a ; 'z'                      ; *L. DUNJ2 (&6E80-&7FFF)
     ldy #7                              ; ...
     jsr oscli                           ; ...
@@ -713,13 +715,13 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
     jsr oscli                           ; ...
     ldx #0                              ; Send the 21 bytes of coder_display_vdu
 ; &076c referenced 1 time by &0775
-.loop_076c
+.send_coder_vdu
     lda coder_display_vdu,x             ; ...
     jsr oswrch                          ; ...
     inx                                 ; ...
     cpx #&15                            ; ...
-    bne loop_076c                       ; ...
-    jmp code_07c0                       ; ...
+    bne send_coder_vdu                  ; ...
+    jmp select_colour_2                 ; ...
 .load_dunj_commands
     equs "L. DUNJ2"
     equb &0d
@@ -735,7 +737,7 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &17, &00, &01, &50, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
 ; &07c0 referenced 1 time by &0777
-.code_07c0
+.select_colour_2
     lda #&11                            ; COLOUR 2...
     jsr oswrch                          ; ...
     lda #2                              ; ...
@@ -1149,7 +1151,7 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &02, &00
     equb &c8, &00
     equb &02, &00
-; &0c00 used as index base 1 time by &15c8
+; &0c00 used as index base 3 times by &15c8, &7fc8, &7feb
 .room_walls
     equs "TIKP$UTHO[KF,D]/DYW3CZD\8V\;VHRVao"
     equb &02
@@ -1792,6 +1794,7 @@ reset_call_address = reset_call+1
 ;
 ; Eight bytes per letter, copied into the definition of character 128 by the WRCHV
 ; handler.
+; &12d7 used as index base 1 time by &7fc5
 .font_letters
     equs "<BB"
     equb &8e, &f2, &82, &c6, &00
@@ -1842,6 +1845,7 @@ reset_call_address = reset_call+1
 ;
 ; Eight bytes per digit, copied into the definition of character 128 by the WRCHV
 ; handler.
+; &13a7 used as index base 1 time by &7fe8
 .font_digits
     equs "<FJ"
     equb &92, &a2, &c4, &78, &00, &08, &18, &08
@@ -1869,7 +1873,7 @@ reset_call_address = reset_call+1
 .start_level
     lda first_level_flag                ; First level?
     cmp #&7b ; '{'                      ; ...
-    bne code_1419                       ; ...
+    bne stop_music_and_load             ; ...
     lda music_rhythm_step               ; No: keep the music's place on the stack: its step...
     pha                                 ; ...
     lda music_transpose                 ; ...transposition...
@@ -1881,7 +1885,7 @@ reset_call_address = reset_call+1
     lda tune_ptr + 1                    ; ...
     pha                                 ; ...
 ; &1419 referenced 1 time by &1405
-.code_1419
+.stop_music_and_load
     jsr stop_music                      ; Stop the music
     jsr count_level                     ; Clear the text area and count the level
     jsr load_level                      ; Put page &0D back and load the level
@@ -1912,7 +1916,7 @@ reset_call_address = reset_call+1
     jsr start_music                     ; Start the music
     lda first_level_flag                ; First level?
     cmp #&7b ; '{'                      ; ...
-    bne code_147d                       ; ...
+    bne mark_first_level_done           ; ...
     pla                                 ; No: put the music's place back: tune pointer...
     sta tune_ptr + 1                    ; ...
     pla                                 ; ...
@@ -1924,7 +1928,7 @@ reset_call_address = reset_call+1
     pla                                 ; ...and rhythm step
     sta music_rhythm_step               ; ...
 ; &147d referenced 1 time by &1469
-.code_147d
+.mark_first_level_done
     lda #&7b ; '{'                      ; Mark the first level done
     sta first_level_flag                ; ...
     rts                                 ; Return
@@ -1939,14 +1943,14 @@ reset_call_address = reset_call+1
 .load_level
     ldx #0                              ; Copy &C400-&C4FF back to page &0D...
 ; &1485 referenced 1 time by &148c
-.loop_1485
+.restore_page_0d_byte
     lda saved_page_0d,x                 ; ...
     sta scratch,x                       ; ...
     dex                                 ; ...
-    bne loop_1485                       ; ...
+    bne restore_page_0d_byte            ; ...
     lda level_bcd                       ; Level 10 or more (in BCD)?
     cmp #&0a                            ; ...
-    bcs code_14a7                       ; ...
+    bcs level_command_two_digits        ; ...
     lda #&20 ; ' '                      ; No: units digit then a space
     sta level_command_digits + 1        ; ...
     lda level_bcd                       ; ...
@@ -1954,9 +1958,9 @@ reset_call_address = reset_call+1
     clc                                 ; ...
     adc #&30 ; '0'                      ; ...
     sta level_command_digits            ; ...
-    bne code_14bf                       ; ...(always branches)
+    bne shrink_display_for_loading      ; ...(always branches)
 ; &14a7 referenced 1 time by &1493
-.code_14a7
+.level_command_two_digits
     lda level_bcd                       ; Yes: tens digit...
     lsr a                               ; ...
     lsr a                               ; ...
@@ -1971,7 +1975,7 @@ reset_call_address = reset_call+1
     adc #&30 ; '0'                      ; ...
     sta level_command_digits + 1        ; ...
 ; &14bf referenced 1 time by &14a5
-.code_14bf
+.shrink_display_for_loading
     lda #&17                            ; VDU 23,0,6,15,0,0,0,0,0,0: show 15 character rows while loading...
     jsr oswrch                          ; ...
     lda #0                              ; ...
@@ -1989,10 +1993,10 @@ reset_call_address = reset_call+1
     jsr oswrch                          ; ...
     lda level_number                    ; Level 25?
     cmp #&19                            ; ...
-    bne code_14f1                       ; ...
+    bne load_level_file                 ; ...
     jmp load_stones                     ; Yes: load it from Stones (and check it there)
 ; &14f1 referenced 1 time by &14ec
-.code_14f1
+.load_level_file
     ldx #&fb                            ; No: *LOAD LEVELnn 6B00
     ldy #&14                            ; ...
     jsr oscli                           ; ...
@@ -2192,9 +2196,9 @@ level_command_digits = level_command+10
     jsr oswrch                          ; ...
     lda #&13                            ; ...
     jsr oswrch                          ; ...
-.code_162d
+.set_text_window_top
 ; &162e referenced 1 time by &c60a
-clear_text_area_top = code_162d+1
+clear_text_area_top = set_text_window_top+1
     lda #0                              ; ...
     jsr oswrch                          ; ...
     lda #&0c                            ; ...VDU 12 to clear it
@@ -6856,29 +6860,89 @@ clear_text_area_top = code_162d+1
 ; The rest of the cassette game's wrch_handler, which prints letters and digits in the
 ; game's own font. On this side WRCHV's entry at &7F8F jumps straight to the MOS, so none
 ; of this runs and text appears in the MOS font.
-.data_7f92
-capital_letter = data_7f92+35
-glyph_offset = data_7f92+38
-copy_glyph = data_7f92+43
-copy_letter_glyph = data_7f92+51
-restore_registers = data_7f92+63
-digit_glyph = data_7f92+72
-copy_digit_glyph = data_7f92+86
-pass_character = data_7f92+100
-    equb &48, &98, &48, &a5, &70, &c9, &30, &90
-    equb &5b, &c9, &3a, &90, &3b, &c9, &41, &90
-    equb &53, &c9, &5b, &90, &0e, &c9, &61, &90
-    equb &4b, &c9, &7b, &b0, &47, &38, &e9, &61
-    equb &4c, &b8, &7f, &38, &e9, &41, &0a, &0a
-    equb &0a, &d0, &00, &aa, &18, &69, &08, &85
-    equb &70, &a0, &00, &bd, &d7, &12, &99, &00
-    equb &0c, &c8, &e8, &e4, &70, &d0, &f4, &68
-    equb &a8, &68, &aa, &a9, &80, &4c, &a4, &e0
-    equb &38, &e9, &30, &0a, &0a, &0a, &aa, &18
-    equb &69, &08, &85, &70, &a0, &00, &bd, &a7
-    equb &13, &99, &00, &0c, &c8, &e8, &e4, &70
-    equb &d0, &f4, &f0, &db, &68, &a8, &68, &aa
-    equb &a5, &70, &4c, &a4, &e0, &00   ; ...  ...and Y  ...  Classify the character  Below '0': print it unchanged  ...  '0'-'9': a digit  ...  ':'-'@': print it unchanged  ...  'A'-'Z': a capital letter  ...  '['-'`': print it unchanged  ...  Above 'z': print it unchanged  ...  A lower-case letter: letter number 0-25  ...  ...  A capital letter: letter number 0-25  ...  x 8: offset of the glyph in font_letters  ...  ...  Branch to the next instruction either way  X = offset of the first glyph byte  Stop after eight bytes  ...  ...  Y indexes the character 128 definition  Copy a glyph byte...  ...into the character 128 definition  ...  ...  ...  Loop for eight bytes  Restore Y...  ...  ...and X  ...  Print character 128, now showing the glyph...  ...through the MOS 1.20 OSWRCH routine  A digit: digit number 0-9  ...  x 8: offset of the glyph in font_digits  ...  ...  X = offset of the first glyph byte  Stop after eight bytes  ...  ...  Y indexes the character 128 definition  Copy a glyph byte...  ...into the character 128 definition  ...  ...  ...  Loop for eight bytes  Print character 128 (always branches)  Any other character: restore Y...  ...  ...and X  ...  Recover the character  ...and print it through the MOS 1.20 OSWRCH routine
+.unused_font_handler
+    pha                                 ; Save X (the TXA before it is now the JMP's operand)...
+    tya                                 ; ...and Y
+    pha                                 ; ...
+    lda plot_x                          ; Classify the character
+    cmp #&30 ; '0'                      ; Below '0': print it unchanged
+    bcc pass_character                  ; ...
+    cmp #&3a ; ':'                      ; '0'-'9': a digit
+    bcc digit_glyph                     ; ...
+    cmp #&41 ; 'A'                      ; ':'-'@': print it unchanged
+    bcc pass_character                  ; ...
+    cmp #&5b ; '['                      ; 'A'-'Z': a capital letter
+    bcc capital_letter                  ; ...
+    cmp #&61 ; 'a'                      ; '['-'`': print it unchanged
+    bcc pass_character                  ; ...
+    cmp #&7b ; '{'                      ; Above 'z': print it unchanged
+    bcs pass_character                  ; ...
+    sec                                 ; A lower-case letter: letter number 0-25
+    sbc #&61 ; 'a'                      ; ...
+    jmp glyph_offset                    ; ...
+; &7fb5 referenced 1 time by &7fa5
+.capital_letter
+    sec                                 ; A capital letter: letter number 0-25
+    sbc #&41 ; 'A'                      ; ...
+; &7fb8 referenced 1 time by &7fb2
+.glyph_offset
+    asl a                               ; x 8: offset of the glyph in font_letters
+    asl a                               ; ...
+    asl a                               ; ...
+    bne copy_glyph                      ; Branch to the next instruction either way
+; &7fbd referenced 1 time by &7fbb
+.copy_glyph
+    tax                                 ; X = offset of the first glyph byte
+    clc                                 ; Stop after eight bytes
+    adc #8                              ; ...
+    sta plot_x                          ; ...
+    ldy #0                              ; Y indexes the character 128 definition
+; &7fc5 referenced 1 time by &7fcf
+.copy_letter_glyph
+    lda font_letters,x                  ; Copy a glyph byte...
+    sta room_walls,y                    ; ...into the character 128 definition
+    iny                                 ; ...
+    inx                                 ; ...
+    cpx plot_x                          ; ...
+    bne copy_letter_glyph               ; Loop for eight bytes
+; &7fd1 referenced 1 time by &7ff4
+.restore_registers
+    pla                                 ; Restore Y...
+    tay                                 ; ...
+    pla                                 ; ...and X
+    tax                                 ; ...
+    lda #&80                            ; Print character 128, now showing the glyph...
+    jmp mos120_oswrch_default           ; ...through the MOS 1.20 OSWRCH routine
+; &7fda referenced 1 time by &7f9d
+.digit_glyph
+    sec                                 ; A digit: digit number 0-9
+    sbc #&30 ; '0'                      ; ...
+    asl a                               ; x 8: offset of the glyph in font_digits
+    asl a                               ; ...
+    asl a                               ; ...
+    tax                                 ; X = offset of the first glyph byte
+    clc                                 ; Stop after eight bytes
+    adc #8                              ; ...
+    sta plot_x                          ; ...
+    ldy #0                              ; Y indexes the character 128 definition
+; &7fe8 referenced 1 time by &7ff2
+.copy_digit_glyph
+    lda font_digits,x                   ; Copy a glyph byte...
+    sta room_walls,y                    ; ...into the character 128 definition
+    iny                                 ; ...
+    inx                                 ; ...
+    cpx plot_x                          ; ...
+    bne copy_digit_glyph                ; Loop for eight bytes
+    beq restore_registers               ; Print character 128 (always branches)
+; &7ff6 referenced 4 times by &7f99, &7fa1, &7fa9, &7fad
+.pass_character
+    pla                                 ; Any other character: restore Y...
+    tay                                 ; ...
+    pla                                 ; ...and X
+    tax                                 ; ...
+    lda plot_x                          ; Recover the character
+    jmp mos120_oswrch_default           ; ...and print it through the MOS 1.20 OSWRCH routine
+    equb &00
 .dasmos_dunj2_end
 
     org &c500
@@ -6901,73 +6965,73 @@ pass_character = data_7f92+100
 ;     X: &FF if the key is pressed, 0 if not
 .joystick_bytev
     cmp #&81                            ; OSBYTE &81 (INKEY)?
-    bne code_c569                       ; No: pass it on
-    cpx #&aa                            ; N (left)?
-    beq code_c51b                       ; ...
-    cpx #&9b                            ; B (down)?
-    beq code_c546                       ; ...
-    cpx #&ac                            ; G (up)?
-    beq code_c538                       ; ...
-    cpx #&9a                            ; M (right)?
-    beq code_c529                       ; ...
-    cpx #&9d                            ; SPACE (fire)?
-    beq code_c555                       ; ...
+    bne joystick_pass_on                ; No: pass it on
+    cpx #inkey_key_n                    ; N (left)?
+    beq joystick_left                   ; ...
+    cpx #inkey_key_b                    ; B (down)?
+    beq joystick_down                   ; ...
+    cpx #inkey_key_g                    ; G (up)?
+    beq joystick_up                     ; ...
+    cpx #inkey_key_m                    ; M (right)?
+    beq joystick_right                  ; ...
+    cpx #inkey_key_space                ; SPACE (fire)?
+    beq joystick_fire                   ; ...
     jmp mos320_osbyte_default           ; Another key: pass it on
 ; &c51b referenced 1 time by &c506
-.code_c51b
+.joystick_left
     ldx #1                              ; N: channel 1 high byte &FF?
     lda #osbyte_read_adc_or_get_buffer_status  ; ...
     jsr osbyte                          ; Read ADC channel X or buffer status  ...
     cpy #&ff                            ; ...
-    bne code_c566                       ; No: not pressed
+    bne joystick_not_pressed            ; No: not pressed
     ldx #&ff                            ; Yes: pressed
     rts                                 ; Return
 ; &c529 referenced 1 time by &c512
-.code_c529
+.joystick_right
     ldx #1                              ; M: channel 1 high byte 0?
     lda #osbyte_read_adc_or_get_buffer_status  ; ...
     jsr osbyte                          ; Read ADC channel X or buffer status  ...
     cpy #0                              ; ...
-    bne code_c566                       ; No: not pressed
+    bne joystick_not_pressed            ; No: not pressed
     dey                                 ; Yes: pressed (Y = &FF)
     ldx #&ff                            ; ...
     rts                                 ; Return
 ; &c538 referenced 1 time by &c50e
-.code_c538
+.joystick_up
     ldx #2                              ; G: channel 2 high byte &FF?
     lda #osbyte_read_adc_or_get_buffer_status  ; ...
     jsr osbyte                          ; Read ADC channel X or buffer status  ...
     cpy #&ff                            ; ...
-    bne code_c566                       ; No: not pressed
+    bne joystick_not_pressed            ; No: not pressed
     ldx #&ff                            ; Yes: pressed
     rts                                 ; Return
 ; &c546 referenced 1 time by &c50a
-.code_c546
+.joystick_down
     ldx #2                              ; B: channel 2 high byte 0?
     lda #osbyte_read_adc_or_get_buffer_status  ; ...
     jsr osbyte                          ; Read ADC channel X or buffer status  ...
     cpy #0                              ; ...
-    bne code_c566                       ; No: not pressed
+    bne joystick_not_pressed            ; No: not pressed
     dey                                 ; Yes: pressed (Y = &FF)
     ldx #&ff                            ; ...
     rts                                 ; Return
 ; &c555 referenced 1 time by &c516
-.code_c555
+.joystick_fire
     ldx #0                              ; Fire: either fire button?
     lda #osbyte_read_adc_or_get_buffer_status  ; ...
     jsr osbyte                          ; ...  Read ADC channel X or buffer status
     txa                                 ; ...
     and #3                              ; ...
-    beq code_c566                       ; No: not pressed
+    beq joystick_not_pressed            ; No: not pressed
     ldx #&ff                            ; Yes: pressed
     ldy #&ff                            ; ...
     rts                                 ; Return
 ; &c566 referenced 5 times by &c524, &c532, &c541, &c54f, &c55f
-.code_c566
+.joystick_not_pressed
     ldx #0                              ; Not pressed
     rts                                 ; Return
 ; &c569 referenced 1 time by &c502
-.code_c569
+.joystick_pass_on
     jmp mos320_osbyte_default           ; Pass the call on to the MOS 3.20 OSBYTE routine
 .dasmos_code_end
 
@@ -7074,11 +7138,11 @@ row_offsets_lo = row_offsets+1
     bne return_11                       ; No: return
     jsr wait_p_released                 ; Paused: wait for P to be released...
 ; &c6dc referenced 1 time by &c6e3
-.loop_c6dc
+.wait_p_pressed
     lda #osbyte_scan_keyboard_from_16   ; ...pressed again...
     jsr osbyte                          ; ...  Scan keyboard from key 16
     cpx #&37 ; '7'                      ; ...
-    bne loop_c6dc                       ; ...
+    bne wait_p_pressed                  ; ...
     jsr wait_p_released                 ; ...and released
     lda #2                              ; Restart the frame timing
     sta os_vsync_counter                ; ...
@@ -7193,34 +7257,34 @@ row_offsets_lo = row_offsets+1
     ldy #0                              ; First byte of the step...
     lda (tune_ptr),y                    ; ...
     cmp #&ff                            ; ...&FF?
-    beq code_c7f0                       ; Yes: end of the section
+    beq end_of_section                  ; Yes: end of the section
 ; &c77a referenced 1 time by &c81a
-.code_c77a
+.play_step
     cmp #0                              ; Non-zero: a new transposition
-    beq code_c781                       ; ...
+    beq play_channel_2                  ; ...
     sta music_transpose                 ; ...
 ; &c781 referenced 1 time by &c77c
-.code_c781
+.play_channel_2
     ldy #1                              ; Second byte: channel 2's pitch...
     lda (tune_ptr),y                    ; ...
-    beq code_c793                       ; ...0 for none
+    beq play_channel_3                  ; ...0 for none
     sta channel_2_sound + 4             ; ...
     ldx #<(channel_2_sound)             ; SOUND channel_2_sound...
     ldy #>(channel_2_sound)             ; ...
     lda #osword_sound                   ; ...
     jsr osword                          ; ...  SOUND command
 ; &c793 referenced 1 time by &c785
-.code_c793
+.play_channel_3
     ldy #2                              ; Third byte: channel 3's pitch...
     lda (tune_ptr),y                    ; ...
-    beq code_c7a5                       ; ...0 for none
+    beq next_step                       ; ...0 for none
     sta channel_3_sound + 4             ; ...
     ldx #<(channel_3_sound)             ; SOUND channel_3_sound...
     ldy #>(channel_3_sound)             ; ...
     lda #osword_sound                   ; ...
     jsr osword                          ; ...  SOUND command
 ; &c7a5 referenced 1 time by &c797
-.code_c7a5
+.next_step
     lda tune_ptr                        ; Next step: tune_ptr += 3...
     clc                                 ; ...
     adc #3                              ; ...
@@ -7232,14 +7296,14 @@ row_offsets_lo = row_offsets+1
     clc                                 ; ...
     adc #1                              ; ...
     cmp #&20 ; ' '                      ; ...
-    bmi code_c7be                       ; ...
+    bmi store_rhythm_step               ; ...
     lda #0                              ; ...
 ; &c7be referenced 1 time by &c7ba
-.code_c7be
+.store_rhythm_step
     sta music_rhythm_step               ; ...
     tay                                 ; Its pitch, 0 for a rest...
     lda rhythm_pattern,y                ; ...
-    beq code_c7e0                       ; ...
+    beq set_step_timer                  ; ...
     clc                                 ; ...transposed...
     adc music_transpose                 ; ...
     sta channel_1_sound + 4             ; ...
@@ -7252,7 +7316,7 @@ row_offsets_lo = row_offsets+1
     lda #osword_sound                   ; ...
     jsr osword                          ; ...  SOUND command
 ; &c7e0 referenced 1 time by &c7c5
-.code_c7e0
+.set_step_timer
     ldx #<(music_interval)              ; OSWORD 4: interval timer = -12 centiseconds, for the next step
     ldy #>(music_interval)              ; ...
     lda #osword_write_interval_timer    ; ...
@@ -7265,20 +7329,20 @@ row_offsets_lo = row_offsets+1
     plp                                 ; ...
     rts                                 ; Return
 ; &c7f0 referenced 1 time by &c778
-.code_c7f0
+.end_of_section
     ldy #1                              ; End of section: the next byte is channel 3's envelope
     lda (tune_ptr),y                    ; ...
     sta channel_3_sound + 2             ; ...
     inc music_section                   ; Next section...
     lda music_section                   ; ...
     cmp #&19                            ; ...
-    bne code_c80b                       ; ...past 24?
+    bne start_section                   ; ...past 24?
     lda #&ff                            ; Yes: back to section 1, with the rhythm restarting
     sta music_rhythm_step               ; ...
     lda #1                              ; ...
     sta music_section                   ; ...
 ; &c80b referenced 1 time by &c7ff
-.code_c80b
+.start_section
     tay                                 ; Point tune_ptr at the section...
     lda section_ptrs_lo,y               ; ...
     sta tune_ptr                        ; ...
@@ -7286,7 +7350,7 @@ row_offsets_lo = row_offsets+1
     sta tune_ptr + 1                    ; ...
     ldy #0                              ; ...and play its first step
     lda (tune_ptr),y                    ; ...
-    jmp code_c77a                       ; ...
+    jmp play_step                       ; ...
 .channel_1_sound
 ; &c821 referenced 1 time by &c7cb
     equb &11, &00, &09, &00, &00, &00, &01, &00
@@ -7819,8 +7883,8 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     cell_y:                        55
 ;     oswrch:                        54
 ;     scratch:                       52
+;     plot_x:                        47
 ;     sprite_number:                 45
-;     plot_x:                        41
 ;     plot_y:                        30
 ;     hero_x:                        29
 ;     hero_y:                        27
@@ -7891,7 +7955,6 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     victory_sprite:                 6
 ;     add_point:                      5
 ;     check_missile_hero:             5
-;     code_c566:                      5
 ;     count:                          5
 ;     erase_hero:                     5
 ;     exit_busy:                      5
@@ -7899,6 +7962,7 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     hero_score_hundreds:            5
 ;     hero_score_tens:                5
 ;     hero_score_thousands:           5
+;     joystick_not_pressed:           5
 ;     music_transpose:                5
 ;     next_trapdoor:                  5
 ;     plot_panel_sprite:              5
@@ -7928,6 +7992,7 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     next_hero:                      4
 ;     next_hero_keys:                 4
 ;     next_other_hero:                4
+;     pass_character:                 4
 ;     plot_keeping_x:                 4
 ;     row_start_ptr:                  4
 ;     row_start_ptr_hi:               4
@@ -7958,6 +8023,7 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     next_victory_sprite:            3
 ;     osasci:                         3
 ;     print_menu:                     3
+;     room_walls:                     3
 ;     system_via_t1c_l:               3
 ;     victory_pitch_step:             3
 ;     wait_p_released:                3
@@ -7997,6 +8063,7 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     monster_move_on:                2
 ;     monster_x + 35:                 2
 ;     monster_y + 35:                 2
+;     mos120_oswrch_default:          2
 ;     mos320_osbyte_default:          2
 ;     new_game:                       2
 ;     next_hero_exit:                 2
@@ -8048,6 +8115,7 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     animate_absent:                 1
 ;     animate_absent_hero:            1
 ;     cancel_hero_step:               1
+;     capital_letter:                 1
 ;     channel_1_sound + 4:            1
 ;     channel_2_sound + 4:            1
 ;     channel_3_sound + 2:            1
@@ -8107,26 +8175,6 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     clear_chalice_sprite:           1
 ;     clear_hero_carrying:            1
 ;     clear_text_area_top:            1
-;     code_07c0:                      1
-;     code_1419:                      1
-;     code_147d:                      1
-;     code_14a7:                      1
-;     code_14bf:                      1
-;     code_14f1:                      1
-;     code_c51b:                      1
-;     code_c529:                      1
-;     code_c538:                      1
-;     code_c546:                      1
-;     code_c555:                      1
-;     code_c569:                      1
-;     code_c77a:                      1
-;     code_c781:                      1
-;     code_c793:                      1
-;     code_c7a5:                      1
-;     code_c7be:                      1
-;     code_c7e0:                      1
-;     code_c7f0:                      1
-;     code_c80b:                      1
 ;     coder_display_vdu:              1
 ;     collect_objects:                1
 ;     continue_down:                  1
@@ -8134,6 +8182,9 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     continue_left:                  1
 ;     continue_monster_step:          1
 ;     continue_right:                 1
+;     copy_digit_glyph:               1
+;     copy_glyph:                     1
+;     copy_letter_glyph:              1
 ;     copy_workspace_template:        1
 ;     count_heroes_in_play:           1
 ;     count_level:                    1
@@ -8142,6 +8193,7 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     dasmos_start:                   1
 ;     decrypt_level_done:             1
 ;     decrypt_level_next:             1
+;     digit_glyph:                    1
 ;     dissolve_chalice:               1
 ;     doors_done:                     1
 ;     double_offsets:                 1
@@ -8168,6 +8220,7 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     emerge_at_trapdoor:             1
 ;     emerge_done:                    1
 ;     end_level_filename:             1
+;     end_of_section:                 1
 ;     erase_boots_icon:               1
 ;     erase_door_loop:                1
 ;     erase_missile:                  1
@@ -8191,8 +8244,11 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     firer_fireball:                 1
 ;     firer_sword:                    1
 ;     flip_firer_frame:               1
+;     font_digits:                    1
+;     font_letters:                   1
 ;     game_over_message:              1
 ;     game_over_music:                1
+;     glyph_offset:                   1
 ;     grow_offset_x:                  1
 ;     grow_offset_x_right:            1
 ;     grow_offset_y_down:             1
@@ -8217,8 +8273,15 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     hero_step_down:                 1
 ;     hero_step_left:                 1
 ;     hero_step_right:                1
+;     joystick_down:                  1
+;     joystick_fire:                  1
+;     joystick_left:                  1
+;     joystick_pass_on:               1
+;     joystick_right:                 1
+;     joystick_up:                    1
 ;     keys_done:                      1
 ;     level_checksums:                1
+;     level_command_two_digits:       1
 ;     level_door_sprite:              1
 ;     level_door_x:                   1
 ;     level_door_y:                   1
@@ -8235,15 +8298,13 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     level_wall_sprite:              1
 ;     level_walls:                    1
 ;     load_level:                     1
+;     load_level_file:                1
 ;     load_stones:                    1
-;     loop_0745:                      1
-;     loop_076c:                      1
-;     loop_1485:                      1
-;     loop_c6dc:                      1
 ;     magic_cast:                     1
 ;     magic_item:                     1
 ;     magic_sword:                    1
 ;     magic_user_cost:                1
+;     mark_first_level_done:          1
 ;     menu_done:                      1
 ;     menu_hero_off:                  1
 ;     menu_reprint:                   1
@@ -8286,6 +8347,7 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     next_queue_entry:               1
 ;     next_queue_slot:                1
 ;     next_room_cell:                 1
+;     next_step:                      1
 ;     next_turn:                      1
 ;     no_magic:                       1
 ;     note_new_cell:                  1
@@ -8301,6 +8363,9 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     owner_sword:                    1
 ;     panel_hero - 1:                 1
 ;     pause_check:                    1
+;     play_channel_2:                 1
+;     play_channel_3:                 1
+;     play_step:                      1
 ;     plot_blank:                     1
 ;     plot_boots_icon:                1
 ;     plot_sprite + 1:                1
@@ -8342,6 +8407,8 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     reset_workspace:                1
 ;     restore_exit:                   1
 ;     restore_message_spaces:         1
+;     restore_page_0d_byte:           1
+;     restore_registers:              1
 ;     restore_sprite_heights:         1
 ;     restore_sprite_widths:          1
 ;     return_1:                       1
@@ -8359,12 +8426,14 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     reverse_left:                   1
 ;     reverse_right:                  1
 ;     rhythm_pattern:                 1
-;     room_walls:                     1
 ;     room_walls + 58:                1
+;     save_page_0d_byte:              1
 ;     screen_address:                 1
 ;     screen_address_hazel:           1
 ;     section_ptrs_hi:                1
 ;     section_ptrs_lo:                1
+;     select_colour_2:                1
+;     send_coder_vdu:                 1
 ;     send_frame_vdu:                 1
 ;     set_bell:                       1
 ;     set_menu_no:                    1
@@ -8372,8 +8441,10 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     set_menu_on:                    1
 ;     set_menu_yes:                   1
 ;     set_monster_step:               1
+;     set_step_timer:                 1
 ;     shift_returning_queue:          1
 ;     show_view_3:                    1
+;     shrink_display_for_loading:     1
 ;     shrink_hero_height:             1
 ;     shrink_hero_width:              1
 ;     sound_victory_bell:             1
@@ -8383,13 +8454,16 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     start_monster_move:             1
 ;     start_monster_step:             1
 ;     start_music:                    1
+;     start_section:                  1
 ;     stay_in_old_cell:               1
 ;     step_down:                      1
 ;     step_left:                      1
 ;     step_right:                     1
+;     stop_music_and_load:            1
 ;     store_hero_frame:               1
 ;     store_level_units:              1
 ;     store_monster_health:           1
+;     store_rhythm_step:              1
 ;     take_health_unit:               1
 ;     take_missile_damage:            1
 ;     take_returning_hero:            1
@@ -8418,6 +8492,7 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     victory_delay_outer:            1
 ;     victory_sequence:               1
 ;     victory_sprite_copy:            1
+;     wait_p_pressed:                 1
 ;     wait_vsync_chalice:             1
 ;     wait_vsync_game_over:           1
 ;     wall_sprite:                    1
@@ -8426,33 +8501,6 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     wrchv + 1:                      1
 
 ; Automatically generated labels:
-;     code_07c0
-;     code_1419
-;     code_147d
-;     code_14a7
-;     code_14bf
-;     code_14f1
-;     code_162d
-;     code_c51b
-;     code_c529
-;     code_c538
-;     code_c546
-;     code_c555
-;     code_c566
-;     code_c569
-;     code_c77a
-;     code_c781
-;     code_c793
-;     code_c7a5
-;     code_c7be
-;     code_c7e0
-;     code_c7f0
-;     code_c80b
-;     data_7f92
-;     loop_0745
-;     loop_076c
-;     loop_1485
-;     loop_c6dc
 ;     return_1
 ;     return_10
 ;     return_11
@@ -8468,11 +8516,11 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 
 ; Stats:
 ;     Total size (Code + Data) = 20187 bytes
-;     Code                     = 7444 bytes (37%)
-;     Data                     = 12743 bytes (63%)
+;     Code                     = 7553 bytes (37%)
+;     Data                     = 12634 bytes (63%)
 ;
-;     Number of instructions   = 3434
-;     Number of data bytes     = 11925 bytes
+;     Number of instructions   = 3499
+;     Number of data bytes     = 11816 bytes
 ;     Number of data words     = 0 bytes
 ;     Number of string bytes   = 818 bytes
 ;     Number of strings        = 102

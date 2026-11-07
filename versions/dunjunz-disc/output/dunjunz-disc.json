@@ -42,6 +42,56 @@
       "comment": "OSFILE control block built by boot_loader (in the level buffer)"
     },
     {
+      "name": "coder_source",
+      "value": 112,
+      "comment": "Coder's copy source pointer (the game's plot_x, plot_y)"
+    },
+    {
+      "name": "coder_dest",
+      "value": 114,
+      "comment": "Coder's copy destination pointer (the game's sprite_width, sprite_height)"
+    },
+    {
+      "name": "core_offset",
+      "value": 128,
+      "comment": "Coder's offset into the game core, &0000 or &0440 (the game's ring_x, ring_y)"
+    },
+    {
+      "name": "game_core_stored",
+      "value": 12288,
+      "comment": "Where Dun1 stores the game core, &08C0-&1FFF at run time"
+    },
+    {
+      "name": "game_core_stored_end",
+      "value": 18240,
+      "comment": "The end of the stored game core"
+    },
+    {
+      "name": "game_core_start",
+      "value": 2240,
+      "comment": "Where the game core runs"
+    },
+    {
+      "name": "keyboard_image_stored",
+      "value": 20912,
+      "comment": "Where Dun1 stores the keyboard-only &0400-&07FF image"
+    },
+    {
+      "name": "joystick_image_stored",
+      "value": 21936,
+      "comment": "Where Dun1 stores the &0400-&07FF image with the joystick handler"
+    },
+    {
+      "name": "low_image_start",
+      "value": 1024,
+      "comment": "Where either &0400-&07FF image runs"
+    },
+    {
+      "name": "low_image_end",
+      "value": 2048,
+      "comment": "The end of the &0400-&07FF image"
+    },
+    {
       "name": "osbyte_bell_channel",
       "value": 211
     },
@@ -1144,6 +1194,17 @@
       "on_exit": {
         "X": "&FF if the key is pressed, 0 if not"
       }
+    },
+    {
+      "addr": 5553,
+      "binary_addr": 15601,
+      "move": "game_core",
+      "name": "show_level_number",
+      "title": "Clear the text area before a level",
+      "description": "Where the cassette game shows the level number here, Coder has already shown it on the disc, so this only clears the text area.",
+      "on_exit": {
+        "A": "corrupted"
+      }
     }
   ],
   "banners": [
@@ -1205,6 +1266,20 @@
       "addr": 18240,
       "title": "Unused",
       "description": "Zeros between the stored game core (&3000-&473F) and Coder (&5000).",
+      "align": "before_label"
+    },
+    {
+      "addr": 20857,
+      "name": "loading_vdu",
+      "title": "Coder's VDU tables",
+      "description": "6845 set-ups sent with VDU 23,0: one while loading, one for play.",
+      "align": "before_label"
+    },
+    {
+      "addr": 20898,
+      "name": "coder_leftovers",
+      "title": "Unused",
+      "description": "Leftover bytes: stale code from an earlier assembly.",
       "align": "before_label"
     },
     {
@@ -1341,8 +1416,6 @@
     "ind3v": 564,
     "os_vsync_counter": 576,
     "os_break_intercept": 647,
-    "data_0288": 648,
-    "data_0289": 649,
     "add_thousand_points": 1024,
     "add_thousand_points_joystick": 1024,
     "draw_ten_thousands": 1054,
@@ -1417,20 +1490,19 @@
     "boot_load_call": 1900,
     "boot_load_call_joystick": 1910,
     "joystick_bytev": 1920,
-    "code_079b": 1947,
-    "code_07a9": 1961,
-    "code_07b8": 1976,
-    "code_07c6": 1990,
-    "code_07d5": 2005,
-    "code_07e6": 2022,
-    "code_07e9": 2025,
+    "joystick_left": 1947,
+    "joystick_right": 1961,
+    "joystick_up": 1976,
+    "joystick_down": 1990,
+    "joystick_fire": 2005,
+    "joystick_not_pressed": 2022,
+    "joystick_pass_on": 2025,
     "boot_filename": 2032,
     "boot_filename_joystick": 2032,
     "hero_score_ten_thousands": 2224,
     "hero_absent": 2228,
     "levels_started": 2236,
     "level_digits": 2237,
-    "data_08be": 2238,
     "mos_row_offsets": 50037,
     "mos_row_offsets_lo": 50038,
     "mos_reset_entry": 55757,
@@ -1769,7 +1841,6 @@
     {
       "addr": 647,
       "name": "os_break_intercept",
-      "length": 3,
       "group": "os_workspace",
       "access": [
         "w"
@@ -1947,6 +2018,17 @@
       "named_slots": false,
       "group": "os_entry_points",
       "description": "6502 RESET vector, in the MOS ROM."
+    },
+    {
+      "anchor": 647,
+      "name": "os_break_intercept",
+      "window": [
+        0,
+        2
+      ],
+      "named_slots": false,
+      "group": "os_workspace",
+      "description": "MOS BREAK intercept: if &0287 holds a JMP opcode the MOS jumps to &0287 twice during a reset, before and after the filing system is initialised (carry clear, then set)."
     }
   ],
   "items": [
@@ -22232,7 +22314,7 @@
       "binary_addr": 13490,
       "move": "game_core",
       "labels": [
-        "code_0d72"
+        "store_level_bcd"
       ],
       "sub_labels": {
         "3444": [
@@ -22302,10 +22384,10 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_0d7f",
+      "operand": "start_new_game",
       "target": 3455,
       "target_move": "game_core",
-      "target_label": "code_0d7f"
+      "target_label": "start_new_game"
     },
     {
       "addr": 3452,
@@ -22345,7 +22427,7 @@
       "binary_addr": 13503,
       "move": "game_core",
       "labels": [
-        "code_0d7f"
+        "start_new_game"
       ],
       "sub_labels": {
         "3456": [
@@ -22381,10 +22463,10 @@
       "comment_inline": "...from new_game's second instruction",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_0e08",
+      "operand": "new_game_reset_heroes",
       "target": 3592,
       "target_move": "game_core",
-      "target_label": "code_0e08"
+      "target_label": "new_game_reset_heroes"
     },
     {
       "addr": 3460,
@@ -23259,7 +23341,7 @@
       "binary_addr": 13640,
       "move": "game_core",
       "labels": [
-        "code_0e08"
+        "new_game_reset_heroes"
       ],
       "comment_inline": "Give each hero their starting attributes",
       "xref_summaries": [
@@ -23456,10 +23538,10 @@
       "comment_inline": "...and play the level",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_0e57",
+      "operand": "play_this_level",
       "target": 3671,
       "target_move": "game_core",
-      "target_label": "code_0e57"
+      "target_label": "play_this_level"
     },
     {
       "addr": 3617,
@@ -23553,7 +23635,7 @@
       "binary_addr": 13701,
       "move": "game_core",
       "labels": [
-        "code_0e45"
+        "to_next_level"
       ],
       "comment_inline": "Next level: reset the machine and run Coder",
       "xref_summaries": [
@@ -23629,7 +23711,7 @@
       "binary_addr": 13719,
       "move": "game_core",
       "labels": [
-        "code_0e57"
+        "play_this_level"
       ],
       "comment_inline": "Load and draw the level",
       "xref_summaries": [
@@ -23948,10 +24030,10 @@
       "comment_inline": "Yes: on to the next level",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_0e45",
+      "operand": "to_next_level",
       "target": 3653,
       "target_move": "game_core",
-      "target_label": "code_0e45"
+      "target_label": "to_next_level"
     },
     {
       "addr": 3718,
@@ -31043,10 +31125,10 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_15b1",
+      "operand": "show_level_number",
       "target": 5553,
       "target_move": "game_core",
-      "target_label": "sub_15b1"
+      "target_label": "show_level_number"
     },
     {
       "addr": 5123,
@@ -31497,10 +31579,10 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_1625",
+      "operand": "text_window_bottom",
       "target": 5669,
       "target_move": "game_core",
-      "target_label": "data_1625"
+      "target_label": "text_window_bottom"
     },
     {
       "addr": 5198,
@@ -31538,7 +31620,16 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&72"
+      "operand": "#<(restart_intercept)",
+      "expr": {
+        "text": "<(restart_intercept)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "restart_intercept"
+          }
+        }
+      }
     },
     {
       "addr": 5201,
@@ -31552,9 +31643,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0288",
-      "target": 648,
-      "target_label": "data_0288"
+      "operand": "os_break_intercept + 1",
+      "target": 648
     },
     {
       "addr": 5204,
@@ -31567,7 +31657,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&14"
+      "operand": "#>(restart_intercept)",
+      "expr": {
+        "text": ">(restart_intercept)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "restart_intercept"
+          }
+        }
+      }
     },
     {
       "addr": 5206,
@@ -31581,9 +31680,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0289",
-      "target": 649,
-      "target_label": "data_0289"
+      "operand": "os_break_intercept + 2",
+      "target": 649
     },
     {
       "addr": 5209,
@@ -31625,10 +31723,10 @@
       "comment_inline": "...and reset (always branches)",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_146f",
+      "operand": "reset_machine",
       "target": 5231,
       "target_move": "game_core",
-      "target_label": "code_146f"
+      "target_label": "reset_machine"
     },
     {
       "addr": 5216,
@@ -31684,7 +31782,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&b5"
+      "operand": "#<(next_level_intercept)",
+      "expr": {
+        "text": "<(next_level_intercept)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "next_level_intercept"
+          }
+        }
+      }
     },
     {
       "addr": 5223,
@@ -31698,9 +31805,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0288",
-      "target": 648,
-      "target_label": "data_0288"
+      "operand": "os_break_intercept + 1",
+      "target": 648
     },
     {
       "addr": 5226,
@@ -31713,7 +31819,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&15"
+      "operand": "#>(next_level_intercept)",
+      "expr": {
+        "text": ">(next_level_intercept)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "next_level_intercept"
+          }
+        }
+      }
     },
     {
       "addr": 5228,
@@ -31727,9 +31842,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0289",
-      "target": 649,
-      "target_label": "data_0289"
+      "operand": "os_break_intercept + 2",
+      "target": 649
     },
     {
       "addr": 5231,
@@ -31741,7 +31855,7 @@
       "binary_addr": 15279,
       "move": "game_core",
       "labels": [
-        "code_146f"
+        "reset_machine"
       ],
       "comment_inline": "Reset the machine",
       "xref_summaries": [
@@ -33930,7 +34044,7 @@
       "binary_addr": 15601,
       "move": "game_core",
       "labels": [
-        "sub_15b1"
+        "show_level_number"
       ],
       "comment_inline": "Clear the text area (Coder has shown the level number)",
       "xref_summaries": [
@@ -34448,11 +34562,11 @@
       "binary_addr": 15716,
       "move": "game_core",
       "labels": [
-        "code_1624"
+        "set_text_window_bottom"
       ],
       "sub_labels": {
         "5669": [
-          "data_1625"
+          "text_window_bottom"
         ]
       },
       "comment_inline": "...",
@@ -43078,7 +43192,7 @@
       "binary_addr": 17952,
       "move": "game_core",
       "labels": [
-        "code_1ee0"
+        "wait_pause_release"
       ],
       "comment_inline": "Paused: wait for P to be released... Scan keyboard from key 16",
       "xref_summaries": [
@@ -43122,10 +43236,10 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_1ee0",
+      "operand": "wait_pause_release",
       "target": 7904,
       "target_move": "game_core",
-      "target_label": "code_1ee0"
+      "target_label": "wait_pause_release"
     },
     {
       "addr": 7911,
@@ -43137,7 +43251,7 @@
       "binary_addr": 17959,
       "move": "game_core",
       "labels": [
-        "code_1ee7"
+        "wait_pause_press"
       ],
       "comment_inline": "...then pressed again Scan keyboard from key 16",
       "xref_summaries": [
@@ -43181,10 +43295,10 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_1ee7",
+      "operand": "wait_pause_press",
       "target": 7911,
       "target_move": "game_core",
-      "target_label": "code_1ee7"
+      "target_label": "wait_pause_press"
     },
     {
       "addr": 7918,
@@ -49718,9 +49832,8 @@
       "comment_inline": "Advance the ASCII level number...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_08be",
-      "target": 2238,
-      "target_label": "data_08be"
+      "operand": "level_digits + 1",
+      "target": 2238
     },
     {
       "addr": 20510,
@@ -49742,9 +49855,9 @@
       "comment_inline": "Yes: advance the single digit",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_5036",
+      "operand": "advance_single_digit",
       "target": 20534,
-      "target_label": "code_5036"
+      "target_label": "advance_single_digit"
     },
     {
       "addr": 20514,
@@ -49776,9 +49889,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_08be",
-      "target": 2238,
-      "target_label": "data_08be"
+      "operand": "level_digits + 1",
+      "target": 2238
     },
     {
       "addr": 20520,
@@ -49800,9 +49912,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcc",
-      "operand": "code_504a",
+      "operand": "set_up_6845_for_loading",
       "target": 20554,
-      "target_label": "code_504a"
+      "target_label": "set_up_6845_for_loading"
     },
     {
       "addr": 20524,
@@ -49825,9 +49937,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_08be",
-      "target": 2238,
-      "target_label": "data_08be"
+      "operand": "level_digits + 1",
+      "target": 2238
     },
     {
       "addr": 20529,
@@ -49852,9 +49963,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_504a",
+      "operand": "set_up_6845_for_loading",
       "target": 20554,
-      "target_label": "code_504a"
+      "target_label": "set_up_6845_for_loading"
     },
     {
       "addr": 20534,
@@ -49864,7 +49975,7 @@
         8
       ],
       "labels": [
-        "code_5036"
+        "advance_single_digit"
       ],
       "comment_inline": "Advance the single digit...",
       "xref_summaries": [
@@ -49916,9 +50027,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcc",
-      "operand": "code_504a",
+      "operand": "set_up_6845_for_loading",
       "target": 20554,
-      "target_label": "code_504a"
+      "target_label": "set_up_6845_for_loading"
     },
     {
       "addr": 20544,
@@ -49966,9 +50077,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_08be",
-      "target": 2238,
-      "target_label": "data_08be"
+      "operand": "level_digits + 1",
+      "target": 2238
     },
     {
       "addr": 20554,
@@ -49977,7 +50087,7 @@
         0
       ],
       "labels": [
-        "code_504a"
+        "set_up_6845_for_loading"
       ],
       "comment_inline": "VDU 23 commands that set up the 6845 for loading",
       "xref_summaries": [
@@ -50009,7 +50119,7 @@
         81
       ],
       "labels": [
-        "loop_504c"
+        "send_loading_vdu"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -50023,9 +50133,15 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_5179,x",
+      "operand": "loading_vdu,x",
+      "expr": {
+        "text": "loading_vdu",
+        "tree": {
+          "sym": "loading_vdu"
+        }
+      },
       "target": 20857,
-      "target_label": "data_5179"
+      "target_label": "loading_vdu"
     },
     {
       "addr": 20559,
@@ -50059,7 +50175,19 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
-      "operand": "#&15"
+      "operand": "#play_vdu - loading_vdu",
+      "expr": {
+        "text": "play_vdu - loading_vdu",
+        "tree": {
+          "op": "sub",
+          "left": {
+            "sym": "play_vdu"
+          },
+          "right": {
+            "sym": "loading_vdu"
+          }
+        }
+      }
     },
     {
       "addr": 20565,
@@ -50070,9 +50198,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_504c",
+      "operand": "send_loading_vdu",
       "target": 20556,
-      "target_label": "loop_504c"
+      "target_label": "send_loading_vdu"
     },
     {
       "addr": 20567,
@@ -50108,7 +50236,16 @@
       "comment_inline": "...and reload Dun1",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&5d"
+      "operand": "#<(dun1_command)",
+      "expr": {
+        "text": "<(dun1_command)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "dun1_command"
+          }
+        }
+      }
     },
     {
       "addr": 20574,
@@ -50119,7 +50256,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&51"
+      "operand": "#>(dun1_command)",
+      "expr": {
+        "text": ">(dun1_command)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "dun1_command"
+          }
+        }
+      }
     },
     {
       "addr": 20576,
@@ -50173,9 +50319,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_08be",
-      "target": 2238,
-      "target_label": "data_08be"
+      "operand": "level_digits + 1",
+      "target": 2238
     },
     {
       "addr": 20588,
@@ -50187,9 +50332,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_5172",
-      "target": 20850,
-      "target_label": "data_5172"
+      "operand": "level_command_digits + 1",
+      "target": 20850
     },
     {
       "addr": 20591,
@@ -50214,7 +50358,13 @@
       "comment_inline": "...in &8E",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "victory_steps_left",
+      "operand": "level_count_copy",
+      "expr": {
+        "text": "level_count_copy",
+        "tree": {
+          "sym": "level_count_copy"
+        }
+      },
       "target": 142,
       "target_label": "victory_steps_left"
     },
@@ -50287,9 +50437,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_508b",
+      "operand": "load_level_file",
       "target": 20619,
-      "target_label": "code_508b"
+      "target_label": "load_level_file"
     },
     {
       "addr": 20609,
@@ -50300,7 +50450,16 @@
       "comment_inline": "Yes: load Stones, which ends with level 25...",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&4c"
+      "operand": "#<(stones_command)",
+      "expr": {
+        "text": "<(stones_command)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "stones_command"
+          }
+        }
+      }
     },
     {
       "addr": 20611,
@@ -50311,7 +50470,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&51"
+      "operand": "#>(stones_command)",
+      "expr": {
+        "text": ">(stones_command)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "stones_command"
+          }
+        }
+      }
     },
     {
       "addr": 20613,
@@ -50337,9 +50505,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_5092",
+      "operand": "level_loaded",
       "target": 20626,
-      "target_label": "code_5092"
+      "target_label": "level_loaded"
     },
     {
       "addr": 20619,
@@ -50348,7 +50516,7 @@
         103
       ],
       "labels": [
-        "code_508b"
+        "load_level_file"
       ],
       "comment_inline": "No: load LEVELnn",
       "xref_summaries": [
@@ -50362,7 +50530,16 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&67"
+      "operand": "#<(level_command)",
+      "expr": {
+        "text": "<(level_command)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "level_command"
+          }
+        }
+      }
     },
     {
       "addr": 20621,
@@ -50373,7 +50550,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&51"
+      "operand": "#>(level_command)",
+      "expr": {
+        "text": ">(level_command)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "level_command"
+          }
+        }
+      }
     },
     {
       "addr": 20623,
@@ -50396,7 +50582,7 @@
         6
       ],
       "labels": [
-        "code_5092"
+        "level_loaded"
       ],
       "comment_inline": "VDU 6: enable the screen",
       "xref_summaries": [
@@ -50435,7 +50621,16 @@
       "comment_inline": "Copy to &0400...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#0"
+      "operand": "#<(low_image_start)",
+      "expr": {
+        "text": "<(low_image_start)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "low_image_start"
+          }
+        }
+      }
     },
     {
       "addr": 20633,
@@ -50443,10 +50638,16 @@
         133,
         114
       ],
-      "comment_inline": "...destination pointer in sprite_width, sprite_height...",
+      "comment_inline": "...destination pointer in coder_dest...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "sprite_width",
+      "operand": "coder_dest",
+      "expr": {
+        "text": "coder_dest",
+        "tree": {
+          "sym": "coder_dest"
+        }
+      },
       "target": 114,
       "target_label": "sprite_width"
     },
@@ -50459,7 +50660,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#4"
+      "operand": "#>(low_image_start)",
+      "expr": {
+        "text": ">(low_image_start)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "low_image_start"
+          }
+        }
+      }
     },
     {
       "addr": 20637,
@@ -50470,7 +50680,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "sprite_height",
+      "operand": "coder_dest + 1",
+      "expr": {
+        "text": "coder_dest + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "coder_dest"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      },
       "target": 115,
       "target_label": "sprite_height"
     },
@@ -50483,7 +50706,16 @@
       "comment_inline": "...from &51B0 or &55B0",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&b0"
+      "operand": "#<(keyboard_image_stored)",
+      "expr": {
+        "text": "<(keyboard_image_stored)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "keyboard_image_stored"
+          }
+        }
+      }
     },
     {
       "addr": 20641,
@@ -50491,10 +50723,16 @@
         133,
         112
       ],
-      "comment_inline": "...source pointer in plot_x, plot_y",
+      "comment_inline": "...source pointer in coder_source",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "plot_x",
+      "operand": "coder_source",
+      "expr": {
+        "text": "coder_source",
+        "tree": {
+          "sym": "coder_source"
+        }
+      },
       "target": 112,
       "target_label": "plot_x"
     },
@@ -50560,9 +50798,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_50b4",
+      "operand": "use_keyboard_image",
       "target": 20660,
-      "target_label": "code_50b4"
+      "target_label": "use_keyboard_image"
     },
     {
       "addr": 20654,
@@ -50573,7 +50811,16 @@
       "comment_inline": "...yes: copy the image with the joystick handler, at &55B0",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&55"
+      "operand": "#>(joystick_image_stored)",
+      "expr": {
+        "text": ">(joystick_image_stored)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "joystick_image_stored"
+          }
+        }
+      }
     },
     {
       "addr": 20656,
@@ -50584,7 +50831,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "plot_y",
+      "operand": "coder_source + 1",
+      "expr": {
+        "text": "coder_source + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "coder_source"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      },
       "target": 113,
       "target_label": "plot_y"
     },
@@ -50597,9 +50857,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_50b8",
+      "operand": "copy_low_image",
       "target": 20664,
-      "target_label": "code_50b8"
+      "target_label": "copy_low_image"
     },
     {
       "addr": 20660,
@@ -50608,7 +50868,7 @@
         81
       ],
       "labels": [
-        "code_50b4"
+        "use_keyboard_image"
       ],
       "comment_inline": "...no: copy the keyboard-only image at &51B0",
       "xref_summaries": [
@@ -50622,7 +50882,16 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&51"
+      "operand": "#>(keyboard_image_stored)",
+      "expr": {
+        "text": ">(keyboard_image_stored)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "keyboard_image_stored"
+          }
+        }
+      }
     },
     {
       "addr": 20662,
@@ -50633,7 +50902,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "plot_y",
+      "operand": "coder_source + 1",
+      "expr": {
+        "text": "coder_source + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "coder_source"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      },
       "target": 113,
       "target_label": "plot_y"
     },
@@ -50644,7 +50926,7 @@
         0
       ],
       "labels": [
-        "code_50b8"
+        "copy_low_image"
       ],
       "comment_inline": "Copy a kilobyte, up to &0800...",
       "xref_summaries": [
@@ -50667,7 +50949,7 @@
         112
       ],
       "labels": [
-        "loop_50ba"
+        "copy_low_byte"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -50681,7 +50963,13 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "(plot_x),y",
+      "operand": "(coder_source),y",
+      "expr": {
+        "text": "coder_source",
+        "tree": {
+          "sym": "coder_source"
+        }
+      },
       "target": 112,
       "target_label": "plot_x"
     },
@@ -50694,7 +50982,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "(sprite_width),y",
+      "operand": "(coder_dest),y",
+      "expr": {
+        "text": "coder_dest",
+        "tree": {
+          "sym": "coder_dest"
+        }
+      },
       "target": 114,
       "target_label": "sprite_width"
     },
@@ -50707,7 +51001,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
-      "operand": "sprite_width",
+      "operand": "coder_dest",
+      "expr": {
+        "text": "coder_dest",
+        "tree": {
+          "sym": "coder_dest"
+        }
+      },
       "target": 114,
       "target_label": "sprite_width"
     },
@@ -50720,9 +51020,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_50c4",
+      "operand": "copy_low_next_source",
       "target": 20676,
-      "target_label": "code_50c4"
+      "target_label": "copy_low_next_source"
     },
     {
       "addr": 20674,
@@ -50733,7 +51033,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
-      "operand": "sprite_height",
+      "operand": "coder_dest + 1",
+      "expr": {
+        "text": "coder_dest + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "coder_dest"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      },
       "target": 115,
       "target_label": "sprite_height"
     },
@@ -50744,7 +51057,7 @@
         112
       ],
       "labels": [
-        "code_50c4"
+        "copy_low_next_source"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -50758,7 +51071,13 @@
       ],
       "type": "code",
       "mnemonic": "inc",
-      "operand": "plot_x",
+      "operand": "coder_source",
+      "expr": {
+        "text": "coder_source",
+        "tree": {
+          "sym": "coder_source"
+        }
+      },
       "target": 112,
       "target_label": "plot_x"
     },
@@ -50771,9 +51090,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_50ca",
+      "operand": "copy_low_check_end",
       "target": 20682,
-      "target_label": "code_50ca"
+      "target_label": "copy_low_check_end"
     },
     {
       "addr": 20680,
@@ -50784,7 +51103,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
-      "operand": "plot_y",
+      "operand": "coder_source + 1",
+      "expr": {
+        "text": "coder_source + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "coder_source"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      },
       "target": 113,
       "target_label": "plot_y"
     },
@@ -50795,7 +51127,7 @@
         115
       ],
       "labels": [
-        "code_50ca"
+        "copy_low_check_end"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -50809,7 +51141,20 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "sprite_height",
+      "operand": "coder_dest + 1",
+      "expr": {
+        "text": "coder_dest + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "coder_dest"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      },
       "target": 115,
       "target_label": "sprite_height"
     },
@@ -50822,7 +51167,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#8"
+      "operand": "#>(low_image_end)",
+      "expr": {
+        "text": ">(low_image_end)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "low_image_end"
+          }
+        }
+      }
     },
     {
       "addr": 20686,
@@ -50833,9 +51187,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_50ba",
+      "operand": "copy_low_byte",
       "target": 20666,
-      "target_label": "loop_50ba"
+      "target_label": "copy_low_byte"
     },
     {
       "addr": 20688,
@@ -50899,9 +51253,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_50e5",
+      "operand": "set_up_screen_for_play",
       "target": 20709,
-      "target_label": "code_50e5"
+      "target_label": "set_up_screen_for_play"
     },
     {
       "addr": 20699,
@@ -50912,7 +51266,16 @@
       "comment_inline": "Yes: point BYTEV at the joystick handler at &0780",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&80"
+      "operand": "#<(joystick_bytev)",
+      "expr": {
+        "text": "<(joystick_bytev)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "joystick_bytev"
+          }
+        }
+      }
     },
     {
       "addr": 20701,
@@ -50937,7 +51300,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#7"
+      "operand": "#>(joystick_bytev)",
+      "expr": {
+        "text": ">(joystick_bytev)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "joystick_bytev"
+          }
+        }
+      }
     },
     {
       "addr": 20706,
@@ -50959,7 +51331,7 @@
         17
       ],
       "labels": [
-        "code_50e5"
+        "set_up_screen_for_play"
       ],
       "comment_inline": "COLOUR 2",
       "xref_summaries": [
@@ -51033,7 +51405,7 @@
         81
       ],
       "labels": [
-        "loop_50f1"
+        "send_play_vdu"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -51047,9 +51419,15 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_518e,x",
+      "operand": "play_vdu,x",
+      "expr": {
+        "text": "play_vdu",
+        "tree": {
+          "sym": "play_vdu"
+        }
+      },
       "target": 20878,
-      "target_label": "data_518e"
+      "target_label": "play_vdu"
     },
     {
       "addr": 20724,
@@ -51083,7 +51461,19 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
-      "operand": "#&14"
+      "operand": "#coder_leftovers - play_vdu",
+      "expr": {
+        "text": "coder_leftovers - play_vdu",
+        "tree": {
+          "op": "sub",
+          "left": {
+            "sym": "coder_leftovers"
+          },
+          "right": {
+            "sym": "play_vdu"
+          }
+        }
+      }
     },
     {
       "addr": 20730,
@@ -51094,9 +51484,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_50f1",
+      "operand": "send_play_vdu",
       "target": 20721,
-      "target_label": "loop_50f1"
+      "target_label": "send_play_vdu"
     },
     {
       "addr": 20732,
@@ -51132,9 +51522,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bcs",
-      "operand": "code_510b",
+      "operand": "keep_heroes",
       "target": 20747,
-      "target_label": "code_510b"
+      "target_label": "keep_heroes"
     },
     {
       "addr": 20739,
@@ -51156,7 +51546,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "ring_x",
+      "operand": "core_offset",
+      "expr": {
+        "text": "core_offset",
+        "tree": {
+          "sym": "core_offset"
+        }
+      },
       "target": 128,
       "target_label": "ring_x"
     },
@@ -51169,7 +51565,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "ring_y",
+      "operand": "core_offset + 1",
+      "expr": {
+        "text": "core_offset + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "core_offset"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      },
       "target": 129,
       "target_label": "ring_y"
     },
@@ -51182,9 +51591,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_5113",
+      "operand": "copy_game_core",
       "target": 20755,
-      "target_label": "code_5113"
+      "target_label": "copy_game_core"
     },
     {
       "addr": 20747,
@@ -51193,7 +51602,7 @@
         64
       ],
       "labels": [
-        "code_510b"
+        "keep_heroes"
       ],
       "comment_inline": "No: copy only &3440-&473F to &0D00-&1FFF, keeping the heroes' state in &08C0-&0CFF",
       "xref_summaries": [
@@ -51218,7 +51627,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "ring_x",
+      "operand": "core_offset",
+      "expr": {
+        "text": "core_offset",
+        "tree": {
+          "sym": "core_offset"
+        }
+      },
       "target": 128,
       "target_label": "ring_x"
     },
@@ -51242,7 +51657,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "ring_y",
+      "operand": "core_offset + 1",
+      "expr": {
+        "text": "core_offset + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "core_offset"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      },
       "target": 129,
       "target_label": "ring_y"
     },
@@ -51253,7 +51681,7 @@
         128
       ],
       "labels": [
-        "code_5113"
+        "copy_game_core"
       ],
       "comment_inline": "Source = &3000 + offset...",
       "xref_summaries": [
@@ -51267,7 +51695,13 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "ring_x",
+      "operand": "core_offset",
+      "expr": {
+        "text": "core_offset",
+        "tree": {
+          "sym": "core_offset"
+        }
+      },
       "target": 128,
       "target_label": "ring_x"
     },
@@ -51280,7 +51714,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "plot_x",
+      "operand": "coder_source",
+      "expr": {
+        "text": "coder_source",
+        "tree": {
+          "sym": "coder_source"
+        }
+      },
       "target": 112,
       "target_label": "plot_x"
     },
@@ -51293,7 +51733,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&30"
+      "operand": "#>(game_core_stored)",
+      "expr": {
+        "text": ">(game_core_stored)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "game_core_stored"
+          }
+        }
+      }
     },
     {
       "addr": 20761,
@@ -51313,7 +51762,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
-      "operand": "ring_y",
+      "operand": "core_offset + 1",
+      "expr": {
+        "text": "core_offset + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "core_offset"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      },
       "target": 129,
       "target_label": "ring_y"
     },
@@ -51326,7 +51788,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "plot_y",
+      "operand": "coder_source + 1",
+      "expr": {
+        "text": "coder_source + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "coder_source"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      },
       "target": 113,
       "target_label": "plot_y"
     },
@@ -51339,7 +51814,16 @@
       "comment_inline": "...destination = &08C0 + offset",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&c0"
+      "operand": "#<(game_core_start)",
+      "expr": {
+        "text": "<(game_core_start)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "game_core_start"
+          }
+        }
+      }
     },
     {
       "addr": 20768,
@@ -51359,7 +51843,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
-      "operand": "ring_x",
+      "operand": "core_offset",
+      "expr": {
+        "text": "core_offset",
+        "tree": {
+          "sym": "core_offset"
+        }
+      },
       "target": 128,
       "target_label": "ring_x"
     },
@@ -51372,7 +51862,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "sprite_width",
+      "operand": "coder_dest",
+      "expr": {
+        "text": "coder_dest",
+        "tree": {
+          "sym": "coder_dest"
+        }
+      },
       "target": 114,
       "target_label": "sprite_width"
     },
@@ -51385,7 +51881,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#8"
+      "operand": "#>(game_core_start)",
+      "expr": {
+        "text": ">(game_core_start)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "game_core_start"
+          }
+        }
+      }
     },
     {
       "addr": 20775,
@@ -51396,7 +51901,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
-      "operand": "ring_y",
+      "operand": "core_offset + 1",
+      "expr": {
+        "text": "core_offset + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "core_offset"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      },
       "target": 129,
       "target_label": "ring_y"
     },
@@ -51409,7 +51927,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "sprite_height",
+      "operand": "coder_dest + 1",
+      "expr": {
+        "text": "coder_dest + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "coder_dest"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      },
       "target": 115,
       "target_label": "sprite_height"
     },
@@ -51431,7 +51962,7 @@
         112
       ],
       "labels": [
-        "code_512d"
+        "copy_core_byte"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -51449,7 +51980,13 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "(plot_x),y",
+      "operand": "(coder_source),y",
+      "expr": {
+        "text": "coder_source",
+        "tree": {
+          "sym": "coder_source"
+        }
+      },
       "target": 112,
       "target_label": "plot_x"
     },
@@ -51462,7 +51999,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "(sprite_width),y",
+      "operand": "(coder_dest),y",
+      "expr": {
+        "text": "coder_dest",
+        "tree": {
+          "sym": "coder_dest"
+        }
+      },
       "target": 114,
       "target_label": "sprite_width"
     },
@@ -51475,7 +52018,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
-      "operand": "plot_x",
+      "operand": "coder_source",
+      "expr": {
+        "text": "coder_source",
+        "tree": {
+          "sym": "coder_source"
+        }
+      },
       "target": 112,
       "target_label": "plot_x"
     },
@@ -51488,9 +52037,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_5137",
+      "operand": "copy_core_next_dest",
       "target": 20791,
-      "target_label": "code_5137"
+      "target_label": "copy_core_next_dest"
     },
     {
       "addr": 20789,
@@ -51501,7 +52050,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
-      "operand": "plot_y",
+      "operand": "coder_source + 1",
+      "expr": {
+        "text": "coder_source + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "coder_source"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      },
       "target": 113,
       "target_label": "plot_y"
     },
@@ -51512,7 +52074,7 @@
         114
       ],
       "labels": [
-        "code_5137"
+        "copy_core_next_dest"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -51526,7 +52088,13 @@
       ],
       "type": "code",
       "mnemonic": "inc",
-      "operand": "sprite_width",
+      "operand": "coder_dest",
+      "expr": {
+        "text": "coder_dest",
+        "tree": {
+          "sym": "coder_dest"
+        }
+      },
       "target": 114,
       "target_label": "sprite_width"
     },
@@ -51539,9 +52107,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_513d",
+      "operand": "copy_core_check_end",
       "target": 20797,
-      "target_label": "code_513d"
+      "target_label": "copy_core_check_end"
     },
     {
       "addr": 20795,
@@ -51552,7 +52120,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "inc",
-      "operand": "sprite_height",
+      "operand": "coder_dest + 1",
+      "expr": {
+        "text": "coder_dest + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "coder_dest"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      },
       "target": 115,
       "target_label": "sprite_height"
     },
@@ -51563,7 +52144,7 @@
         112
       ],
       "labels": [
-        "code_513d"
+        "copy_core_check_end"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -51577,7 +52158,13 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "plot_x",
+      "operand": "coder_source",
+      "expr": {
+        "text": "coder_source",
+        "tree": {
+          "sym": "coder_source"
+        }
+      },
       "target": 112,
       "target_label": "plot_x"
     },
@@ -51590,7 +52177,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&40"
+      "operand": "#<(game_core_stored_end)",
+      "expr": {
+        "text": "<(game_core_stored_end)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "game_core_stored_end"
+          }
+        }
+      }
     },
     {
       "addr": 20801,
@@ -51601,9 +52197,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_512d",
+      "operand": "copy_core_byte",
       "target": 20781,
-      "target_label": "code_512d"
+      "target_label": "copy_core_byte"
     },
     {
       "addr": 20803,
@@ -51614,7 +52210,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "plot_y",
+      "operand": "coder_source + 1",
+      "expr": {
+        "text": "coder_source + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "coder_source"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      },
       "target": 113,
       "target_label": "plot_y"
     },
@@ -51627,7 +52236,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&47"
+      "operand": "#>(game_core_stored_end)",
+      "expr": {
+        "text": ">(game_core_stored_end)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "game_core_stored_end"
+          }
+        }
+      }
     },
     {
       "addr": 20807,
@@ -51638,9 +52256,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_512d",
+      "operand": "copy_core_byte",
       "target": 20781,
-      "target_label": "code_512d"
+      "target_label": "copy_core_byte"
     },
     {
       "addr": 20809,
@@ -51749,9 +52367,6 @@
       "sub_labels": {
         "20849": [
           "level_command_digits"
-        ],
-        "20850": [
-          "data_5172"
         ]
       },
       "xref_summaries": [
@@ -51783,31 +52398,12 @@
         0,
         0,
         0,
-        0,
-        23,
-        0,
-        10,
-        32,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         0
       ],
       "labels": [
-        "data_5179"
+        "loading_vdu"
       ],
-      "xref_summaries": [
-        "&5179 used as index base 1 time by &504c"
-      ],
-      "references": [
-        {
-          "addr": 20556,
-          "kind": "indexed"
-        }
-      ],
+      "comment_inline": "VDU 23,0,1,0: 6845 register 1 = 0, no characters displayed",
       "type": "byte",
       "values": [
         23,
@@ -51819,7 +52415,12 @@
         0,
         0,
         0,
-        0,
+        0
+      ]
+    },
+    {
+      "addr": 20867,
+      "bytes": [
         23,
         0,
         10,
@@ -51829,7 +52430,31 @@
         0,
         0,
         0,
+        0
+      ],
+      "comment_inline": "VDU 23,0,10,&20: 6845 register 10 = &20, no cursor",
+      "type": "byte",
+      "values": [
+        23,
         0,
+        10,
+        32,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 20877,
+      "bytes": [
+        0
+      ],
+      "comment_inline": "A further 0, sent too (21 bytes are sent)",
+      "type": "byte",
+      "values": [
         0
       ]
     },
@@ -51845,7 +52470,29 @@
         0,
         0,
         0,
+        0
+      ],
+      "labels": [
+        "play_vdu"
+      ],
+      "comment_inline": "VDU 23,0,1,80: 6845 register 1 = 80 characters displayed",
+      "type": "byte",
+      "values": [
+        23,
         0,
+        1,
+        80,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 20888,
+      "bytes": [
         23,
         0,
         6,
@@ -51855,7 +52502,26 @@
         0,
         0,
         0,
+        0
+      ],
+      "comment_inline": "VDU 23,0,6,23: 6845 register 6 = 23 character rows displayed",
+      "type": "byte",
+      "values": [
+        23,
         0,
+        6,
+        23,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 20898,
+      "bytes": [
         133,
         112,
         189,
@@ -51872,39 +52538,10 @@
         0
       ],
       "labels": [
-        "data_518e"
-      ],
-      "xref_summaries": [
-        "&518e used as index base 1 time by &50f1"
-      ],
-      "references": [
-        {
-          "addr": 20721,
-          "kind": "indexed"
-        }
+        "coder_leftovers"
       ],
       "type": "byte",
       "values": [
-        23,
-        0,
-        1,
-        80,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        23,
-        0,
-        6,
-        23,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         133,
         112,
         189,
@@ -57262,104 +57899,10 @@
         0,
         0,
         0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         0
       ],
       "binary_addr": 21808,
       "move": "low_keyboard",
-      "xref_summaries": [
-        "&554b referenced 1 time by &0786[3]",
-        "&5559 referenced 1 time by &0792[3]",
-        "&5568 referenced 1 time by &078e[3]",
-        "&5576 referenced 1 time by &078a[3]",
-        "&5585 referenced 1 time by &0796[3]",
-        "&5596 referenced 5 times by &07a4[3], &07b2[3], &07c1[3], &07cf[3], &07df[3]",
-        "&5599 referenced 1 time by &0782[3]"
-      ],
       "type": "byte",
       "values": [
         0,
@@ -57388,6 +57931,12 @@
         0,
         0,
         0,
+        0
+      ]
+    },
+    {
+      "addr": 1947,
+      "bytes": [
         0,
         0,
         0,
@@ -57401,6 +57950,23 @@
         0,
         0,
         0,
+        0
+      ],
+      "binary_addr": 21835,
+      "move": "low_keyboard",
+      "xref_summaries": [
+        "&554b referenced 1 time by &0786[3]"
+      ],
+      "references": [
+        {
+          "addr": 1926,
+          "kind": "direct",
+          "move": "low_joystick",
+          "move_id": 3
+        }
+      ],
+      "type": "byte",
+      "values": [
         0,
         0,
         0,
@@ -57414,6 +57980,12 @@
         0,
         0,
         0,
+        0
+      ]
+    },
+    {
+      "addr": 1961,
+      "bytes": [
         0,
         0,
         0,
@@ -57428,6 +58000,23 @@
         0,
         0,
         0,
+        0
+      ],
+      "binary_addr": 21849,
+      "move": "low_keyboard",
+      "xref_summaries": [
+        "&5559 referenced 1 time by &0792[3]"
+      ],
+      "references": [
+        {
+          "addr": 1938,
+          "kind": "direct",
+          "move": "low_joystick",
+          "move_id": 3
+        }
+      ],
+      "type": "byte",
+      "values": [
         0,
         0,
         0,
@@ -57442,6 +58031,12 @@
         0,
         0,
         0,
+        0
+      ]
+    },
+    {
+      "addr": 1976,
+      "bytes": [
         0,
         0,
         0,
@@ -57455,6 +58050,23 @@
         0,
         0,
         0,
+        0
+      ],
+      "binary_addr": 21864,
+      "move": "low_keyboard",
+      "xref_summaries": [
+        "&5568 referenced 1 time by &078e[3]"
+      ],
+      "references": [
+        {
+          "addr": 1934,
+          "kind": "direct",
+          "move": "low_joystick",
+          "move_id": 3
+        }
+      ],
+      "type": "byte",
+      "values": [
         0,
         0,
         0,
@@ -57467,6 +58079,193 @@
         0,
         0,
         0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 1990,
+      "bytes": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "binary_addr": 21878,
+      "move": "low_keyboard",
+      "xref_summaries": [
+        "&5576 referenced 1 time by &078a[3]"
+      ],
+      "references": [
+        {
+          "addr": 1930,
+          "kind": "direct",
+          "move": "low_joystick",
+          "move_id": 3
+        }
+      ],
+      "type": "byte",
+      "values": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 2005,
+      "bytes": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "binary_addr": 21893,
+      "move": "low_keyboard",
+      "xref_summaries": [
+        "&5585 referenced 1 time by &0796[3]"
+      ],
+      "references": [
+        {
+          "addr": 1942,
+          "kind": "direct",
+          "move": "low_joystick",
+          "move_id": 3
+        }
+      ],
+      "type": "byte",
+      "values": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 2022,
+      "bytes": [
+        0,
+        0,
+        0
+      ],
+      "binary_addr": 21910,
+      "move": "low_keyboard",
+      "xref_summaries": [
+        "&5596 referenced 5 times by &07a4[3], &07b2[3], &07c1[3], &07cf[3], &07df[3]"
+      ],
+      "references": [
+        {
+          "addr": 1956,
+          "kind": "direct",
+          "move": "low_joystick",
+          "move_id": 3
+        },
+        {
+          "addr": 1970,
+          "kind": "direct",
+          "move": "low_joystick",
+          "move_id": 3
+        },
+        {
+          "addr": 1985,
+          "kind": "direct",
+          "move": "low_joystick",
+          "move_id": 3
+        },
+        {
+          "addr": 1999,
+          "kind": "direct",
+          "move": "low_joystick",
+          "move_id": 3
+        },
+        {
+          "addr": 2015,
+          "kind": "direct",
+          "move": "low_joystick",
+          "move_id": 3
+        }
+      ],
+      "type": "byte",
+      "values": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 2025,
+      "bytes": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "binary_addr": 21913,
+      "move": "low_keyboard",
+      "xref_summaries": [
+        "&5599 referenced 1 time by &0782[3]"
+      ],
+      "references": [
+        {
+          "addr": 1922,
+          "kind": "direct",
+          "move": "low_joystick",
+          "move_id": 3
+        }
+      ],
+      "type": "byte",
+      "values": [
         0,
         0,
         0,
@@ -62885,10 +63684,10 @@
       "comment_inline": "No: pass it on",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_07e9",
+      "operand": "joystick_pass_on",
       "target": 2025,
       "target_move": "low_joystick",
-      "target_label": "code_07e9"
+      "target_label": "joystick_pass_on"
     },
     {
       "addr": 1924,
@@ -62901,7 +63700,8 @@
       "comment_inline": "Left key (>)?",
       "type": "code",
       "mnemonic": "cpx",
-      "operand": "#&98"
+      "operand": "#inkey_key_full_stop",
+      "format_hint": "inkey_number"
     },
     {
       "addr": 1926,
@@ -62914,10 +63714,10 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_079b",
+      "operand": "joystick_left",
       "target": 1947,
       "target_move": "low_joystick",
-      "target_label": "code_079b"
+      "target_label": "joystick_left"
     },
     {
       "addr": 1928,
@@ -62930,7 +63730,8 @@
       "comment_inline": "Down key (<)?",
       "type": "code",
       "mnemonic": "cpx",
-      "operand": "#&99"
+      "operand": "#inkey_key_comma",
+      "format_hint": "inkey_number"
     },
     {
       "addr": 1930,
@@ -62943,10 +63744,10 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_07c6",
+      "operand": "joystick_down",
       "target": 1990,
       "target_move": "low_joystick",
-      "target_label": "code_07c6"
+      "target_label": "joystick_down"
     },
     {
       "addr": 1932,
@@ -62959,7 +63760,8 @@
       "comment_inline": "Up key (K)?",
       "type": "code",
       "mnemonic": "cpx",
-      "operand": "#&b9"
+      "operand": "#inkey_key_k",
+      "format_hint": "inkey_number"
     },
     {
       "addr": 1934,
@@ -62972,10 +63774,10 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_07b8",
+      "operand": "joystick_up",
       "target": 1976,
       "target_move": "low_joystick",
-      "target_label": "code_07b8"
+      "target_label": "joystick_up"
     },
     {
       "addr": 1936,
@@ -62988,7 +63790,8 @@
       "comment_inline": "Right key (?)?",
       "type": "code",
       "mnemonic": "cpx",
-      "operand": "#&97"
+      "operand": "#inkey_key_slash",
+      "format_hint": "inkey_number"
     },
     {
       "addr": 1938,
@@ -63001,10 +63804,10 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_07a9",
+      "operand": "joystick_right",
       "target": 1961,
       "target_move": "low_joystick",
-      "target_label": "code_07a9"
+      "target_label": "joystick_right"
     },
     {
       "addr": 1940,
@@ -63017,7 +63820,8 @@
       "comment_inline": "Fire key (SPACE)?",
       "type": "code",
       "mnemonic": "cpx",
-      "operand": "#&9d"
+      "operand": "#inkey_key_space",
+      "format_hint": "inkey_number"
     },
     {
       "addr": 1942,
@@ -63030,10 +63834,10 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_07d5",
+      "operand": "joystick_fire",
       "target": 2005,
       "target_move": "low_joystick",
-      "target_label": "code_07d5"
+      "target_label": "joystick_fire"
     },
     {
       "addr": 1944,
@@ -63060,7 +63864,7 @@
       "binary_addr": 22859,
       "move": "low_joystick",
       "labels": [
-        "code_079b"
+        "joystick_left"
       ],
       "comment_inline": "Left: channel 1 high byte &FF?",
       "xref_summaries": [
@@ -63137,10 +63941,10 @@
       "comment_inline": "No: not pressed",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_07e6",
+      "operand": "joystick_not_pressed",
       "target": 2022,
       "target_move": "low_joystick",
-      "target_label": "code_07e6"
+      "target_label": "joystick_not_pressed"
     },
     {
       "addr": 1958,
@@ -63175,7 +63979,7 @@
       "binary_addr": 22873,
       "move": "low_joystick",
       "labels": [
-        "code_07a9"
+        "joystick_right"
       ],
       "comment_inline": "Right: channel 1 high byte 0?",
       "xref_summaries": [
@@ -63252,10 +64056,10 @@
       "comment_inline": "No: not pressed",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_07e6",
+      "operand": "joystick_not_pressed",
       "target": 2022,
       "target_move": "low_joystick",
-      "target_label": "code_07e6"
+      "target_label": "joystick_not_pressed"
     },
     {
       "addr": 1972,
@@ -63301,7 +64105,7 @@
       "binary_addr": 22888,
       "move": "low_joystick",
       "labels": [
-        "code_07b8"
+        "joystick_up"
       ],
       "comment_inline": "Up: channel 2 high byte &FF?",
       "xref_summaries": [
@@ -63378,10 +64182,10 @@
       "comment_inline": "No: not pressed",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_07e6",
+      "operand": "joystick_not_pressed",
       "target": 2022,
       "target_move": "low_joystick",
-      "target_label": "code_07e6"
+      "target_label": "joystick_not_pressed"
     },
     {
       "addr": 1987,
@@ -63416,7 +64220,7 @@
       "binary_addr": 22902,
       "move": "low_joystick",
       "labels": [
-        "code_07c6"
+        "joystick_down"
       ],
       "comment_inline": "Down: channel 2 high byte 0?",
       "xref_summaries": [
@@ -63493,10 +64297,10 @@
       "comment_inline": "No: not pressed",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_07e6",
+      "operand": "joystick_not_pressed",
       "target": 2022,
       "target_move": "low_joystick",
-      "target_label": "code_07e6"
+      "target_label": "joystick_not_pressed"
     },
     {
       "addr": 2001,
@@ -63542,7 +64346,7 @@
       "binary_addr": 22917,
       "move": "low_joystick",
       "labels": [
-        "code_07d5"
+        "joystick_fire"
       ],
       "comment_inline": "Fire: either fire button?",
       "xref_summaries": [
@@ -63630,10 +64434,10 @@
       "comment_inline": "No: not pressed",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_07e6",
+      "operand": "joystick_not_pressed",
       "target": 2022,
       "target_move": "low_joystick",
-      "target_label": "code_07e6"
+      "target_label": "joystick_not_pressed"
     },
     {
       "addr": 2017,
@@ -63681,7 +64485,7 @@
       "binary_addr": 22934,
       "move": "low_joystick",
       "labels": [
-        "code_07e6"
+        "joystick_not_pressed"
       ],
       "comment_inline": "Not pressed",
       "xref_summaries": [
@@ -63744,7 +64548,7 @@
       "binary_addr": 22937,
       "move": "low_joystick",
       "labels": [
-        "code_07e9"
+        "joystick_pass_on"
       ],
       "comment_inline": "Pass the call on to the MOS 1.20 OSBYTE routine",
       "xref_summaries": [

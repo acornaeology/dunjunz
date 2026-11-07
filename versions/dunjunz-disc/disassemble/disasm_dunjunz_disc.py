@@ -19,6 +19,7 @@ import sys
 from pathlib import Path
 
 import dasmos
+from dasmos.expr import hi, lo, sym
 
 VERSION_DIRPATH = Path(__file__).resolve().parent.parent
 REPO_DIRPATH = VERSION_DIRPATH.parent.parent
@@ -105,8 +106,8 @@ annotator.label(0x08BD, "level_digits", length=2, group="disc_state",
                 description=(
                     "The level number as ASCII digits for the level's "
                     "filename: one digit and a space, or two digits."))
-annotator.label(0x0287, "os_break_intercept", group="os_workspace",
-                length=3, access="w", description=(
+annotator.region(0x0287, "os_break_intercept", (0, 2), group="os_workspace",
+                 access="w", description=(
                     "MOS BREAK intercept: if &0287 holds a JMP opcode the "
                     "MOS jumps to &0287 twice during a reset, before and "
                     "after the filing system is initialised (carry clear, "
@@ -254,9 +255,9 @@ for addr, text in [
     (0x507F, "..."), (0x5083, "..."), (0x5085, "..."),
     (0x508D, "..."), (0x508F, "..."),
     (0x5094, "..."),
-    (0x5099, "...destination pointer in sprite_width, sprite_height..."),
+    (0x5099, "...destination pointer in coder_dest..."),
     (0x509B, "..."), (0x509D, "..."),
-    (0x50A1, "...source pointer in plot_x, plot_y"),
+    (0x50A1, "...source pointer in coder_source"),
     (0x50A5, "..."),
     (0x50AC, "..."), (0x50B0, "..."), (0x50B2, "..."), (0x50B6, "..."),
     (0x50B8, "Copy a kilobyte, up to &0800..."),
@@ -334,6 +335,122 @@ for addr, text in [
     (0x07E9, "Pass the call on to the MOS 1.20 OSBYTE routine"),
 ]:
     joystick_only.c(addr, text)
+
+# ---------------------------------------------------------------------------
+# Coder's copies: its pointers (game zero page, used here before the game
+# runs), the addresses it copies between, and its VDU tables.
+
+for value, name, text in [
+    (0x70, "coder_source", "Coder's copy source pointer (the game's plot_x, plot_y)"),
+    (0x72, "coder_dest", "Coder's copy destination pointer (the game's sprite_width, sprite_height)"),
+    (0x80, "core_offset", "Coder's offset into the game core, &0000 or &0440 (the game's ring_x, ring_y)"),
+    (0x3000, "game_core_stored", "Where Dun1 stores the game core, &08C0-&1FFF at run time"),
+    (0x4740, "game_core_stored_end", "The end of the stored game core"),
+    (0x08C0, "game_core_start", "Where the game core runs"),
+    (0x51B0, "keyboard_image_stored", "Where Dun1 stores the keyboard-only &0400-&07FF image"),
+    (0x55B0, "joystick_image_stored", "Where Dun1 stores the &0400-&07FF image with the joystick handler"),
+    (0x0400, "low_image_start", "Where either &0400-&07FF image runs"),
+    (0x0800, "low_image_end", "The end of the &0400-&07FF image"),
+]:
+    d.constant(value, name, comment=text)
+operand_exprs = [
+    (0x5097 + 1, lo(sym("low_image_start"))), (0x509B + 1, hi(sym("low_image_start"))),
+    (0x5099 + 1, sym("coder_dest")), (0x509D + 1, sym("coder_dest") + 1),
+    (0x509F + 1, lo(sym("keyboard_image_stored"))), (0x50A1 + 1, sym("coder_source")),
+    (0x50AE + 1, hi(sym("joystick_image_stored"))), (0x50B0 + 1, sym("coder_source") + 1),
+    (0x50B4 + 1, hi(sym("keyboard_image_stored"))), (0x50B6 + 1, sym("coder_source") + 1),
+    (0x50BA + 1, sym("coder_source")), (0x50BC + 1, sym("coder_dest")),
+    (0x50BE + 1, sym("coder_dest")), (0x50C2 + 1, sym("coder_dest") + 1),
+    (0x50C4 + 1, sym("coder_source")), (0x50C8 + 1, sym("coder_source") + 1),
+    (0x50CA + 1, sym("coder_dest") + 1), (0x50CC + 1, hi(sym("low_image_end"))),
+    (0x50DB + 1, lo(sym("joystick_bytev"))), (0x50E0 + 1, hi(sym("joystick_bytev"))),
+    (0x5105 + 1, sym("core_offset")), (0x5107 + 1, sym("core_offset") + 1),
+    (0x510D + 1, sym("core_offset")), (0x5111 + 1, sym("core_offset") + 1),
+    (0x5113 + 1, sym("core_offset")), (0x5115 + 1, sym("coder_source")),
+    (0x5117 + 1, hi(sym("game_core_stored"))), (0x511A + 1, sym("core_offset") + 1),
+    (0x511C + 1, sym("coder_source") + 1), (0x511E + 1, lo(sym("game_core_start"))),
+    (0x5121 + 1, sym("core_offset")), (0x5123 + 1, sym("coder_dest")),
+    (0x5125 + 1, hi(sym("game_core_start"))), (0x5127 + 1, sym("core_offset") + 1),
+    (0x5129 + 1, sym("coder_dest") + 1),
+    (0x512D + 1, sym("coder_source")), (0x512F + 1, sym("coder_dest")),
+    (0x5131 + 1, sym("coder_source")), (0x5135 + 1, sym("coder_source") + 1),
+    (0x5137 + 1, sym("coder_dest")), (0x513B + 1, sym("coder_dest") + 1),
+    (0x513D + 1, sym("coder_source")), (0x513F + 1, lo(sym("game_core_stored_end"))),
+    (0x5143 + 1, sym("coder_source") + 1), (0x5145 + 1, hi(sym("game_core_stored_end"))),
+    (0x505C + 1, lo(sym("dun1_command"))), (0x505E + 1, hi(sym("dun1_command"))),
+    (0x5081 + 1, lo(sym("stones_command"))), (0x5083 + 1, hi(sym("stones_command"))),
+    (0x508B + 1, lo(sym("level_command"))), (0x508D + 1, hi(sym("level_command"))),
+    (0x5072 + 1, sym("level_count_copy")),
+]
+for operand_addr, expression in operand_exprs:
+    d.expr(operand_addr, expression)
+d.expr_label(0x08BE, "level_digits+1")
+d.expr_label(0x5172, "level_command_digits+1")
+for addr, name in [(0x5036, "advance_single_digit"), (0x504A, "set_up_6845_for_loading"),
+                   (0x504C, "send_loading_vdu"), (0x508B, "load_level_file"),
+                   (0x5092, "level_loaded"), (0x50B4, "use_keyboard_image"),
+                   (0x50B8, "copy_low_image"), (0x50BA, "copy_low_byte"),
+                   (0x50C4, "copy_low_next_source"), (0x50CA, "copy_low_check_end"),
+                   (0x50E5, "set_up_screen_for_play"), (0x50F1, "send_play_vdu"),
+                   (0x510B, "keep_heroes"), (0x5113, "copy_game_core"),
+                   (0x512D, "copy_core_byte"), (0x5137, "copy_core_next_dest"),
+                   (0x513D, "copy_core_check_end")]:
+    annotator.label(addr, name)
+annotator.banner(0x5179, "Coder's VDU tables",
+                 "6845 set-ups sent with VDU 23,0: one while loading, one for play.")
+annotator.label(0x5179, "loading_vdu", length=21, description=(
+    "VDU 23,0,1,0 (no characters displayed: the screen goes blank) and "
+    "VDU 23,0,10,&20 (no cursor), each padded to ten bytes, and one more "
+    "byte sent."))
+annotator.byte(0x5179, 10, cols=10)
+annotator.byte(0x5183, 10, cols=10)
+annotator.byte(0x518D, 1)
+annotator.label(0x518E, "play_vdu", length=20, description=(
+    "VDU 23,0,1,80 (80 characters displayed) and VDU 23,0,6,23 (23 rows "
+    "displayed), for play."))
+annotator.byte(0x518E, 10, cols=10)
+annotator.byte(0x5198, 10, cols=10)
+annotator.banner(0x51A2, "Unused", "Leftover bytes: stale code from an earlier assembly.")
+annotator.label(0x51A2, "coder_leftovers")
+annotator.byte(0x51A2, 0x51B0 - 0x51A2, cols=14)
+for addr, text in [(0x5179, "VDU 23,0,1,0: 6845 register 1 = 0, no characters displayed"),
+                   (0x5183, "VDU 23,0,10,&20: 6845 register 10 = &20, no cursor"),
+                   (0x518D, "A further 0, sent too (21 bytes are sent)"),
+                   (0x518E, "VDU 23,0,1,80: 6845 register 1 = 80 characters displayed"),
+                   (0x5198, "VDU 23,0,6,23: 6845 register 6 = 23 character rows displayed")]:
+    annotator.c(addr, text)
+for operand_addr, name in [(0x504D, "loading_vdu"), (0x50F2, "play_vdu")]:
+    d.expr(operand_addr, sym(name))
+d.expr(0x5054, sym("play_vdu") - sym("loading_vdu"))
+d.expr(0x50F9, sym("coder_leftovers") - sym("play_vdu"))
+
+# ---------------------------------------------------------------------------
+# The disc's own branch targets and patched operands.
+
+annotator.sub(0x15B1, "show_level_number", "Clear the text area before a level",
+              "Where the cassette game shows the level number here, Coder has "
+              "already shown it on the disc, so this only clears the text area.",
+              on_exit={"A": "corrupted"})
+for addr, name in [(0x0D72, "store_level_bcd"), (0x0D7F, "start_new_game"),
+                   (0x0E08, "new_game_reset_heroes"), (0x0E45, "to_next_level"),
+                   (0x0E57, "play_this_level"), (0x146F, "reset_machine"),
+                   (0x1624, "set_text_window_bottom"),
+                   (0x1EE0, "wait_pause_release"), (0x1EE7, "wait_pause_press")]:
+    annotator.label(addr, name)
+annotator.label(0x1625, "text_window_bottom", description=(
+    "The bottom row of clear_text_area's text window, an operand that "
+    "check_level sets to &18."))
+for operand_addr, name in [(0x1450, "restart_intercept"), (0x1466, "next_level_intercept")]:
+    annotator.expr(operand_addr, lo(sym(name)))
+for operand_addr, name in [(0x1455, "restart_intercept"), (0x146B, "next_level_intercept")]:
+    annotator.expr(operand_addr, hi(sym(name)))
+for addr, name in [(0x079B, "joystick_left"), (0x07A9, "joystick_right"),
+                   (0x07B8, "joystick_up"), (0x07C6, "joystick_down"),
+                   (0x07D5, "joystick_fire"), (0x07E6, "joystick_not_pressed"),
+                   (0x07E9, "joystick_pass_on")]:
+    joystick_only.label(addr, name)
+for operand_addr in (0x0785, 0x0789, 0x078D, 0x0791, 0x0795):
+    joystick_only.inkey_number(operand_addr)
 
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)
