@@ -64,13 +64,13 @@ reset_vector   = &fffc  ; The 6502 reset vector: the MOS's reset entry.
     lda #<(level_digits)                ; ...and fill it in: the buffer is level_digits...
     sta read_level_block                ; ...
     lda #>(level_digits)                ; ...
-    sta data_0f1c                       ; ...
+    sta read_level_block + 1            ; ...
     lda #2                              ; ...at most two characters...
-    sta data_0f1d                       ; ...
+    sta read_level_block + 2            ; ...
     lda #&30 ; '0'                      ; ...from '0'...
-    sta data_0f1e                       ; ...
+    sta read_level_block + 3            ; ...
     lda #&39 ; '9'                      ; ...to '9'
-    sta data_0f1f                       ; ...
+    sta read_level_block + 4            ; ...
     lda #osword_read_line               ; OSWORD 0: read the level number
     jsr osword                          ; ...  Read line from input stream (exits with C=1 if ESCAPE pressed)
     cpy #0                              ; Nothing typed (or ESCAPE)?
@@ -189,13 +189,9 @@ reset_vector   = &fffc  ; The 6502 reset vector: the MOS's reset entry.
 ; &0f1b referenced 1 time by &0e26
 .read_level_block
 ; &0f1c referenced 1 time by &0e2b
-data_0f1c = read_level_block+1
 ; &0f1d referenced 1 time by &0e30
-data_0f1d = read_level_block+2
 ; &0f1e referenced 1 time by &0e35
-data_0f1e = read_level_block+3
 ; &0f1f referenced 1 time by &0e3a
-data_0f1f = read_level_block+4
     equb &2a, &2a, &2a, &2a, &2a
 ; &0f20 referenced 3 times by &0e4a, &0e6a, &0eb7
 .level_digits
@@ -1443,46 +1439,40 @@ data_0f1f = read_level_block+4
 save "Default", dasmos_start, dasmos_end, &0e00, &0e00
 
 ; Label references by decreasing frequency:
-;     oswrch:             5
-;     read_ptr:           5
-;     dasmos_start:       4
-;     default_start:      4
-;     put_ptr:            4
-;     read_ptr_hi:        4
-;     tens_times_ten:     4
-;     level_digits:       3
-;     level_digits + 1:   3
-;     osbyte:             3
-;     put_ptr_hi:         3
-;     copy_level:         2
-;     another_level:      1
-;     another_question:   1
-;     check_level:        1
-;     copy_check_end:     1
-;     copy_put_next:      1
-;     data_0f1c:          1
-;     data_0f1d:          1
-;     data_0f1e:          1
-;     data_0f1f:          1
-;     find_copy:          1
-;     level_prompt:       1
-;     one_digit:          1
-;     oscli:              1
-;     osrdch:             1
-;     osword:             1
-;     print_prompt:       1
-;     print_question:     1
-;     read_level_block:   1
-;     reset_vector:       1
-;     save_command + 10:  1
-;     save_command + 11:  1
-;     wait_for_answer:    1
-
-; Automatically generated labels:
-;     data_0f1c
-;     data_0f1d
-;     data_0f1e
-;     data_0f1f
+;     oswrch:                5
+;     read_ptr:              5
+;     dasmos_start:          4
+;     default_start:         4
+;     put_ptr:               4
+;     read_ptr_hi:           4
+;     tens_times_ten:        4
+;     level_digits:          3
+;     level_digits + 1:      3
+;     osbyte:                3
+;     put_ptr_hi:            3
+;     copy_level:            2
+;     another_level:         1
+;     another_question:      1
+;     check_level:           1
+;     copy_check_end:        1
+;     copy_put_next:         1
+;     find_copy:             1
+;     level_prompt:          1
+;     one_digit:             1
+;     oscli:                 1
+;     osrdch:                1
+;     osword:                1
+;     print_prompt:          1
+;     print_question:        1
+;     read_level_block:      1
+;     read_level_block + 1:  1
+;     read_level_block + 2:  1
+;     read_level_block + 3:  1
+;     read_level_block + 4:  1
+;     reset_vector:          1
+;     save_command + 10:     1
+;     save_command + 11:     1
+;     wait_for_answer:       1
 
 ; Stats:
 ;     Total size (Code + Data) = 18400 bytes

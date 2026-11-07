@@ -652,7 +652,16 @@
       "comment_inline": "*LOAD Code2 (the music, at &C700)",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&5a"
+      "operand": "#<(load_code2_command)",
+      "expr": {
+        "text": "<(load_code2_command)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "load_code2_command"
+          }
+        }
+      }
     },
     {
       "addr": 9803,
@@ -663,7 +672,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&26"
+      "operand": "#>(load_code2_command)",
+      "expr": {
+        "text": ">(load_code2_command)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "load_code2_command"
+          }
+        }
+      }
     },
     {
       "addr": 9805,
@@ -688,7 +706,16 @@
       "comment_inline": "*LOAD Code3 (a copy of the sprite plotter, at &D800)",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&65"
+      "operand": "#<(load_code3_command)",
+      "expr": {
+        "text": "<(load_code3_command)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "load_code3_command"
+          }
+        }
+      }
     },
     {
       "addr": 9810,
@@ -699,7 +726,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&26"
+      "operand": "#>(load_code3_command)",
+      "expr": {
+        "text": ">(load_code3_command)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "load_code3_command"
+          }
+        }
+      }
     },
     {
       "addr": 9812,
@@ -725,9 +761,9 @@
       "comment_inline": "Load Table and start the title",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_26ad",
+      "operand": "load_table",
       "target": 9901,
-      "target_label": "code_26ad"
+      "target_label": "load_table"
     },
     {
       "addr": 9818,
@@ -863,9 +899,9 @@
       "comment_inline": "Yes: a joystick",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_2686",
+      "operand": "run_coder2",
       "target": 9862,
-      "target_label": "code_2686"
+      "target_label": "run_coder2"
     },
     {
       "addr": 9851,
@@ -887,9 +923,9 @@
       "comment_inline": "Yes: a joystick",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_2686",
+      "operand": "run_coder2",
       "target": 9862,
-      "target_label": "code_2686"
+      "target_label": "run_coder2"
     },
     {
       "addr": 9855,
@@ -900,7 +936,16 @@
       "comment_inline": "No joystick: *CODER, which does not return",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&a9"
+      "operand": "#<(coder_command)",
+      "expr": {
+        "text": "<(coder_command)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "coder_command"
+          }
+        }
+      }
     },
     {
       "addr": 9857,
@@ -911,7 +956,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&27"
+      "operand": "#>(coder_command)",
+      "expr": {
+        "text": ">(coder_command)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "coder_command"
+          }
+        }
+      }
     },
     {
       "addr": 9859,
@@ -934,7 +988,7 @@
         141
       ],
       "labels": [
-        "code_2686"
+        "run_coder2"
       ],
       "comment_inline": "Joystick: *CODER2, which does not return",
       "xref_summaries": [
@@ -952,7 +1006,16 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&8d"
+      "operand": "#<(coder2_command)",
+      "expr": {
+        "text": "<(coder2_command)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "coder2_command"
+          }
+        }
+      }
     },
     {
       "addr": 9864,
@@ -963,7 +1026,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&26"
+      "operand": "#>(coder2_command)",
+      "expr": {
+        "text": ">(coder2_command)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "coder2_command"
+          }
+        }
+      }
     },
     {
       "addr": 9866,
@@ -1036,7 +1108,7 @@
         38
       ],
       "labels": [
-        "loop_2696"
+        "blank_display_loop"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -1097,9 +1169,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_2696",
+      "operand": "blank_display_loop",
       "target": 9878,
-      "target_label": "loop_2696"
+      "target_label": "blank_display_loop"
     },
     {
       "addr": 9889,
@@ -1159,7 +1231,7 @@
         183
       ],
       "labels": [
-        "code_26ad"
+        "load_table"
       ],
       "comment_inline": "*L. TABLE (level 25, game over, row offsets, pause, at &C5A0)",
       "xref_summaries": [
@@ -1173,7 +1245,16 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&b7"
+      "operand": "#<(load_table_command)",
+      "expr": {
+        "text": "<(load_table_command)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "load_table_command"
+          }
+        }
+      }
     },
     {
       "addr": 9903,
@@ -1184,7 +1265,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&26"
+      "operand": "#>(load_table_command)",
+      "expr": {
+        "text": ">(load_table_command)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "load_table_command"
+          }
+        }
+      }
     },
     {
       "addr": 9905,
@@ -1288,7 +1378,16 @@
       "comment_inline": "*LOAD SCREEN",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&98"
+      "operand": "#<(load_screen_command)",
+      "expr": {
+        "text": "<(load_screen_command)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "load_screen_command"
+          }
+        }
+      }
     },
     {
       "addr": 9927,
@@ -1299,7 +1398,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&27"
+      "operand": "#>(load_screen_command)",
+      "expr": {
+        "text": ">(load_screen_command)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "load_screen_command"
+          }
+        }
+      }
     },
     {
       "addr": 9929,
@@ -1690,7 +1798,7 @@
         105
       ],
       "labels": [
-        "loop_2721"
+        "init_hero_tables"
       ],
       "comment_inline": "...no ten-thousands digit (sprite &69)...",
       "xref_summaries": [
@@ -1763,9 +1871,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bpl",
-      "operand": "loop_2721",
+      "operand": "init_hero_tables",
       "target": 10017,
-      "target_label": "loop_2721"
+      "target_label": "init_hero_tables"
     },
     {
       "addr": 10030,
@@ -1849,7 +1957,16 @@
       "comment_inline": "*TV 255,1: vertical offset for the title's MODE 2",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&b7"
+      "operand": "#<(tv_title_command)",
+      "expr": {
+        "text": "<(tv_title_command)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "tv_title_command"
+          }
+        }
+      }
     },
     {
       "addr": 10047,
@@ -1860,7 +1977,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&27"
+      "operand": "#>(tv_title_command)",
+      "expr": {
+        "text": ">(tv_title_command)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "tv_title_command"
+          }
+        }
+      }
     },
     {
       "addr": 10049,
@@ -1908,7 +2034,7 @@
         19
       ],
       "labels": [
-        "loop_2749"
+        "black_colours"
       ],
       "comment_inline": "...VDU 19, colour, 0, 0, 0, 0...",
       "xref_summaries": [
@@ -2046,9 +2172,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bpl",
-      "operand": "loop_2749",
+      "operand": "black_colours",
       "target": 10057,
-      "target_label": "loop_2749"
+      "target_label": "black_colours"
     },
     {
       "addr": 10083,
@@ -2208,7 +2334,16 @@
       "comment_inline": "*TV 252,1: vertical offset for the game's display",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&af"
+      "operand": "#<(tv_game_command)",
+      "expr": {
+        "text": "<(tv_game_command)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "tv_game_command"
+          }
+        }
+      }
     },
     {
       "addr": 10109,
@@ -2219,7 +2354,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&27"
+      "operand": "#>(tv_game_command)",
+      "expr": {
+        "text": ">(tv_game_command)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "tv_game_command"
+          }
+        }
+      }
     },
     {
       "addr": 10111,
@@ -2258,7 +2402,16 @@
       "comment_inline": "*DISC",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&a4"
+      "operand": "#<(disc_command)",
+      "expr": {
+        "text": "<(disc_command)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "disc_command"
+          }
+        }
+      }
     },
     {
       "addr": 10119,
@@ -2269,7 +2422,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&27"
+      "operand": "#>(disc_command)",
+      "expr": {
+        "text": ">(disc_command)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "disc_command"
+          }
+        }
+      }
     },
     {
       "addr": 10121,
@@ -2587,7 +2749,7 @@
         39
       ],
       "labels": [
-        "loop_27cb"
+        "send_cursor_off_vdu"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -2648,9 +2810,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_27cb",
+      "operand": "send_cursor_off_vdu",
       "target": 10187,
-      "target_label": "loop_27cb"
+      "target_label": "send_cursor_off_vdu"
     },
     {
       "addr": 10198,
@@ -2940,7 +3102,7 @@
         116
       ],
       "labels": [
-        "loop_2819"
+        "plot_star_row"
       ],
       "comment_inline": "...remember its start...",
       "xref_summaries": [
@@ -3035,7 +3197,7 @@
         120
       ],
       "labels": [
-        "loop_2825"
+        "plot_star_byte"
       ],
       "comment_inline": "...exclusive-OR the frame onto the screen...",
       "xref_summaries": [
@@ -3106,9 +3268,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_283c",
+      "operand": "plot_star_left",
       "target": 10300,
-      "target_label": "code_283c"
+      "target_label": "plot_star_left"
     },
     {
       "addr": 10287,
@@ -3165,9 +3327,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcc",
-      "operand": "code_2847",
+      "operand": "plot_star_next_data",
       "target": 10311,
-      "target_label": "code_2847"
+      "target_label": "plot_star_next_data"
     },
     {
       "addr": 10296,
@@ -3191,9 +3353,9 @@
       "comment_inline": "...(always branches)",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_2847",
+      "operand": "plot_star_next_data",
       "target": 10311,
-      "target_label": "code_2847"
+      "target_label": "plot_star_next_data"
     },
     {
       "addr": 10300,
@@ -3201,7 +3363,7 @@
         56
       ],
       "labels": [
-        "code_283c"
+        "plot_star_left"
       ],
       "comment_inline": "Left...",
       "xref_summaries": [
@@ -3262,9 +3424,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcs",
-      "operand": "code_2847",
+      "operand": "plot_star_next_data",
       "target": 10311,
-      "target_label": "code_2847"
+      "target_label": "plot_star_next_data"
     },
     {
       "addr": 10309,
@@ -3286,7 +3448,7 @@
         120
       ],
       "labels": [
-        "code_2847"
+        "plot_star_next_data"
       ],
       "comment_inline": "Next byte of the frame",
       "xref_summaries": [
@@ -3321,9 +3483,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_284d",
+      "operand": "plot_star_next_byte",
       "target": 10317,
-      "target_label": "code_284d"
+      "target_label": "plot_star_next_byte"
     },
     {
       "addr": 10315,
@@ -3344,7 +3506,7 @@
         202
       ],
       "labels": [
-        "code_284d"
+        "plot_star_next_byte"
       ],
       "comment_inline": "Next byte across",
       "xref_summaries": [
@@ -3368,9 +3530,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_2825",
+      "operand": "plot_star_byte",
       "target": 10277,
-      "target_label": "loop_2825"
+      "target_label": "plot_star_byte"
     },
     {
       "addr": 10320,
@@ -3488,9 +3650,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_2870",
+      "operand": "plot_star_next_row",
       "target": 10352,
-      "target_label": "code_2870"
+      "target_label": "plot_star_next_row"
     },
     {
       "addr": 10339,
@@ -3581,7 +3743,7 @@
         104
       ],
       "labels": [
-        "code_2870"
+        "plot_star_next_row"
       ],
       "comment_inline": "Next row",
       "xref_summaries": [
@@ -3623,9 +3785,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_2819",
+      "operand": "plot_star_row",
       "target": 10265,
-      "target_label": "loop_2819"
+      "target_label": "plot_star_row"
     },
     {
       "addr": 10357,
@@ -4010,9 +4172,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcc",
-      "operand": "code_28ae",
+      "operand": "title_screen_address_done",
       "target": 10414,
-      "target_label": "code_28ae"
+      "target_label": "title_screen_address_done"
     },
     {
       "addr": 10412,
@@ -4034,7 +4196,7 @@
         0
       ],
       "labels": [
-        "code_28ae"
+        "title_screen_address_done"
       ],
       "comment_inline": "Y = 0 for the plotting loop",
       "xref_summaries": [
@@ -4323,7 +4485,7 @@
         41
       ],
       "labels": [
-        "loop_2904"
+        "clear_star_showing"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -4359,9 +4521,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bpl",
-      "operand": "loop_2904",
+      "operand": "clear_star_showing",
       "target": 10500,
-      "target_label": "loop_2904"
+      "target_label": "clear_star_showing"
     },
     {
       "addr": 10506,
@@ -4371,7 +4533,7 @@
         254
       ],
       "labels": [
-        "loop_290a"
+        "twinkle_loop"
       ],
       "comment_inline": "One time in four (System VIA timer 1, low bits)...",
       "xref_summaries": [
@@ -4409,9 +4571,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_2914",
+      "operand": "twinkle_advance",
       "target": 10516,
-      "target_label": "code_2914"
+      "target_label": "twinkle_advance"
     },
     {
       "addr": 10513,
@@ -4435,7 +4597,7 @@
         41
       ],
       "labels": [
-        "code_2914"
+        "twinkle_advance"
       ],
       "comment_inline": "Advance every star",
       "xref_summaries": [
@@ -4504,9 +4666,9 @@
       "comment_inline": "No: carry on",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "loop_290a",
+      "operand": "twinkle_loop",
       "target": 10506,
-      "target_label": "loop_290a"
+      "target_label": "twinkle_loop"
     },
     {
       "addr": 10528,
@@ -4527,7 +4689,7 @@
         41
       ],
       "labels": [
-        "loop_2922"
+        "erase_stars"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -4554,9 +4716,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_292a",
+      "operand": "erase_next_star",
       "target": 10538,
-      "target_label": "code_292a"
+      "target_label": "erase_next_star"
     },
     {
       "addr": 10535,
@@ -4578,7 +4740,7 @@
         136
       ],
       "labels": [
-        "code_292a"
+        "erase_next_star"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -4602,9 +4764,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bpl",
-      "operand": "loop_2922",
+      "operand": "erase_stars",
       "target": 10530,
-      "target_label": "loop_2922"
+      "target_label": "erase_stars"
     },
     {
       "addr": 10541,
@@ -4646,7 +4808,7 @@
         41
       ],
       "labels": [
-        "loop_2930"
+        "find_free_star"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -4673,9 +4835,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_293b",
+      "operand": "star_found",
       "target": 10555,
-      "target_label": "code_293b"
+      "target_label": "star_found"
     },
     {
       "addr": 10549,
@@ -4706,9 +4868,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_2930",
+      "operand": "find_free_star",
       "target": 10544,
-      "target_label": "loop_2930"
+      "target_label": "find_free_star"
     },
     {
       "addr": 10554,
@@ -4726,7 +4888,7 @@
         1
       ],
       "labels": [
-        "code_293b"
+        "star_found"
       ],
       "comment_inline": "Mark it showing",
       "xref_summaries": [
@@ -4824,7 +4986,7 @@
         254
       ],
       "labels": [
-        "loop_294a"
+        "pick_place"
       ],
       "comment_inline": "Pick a place at random (timer, &FA and &FC mixed)...",
       "xref_summaries": [
@@ -4911,9 +5073,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bmi",
-      "operand": "loop_294a",
+      "operand": "pick_place",
       "target": 10570,
-      "target_label": "loop_294a"
+      "target_label": "pick_place"
     },
     {
       "addr": 10585,
@@ -5064,7 +5226,7 @@
         41
       ],
       "labels": [
-        "loop_296f"
+        "advance_star"
       ],
       "comment_inline": "...showing?",
       "xref_summaries": [
@@ -5091,9 +5253,9 @@
       "comment_inline": "No: just pause",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_29d0",
+      "operand": "star_not_showing",
       "target": 10704,
-      "target_label": "code_29d0"
+      "target_label": "star_not_showing"
     },
     {
       "addr": 10612,
@@ -5184,9 +5346,9 @@
       "comment_inline": "Below 0: finished",
       "type": "code",
       "mnemonic": "bmi",
-      "operand": "code_2993",
+      "operand": "star_finished",
       "target": 10643,
-      "target_label": "code_2993"
+      "target_label": "star_finished"
     },
     {
       "addr": 10627,
@@ -5208,9 +5370,9 @@
       "comment_inline": "No: plot it",
       "type": "code",
       "mnemonic": "bcc",
-      "operand": "code_29a2",
+      "operand": "plot_new_frame",
       "target": 10658,
-      "target_label": "code_29a2"
+      "target_label": "plot_new_frame"
     },
     {
       "addr": 10631,
@@ -5281,9 +5443,9 @@
       "comment_inline": "...and plot it (always branches)",
       "type": "code",
       "mnemonic": "bmi",
-      "operand": "code_29a2",
+      "operand": "plot_new_frame",
       "target": 10658,
-      "target_label": "code_29a2"
+      "target_label": "plot_new_frame"
     },
     {
       "addr": 10643,
@@ -5292,7 +5454,7 @@
         0
       ],
       "labels": [
-        "code_2993"
+        "star_finished"
       ],
       "comment_inline": "Finished: not showing...",
       "xref_summaries": [
@@ -5382,9 +5544,9 @@
       "comment_inline": "...(always branches)",
       "type": "code",
       "mnemonic": "bpl",
-      "operand": "code_29a5",
+      "operand": "star_pause",
       "target": 10661,
-      "target_label": "code_29a5"
+      "target_label": "star_pause"
     },
     {
       "addr": 10658,
@@ -5394,7 +5556,7 @@
         41
       ],
       "labels": [
-        "code_29a2"
+        "plot_new_frame"
       ],
       "comment_inline": "Plot the new frame",
       "xref_summaries": [
@@ -5422,7 +5584,7 @@
         152
       ],
       "labels": [
-        "code_29a5"
+        "star_pause"
       ],
       "comment_inline": "Pause...",
       "xref_summaries": [
@@ -5464,7 +5626,7 @@
         255
       ],
       "labels": [
-        "code_29a9"
+        "star_pause_outer"
       ],
       "comment_inline": "...X x 256 iterations...",
       "xref_summaries": [
@@ -5490,7 +5652,7 @@
         136
       ],
       "labels": [
-        "loop_29ab"
+        "star_pause_inner"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -5514,9 +5676,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_29ab",
+      "operand": "star_pause_inner",
       "target": 10667,
-      "target_label": "loop_29ab"
+      "target_label": "star_pause_inner"
     },
     {
       "addr": 10670,
@@ -5536,9 +5698,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_29a9",
+      "operand": "star_pause_outer",
       "target": 10665,
-      "target_label": "code_29a9"
+      "target_label": "star_pause_outer"
     },
     {
       "addr": 10673,
@@ -5587,9 +5749,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_296f",
+      "operand": "advance_star",
       "target": 10607,
-      "target_label": "loop_296f"
+      "target_label": "advance_star"
     },
     {
       "addr": 10680,
@@ -5785,7 +5947,7 @@
         152
       ],
       "labels": [
-        "code_29d0"
+        "star_not_showing"
       ],
       "comment_inline": "Star not showing: pause for longer...",
       "xref_summaries": [
@@ -5829,9 +5991,9 @@
       "comment_inline": "...(always branches)",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_29a9",
+      "operand": "star_pause_outer",
       "target": 10665,
-      "target_label": "code_29a9"
+      "target_label": "star_pause_outer"
     },
     {
       "addr": 10710,

@@ -590,9 +590,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0f1c",
-      "target": 3868,
-      "target_label": "data_0f1c"
+      "operand": "read_level_block + 1",
+      "target": 3868
     },
     {
       "addr": 3630,
@@ -615,9 +614,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0f1d",
-      "target": 3869,
-      "target_label": "data_0f1d"
+      "operand": "read_level_block + 2",
+      "target": 3869
     },
     {
       "addr": 3635,
@@ -640,9 +638,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0f1e",
-      "target": 3870,
-      "target_label": "data_0f1e"
+      "operand": "read_level_block + 3",
+      "target": 3870
     },
     {
       "addr": 3640,
@@ -665,9 +662,8 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "data_0f1f",
-      "target": 3871,
-      "target_label": "data_0f1f"
+      "operand": "read_level_block + 4",
+      "target": 3871
     },
     {
       "addr": 3645,
@@ -1971,20 +1967,6 @@
       "labels": [
         "read_level_block"
       ],
-      "sub_labels": {
-        "3868": [
-          "data_0f1c"
-        ],
-        "3869": [
-          "data_0f1d"
-        ],
-        "3870": [
-          "data_0f1e"
-        ],
-        "3871": [
-          "data_0f1f"
-        ]
-      },
       "xref_summaries": [
         "&0f1b referenced 1 time by &0e26",
         "&0f1c referenced 1 time by &0e2b",

@@ -173,6 +173,8 @@ d.label(0x0F1B, "read_level_block", length=5, description=(
     "OSWORD 0 block: buffer address, maximum length, lowest and highest "
     "character; *DEFAULT fills it in before each call."))
 d.byte(0x0F1B, 5, cols=5)
+for k in range(1, 5):
+    d.expr_label(0x0F1B + k, f"read_level_block+{k}")
 d.label(0x0F20, "level_digits", length=3, description=(
     "The digits typed, and the CR that ends them."))
 d.byte(0x0F20, 3, cols=3)
