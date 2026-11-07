@@ -1,5 +1,6 @@
 ; Constants
 spr_wall                             = &00  ; Sprite &00
+spr_ranger_up_0                      = &01  ; Sprite &01
 spr_monster_up_0                     = &09  ; Sprite &09
 spr_monster_down_0                   = &0d  ; Sprite &0D
 spr_arrow_up                         = &11  ; Sprite &11
@@ -16,7 +17,11 @@ spr_food                             = &29  ; Sprite &29
 spr_cross                            = &2a  ; Sprite &2A
 spr_teleporter                       = &2b  ; Sprite &2B
 spr_trapdoor                         = &2c  ; Sprite &2C
+spr_magic_user_up_0                  = &2d  ; Sprite &2D
+spr_barbarian_up_0                   = &35  ; Sprite &35
+spr_fighter_up_0                     = &3d  ; Sprite &3D
 spr_fireball_up                      = &45  ; Sprite &45
+spr_sword_up                         = &49  ; Sprite &49
 spr_axe_up                           = &4d  ; Sprite &4D
 spr_exit                             = &51  ; Sprite &51
 spr_key_icon                         = &52  ; Sprite &52
@@ -6981,49 +6986,71 @@ clear_text_area_top = set_text_window_top+1
 ; and panel rows (+&D0).
 ; &7d00 used as index base 1 time by &150f
 .workspace_template
-    equb &00, &00, &1f, &1f, &d2, &d2, &cc, &b1
-    equb &07, &07, &01, &01, &00
-    equs ",4<"
-    equb &0b, &0b, &0c, &0c, &2f, &0b, &0c, &0b
-    equb &0c, &26, &01, &03, &05, &07, &2d, &2f
-    equb &01, &01, &01, &01, &5d, &00, &00, &00
-    equb &00, &16, &00, &00, &00, &00, &1d, &1f
-    equb &00, &00, &00, &00, &03, &05, &07, &05
-    equb &07
-    equs "657<>=?"
+    equb &00                            ; scratch: working byte
+    equb &00                            ; scratch2: working byte
+    equb &1f                            ; cell_x: set before use
+    equb &1f                            ; cell_y: set before use
+    equb &d2                            ; cell_room: set before use
+    equb &d2                            ; Copied to &0D05: no variable starts here
+    equb &cc                            ; previous_x: set before use
+    equb &b1                            ; previous_y: set before use
+    equb &07                            ; previous_offset_x: set before use
+    equb &07                            ; previous_offset_y: set before use
+    equb &01, &01, &00, &2c, &34, &3c   ; Copied to &0D0A: no variable starts here
+    equb &0b, &0b, &0c, &0c             ; hero_x: the heroes start at x 11, 11, 12, 12...
+    equb &2f                            ; Copied to &0D14: no variable starts here
+    equb &0b, &0c, &0b, &0c             ; hero_y: ...and y 11, 12, 11, 12, the four cells of the start
+    equb &26                            ; Copied to &0D19: no variable starts here
+    equb &01, &03, &05, &07             ; hero_direction: facing up, right, down and left
+    equb &2d, &2f                       ; Copied to &0D1E: no variable starts here
+    equb &01, &01, &01, &01             ; hero_frame: frame 1
+    equb &5d                            ; Copied to &0D24: no variable starts here
+    equb &00, &00, &00, &00             ; hero_step: not stepping
+    equb &16                            ; Copied to &0D29: no variable starts here
+    equb &00, &00, &00, &00             ; hero_offset_x: no offset
+    equb &1d, &1f                       ; Copied to &0D2E: no variable starts here
+    equb &00, &00, &00, &00             ; hero_offset_y: no offset
+    equb &03, &05, &07, &05, &07, &36, &35, &37
+    equb &3c, &3e, &3d, &3f             ; Copied to &0D34: no variable starts here
     equb &01, &82, &81, &83, &88, &8a, &89, &8b
-    equb &84, &86, &85, &87, &8c, &8e, &8d, &8f
-    equb &08, &48, &8a, &48, &98, &48, &ae, &ff
+    equb &84, &86, &85, &87             ; missile_x: unused while the slots are empty
+    equb &8c, &8e, &8d, &8f, &08, &48, &8a, &48
+    equb &98, &48, &ae, &ff             ; missile_y: unused while the slots are empty
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &15, &85, &7a, &8a
-    equb &48, &20, &00, &09, &68, &aa, &bd, &08
-    equb inkey_key_caps_lock, inkey_key_keypad_hash, inkey_key_g, inkey_key_underscore
-    equb inkey_key_shift_lock, inkey_key_keypad_del, inkey_key_b, inkey_key_return
-    equb inkey_key_z, inkey_key_keypad_comma, inkey_key_m, inkey_key_copy
-    equb inkey_key_shift, inkey_key_keypad_3, inkey_key_n, inkey_key_delete
-    equb inkey_key_tab, inkey_key_keypad_asterisk, inkey_key_space, inkey_key_left_square_bracket
+    equb &00, &00, &00, &00             ; missile_direction: every slot empty
+    equb &15, &85, &7a, &8a, &48, &20, &00, &09
+    equb &68, &aa, &bd, &08             ; missile_sprite_base: set when a missile is fired
+    equb inkey_key_caps_lock, inkey_key_keypad_hash, inkey_key_g, inkey_key_underscore  ; hero_key_up: each hero's up key
+    equb inkey_key_shift_lock, inkey_key_keypad_del, inkey_key_b, inkey_key_return  ; hero_key_down
+    equb inkey_key_z, inkey_key_keypad_comma, inkey_key_m, inkey_key_copy  ; hero_key_right
+    equb inkey_key_shift, inkey_key_keypad_3, inkey_key_n, inkey_key_delete  ; hero_key_left
+    equb inkey_key_tab, inkey_key_keypad_asterisk, inkey_key_space, inkey_key_left_square_bracket  ; hero_key_fire
     equb &0d, &c9, &05, &d0, &09, &18, &bd, &04
-    equb &0d, &69, &03, &9d
-    equs "''''"
-    equb &d0
-    equs "(((("
-    equb &18, &bd, &08, &0d, &6d, &40, &0d, &28
-    equb &0c, &28, &0c, &28, &0c, &28, &0c, &00
-    equb &00, &bd, &04, &0d, &85, &71, &8a, &10
-    equs "DLHh"
-    equb &00
-    equs ",4<"
-    equb &00, &0d, &d9, &00, &00, &00, &00, &80
-    equb &40, &20, &10, &08, &04, &02, &01, &b9
-    equb &30, &0d, &9d, &08, &0d, &4c, &d4, &18
-    equb &46, &74, &a2, &e8, &e0, &04, &d0, &0a
-    equb &a2, &00, &ad, &40, &0d, &49, &01, &8d
-    equb &40, &0d, &8e, &ff, &0d, &68, &a8, &68
-    equb &aa
-    equs "h(`"
-    equb &de, &dd, &df, &f0, &f2, &f1, &f3, &f8
-    equb &fa, &f9, &fb, &f4, &f6, &f5, &f7, &fc
-    equb &1e, &fd, &00
+    equb &0d, &69, &03, &9d             ; Copied to &0D84: no variable starts here
+    equb spr_digit_9, spr_digit_9, spr_digit_9, spr_digit_9  ; hero_health_tens: 9...
+    equb &d0                            ; Copied to &0D94: no variable starts here
+    equb spr_digit_9 + 1, spr_digit_9 + 1, spr_digit_9 + 1, spr_digit_9 + 1  ; hero_health_units: ...and one past 9: health 99 + 1, which draw_status_panel takes a point from
+    equb &18, &bd, &08, &0d, &6d, &40, &0d  ; Copied to &0D99: no variable starts here
+    equb <(room_walls + &28), >(room_walls + &28), <(room_walls + &28), >(room_walls + &28), <(room_walls + &28), >(room_walls + &28), <(room_walls + &28), >(room_walls + &28)  ; view_room: every view starts on room &0C28
+    equb &00, &00, &bd, &04, &0d, &85, &71, &8a  ; Copied to &0DA8: no variable starts here
+    equb spr_arrow_up - 1, spr_fireball_up - 1, spr_axe_up - 1, spr_sword_up - 1  ; hero_missile_sprites: arrows, fireballs, axes, swords
+    equb &68                            ; Copied to &0DB4: no variable starts here
+    equb spr_ranger_up_0 - 1, spr_magic_user_up_0 - 1, spr_barbarian_up_0 - 1, spr_fighter_up_0 - 1  ; hero_sprites: Ranger, Magic-User, Barbarian, Fighter
+    equb &00, &0d, &d9                  ; Copied to &0DB9: no variable starts here
+    equb &00, &00, &00, &00             ; hero_has_boots: none
+    equb &80, &40, &20, &10, &08, &04, &02, &01  ; bit_masks: &80 down to &01
+    equb &b9, &30, &0d, &9d, &08, &0d, &4c, &d4  ; Copied to &0DC8: no variable starts here
+; &7dd0 used as index base 2 times by &0424, &0f71
+    equb &18, &46, &74, &a2             ; hero_panel_y: the four sections of the status panel
+    equb &e8, &e0, &04, &d0, &0a, &a2, &00, &ad
+    equb &40, &0d, &49, &01, &8d, &40, &0d, &8e
+    equb &ff, &0d, &68, &a8, &68, &aa, &68, &28
+    equb &60, &de, &dd, &df, &f0, &f2, &f1, &f3
+    equb &f8, &fa, &f9, &fb, &f4, &f6, &f5, &f7
+    equb &fc                            ; Copied to &0DD4: no variable starts here
+    equb &1e                            ; teleport_last: object &1E, the last
+    equb &fd                            ; Copied to &0DFE: no variable starts here
+    equb &00                            ; victory_sprite_copy: set before use
 ; &7e00 used as index base 17 times by &15ed, &7667, &797e, &79e7, &7a31, &7a3f, &7a45, &7a5b, &7a98, &7ace, &7afb, &7b04, &7b41, &7c46, &7c54, &7cc8, &7cf2
 .monster_x
 ; &7e23 referenced 2 times by &1d29, &1d39
@@ -8810,7 +8837,7 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     Data                     = 12634 bytes (63%)
 ;
 ;     Number of instructions   = 3499
-;     Number of data bytes     = 11816 bytes
+;     Number of data bytes     = 11844 bytes
 ;     Number of data words     = 0 bytes
-;     Number of string bytes   = 818 bytes
-;     Number of strings        = 102
+;     Number of string bytes   = 790 bytes
+;     Number of strings        = 95

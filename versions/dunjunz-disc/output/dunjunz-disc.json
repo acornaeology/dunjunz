@@ -42,6 +42,11 @@
       "comment": "Sprite &00"
     },
     {
+      "name": "spr_ranger_up_0",
+      "value": 1,
+      "comment": "Sprite &01"
+    },
+    {
       "name": "spr_monster_up_0",
       "value": 9,
       "comment": "Sprite &09"
@@ -122,9 +127,29 @@
       "comment": "Sprite &2C"
     },
     {
+      "name": "spr_magic_user_up_0",
+      "value": 45,
+      "comment": "Sprite &2D"
+    },
+    {
+      "name": "spr_barbarian_up_0",
+      "value": 53,
+      "comment": "Sprite &35"
+    },
+    {
+      "name": "spr_fighter_up_0",
+      "value": 61,
+      "comment": "Sprite &3D"
+    },
+    {
       "name": "spr_fireball_up",
       "value": 69,
       "comment": "Sprite &45"
+    },
+    {
+      "name": "spr_sword_up",
+      "value": 73,
+      "comment": "Sprite &49"
     },
     {
       "name": "spr_axe_up",
@@ -101065,23 +101090,12 @@
     {
       "addr": 32000,
       "bytes": [
-        0,
-        0,
-        31,
-        31,
-        210,
-        210,
-        204,
-        177,
-        7,
-        7,
-        1,
-        1,
         0
       ],
       "labels": [
         "workspace_template"
       ],
+      "comment_inline": "scratch: working byte",
       "xref_summaries": [
         "&7d00 used as index base 1 time by &14a2[1]"
       ],
@@ -101095,30 +101109,128 @@
       ],
       "type": "byte",
       "values": [
-        0,
-        0,
-        31,
-        31,
-        210,
-        210,
-        204,
-        177,
-        7,
-        7,
-        1,
-        1,
         0
       ]
     },
     {
-      "addr": 32013,
+      "addr": 32001,
       "bytes": [
+        0
+      ],
+      "comment_inline": "scratch2: working byte",
+      "type": "byte",
+      "values": [
+        0
+      ]
+    },
+    {
+      "addr": 32002,
+      "bytes": [
+        31
+      ],
+      "comment_inline": "cell_x: set before use",
+      "type": "byte",
+      "values": [
+        31
+      ]
+    },
+    {
+      "addr": 32003,
+      "bytes": [
+        31
+      ],
+      "comment_inline": "cell_y: set before use",
+      "type": "byte",
+      "values": [
+        31
+      ]
+    },
+    {
+      "addr": 32004,
+      "bytes": [
+        210
+      ],
+      "comment_inline": "cell_room: set before use",
+      "type": "byte",
+      "values": [
+        210
+      ]
+    },
+    {
+      "addr": 32005,
+      "bytes": [
+        210
+      ],
+      "comment_inline": "Copied to &0D05: no variable starts here",
+      "type": "byte",
+      "values": [
+        210
+      ]
+    },
+    {
+      "addr": 32006,
+      "bytes": [
+        204
+      ],
+      "comment_inline": "previous_x: set before use",
+      "type": "byte",
+      "values": [
+        204
+      ]
+    },
+    {
+      "addr": 32007,
+      "bytes": [
+        177
+      ],
+      "comment_inline": "previous_y: set before use",
+      "type": "byte",
+      "values": [
+        177
+      ]
+    },
+    {
+      "addr": 32008,
+      "bytes": [
+        7
+      ],
+      "comment_inline": "previous_offset_x: set before use",
+      "type": "byte",
+      "values": [
+        7
+      ]
+    },
+    {
+      "addr": 32009,
+      "bytes": [
+        7
+      ],
+      "comment_inline": "previous_offset_y: set before use",
+      "type": "byte",
+      "values": [
+        7
+      ]
+    },
+    {
+      "addr": 32010,
+      "bytes": [
+        1,
+        1,
+        0,
         44,
         52,
         60
       ],
-      "type": "string",
-      "string": ",4<"
+      "comment_inline": "Copied to &0D0A: no variable starts here",
+      "type": "byte",
+      "values": [
+        1,
+        1,
+        0,
+        44,
+        52,
+        60
+      ]
     },
     {
       "addr": 32016,
@@ -101126,93 +101238,197 @@
         11,
         11,
         12,
-        12,
-        47,
-        11,
-        12,
-        11,
-        12,
-        38,
-        1,
-        3,
-        5,
-        7,
-        45,
-        47,
-        1,
-        1,
-        1,
-        1,
-        93,
-        0,
-        0,
-        0,
-        0,
-        22,
-        0,
-        0,
-        0,
-        0,
-        29,
-        31,
-        0,
-        0,
-        0,
-        0,
-        3,
-        5,
-        7,
-        5,
-        7
+        12
       ],
+      "comment_inline": "hero_x: the heroes start at x 11, 11, 12, 12...",
       "type": "byte",
       "values": [
         11,
         11,
         12,
-        12,
-        47,
+        12
+      ]
+    },
+    {
+      "addr": 32020,
+      "bytes": [
+        47
+      ],
+      "comment_inline": "Copied to &0D14: no variable starts here",
+      "type": "byte",
+      "values": [
+        47
+      ]
+    },
+    {
+      "addr": 32021,
+      "bytes": [
         11,
         12,
         11,
+        12
+      ],
+      "comment_inline": "hero_y: ...and y 11, 12, 11, 12, the four cells of the start",
+      "type": "byte",
+      "values": [
+        11,
         12,
-        38,
+        11,
+        12
+      ]
+    },
+    {
+      "addr": 32025,
+      "bytes": [
+        38
+      ],
+      "comment_inline": "Copied to &0D19: no variable starts here",
+      "type": "byte",
+      "values": [
+        38
+      ]
+    },
+    {
+      "addr": 32026,
+      "bytes": [
         1,
         3,
         5,
-        7,
-        45,
-        47,
+        7
+      ],
+      "comment_inline": "hero_direction: facing up, right, down and left",
+      "type": "byte",
+      "values": [
         1,
-        1,
-        1,
-        1,
-        93,
-        0,
-        0,
-        0,
-        0,
-        22,
-        0,
-        0,
-        0,
-        0,
-        29,
-        31,
-        0,
-        0,
-        0,
-        0,
         3,
-        5,
-        7,
         5,
         7
       ]
     },
     {
-      "addr": 32057,
+      "addr": 32030,
       "bytes": [
+        45,
+        47
+      ],
+      "comment_inline": "Copied to &0D1E: no variable starts here",
+      "type": "byte",
+      "values": [
+        45,
+        47
+      ]
+    },
+    {
+      "addr": 32032,
+      "bytes": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "comment_inline": "hero_frame: frame 1",
+      "type": "byte",
+      "values": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "addr": 32036,
+      "bytes": [
+        93
+      ],
+      "comment_inline": "Copied to &0D24: no variable starts here",
+      "type": "byte",
+      "values": [
+        93
+      ]
+    },
+    {
+      "addr": 32037,
+      "bytes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "comment_inline": "hero_step: not stepping",
+      "type": "byte",
+      "values": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 32041,
+      "bytes": [
+        22
+      ],
+      "comment_inline": "Copied to &0D29: no variable starts here",
+      "type": "byte",
+      "values": [
+        22
+      ]
+    },
+    {
+      "addr": 32042,
+      "bytes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "comment_inline": "hero_offset_x: no offset",
+      "type": "byte",
+      "values": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 32046,
+      "bytes": [
+        29,
+        31
+      ],
+      "comment_inline": "Copied to &0D2E: no variable starts here",
+      "type": "byte",
+      "values": [
+        29,
+        31
+      ]
+    },
+    {
+      "addr": 32048,
+      "bytes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "comment_inline": "hero_offset_y: no offset",
+      "type": "byte",
+      "values": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 32052,
+      "bytes": [
+        3,
+        5,
+        7,
+        5,
+        7,
         54,
         53,
         55,
@@ -101221,8 +101437,22 @@
         61,
         63
       ],
-      "type": "string",
-      "string": "657<>=?"
+      "comment_inline": "Copied to &0D34: no variable starts here",
+      "type": "byte",
+      "values": [
+        3,
+        5,
+        7,
+        5,
+        7,
+        54,
+        53,
+        55,
+        60,
+        62,
+        61,
+        63
+      ]
     },
     {
       "addr": 32064,
@@ -101238,44 +101468,9 @@
         132,
         134,
         133,
-        135,
-        140,
-        142,
-        141,
-        143,
-        8,
-        72,
-        138,
-        72,
-        152,
-        72,
-        174,
-        255,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        21,
-        133,
-        122,
-        138,
-        72,
-        32,
-        0,
-        9,
-        104,
-        170,
-        189,
-        8
+        135
       ],
+      "comment_inline": "missile_x: unused while the slots are empty",
       "type": "byte",
       "values": [
         1,
@@ -101289,7 +101484,12 @@
         132,
         134,
         133,
-        135,
+        135
+      ]
+    },
+    {
+      "addr": 32076,
+      "bytes": [
         140,
         142,
         141,
@@ -101301,7 +101501,28 @@
         152,
         72,
         174,
-        255,
+        255
+      ],
+      "comment_inline": "missile_y: unused while the slots are empty",
+      "type": "byte",
+      "values": [
+        140,
+        142,
+        141,
+        143,
+        8,
+        72,
+        138,
+        72,
+        152,
+        72,
+        174,
+        255
+      ]
+    },
+    {
+      "addr": 32088,
+      "bytes": [
         0,
         0,
         0,
@@ -101313,7 +101534,44 @@
         0,
         0,
         0,
+        0
+      ],
+      "comment_inline": "missile_direction: every slot empty",
+      "type": "byte",
+      "values": [
         0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 32100,
+      "bytes": [
+        21,
+        133,
+        122,
+        138,
+        72,
+        32,
+        0,
+        9,
+        104,
+        170,
+        189,
+        8
+      ],
+      "comment_inline": "missile_sprite_base: set when a missile is fired",
+      "type": "byte",
+      "values": [
         21,
         133,
         122,
@@ -101336,6 +101594,7 @@
         185,
         172
       ],
+      "comment_inline": "hero_key_up: each hero's up key",
       "type": "byte",
       "values": [
         191,
@@ -101358,6 +101617,7 @@
         153,
         155
       ],
+      "comment_inline": "hero_key_down",
       "type": "byte",
       "values": [
         175,
@@ -101380,6 +101640,7 @@
         151,
         218
       ],
+      "comment_inline": "hero_key_right",
       "type": "byte",
       "values": [
         158,
@@ -101402,6 +101663,7 @@
         152,
         202
       ],
+      "comment_inline": "hero_key_left",
       "type": "byte",
       "values": [
         255,
@@ -101424,6 +101686,7 @@
         157,
         201
       ],
+      "comment_inline": "hero_key_fire",
       "type": "byte",
       "values": [
         159,
@@ -101454,6 +101717,7 @@
         3,
         157
       ],
+      "comment_inline": "Copied to &0D84: no variable starts here",
       "type": "byte",
       "values": [
         13,
@@ -101478,14 +101742,47 @@
         39,
         39
       ],
-      "type": "string",
-      "string": "''''"
+      "comment_inline": "hero_health_tens: 9...",
+      "type": "byte",
+      "values": [
+        39,
+        39,
+        39,
+        39
+      ],
+      "expressions": [
+        {
+          "text": "spr_digit_9",
+          "tree": {
+            "sym": "spr_digit_9"
+          }
+        },
+        {
+          "text": "spr_digit_9",
+          "tree": {
+            "sym": "spr_digit_9"
+          }
+        },
+        {
+          "text": "spr_digit_9",
+          "tree": {
+            "sym": "spr_digit_9"
+          }
+        },
+        {
+          "text": "spr_digit_9",
+          "tree": {
+            "sym": "spr_digit_9"
+          }
+        }
+      ]
     },
     {
       "addr": 32148,
       "bytes": [
         208
       ],
+      "comment_inline": "Copied to &0D94: no variable starts here",
       "type": "byte",
       "values": [
         208
@@ -101499,8 +101796,68 @@
         40,
         40
       ],
-      "type": "string",
-      "string": "(((("
+      "comment_inline": "hero_health_units: ...and one past 9: health 99 + 1, which draw_status_panel takes a point from",
+      "type": "byte",
+      "values": [
+        40,
+        40,
+        40,
+        40
+      ],
+      "expressions": [
+        {
+          "text": "spr_digit_9 + 1",
+          "tree": {
+            "op": "add",
+            "left": {
+              "sym": "spr_digit_9"
+            },
+            "right": {
+              "int": 1,
+              "radix": "auto"
+            }
+          }
+        },
+        {
+          "text": "spr_digit_9 + 1",
+          "tree": {
+            "op": "add",
+            "left": {
+              "sym": "spr_digit_9"
+            },
+            "right": {
+              "int": 1,
+              "radix": "auto"
+            }
+          }
+        },
+        {
+          "text": "spr_digit_9 + 1",
+          "tree": {
+            "op": "add",
+            "left": {
+              "sym": "spr_digit_9"
+            },
+            "right": {
+              "int": 1,
+              "radix": "auto"
+            }
+          }
+        },
+        {
+          "text": "spr_digit_9 + 1",
+          "tree": {
+            "op": "add",
+            "left": {
+              "sym": "spr_digit_9"
+            },
+            "right": {
+              "int": 1,
+              "radix": "auto"
+            }
+          }
+        }
+      ]
     },
     {
       "addr": 32153,
@@ -101511,25 +101868,9 @@
         13,
         109,
         64,
-        13,
-        40,
-        12,
-        40,
-        12,
-        40,
-        12,
-        40,
-        12,
-        0,
-        0,
-        189,
-        4,
-        13,
-        133,
-        113,
-        138,
-        16
+        13
       ],
+      "comment_inline": "Copied to &0D99: no variable starts here",
       "type": "byte",
       "values": [
         24,
@@ -101538,7 +101879,12 @@
         13,
         109,
         64,
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 32160,
+      "bytes": [
         40,
         12,
         40,
@@ -101546,7 +101892,154 @@
         40,
         12,
         40,
+        12
+      ],
+      "comment_inline": "view_room: every view starts on room &0C28",
+      "type": "byte",
+      "values": [
+        40,
         12,
+        40,
+        12,
+        40,
+        12,
+        40,
+        12
+      ],
+      "expressions": [
+        {
+          "text": "<(room_walls + &28)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "sym": "room_walls"
+              },
+              "right": {
+                "int": 40,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(room_walls + &28)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "sym": "room_walls"
+              },
+              "right": {
+                "int": 40,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(room_walls + &28)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "sym": "room_walls"
+              },
+              "right": {
+                "int": 40,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(room_walls + &28)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "sym": "room_walls"
+              },
+              "right": {
+                "int": 40,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(room_walls + &28)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "sym": "room_walls"
+              },
+              "right": {
+                "int": 40,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(room_walls + &28)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "sym": "room_walls"
+              },
+              "right": {
+                "int": 40,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(room_walls + &28)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "sym": "room_walls"
+              },
+              "right": {
+                "int": 40,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(room_walls + &28)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "sym": "room_walls"
+              },
+              "right": {
+                "int": 40,
+                "radix": "auto"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "addr": 32168,
+      "bytes": [
         0,
         0,
         189,
@@ -101554,185 +102047,324 @@
         13,
         133,
         113,
-        138,
-        16
+        138
+      ],
+      "comment_inline": "Copied to &0DA8: no variable starts here",
+      "type": "byte",
+      "values": [
+        0,
+        0,
+        189,
+        4,
+        13,
+        133,
+        113,
+        138
       ]
     },
     {
-      "addr": 32177,
+      "addr": 32176,
       "bytes": [
+        16,
         68,
         76,
-        72,
+        72
+      ],
+      "comment_inline": "hero_missile_sprites: arrows, fireballs, axes, swords",
+      "type": "byte",
+      "values": [
+        16,
+        68,
+        76,
+        72
+      ],
+      "expressions": [
+        {
+          "text": "spr_arrow_up - 1",
+          "tree": {
+            "op": "sub",
+            "left": {
+              "sym": "spr_arrow_up"
+            },
+            "right": {
+              "int": 1,
+              "radix": "auto"
+            }
+          }
+        },
+        {
+          "text": "spr_fireball_up - 1",
+          "tree": {
+            "op": "sub",
+            "left": {
+              "sym": "spr_fireball_up"
+            },
+            "right": {
+              "int": 1,
+              "radix": "auto"
+            }
+          }
+        },
+        {
+          "text": "spr_axe_up - 1",
+          "tree": {
+            "op": "sub",
+            "left": {
+              "sym": "spr_axe_up"
+            },
+            "right": {
+              "int": 1,
+              "radix": "auto"
+            }
+          }
+        },
+        {
+          "text": "spr_sword_up - 1",
+          "tree": {
+            "op": "sub",
+            "left": {
+              "sym": "spr_sword_up"
+            },
+            "right": {
+              "int": 1,
+              "radix": "auto"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "addr": 32180,
+      "bytes": [
         104
       ],
-      "type": "string",
-      "string": "DLHh"
+      "comment_inline": "Copied to &0DB4: no variable starts here",
+      "type": "byte",
+      "values": [
+        104
+      ]
     },
     {
       "addr": 32181,
       "bytes": [
-        0
-      ],
-      "type": "byte",
-      "values": [
-        0
-      ]
-    },
-    {
-      "addr": 32182,
-      "bytes": [
+        0,
         44,
         52,
         60
       ],
-      "type": "string",
-      "string": ",4<"
+      "comment_inline": "hero_sprites: Ranger, Magic-User, Barbarian, Fighter",
+      "type": "byte",
+      "values": [
+        0,
+        44,
+        52,
+        60
+      ],
+      "expressions": [
+        {
+          "text": "spr_ranger_up_0 - 1",
+          "tree": {
+            "op": "sub",
+            "left": {
+              "sym": "spr_ranger_up_0"
+            },
+            "right": {
+              "int": 1,
+              "radix": "auto"
+            }
+          }
+        },
+        {
+          "text": "spr_magic_user_up_0 - 1",
+          "tree": {
+            "op": "sub",
+            "left": {
+              "sym": "spr_magic_user_up_0"
+            },
+            "right": {
+              "int": 1,
+              "radix": "auto"
+            }
+          }
+        },
+        {
+          "text": "spr_barbarian_up_0 - 1",
+          "tree": {
+            "op": "sub",
+            "left": {
+              "sym": "spr_barbarian_up_0"
+            },
+            "right": {
+              "int": 1,
+              "radix": "auto"
+            }
+          }
+        },
+        {
+          "text": "spr_fighter_up_0 - 1",
+          "tree": {
+            "op": "sub",
+            "left": {
+              "sym": "spr_fighter_up_0"
+            },
+            "right": {
+              "int": 1,
+              "radix": "auto"
+            }
+          }
+        }
+      ]
     },
     {
       "addr": 32185,
       "bytes": [
         0,
         13,
-        217,
-        0,
-        0,
-        0,
-        0,
-        128,
-        64,
-        32,
-        16,
-        8,
-        4,
-        2,
-        1,
-        185,
-        48,
-        13,
-        157,
-        8,
-        13,
-        76,
-        212,
-        24,
-        70,
-        116,
-        162,
-        232,
-        224,
-        4,
-        208,
-        10,
-        162,
-        0,
-        173,
-        64,
-        13,
-        73,
-        1,
-        141,
-        64,
-        13,
-        142,
-        255,
-        13,
-        104,
-        168,
-        104,
-        170
+        217
       ],
-      "xref_summaries": [
-        "&7dd0 used as index base 3 times by &0424[2], &0424[3], &0f71[1]"
-      ],
+      "comment_inline": "Copied to &0DB9: no variable starts here",
       "type": "byte",
       "values": [
         0,
         13,
-        217,
-        0,
-        0,
-        0,
-        0,
-        128,
-        64,
-        32,
-        16,
-        8,
-        4,
-        2,
-        1,
-        185,
-        48,
-        13,
-        157,
-        8,
-        13,
-        76,
-        212,
-        24,
-        70,
-        116,
-        162,
-        232,
-        224,
-        4,
-        208,
-        10,
-        162,
-        0,
-        173,
-        64,
-        13,
-        73,
-        1,
-        141,
-        64,
-        13,
-        142,
-        255,
-        13,
-        104,
-        168,
-        104,
-        170
+        217
       ]
     },
     {
-      "addr": 32234,
+      "addr": 32188,
       "bytes": [
-        104,
-        40,
-        96
+        0,
+        0,
+        0,
+        0
       ],
-      "type": "string",
-      "string": "h(`"
+      "comment_inline": "hero_has_boots: none",
+      "type": "byte",
+      "values": [
+        0,
+        0,
+        0,
+        0
+      ]
     },
     {
-      "addr": 32237,
+      "addr": 32192,
       "bytes": [
-        222,
-        221,
-        223,
-        240,
-        242,
-        241,
-        243,
-        248,
-        250,
-        249,
-        251,
-        244,
-        246,
-        245,
-        247,
-        252,
-        30,
-        253,
-        0
+        128,
+        64,
+        32,
+        16,
+        8,
+        4,
+        2,
+        1
+      ],
+      "comment_inline": "bit_masks: &80 down to &01",
+      "type": "byte",
+      "values": [
+        128,
+        64,
+        32,
+        16,
+        8,
+        4,
+        2,
+        1
+      ]
+    },
+    {
+      "addr": 32200,
+      "bytes": [
+        185,
+        48,
+        13,
+        157,
+        8,
+        13,
+        76,
+        212
+      ],
+      "comment_inline": "Copied to &0DC8: no variable starts here",
+      "type": "byte",
+      "values": [
+        185,
+        48,
+        13,
+        157,
+        8,
+        13,
+        76,
+        212
+      ]
+    },
+    {
+      "addr": 32208,
+      "bytes": [
+        24,
+        70,
+        116,
+        162
+      ],
+      "comment_inline": "hero_panel_y: the four sections of the status panel",
+      "xref_summaries": [
+        "&7dd0 used as index base 3 times by &0424[2], &0424[3], &0f71[1]"
+      ],
+      "references": [
+        {
+          "addr": 1060,
+          "kind": "indexed",
+          "move": "low_keyboard",
+          "move_id": 2
+        },
+        {
+          "addr": 1060,
+          "kind": "indexed",
+          "move": "low_joystick",
+          "move_id": 3
+        },
+        {
+          "addr": 3953,
+          "kind": "indexed",
+          "move": "game_core",
+          "move_id": 1
+        }
       ],
       "type": "byte",
       "values": [
+        24,
+        70,
+        116,
+        162
+      ]
+    },
+    {
+      "addr": 32212,
+      "bytes": [
+        232,
+        224,
+        4,
+        208,
+        10,
+        162,
+        0,
+        173,
+        64,
+        13,
+        73,
+        1,
+        141,
+        64,
+        13,
+        142,
+        255,
+        13,
+        104,
+        168,
+        104,
+        170,
+        104,
+        40,
+        96,
         222,
         221,
         223,
@@ -101748,9 +102380,84 @@
         246,
         245,
         247,
-        252,
-        30,
-        253,
+        252
+      ],
+      "comment_inline": "Copied to &0DD4: no variable starts here",
+      "type": "byte",
+      "values": [
+        232,
+        224,
+        4,
+        208,
+        10,
+        162,
+        0,
+        173,
+        64,
+        13,
+        73,
+        1,
+        141,
+        64,
+        13,
+        142,
+        255,
+        13,
+        104,
+        168,
+        104,
+        170,
+        104,
+        40,
+        96,
+        222,
+        221,
+        223,
+        240,
+        242,
+        241,
+        243,
+        248,
+        250,
+        249,
+        251,
+        244,
+        246,
+        245,
+        247,
+        252
+      ]
+    },
+    {
+      "addr": 32253,
+      "bytes": [
+        30
+      ],
+      "comment_inline": "teleport_last: object &1E, the last",
+      "type": "byte",
+      "values": [
+        30
+      ]
+    },
+    {
+      "addr": 32254,
+      "bytes": [
+        253
+      ],
+      "comment_inline": "Copied to &0DFE: no variable starts here",
+      "type": "byte",
+      "values": [
+        253
+      ]
+    },
+    {
+      "addr": 32255,
+      "bytes": [
+        0
+      ],
+      "comment_inline": "victory_sprite_copy: set before use",
+      "type": "byte",
+      "values": [
         0
       ]
     },

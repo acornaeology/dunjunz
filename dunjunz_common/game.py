@@ -1758,12 +1758,9 @@ def annotate_data(a: Annotator) -> None:
              "address low bytes, high bytes, widths in bytes and heights in "
              "rows.")
 
-    # Workspace template
-    # The heroes' magic keys, and the keys in the workspace template.
+    # The heroes' magic keys
     a.inkey_number(0x0B24, 2)
-    for table_addr in range(0x7D70, 0x7D84, 4):
-        a.byte(table_addr, 4, cols=4)
-    a.inkey_number(0x7D70, 0x14)
+    annotate_workspace_template(a)
 
     a.banner(0x7D00, "Workspace template",
              "The starting contents of page &0D for each level, copied there "
@@ -1771,6 +1768,95 @@ def annotate_data(a: Annotator) -> None:
              "keys (hero_key_up etc. at +&70), health of 99 + 1 (at +&90, "
              "+&95), the views' rooms (+&A0), sprite bases (+&B0, +&B5), bit "
              "masks (+&C0) and panel rows (+&D0).")
+
+
+
+# Page &0D's variables, as workspace_template holds their starting values:
+# (offset in the page, variable, length).
+WORKSPACE_FIELDS = [
+    (0x00, "scratch", 1), (0x01, "scratch2", 1), (0x02, "cell_x", 1),
+    (0x03, "cell_y", 1), (0x04, "cell_room", 1), (0x06, "previous_x", 1),
+    (0x07, "previous_y", 1), (0x08, "previous_offset_x", 1),
+    (0x09, "previous_offset_y", 1), (0x10, "hero_x", 4), (0x15, "hero_y", 4),
+    (0x1A, "hero_direction", 4), (0x20, "hero_frame", 4), (0x25, "hero_step", 4),
+    (0x2A, "hero_offset_x", 4), (0x30, "hero_offset_y", 4),
+    (0x40, "missile_x", 12), (0x4C, "missile_y", 12),
+    (0x58, "missile_direction", 12), (0x64, "missile_sprite_base", 12),
+    (0x70, "hero_key_up", 4), (0x74, "hero_key_down", 4),
+    (0x78, "hero_key_right", 4), (0x7C, "hero_key_left", 4),
+    (0x80, "hero_key_fire", 4), (0x90, "hero_health_tens", 4),
+    (0x95, "hero_health_units", 4), (0xA0, "view_room", 8),
+    (0xB0, "hero_missile_sprites", 4), (0xB5, "hero_sprites", 4),
+    (0xBC, "hero_has_boots", 4), (0xC0, "bit_masks", 8),
+    (0xD0, "hero_panel_y", 4), (0xFD, "teleport_last", 1),
+    (0xFF, "victory_sprite_copy", 1),
+]
+
+
+WORKSPACE_NOTES = {
+    "scratch": "scratch: working byte",
+    "scratch2": "scratch2: working byte",
+    "cell_x": "cell_x: set before use",
+    "cell_y": "cell_y: set before use",
+    "cell_room": "cell_room: set before use",
+    "previous_x": "previous_x: set before use",
+    "previous_y": "previous_y: set before use",
+    "previous_offset_x": "previous_offset_x: set before use",
+    "previous_offset_y": "previous_offset_y: set before use",
+    "hero_x": "hero_x: the heroes start at x 11, 11, 12, 12...",
+    "hero_y": "hero_y: ...and y 11, 12, 11, 12, the four cells of the start",
+    "hero_direction": "hero_direction: facing up, right, down and left",
+    "hero_frame": "hero_frame: frame 1",
+    "hero_step": "hero_step: not stepping",
+    "hero_offset_x": "hero_offset_x: no offset",
+    "hero_offset_y": "hero_offset_y: no offset",
+    "missile_x": "missile_x: unused while the slots are empty",
+    "missile_y": "missile_y: unused while the slots are empty",
+    "missile_direction": "missile_direction: every slot empty",
+    "missile_sprite_base": "missile_sprite_base: set when a missile is fired",
+    "hero_key_up": "hero_key_up: each hero's up key",
+    "hero_key_down": "hero_key_down",
+    "hero_key_right": "hero_key_right",
+    "hero_key_left": "hero_key_left",
+    "hero_key_fire": "hero_key_fire",
+    "hero_health_tens": "hero_health_tens: 9...",
+    "hero_health_units": "hero_health_units: ...and one past 9: health 99 + 1, which draw_status_panel takes a point from",
+    "view_room": "view_room: every view starts on room &0C28",
+    "hero_missile_sprites": "hero_missile_sprites: arrows, fireballs, axes, swords",
+    "hero_sprites": "hero_sprites: Ranger, Magic-User, Barbarian, Fighter",
+    "hero_has_boots": "hero_has_boots: none",
+    "bit_masks": "bit_masks: &80 down to &01",
+    "hero_panel_y": "hero_panel_y: the four sections of the status panel",
+    "teleport_last": "teleport_last: object &1E, the last",
+    "victory_sprite_copy": "victory_sprite_copy: set before use",
+}
+
+
+def annotate_workspace_template(a: Annotator) -> None:
+    """Lay out workspace_template as the page &0D variables it starts."""
+    base = 0x7D00
+    offset = 0
+    for field_offset, name, length in WORKSPACE_FIELDS:
+        if field_offset > offset:
+            a.byte(base + offset, field_offset - offset, cols=8)
+            a.c(base + offset, f"Copied to &{0x0D00 + offset:04X}: no variable "
+                f"starts here")
+        a.byte(base + field_offset, length, cols=min(length, 8))
+        a.c(base + field_offset, WORKSPACE_NOTES.get(name, name))
+        offset = field_offset + length
+    if offset < 0x100:
+        a.byte(base + offset, 0x100 - offset, cols=8)
+    a.inkey_number(0x7D70, 0x14)
+    # Starting values that are sprite numbers and a room address.
+    for i, name in enumerate(("arrow_up", "fireball_up", "axe_up", "sword_up")):
+        a.expr(0x7DB0 + i, sym(f"spr_{name}") - 1)
+    for i, name in enumerate(("ranger_up_0", "magic_user_up_0", "barbarian_up_0", "fighter_up_0")):
+        a.expr(0x7DB5 + i, sym(f"spr_{name}") - 1)
+    for i in range(4):
+        a.expr(0x7D90 + i, sym("spr_digit_9"))
+        a.expr(0x7D95 + i, sym("spr_digit_9") + 1)
+        a.expr(0x7DA0 + 2 * i, lo(sym("room_walls") + 0x28))
+        a.expr(0x7DA1 + 2 * i, hi(sym("room_walls") + 0x28))
 
 
 def annotate_hero_comments(a: Annotator) -> None:
@@ -3661,7 +3747,9 @@ SPRITE_OPERANDS = [
 
 def annotate_sprite_numbers(a: Annotator) -> None:
     numbers = {name: number for number, name, *_ in SPRITES}
-    for name in sorted({name for _, name, _ in SPRITE_OPERANDS}, key=numbers.get):
+    used = {name for _, name, _ in SPRITE_OPERANDS} | {
+        "sword_up", "ranger_up_0", "magic_user_up_0", "barbarian_up_0", "fighter_up_0"}
+    for name in sorted(used, key=numbers.get):
         a.d.constant(numbers[name], f"spr_{name}", comment=f"Sprite &{numbers[name]:02X}")
     for operand_addr, name, offset in SPRITE_OPERANDS:
         expression = sym(f"spr_{name}")
