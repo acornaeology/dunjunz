@@ -204,8 +204,10 @@ master.banner(0x0700, "Leftovers in the line-input buffer",
               "cassette lineage's &0400 images also hold.")
 master.string(0x0700, 22)
 master.byte(0x0716)
+master.c(0x0716, "CR: the end of that line")
 master.string(0x0717, 4)
 master.byte(0x071B, 7, cols=7)
+master.c(0x071B, "Ends of shorter lines")
 master.string(0x0722, 30)
 
 master.sub(0x0740, "coder_start", "Coder: save the MOS's page &0D, load the game and start it",
@@ -235,8 +237,7 @@ comments(master, [
     (0x0777, "..."),
 ])
 for addr in (0x077A, 0x0783, 0x078C, 0x0795):
-    master.string(addr, 8)
-    master.byte(addr + 8)
+    master.stringcr(addr)
 for addr, name in [(0x077A, "load_dunj2_command"), (0x0783, "load_dunj3_command"),
                    (0x078C, "load_dunj4_command"), (0x0795, "load_dunj5_command")]:
     master.label(addr, name, description=(
@@ -316,6 +317,7 @@ master.banner(0xD8A0, "Copied data",
               "that follow screen_address there, including the exit "
               "workspace's initial values. Not used here.")
 master.byte(0xD8A0, 0x5F, cols=8)
+master.c(0xD8A0, "Not used")
 
 master.c(0x0481, "No match: call &D9CD, the MOS 1.20 reset entry; on a Master "
                  "it is private RAM that no file of this side fills")
@@ -474,8 +476,7 @@ master.label(0x14FB, "level_command", description=(
     "\"LOAD LEVELnn 6B00\", with the level's digits written at "
     "level_command+10."))
 master.region(0x1505, "level_command_digits", (0, 1))
-master.string(0x14FB, 17)
-master.byte(0x150C)
+master.stringcr(0x14FB)
 master.sub(0x1612, "count_level", "Clear the text area and count the level",
            "The cassette game's show_level_number also plots LEVEL and the "
            "number; this side shows no level number.",
@@ -594,8 +595,7 @@ comments(master, [
     (0xC6C7, "Return"),
 ])
 master.label(0xC6C8, "free_command")
-master.string(0xC6C8, 4)
-master.byte(0xC6CC)
+master.stringcr(0xC6C8)
 master.byte(0xC6CD, 3, cols=3)
 d.expr(0xC6C1, lo(sym("free_command")))
 d.expr(0xC6C3, hi(sym("free_command")))
@@ -822,6 +822,14 @@ for lo_addr, hi_addr, name in [
     master.expr(hi_addr, hi(sym(name)))
 
 master.c(0x0D6E, "Not referenced")  # after game_entry
+
+# Bytes no instruction refers to.
+master.byte(0x08C0, 0x40, cols=8)
+for addr in (0x07CD, 0x07F8, 0x08C0, 0x1639, 0x1EF7, 0xC5BA, 0xC623, 0xC6A7,
+             0xC6CD, 0xC8CC):
+    master.c(addr, "Not referenced")
+for addr in (0x1EDA, 0xC60E):
+    master.c(addr, "Not used")
 
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)

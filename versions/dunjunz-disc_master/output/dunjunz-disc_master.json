@@ -7374,6 +7374,7 @@
         13
       ],
       "image": 0,
+      "comment_inline": "CR: the end of that line",
       "type": "byte",
       "values": [
         13
@@ -7403,6 +7404,7 @@
         13
       ],
       "image": 0,
+      "comment_inline": "Ends of shorter lines",
       "type": "byte",
       "values": [
         13,
@@ -7903,25 +7905,15 @@
         85,
         78,
         74,
-        50
+        50,
+        13
       ],
       "image": 0,
       "labels": [
         "load_dunj2_command"
       ],
       "type": "string",
-      "string": "L. DUNJ2"
-    },
-    {
-      "addr": 1922,
-      "bytes": [
-        13
-      ],
-      "image": 0,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "L. DUNJ2."
     },
     {
       "addr": 1923,
@@ -7933,25 +7925,15 @@
         85,
         78,
         74,
-        51
+        51,
+        13
       ],
       "image": 0,
       "labels": [
         "load_dunj3_command"
       ],
       "type": "string",
-      "string": "L. DUNJ3"
-    },
-    {
-      "addr": 1931,
-      "bytes": [
-        13
-      ],
-      "image": 0,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "L. DUNJ3."
     },
     {
       "addr": 1932,
@@ -7963,25 +7945,15 @@
         85,
         78,
         74,
-        52
+        52,
+        13
       ],
       "image": 0,
       "labels": [
         "load_dunj4_command"
       ],
       "type": "string",
-      "string": "L. DUNJ4"
-    },
-    {
-      "addr": 1940,
-      "bytes": [
-        13
-      ],
-      "image": 0,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "L. DUNJ4."
     },
     {
       "addr": 1941,
@@ -7993,25 +7965,15 @@
         85,
         78,
         74,
-        53
+        53,
+        13
       ],
       "image": 0,
       "labels": [
         "load_dunj5_command"
       ],
       "type": "string",
-      "string": "L. DUNJ5"
-    },
-    {
-      "addr": 1949,
-      "bytes": [
-        13
-      ],
-      "image": 0,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "L. DUNJ5."
     },
     {
       "addr": 1950,
@@ -8224,6 +8186,7 @@
         0
       ],
       "image": 0,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -8504,6 +8467,7 @@
         0
       ],
       "image": 0,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         13,
@@ -8584,6 +8548,7 @@
         0
       ],
       "image": 1,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         128,
@@ -25327,7 +25292,8 @@
         54,
         66,
         48,
-        48
+        48,
+        13
       ],
       "image": 2,
       "labels": [
@@ -25343,18 +25309,7 @@
         "&1506 referenced 2 times by &1497, &14bc"
       ],
       "type": "string",
-      "string": "LOAD LEVEL11 6B00"
-    },
-    {
-      "addr": 5388,
-      "bytes": [
-        13
-      ],
-      "image": 2,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "LOAD LEVEL11 6B00."
     },
     {
       "addr": 5389,
@@ -27364,6 +27319,7 @@
         96
       ],
       "image": 2,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         96
@@ -35781,6 +35737,7 @@
         0
       ],
       "image": 2,
+      "comment_inline": "Not used",
       "type": "byte",
       "values": [
         96,
@@ -35824,6 +35781,7 @@
         0
       ],
       "image": 2,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -79789,6 +79747,7 @@
         0
       ],
       "image": 6,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -79973,6 +79932,7 @@
         255
       ],
       "image": 6,
+      "comment_inline": "Not used",
       "type": "byte",
       "values": [
         238,
@@ -80093,6 +80053,7 @@
         0
       ],
       "image": 6,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         13,
@@ -80340,6 +80301,7 @@
         0
       ],
       "image": 6,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         62,
@@ -80445,25 +80407,15 @@
         70,
         82,
         69,
-        69
+        69,
+        13
       ],
       "image": 6,
       "labels": [
         "free_command"
       ],
       "type": "string",
-      "string": "FREE"
-    },
-    {
-      "addr": 50892,
-      "bytes": [
-        13
-      ],
-      "image": 6,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "FREE."
     },
     {
       "addr": 50893,
@@ -80473,6 +80425,7 @@
         0
       ],
       "image": 6,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -83567,6 +83520,7 @@
         116
       ],
       "image": 7,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         116
@@ -92364,6 +92318,7 @@
         0
       ],
       "image": 8,
+      "comment_inline": "Not used",
       "type": "byte",
       "values": [
         0,

@@ -751,9 +751,9 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; that the Model B images and the cassette lineage's &0400 images also hold.
 .line_buffer_leftovers
     equs "*SA. CODER 400+3FF 740"
-    equb &0d
+    equb &0d                            ; CR: the end of that line
     equs " 740"
-    equb &0d, &54, &50, &0d, &0d, &50, &0d
+    equb &0d, &54, &50, &0d, &0d, &50, &0d  ; Ends of shorter lines
     equs "Alabel+2:LDA#255:.label JSR&30"
 ; ***************************************************************************************
 ; Coder: save the MOS's page &0D, load the game and start it
@@ -794,17 +794,13 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
     bne send_coder_vdu                  ; ...
     jmp select_colour_2                 ; ...
 .load_dunj2_command
-    equs "L. DUNJ2"
-    equb &0d
+    equs "L. DUNJ2", &0d
 .load_dunj3_command
-    equs "L. DUNJ3"
-    equb &0d
+    equs "L. DUNJ3", &0d
 .load_dunj4_command
-    equs "L. DUNJ4"
-    equb &0d
+    equs "L. DUNJ4", &0d
 .load_dunj5_command
-    equs "L. DUNJ5"
-    equb &0d
+    equs "L. DUNJ5", &0d
 ; &079e used as index base 1 time by &076c
 .coder_display_vdu
     equb &06                            ; VDU 6: enable VDU output
@@ -823,7 +819,7 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
     lda #2                              ; ...
     jsr oswrch                          ; ...
     jmp new_game                        ; ...and start a new game
-    equb &00, &00, &00
+    equb &00, &00, &00                  ; Not referenced
 ; ***************************************************************************************
 ; Set the bell sound
 ;
@@ -860,7 +856,7 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; The end of "Dunjunz1", the name the cassette lineage's &0400 images hold at &07F0, part
 ; overwritten by set_bell.
     equs "nz1"
-    equb &0d, &00, &00, &00, &00, &00, &00
+    equb &0d, &00, &00, &00, &00, &00, &00  ; Not referenced
 .dasmos_coder_end
 
     org &08c0
@@ -873,7 +869,7 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &80, &00, &00, &00, &01, &1e, &1e, &80
     equb &00, &00, &fe, &80, &80, &00, &00, &00
     equb &01, &14, &0a, &05, &02, &02, &02, &01
-    equb &00, &00, &ff, &80, &80, &00, &00, &00
+    equb &00, &00, &ff, &80, &80, &00, &00, &00  ; Not referenced
 ; ***************************************************************************************
 ; Plot a sprite
 ;
@@ -2353,8 +2349,7 @@ reset_call_address = reset_call+1
 ; &1505 referenced 2 times by &14a2, &14b1
 level_command_digits = level_command+10
 ; &1506 referenced 2 times by &1497, &14bc
-    equs "LOAD LEVEL11 6B00"
-    equb &0d
+    equs "LOAD LEVEL11 6B00", &0d
 ; ***************************************************************************************
 ; Reset the game workspace for a new level
 ;
@@ -2580,7 +2575,7 @@ clear_text_area_top = set_text_window_top+1
 ; &1638 referenced 3 times by &1400, &1464, &147f
 .first_level_flag
     equb &ea
-    equb &60
+    equb &60                            ; Not referenced
 ; ***************************************************************************************
 ; View frame PLOT commands
 ;
@@ -3339,8 +3334,8 @@ clear_text_area_top = set_text_window_top+1
     equb &60, &ff, &e0, &71, &d0, &15, &20, &f4
     equb &ff, &e0, &71, &f0, &f9, &20, &f4, &ff
     equb &e0, &71, &d0, &f9, &20, &f4, &ff, &e0
-    equb &71, &f0, &f9, &60, &00
-    equb &00, &00, &00, &00, &00
+    equb &71, &f0, &f9, &60, &00        ; Not used
+    equb &00, &00, &00, &00, &00        ; Not referenced
     equs "<<<<"
 ; ***************************************************************************************
 ; Play a level until it ends
@@ -7540,7 +7535,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00   ; Not referenced
 ; ***************************************************************************************
 ; Stop the music for the game-over message
 ;
@@ -7565,7 +7560,7 @@ clear_text_area_top = set_text_window_top+1
 ; Leftover bytes: the end of a routine that selects COLOUR 2 and runs *DUNJUNZ (its
 ; command follows), and zeros.
     equb &ee, &ff, &a9, &02, &20, &ee, &ff
-    equb &a2, &1c, &a0, &c6, &20, &f7, &ff
+    equb &a2, &1c, &a0, &c6, &20, &f7, &ff  ; Not used
     equs "DUNJUNZ"
     equb &0d, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -7577,7 +7572,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00
+    equb &00, &00                       ; Not referenced
 ; ***************************************************************************************
 ; Screen row offsets
 ;
@@ -7595,7 +7590,7 @@ row_offsets_lo = row_offsets+1
     equb &3e, &80, &41, &00, &43, &80, &46, &00
     equb &48, &80, &4b, &00, &4d, &80, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00
+    equb &00                            ; Not referenced
 ; ***************************************************************************************
 ; *FREE
 ;
@@ -7612,9 +7607,8 @@ row_offsets_lo = row_offsets+1
     jsr oscli                           ; ...
     rts                                 ; Return
 .free_command
-    equs "FREE"
-    equb &0d
-    equb &00, &00, &00
+    equs "FREE", &0d
+    equb &00, &00, &00                  ; Not referenced
 ; ***************************************************************************************
 ; Pause while P is pressed
 ;
@@ -7904,7 +7898,7 @@ row_offsets_lo = row_offsets+1
 ;
 ; The music's data: sections of three-byte steps (transposition or &FF, channel 2 pitch,
 ; channel 3 pitch), reached through section_ptrs_lo and section_ptrs_hi.
-    equb &74
+    equb &74                            ; Not referenced
 .tune
     equb &04, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
@@ -8379,7 +8373,7 @@ row_offsets_lo = row_offsets+1
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &04, &2c, &00, &ff, &00, &03, &04, &01
-    equb &01, &00, &00, &05, &03, &01, &00
+    equb &01, &00, &00, &05, &03, &01, &00  ; Not used
 .dasmos_code3_end
 
 save "Coder", dasmos_coder_start, dasmos_coder_end, &0740, &0400
@@ -9020,7 +9014,7 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     Data                     = 12634 bytes (63%)
 ;
 ;     Number of instructions   = 3499
-;     Number of data bytes     = 11976 bytes
+;     Number of data bytes     = 11970 bytes
 ;     Number of data words     = 64 bytes
-;     Number of string bytes   = 594 bytes
+;     Number of string bytes   = 600 bytes
 ;     Number of strings        = 55
