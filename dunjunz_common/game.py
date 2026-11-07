@@ -543,7 +543,8 @@ def annotate_routines(a: Annotator) -> None:
           "views: health and score (by taking a health point and adding a "
           "score point, from starting values one beyond those wanted), face, "
           "shield and armour rating, one icon per missile allowed, and "
-          "missile damage.")
+          "missile damage.",
+           on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     a.sub(0x0F68, "plot_panel_sprite", "Plot a sprite in a hero's panel section",
           "Plot sprite A at byte column X and pixel row Y + hero_panel_y - "
           "14 for the hero being drawn (draw_status_panel's loop counter).",
@@ -573,9 +574,11 @@ def annotate_routines(a: Annotator) -> None:
     a.sub(0x0500, "hero_menu", "Choose the heroes and the sound",
           "Clear the left of the screen, print the menu and let the players "
           "toggle each hero (keys 1-4) and the sound (5 on, 6 off). SPACE "
-          "starts the game if at least one hero is playing.")
+          "starts the game if at least one hero is playing.",
+           on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     a.sub(0x0524, "print_menu", "Print the menu text",
-          "Print the sixteen positioned strings of menu_text.")
+          "Print the sixteen positioned strings of menu_text.",
+           on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     a.sub(0x052E, "print_menu_string", "Print one menu string",
           "Move the text cursor to the column and row in the two bytes at "
           "menu_text+Y, then print the following characters up to and "
@@ -595,7 +598,8 @@ def annotate_routines(a: Annotator) -> None:
     a.sub(0x06B0, "remove_absent_heroes", "Take the heroes nobody plays out of the game",
           "Draw any ten-thousands score digits, then put every hero switched "
           "off on the menu out of play, with a &64 entry in "
-          "returning_hero_queue in their place.")
+          "returning_hero_queue in their place.",
+           on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 
     # Branch targets within the routines above
     for addr, name in [
@@ -621,7 +625,8 @@ def annotate_routines(a: Annotator) -> None:
     # Levels
     a.sub(0x14A0, "reset_workspace", "Reset the game workspace for a new level",
           "Copy workspace_template into page &0D and clear the per-level "
-          "state.")
+          "state.",
+           on_exit={"A": "corrupted", "X": "corrupted", "Y": "preserved"})
     a.sub(0x14D7, "draw_view_frames", "Draw the frames round the four views",
           "With the MOS's own text output restored, send the twenty PLOT "
           "commands of view_frame_plots, draw the four views, then put the "
@@ -630,13 +635,16 @@ def annotate_routines(a: Annotator) -> None:
                     "plot_y": "address of view_frame_plots, high byte"})
     a.sub(0x1510, "unpack_level", "Copy the loaded level into the game's tables",
           "Distribute the level file at &6B00 into the object, door, key, "
-          "trapdoor and map tables and the wall sprite.")
+          "trapdoor and map tables and the wall sprite.",
+           on_exit={"A": "corrupted", "X": "corrupted", "Y": "preserved"})
     a.sub(0x1583, "reset_monsters", "Clear the monsters for a new level",
           "Mark every monster as not yet appeared, give each the level's "
           "starting hit points, and clear the heroes' keys and the "
-          "returning_hero_queue.")
+          "returning_hero_queue.",
+           on_exit={"A": "0", "X": "4", "Y": "preserved"})
     a.sub(0x161A, "clear_text_area", "Clear the left of the screen",
-          "Set a text window over the left of the screen and clear it.")
+          "Set a text window over the left of the screen and clear it.",
+           on_exit={"A": "corrupted", "X": "preserved", "Y": "preserved"})
 
     # Winning
     a.sub(0x1070, "check_for_victory", "Check whether the Chalice has been found",
@@ -645,28 +653,36 @@ def annotate_routines(a: Annotator) -> None:
           "key and reset the machine through the RESET vector. The message "
           "is not part of the program: it is the 140 bytes at room_walls + "
           "&3A followed by the string at object_free_map + &3A, which on "
-          "level 25 hold the ending text instead of map data.")
+          "level 25 hold the ending text instead of map data.",
+           on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     a.sub(0x10E9, "victory_sequence", "Play the victory sequence",
           "Spin sprites round the Chalice with a rising tone, then dissolve "
-          "it.")
+          "it.",
+           on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     a.sub(0x1149, "draw_victory_ring", "Draw the ring of sprites round the Chalice",
           "Plot the current victory sprite at the twelve cells round the "
-          "Chalice, changing sprite as it goes.")
+          "Chalice, changing sprite as it goes.",
+           on_entry={"victory_sprite": "the sprite to plot"}, on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     a.sub(0x119A, "plot_victory_sprite", "Plot a victory sprite at a cell",
-          "Plot the current victory sprite at the map cell in &80, &81.")
+          "Plot the current victory sprite at the map cell in &80, &81.",
+           on_entry={"ring_x": "cell x", "ring_y": "cell y", "victory_sprite": "the sprite"}, on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     a.sub(0x11AC, "next_victory_sprite", "Choose the next victory sprite",
-          "Step the victory sprite through &16-&19.")
+          "Step the victory sprite through &16-&19.",
+           on_entry={"victory_sprite": "the current sprite"}, on_exit={"victory_sprite": "the next sparkle, &16-&19 in turn; &15 (erasing) is kept", "A": "victory_sprite", "X": "preserved", "Y": "preserved"})
     a.sub(0x11BE, "dissolve_chalice", "Clear a random byte of the Chalice",
           "Use the System VIA timer to pick a byte of the Chalice sprite, "
-          "clear it, and redraw the Chalice.")
+          "clear it, and redraw the Chalice.",
+           on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     a.sub(0x11F2, "plot_chalice", "Plot the Chalice",
-          "Plot the Chalice sprite at its place on the map.")
+          "Plot the Chalice sprite at its place on the map.",
+           on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 
     # The main loop
     a.sub(0x1CC0, "update_game", "Run one frame of play",
           "Move the heroes, open doors for heroes carrying the right key, "
           "pick up and swap keys, then draw the objects, move the missiles "
-          "and the monsters, and handle the pause key.")
+          "and the monsters, and handle the pause key.",
+           on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     a.sub(0x203A, "hero_enters_exit", "Start a hero going down the exit",
           "Play the exit sound, restore any hero shrunk before, and start "
           "the animation of hero X spinning and shrinking on the exit. Ends "
@@ -680,10 +696,12 @@ def annotate_routines(a: Annotator) -> None:
     a.sub(0x20D0, "find_open_neighbour", "Find a free cell next to a cell",
           "Starting with cell_x, cell_y, try the cells above, to the right, "
           "below and to the left, and leave cell_x, cell_y at the first "
-          "without a wall.")
+          "without a wall.",
+           on_entry={"cell_x": "cell x", "cell_y": "cell y"}, on_exit={"cell_x": "x of the first free neighbour, trying above, right and below; otherwise the cell to the left, unchecked", "cell_y": "its y", "Y": "0 if a free neighbour was found", "A": "corrupted", "X": "corrupted"})
     a.sub(0x16A0, "queue_exit_marker", "Sound the exit and add a queue marker",
           "Play the exit sound and put a &64 entry in the first free slot of "
-          "returning_hero_queue.")
+          "returning_hero_queue.",
+           on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 
     # Heroes
     a.sub(0x6E80, "move_heroes", "Move the heroes",
@@ -691,7 +709,8 @@ def annotate_routines(a: Annotator) -> None:
           "hero's keys (and, for heroes 0 and 1, the magic key) and start a "
           "step or fire a missile; check the new cell for walls, monsters, "
           "other heroes and objects, change view when the hero enters "
-          "another room, and draw the hero.")
+          "another room, and draw the hero.",
+           on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     a.sub(0x7B62, "start_hero_step", "Start a hero's step between cells",
           "Set hero X's step counter to 1 and their pixel offsets for the "
           "direction they face: 6 rows up or down, or 2 byte columns left or "
@@ -725,13 +744,15 @@ def annotate_routines(a: Annotator) -> None:
           on_entry=X_HERO)
     a.sub(0x74A3, "play_pickup_sound", "Play the pickup sound",
           "Define the pickup envelope and play the pickup sound, from the "
-          "OSWORD parameter blocks at &192C and &193A.")
+          "OSWORD parameter blocks at &192C and &193A.",
+           on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 
     # Missiles
     a.sub(0x70CA, "move_missiles", "Move the missiles",
           "Advance every missile in flight one cell. A missile stops at a "
           "wall, damages a monster or hero it meets, and bounces back off an "
-          "energy drainer, wearing it down.")
+          "energy drainer, wearing it down.",
+           on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     a.sub(0x7747, "flip_firer_frame", "Animate the hero who fired a missile",
           "Toggle the animation frame of the hero whose missile is in slot X.",
           on_entry={"X": "missile slot"})
@@ -740,7 +761,8 @@ def annotate_routines(a: Annotator) -> None:
 
     # The views
     a.sub(0x7788, "draw_all_views", "Draw all four views",
-          "Draw the room each hero's view shows.")
+          "Draw the room each hero's view shows.",
+           on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     a.sub(0x752C, "show_hero_room", "Show the room a hero has moved into",
           "Set hero X's view to the room containing their cell and redraw "
           "that view.", on_entry=X_HERO, on_exit=X_KEPT)
@@ -754,20 +776,26 @@ def annotate_routines(a: Annotator) -> None:
     ]:
         a.c(addr, text)
     a.sub(0x7795, "draw_view_0", "Draw the top-left view",
-          "Draw the room in hero 0's view.")
+          "Draw the room in hero 0's view.",
+           on_entry={"view_room": "the room hero 0 is in"}, on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     a.sub(0x77A7, "draw_view_1", "Draw the top-right view",
-          "Draw the room in hero 1's view.")
+          "Draw the room in hero 1's view.",
+           on_entry={"view_room + 2": "the room hero 1 is in"}, on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     a.sub(0x77B9, "draw_view_2", "Draw the bottom-left view",
-          "Draw the room in hero 2's view.")
+          "Draw the room in hero 2's view.",
+           on_entry={"view_room + 4": "the room hero 2 is in"}, on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     a.sub(0x77CB, "draw_view_3", "Draw the bottom-right view",
-          "Draw the room in hero 3's view.")
+          "Draw the room in hero 3's view.",
+           on_entry={"view_room + 6": "the room hero 3 is in"}, on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     a.sub(0x77DE, "draw_room", "Draw a room",
           "Draw the eight rows of walls of the room at &7B, &7C (a pointer "
           "into room_walls) with its top-left at plot_y and the column in "
-          "cell_x, then draw the doors.")
+          "cell_x, then draw the doors.",
+           on_entry={"map_ptr": "the room's offset in room_walls (the low byte)", "cell_x": "the view's left column", "plot_y": "the view's top pixel row"}, on_exit={"A": "corrupted", "X": "0", "Y": "corrupted"})
     a.sub(0x7820, "draw_room_row", "Draw one row of a room",
           "Plot a wall or a blank for each of the eight bits of scratch, "
-          "four byte columns apart, starting at byte column cell_x.")
+          "four byte columns apart, starting at byte column cell_x.",
+           on_entry={"scratch": "the row's eight wall bits, the leftmost cell in bit 7", "cell_x": "the view's left column", "plot_y": "the row's top pixel row"}, on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     a.sub(0x7852, "plot_at_cell", "Plot a sprite at a map cell in every view",
           "Plot sprite_number at map cell cell_x, cell_y, shifted by the "
           "pixel offsets in &7D, &7E, in each view that shows the cell's "
@@ -794,7 +822,8 @@ def annotate_routines(a: Annotator) -> None:
     a.sub(0x79C1, "update_monsters", "Draw the trapdoors and move the monsters",
           "Draw the eight trapdoors, then for each monster continue its step "
           "or start a new one, turning a random way when it is blocked, and "
-          "advance dying monsters until they reappear at a trapdoor.")
+          "advance dying monsters until they reappear at a trapdoor.",
+           on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     a.sub(0x7BEB, "start_monster_step", "Start a monster's step between cells",
           "Set monster X's step counter to 3 and its pixel offsets to one "
           "step in its direction of travel: 3 rows up or down, or one byte "
@@ -826,7 +855,8 @@ def annotate_game_entry(a: Annotator) -> None:
           "and duration), save WRCHV in saved_wrchv and point WRCHV at "
           "wrch_handler. The code here is run once only: from &0D40 its "
           "bytes are then reused as the missile tables and other workspace "
-          "in page &0D, which reset_workspace refreshes for each level.")
+          "in page &0D, which reset_workspace refreshes for each level. It "
+          "does not return: it starts a new game.")
     a.c(0x0D31, "OSBYTE &D3: bell channel...")
     a.c(0x0D33, "...channel &11")
     a.c(0x0D37, "...")
@@ -919,7 +949,8 @@ def annotate_start_level(a: Annotator) -> None:
     a.sub(0x1400, "start_level", "Set up and draw a new level",
           "Show the level number, load and unpack the level, reset the "
           "workspace and monsters, then clear the text area, set the screen "
-          "to its full 25-row height and draw the view frames and views.")
+          "to its full 25-row height and draw the view frames and views.",
+           on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     a.c(0x1400, "Show the level number")
     a.c(0x1403, "Load the level")
     a.c(0x1406, "Copy it into the game's tables")
@@ -990,7 +1021,8 @@ def annotate_cassette_level_loop(a: Annotator) -> None:
     a.sub(0x15B1, "show_level_number", "Show the number of the level about to start",
           "Clear the text area, count the level, plot the word LEVEL and "
           "print the number in the game's font, then set a text window and "
-          "colour for later messages.")
+          "colour for later messages.",
+           on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     a.c(0x15B1, "Clear the text area")
     a.c(0x15B4, "COLOUR 6...")
     a.c(0x15B9, "...")
@@ -1937,7 +1969,8 @@ def annotate_play_loop(a: Annotator) -> None:
           "return address on the stack (it ends with a jump back here), so "
           "the first RTS at the end of a level returns into this loop, once "
           "for each hero who left by the exit, before the last returns to "
-          "the caller.")
+          "the caller.",
+           on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     for addr, text in [
         (0x1F00, "Wait for the vertical sync counter to pass zero..."),
         (0x1F03, "..."),

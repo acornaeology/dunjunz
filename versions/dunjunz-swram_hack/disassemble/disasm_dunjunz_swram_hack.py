@@ -85,7 +85,8 @@ annotator.sub(0x1446, "load_level", "Load the level file",
               "check it. The block's byte 6 (the exec address's low byte, "
               "which must be 0 for the load address to be used) is not set "
               "here: it relies on show_level_number having cleared the screen, "
-              "which the block lies in.")
+              "which the block lies in.",
+               on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 for addr, text in [
     (0x1446, "VDU 23,0,6,23,0,0,0,0,0,0: set 6845 register 6..."),
     (0x1450, "..."),

@@ -816,7 +816,8 @@ reset_vector             = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; Set the bell sound (the BEL character's channel, envelope, pitch and duration), save
 ; WRCHV in saved_wrchv and point WRCHV at wrch_handler. The code here is run once only:
 ; from &0D40 its bytes are then reused as the missile tables and other workspace in page
-; &0D, which reset_workspace refreshes for each level.
+; &0D, which reset_workspace refreshes for each level. It does not return: it starts a
+; new game.
 ; &0d31 referenced 1 time by &5149
 .game_entry
     lda #osbyte_bell_channel            ; OSBYTE &D3: bell channel...
@@ -1062,6 +1063,11 @@ hero_key_fire = start_new_game+1
 ; score (by taking a health point and adding a score point, from starting values one
 ; beyond those wanted), face, shield and armour rating, one icon per missile allowed, and
 ; missile damage.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &0ef7 referenced 1 time by &359a
 .draw_status_panel
     lda #0                              ; For each hero...
@@ -1211,6 +1217,11 @@ count = game_over_you_all+8
 ; RESET vector. The message is not part of the program: it is the 140 bytes at room_walls
 ; + &3A followed by the string at object_free_map + &3A, which on level 25 hold the
 ; ending text instead of map data.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &1070 referenced 1 time by &464a
 .check_for_victory
     lda level_number                    ; Only on level 25
@@ -1287,6 +1298,11 @@ reset_call_address = reset_call+1
 ; Play the victory sequence
 ;
 ; Spin sprites round the Chalice with a rising tone, then dissolve it.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &10e9 referenced 1 time by &37d7
 .victory_sequence
     lda #osbyte_bell_envelope           ; OSBYTE &D4: the bell's envelope...
@@ -1352,6 +1368,14 @@ reset_call_address = reset_call+1
 ;
 ; Plot the current victory sprite at the twelve cells round the Chalice, changing sprite
 ; as it goes.
+;
+; On Entry:
+;     VICTORY_SPRITE: the sprite to plot
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &1149 referenced 2 times by &3870, &3917
 .draw_victory_ring
     lda #&1c                            ; Start at x &1C, y 3: the ring runs round the Chalice's four cells
@@ -1391,6 +1415,16 @@ reset_call_address = reset_call+1
 ; Plot a victory sprite at a cell
 ;
 ; Plot the current victory sprite at the map cell in &80, &81.
+;
+; On Entry:
+;     RING_X: cell x
+;     RING_Y: cell y
+;     VICTORY_SPRITE: the sprite
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &119a referenced 12 times by &3891, &3896, &389b, &38a8, &38ad, &38b2, &38ba, &38bf, &38c4, &38cc, &38d1, &38d6
 .plot_victory_sprite
     lda ring_x                          ; Plot the victory sprite at the ring cell
@@ -1405,6 +1439,15 @@ reset_call_address = reset_call+1
 ; Choose the next victory sprite
 ;
 ; Step the victory sprite through &16-&19.
+;
+; On Entry:
+;     VICTORY_SPRITE: the current sprite
+;
+; On Exit:
+;     VICTORY_SPRITE: the next sparkle, &16-&19 in turn; &15 (erasing) is kept
+;     A: victory_sprite
+;     X: preserved
+;     Y: preserved
 ; &11ac referenced 3 times by &38a3, &38b5, &38c7
 .next_victory_sprite
     lda victory_sprite                  ; Erasing (sprite &15)? Keep it
@@ -1424,6 +1467,11 @@ reset_call_address = reset_call+1
 ;
 ; Use the System VIA timer to pick a byte of the Chalice sprite, clear it, and redraw the
 ; Chalice.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &11be referenced 1 time by &3879
 .dissolve_chalice
     lda system_via_t1c_l                ; Pick a byte of the Chalice at random...
@@ -1462,6 +1510,11 @@ reset_call_address = reset_call+1
 ; Plot the Chalice
 ;
 ; Plot the Chalice sprite at its place on the map.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &11f2 referenced 2 times by &390f, &3924
 .plot_chalice
     lda #&1a                            ; The Chalice's top-left cell, x &1A, y 4...
@@ -1586,6 +1639,11 @@ reset_call_address = reset_call+1
 ; Show the level number, load and unpack the level, reset the workspace and monsters,
 ; then clear the text area, set the screen to its full 25-row height and draw the view
 ; frames and views.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &1400 referenced 1 time by &3597
 .start_level
     jsr show_level_number               ; Show the level number
@@ -1620,6 +1678,11 @@ reset_call_address = reset_call+1
 ;
 ; Decrypt and check the level (Coder has already loaded it), and set the bottom row used
 ; by clear_text_area.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &1446 referenced 1 time by &3b43
 .check_level
     jsr decrypt_level                   ; Decrypt and check the level Coder loaded
@@ -1685,6 +1748,11 @@ reset_call_address = reset_call+1
 ; Reset the game workspace for a new level
 ;
 ; Copy workspace_template into page &0D and clear the per-level state.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: preserved
 ; &14a0 referenced 1 time by &3b49
 .reset_workspace
     ldx #0                              ; Copy workspace_template to page &0D
@@ -1757,6 +1825,11 @@ reset_call_address = reset_call+1
 ;
 ; Distribute the level file at &6B00 into the object, door, key, trapdoor and map tables
 ; and the wall sprite.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: preserved
 ; &1510 referenced 1 time by &3b46
 .unpack_level
     ldx #&1e                            ; Objects 30 to 1: position and type
@@ -1824,6 +1897,11 @@ reset_call_address = reset_call+1
 ;
 ; Mark every monster as not yet appeared, give each the level's starting hit points, and
 ; clear the heroes' keys and the returning_hero_queue.
+;
+; On Exit:
+;     A: 0
+;     X: 4
+;     Y: preserved
 ; &1583 referenced 1 time by &3b4c
 .reset_monsters
     ldx #&1e                            ; Monsters 30 to 1...
@@ -1903,6 +1981,11 @@ reset_call_address = reset_call+1
 ; Clear the left of the screen
 ;
 ; Set a text window over the left of the screen and clear it.
+;
+; On Exit:
+;     A: corrupted
+;     X: preserved
+;     Y: preserved
 ; &161a referenced 2 times by &3b4f, &3cf1
 .clear_text_area
     lda #&1c                            ; VDU 28: a text window over the whole of the left of the screen...
@@ -1955,6 +2038,11 @@ text_window_bottom = set_text_window_bottom+1
 ; Sound the exit and add a queue marker
 ;
 ; Play the exit sound and put a &64 entry in the first free slot of returning_hero_queue.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &16a0 referenced 1 time by &203d
 .queue_exit_marker
     ldx #<(exit_envelope)               ; Define the exit envelope...
@@ -2350,6 +2438,11 @@ text_window_bottom = set_text_window_bottom+1
 ;
 ; Move the heroes, open doors for heroes carrying the right key, pick up and swap keys,
 ; then draw the objects, move the missiles and the monsters, and handle the pause key.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &1cc0 referenced 1 time by &464d
 .update_game
     jsr move_heroes                     ; Move the heroes
@@ -2679,6 +2772,11 @@ text_window_bottom = set_text_window_bottom+1
 ; return address on the stack (it ends with a jump back here), so the first RTS at the
 ; end of a level returns into this loop, once for each hero who left by the exit, before
 ; the last returns to the caller.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &1f00 referenced 7 times by &2023, &2037, &208e, &35a5, &4643, &46db, &472f
 .play_level
     lda os_vsync_counter                ; Wait for the vertical sync counter to pass zero...
@@ -2964,6 +3062,11 @@ text_window_bottom = set_text_window_bottom+1
 ; Clear the left of the screen, print the menu and let the players toggle each hero (keys
 ; 1-4) and the sound (5 on, 6 off). SPACE starts the game if at least one hero is
 ; playing.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &0500 referenced 1 time by &3551
 .hero_menu
     lda #&1c                            ; VDU 28: a text window over the left of the screen...
@@ -2984,6 +3087,11 @@ text_window_bottom = set_text_window_bottom+1
 ; Print the menu text
 ;
 ; Print the sixteen positioned strings of menu_text.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &0524 referenced 3 times by &52ce, &5373, &53a0
 .print_menu
     ldx #&0f                            ; Fifteen strings, then one more by falling through
@@ -3217,6 +3325,11 @@ text_window_bottom = set_text_window_bottom+1
 ;
 ; Draw any ten-thousands score digits, then put every hero switched off on the menu out
 ; of play, with a &64 entry in returning_hero_queue in their place.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &06b0 referenced 1 time by &359d
 .remove_absent_heroes
     ldx #0                              ; For each hero, keeping a count of absent heroes in Y...
@@ -3494,6 +3607,11 @@ text_window_bottom = set_text_window_bottom+1
 ; Clear the left of the screen, print the menu and let the players toggle each hero (keys
 ; 1-4) and the sound (5 on, 6 off). SPACE starts the game if at least one hero is
 ; playing.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &0500 referenced 1 time by &3551
 .hero_menu_joystick
     lda #&1c                            ; VDU 28: a text window over the left of the screen...
@@ -3514,6 +3632,11 @@ text_window_bottom = set_text_window_bottom+1
 ; Print the menu text
 ;
 ; Print the sixteen positioned strings of menu_text.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &0524 referenced 3 times by &56ce, &5773, &57a0
 .print_menu_joystick
     ldx #&0f                            ; Fifteen strings, then one more by falling through
@@ -3746,6 +3869,11 @@ text_window_bottom = set_text_window_bottom+1
 ;
 ; Draw any ten-thousands score digits, then put every hero switched off on the menu out
 ; of play, with a &64 entry in returning_hero_queue in their place.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &06b0 referenced 1 time by &359d
 .remove_absent_heroes_joystick
     ldx #0                              ; For each hero, keeping a count of absent heroes in Y...
@@ -4096,6 +4224,17 @@ text_window_bottom = set_text_window_bottom+1
 ;
 ; Starting with cell_x, cell_y, try the cells above, to the right, below and to the left,
 ; and leave cell_x, cell_y at the first without a wall.
+;
+; On Entry:
+;     CELL_X: cell x
+;     CELL_Y: cell y
+;
+; On Exit:
+;     CELL_X: x of the first free neighbour, trying above, right and below; otherwise the cell to the left, unchecked
+;     CELL_Y: its y
+;     Y: 0 if a free neighbour was found
+;     A: corrupted
+;     X: corrupted
 ; &20d0 referenced 1 time by &209f
 .find_open_neighbour
     dec cell_y                          ; The cell above
@@ -6393,6 +6532,11 @@ level_command_digits = level_command+10
 ; heroes 0 and 1, the magic key) and start a step or fire a missile; check the new cell
 ; for walls, monsters, other heroes and objects, change view when the hero enters another
 ; room, and draw the hero.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &6e80 referenced 1 time by &4400
 .move_heroes
     ldx #0                              ; For each hero...
@@ -6695,6 +6839,11 @@ level_command_digits = level_command+10
 ;
 ; Advance every missile in flight one cell. A missile stops at a wall, damages a monster
 ; or hero it meets, and bounces back off an energy drainer, wearing it down.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &70ca referenced 1 time by &4611
 .move_missiles
     lda #0                              ; No pixel offsets for missiles
@@ -7343,6 +7492,11 @@ level_command_digits = level_command+10
 ;
 ; Define the pickup envelope and play the pickup sound, from the OSWORD parameter blocks
 ; at &192C and &193A.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &74a3 referenced 2 times by &741e, &74ca
 .play_pickup_sound
     ldx #<(pickup_envelope)             ; Define the envelope...
@@ -7873,6 +8027,11 @@ level_command_digits = level_command+10
 ; Draw all four views
 ;
 ; Draw the room each hero's view shows.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &7788 referenced 1 time by &3c42
 .draw_all_views
     jsr draw_view_0                     ; Top-left view
@@ -7884,6 +8043,14 @@ level_command_digits = level_command+10
 ; Draw the top-left view
 ;
 ; Draw the room in hero 0's view.
+;
+; On Entry:
+;     VIEW_ROOM: the room hero 0 is in
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &7795 referenced 2 times by &754b, &7788
 .draw_view_0
     lda #1                              ; Top-left view: row 1...
@@ -7898,6 +8065,14 @@ level_command_digits = level_command+10
 ; Draw the top-right view
 ;
 ; Draw the room in hero 1's view.
+;
+; On Entry:
+;     VIEW_ROOM + 2: the room hero 1 is in
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &77a7 referenced 2 times by &7555, &778b
 .draw_view_1
     lda #1                              ; Top-right view: row 1...
@@ -7912,6 +8087,14 @@ level_command_digits = level_command+10
 ; Draw the bottom-left view
 ;
 ; Draw the room in hero 2's view.
+;
+; On Entry:
+;     VIEW_ROOM + 4: the room hero 2 is in
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &77b9 referenced 2 times by &755f, &778e
 .draw_view_2
     lda #&67 ; 'g'                      ; Bottom-left view: row &67...
@@ -7926,6 +8109,14 @@ level_command_digits = level_command+10
 ; Draw the bottom-right view
 ;
 ; Draw the room in hero 3's view.
+;
+; On Entry:
+;     VIEW_ROOM + 6: the room hero 3 is in
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &77cb referenced 2 times by &7565, &7791
 .draw_view_3
     lda #&67 ; 'g'                      ; Bottom-right view: row &67...
@@ -7942,6 +8133,16 @@ level_command_digits = level_command+10
 ;
 ; Draw the eight rows of walls of the room at &7B, &7C (a pointer into room_walls) with
 ; its top-left at plot_y and the column in cell_x, then draw the doors.
+;
+; On Entry:
+;     MAP_PTR: the room's offset in room_walls (the low byte)
+;     CELL_X: the view's left column
+;     PLOT_Y: the view's top pixel row
+;
+; On Exit:
+;     A: corrupted
+;     X: 0
+;     Y: corrupted
 ; &77de referenced 4 times by &77a3, &77b5, &77c7, &77d9
 .draw_room
     lda #&0c                            ; The room's walls are in page &0C
@@ -7988,6 +8189,16 @@ level_command_digits = level_command+10
 ;
 ; Plot a wall or a blank for each of the eight bits of scratch, four byte columns apart,
 ; starting at byte column cell_x.
+;
+; On Entry:
+;     SCRATCH: the row's eight wall bits, the leftmost cell in bit 7
+;     CELL_X: the view's left column
+;     PLOT_Y: the row's top pixel row
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &7820 referenced 1 time by &77eb
 .draw_room_row
     lda cell_x                          ; Start at the room's left edge
@@ -8262,6 +8473,11 @@ level_command_digits = level_command+10
 ; Draw the eight trapdoors, then for each monster continue its step or start a new one,
 ; turning a random way when it is blocked, and advance dying monsters until they reappear
 ; at a trapdoor.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &79c1 referenced 1 time by &4614
 .update_monsters
     ldx #8                              ; Draw the eight trapdoors (sprite &2C)...

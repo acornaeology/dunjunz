@@ -345,7 +345,12 @@
       "addr": 3831,
       "name": "draw_status_panel",
       "title": "Draw the status panel",
-      "description": "Draw each hero's section of the status panel to the right of the views: health and score (by taking a health point and adding a score point, from starting values one beyond those wanted), face, shield and armour rating, one icon per missile allowed, and missile damage."
+      "description": "Draw each hero's section of the status panel to the right of the views: health and score (by taking a health point and adding a score point, from starting values one beyond those wanted), face, shield and armour rating, one icon per missile allowed, and missile damage.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 3944,
@@ -426,13 +431,23 @@
       "addr": 1280,
       "name": "hero_menu",
       "title": "Choose the heroes and the sound",
-      "description": "Clear the left of the screen, print the menu and let the players toggle each hero (keys 1-4) and the sound (5 on, 6 off). SPACE starts the game if at least one hero is playing."
+      "description": "Clear the left of the screen, print the menu and let the players toggle each hero (keys 1-4) and the sound (5 on, 6 off). SPACE starts the game if at least one hero is playing.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 1316,
       "name": "print_menu",
       "title": "Print the menu text",
       "description": "Print the sixteen positioned strings of menu_text.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      },
       "fall_through": true
     },
     {
@@ -487,56 +502,113 @@
       "addr": 1712,
       "name": "remove_absent_heroes",
       "title": "Take the heroes nobody plays out of the game",
-      "description": "Draw any ten-thousands score digits, then put every hero switched off on the menu out of play, with a &64 entry in returning_hero_queue in their place."
+      "description": "Draw any ten-thousands score digits, then put every hero switched off on the menu out of play, with a &64 entry in returning_hero_queue in their place.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 4208,
       "name": "check_for_victory",
       "title": "Check whether the Chalice has been found",
       "description": "On level 25, if a hero stands on the cell where the Chalice is, play the victory sequence, print the ending message, wait for a key and reset the machine through the RESET vector. The message is not part of the program: it is the 140 bytes at room_walls + &3A followed by the string at object_free_map + &3A, which on level 25 hold the ending text instead of map data.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      },
       "fall_through": true
     },
     {
       "addr": 4329,
       "name": "victory_sequence",
       "title": "Play the victory sequence",
-      "description": "Spin sprites round the Chalice with a rising tone, then dissolve it."
+      "description": "Spin sprites round the Chalice with a rising tone, then dissolve it.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 4425,
       "name": "draw_victory_ring",
       "title": "Draw the ring of sprites round the Chalice",
-      "description": "Plot the current victory sprite at the twelve cells round the Chalice, changing sprite as it goes."
+      "description": "Plot the current victory sprite at the twelve cells round the Chalice, changing sprite as it goes.",
+      "on_entry": {
+        "victory_sprite": "the sprite to plot"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 4506,
       "name": "plot_victory_sprite",
       "title": "Plot a victory sprite at a cell",
-      "description": "Plot the current victory sprite at the map cell in &80, &81."
+      "description": "Plot the current victory sprite at the map cell in &80, &81.",
+      "on_entry": {
+        "ring_x": "cell x",
+        "ring_y": "cell y",
+        "victory_sprite": "the sprite"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 4524,
       "name": "next_victory_sprite",
       "title": "Choose the next victory sprite",
-      "description": "Step the victory sprite through &16-&19."
+      "description": "Step the victory sprite through &16-&19.",
+      "on_entry": {
+        "victory_sprite": "the current sprite"
+      },
+      "on_exit": {
+        "victory_sprite": "the next sparkle, &16-&19 in turn; &15 (erasing) is kept",
+        "A": "victory_sprite",
+        "X": "preserved",
+        "Y": "preserved"
+      }
     },
     {
       "addr": 4542,
       "name": "dissolve_chalice",
       "title": "Clear a random byte of the Chalice",
-      "description": "Use the System VIA timer to pick a byte of the Chalice sprite, clear it, and redraw the Chalice."
+      "description": "Use the System VIA timer to pick a byte of the Chalice sprite, clear it, and redraw the Chalice.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 4594,
       "name": "plot_chalice",
       "title": "Plot the Chalice",
-      "description": "Plot the Chalice sprite at its place on the map."
+      "description": "Plot the Chalice sprite at its place on the map.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 7360,
       "name": "update_game",
       "title": "Run one frame of play",
-      "description": "Move the heroes, open doors for heroes carrying the right key, pick up and swap keys, then draw the objects, move the missiles and the monsters, and handle the pause key."
+      "description": "Move the heroes, open doors for heroes carrying the right key, pick up and swap keys, then draw the objects, move the missiles and the monsters, and handle the pause key.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 8250,
@@ -572,20 +644,41 @@
       "addr": 8400,
       "name": "find_open_neighbour",
       "title": "Find a free cell next to a cell",
-      "description": "Starting with cell_x, cell_y, try the cells above, to the right, below and to the left, and leave cell_x, cell_y at the first without a wall."
+      "description": "Starting with cell_x, cell_y, try the cells above, to the right, below and to the left, and leave cell_x, cell_y at the first without a wall.",
+      "on_entry": {
+        "cell_x": "cell x",
+        "cell_y": "cell y"
+      },
+      "on_exit": {
+        "cell_x": "x of the first free neighbour, trying above, right and below; otherwise the cell to the left, unchecked",
+        "cell_y": "its y",
+        "Y": "0 if a free neighbour was found",
+        "A": "corrupted",
+        "X": "corrupted"
+      }
     },
     {
       "addr": 5792,
       "name": "queue_exit_marker",
       "title": "Sound the exit and add a queue marker",
       "description": "Play the exit sound and put a &64 entry in the first free slot of returning_hero_queue.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      },
       "fall_through": true
     },
     {
       "addr": 28288,
       "name": "move_heroes",
       "title": "Move the heroes",
-      "description": "For each hero in play: continue a step between cells, or read the hero's keys (and, for heroes 0 and 1, the magic key) and start a step or fire a missile; check the new cell for walls, monsters, other heroes and objects, change view when the hero enters another room, and draw the hero."
+      "description": "For each hero in play: continue a step between cells, or read the hero's keys (and, for heroes 0 and 1, the magic key) and start a step or fire a missile; check the new cell for walls, monsters, other heroes and objects, change view when the hero enters another room, and draw the hero.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 31586,
@@ -667,13 +760,23 @@
       "addr": 29859,
       "name": "play_pickup_sound",
       "title": "Play the pickup sound",
-      "description": "Define the pickup envelope and play the pickup sound, from the OSWORD parameter blocks at &192C and &193A."
+      "description": "Define the pickup envelope and play the pickup sound, from the OSWORD parameter blocks at &192C and &193A.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 28874,
       "name": "move_missiles",
       "title": "Move the missiles",
-      "description": "Advance every missile in flight one cell. A missile stops at a wall, damages a monster or hero it meets, and bounces back off an energy drainer, wearing it down."
+      "description": "Advance every missile in flight one cell. A missile stops at a wall, damages a monster or hero it meets, and bounces back off an energy drainer, wearing it down.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 30535,
@@ -699,7 +802,12 @@
       "addr": 30600,
       "name": "draw_all_views",
       "title": "Draw all four views",
-      "description": "Draw the room each hero's view shows."
+      "description": "Draw the room each hero's view shows.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 29996,
@@ -717,37 +825,89 @@
       "addr": 30613,
       "name": "draw_view_0",
       "title": "Draw the top-left view",
-      "description": "Draw the room in hero 0's view."
+      "description": "Draw the room in hero 0's view.",
+      "on_entry": {
+        "view_room": "the room hero 0 is in"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 30631,
       "name": "draw_view_1",
       "title": "Draw the top-right view",
-      "description": "Draw the room in hero 1's view."
+      "description": "Draw the room in hero 1's view.",
+      "on_entry": {
+        "view_room + 2": "the room hero 1 is in"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 30649,
       "name": "draw_view_2",
       "title": "Draw the bottom-left view",
-      "description": "Draw the room in hero 2's view."
+      "description": "Draw the room in hero 2's view.",
+      "on_entry": {
+        "view_room + 4": "the room hero 2 is in"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 30667,
       "name": "draw_view_3",
       "title": "Draw the bottom-right view",
-      "description": "Draw the room in hero 3's view."
+      "description": "Draw the room in hero 3's view.",
+      "on_entry": {
+        "view_room + 6": "the room hero 3 is in"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 30686,
       "name": "draw_room",
       "title": "Draw a room",
-      "description": "Draw the eight rows of walls of the room at &7B, &7C (a pointer into room_walls) with its top-left at plot_y and the column in cell_x, then draw the doors."
+      "description": "Draw the eight rows of walls of the room at &7B, &7C (a pointer into room_walls) with its top-left at plot_y and the column in cell_x, then draw the doors.",
+      "on_entry": {
+        "map_ptr": "the room's offset in room_walls (the low byte)",
+        "cell_x": "the view's left column",
+        "plot_y": "the view's top pixel row"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "0",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 30752,
       "name": "draw_room_row",
       "title": "Draw one row of a room",
-      "description": "Plot a wall or a blank for each of the eight bits of scratch, four byte columns apart, starting at byte column cell_x."
+      "description": "Plot a wall or a blank for each of the eight bits of scratch, four byte columns apart, starting at byte column cell_x.",
+      "on_entry": {
+        "scratch": "the row's eight wall bits, the leftmost cell in bit 7",
+        "cell_x": "the view's left column",
+        "plot_y": "the row's top pixel row"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 30802,
@@ -796,7 +956,12 @@
       "addr": 31169,
       "name": "update_monsters",
       "title": "Draw the trapdoors and move the monsters",
-      "description": "Draw the eight trapdoors, then for each monster continue its step or start a new one, turning a random way when it is blocked, and advance dying monsters until they reappear at a trapdoor."
+      "description": "Draw the eight trapdoors, then for each monster continue its step or start a new one, turning a random way when it is blocked, and advance dying monsters until they reappear at a trapdoor.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 31723,
@@ -834,7 +999,12 @@
       "addr": 7936,
       "name": "play_level",
       "title": "Play a level until it ends",
-      "description": "Run one frame every three vertical syncs: check for victory and update the game, take any hero standing on the exit down it, and animate one going down. Return when no hero is in play and every death animation has finished. Each hero_enters_exit leaves its return address on the stack (it ends with a jump back here), so the first RTS at the end of a level returns into this loop, once for each hero who left by the exit, before the last returns to the caller."
+      "description": "Run one frame every three vertical syncs: check for victory and update the game, take any hero standing on the exit down it, and animate one going down. Return when no hero is in play and every death animation has finished. Each hero_enters_exit leaves its return address on the stack (it ends with a jump back here), so the first RTS at the end of a level returns into this loop, once for each hero who left by the exit, before the last returns to the caller.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 1104,
@@ -849,25 +1019,45 @@
       "addr": 5389,
       "name": "reset_workspace",
       "title": "Reset the game workspace for a new level",
-      "description": "Copy workspace_template into page &0D and clear the per-level state."
+      "description": "Copy workspace_template into page &0D and clear the per-level state.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "preserved"
+      }
     },
     {
       "addr": 5489,
       "name": "unpack_level",
       "title": "Copy the loaded level into the game's tables",
-      "description": "Distribute the level file at &6B00 into the object, door, key, trapdoor and map tables and the wall sprite."
+      "description": "Distribute the level file at &6B00 into the object, door, key, trapdoor and map tables and the wall sprite.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "preserved"
+      }
     },
     {
       "addr": 5604,
       "name": "reset_monsters",
       "title": "Clear the monsters for a new level",
-      "description": "Mark every monster as not yet appeared, give each the level's starting hit points, and clear the heroes' keys and the returning_hero_queue."
+      "description": "Mark every monster as not yet appeared, give each the level's starting hit points, and clear the heroes' keys and the returning_hero_queue.",
+      "on_exit": {
+        "A": "0",
+        "X": "4",
+        "Y": "preserved"
+      }
     },
     {
       "addr": 5657,
       "name": "clear_text_area",
       "title": "Clear the left of the screen",
-      "description": "Set a text window over the left of the screen and clear it."
+      "description": "Set a text window over the left of the screen and clear it.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "preserved",
+        "Y": "preserved"
+      }
     },
     {
       "addr": 55296,
@@ -905,7 +1095,12 @@
       "addr": 2000,
       "name": "set_bell",
       "title": "Set the bell sound",
-      "description": "OSBYTEs &D3-&D6: the BEL character's sound on channel &13, envelope 0 (fixed amplitude), pitch &64, duration 1. The cassette game's start-up sets the same sound on channel &11."
+      "description": "OSBYTEs &D3-&D6: the BEL character's sound on channel &13, envelope 0 (fixed amplitude), pitch &64, duration 1. The cassette game's start-up sets the same sound on channel &11.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 2407,
@@ -943,19 +1138,34 @@
       "addr": 5120,
       "name": "start_level",
       "title": "Set up and draw a new level",
-      "description": "Stop the music (saving its place after the first level), count the level, put the MOS's page &0D back and load the level, unpack it, reset the workspace and monsters, clear the text area, show 25 rows, draw the view frames and views, and restart the music, from where it was after the first level."
+      "description": "Stop the music (saving its place after the first level), count the level, put the MOS's page &0D back and load the level, unpack it, reset the workspace and monsters, clear the text area, show 25 rows, draw the view frames and views, and restart the music, from where it was after the first level.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 5251,
       "name": "load_level",
       "title": "Put the MOS's page &0D back and load the level",
-      "description": "Copy the MOS's page &0D back from &C400 (Coder saved it there), so that the filing system's NMI code and workspace are intact, write the level number's digits into level_command, show 15 rows while loading, and *LOAD LEVELnn 6B00 (level 25 comes from Stones, via load_stones in Table). Then decrypt and check it."
+      "description": "Copy the MOS's page &0D back from &C400 (Coder saved it there), so that the filing system's NMI code and workspace are intact, write the level number's digits into level_command, show 15 rows while loading, and *LOAD LEVELnn 6B00 (level 25 comes from Stones, via load_stones in Table). Then decrypt and check it.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 5650,
       "name": "count_level",
       "title": "Clear the text area and count the level",
-      "description": "The cassette game's show_level_number also plots LEVEL and the number; this side shows no level number."
+      "description": "The cassette game's show_level_number also plots LEVEL and the number; this side shows no level number.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "preserved",
+        "Y": "preserved"
+      }
     },
     {
       "addr": 50432,
@@ -974,42 +1184,77 @@
       "addr": 50592,
       "name": "load_stones",
       "title": "Load level 25 from Stones",
-      "description": "Level 25 has no file of its own: Stones ends with its data, so *LOAD STONES 6680 puts it at &6B00. Then decrypt and check it."
+      "description": "Level 25 has no file of its own: Stones ends with its data, so *LOAD STONES 6680 puts it at &6B00. Then decrypt and check it.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 50688,
       "name": "game_over_music",
       "title": "Stop the music for the game-over message",
-      "description": "Stop the music, send the VDU 28 that the game-over code's text window begins with, and set the top row in clear_text_area's window to 0."
+      "description": "Stop the music, send the VDU 28 that the game-over code's text window begins with, and set the top row in clear_text_area's window to 0.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 50880,
       "name": "show_free_space",
       "title": "*FREE",
-      "description": "Show the disc's free space. The game never calls it: [*EDITOR](address:23F7@/editor) does, after cataloguing the disc, relying on Table being in private RAM."
+      "description": "Show the disc's free space. The game never calls it: [*EDITOR](address:23F7@/editor) does, after cataloguing the disc, relying on Table being in private RAM.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 50896,
       "name": "pause_check",
       "title": "Pause while P is pressed",
-      "description": "Called from check_pause in the game's update. If P (internal key &37) is held, wait for it to be released, pressed again and released, then restart the frame timing. The Model B side uses the same key."
+      "description": "Called from check_pause in the game's update. If P (internal key &37) is held, wait for it to be released, pressed again and released, then restart the frame timing. The Model B side uses the same key.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 50926,
       "name": "wait_p_released",
-      "title": "Wait until P is not pressed"
+      "title": "Wait until P is not pressed",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 50944,
       "name": "start_music",
       "title": "Start the music",
-      "description": "Define envelopes 6-9, redirect the game's plot_sprite to the copy in Code3, point the tune at its first section, and play it on the interval timer: EVNTV is pointed at music_event and the interval timer event enabled. Then play the first step."
+      "description": "Define envelopes 6-9, redirect the game's plot_sprite to the copy in Code3, point the tune at its first section, and play it on the interval timer: EVNTV is pointed at music_event and the interval timer event enabled. Then play the first step.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 51040,
       "name": "stop_music",
       "title": "Stop the music",
-      "description": "OSBYTE 13, 5: disable the interval timer event."
+      "description": "OSBYTE 13, 5: disable the interval timer event.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 51052,

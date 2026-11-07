@@ -200,7 +200,8 @@ annotator.sub(0x15B5, "next_level_intercept", "BREAK intercept: run Coder for th
                              "system is initialised"})
 annotator.sub(0x1446, "check_level", "Check the level and set the text window",
               "Decrypt and check the level (Coder has already loaded it), and "
-              "set the bottom row used by clear_text_area.")
+              "set the bottom row used by clear_text_area.",
+               on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 
 annotator.c(0x1ED7, "OSBYTE &7A: is a key pressed?")
 annotator.c(0x1EDC, "P (internal key &37)?")

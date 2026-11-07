@@ -344,7 +344,12 @@
       "move": "game_image",
       "name": "draw_status_panel",
       "title": "Draw the status panel",
-      "description": "Draw each hero's section of the status panel to the right of the views: health and score (by taking a health point and adding a score point, from starting values one beyond those wanted), face, shield and armour rating, one icon per missile allowed, and missile damage."
+      "description": "Draw each hero's section of the status panel to the right of the views: health and score (by taking a health point and adding a score point, from starting values one beyond those wanted), face, shield and armour rating, one icon per missile allowed, and missile damage.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 3944,
@@ -429,7 +434,12 @@
       "move": "game_image",
       "name": "hero_menu",
       "title": "Choose the heroes and the sound",
-      "description": "Clear the left of the screen, print the menu and let the players toggle each hero (keys 1-4) and the sound (5 on, 6 off). SPACE starts the game if at least one hero is playing."
+      "description": "Clear the left of the screen, print the menu and let the players toggle each hero (keys 1-4) and the sound (5 on, 6 off). SPACE starts the game if at least one hero is playing.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 1316,
@@ -438,6 +448,11 @@
       "name": "print_menu",
       "title": "Print the menu text",
       "description": "Print the sixteen positioned strings of menu_text.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      },
       "fall_through": true
     },
     {
@@ -504,7 +519,12 @@
       "move": "game_image",
       "name": "remove_absent_heroes",
       "title": "Take the heroes nobody plays out of the game",
-      "description": "Draw any ten-thousands score digits, then put every hero switched off on the menu out of play, with a &64 entry in returning_hero_queue in their place."
+      "description": "Draw any ten-thousands score digits, then put every hero switched off on the menu out of play, with a &64 entry in returning_hero_queue in their place.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 5280,
@@ -512,7 +532,12 @@
       "move": "game_image",
       "name": "reset_workspace",
       "title": "Reset the game workspace for a new level",
-      "description": "Copy workspace_template into page &0D and clear the per-level state."
+      "description": "Copy workspace_template into page &0D and clear the per-level state.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "preserved"
+      }
     },
     {
       "addr": 5335,
@@ -532,7 +557,12 @@
       "move": "game_image",
       "name": "unpack_level",
       "title": "Copy the loaded level into the game's tables",
-      "description": "Distribute the level file at &6B00 into the object, door, key, trapdoor and map tables and the wall sprite."
+      "description": "Distribute the level file at &6B00 into the object, door, key, trapdoor and map tables and the wall sprite.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "preserved"
+      }
     },
     {
       "addr": 5507,
@@ -540,7 +570,12 @@
       "move": "game_image",
       "name": "reset_monsters",
       "title": "Clear the monsters for a new level",
-      "description": "Mark every monster as not yet appeared, give each the level's starting hit points, and clear the heroes' keys and the returning_hero_queue."
+      "description": "Mark every monster as not yet appeared, give each the level's starting hit points, and clear the heroes' keys and the returning_hero_queue.",
+      "on_exit": {
+        "A": "0",
+        "X": "4",
+        "Y": "preserved"
+      }
     },
     {
       "addr": 5658,
@@ -548,7 +583,12 @@
       "move": "game_image",
       "name": "clear_text_area",
       "title": "Clear the left of the screen",
-      "description": "Set a text window over the left of the screen and clear it."
+      "description": "Set a text window over the left of the screen and clear it.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "preserved",
+        "Y": "preserved"
+      }
     },
     {
       "addr": 4208,
@@ -557,6 +597,11 @@
       "name": "check_for_victory",
       "title": "Check whether the Chalice has been found",
       "description": "On level 25, if a hero stands on the cell where the Chalice is, play the victory sequence, print the ending message, wait for a key and reset the machine through the RESET vector. The message is not part of the program: it is the 140 bytes at room_walls + &3A followed by the string at object_free_map + &3A, which on level 25 hold the ending text instead of map data.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      },
       "fall_through": true
     },
     {
@@ -565,7 +610,12 @@
       "move": "game_image",
       "name": "victory_sequence",
       "title": "Play the victory sequence",
-      "description": "Spin sprites round the Chalice with a rising tone, then dissolve it."
+      "description": "Spin sprites round the Chalice with a rising tone, then dissolve it.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 4425,
@@ -573,7 +623,15 @@
       "move": "game_image",
       "name": "draw_victory_ring",
       "title": "Draw the ring of sprites round the Chalice",
-      "description": "Plot the current victory sprite at the twelve cells round the Chalice, changing sprite as it goes."
+      "description": "Plot the current victory sprite at the twelve cells round the Chalice, changing sprite as it goes.",
+      "on_entry": {
+        "victory_sprite": "the sprite to plot"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 4506,
@@ -581,7 +639,17 @@
       "move": "game_image",
       "name": "plot_victory_sprite",
       "title": "Plot a victory sprite at a cell",
-      "description": "Plot the current victory sprite at the map cell in &80, &81."
+      "description": "Plot the current victory sprite at the map cell in &80, &81.",
+      "on_entry": {
+        "ring_x": "cell x",
+        "ring_y": "cell y",
+        "victory_sprite": "the sprite"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 4524,
@@ -589,7 +657,16 @@
       "move": "game_image",
       "name": "next_victory_sprite",
       "title": "Choose the next victory sprite",
-      "description": "Step the victory sprite through &16-&19."
+      "description": "Step the victory sprite through &16-&19.",
+      "on_entry": {
+        "victory_sprite": "the current sprite"
+      },
+      "on_exit": {
+        "victory_sprite": "the next sparkle, &16-&19 in turn; &15 (erasing) is kept",
+        "A": "victory_sprite",
+        "X": "preserved",
+        "Y": "preserved"
+      }
     },
     {
       "addr": 4542,
@@ -597,7 +674,12 @@
       "move": "game_image",
       "name": "dissolve_chalice",
       "title": "Clear a random byte of the Chalice",
-      "description": "Use the System VIA timer to pick a byte of the Chalice sprite, clear it, and redraw the Chalice."
+      "description": "Use the System VIA timer to pick a byte of the Chalice sprite, clear it, and redraw the Chalice.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 4594,
@@ -605,7 +687,12 @@
       "move": "game_image",
       "name": "plot_chalice",
       "title": "Plot the Chalice",
-      "description": "Plot the Chalice sprite at its place on the map."
+      "description": "Plot the Chalice sprite at its place on the map.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 7360,
@@ -613,7 +700,12 @@
       "move": "game_image",
       "name": "update_game",
       "title": "Run one frame of play",
-      "description": "Move the heroes, open doors for heroes carrying the right key, pick up and swap keys, then draw the objects, move the missiles and the monsters, and handle the pause key."
+      "description": "Move the heroes, open doors for heroes carrying the right key, pick up and swap keys, then draw the objects, move the missiles and the monsters, and handle the pause key.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 8250,
@@ -657,7 +749,18 @@
       "move": "game_image",
       "name": "find_open_neighbour",
       "title": "Find a free cell next to a cell",
-      "description": "Starting with cell_x, cell_y, try the cells above, to the right, below and to the left, and leave cell_x, cell_y at the first without a wall."
+      "description": "Starting with cell_x, cell_y, try the cells above, to the right, below and to the left, and leave cell_x, cell_y at the first without a wall.",
+      "on_entry": {
+        "cell_x": "cell x",
+        "cell_y": "cell y"
+      },
+      "on_exit": {
+        "cell_x": "x of the first free neighbour, trying above, right and below; otherwise the cell to the left, unchecked",
+        "cell_y": "its y",
+        "Y": "0 if a free neighbour was found",
+        "A": "corrupted",
+        "X": "corrupted"
+      }
     },
     {
       "addr": 5792,
@@ -666,13 +769,23 @@
       "name": "queue_exit_marker",
       "title": "Sound the exit and add a queue marker",
       "description": "Play the exit sound and put a &64 entry in the first free slot of returning_hero_queue.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      },
       "fall_through": true
     },
     {
       "addr": 28288,
       "name": "move_heroes",
       "title": "Move the heroes",
-      "description": "For each hero in play: continue a step between cells, or read the hero's keys (and, for heroes 0 and 1, the magic key) and start a step or fire a missile; check the new cell for walls, monsters, other heroes and objects, change view when the hero enters another room, and draw the hero."
+      "description": "For each hero in play: continue a step between cells, or read the hero's keys (and, for heroes 0 and 1, the magic key) and start a step or fire a missile; check the new cell for walls, monsters, other heroes and objects, change view when the hero enters another room, and draw the hero.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 31586,
@@ -754,13 +867,23 @@
       "addr": 29859,
       "name": "play_pickup_sound",
       "title": "Play the pickup sound",
-      "description": "Define the pickup envelope and play the pickup sound, from the OSWORD parameter blocks at &192C and &193A."
+      "description": "Define the pickup envelope and play the pickup sound, from the OSWORD parameter blocks at &192C and &193A.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 28874,
       "name": "move_missiles",
       "title": "Move the missiles",
-      "description": "Advance every missile in flight one cell. A missile stops at a wall, damages a monster or hero it meets, and bounces back off an energy drainer, wearing it down."
+      "description": "Advance every missile in flight one cell. A missile stops at a wall, damages a monster or hero it meets, and bounces back off an energy drainer, wearing it down.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 30535,
@@ -786,7 +909,12 @@
       "addr": 30600,
       "name": "draw_all_views",
       "title": "Draw all four views",
-      "description": "Draw the room each hero's view shows."
+      "description": "Draw the room each hero's view shows.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 29996,
@@ -804,37 +932,89 @@
       "addr": 30613,
       "name": "draw_view_0",
       "title": "Draw the top-left view",
-      "description": "Draw the room in hero 0's view."
+      "description": "Draw the room in hero 0's view.",
+      "on_entry": {
+        "view_room": "the room hero 0 is in"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 30631,
       "name": "draw_view_1",
       "title": "Draw the top-right view",
-      "description": "Draw the room in hero 1's view."
+      "description": "Draw the room in hero 1's view.",
+      "on_entry": {
+        "view_room + 2": "the room hero 1 is in"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 30649,
       "name": "draw_view_2",
       "title": "Draw the bottom-left view",
-      "description": "Draw the room in hero 2's view."
+      "description": "Draw the room in hero 2's view.",
+      "on_entry": {
+        "view_room + 4": "the room hero 2 is in"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 30667,
       "name": "draw_view_3",
       "title": "Draw the bottom-right view",
-      "description": "Draw the room in hero 3's view."
+      "description": "Draw the room in hero 3's view.",
+      "on_entry": {
+        "view_room + 6": "the room hero 3 is in"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 30686,
       "name": "draw_room",
       "title": "Draw a room",
-      "description": "Draw the eight rows of walls of the room at &7B, &7C (a pointer into room_walls) with its top-left at plot_y and the column in cell_x, then draw the doors."
+      "description": "Draw the eight rows of walls of the room at &7B, &7C (a pointer into room_walls) with its top-left at plot_y and the column in cell_x, then draw the doors.",
+      "on_entry": {
+        "map_ptr": "the room's offset in room_walls (the low byte)",
+        "cell_x": "the view's left column",
+        "plot_y": "the view's top pixel row"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "0",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 30752,
       "name": "draw_room_row",
       "title": "Draw one row of a room",
-      "description": "Plot a wall or a blank for each of the eight bits of scratch, four byte columns apart, starting at byte column cell_x."
+      "description": "Plot a wall or a blank for each of the eight bits of scratch, four byte columns apart, starting at byte column cell_x.",
+      "on_entry": {
+        "scratch": "the row's eight wall bits, the leftmost cell in bit 7",
+        "cell_x": "the view's left column",
+        "plot_y": "the row's top pixel row"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 30802,
@@ -883,7 +1063,12 @@
       "addr": 31169,
       "name": "update_monsters",
       "title": "Draw the trapdoors and move the monsters",
-      "description": "Draw the eight trapdoors, then for each monster continue its step or start a new one, turning a random way when it is blocked, and advance dying monsters until they reappear at a trapdoor."
+      "description": "Draw the eight trapdoors, then for each monster continue its step or start a new one, turning a random way when it is blocked, and advance dying monsters until they reappear at a trapdoor.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 31723,
@@ -923,7 +1108,12 @@
       "move": "game_image",
       "name": "play_level",
       "title": "Play a level until it ends",
-      "description": "Run one frame every three vertical syncs: check for victory and update the game, take any hero standing on the exit down it, and animate one going down. Return when no hero is in play and every death animation has finished. Each hero_enters_exit leaves its return address on the stack (it ends with a jump back here), so the first RTS at the end of a level returns into this loop, once for each hero who left by the exit, before the last returns to the caller."
+      "description": "Run one frame every three vertical syncs: check for victory and update the game, take any hero standing on the exit down it, and animate one going down. Return when no hero is in play and every death animation has finished. Each hero_enters_exit leaves its return address on the stack (it ends with a jump back here), so the first RTS at the end of a level returns into this loop, once for each hero who left by the exit, before the last returns to the caller.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 3377,
@@ -931,7 +1121,7 @@
       "move": "game_image",
       "name": "game_entry",
       "title": "Start the game",
-      "description": "Set the bell sound (the BEL character's channel, envelope, pitch and duration), save WRCHV in saved_wrchv and point WRCHV at wrch_handler. The code here is run once only: from &0D40 its bytes are then reused as the missile tables and other workspace in page &0D, which reset_workspace refreshes for each level."
+      "description": "Set the bell sound (the BEL character's channel, envelope, pitch and duration), save WRCHV in saved_wrchv and point WRCHV at wrch_handler. The code here is run once only: from &0D40 its bytes are then reused as the missile tables and other workspace in page &0D, which reset_workspace refreshes for each level. It does not return: it starts a new game."
     },
     {
       "addr": 5120,
@@ -939,7 +1129,12 @@
       "move": "game_image",
       "name": "start_level",
       "title": "Set up and draw a new level",
-      "description": "Show the level number, load and unpack the level, reset the workspace and monsters, then clear the text area, set the screen to its full 25-row height and draw the view frames and views."
+      "description": "Show the level number, load and unpack the level, reset the workspace and monsters, then clear the text area, set the screen to its full 25-row height and draw the view frames and views.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 1856,
@@ -955,7 +1150,12 @@
       "move": "game_image",
       "name": "show_level_number",
       "title": "Show the number of the level about to start",
-      "description": "Clear the text area, count the level, plot the word LEVEL and print the number in the game's font, then set a text window and colour for later messages."
+      "description": "Clear the text area, count the level, plot the word LEVEL and print the number in the game's font, then set a text window and colour for later messages.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 20480,
@@ -967,7 +1167,13 @@
       "addr": 20536,
       "name": "select_tape_and_cheat",
       "title": "Select *TAPE and apply the start-level cheat",
-      "description": "Select the cassette filing system at 1200 baud, and copy the start level chosen in the loader (at &5100, poked there by DUNJ) into the stored copy of first_level's operand, where the copy loop then moves it."
+      "description": "Select the cassette filing system at 1200 baud, and copy the start level chosen in the loader (at &5100, poked there by DUNJ) into the stored copy of first_level's operand, where the copy loop then moves it.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "0",
+        "plot_x": "0, for start's copy"
+      }
     },
     {
       "addr": 5259,
@@ -975,7 +1181,12 @@
       "move": "game_image",
       "name": "first_level",
       "title": "Set the starting level",
-      "description": "Set level_bcd to the level before the first one played. The operand of the LDA is 0 unless the loader's start-level cheat has patched it."
+      "description": "Set level_bcd to the level before the first one played. The operand of the LDA is 0 unless the loader's start-level cheat has patched it.",
+      "on_exit": {
+        "A": "the level before the first to play (0, or the cheat's choice)",
+        "X": "preserved",
+        "Y": "preserved"
+      }
     },
     {
       "addr": 5190,
@@ -983,7 +1194,12 @@
       "move": "game_image",
       "name": "load_level",
       "title": "Load the level file",
-      "description": "Reset the page numbers in the self-modifying copy loops, then move pages &0E-&18 out of the filing system's way and load the level from disc (save_game_pages, continuing in load_level_from_copy)."
+      "description": "Reset the page numbers in the self-modifying copy loops, then move pages &0E-&18 out of the filing system's way and load the level from disc (save_game_pages, continuing in load_level_from_copy).",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 1104,
@@ -991,7 +1207,12 @@
       "move": "game_image",
       "name": "save_game_pages",
       "title": "Move the game out of the way and load a level",
-      "description": "Keep the level number's digits on the stack, copy pages &0E-&18 to &4E-&58 and clear the originals for the filing system's use, put the digits into the moved copy of level_command, and jump to the moved copy of load_level_from_copy."
+      "description": "Keep the level number's digits on the stack, copy pages &0E-&18 to &4E-&58 and clear the originals for the filing system's use, put the digits into the moved copy of level_command, and jump to the moved copy of load_level_from_copy.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 5212,
@@ -999,7 +1220,12 @@
       "move": "game_image",
       "name": "load_level_from_copy",
       "title": "Load a level, running from the copy at &545C",
-      "description": "Runs only from its copy at &545C, made by save_game_pages, so its addresses are those of the copy. Select the disc filing system, *LOAD the level, reselect *TAPE, and copy pages &4E-&58 back to &0E-&18 before returning to start_level."
+      "description": "Runs only from its copy at &545C, made by save_game_pages, so its addresses are those of the copy. Select the disc filing system, *LOAD the level, reselect *TAPE, and copy pages &4E-&58 back to &0E-&18 before returning to start_level.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     }
   ],
   "banners": [

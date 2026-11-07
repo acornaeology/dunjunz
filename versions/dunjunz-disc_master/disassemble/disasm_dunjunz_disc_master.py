@@ -253,7 +253,8 @@ master.byte(0x07CD, 3, cols=3)
 master.sub(0x07D0, "set_bell", "Set the bell sound",
            "OSBYTEs &D3-&D6: the BEL character's sound on channel &13, "
            "envelope 0 (fixed amplitude), pitch &64, duration 1. The "
-           "cassette game's start-up sets the same sound on channel &11.")
+           "cassette game's start-up sets the same sound on channel &11.",
+            on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 comments(master, [
     (0x07D0, "OSBYTE &D3: bell channel..."),
     (0x07D2, "...&13"), (0x07D4, "..."), (0x07D6, "..."),
@@ -373,7 +374,8 @@ master.sub(0x1400, "start_level", "Set up and draw a new level",
            "the level, put the MOS's page &0D back and load the level, "
            "unpack it, reset the workspace and monsters, clear the text "
            "area, show 25 rows, draw the view frames and views, and restart "
-           "the music, from where it was after the first level.")
+           "the music, from where it was after the first level.",
+            on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 comments(master, [
     (0x1400, "First level?"),
     (0x1403, "..."), (0x1405, "..."),
@@ -426,7 +428,8 @@ master.sub(0x1483, "load_level", "Put the MOS's page &0D back and load the level
            "so that the filing system's NMI code and workspace are intact, "
            "write the level number's digits into level_command, show 15 "
            "rows while loading, and *LOAD LEVELnn 6B00 (level 25 comes from "
-           "Stones, via load_stones in Table). Then decrypt and check it.")
+           "Stones, via load_stones in Table). Then decrypt and check it.",
+            on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 comments(master, [
     (0x1483, "Copy &C400-&C4FF back to page &0D..."),
     (0x1485, "..."), (0x1488, "..."), (0x148B, "..."), (0x148C, "..."),
@@ -463,7 +466,8 @@ master.string(0x14FB, 17)
 master.byte(0x150C)
 master.sub(0x1612, "count_level", "Clear the text area and count the level",
            "The cassette game's show_level_number also plots LEVEL and the "
-           "number; this side shows no level number.")
+           "number; this side shows no level number.",
+            on_exit={"A": "corrupted", "X": "preserved", "Y": "preserved"})
 comments(master, [
     (0x1612, "Clear the text area"),
     (0x1615, "Count the level"),
@@ -525,7 +529,8 @@ comments(master, [
 
 master.sub(0xC5A0, "load_stones", "Load level 25 from Stones",
            "Level 25 has no file of its own: Stones ends with its data, so "
-           "*LOAD STONES 6680 puts it at &6B00. Then decrypt and check it.")
+           "*LOAD STONES 6680 puts it at &6B00. Then decrypt and check it.",
+            on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 comments(master, [
     (0xC5A0, "*LOAD STONES 6680"),
     (0xC5A2, "..."), (0xC5A4, "..."),
@@ -537,7 +542,8 @@ master.byte(0xC5BA, 0x46, cols=8)
 master.sub(0xC600, "game_over_music", "Stop the music for the game-over message",
            "Stop the music, send the VDU 28 that the game-over code's text "
            "window begins with, and set the top row in clear_text_area's "
-           "window to 0.")
+           "window to 0.",
+            on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 comments(master, [
     (0xC600, "Stop the music"),
     (0xC603, "VDU 28: the game-over text window..."),
@@ -568,7 +574,8 @@ master.byte(0xC6A7, 0x19, cols=8)
 master.sub(0xC6C0, "show_free_space", "*FREE",
            "Show the disc's free space. The game never calls it: [*EDITOR](address:23F7@/editor) "
            "does, after cataloguing the disc, relying on Table being in "
-           "private RAM.")
+           "private RAM.",
+            on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 comments(master, [
     (0xC6C0, "*FREE..."),
     (0xC6C2, "..."), (0xC6C4, "..."),
@@ -586,7 +593,8 @@ master.sub(0xC6D0, "pause_check", "Pause while P is pressed",
            "Called from check_pause in the game's update. If P (internal "
            "key &37) is held, wait for it to be released, pressed again and "
            "released, then restart the frame timing. The Model B side uses "
-           "the same key.")
+           "the same key.",
+            on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 comments(master, [
     (0xC6D0, "OSBYTE &7A: which key is pressed?"),
     (0xC6D2, "..."),
@@ -600,7 +608,8 @@ comments(master, [
     (0xC6EA, "..."),
     (0xC6ED, "Return"),
 ])
-master.sub(0xC6EE, "wait_p_released", "Wait until P is not pressed", "")
+master.sub(0xC6EE, "wait_p_released", "Wait until P is not pressed", "",
+            on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 comments(master, [
     (0xC6EE, "OSBYTE &7A: which key is pressed?"),
     (0xC6F0, "..."),
@@ -616,7 +625,8 @@ master.sub(0xC700, "start_music", "Start the music",
            "Define envelopes 6-9, redirect the game's plot_sprite to the "
            "copy in Code3, point the tune at its first section, and play it "
            "on the interval timer: EVNTV is pointed at music_event and the "
-           "interval timer event enabled. Then play the first step.")
+           "interval timer event enabled. Then play the first step.",
+            on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 comments(master, [
     (0xC700, "ENVELOPE 6..."),
     (0xC702, "..."), (0xC704, "..."), (0xC706, "..."),
@@ -644,7 +654,8 @@ comments(master, [
     (0xC75D, "Play the first step, and return from there"),
 ])
 master.sub(0xC760, "stop_music", "Stop the music",
-           "OSBYTE 13, 5: disable the interval timer event.")
+           "OSBYTE 13, 5: disable the interval timer event.",
+            on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 comments(master, [
     (0xC760, "OSBYTE 13, 5: disable the interval timer event"),
     (0xC762, "..."), (0xC764, "..."), (0xC766, "..."),
