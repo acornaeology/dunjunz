@@ -37,9 +37,7 @@ def comments(a, pairs):
 # ---------------------------------------------------------------------------
 # Coder2: install the joystick handler, then run Coder.
 #
-# The OSCLI after *CODER never returns, so the trace must not run on into
-# the command strings (whose "L. " would decode as JMP &202E, a jump into
-# Dunj5's run addresses that dasmos traces even from bytes declared data).
+# The OSCLI that runs *CODER never returns; the command strings follow it.
 
 coder2 = Annotator(d, "disc_master", lambda addr: [(None, "")],
                    default_group=lambda addr: "loader")
