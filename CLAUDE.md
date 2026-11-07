@@ -117,6 +117,9 @@ on the official release.
   immediates. `tools/registers.py` suggests a routine's register inputs
   and what it corrupts (following calls); `tools/address_pairs.py` finds
   immediate pairs that are the halves of a labelled address.
+  `tools/cross_check.py REFERENCE_JSON OTHER_JSON ...` flags shared
+  operand expressions that land on different code in another version,
+  which a passing round trip cannot catch when the values coincide.
 
 ## Conventions
 

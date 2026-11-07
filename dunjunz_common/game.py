@@ -891,6 +891,9 @@ def annotate_game_entry(a: Annotator) -> None:
 def annotate_level_check(a: Annotator) -> None:
     """&0450-&04A9: the level decrypt-and-check routine and its table, in
     the official disc release and the sideways RAM hack."""
+    a.expr(0x0457, hi(sym("level_object_x")))
+    a.expr(0x046E, lo(sym("level_file_end")))
+    a.expr(0x0474, hi(sym("level_file_end")))
     a.sub(0x0450, "decrypt_level", "Decrypt and check the level just loaded",
           "Decrypt the level at &6B00-&6DAF in place, XORing each byte with "
           "the low byte of its own address, and sum the decrypted bytes. If "
@@ -3824,6 +3827,16 @@ COUNT_CONSTANTS = [
     (20, "max_door", "Doors are numbered 1 to 20"),
     (20, "max_key", "Keys are numbered 1 to 20; key n opens door n"),
     (0x3000, "screen_start", "The start of screen memory, as the game programs the 6845"),
+    (0xFF, "off_map", "A map x or y that puts a door, key, object, monster or the exit off the map"),
+    (0x64, "nobody_returns", "A returning_hero_queue entry that brings nobody back"),
+    (0x63, "step_out_of_play", "hero_step of a hero out of play, never animated"),
+    (0x23, "view_right_column", "The screen byte column of the two right-hand views"),
+    (0x67, "view_bottom_row", "The pixel row of the two lower views"),
+    (0x45, "panel_left", "The status panel's leftmost screen byte column"),
+    (0x6DB0, "level_file_end", "The end of the level file at &6B00"),
+    (25, "last_level", "The level with the Chalice"),
+    (0x1A, "chalice_x", "Map x of the Chalice's left cells"),
+    (4, "chalice_y", "Map y of the Chalice's top cells"),
 ]
 COUNT_OPERANDS = [
     (0x1511, "max_object"), (0x7172, "max_object"), (0x730C, "max_object"),
@@ -3833,6 +3846,27 @@ COUNT_OPERANDS = [
     (0x1528, "max_door"), (0x1CD7, "max_door"), (0x77FD, "max_door"),
     (0x153F, "max_key"), (0x1DCD, "max_key"), (0x1E44, "max_key"),
 ]
+COUNT_OPERANDS += [(addr, "off_map") for addr in (
+    0x158B, 0x1D8A, 0x1EA0, 0x1F73, 0x1F84, 0x7199, 0x7412, 0x7468, 0x74BA, 0x7CF1)]
+COUNT_OPERANDS += [(addr, "nobody_returns") for addr in (0x06EB, 0x16BA, 0x7449)]
+COUNT_OPERANDS += [(addr, "step_out_of_play") for addr in (0x06D4, 0x1F4C, 0x6E8B)]
+COUNT_OPERANDS += [(addr, "view_right_column") for addr in (0x77AC, 0x77D0, 0x78B7, 0x78EB)]
+COUNT_OPERANDS += [(addr, "view_bottom_row") for addr in (0x77BA, 0x77CC, 0x78D8, 0x78F2)]
+COUNT_OPERANDS += [(0x1074, "last_level"), (0x107D, "chalice_x"), (0x108E, "chalice_y"),
+                   (0x11F3, "chalice_x"), (0x11F8, "chalice_y")]
+# Expressions: (operand address, symbol, offset).
+OFFSET_OPERANDS = [
+    (0x7445, "nobody_returns", -1),
+    (0x1081, "chalice_x", 1), (0x1092, "chalice_y", 1),
+    (0x114A, "chalice_x", 2), (0x114E, "chalice_y", -1),
+    (0x0421, "panel_left", 0), (0x0F09, "panel_left", 0), (0x0F10, "panel_left", 8),
+    (0x0F22, "panel_left", 9), (0x0F3D, "panel_left", 6), (0x0F57, "panel_left", 7),
+    (0x1DA5, "panel_left", 5), (0x1E1B, "panel_left", 5), (0x1E76, "panel_left", 5),
+    (0x20C5, "panel_left", 5), (0x726C, "panel_left", 0), (0x7281, "panel_left", 3),
+    (0x72C5, "panel_left", 0), (0x72DA, "panel_left", 3), (0x72EA, "panel_left", 6),
+    (0x72FA, "panel_left", 9), (0x75B7, "panel_left", 9), (0x75D8, "panel_left", 6),
+    (0x75E3, "panel_left", 7), (0x75FA, "panel_left", 5),
+]
 PAGE_OPERANDS = [(0x1D67, "room_walls"), (0x77DF, "room_walls"), (0x791A, "room_walls"),
                  (0x0973, "screen_start")]
 MONSTER_SPRITE_OPERANDS = [
@@ -3841,7 +3875,9 @@ MONSTER_SPRITE_OPERANDS = [
     (0x7C43, "monster_right_0"), (0x7C4A, "monster_down_0"), (0x7C51, "monster_left_0"),
 ]
 CHAR_OPERANDS = [0x0597, 0x05A0, 0x0E3D, 0x0E4E, 0x15E9, 0x15F2, 0x7F98, 0x7FA0,
-                 0x7FA8, 0x7FB1, 0x7FB7, 0x7FDC]
+                 0x7FA8, 0x7FB1, 0x7FB7, 0x7FDC, 0x7F9C, 0x7FA4, 0x7FAC,
+                 0x054E, 0x0553, 0x0558, 0x055E, 0x0563, 0x0568, 0x056E, 0x0577,
+                 0x057C, 0x0593, 0x059B]
 
 
 def annotate_named_operands(a: Annotator) -> None:
@@ -3849,6 +3885,11 @@ def annotate_named_operands(a: Annotator) -> None:
         a.d.constant(value, name, comment=text)
     for operand_addr, name in COUNT_OPERANDS:
         a.expr(operand_addr, sym(name))
+    for operand_addr, name, offset in OFFSET_OPERANDS:
+        expression = sym(name)
+        if offset:
+            expression = expression + offset if offset > 0 else expression - (-offset)
+        a.expr(operand_addr, expression)
     for operand_addr, name in PAGE_OPERANDS:
         a.expr(operand_addr, hi(sym(name)))
     for operand_addr, name in MONSTER_SPRITE_OPERANDS:

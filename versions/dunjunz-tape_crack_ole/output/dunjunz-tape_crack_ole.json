@@ -268,6 +268,56 @@
       "comment": "The start of screen memory, as the game programs the 6845"
     },
     {
+      "name": "off_map",
+      "value": 255,
+      "comment": "A map x or y that puts a door, key, object, monster or the exit off the map"
+    },
+    {
+      "name": "nobody_returns",
+      "value": 100,
+      "comment": "A returning_hero_queue entry that brings nobody back"
+    },
+    {
+      "name": "step_out_of_play",
+      "value": 99,
+      "comment": "hero_step of a hero out of play, never animated"
+    },
+    {
+      "name": "view_right_column",
+      "value": 35,
+      "comment": "The screen byte column of the two right-hand views"
+    },
+    {
+      "name": "view_bottom_row",
+      "value": 103,
+      "comment": "The pixel row of the two lower views"
+    },
+    {
+      "name": "panel_left",
+      "value": 69,
+      "comment": "The status panel's leftmost screen byte column"
+    },
+    {
+      "name": "level_file_end",
+      "value": 28080,
+      "comment": "The end of the level file at &6B00"
+    },
+    {
+      "name": "last_level",
+      "value": 25,
+      "comment": "The level with the Chalice"
+    },
+    {
+      "name": "chalice_x",
+      "value": 26,
+      "comment": "Map x of the Chalice's left cells"
+    },
+    {
+      "name": "chalice_y",
+      "value": 4,
+      "comment": "Map y of the Chalice's top cells"
+    },
+    {
       "name": "boot_osfile_block",
       "value": 27392,
       "comment": "OSFILE control block built by boot_loader (in the level buffer)"
@@ -2517,7 +2567,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&45"
+      "operand": "#panel_left",
+      "expr": {
+        "text": "panel_left",
+        "tree": {
+          "sym": "panel_left"
+        }
+      }
     },
     {
       "addr": 1058,
@@ -4275,7 +4331,14 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&4e"
+      "operand": "#'N'",
+      "expr": {
+        "text": "'N'",
+        "tree": {
+          "int": 78,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 1359,
@@ -4307,7 +4370,14 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&4f"
+      "operand": "#'O'",
+      "expr": {
+        "text": "'O'",
+        "tree": {
+          "int": 79,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 1364,
@@ -4338,7 +4408,14 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&20"
+      "operand": "#' '",
+      "expr": {
+        "text": "' '",
+        "tree": {
+          "int": 32,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 1369,
@@ -4395,7 +4472,14 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&59"
+      "operand": "#'Y'",
+      "expr": {
+        "text": "'Y'",
+        "tree": {
+          "int": 89,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 1375,
@@ -4427,7 +4511,14 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&45"
+      "operand": "#'E'",
+      "expr": {
+        "text": "'E'",
+        "tree": {
+          "int": 69,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 1380,
@@ -4458,7 +4549,14 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&53"
+      "operand": "#'S'",
+      "expr": {
+        "text": "'S'",
+        "tree": {
+          "int": 83,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 1385,
@@ -4515,7 +4613,14 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&46"
+      "operand": "#'F'",
+      "expr": {
+        "text": "'F'",
+        "tree": {
+          "int": 70,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 1391,
@@ -4590,7 +4695,14 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&4e"
+      "operand": "#'N'",
+      "expr": {
+        "text": "'N'",
+        "tree": {
+          "int": 78,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 1400,
@@ -4622,7 +4734,14 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&20"
+      "operand": "#' '",
+      "expr": {
+        "text": "' '",
+        "tree": {
+          "int": 32,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 1405,
@@ -4828,7 +4947,14 @@
       "comment_inline": "SPACE?",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&20"
+      "operand": "#' '",
+      "expr": {
+        "text": "' '",
+        "tree": {
+          "int": 32,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 1428,
@@ -4897,7 +5023,14 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&37"
+      "operand": "#'7'",
+      "expr": {
+        "text": "'7'",
+        "tree": {
+          "int": 55,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 1436,
@@ -6686,7 +6819,13 @@
       "comment_inline": "...never to be animated (step &63)...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&63"
+      "operand": "#step_out_of_play",
+      "expr": {
+        "text": "step_out_of_play",
+        "tree": {
+          "sym": "step_out_of_play"
+        }
+      }
     },
     {
       "addr": 1749,
@@ -6845,7 +6984,13 @@
       "comment_inline": "...and a &64 marker in the returning queue",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&64"
+      "operand": "#nobody_returns",
+      "expr": {
+        "text": "nobody_returns",
+        "tree": {
+          "sym": "nobody_returns"
+        }
+      }
     },
     {
       "addr": 1772,
@@ -21365,7 +21510,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&45"
+      "operand": "#panel_left",
+      "expr": {
+        "text": "panel_left",
+        "tree": {
+          "sym": "panel_left"
+        }
+      }
     },
     {
       "addr": 3850,
@@ -21411,7 +21562,20 @@
       "comment_inline": "Shield, at column &4D, row 0",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&4d"
+      "operand": "#panel_left + 8",
+      "expr": {
+        "text": "panel_left + 8",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "panel_left"
+          },
+          "right": {
+            "int": 8,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 3857,
@@ -21539,7 +21703,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&4e"
+      "operand": "#panel_left + 9",
+      "expr": {
+        "text": "panel_left + 9",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "panel_left"
+          },
+          "right": {
+            "int": 9,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 3875,
@@ -21747,7 +21924,20 @@
       "comment_inline": "...at column &4B",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&4b"
+      "operand": "#panel_left + 6",
+      "expr": {
+        "text": "panel_left + 6",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "panel_left"
+          },
+          "right": {
+            "int": 6,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 3902,
@@ -21959,7 +22149,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&4c"
+      "operand": "#panel_left + 7",
+      "expr": {
+        "text": "panel_left + 7",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "panel_left"
+          },
+          "right": {
+            "int": 7,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 3928,
@@ -22870,7 +23073,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&19"
+      "operand": "#last_level",
+      "expr": {
+        "text": "last_level",
+        "tree": {
+          "sym": "last_level"
+        }
+      }
     },
     {
       "addr": 4213,
@@ -22947,7 +23156,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&1a"
+      "operand": "#chalice_x",
+      "expr": {
+        "text": "chalice_x",
+        "tree": {
+          "sym": "chalice_x"
+        }
+      }
     },
     {
       "addr": 4222,
@@ -22978,7 +23193,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&1b"
+      "operand": "#chalice_x + 1",
+      "expr": {
+        "text": "chalice_x + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "chalice_x"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 4226,
@@ -23130,7 +23358,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#4"
+      "operand": "#chalice_y",
+      "expr": {
+        "text": "chalice_y",
+        "tree": {
+          "sym": "chalice_y"
+        }
+      }
     },
     {
       "addr": 4239,
@@ -23161,7 +23395,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#5"
+      "operand": "#chalice_y + 1",
+      "expr": {
+        "text": "chalice_y + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "chalice_y"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 4243,
@@ -24657,7 +24904,20 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&1c"
+      "operand": "#chalice_x + 2",
+      "expr": {
+        "text": "chalice_x + 2",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "chalice_x"
+          },
+          "right": {
+            "int": 2,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 4427,
@@ -24687,7 +24947,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#3"
+      "operand": "#chalice_y - 1",
+      "expr": {
+        "text": "chalice_y - 1",
+        "tree": {
+          "op": "sub",
+          "left": {
+            "sym": "chalice_y"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 4431,
@@ -26102,7 +26375,13 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&1a"
+      "operand": "#chalice_x",
+      "expr": {
+        "text": "chalice_x",
+        "tree": {
+          "sym": "chalice_x"
+        }
+      }
     },
     {
       "addr": 4596,
@@ -26134,7 +26413,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#4"
+      "operand": "#chalice_y",
+      "expr": {
+        "text": "chalice_y",
+        "tree": {
+          "sym": "chalice_y"
+        }
+      }
     },
     {
       "addr": 4601,
@@ -30747,7 +31032,13 @@
       "comment_inline": "...off the map...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&ff"
+      "operand": "#off_map",
+      "expr": {
+        "text": "off_map",
+        "tree": {
+          "sym": "off_map"
+        }
+      }
     },
     {
       "addr": 5516,
@@ -32533,7 +32824,13 @@
       "comment_inline": "...and add a &64 marker there",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&64"
+      "operand": "#nobody_returns",
+      "expr": {
+        "text": "nobody_returns",
+        "tree": {
+          "sym": "nobody_returns"
+        }
+      }
     },
     {
       "addr": 5819,
@@ -38435,7 +38732,13 @@
       "comment_inline": "Remove the door...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&ff"
+      "operand": "#off_map",
+      "expr": {
+        "text": "off_map",
+        "tree": {
+          "sym": "off_map"
+        }
+      }
     },
     {
       "addr": 7563,
@@ -38637,7 +38940,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&4a"
+      "operand": "#panel_left + 5",
+      "expr": {
+        "text": "panel_left + 5",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "panel_left"
+          },
+          "right": {
+            "int": 5,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 7590,
@@ -39630,7 +39946,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&4a"
+      "operand": "#panel_left + 5",
+      "expr": {
+        "text": "panel_left + 5",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "panel_left"
+          },
+          "right": {
+            "int": 5,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 7708,
@@ -40378,7 +40707,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&4a"
+      "operand": "#panel_left + 5",
+      "expr": {
+        "text": "panel_left + 5",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "panel_left"
+          },
+          "right": {
+            "int": 5,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 7799,
@@ -40710,7 +41052,13 @@
       "comment_inline": "Take the new key off the floor",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&ff"
+      "operand": "#off_map",
+      "expr": {
+        "text": "off_map",
+        "tree": {
+          "sym": "off_map"
+        }
+      }
     },
     {
       "addr": 7841,
@@ -42203,7 +42551,13 @@
       "comment_inline": "Take them out of play for the rest of the level",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&63"
+      "operand": "#step_out_of_play",
+      "expr": {
+        "text": "step_out_of_play",
+        "tree": {
+          "sym": "step_out_of_play"
+        }
+      }
     },
     {
       "addr": 8013,
@@ -42486,7 +42840,13 @@
       "comment_inline": "Move them off the map",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&ff"
+      "operand": "#off_map",
+      "expr": {
+        "text": "off_map",
+        "tree": {
+          "sym": "off_map"
+        }
+      }
     },
     {
       "addr": 8052,
@@ -42588,7 +42948,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&ff"
+      "operand": "#off_map",
+      "expr": {
+        "text": "off_map",
+        "tree": {
+          "sym": "off_map"
+        }
+      }
     },
     {
       "addr": 8069,
@@ -44985,7 +45351,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&4a"
+      "operand": "#panel_left + 5",
+      "expr": {
+        "text": "panel_left + 5",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "panel_left"
+          },
+          "right": {
+            "int": 5,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 8390,
@@ -57633,7 +58012,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&63"
+      "operand": "#step_out_of_play",
+      "expr": {
+        "text": "step_out_of_play",
+        "tree": {
+          "sym": "step_out_of_play"
+        }
+      }
     },
     {
       "addr": 28300,
@@ -62858,7 +63243,13 @@
       "comment_inline": "Yes: remove it from the level",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&ff"
+      "operand": "#off_map",
+      "expr": {
+        "text": "off_map",
+        "tree": {
+          "sym": "off_map"
+        }
+      }
     },
     {
       "addr": 29082,
@@ -64510,7 +64901,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&45"
+      "operand": "#panel_left",
+      "expr": {
+        "text": "panel_left",
+        "tree": {
+          "sym": "panel_left"
+        }
+      }
     },
     {
       "addr": 29293,
@@ -64652,7 +65049,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&48"
+      "operand": "#panel_left + 3",
+      "expr": {
+        "text": "panel_left + 3",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "panel_left"
+          },
+          "right": {
+            "int": 3,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 29314,
@@ -65203,7 +65613,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&45"
+      "operand": "#panel_left",
+      "expr": {
+        "text": "panel_left",
+        "tree": {
+          "sym": "panel_left"
+        }
+      }
     },
     {
       "addr": 29382,
@@ -65345,7 +65761,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&48"
+      "operand": "#panel_left + 3",
+      "expr": {
+        "text": "panel_left + 3",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "panel_left"
+          },
+          "right": {
+            "int": 3,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 29403,
@@ -65457,7 +65886,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&4b"
+      "operand": "#panel_left + 6",
+      "expr": {
+        "text": "panel_left + 6",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "panel_left"
+          },
+          "right": {
+            "int": 6,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 29419,
@@ -65569,7 +66011,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&4e"
+      "operand": "#panel_left + 9",
+      "expr": {
+        "text": "panel_left + 9",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "panel_left"
+          },
+          "right": {
+            "int": 9,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 29435,
@@ -67676,7 +68131,13 @@
       "comment_inline": "Yes: remove it",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&ff"
+      "operand": "#off_map",
+      "expr": {
+        "text": "off_map",
+        "tree": {
+          "sym": "off_map"
+        }
+      }
     },
     {
       "addr": 29715,
@@ -67996,7 +68457,20 @@
       "comment_inline": "A &64 marker?",
       "type": "code",
       "mnemonic": "cpx",
-      "operand": "#&63"
+      "operand": "#nobody_returns - 1",
+      "expr": {
+        "text": "nobody_returns - 1",
+        "tree": {
+          "op": "sub",
+          "left": {
+            "sym": "nobody_returns"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 29766,
@@ -68022,7 +68496,13 @@
       "comment_inline": "Yes: move it to the back and take the next entry",
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&64"
+      "operand": "#nobody_returns",
+      "expr": {
+        "text": "nobody_returns",
+        "tree": {
+          "sym": "nobody_returns"
+        }
+      }
     },
     {
       "addr": 29770,
@@ -68256,7 +68736,13 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&ff"
+      "operand": "#off_map",
+      "expr": {
+        "text": "off_map",
+        "tree": {
+          "sym": "off_map"
+        }
+      }
     },
     {
       "addr": 29801,
@@ -68945,7 +69431,13 @@
       "comment_inline": "Remove it from the level",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&ff"
+      "operand": "#off_map",
+      "expr": {
+        "text": "off_map",
+        "tree": {
+          "sym": "off_map"
+        }
+      }
     },
     {
       "addr": 29883,
@@ -70754,7 +71246,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&4e"
+      "operand": "#panel_left + 9",
+      "expr": {
+        "text": "panel_left + 9",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "panel_left"
+          },
+          "right": {
+            "int": 9,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 30136,
@@ -70981,7 +71486,20 @@
       "comment_inline": "...column &4B...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&4b"
+      "operand": "#panel_left + 6",
+      "expr": {
+        "text": "panel_left + 6",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "panel_left"
+          },
+          "right": {
+            "int": 6,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 30169,
@@ -71070,7 +71588,20 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&4c"
+      "operand": "#panel_left + 7",
+      "expr": {
+        "text": "panel_left + 7",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "panel_left"
+          },
+          "right": {
+            "int": 7,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 30180,
@@ -71244,7 +71775,20 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&4a"
+      "operand": "#panel_left + 5",
+      "expr": {
+        "text": "panel_left + 5",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "panel_left"
+          },
+          "right": {
+            "int": 5,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 30203,
@@ -74542,7 +75086,13 @@
       "comment_inline": "...column &23...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&23"
+      "operand": "#view_right_column",
+      "expr": {
+        "text": "view_right_column",
+        "tree": {
+          "sym": "view_right_column"
+        }
+      }
     },
     {
       "addr": 30637,
@@ -74640,7 +75190,13 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&67"
+      "operand": "#view_bottom_row",
+      "expr": {
+        "text": "view_bottom_row",
+        "tree": {
+          "sym": "view_bottom_row"
+        }
+      }
     },
     {
       "addr": 30651,
@@ -74764,7 +75320,13 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&67"
+      "operand": "#view_bottom_row",
+      "expr": {
+        "text": "view_bottom_row",
+        "tree": {
+          "sym": "view_bottom_row"
+        }
+      }
     },
     {
       "addr": 30669,
@@ -74790,7 +75352,13 @@
       "comment_inline": "...column &23...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&23"
+      "operand": "#view_right_column",
+      "expr": {
+        "text": "view_right_column",
+        "tree": {
+          "sym": "view_right_column"
+        }
+      }
     },
     {
       "addr": 30673,
@@ -76496,7 +77064,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&23"
+      "operand": "#view_right_column",
+      "expr": {
+        "text": "view_right_column",
+        "tree": {
+          "sym": "view_right_column"
+        }
+      }
     },
     {
       "addr": 30904,
@@ -76705,7 +77279,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&67"
+      "operand": "#view_bottom_row",
+      "expr": {
+        "text": "view_bottom_row",
+        "tree": {
+          "sym": "view_bottom_row"
+        }
+      }
     },
     {
       "addr": 30937,
@@ -76830,7 +77410,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&23"
+      "operand": "#view_right_column",
+      "expr": {
+        "text": "view_right_column",
+        "tree": {
+          "sym": "view_right_column"
+        }
+      }
     },
     {
       "addr": 30956,
@@ -76872,7 +77458,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&67"
+      "operand": "#view_bottom_row",
+      "expr": {
+        "text": "view_bottom_row",
+        "tree": {
+          "sym": "view_bottom_row"
+        }
+      }
     },
     {
       "addr": 30963,
@@ -83957,7 +84549,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&ff"
+      "operand": "#off_map",
+      "expr": {
+        "text": "off_map",
+        "tree": {
+          "sym": "off_map"
+        }
+      }
     },
     {
       "addr": 31986,
@@ -87165,7 +87763,14 @@
       "comment_inline": "'0'-'9': a digit",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&3a"
+      "operand": "#':'",
+      "expr": {
+        "text": "':'",
+        "tree": {
+          "int": 58,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 32669,
@@ -87224,7 +87829,14 @@
       "comment_inline": "'A'-'Z': a capital letter",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&5b"
+      "operand": "#'['",
+      "expr": {
+        "text": "'['",
+        "tree": {
+          "int": 91,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 32677,
@@ -87283,7 +87895,14 @@
       "comment_inline": "Above 'z': print it unchanged",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&7b"
+      "operand": "#'{'",
+      "expr": {
+        "text": "'{'",
+        "tree": {
+          "int": 123,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 32685,
