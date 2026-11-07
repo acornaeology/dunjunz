@@ -715,7 +715,10 @@ numbered below it is held, as most movement keys are. The same applies
 to the press that ends the pause **[confirmed from the code]**. On the
 disc's Model B side the game does not wait for P to be released after
 the second press, so a P still held at the next frame's check pauses
-again **[confirmed from the code]**.
+again **[confirmed in beebium]**: with P held through the unpausing press,
+the next pause test, 19 vsyncs later (the counter is set to &10), went
+straight back into `wait_pause_release` (`tools/timing_probe.py
+disc_repause`).
 
 ### The victory bell is set with a stale Y
 
@@ -750,7 +753,15 @@ blocks heroes and costs the point, though missiles pass through it
 A step into a cell inside a room takes four frames (`start_monster_step`
 draws a quarter of the way, `continue_monster_step` a half, three
 quarters, then the cell). A cell on a room's edge, in the direction of
-travel, is entered at once **[confirmed from the code]**.
+travel, is entered at once, and so is the first cell of the next room,
+so a monster crosses a room boundary two cells in two frames.
+
+**[confirmed in beebium]** On the sideways RAM hack's level 1, following
+every monster for 80 frames (`tools/timing_probe.py monster_step`): of
+the steps inside a room, 394 took four frames and none fewer (longer
+gaps are monsters that were blocked and turned); 43 of 54 steps onto an
+edge cell, and 47 of 52 into the next room, came one frame after the
+previous step.
 
 ### All the monsters emerge together at the start of a level
 
@@ -781,16 +792,37 @@ The pause loop (&1ED7-&1EF5) does not set `os_vsync_counter` (&0240)
 again. The MOS counts it down at every vsync throughout the pause, so it
 can be positive when play resumes and `play_level` then waits up to 128
 vsyncs, about 2.6 seconds, for the next frame. Both disc sides reset the
-counter after a pause **[inference from the code and the MOS; not
-tested]**.
+counter after a pause.
+
+**[confirmed in beebium]** On the sideways RAM hack (the crack's pause
+code is the same), pausing with f1 for various times and measuring from
+the unpause to the next frame (`tools/timing_probe.py hack_pause`):
+
+| Paused (vsyncs) | Counter at resume | Next frame after |
+|---|---|---|
+| 55 | &C8 | 0 vsyncs |
+| 105 | &96 | 0 vsyncs |
+| 155 | &64 | 101 vsyncs (2.02 s) |
+| 180 | &4C | 77 vsyncs (1.54 s) |
+| 205 | &32 | 51 vsyncs (1.02 s) |
+| 255 | &00 | 1 vsync |
+
+The game freezes for the counter's value plus one vsync after any pause
+of between about 2.6 and 5.1 seconds (and of the same lengths plus
+multiples of 5.1 seconds).
 
 ### Game over waits for the vsync counter to reach exactly 0
 
 At &0EB9 the game waits for &0240 to be 0. `play_level` last set it to 2
 and the MOS goes on counting it down, so if the window clear and message
 take more than two vsyncs the wait lasts until it wraps, up to 256
-vsyncs (about 5 s), before the keys are flushed and the timed wait starts
-**[inference from the code; not tested]**.
+vsyncs (about 5 s), before the keys are flushed and the timed wait starts.
+
+**[confirmed in beebium]** On the sideways RAM hack, with all four
+heroes made dead in play (`tools/timing_probe.py game_over`), the window
+clear and message took 18 vsyncs, leaving the counter at &EF, and the
+wait at &0EB9 then took 239 vsyncs (4.78 s). Keys pressed during it are
+flushed afterwards, so the message cannot be skipped for those seconds.
 
 ### The hero menu keeps the last game's choices
 

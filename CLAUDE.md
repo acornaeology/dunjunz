@@ -111,6 +111,11 @@ on the official release.
   and follows the end-of-level reset to the next: a pattern for testing
   the disc release at run time.
 
+- `uv run python tools/timing_probe.py TEST` measures the timing findings
+  in vsyncs (`hack_pause`, `game_over`, `monster_step`, `disc_repause`),
+  stopping with `debugger.run_to(addr, skip_current=True)`; the polling
+  `run_until` in `disc_level_probe.py` can miss an arrival.
+
 - `uv run python tools/master_probe.py BEEBJIT_FILEPATH ADDR [DUMP ...]
   [--then 'cmds']` runs the Master side in beebjit (beebium has no Master
   yet, rob-smallshire/beebium#189) and reports registers, ACCCON and
