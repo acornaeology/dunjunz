@@ -213,7 +213,7 @@ reset_vector             = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &80, &00, &00, &00, &01, &1e, &1e, &80
     equb &00, &00, &fe, &80, &80, &00, &00, &00
     equb &01, &14, &0a, &05, &02, &02, &02, &01
-    equb &00, &00, &ff, &80, &80, &00, &00, &00
+    equb &00, &00, &ff, &80, &80, &00, &00, &00  ; Not referenced
 ; ***************************************************************************************
 ; Plot a sprite
 ;
@@ -507,12 +507,12 @@ reset_vector             = &fffc  ; 6502 RESET vector, in the MOS ROM.
 .returning_hero_queue
     equb &03
 ; &0b2b referenced 2 times by &742f, &7438
-    equb &02
+    equb &02                            ; ...
 ; &0b2c referenced 2 times by &7435, &743e
-    equb &01
+    equb &01                            ; ...
 ; &0b2d referenced 2 times by &743b, &7441
-    equb &04
-    equb &10
+    equb &04                            ; ...
+    equb &10                            ; ...
 ; &0b2f referenced 5 times by &3bf9, &7cb3, &7cb6, &7cbf, &7cc2
 .next_trapdoor
     equb &04
@@ -538,28 +538,28 @@ reset_vector             = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &02, &02, &02, &03, &03, &04, &09, &09
     equb &10, &03, &03, &03, &10, &10, &10
 ; &0b8f used as index base 1 time by &79cd
-    equb &10
+    equb &10                            ; ...
 ; &0b90 used as index base 2 times by &3c94, &7cc5
 .trapdoor_x
     equb &0b
-    equb &15
-    equb &17
-    equb &10
-    equb &03
-    equb &17
-    equb &0d
+    equb &15                            ; ...
+    equb &17                            ; ...
+    equb &10                            ; ...
+    equb &03                            ; ...
+    equb &17                            ; ...
+    equb &0d                            ; ...
 ; &0b97 used as index base 1 time by &79d3
-    equb &1a
+    equb &1a                            ; ...
 ; &0b98 used as index base 2 times by &3c9a, &7ccb
 .trapdoor_y
     equb &04
-    equb &0c
-    equb &14
-    equb &1d
-    equb &25
-    equb &20
-    equb &28
-    equb &2c
+    equb &0c                            ; ...
+    equb &14                            ; ...
+    equb &1d                            ; ...
+    equb &25                            ; ...
+    equb &20                            ; ...
+    equb &28                            ; ...
+    equb &2c                            ; ...
 ; &0ba0 used as index base 5 times by &3626, &72aa, &72ad, &72b6, &72d4
 .hero_score_hundreds
     equb &1e, &1e, &1e, &1e
@@ -645,24 +645,24 @@ reset_vector             = &fffc  ; 6502 RESET vector, in the MOS ROM.
 .hero_y
     equb &80, &a0, &0d, &a9
 ; &0d19 used as index base 1 time by &4657
-    equb &00
+    equb &00                            ; ...
 ; &0d1a used as index base 19 times by &4526, &4692, &5480, &5880, &6e82, &6ecb, &6ede, &6ef1, &6f04, &6f2d, &6f79, &701c, &7097, &7221, &7249, &7452, &7711, &7b67, &7baf
 .hero_direction
     equb &8d
-    equb &84
-    equb &0d
-    equb &8d, &85
+    equb &84                            ; ...
+    equb &0d                            ; ...
+    equb &8d, &85                       ; ...
 ; &0d1f used as index base 1 time by &4663
-    equb &0d
+    equb &0d                            ; ...
 ; &0d20 referenced 2 times by &774e, &7753; also used as index base 13 times by &4533, &548a, &588a, &6f62, &6f67, &709c, &7457, &76ee, &76ff, &771f, &772e, &7ba2, &7ba7
 .hero_frame
     equb &ad
 ; &0d21 referenced 2 times by &775b, &7760
-    equb &12
+    equb &12                            ; ...
 ; &0d22 referenced 2 times by &7768, &776d
-    equb &02
+    equb &02                            ; ...
 ; &0d23 referenced 2 times by &7771, &7776
-    equb &8d, &2f
+    equb &8d, &2f                       ; ...
 ; &0d25 used as index base 13 times by &468d, &5485, &5885, &6e87, &6eaf, &6fc9, &6ff3, &702f, &7063, &7401, &7716, &7b64, &7baa
 .hero_step
     equb &0d, &ad, &13, &02, &8d
@@ -739,15 +739,15 @@ hero_key_fire = start_new_game+1
     lda #0                              ; Yes: start a new game
     jmp new_game_reset_heroes           ; ...from new_game's second instruction
     equs "eon5"
-    equb &0d, &18, &bd, &04, &0d, &69, &03
+    equb &0d, &18, &bd, &04, &0d, &69, &03  ; Not referenced
 ; &0d8f used as index base 1 time by &465c
-    equb &9d
+    equb &9d                            ; Not referenced
 ; &0d90 used as index base 11 times by &35ad, &548f, &588f, &7236, &7239, &726f, &738e, &7391, &739a, &7506, &7724
 .hero_health_tens
     equb &1d
-    equb &1d
-    equb &1d
-    equb &1d, &d0
+    equb &1d                            ; ...
+    equb &1d                            ; ...
+    equb &1d, &d0                       ; ...
 ; &0d95 used as index base 7 times by &7227, &722a, &7233, &727b, &739d, &750f, &7727
 .hero_health_units
     equs "''''"
@@ -755,17 +755,17 @@ hero_key_fire = start_new_game+1
 ; &0da0 referenced 2 times by &779e, &7893; also used as index base 3 times by &7043, &7544, &767c
 .view_room
     equb &18
-    equb &0c
+    equb &0c                            ; ...
 ; &0da2 referenced 2 times by &77b0, &78ad
-    equb &68
-    equb &0c
+    equb &68                            ; ...
+    equb &0c                            ; ...
 ; &0da4 referenced 2 times by &77c2, &78c7
-    equb &28
-    equb &0c
+    equb &28                            ; ...
+    equb &0c                            ; ...
 ; &0da6 referenced 2 times by &77d4, &78e1
-    equb &30
+    equb &30                            ; ...
     equb &0c, &00, &00, &bd, &04, &0d, &85, &71
-    equb &8a
+    equb &8a                            ; ...
 ; &0db0 used as index base 1 time by &6f50
 .hero_missile_sprites
     equb &10
@@ -820,13 +820,13 @@ hero_key_fire = start_new_game+1
     equb &ad, &9f, &16, &c9, &09, &b0, &04, &a2
     equb &00, &f0, &02, &a2, &01, &ad, &ff, &16
     equb &29, &0f, &18, &69, '0', &9d, &d5, &16
-    equb &e0, &00, &f0, &0d
+    equb &e0, &00, &f0, &0d             ; Not referenced
 ; &0e45 referenced 1 time by &35c4
 .to_next_level
     jmp next_level_by_reset             ; Next level: reset the machine and run Coder
     equs "JJJJ"
     equb &18, &69, '0', &8d, &d5, &16, &a9, &0d
-    equb &9d, &d6, &16
+    equb &9d, &d6, &16                  ; Not referenced
 ; &0e57 referenced 1 time by &355e
 .play_this_level
     jsr start_level                     ; Load and draw the level
@@ -1379,7 +1379,7 @@ reset_call_address = reset_call+1
     rts                                 ; Return
     equs "Rx`(&1900+F"
 ; &120f used as index base 1 time by &391e
-    equb &25
+    equb &25                            ; Not referenced
 ; &1210 used as index base 1 time by &390c
 .sprite_chalice
     equb &00, &00, &05, &0f, &0f, &0a, &00, &00
@@ -1411,7 +1411,7 @@ reset_call_address = reset_call+1
 .saved_wrchv
     equb &a4
 ; &12d4 referenced 2 times by &349e, &3c1d
-    equb &e0, &00, &73
+    equb &e0, &00, &73                  ; Not referenced
 ; ***************************************************************************************
 ; Font: letters A-Z
 ;
@@ -1822,11 +1822,11 @@ reset_call_address = reset_call+1
 .restart_intercept_done
     rts                                 ; Return to the MOS
     equs "CDISC"
-    equb &0d
+    equb &0d                            ; Not referenced
     equs "DUNJUNZ"
-    equb &0d, &9c, &14, &a9, &ff, &20, &00
+    equb &0d, &9c, &14, &a9, &ff, &20, &00  ; Not referenced
     equs "0LP"
-    equb &04
+    equb &04                            ; Not referenced
 ; ***************************************************************************************
 ; Reset the game workspace for a new level
 ;
@@ -2047,19 +2047,19 @@ reset_call_address = reset_call+1
 .next_level_intercept_done
     rts                                 ; Return to the MOS
     equb &f7, &ff, &a2, &e5, &a0, &15, &20, &f7
-    equb &ff
+    equb &ff                            ; Not referenced
     equs "`ODER"
-    equb &0d, &ad
+    equb &0d, &ad                       ; Not referenced
     equs "DISC"
-    equb &0d
+    equb &0d                            ; Not referenced
     equs "RUN CODER"
-    equb &0d, &0f, &18
+    equb &0d, &0f, &18                  ; Not referenced
     equs "i0 "
     equb &ee, &ff, &a9, &1c, &20, &ee, &ff, &a9
     equb &01, &20, &ee, &ff, &a9, &16, &20, &ee
     equb &ff, &a9, &0e, &20, &ee, &ff, &a9, &11
     equb &20, &ee, &ff, &a9, &11, &20, &ee, &ff
-    equb &a9, &02, &20, &ee, &ff, &60
+    equb &a9, &02, &20, &ee, &ff, &60   ; Not referenced
 ; ***************************************************************************************
 ; Clear the left of the screen
 ;
@@ -2154,7 +2154,7 @@ text_window_bottom = set_text_window_bottom+1
 .level_filename_digits
     equb &31
     equb &0d, &0d, &70, &00, &8d, &35, &f8, &00
-    equb &00, &00, &00
+    equb &00, &00, &00                  ; Not referenced
     equs "code"
     equb &00, &54, &12, &03, &17, &74, &00, &8c
     equb &50, &00, &00, &00, &fa, &16, &78, &00
@@ -2854,7 +2854,7 @@ text_window_bottom = set_text_window_bottom+1
 ; &1ef3 referenced 1 time by &461e
 .not_paused
     rts                                 ; Return
-    equb &f9, &60
+    equb &f9, &60                       ; Not referenced
 ; ***************************************************************************************
 ; Unused
 ;
@@ -3472,7 +3472,7 @@ text_window_bottom = set_text_window_bottom+1
 ; &06f8 used as index base 3 times by &51bf, &51c2, &51cb
 .page6_score_ten_thousands
     equs "iiii"
-    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00             ; Not referenced
 ; ***************************************************************************************
 ; Leftovers in the line-input buffer
 ;
@@ -3481,9 +3481,9 @@ text_window_bottom = set_text_window_bottom+1
 ; of BBC BASIC assembler (label+2:LDA#255:.label JSR&30).
 .line_buffer_leftovers
     equs "*SA. DANK 400+3FF 740"
-    equb &0d, &0d
+    equb &0d, &0d                       ; Not referenced
     equs "740"
-    equb &0d
+    equb &0d                            ; Not referenced
     equb &0d, &54, &50, &0d, &0d, &50, &0d  ; Not referenced
     equs "Alabel+2:LDA#255:.label JSR&30"
 ; ***************************************************************************************
@@ -3516,35 +3516,35 @@ text_window_bottom = set_text_window_bottom+1
 ; &551e referenced 1 time by &5517
     jsr &3000                           ; Call FILEV (operand patched above)
     jmp &2000                           ; Run the game
-    equb &00, &00, &00, &00
-    equb &00
+    equb &00, &00, &00, &00             ; Not referenced
+    equb &00                            ; Not referenced
 ; &0777 referenced 1 time by &591b
-    equb &00
+    equb &00                            ; Not referenced
 ; &0778 referenced 1 time by &5921
+    equb &00, &00, &00, &00, &00, &00, &00, &00  ; Not referenced
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00                  ; Not referenced
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00   ; Not referenced
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00  ; Not referenced
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00   ; Not referenced
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00  ; Not referenced
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00
-    equb &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00                            ; Not referenced
+    equb &00, &00, &00                  ; Not referenced
+    equb &00, &00, &00, &00, &00, &00, &00  ; Not referenced
 ; ***************************************************************************************
 ; Name of the file boot_loader loads
 .boot_filename
     equs "Dun1"
     equb &0d, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00             ; Not referenced
 
 
     ; Copy the newly assembled block of code back to it's proper place in the binary
@@ -4014,7 +4014,7 @@ text_window_bottom = set_text_window_bottom+1
 ; &06f8 used as index base 3 times by &55bf, &55c2, &55cb
 .page6_score_ten_thousands_joystick
     equs "iiii"
-    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00             ; Not referenced
 ; ***************************************************************************************
 ; Leftovers in the line-input buffer
 ;
@@ -4023,9 +4023,9 @@ text_window_bottom = set_text_window_bottom+1
 ; BBC BASIC assembler (label+2:LDA#255:.label JSR&30).
 .line_buffer_leftovers_joystick
     equs "*SA. Control 400+3FF"
-    equb &0d, &0d, &0d
+    equb &0d, &0d, &0d                  ; Not referenced
     equs "740"
-    equb &0d
+    equb &0d                            ; Not referenced
     equb &0d, &54, &50, &0d, &0d, &50, &0d  ; Not referenced
     equs "Alabel+2:LDA#255:.label JSR&30"
 ; ***************************************************************************************
@@ -4063,7 +4063,7 @@ text_window_bottom = set_text_window_bottom+1
 ; &5928 referenced 1 time by &5921
     jsr &3000                           ; Call FILEV (operand patched above)
     jmp &2000                           ; Run the game
-    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00             ; Not referenced
 ; ***************************************************************************************
 ; BYTEV handler: read a joystick for the third player's keys
 ;
@@ -4149,13 +4149,13 @@ text_window_bottom = set_text_window_bottom+1
 ; &07e9 referenced 1 time by &5932
 .joystick_pass_on
     jmp mos_osbyte_default              ; Pass the call on to the MOS 1.20 OSBYTE routine
-    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00             ; Not referenced
 ; ***************************************************************************************
 ; Name of the file boot_loader loads
 .boot_filename_joystick
     equs "Dun1"
     equb &0d, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00             ; Not referenced
 
 
     ; Copy the newly assembled block of code back to it's proper place in the binary
@@ -5681,7 +5681,7 @@ text_window_bottom = set_text_window_bottom+1
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00  ; Not referenced
 ; ***************************************************************************************
 ; Coder: load the game and the next level
 ;
@@ -5875,17 +5875,14 @@ text_window_bottom = set_text_window_bottom+1
     bne copy_core_byte                  ; ...
     jmp game_entry                      ; Start the game
 .stones_command
-    equs "LOAD STONES 6680"
-    equb &0d
+    equs "LOAD STONES 6680", &0d
 .dun1_command
-    equs "LOAD DUN1"
-    equb &0d
+    equs "LOAD DUN1", &0d
 .level_command
 ; &5171 referenced 1 time by &5066
 level_command_digits = level_command+10
 ; &5172 referenced 1 time by &506c
-    equs "LOAD LEVEL   6B00"
-    equb &0d
+    equs "LOAD LEVEL   6B00", &0d
 ; ***************************************************************************************
 ; Coder's VDU tables
 ;
@@ -6458,7 +6455,7 @@ level_command_digits = level_command+10
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00  ; Not referenced
 ; &6b00 used as index base 1 time by &3c52
 .level_object_x
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -9969,7 +9966,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     Data                     = 16788 bytes (68%)
 ;
 ;     Number of instructions   = 3574
-;     Number of data bytes     = 15911 bytes
+;     Number of data bytes     = 15908 bytes
 ;     Number of data words     = 64 bytes
-;     Number of string bytes   = 813 bytes
+;     Number of string bytes   = 816 bytes
 ;     Number of strings        = 83

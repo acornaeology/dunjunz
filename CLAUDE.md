@@ -161,9 +161,11 @@ feature or defect met along the way, and note the workaround here.
   against the extra save. fantasm's version graph (annotation porting)
   assumes one binary per version, so annotations shared between
   releases live in `dunjunz_common/`, keyed by runtime address.
-- Index regions cannot be declared inside a dasmos move, so
-  `Annotator.region` gives each offset in a moved table an `expr_label`
-  instead (`trapdoor_x - 1`).
+- Index regions cannot be declared inside a dasmos move
+  (acornaeology/dasmos#60), so `Annotator.region` gives each offset in a
+  moved table an `expr_label` instead (`trapdoor_x - 1`). Each expression
+  label starts a new item, so on the disc those tables list one entry per
+  line; the disc driver's `DISC_TABLE_ENTRIES` comments them.
 - The official disc's two &0400-&07FF images are two moves to one run
   address. Each image's labels are its own (the joystick image's carry a
   `_joystick` suffix), and every branch target in the page is named in

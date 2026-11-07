@@ -120,11 +120,9 @@ annotator.label(0x515D, "dun1_command", description="\"LOAD DUN1\".")
 annotator.label(0x5167, "level_command", description=(
     "\"LOAD LEVEL nn 6B00\", with the digits written at level_command+10."))
 annotator.label(0x5171, "level_command_digits", length=2)
-annotator.string(0x514C, 16)
-annotator.byte(0x515C, 1)
-annotator.string(0x515D, 9)
-annotator.byte(0x5166, 1)
-annotator.string(0x5167, 17)
+annotator.stringcr(0x514C)
+annotator.stringcr(0x515D)
+annotator.stringcr(0x5167)
 
 annotator.sub(0x5000, "coder_start", "Coder: load the game and the next level",
               "Run with *RUN CODER at the start of every level. Count the "
@@ -454,6 +452,99 @@ for addr, name in [(0x079B, "joystick_left"), (0x07A9, "joystick_right"),
     joystick_only.label(addr, name)
 for operand_addr in (0x0785, 0x0789, 0x078D, 0x0791, 0x0795):
     joystick_only.inkey_number(operand_addr)
+
+# ---------------------------------------------------------------------------
+# Data no instruction refers to, and the entries of moved tables that the
+# tables' expression labels split into items of their own
+# (acornaeology/dasmos#60): (move name or None, runtime address).
+
+DISC_UNREFERENCED = [
+    ('game_core', 0x08C0),
+    ('game_core', 0x0D88),
+    ('game_core', 0x0D8F),
+    ('game_core', 0x0E21),
+    ('game_core', 0x0E4C),
+    ('game_core', 0x120F),
+    ('game_core', 0x12D4),
+    ('game_core', 0x148D),
+    ('game_core', 0x1495),
+    ('game_core', 0x149F),
+    ('game_core', 0x15D0),
+    ('game_core', 0x15DE),
+    ('game_core', 0x15E4),
+    ('game_core', 0x15EE),
+    ('game_core', 0x15F4),
+    ('game_core', 0x16D6),
+    ('game_core', 0x1EF4),
+    (None, 0x4740),
+    ('low_keyboard', 0x06FC),
+    ('low_keyboard', 0x0715),
+    ('low_keyboard', 0x071A),
+    ('low_keyboard', 0x0772),
+    ('low_keyboard', 0x0776),
+    ('low_keyboard', 0x0777),
+    ('low_keyboard', 0x0778),
+    ('low_keyboard', 0x0780),
+    ('low_keyboard', 0x079B),
+    ('low_keyboard', 0x07A9),
+    ('low_keyboard', 0x07B8),
+    ('low_keyboard', 0x07C6),
+    ('low_keyboard', 0x07D5),
+    ('low_keyboard', 0x07E6),
+    ('low_keyboard', 0x07E9),
+    ('low_keyboard', 0x07F4),
+    ('low_joystick', 0x06FC),
+    ('low_joystick', 0x0714),
+    ('low_joystick', 0x071A),
+    ('low_joystick', 0x077C),
+    ('low_joystick', 0x07EC),
+    ('low_joystick', 0x07F4),
+    (None, 0x59B0),
+]
+DISC_TABLE_ENTRIES = [
+    ('game_core', 0x0B2B),
+    ('game_core', 0x0B2C),
+    ('game_core', 0x0B2D),
+    ('game_core', 0x0B2E),
+    ('game_core', 0x0B8F),
+    ('game_core', 0x0B91),
+    ('game_core', 0x0B92),
+    ('game_core', 0x0B93),
+    ('game_core', 0x0B94),
+    ('game_core', 0x0B95),
+    ('game_core', 0x0B96),
+    ('game_core', 0x0B97),
+    ('game_core', 0x0B99),
+    ('game_core', 0x0B9A),
+    ('game_core', 0x0B9B),
+    ('game_core', 0x0B9C),
+    ('game_core', 0x0B9D),
+    ('game_core', 0x0B9E),
+    ('game_core', 0x0B9F),
+    ('game_core', 0x0D19),
+    ('game_core', 0x0D1B),
+    ('game_core', 0x0D1C),
+    ('game_core', 0x0D1D),
+    ('game_core', 0x0D1F),
+    ('game_core', 0x0D21),
+    ('game_core', 0x0D22),
+    ('game_core', 0x0D23),
+    ('game_core', 0x0D91),
+    ('game_core', 0x0D92),
+    ('game_core', 0x0D93),
+    ('game_core', 0x0DA1),
+    ('game_core', 0x0DA2),
+    ('game_core', 0x0DA3),
+    ('game_core', 0x0DA4),
+    ('game_core', 0x0DA5),
+    ('game_core', 0x0DA6),
+    ('game_core', 0x0DA7),
+]
+moves_by_name = {"game_core": game_core, "low_keyboard": low_keyboard,
+                 "low_joystick": low_joystick, None: None}
+for entries, text in ((DISC_UNREFERENCED, "Not referenced"), (DISC_TABLE_ENTRIES, "...")):
+    for move_name, addr in entries:
+        d.comment(addr, text, align=dasmos.Align.INLINE, move=moves_by_name[move_name])
 
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)
