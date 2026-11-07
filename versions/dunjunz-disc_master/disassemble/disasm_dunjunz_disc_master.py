@@ -797,7 +797,7 @@ for addr, name in [
     (0xC538, "joystick_up"), (0xC546, "joystick_down"),
     (0xC555, "joystick_fire"), (0xC566, "joystick_not_pressed"),
     (0xC569, "joystick_pass_on"), (0xC6DC, "wait_p_pressed"),
-    (0xC77A, "play_step"), (0xC781, "play_channel_2"),
+    (0xC6ED, "not_paused"), (0xC77A, "play_step"), (0xC781, "play_channel_2"),
     (0xC793, "play_channel_3"), (0xC7A5, "next_step"),
     (0xC7BE, "store_rhythm_step"), (0xC7E0, "set_step_timer"),
     (0xC7F0, "end_of_section"), (0xC80B, "start_section"),

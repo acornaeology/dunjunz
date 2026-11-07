@@ -4,8 +4,8 @@
 
 For each listing, counts what the comment-coverage figure does not show:
 auto-generated labels (dasmos's code_/loop_/data_/sub_ names), subroutines
-without a calling convention (on_entry/on_exit), data items other than strings
-with no inline comment, and code whose operand is a raw address or a hex
+without a calling convention (on_entry/on_exit), data items other than strings and
+binary rows (pictures) with no inline comment, and code whose operand is a raw address or a hex
 immediate. `--list KIND` prints the addresses of one kind: auto, conv,
 data, rawaddr or hexconst.
 """
@@ -15,7 +15,7 @@ import json
 import re
 from pathlib import Path
 
-AUTO_RE = re.compile(r"\b(code|loop|data|sub)_[0-9a-f]{4}\b")
+AUTO_RE = re.compile(r"\b((code|loop|data|sub)_[0-9a-f]{4}|return_[0-9]+)\b")
 RAW_ADDR_RE = re.compile(r"^\(?&[0-9a-f]{3,4}\b")
 HEX_IMM_RE = re.compile(r"^#&[0-9a-f]+$")
 
@@ -41,7 +41,8 @@ def analyse(json_filepath):
                 found["rawaddr"].append((item["addr"], f"{mnemonic} {operand}"))
             if HEX_IMM_RE.match(operand):
                 found["hexconst"].append((item["addr"], f"{mnemonic} {operand}"))
-        elif item["type"] != "string" and not item.get("comment_inline") and not item.get("labels"):
+        elif (item["type"] != "string" and "binary" not in item.get("format_hints", [])
+              and not item.get("comment_inline") and not item.get("labels")):
             found["data"].append((item["addr"], f"{item['type']} x{len(item['bytes'])}"))
     for sub in listing["subroutines"]:
         if "title" not in sub:

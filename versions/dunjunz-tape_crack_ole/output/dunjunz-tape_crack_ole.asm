@@ -275,7 +275,11 @@ reset_vector               = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; &0447 referenced 1 time by &2408
 .add_thousand_points_done
     rts                                 ; Return
-    equb &00, &00, &00, &00, &00, &00, &00, &00
+; ***************************************************************************************
+; Unused
+;
+; Zero bytes, which nothing reads.
+    equb &00, &00, &00, &00, &00, &00, &00, &00  ; Zeros
 ; ***************************************************************************************
 ; Move the game out of the way and load a level
 ;
@@ -323,17 +327,22 @@ save_dest_page = store_saved_byte+2
     pla                                 ; ...
     sta moved_level_command_digits      ; ...
     jmp moved_load_level_from_copy      ; Continue in the moved copy of load_level_from_copy
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &62, &cd, &0c, &44
-    equb &1a, &22, &f6
+; ***************************************************************************************
+; Unused
+;
+; Zero bytes, which nothing reads.
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00  ; Zeros
+    equb &00, &62, &cd, &0c, &44, &1a, &22, &f6
     equs "B!}]"
     equb &d8, &a0, &f1, &0f, &cc, &d3, &53, &3b
-    equb &83, &71, &b2, &6f, &f3, &f1, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00
+    equb &83, &71, &b2, &6f, &f3, &f1
+; ***************************************************************************************
+; Unused
+;
+; Zero bytes, which nothing reads.
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00  ; Zeros
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00  ; ...
+    equb &00, &00, &00, &00, &00        ; ...
 .sprite_blank
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
@@ -649,7 +658,11 @@ save_dest_page = store_saved_byte+2
     cpx #4                              ; ...
     bne remove_absent_heroes_loop       ; ...
     rts                                 ; Return
-    equb &00, &00
+; ***************************************************************************************
+; Unused
+;
+; Zero bytes, which nothing reads.
+    equb &00, &00                       ; Zeros
 ; &06f8 used as index base 6 times by &240f, &2412, &241b, &26b4, &26bf, &2ef3
 .hero_score_ten_thousands
     equs "iiii"
@@ -887,10 +900,10 @@ save_dest_page = store_saved_byte+2
     clc                                 ; ...
     adc screen_ptr                      ; ...
     sta screen_ptr                      ; ...
-    bcc return_1                        ; ...
+    bcc screen_address_done             ; ...
     inc screen_ptr_hi                   ; ...with carry into the high byte
 ; &099f referenced 1 time by &299b
-.return_1
+.screen_address_done
     rts                                 ; Return
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -1124,208 +1137,20 @@ save_dest_page = store_saved_byte+2
     equw &0013, &0002, &00c8, &0002     ; SOUND channel 3 (flush), envelope 2, pitch 200, duration 2
 ; &0c00 used as index base 3 times by &3567, &7fc8, &7feb
 .room_walls
-    equb &54
-    equb &49
-    equb &4b
-    equb &50
-    equb &24
-    equb &55
-    equb &54
-    equb &48
-    equb &4f
-    equb &5b
-    equb &4b
-    equb &46
-    equb &2c
-    equb &44
-    equb &5d
-    equb &2f
-    equb &44
-    equb &59
-    equb &57
-    equb &33
-    equb &43
-    equb &5a
-    equb &44
-    equb &5c
-    equb &38
-    equb &56
-    equb &5c
-    equb &3b
-    equb &56
-    equb &48
-    equb &52
-    equb &56
-    equb &61
-    equb &6f
-    equb &02
-    equb &62
-    equb &72
-    equb &6c
-    equb &75
-    equb &07
-    equb &00
-    equb &6a
-    equb &03
-    equb &0b
-    equb &1d
-    equb &14
-    equb &16
-    equb &19
-    equb &10
-    equb &70
-    equb &67
-    equb &74
-    equb &61
-    equb &66
-    equb &62
-    equb &19
-    equb &71
-    equb &19
-; &0c3a used as index base 1 time by &30ba
-    equb &72
-    equb &7a
-    equb &6a
-    equb &78
-    equb &1e
-    equb &78
-    equb &09
-    equb &17
-    equb &07
-    equb &0d
-    equb &64
-    equb &0b
-    equb &09
-    equb &05
-    equb &07
-    equb &0d
-    equb &13
-    equb &6b
-    equb &1c
-    equb &08
-    equb &1c
-    equb &02
-    equb &19
-    equb &02
-    equb &01
-    equb &1a
-    equb &1b
-    equb &1b
-    equb &76
-    equb &03
-    equb &17
-    equb &79
-    equb &17
-    equb &1a
-    equb &0e
-    equb &16
-    equb &1b
-    equb &0b
-    equb &40
-    equb &35
-    equb &2a
-    equb &2a
-    equb &37
-    equb &45
-    equb &21
-    equb &26
-    equb &25
-    equb &2c
-    equb &4a
-    equb &32
-    equb &29
-    equb &39
-    equb &4e
-    equb &2e
-    equb &3e
-    equb &35
-    equb &52
-    equb &32
-    equb &3a
-    equb &2c
-    equb &56
-    equb &38
-    equb &36
-    equb &3c
-    equb &5a
-    equb &29
-    equb &39
-    equb &3c
-    equb &3a
-    equb &36
-    equb &ce
-    equb &c6
-    equb &a2
-    equb &d7
-    equb &cc
-    equb &cc
-    equb &d5
-    equb &a7
-    equb &c1
-    equb &da
-    equb &aa
-    equb &ca
-    equb &ac
-    equb &cb
-    equb &a4
-    equb &a5
-    equb &ba
-    equb &bb
-    equb &b8
-    equb &d4
-    equb &b4
-    equb &d7
-    equb &bc
-    equb &bd
-    equb &b2
-    equb &b3
-    equb &b0
-    equb &df
-    equb &bc
-    equb &d4
-    equb &d8
-    equb &bf
-    equb &f4
-    equb &e9
-    equb &e7
-    equb &fa
-    equb &84
-    equb &e4
-    equb &f4
-    equb &e2
-    equb &88
-    equb &ea
-    equb &e5
-    equb &e5
-    equb &ff
-    equb &e4
-    equb &ea
-    equb &ea
-    equb &e2
-    equb &f8
-    equb &fc
-    equb &f4
-    equb &94
-    equb &f0
-    equb &e4
-    equb &f6
-    equb &eb
-    equb &f0
-    equb &f4
-    equb &fc
-    equb &9c
-    equb &e9
-    equb &f6
-    equb &f6
-    equb &93
-    equb &e1
-    equb &8f
-    equb &86
-    equb &97
-    equb &96
-    equb &87
-    equb &80
-    equb &8d, &e7, &9e, &83, &8d, &83, &85, &90
+    equb &54, &49, &4b, &50, &24, &55, &54, &48, &4f, &5b, &4b, &46, &2c, &44, &5d, &2f  ; Not read: unpack_level copies each level's wall map here
+    equb &44, &59, &57, &33, &43, &5a, &44, &5c, &38, &56, &5c, &3b, &56, &48, &52, &56  ; ...
+    equb &61, &6f, &02, &62, &72, &6c, &75, &07, &00, &6a, &03, &0b, &1d, &14, &16, &19  ; ...
+    equb &10, &70, &67, &74, &61, &66, &62, &19, &71, &19, &72, &7a, &6a, &78, &1e, &78  ; ...
+    equb &09, &17, &07, &0d, &64, &0b, &09, &05, &07, &0d, &13, &6b, &1c, &08, &1c, &02  ; ...
+    equb &19, &02, &01, &1a, &1b, &1b, &76, &03, &17, &79, &17, &1a, &0e, &16, &1b, &0b  ; ...
+    equb &40, &35, &2a, &2a, &37, &45, &21, &26, &25, &2c, &4a, &32, &29, &39, &4e, &2e  ; ...
+    equb &3e, &35, &52, &32, &3a, &2c, &56, &38, &36, &3c, &5a, &29, &39, &3c, &3a, &36  ; ...
+    equb &ce, &c6, &a2, &d7, &cc, &cc, &d5, &a7, &c1, &da, &aa, &ca, &ac, &cb, &a4, &a5  ; ...
+    equb &ba, &bb, &b8, &d4, &b4, &d7, &bc, &bd, &b2, &b3, &b0, &df, &bc, &d4, &d8, &bf  ; ...
+    equb &f4, &e9, &e7, &fa, &84, &e4, &f4, &e2, &88, &ea, &e5, &e5, &ff, &e4, &ea, &ea  ; ...
+    equb &e2, &f8, &fc, &f4, &94, &f0, &e4, &f6, &eb, &f0, &f4, &fc, &9c, &e9, &f6, &f6  ; ...
+    equb &93, &e1, &8f, &86, &97, &96, &87, &80, &8d  ; ...
+    equb &e7, &9e, &83, &8d, &83, &85, &90
 ; &0cd0 used as index base 7 times by &2ede, &2f1e, &74ef, &74f2, &74f9, &75bd, &79a7
 .hero_damage_taken
     equb &89, &9e, &87, &f3, &95, &9b, &92, &f7
@@ -1819,7 +1644,7 @@ count = game_over_you_all+8
 .check_for_victory
     lda level_number                    ; Only on level 25
     cmp #last_level                     ; ...
-    bne return_2                        ; ...
+    bne no_victory                      ; ...
     ldx #0                              ; Is a hero on one of the Chalice's cells, x &1A or &1B...
 ; &1079 referenced 1 time by &3087
 .check_door_x
@@ -1834,7 +1659,7 @@ count = game_over_you_all+8
     cpx #4                              ; ...
     bne check_door_x                    ; ...
 ; &1089 referenced 1 time by &3075
-.return_2
+.no_victory
     rts                                 ; Return
 ; &108a referenced 2 times by &307e, &3082
 .check_door_y
@@ -2071,13 +1896,13 @@ reset_call_address = reset_call+1
     eor os_irq_a                        ; ...
     eor os_zp_fa                        ; ...
     cmp #&c0                            ; ...if it is within the sprite
-    bcs return_3                        ; ...
+    bcs dissolve_done                   ; ...
     tax                                 ; Clear it...
     lda #0                              ; ...
     sta sprite_chalice,x                ; ...
     jsr plot_chalice                    ; ...and redraw the Chalice
 ; &11d2 referenced 1 time by &31c7
-.return_3
+.dissolve_done
     rts                                 ; Return
 ; &11d3 referenced 1 time by &3119
 .erase_victory_ring
@@ -3599,7 +3424,7 @@ restore_dest_page = put_back_byte+2
     lda #osbyte_scan_keyboard_from_16   ; OSBYTE &7A: which key is pressed?
     jsr osbyte                          ; ...  Scan keyboard from key 16
     cpx #&71 ; 'q'                      ; f1 (internal key &71)?
-    bne return_4                        ; No: return
+    bne not_paused                      ; No: return
 ; &1ee0 referenced 1 time by &3ee5
 .wait_pause_release
     jsr osbyte                          ; Paused: wait for f1 to be released...  Scan keyboard from key 16
@@ -3616,9 +3441,13 @@ restore_dest_page = put_back_byte+2
     cpx #&71 ; 'q'                      ; ...
     beq wait_pause_release_again        ; ...
 ; &1ef5 referenced 1 time by &3ede
-.return_4
+.not_paused
     rts                                 ; Return
-    equb &00, &00, &00, &00, &00, &00
+; ***************************************************************************************
+; Unused
+;
+; Zero bytes, which nothing reads.
+    equb &00, &00, &00, &00, &00, &00   ; Zeros
     equs "<<<<"
 ; ***************************************************************************************
 ; Play a level until it ends
@@ -3660,10 +3489,10 @@ restore_dest_page = put_back_byte+2
     dex                                 ; Next hero
     bne count_heroes_in_play            ; ...
     ldx shrunk_hero                     ; The level is over: restore the last exiting hero's sprites
-    bmi return_5                        ; ...
+    bmi play_level_done                 ; ...
     jsr restore_hero_sprites            ; ...
 ; &1f35 referenced 1 time by &3f30
-.return_5
+.play_level_done
     rts                                 ; Return
 ; &1f36 referenced 3 times by &3f13, &3f1a, &3f28
 .check_exit
@@ -3945,208 +3774,20 @@ restore_dest_page = put_back_byte+2
     equb &01, &3f
 ; &2100 used as index base 1 time by &356d
 .object_free_map
-    equb &00
-    equb &02
-    equb &07
-    equb &07
-    equb &1f
-    equb &3f
-    equb &7d
-    equb &7f
-    equb &00
-    equb &30
-    equb &78
-    equb &fd
-    equb &7f
-    equb &ff
-    equb &80
-    equb &00
-    equb &00
-    equb &60
-    equb &e0
-    equb &c0
-    equb &df
-    equb &c0
-    equb &1f
-    equb &0f
-    equb &00
-    equb &58
-    equb &58
-    equb &58
-    equb &d8
-    equb &18
-    equb &f8
-    equb &80
-    equb &76
-    equb &3e
-    equb &5f
-    equb &6e
-    equb &7e
-    equb &00
-    equb &7f
-    equb &7f
-    equb &00
-    equb &66
-    equb &66
-    equb &7e
-    equb &7e
-    equb &66
-    equb &66
-    equb &00
-    equb &1f
-    equb &1f
-    equb &03
-    equb &03
-    equb &ff
-    equb &03
-    equb &03
-    equb &03
-    equb &80
-    equb &80
-; &213a used as index base 1 time by &30c7
-    equb &80
-    equb &80
-    equb &80
-    equb &f6
-    equb &fe
-    equb &f6
-    equb &7f
-    equb &00
-    equb &3f
-    equb &2f
-    equb &37
-    equb &37
-    equb &2f
-    equb &37
-    equb &c0
-    equb &03
-    equb &c4
-    equb &86
-    equb &40
-    equb &00
-    equb &80
-    equb &c1
-    equb &03
-    equb &e3
-    equb &e0
-    equb &e1
-    equb &41
-    equb &41
-    equb &00
-    equb &ff
-    equb &fe
-    equb &fe
-    equb &00
-    equb &00
-    equb &00
-    equb &00
-    equb &00
-    equb &8a
-    equb &00
-    equb &00
-    equb &00
-    equb &00
-    equb &7e
-    equb &7f
-    equb &7e
-    equb &00
-    equb &01
-    equb &01
-    equb &01
-    equb &3f
-    equb &3f
-    equb &bf
-    equb &3f
-    equb &3f
-    equb &f7
-    equb &ff
-    equb &c1
-    equb &f7
-    equb &c1
-    equb &ff
-    equb &f7
-    equb &bf
-    equb &8e
-    equb &9e
-    equb &de
-    equb &9c
-    equb &9e
-    equb &8e
-    equb &8e
-    equb &80
-    equb &7e
-    equb &3e
-    equb &7e
-    equb &00
-    equb &7c
-    equb &7a
-    equb &7e
-    equb &00
-    equb &2f
-    equb &1f
-    equb &00
-    equb &00
-    equb &00
-    equb &ce
-    equb &ae
-    equb &5e
-    equb &1f
-    equb &1f
-    equb &1f
-    equb &1b
-    equb &17
-    equb &1f
-    equb &00
-    equb &01
-    equb &80
-    equb &80
-    equb &80
-    equb &80
-    equb &80
-    equb &80
-    equb &02
-    equb &02
-    equb &7e
-    equb &7a
-    equb &7e
-    equb &00
-    equb &7e
-    equb &3e
-    equb &7f
-    equb &00
-    equb &be
-    equb &0e
-    equb &0e
-    equb &0f
-    equb &0e
-    equb &0e
-    equb &be
-    equb &00
-    equb &01
-    equb &01
-    equb &0f
-    equb &df
-    equb &07
-    equb &03
-    equb &01
-    equb &00
-    equb &08
-    equb &08
-    equb &5a
-    equb &fe
-    equb &fe
-    equb &fc
-    equb &b8
-    equb &00
-    equb &00
-    equb &00
-    equb &00
-    equb &00
-    equb &00
-    equb &00
-    equb &00
-    equb &00
-    equb &00, &08, &2a, &00, &00, &00, &00, &00
+    equb &00, &02, &07, &07, &1f, &3f, &7d, &7f, &00, &30, &78, &fd, &7f, &ff, &80, &00  ; Not read: unpack_level copies each level's object-free map here
+    equb &00, &60, &e0, &c0, &df, &c0, &1f, &0f, &00, &58, &58, &58, &d8, &18, &f8, &80  ; ...
+    equb &76, &3e, &5f, &6e, &7e, &00, &7f, &7f, &00, &66, &66, &7e, &7e, &66, &66, &00  ; ...
+    equb &1f, &1f, &03, &03, &ff, &03, &03, &03, &80, &80, &80, &80, &80, &f6, &fe, &f6  ; ...
+    equb &7f, &00, &3f, &2f, &37, &37, &2f, &37, &c0, &03, &c4, &86, &40, &00, &80, &c1  ; ...
+    equb &03, &e3, &e0, &e1, &41, &41, &00, &ff, &fe, &fe, &00, &00, &00, &00, &00, &8a  ; ...
+    equb &00, &00, &00, &00, &7e, &7f, &7e, &00, &01, &01, &01, &3f, &3f, &bf, &3f, &3f  ; ...
+    equb &f7, &ff, &c1, &f7, &c1, &ff, &f7, &bf, &8e, &9e, &de, &9c, &9e, &8e, &8e, &80  ; ...
+    equb &7e, &3e, &7e, &00, &7c, &7a, &7e, &00, &2f, &1f, &00, &00, &00, &ce, &ae, &5e  ; ...
+    equb &1f, &1f, &1f, &1b, &17, &1f, &00, &01, &80, &80, &80, &80, &80, &80, &02, &02  ; ...
+    equb &7e, &7a, &7e, &00, &7e, &3e, &7f, &00, &be, &0e, &0e, &0f, &0e, &0e, &be, &00  ; ...
+    equb &01, &01, &0f, &df, &07, &03, &01, &00, &08, &08, &5a, &fe, &fe, &fc, &b8, &00  ; ...
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00  ; ...
+    equb &08, &2a, &00, &00, &00, &00, &00
 .sprite_drainer
     equb &11, &33, &33, &22
     equb &33, &33, &33, &33
@@ -4162,37 +3803,34 @@ restore_dest_page = put_back_byte+2
     equb &11, &33, &33, &22
 ; &2200 used as index base 4 times by &352c, &3cd8, &3d8b, &77fe
 .door_x
-    equb &ff, &ff, &ff, &04, &ff, &ff, &06, &ff
-    equb &11, &ff, &ff, &ff, &1a, &03, &03, &0b
-    equb &ff, &03, &09, &12, &ff, &ff, &ff, &ff
+    equb &ff, &ff, &ff, &04, &ff, &ff, &06, &ff, &11, &ff, &ff, &ff, &1a, &03, &03, &0b  ; Not read: unpack_level copies each level's doors here
+    equb &ff, &03, &09, &12, &ff        ; ...
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
+    equb &ff, &ff, &ff
 ; &2220 used as index base 4 times by &3532, &3ce3, &3d8e, &7804
 .door_y
-    equb &ff, &ff, &ff, &0d, &ff, &ff, &11, &ff
-    equb &16, &ff, &ff, &ff, &1a
-    equs "#'%"
-    equb &ff
-    equs "+.+"
+    equb &ff, &ff, &ff, &0d, &ff, &ff, &11, &ff, &16, &ff, &ff, &ff, &1a, &23, &27, &25  ; Not read: unpack_level copies each level's doors here
+    equb &ff, &2b, &2e, &2b, &ff        ; ...
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
-    equb &ff, &ff, &ff, &ff
+    equb &ff, &ff, &ff
 ; &2240 used as index base 2 times by &3538, &7810
 .door_sprite
-    equb &ff, &1c, &1c, &1d, &1c, &1c, &1d, &1d
-    equb &1d, &1d, &1d, &1c, &1c, &1d, &1d, &1c
-    equb &1d, &1d, &1c, &1c, &ff, &ff, &ff, &ff
+    equb &ff, &1c, &1c, &1d, &1c, &1c, &1d, &1d, &1d, &1d, &1d, &1c, &1c, &1d, &1d, &1c  ; Not read: unpack_level copies each level's door sprites here
+    equb &1d, &1d, &1c, &1c, &ff        ; ...
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
+    equb &ff, &ff, &ff
 ; &2260 used as index base 7 times by &3543, &3dce, &3e00, &3e45, &3e8c, &3ea1, &40aa
 .key_x
-    equb &13, &ff, &ff, &1b, &ff, &ff, &17, &ff
-    equb &1c, &ff, &ff, &ff, &02, &15, &04, &09
-    equb &ff, &04, &19, &17, &ff, &ff, &ff, &ff
+    equb &13, &ff, &ff, &1b, &ff, &ff, &17, &ff, &1c, &ff, &ff, &ff, &02, &15, &04, &09  ; Not read: unpack_level copies each level's keys here
+    equb &ff, &04, &19, &17, &ff        ; ...
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
+    equb &ff, &ff, &ff
 ; &2280 used as index base 7 times by &3549, &3dd4, &3e06, &3e4d, &3e92, &3ea4, &40b0
 .key_y
-    equb &25, &ff, &ff, &06, &ff, &ff, &09, &ff
-    equb &18, &ff, &ff, &ff, &29, &04, &0c, &14
-    equb &ff, &0f, &03, &04, &ff, &ff, &ff, &ff
+    equb &25, &ff, &ff, &06, &ff, &ff, &09, &ff, &18, &ff, &ff, &ff, &29, &04, &0c, &14  ; Not read: unpack_level copies each level's keys here
+    equb &ff, &0f, &03, &04, &ff        ; ...
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
+    equb &ff, &ff, &ff
 .sprite_exit
     equb &03, &03, &03, &03
     equb &02, &00, &00, &01
@@ -4210,8 +3848,11 @@ restore_dest_page = put_back_byte+2
     equb &00, &05
     equb &0f, &0f
     equb &0f, &05
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00
+; ***************************************************************************************
+; Unused
+;
+; Zero bytes, which nothing reads.
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00  ; Zeros
 ; &22e0 used as index base 10 times by &359f, &3cf2, &3d95, &3deb, &3dfa, &3e0b, &3e86, &3e97, &40a4, &40b5
 .hero_key
     equb &00, &00, &00, &00, &00
@@ -5554,10 +5195,10 @@ restore_dest_page = put_back_byte+2
 .next_hero
     inx                                 ; Next hero
     cpx #4                              ; ...
-    beq return_6                        ; ...
+    beq move_heroes_done                ; ...
     jmp move_hero                       ; ...
 ; &70c9 referenced 1 time by &70c4
-.return_6
+.move_heroes_done
     rts                                 ; Return
 ; ***************************************************************************************
 ; Move the missiles
@@ -5780,10 +5421,10 @@ restore_dest_page = put_back_byte+2
 .next_missile
     inx                                 ; Next slot
     cpx #&0c                            ; ...
-    beq return_7                        ; ...
+    beq move_missiles_done              ; ...
     jmp move_missile                    ; ...
 ; &7220 referenced 1 time by &721b
-.return_7
+.move_missiles_done
     rts                                 ; Return
 ; ***************************************************************************************
 ; Take one health point from a hero
@@ -6178,10 +5819,10 @@ restore_dest_page = put_back_byte+2
 ; &7470 referenced 3 times by &733f, &734a, &747d
 .next_object
     dey                                 ; Next object
-    beq return_8                        ; ...
+    beq collect_objects_done            ; ...
     jmp check_object                    ; ...
 ; &7476 referenced 1 time by &7471
-.return_8
+.collect_objects_done
     rts                                 ; Return
 ; &7477 referenced 1 time by &740f
 .check_magic_item
@@ -7040,7 +6681,7 @@ restore_dest_page = put_back_byte+2
 .check_view_3_room
     lda view_room + 6                   ; Does the bottom-right view show it?
     cmp cell_room                       ; ...
-    bne return_9                        ; No
+    bne plot_at_cell_done               ; No
     clc                                 ; Yes: plot at column &23, row &67
     lda #view_right_column              ; ...
     adc cell_x                          ; ...
@@ -7050,7 +6691,7 @@ restore_dest_page = put_back_byte+2
     sta plot_y                          ; ...
     jsr plot_sprite                     ; ...
 ; &78fb referenced 1 time by &78e7
-.return_9
+.plot_at_cell_done
     rts                                 ; Return
 ; ***************************************************************************************
 ; Test for a wall at a map cell
@@ -7393,10 +7034,10 @@ restore_dest_page = put_back_byte+2
     pla                                 ; ...
     tax                                 ; ...
     dex                                 ; Next monster
-    beq return_10                       ; ...
+    beq update_monsters_done            ; ...
     jmp next_monster_update             ; ...
 ; &7b30 referenced 1 time by &7b2b
-.return_10
+.update_monsters_done
     rts                                 ; Return
 ; &7b31 referenced 1 time by &7a14
 .advance_dying_monster
@@ -7622,13 +7263,13 @@ restore_dest_page = put_back_byte+2
 ; &7c6f referenced 2 times by &7c62, &7c69
 .grow_offset_y
     lda monster_offset_y,x              ; Grow the vertical offset by three rows, away from zero
-    beq return_11                       ; ...
+    beq monster_step_done               ; ...
     bpl grow_offset_y_down              ; ...
     sec                                 ; ...
     lda monster_offset_y,x              ; ...
     sbc #3                              ; ...
     sta monster_offset_y,x              ; ...
-    jmp return_11                       ; ...
+    jmp monster_step_done               ; ...
 ; &7c82 referenced 1 time by &7c74
 .grow_offset_y_down
     clc                                 ; ...
@@ -7636,7 +7277,7 @@ restore_dest_page = put_back_byte+2
     adc #3                              ; ...
     sta monster_offset_y,x              ; ...
 ; &7c8b referenced 2 times by &7c72, &7c7f
-.return_11
+.monster_step_done
     rts                                 ; Return
     equb &de, &35, &0d, &bd, &35, &0d, &d0, &00
     equb &60
@@ -7793,22 +7434,14 @@ restore_dest_page = put_back_byte+2
     equb &00                            ; victory_sprite_copy: set before use
 ; &7e00 used as index base 17 times by &358c, &7667, &797e, &79e7, &7a31, &7a3f, &7a45, &7a5b, &7a98, &7ace, &7afb, &7b04, &7b41, &7c46, &7c54, &7cc8, &7cf2
 .monster_x
-; &7e23 referenced 2 times by &3d29, &3d39
-    equb &00, &04, &0b, &09, &1d, &08, &01, &06
-    equb &07, &0a, &01, &0b, &1a, &06, &0b, &16
-    equb &15, &0d, &1b, &14, &1a, &09, &1c, &0f
-    equb &1e, &02, &1a, &0b, &1c, &0e, &16, &00
-    equb &00, &00, &00, &1a, &00, &00, &00, &00
-    equb &00
+    equb &00, &04, &0b, &09, &1d, &08, &01, &06, &07, &0a, &01, &0b, &1a, &06, &0b, &16  ; Not read: reset_monsters and the trapdoors set the monsters
+    equb &15, &0d, &1b, &14, &1a, &09, &1c, &0f, &1e, &02, &1a, &0b, &1c, &0e, &16, &00  ; ...
+    equb &00, &00, &00, &1a, &00, &00, &00, &00, &00  ; ...
 ; &7e29 used as index base 16 times by &766d, &7986, &79f0, &7a2a, &7a38, &7a4b, &7a61, &7a9e, &7adc, &7b01, &7b0a, &7b47, &7c3f, &7c4d, &7cce, &7cf5
 .monster_y
-    equb &00, &24, &17
-    equs "% $", &22
-    equb &14, &27, &0d, &20, &01, &26, &0a, &01
-    equb &12, &05, &20, &29, &0d, &26, &27, &08
-    equb &06, &1a, &14, &03, &1d, &07, &0d, &17
-    equb &00, &00, &00, &00, &1b, &00, &00, &00
-    equb &00, &00
+    equb &00, &24, &17, &25, &20, &24, &22, &14, &27, &0d, &20, &01, &26, &0a, &01, &12  ; Not read: reset_monsters and the trapdoors set the monsters
+    equb &05, &20, &29, &0d, &26, &27, &08, &06, &1a, &14, &03, &1d, &07, &0d, &17, &00  ; ...
+    equb &00, &00, &00, &1b, &00, &00, &00, &00, &00  ; ...
 ; &7e52 used as index base 19 times by &3587, &7144, &7598, &7683, &768c, &7a0d, &7a23, &7a77, &7a81, &7ab4, &7abb, &7ac3, &7b11, &7b32, &7b35, &7b4d, &7bf0, &7c38, &7cd3
 .monster_sprite
     equb &00, &09, &0d, &0b, &0b, &0b, &09, &0f
@@ -7851,27 +7484,23 @@ restore_dest_page = put_back_byte+2
     equb &00, &00
 ; &7f20 used as index base 9 times by &3515, &7173, &719a, &730d, &7337, &73ea, &7413, &7469, &74bb
 .object_x
-    equb &00, &ff, &ff, &ff, &ff, &ff, &18, &04
-    equb &04, &05, &ff, &ff, &ff, &ff, &ff, &ff
-    equb &ff, &ff, &ff, &ff, &ff, &01, &07, &04
-    equb &04, &ff, &ff, &ff, &ff, &ff
+    equb &00, &ff, &ff, &ff, &ff, &ff, &18, &04, &04, &05, &ff, &ff, &ff, &ff, &ff, &ff  ; Not read: unpack_level copies each level's objects here
+    equb &ff, &ff, &ff, &ff, &ff, &01, &07, &04, &04, &ff, &ff, &ff, &ff, &ff  ; ...
 ; &7f3e referenced 4 times by &3f3b, &3f77, &3f85, &4029
 .exit_x
-    equb &04
+    equb &04                            ; ...the exit's entry
 ; &7f3f used as index base 9 times by &351b, &717b, &719d, &7313, &7342, &73f3, &7416, &746c, &74be
 .object_y
-    equb &00, &ff, &ff, &ff, &ff, &ff, &15, &18
-    equb &19, &19, &ff, &ff, &ff, &ff, &ff, &ff
-    equb &ff, &ff, &ff, &ff, &ff
-    equs "**+."
-    equb &ff, &ff, &ff, &ff, &ff
+    equb &00, &ff, &ff, &ff, &ff, &ff, &15, &18, &19, &19, &ff, &ff, &ff, &ff, &ff, &ff  ; Not read: unpack_level copies each level's objects here
+    equb &ff, &ff, &ff, &ff, &ff, &2a, &2a, &2b, &2e, &ff, &ff, &ff, &ff, &ff  ; ...
 ; &7f5d referenced 4 times by &3f43, &3f7d, &3f88, &402f
 .exit_y
-    equb &2c
+    equb &2c                            ; ...the exit's entry
 ; &7f5e used as index base 7 times by &3521, &7183, &718e, &7191, &7319, &735c, &73c8
 .object_type
-    equb &00
-    equs "___)c_S+S((``(*b(()(++++)(()(Q"
+    equb &00, &5f, &5f, &5f, &29, &63, &5f, &53, &2b, &53, &28, &28, &60, &60, &28, &2a  ; Not read: unpack_level copies each level's objects here
+    equb &62, &28, &28, &29, &28, &2b, &2b, &2b, &2b, &29, &28, &28, &29, &28  ; ...
+    equb &51                            ; ...the exit's entry
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00
@@ -9182,6 +8811,7 @@ save "DUNJ3", dasmos_dunj3_start, dasmos_dunj3_end, &0000, &6e80
 ;     menu_text + 2:                    2
 ;     missile_spent_pop:                2
 ;     monster_move_on:                  2
+;     monster_step_done:                2
 ;     monster_x + 35:                   2
 ;     monster_y + 35:                   2
 ;     mos_oswrch_default:               2
@@ -9206,7 +8836,6 @@ save "DUNJ3", dasmos_dunj3_start, dasmos_dunj3_end, &0000, &6e80
 ;     reset_hero:                       2
 ;     restore_hero_sprites:             2
 ;     restore_page_byte:                2
-;     return_11:                        2
 ;     returning_hero_queue + 1:         2
 ;     returning_hero_queue + 2:         2
 ;     returning_hero_queue + 3:         2
@@ -9296,6 +8925,7 @@ save "DUNJ3", dasmos_dunj3_start, dasmos_dunj3_end, &0000, &6e80
 ;     clear_chalice_sprite:             1
 ;     clear_hero_carrying:              1
 ;     collect_objects:                  1
+;     collect_objects_done:             1
 ;     continue_down:                    1
 ;     continue_hero_step:               1
 ;     continue_left:                    1
@@ -9310,6 +8940,7 @@ save "DUNJ3", dasmos_dunj3_start, dasmos_dunj3_end, &0000, &6e80
 ;     cross_done:                       1
 ;     digit_glyph:                      1
 ;     dissolve_chalice:                 1
+;     dissolve_done:                    1
 ;     doors_done:                       1
 ;     double_offsets:                   1
 ;     draw_all_views:                   1
@@ -9438,8 +9069,10 @@ save "DUNJ3", dasmos_dunj3_start, dasmos_dunj3_end, &0000, &6e80
 ;     mos_row_offsets_lo:               1
 ;     move_hero:                        1
 ;     move_heroes:                      1
+;     move_heroes_done:                 1
 ;     move_missile:                     1
 ;     move_missiles:                    1
+;     move_missiles_done:               1
 ;     moved_level_command_digits:       1
 ;     moved_level_command_digits + 1:   1
 ;     moved_load_level_from_copy:       1
@@ -9455,6 +9088,8 @@ save "DUNJ3", dasmos_dunj3_start, dasmos_dunj3_end, &0000, &6e80
 ;     next_room_cell:                   1
 ;     next_turn:                        1
 ;     no_magic:                         1
+;     no_victory:                       1
+;     not_paused:                       1
 ;     note_new_cell:                    1
 ;     nothing_found:                    1
 ;     object_found:                     1
@@ -9467,6 +9102,8 @@ save "DUNJ3", dasmos_dunj3_start, dasmos_dunj3_end, &0000, &6e80
 ;     owner_fireball:                   1
 ;     owner_sword:                      1
 ;     panel_hero - 1:                   1
+;     play_level_done:                  1
+;     plot_at_cell_done:                1
 ;     plot_blank:                       1
 ;     plot_boots_icon:                  1
 ;     plot_sprite_byte:                 1
@@ -9506,22 +9143,13 @@ save "DUNJ3", dasmos_dunj3_start, dasmos_dunj3_end, &0000, &6e80
 ;     restore_source_page:              1
 ;     restore_sprite_heights:           1
 ;     restore_sprite_widths:            1
-;     return_1:                         1
-;     return_10:                        1
-;     return_2:                         1
-;     return_3:                         1
-;     return_4:                         1
-;     return_5:                         1
-;     return_6:                         1
-;     return_7:                         1
-;     return_8:                         1
-;     return_9:                         1
 ;     reverse_down:                     1
 ;     reverse_left:                     1
 ;     reverse_right:                    1
 ;     room_walls + 58:                  1
 ;     save_game_pages:                  1
 ;     screen_address:                   1
+;     screen_address_done:              1
 ;     select_tape_and_cheat:            1
 ;     send_frame_vdu:                   1
 ;     set_menu_no:                      1
@@ -9571,6 +9199,7 @@ save "DUNJ3", dasmos_dunj3_start, dasmos_dunj3_end, &0000, &6e80
 ;     unpack_walls:                     1
 ;     update_game:                      1
 ;     update_monsters:                  1
+;     update_monsters_done:             1
 ;     update_rest:                      1
 ;     victory_delay_inner:              1
 ;     victory_delay_loop:               1
@@ -9585,26 +9214,13 @@ save "DUNJ3", dasmos_dunj3_start, dasmos_dunj3_end, &0000, &6e80
 ;     wall_sprite:                      1
 ;     workspace_template:               1
 
-; Automatically generated labels:
-;     return_1
-;     return_10
-;     return_11
-;     return_2
-;     return_3
-;     return_4
-;     return_5
-;     return_6
-;     return_7
-;     return_8
-;     return_9
-
 ; Stats:
 ;     Total size (Code + Data) = 23248 bytes
 ;     Code                     = 7042 bytes (30%)
 ;     Data                     = 16206 bytes (70%)
 ;
 ;     Number of instructions   = 3228
-;     Number of data bytes     = 14812 bytes
+;     Number of data bytes     = 14856 bytes
 ;     Number of data words     = 64 bytes
-;     Number of string bytes   = 1330 bytes
-;     Number of strings        = 189
+;     Number of string bytes   = 1286 bytes
+;     Number of strings        = 184

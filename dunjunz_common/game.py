@@ -35,6 +35,7 @@ def annotate(a: Annotator) -> None:
     annotate_branch_labels(a)
     annotate_sprite_numbers(a)
     annotate_named_operands(a)
+    annotate_runtime_tables(a)
     a.expr(0x1506, lo(sym("wrch_handler")))
     a.expr(0x150B, hi(sym("wrch_handler")))
 
@@ -2790,7 +2791,7 @@ def annotate_cassette_pause(a: Annotator) -> None:
     ]:
         a.c(addr, text)
     for addr, name in [(0x1EE0, "wait_pause_release"), (0x1EE7, "wait_pause_press"),
-                       (0x1EEE, "wait_pause_release_again")]:
+                       (0x1EEE, "wait_pause_release_again"), (0x1EF5, "not_paused")]:
         a.label(addr, name)
 
 
@@ -3540,6 +3541,11 @@ def annotate_branch_labels(a: Annotator) -> None:
         0x093E: "plot_sprite_count_byte",
         0x0961: "plot_sprite_next_row",
         0x0D63: "set_wrchv_low",
+        0x099F: "screen_address_done", 0x1089: "no_victory",
+        0x11D2: "dissolve_done", 0x1F35: "play_level_done",
+        0x70C9: "move_heroes_done", 0x7220: "move_missiles_done",
+        0x7476: "collect_objects_done", 0x78FB: "plot_at_cell_done",
+        0x7B30: "update_monsters_done", 0x7C8B: "monster_step_done",
         0x0E09: "reset_each_hero",
         0x0E6D: "check_hero_dead",
         0x0E7A: "next_hero_dead",
@@ -3913,6 +3919,48 @@ def annotate_named_operands(a: Annotator) -> None:
         value = a.byte_value(operand_addr)
         if value is not None:
             a.expr(operand_addr, char(value))
+
+
+
+# Tables that the game fills at run time, so the bytes the file holds in
+# them are never read: (address, length, what fills them).
+RUNTIME_TABLES = [
+    (0x0C00, 0xC9, "unpack_level copies each level's wall map here"),
+    (0x2100, 0xC9, "unpack_level copies each level's object-free map here"),
+    (0x2200, 21, "unpack_level copies each level's doors here"),
+    (0x2220, 21, "unpack_level copies each level's doors here"),
+    (0x2240, 21, "unpack_level copies each level's door sprites here"),
+    (0x2260, 21, "unpack_level copies each level's keys here"),
+    (0x2280, 21, "unpack_level copies each level's keys here"),
+    (0x7E00, 0x29, "reset_monsters and the trapdoors set the monsters"),
+    (0x7E29, 0x29, "reset_monsters and the trapdoors set the monsters"),
+    (0x7F20, 0x1F, "unpack_level copies each level's objects here"),
+    (0x7F3F, 0x1F, "unpack_level copies each level's objects here"),
+    (0x7F5E, 0x1F, "unpack_level copies each level's objects here"),
+]
+# Runs of zero bytes between routines and tables, which nothing reads.
+PADDING = [(0x0448, 8), (0x0485, 11), (0x04AA, 0x25), (0x06F6, 2), (0x09A0, 0x50),
+           (0x1EF6, 6), (0x22D6, 10)]
+
+
+def annotate_runtime_tables(a: Annotator) -> None:
+    for addr, length, filler in RUNTIME_TABLES:
+        # The object tables end with the exit's entry, object 30.
+        rows = [16, 14, 1] if length == 0x1F else [16] * (length // 16) + [length % 16]
+        offset = 0
+        for size in filter(None, rows):
+            a.byte(addr + offset, size, cols=16)
+            a.c(addr + offset, f"Not read: {filler}" if offset == 0 else (
+                "...the exit's entry" if size == 1 and length == 0x1F else "..."))
+            offset += size
+    for addr, length in PADDING:
+        values = [a.byte_value(addr + i) for i in range(length)]
+        if None in values or any(values):
+            continue
+        a.banner(addr, "Unused", "Zero bytes, which nothing reads.")
+        for row in range(0, length, 16):
+            a.byte(addr + row, min(16, length - row), cols=16)
+            a.c(addr + row, "Zeros" if row == 0 else "...")
 
 
 def annotate_regions(a: Annotator) -> None:

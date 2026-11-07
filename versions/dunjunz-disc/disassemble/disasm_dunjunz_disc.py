@@ -436,7 +436,9 @@ for addr, name in [(0x0D72, "store_level_bcd"), (0x0D7F, "start_new_game"),
                    (0x0E08, "new_game_reset_heroes"), (0x0E45, "to_next_level"),
                    (0x0E57, "play_this_level"), (0x146F, "reset_machine"),
                    (0x1624, "set_text_window_bottom"),
-                   (0x1EE0, "wait_pause_release"), (0x1EE7, "wait_pause_press")]:
+                   (0x1EE0, "wait_pause_release"), (0x1EE7, "wait_pause_press"),
+                   (0x1EF3, "not_paused"), (0x1487, "restart_intercept_done"),
+                   (0x15CF, "next_level_intercept_done")]:
     annotator.label(addr, name)
 annotator.label(0x1625, "text_window_bottom", description=(
     "The bottom row of clear_text_area's text window, an operand that "
