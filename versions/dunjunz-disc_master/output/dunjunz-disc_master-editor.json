@@ -436,7 +436,12 @@
       "addr": 7727,
       "name": "new_lines",
       "title": "Print a new line and a blank line",
-      "description": "CR, LF, LF."
+      "description": "CR, LF, LF.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "preserved",
+        "Y": "preserved"
+      }
     },
     {
       "addr": 7741,
@@ -452,6 +457,11 @@
       "name": "new_level",
       "title": "Start a new, empty level",
       "description": "Fill the level's wall block with &03, then set up the editing screen as for a loaded level.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "preserved"
+      },
       "fall_through": true
     },
     {
@@ -492,43 +502,85 @@
       "addr": 8474,
       "name": "choose_filing_system",
       "title": "Ask for disc or tape",
-      "description": "Disc: *DISC, then ask for the drive (0-3) and *DRIVE it. Tape: *TAPE."
+      "description": "Disc: *DISC, then ask for the drive (0-3) and *DRIVE it. Tape: *TAPE.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 8531,
       "name": "set_edit_screen",
       "title": "Send edit_screen_vdu",
-      "description": "No cursor, 30 rows, and colours 10 and 9."
+      "description": "No cursor, 30 rows, and colours 10 and 9.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "preserved"
+      }
     },
     {
       "addr": 8545,
       "name": "crypt_level",
       "title": "Encrypt or decrypt the level file",
-      "description": "Exclusive-OR each byte of &2700-&29AF with the low byte of its address, as the game's decrypt_level does at &6B00. Doing it twice restores the bytes."
+      "description": "Exclusive-OR each byte of &2700-&29AF with the low byte of its address, as the game's decrypt_level does at &6B00. Doing it twice restores the bytes.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 8583,
       "name": "set_colour_10",
       "title": "Show logical colour 10 as the chosen colour",
-      "description": "VDU 19,10,n,0,0,0 with n from colour_10."
+      "description": "VDU 19,10,n,0,0,0 with n from colour_10.",
+      "on_entry": {
+        "colour_10": "the colour to show"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "preserved",
+        "Y": "preserved"
+      }
     },
     {
       "addr": 8611,
       "name": "show_labels",
       "title": "Print the counts' labels",
-      "description": "In colour 1, at column 16: Objs, Mons and Dors."
+      "description": "In colour 1, at column 16: Objs, Mons and Dors.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "preserved"
+      }
     },
     {
       "addr": 8645,
       "name": "show_counts",
       "title": "Print the counts",
-      "description": "Objects at (17, 2), trapdoors at (17, 6) and doors at (17, 10)."
+      "description": "Objects at (17, 2), trapdoors at (17, 6) and doors at (17, 10).",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 8673,
       "name": "show_cursor_position",
       "title": "Print the cursor's cell",
-      "description": "x at (17, 20) and y at (17, 21)."
+      "description": "x at (17, 20) and y at (17, 21).",
+      "on_entry": {
+        "cursor_x": "the cell's column",
+        "cursor_y": "the cell's row"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 8692,
@@ -545,7 +597,12 @@
       "addr": 8741,
       "name": "wall_edges",
       "title": "Put walls round the edge of the map",
-      "description": "Place a wall in every cell of columns 0 and 31 and rows 0 and 47, as every level has."
+      "description": "Place a wall in every cell of columns 0 and 31 and rows 0 and 47, as every level has.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 8793,
@@ -563,13 +620,23 @@
       "addr": 9216,
       "name": "choose_wall_block",
       "title": "Choose the level's wall block",
-      "description": "Clear the screen, show 25 rows, load Stones (the 24 wall blocks) at &6E80, draw them in a grid of four by six and frame the chosen one. Move the frame with ',' '.' (one) and 'A' 'Z' (a row); SPACE copies the chosen block into the level's wall block."
+      "description": "Clear the screen, show 25 rows, load Stones (the 24 wall blocks) at &6E80, draw them in a grid of four by six and frame the chosen one. Move the frame with ',' '.' (one) and 'A' 'Z' (a row); SPACE copies the chosen block into the level's wall block.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 9363,
       "name": "draw_wall_blocks",
       "title": "Draw the 24 wall blocks",
-      "description": "Plot sprites &12-&29 at their places in the grid."
+      "description": "Plot sprites &12-&29 at their places in the grid.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 9385,
@@ -615,31 +682,56 @@
       "addr": 9563,
       "name": "show_25_rows",
       "title": "Show 25 rows",
-      "description": "Send VDU 23,0,6,25,0,0,0,0,0,0."
+      "description": "Send VDU 23,0,6,25,0,0,0,0,0,0.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "preserved"
+      }
     },
     {
       "addr": 9728,
       "name": "pack_items",
       "title": "Pack the item slots into the level file",
-      "description": "Go through the slots from the last (&4F) to the first, so that the tables come out in the reverse of the order unpack_level read them: objects into entries 1 upwards (the exit always into entry 30), trapdoors into entries 0-7, and each door with its linked key into the next door entry. Keys and free slots are skipped."
+      "description": "Go through the slots from the last (&4F) to the first, so that the tables come out in the reverse of the order unpack_level read them: objects into entries 1 upwards (the exit always into entry 30), trapdoors into entries 0-7, and each door with its linked key into the next door entry. Keys and free slots are skipped.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 9897,
       "name": "pack_level",
       "title": "Pack the level for saving",
-      "description": "Pack the item slots, then copy the wall map and the object-free map into the level file."
+      "description": "Pack the item slots, then copy the wall map and the object-free map into the level file.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 9936,
       "name": "load_stones",
       "title": "Load the wall blocks",
-      "description": "*LOAD STONES (at its own address, &6E80) with VDU output off."
+      "description": "*LOAD STONES (at its own address, &6E80) with VDU output off.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 11008,
       "name": "move_cursor",
       "title": "Move the cursor",
-      "description": "Wait for the frame, rub out the cursor and put back what is under it, move with ',' '.' 'A' 'Z' within the 32 by 48 map, and plot the current item there as the cursor."
+      "description": "Wait for the frame, rub out the cursor and put back what is under it, move with ',' '.' 'A' 'Z' within the 32 by 48 map, and plot the current item there as the cursor.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 11106,
@@ -675,25 +767,60 @@
       "addr": 11223,
       "name": "put_item",
       "title": "Put the current item in the cursor's cell",
-      "description": "Clear the cell's object-free bit. A wall sets the wall map's bit; anything else takes a free slot, and a key is recorded as the key of the link being made."
+      "description": "Clear the cell's object-free bit. A wall sets the wall map's bit; anything else takes a free slot, and a key is recorded as the key of the link being made.",
+      "on_entry": {
+        "cursor_x": "the cell's column",
+        "cursor_y": "the cell's row",
+        "current_item": "the item to put there",
+        "link_index": "for a key, its door's link"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 11277,
       "name": "remove_at_cursor",
       "title": "Remove what is in the cursor's cell",
-      "description": "Free an item's slot, or clear a wall's bit in the wall map."
+      "description": "Free an item's slot, or clear a wall's bit in the wall map.",
+      "on_entry": {
+        "cursor_x": "the cell's column",
+        "cursor_y": "the cell's row"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 11305,
       "name": "place_item",
       "title": "Place the current item at the cursor",
-      "description": "In an empty cell, place the current item within the limits: one exit, eight trapdoors, 20 doors (a door is also a wall), 29 objects, and a key only when a door is waiting for one, which links the two. With a key chosen, SPACE on an unlinked door makes it the door waiting for its key."
+      "description": "In an empty cell, place the current item within the limits: one exit, eight trapdoors, 20 doors (a door is also a wall), 29 objects, and a key only when a door is waiting for one, which links the two. With a key chosen, SPACE on an unlinked door makes it the door waiting for its key.",
+      "on_entry": {
+        "cursor_x": "the cell's column",
+        "cursor_y": "the cell's row",
+        "current_item": "the item to place"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 11479,
       "name": "restore_waiting_door",
       "title": "Show the waiting door as it was",
       "description": "Put the waiting door's own sprite back in its slot and plot it.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "preserved"
+      },
       "fall_through": true
     },
     {
@@ -733,19 +860,46 @@
       "name": "delete_item",
       "title": "Delete what is in the cursor's cell",
       "description": "Uncount the item and remove it. Deleting a door removes its key too, and deleting a key removes its door (and the door's wall). A waiting door is left alone. A wall is cleared.",
+      "on_entry": {
+        "cursor_x": "the cell's column",
+        "cursor_y": "the cell's row"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      },
       "fall_through": true
     },
     {
       "addr": 11698,
       "name": "line_x_to_graphics",
       "title": "Convert line_x to graphics x",
-      "description": "line_gx = line_x x 32: a cell is two screen bytes, four MODE 2 pixels, 32 graphics units wide. (delete_item also falls into it, harmlessly, when a key has no link.)"
+      "description": "line_gx = line_x x 32: a cell is two screen bytes, four MODE 2 pixels, 32 graphics units wide. (delete_item also falls into it, harmlessly, when a key has no link.)",
+      "on_entry": {
+        "line_x": "a map column"
+      },
+      "on_exit": {
+        "line_gx": "its graphics x, column x 32",
+        "A": "corrupted",
+        "X": "preserved",
+        "Y": "preserved"
+      }
     },
     {
       "addr": 11725,
       "name": "line_y_to_graphics",
       "title": "Convert line_y to graphics y",
-      "description": "line_gy = &3FF - line_y x 20: a cell is five pixel rows, 20 graphics units, counted down from the top of the screen."
+      "description": "line_gy = &3FF - line_y x 20: a cell is five pixel rows, 20 graphics units, counted down from the top of the screen.",
+      "on_entry": {
+        "line_y": "a map row"
+      },
+      "on_exit": {
+        "line_gy": "its graphics y, &3FF - row x 20",
+        "A": "corrupted",
+        "X": "preserved",
+        "Y": "preserved"
+      }
     },
     {
       "addr": 11784,
@@ -760,7 +914,12 @@
       "addr": 11830,
       "name": "draw_links",
       "title": "Draw each door-key link as a line",
-      "description": "For each link in use, PLOT 68 at the door's cell and PLOT 5 to its key's: exclusive-OR lines (GCOL 3), so drawing them again rubs them out."
+      "description": "For each link in use, PLOT 68 at the door's cell and PLOT 5 to its key's: exclusive-OR lines (GCOL 3), so drawing them again rubs them out.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "preserved"
+      }
     },
     {
       "addr": 11920,
@@ -780,7 +939,12 @@
       "move": "unpack",
       "name": "unpack_level",
       "title": "Unpack the loaded level into the slots",
-      "description": "Read the level file's tables from the last entry back, putting each item in the next slot down from &4F: objects (with their editor items found from item_types), each door and then its key (linked), and the trapdoors. Copy the wall map and object-free map. Count the objects and doors."
+      "description": "Read the level file's tables from the last entry back, putting each item in the next slot down from &4F: objects (with their editor items found from item_types), each door and then its key (linked), and the trapdoors. Copy the wall map and object-free map. Count the objects and doors.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 31678,
@@ -802,7 +966,16 @@
       "move": "free_cell",
       "name": "free_cell",
       "title": "Mark the cursor's cell as holding an object",
-      "description": "Clear its bit in the object-free map (laid out as the wall map)."
+      "description": "Clear its bit in the object-free map (laid out as the wall map).",
+      "on_entry": {
+        "cursor_x": "the cell's column",
+        "cursor_y": "the cell's row"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     }
   ],
   "banners": [
@@ -3339,7 +3512,16 @@
       "comment_inline": "...in object_free_map",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&7e"
+      "operand": "#>(object_free_map)",
+      "expr": {
+        "text": ">(object_free_map)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "object_free_map"
+          }
+        }
+      }
     },
     {
       "addr": 32156,
@@ -27096,7 +27278,16 @@
       "comment_inline": "...in wall_map",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&2f"
+      "operand": "#>(wall_map)",
+      "expr": {
+        "text": ">(wall_map)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "wall_map"
+          }
+        }
+      }
     },
     {
       "addr": 11192,

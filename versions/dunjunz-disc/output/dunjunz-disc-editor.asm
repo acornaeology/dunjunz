@@ -209,6 +209,11 @@ oscli                 = &fff7
 ; slot down from &4F: objects (with their editor items found from item_types), each door
 ; and then its key (linked), and the trapdoors. Copy the wall map and object-free map.
 ; Count the objects and doors.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &7b00 referenced 1 time by &1f38; also used as index base 1 time by &1ec8
 .unpack_level
     lda #0                              ; No doors...
@@ -349,6 +354,15 @@ oscli                 = &fff7
 ; Mark the cursor's cell as holding an object
 ;
 ; Clear its bit in the object-free map (laid out as the wall map).
+;
+; On Entry:
+;     CURSOR_X: the cell's column
+;     CURSOR_Y: the cell's row
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &7d80 referenced 1 time by &2bd7; also used as index base 1 time by &1ed5
 .free_cell
     lda cursor_y                        ; (y AND &F8) x 4...
@@ -366,7 +380,7 @@ oscli                 = &fff7
     clc                                 ; ...
     adc map_ptr                         ; ...
     sta map_ptr                         ; ...
-    lda #&7e ; '~'                      ; ...in object_free_map
+    lda #>(object_free_map)             ; ...in object_free_map
     sta map_ptr_hi                      ; ...
     lda cursor_x                        ; Bit 7 - (x AND 7)...
     and #7                              ; ...
@@ -949,6 +963,11 @@ oscli                 = &fff7
 ; Print a new line and a blank line
 ;
 ; CR, LF, LF.
+;
+; On Exit:
+;     A: corrupted
+;     X: preserved
+;     Y: preserved
 ; &1e1a referenced 6 times by &1c7d, &1e38, &211f, &23d2, &23d8, &23e2
 .new_lines
     lda #&0d                            ; CR
@@ -1029,6 +1048,11 @@ oscli                 = &fff7
 ;
 ; Fill the level's wall block with &03, then set up the editing screen as for a loaded
 ; level.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: preserved
 ; &1e8e referenced 1 time by &1c7a
 .new_level
     lda #3                              ; Fill level_wall_block with &03...
@@ -1437,6 +1461,11 @@ oscli                 = &fff7
 ; Ask for disc or tape
 ;
 ; Disc: *DISC, then ask for the drive (0-3) and *DRIVE it. Tape: *TAPE.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &2105 referenced 3 times by &1c80, &234f, &23d5
 .choose_filing_system
     ldx #<(disc_or_tape_prompt)         ; Ask: disc (D) or tape (T)
@@ -1471,6 +1500,11 @@ oscli                 = &fff7
 ; Send edit_screen_vdu
 ;
 ; No cursor, 30 rows, and colours 10 and 9.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: preserved
 ; &213e referenced 1 time by &1ec0
 .set_edit_screen
     ldx #0                              ; Send its &21 bytes
@@ -1487,6 +1521,11 @@ oscli                 = &fff7
 ;
 ; Exclusive-OR each byte of &2700-&29AF with the low byte of its address, as the game's
 ; decrypt_level does at &6B00. Doing it twice restores the bytes.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &214c referenced 3 times by &1f1f, &22f7, &2347
 .crypt_level
     lda #0                              ; Point at &2700, X counting the offset...
@@ -1518,6 +1557,14 @@ oscli                 = &fff7
 ; Show logical colour 10 as the chosen colour
 ;
 ; VDU 19,10,n,0,0,0 with n from colour_10.
+;
+; On Entry:
+;     COLOUR_10: the colour to show
+;
+; On Exit:
+;     A: corrupted
+;     X: preserved
+;     Y: preserved
 ; &2172 referenced 2 times by &2039, &2052
 .set_colour_10
     lda #&13                            ; VDU 19,10...
@@ -1535,6 +1582,11 @@ oscli                 = &fff7
 ; Print the counts' labels
 ;
 ; In colour 1, at column 16: Objs, Mons and Dors.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: preserved
 ; &218e referenced 2 times by &1f3b, &1f85
 .show_labels
     lda #&11                            ; COLOUR 1
@@ -1558,6 +1610,11 @@ oscli                 = &fff7
 ; Print the counts
 ;
 ; Objects at (17, 2), trapdoors at (17, 6) and doors at (17, 10).
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &21b0 referenced 4 times by &1f3e, &1f88, &20a5, &20bd
 .show_counts
     ldx #&11                            ; Objects at (17, 2)
@@ -1577,6 +1634,15 @@ oscli                 = &fff7
 ; Print the cursor's cell
 ;
 ; x at (17, 20) and y at (17, 21).
+;
+; On Entry:
+;     CURSOR_X: the cell's column
+;     CURSOR_Y: the cell's row
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &21cc referenced 1 time by &205c
 .show_cursor_position
     ldx #&11                            ; x at (17, 20)
@@ -1636,6 +1702,11 @@ oscli                 = &fff7
 ; Put walls round the edge of the map
 ;
 ; Place a wall in every cell of columns 0 and 31 and rows 0 and 47, as every level has.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &2210 referenced 1 time by &1ff8
 .wall_edges
     lda #0                              ; Walls...
@@ -1931,6 +2002,11 @@ oscli                 = &fff7
 ; Clear the screen, show 25 rows, load Stones (the 24 wall blocks) at &6E80, draw them in
 ; a grid of four by six and frame the chosen one. Move the frame with ',' '.' (one) and
 ; 'A' 'Z' (a row); SPACE copies the chosen block into the level's wall block.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &2400 referenced 1 time by &1ffe
 .choose_wall_block
     lda #&0c                            ; VDU 12: clear the screen
@@ -2019,6 +2095,11 @@ oscli                 = &fff7
 ; Draw the 24 wall blocks
 ;
 ; Plot sprites &12-&29 at their places in the grid.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &2493 referenced 1 time by &2414
 .draw_wall_blocks
     ldx #&17                            ; For blocks 23 to 0...
@@ -2179,6 +2260,11 @@ oscli                 = &fff7
 ; Show 25 rows
 ;
 ; Send VDU 23,0,6,25,0,0,0,0,0,0.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: preserved
 ; &255b referenced 1 time by &2405
 .show_25_rows
     ldx #0                              ; Send rows_25_vdu
@@ -2267,6 +2353,11 @@ oscli                 = &fff7
 ; the reverse of the order unpack_level read them: objects into entries 1 upwards (the
 ; exit always into entry 30), trapdoors into entries 0-7, and each door with its linked
 ; key into the next door entry. Keys and free slots are skipped.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &2600 referenced 1 time by &26a9
 .pack_items
     lda #0                              ; No objects, trapdoors or doors packed yet
@@ -2358,6 +2449,11 @@ oscli                 = &fff7
 ;
 ; Pack the item slots, then copy the wall map and the object-free map into the level
 ; file.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &26a9 referenced 1 time by &1ffb
 .pack_level
     jsr pack_items                      ; Pack the items
@@ -2382,6 +2478,11 @@ oscli                 = &fff7
 ; Load the wall blocks
 ;
 ; *LOAD STONES (at its own address, &6E80) with VDU output off.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &26d0 referenced 1 time by &2408
 .load_stones
     lda #&15                            ; VDU 21: output off
@@ -2485,6 +2586,11 @@ oscli                 = &fff7
 ;
 ; Wait for the frame, rub out the cursor and put back what is under it, move with ',' '.'
 ; 'A' 'Z' within the 32 by 48 map, and plot the current item there as the cursor.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &2b00 referenced 1 time by &200f
 .move_cursor
     lda #osbyte_vsync                   ; Wait for the frame
@@ -2629,7 +2735,7 @@ oscli                 = &fff7
     clc                                 ; ...
     adc map_ptr                         ; ...
     sta map_ptr                         ; ...
-    lda #&2f ; '/'                      ; ...in wall_map
+    lda #>(wall_map)                    ; ...in wall_map
     sta map_ptr_hi                      ; ...
     lda cursor_x                        ; Bit 7 - (x AND 7)...
     and #7                              ; ...
@@ -2659,6 +2765,17 @@ oscli                 = &fff7
 ;
 ; Clear the cell's object-free bit. A wall sets the wall map's bit; anything else takes a
 ; free slot, and a key is recorded as the key of the link being made.
+;
+; On Entry:
+;     CURSOR_X: the cell's column
+;     CURSOR_Y: the cell's row
+;     CURRENT_ITEM: the item to put there
+;     LINK_INDEX: for a key, its door's link
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &2bd7 referenced 1 time by &2ca0
 .put_item
     jsr free_cell                       ; Clear the cell's object-free bit
@@ -2698,6 +2815,15 @@ oscli                 = &fff7
 ; Remove what is in the cursor's cell
 ;
 ; Free an item's slot, or clear a wall's bit in the wall map.
+;
+; On Entry:
+;     CURSOR_X: the cell's column
+;     CURSOR_Y: the cell's row
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &2c0d referenced 1 time by &2d65
 .remove_at_cursor
     jsr item_at_cursor                  ; What is here?
@@ -2728,6 +2854,16 @@ oscli                 = &fff7
 ; 20 doors (a door is also a wall), 29 objects, and a key only when a door is waiting for
 ; one, which links the two. With a key chosen, SPACE on an unlinked door makes it the
 ; door waiting for its key.
+;
+; On Entry:
+;     CURSOR_X: the cell's column
+;     CURSOR_Y: the cell's row
+;     CURRENT_ITEM: the item to place
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &2c29 referenced 6 times by &208c, &20a2, &221c, &2223, &2232, &2239
 .place_item
     jsr item_at_cursor                  ; What is here?
@@ -2844,6 +2980,11 @@ oscli                 = &fff7
 ; Show the waiting door as it was
 ;
 ; Put the waiting door's own sprite back in its slot and plot it.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: preserved
 ; &2cd7 referenced 2 times by &2c95, &2cc3
 .restore_waiting_door
     ldx pending_door_slot               ; The waiting door's slot...
@@ -2915,6 +3056,15 @@ oscli                 = &fff7
 ; Uncount the item and remove it. Deleting a door removes its key too, and deleting a key
 ; removes its door (and the door's wall). A waiting door is left alone. A wall is
 ; cleared.
+;
+; On Entry:
+;     CURSOR_X: the cell's column
+;     CURSOR_Y: the cell's row
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &2d11 referenced 1 time by &20ba
 .delete_item
     jsr item_at_cursor                  ; What is here?
@@ -3020,6 +3170,15 @@ oscli                 = &fff7
 ;
 ; line_gx = line_x x 32: a cell is two screen bytes, four MODE 2 pixels, 32 graphics
 ; units wide. (delete_item also falls into it, harmlessly, when a key has no link.)
+;
+; On Entry:
+;     LINE_X: a map column
+;
+; On Exit:
+;     LINE_GX: its graphics x, column x 32
+;     A: corrupted
+;     X: preserved
+;     Y: preserved
 ; &2db2 referenced 1 time by &2e0b
 .line_x_to_graphics
     lda #0                              ; Clear the result
@@ -3041,6 +3200,15 @@ oscli                 = &fff7
 ;
 ; line_gy = &3FF - line_y x 20: a cell is five pixel rows, 20 graphics units, counted
 ; down from the top of the screen.
+;
+; On Entry:
+;     LINE_Y: a map row
+;
+; On Exit:
+;     LINE_GY: its graphics y, &3FF - row x 20
+;     A: corrupted
+;     X: preserved
+;     Y: preserved
 ; &2dcd referenced 1 time by &2e11
 .line_y_to_graphics
     lda #0                              ; Clear the result
@@ -3101,6 +3269,11 @@ oscli                 = &fff7
 ;
 ; For each link in use, PLOT 68 at the door's cell and PLOT 5 to its key's: exclusive-OR
 ; lines (GCOL 3), so drawing them again rubs them out.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: preserved
 ; &2e36 referenced 2 times by &20d2, &20dc
 .draw_links
     ldx #max_link                       ; For links 19 to 0...

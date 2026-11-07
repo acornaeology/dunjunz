@@ -123,6 +123,7 @@ EDITOR_OPERANDS = [
     (0x217D, lo(sym("level_file_end"))), (0x2183, hi(sym("level_file_end"))),
     (0x2335, lo(sym("level_file_end"))), (0x233B, hi(sym("level_file_end"))),
     (0x1F3D, sym("game_chalice_type")),
+    (0x2BB7, hi(sym("wall_map"))), (0x7D9B, hi(sym("object_free_map"))),
 ]
 EDITOR_CHAR_OPERANDS = [
     0x1CD6, 0x1CF8, 0x1E71, 0x1E76, 0x1E95, 0x1C97, 0x1CAB, 0x2368,
@@ -590,7 +591,8 @@ def annotate(d, model_b=False):
     # -----------------------------------------------------------------------
 
     main.sub(0x1E2F, "new_lines", "Print a new line and a blank line",
-             "CR, LF, LF.")
+             "CR, LF, LF.",
+              on_exit={"A": "corrupted", "X": "preserved", "Y": "preserved"})
     comments(main, [
         (0x1E2F, "CR"), (0x1E31, "..."),
         (0x1E34, "LF, twice"), (0x1E36, "..."), (0x1E39, "..."),
@@ -646,7 +648,8 @@ def annotate(d, model_b=False):
 
     main.sub(0x1EA3, "new_level", "Start a new, empty level",
              "Fill the level's wall block with &03, then set up the editing "
-             "screen as for a loaded level.")
+             "screen as for a loaded level.",
+              on_exit={"A": "corrupted", "X": "corrupted", "Y": "preserved"})
     comments(main, [
         (0x1EA3, "Fill level_wall_block with &03..."),
         (0x1EA5, "..."), (0x1EA7, "..."), (0x1EAA, "..."), (0x1EAB, "..."),
@@ -888,7 +891,8 @@ def annotate(d, model_b=False):
 
     main.sub(0x211A, "choose_filing_system", "Ask for disc or tape",
              "Disc: *DISC, then ask for the drive (0-3) and *DRIVE it. Tape: "
-             "*TAPE.")
+             "*TAPE.",
+              on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x211A, "Ask: disc (D) or tape (T)"),
         (0x211C, "..."), (0x211E, "..."), (0x2120, "..."), (0x2122, "..."),
@@ -910,7 +914,8 @@ def annotate(d, model_b=False):
     main.label(0x214B, "choose_tape")
 
     main.sub(0x2153, "set_edit_screen", "Send edit_screen_vdu",
-             "No cursor, 30 rows, and colours 10 and 9.")
+             "No cursor, 30 rows, and colours 10 and 9.",
+              on_exit={"A": "corrupted", "X": "corrupted", "Y": "preserved"})
     comments(main, [
         (0x2153, "Send its &21 bytes"),
         (0x2155, "..."), (0x2158, "..."), (0x215B, "..."), (0x215C, "..."),
@@ -921,7 +926,8 @@ def annotate(d, model_b=False):
     main.sub(0x2161, "crypt_level", "Encrypt or decrypt the level file",
              "Exclusive-OR each byte of &2700-&29AF with the low byte of its "
              "address, as the game's decrypt_level does at &6B00. Doing it "
-             "twice restores the bytes.")
+             "twice restores the bytes.",
+              on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x2161, "Point at &2700, X counting the offset..."),
         (0x2163, "..."), (0x2164, "..."), (0x2165, "..."), (0x2167, "..."),
@@ -938,7 +944,8 @@ def annotate(d, model_b=False):
     main.label(0x217A, "crypt_check_end")
 
     main.sub(0x2187, "set_colour_10", "Show logical colour 10 as the chosen colour",
-             "VDU 19,10,n,0,0,0 with n from colour_10.")
+             "VDU 19,10,n,0,0,0 with n from colour_10.",
+              on_entry={"colour_10": "the colour to show"}, on_exit={"A": "corrupted", "X": "preserved", "Y": "preserved"})
     comments(main, [
         (0x2187, "VDU 19,10..."),
         (0x2189, "..."), (0x218C, "..."), (0x218E, "..."),
@@ -950,7 +957,8 @@ def annotate(d, model_b=False):
     ])
 
     main.sub(0x21A3, "show_labels", "Print the counts' labels",
-             "In colour 1, at column 16: Objs, Mons and Dors.")
+             "In colour 1, at column 16: Objs, Mons and Dors.",
+              on_exit={"A": "corrupted", "X": "corrupted", "Y": "preserved"})
     comments(main, [
         (0x21A3, "COLOUR 1"),
         (0x21A5, "..."), (0x21A8, "..."), (0x21AA, "..."),
@@ -964,7 +972,8 @@ def annotate(d, model_b=False):
     main.label(0x21AF, "print_labels")
 
     main.sub(0x21C5, "show_counts", "Print the counts",
-             "Objects at (17, 2), trapdoors at (17, 6) and doors at (17, 10).")
+             "Objects at (17, 2), trapdoors at (17, 6) and doors at (17, 10).",
+              on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x21C5, "Objects at (17, 2)"),
         (0x21C7, "..."), (0x21C9, "..."), (0x21CB, "..."),
@@ -976,7 +985,8 @@ def annotate(d, model_b=False):
     ])
 
     main.sub(0x21E1, "show_cursor_position", "Print the cursor's cell",
-             "x at (17, 20) and y at (17, 21).")
+             "x at (17, 20) and y at (17, 21).",
+              on_entry={"cursor_x": "the cell's column", "cursor_y": "the cell's row"}, on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x21E1, "x at (17, 20)"),
         (0x21E3, "..."), (0x21E5, "..."), (0x21E7, "..."),
@@ -1012,7 +1022,8 @@ def annotate(d, model_b=False):
 
     main.sub(0x2225, "wall_edges", "Put walls round the edge of the map",
              "Place a wall in every cell of columns 0 and 31 and rows 0 and 47, "
-             "as every level has.")
+             "as every level has.",
+              on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x2225, "Walls..."),
         (0x2227, "..."),
@@ -1192,7 +1203,8 @@ def annotate(d, model_b=False):
              "Clear the screen, show 25 rows, load Stones (the 24 wall blocks) "
              "at &6E80, draw them in a grid of four by six and frame the "
              "chosen one. Move the frame with ',' '.' (one) and 'A' 'Z' (a "
-             "row); SPACE copies the chosen block into the level's wall block.")
+             "row); SPACE copies the chosen block into the level's wall block.",
+              on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x2400, "VDU 12: clear the screen"),
         (0x2402, "..."),
@@ -1242,7 +1254,8 @@ def annotate(d, model_b=False):
         main.label(addr, name)
 
     main.sub(0x2493, "draw_wall_blocks", "Draw the 24 wall blocks",
-             "Plot sprites &12-&29 at their places in the grid.")
+             "Plot sprites &12-&29 at their places in the grid.",
+              on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x2493, "For blocks 23 to 0..."),
         (0x2495, "..."), (0x2496, "..."),
@@ -1341,7 +1354,8 @@ def annotate(d, model_b=False):
     main.byte(0x255A)
 
     main.sub(0x255B, "show_25_rows", "Show 25 rows",
-             "Send VDU 23,0,6,25,0,0,0,0,0,0.")
+             "Send VDU 23,0,6,25,0,0,0,0,0,0.",
+              on_exit={"A": "corrupted", "X": "corrupted", "Y": "preserved"})
     comments(main, [
         (0x255B, "Send rows_25_vdu"),
         (0x255D, "..."), (0x2560, "..."), (0x2563, "..."), (0x2564, "..."),
@@ -1392,7 +1406,8 @@ def annotate(d, model_b=False):
              "read them: objects into entries 1 upwards (the exit always into "
              "entry 30), trapdoors into entries 0-7, and each door with its "
              "linked key into the next door entry. Keys and free slots are "
-             "skipped.")
+             "skipped.",
+              on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x2600, "No objects, trapdoors or doors packed yet"),
         (0x2602, "..."), (0x2605, "..."), (0x2608, "..."),
@@ -1444,7 +1459,8 @@ def annotate(d, model_b=False):
 
     main.sub(0x26A9, "pack_level", "Pack the level for saving",
              "Pack the item slots, then copy the wall map and the object-free "
-             "map into the level file.")
+             "map into the level file.",
+              on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x26A9, "Pack the items"),
         (0x26AC, "Copy the &C9 bytes of each map"),
@@ -1457,7 +1473,8 @@ def annotate(d, model_b=False):
     main.byte(0x26C0, 0x10, cols=8)
 
     main.sub(0x26D0, "load_stones", "Load the wall blocks",
-             "*LOAD STONES (at its own address, &6E80) with VDU output off.")
+             "*LOAD STONES (at its own address, &6E80) with VDU output off.",
+              on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x26D0, "VDU 21: output off"),
         (0x26D2, "..."),
@@ -1500,7 +1517,8 @@ def annotate(d, model_b=False):
     main.sub(0x2B00, "move_cursor", "Move the cursor",
              "Wait for the frame, rub out the cursor and put back what is "
              "under it, move with ',' '.' 'A' 'Z' within the 32 by 48 map, and "
-             "plot the current item there as the cursor.")
+             "plot the current item there as the cursor.",
+              on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x2B00, "Wait for the frame"),
         (0x2B02, "..."),
@@ -1611,7 +1629,8 @@ def annotate(d, model_b=False):
     main.sub(0x2BD7, "put_item", "Put the current item in the cursor's cell",
              "Clear the cell's object-free bit. A wall sets the wall map's "
              "bit; anything else takes a free slot, and a key is recorded as "
-             "the key of the link being made.")
+             "the key of the link being made.",
+              on_entry={"cursor_x": "the cell's column", "cursor_y": "the cell's row", "current_item": "the item to put there", "link_index": "for a key, its door's link"}, on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x2BD7, "Clear the cell's object-free bit"),
         (0x2BDA, "A wall?"),
@@ -1635,7 +1654,8 @@ def annotate(d, model_b=False):
         main.label(addr, name)
 
     main.sub(0x2C0D, "remove_at_cursor", "Remove what is in the cursor's cell",
-             "Free an item's slot, or clear a wall's bit in the wall map.")
+             "Free an item's slot, or clear a wall's bit in the wall map.",
+              on_entry={"cursor_x": "the cell's column", "cursor_y": "the cell's row"}, on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x2C0D, "What is here?"),
         (0x2C10, "A wall"),
@@ -1658,7 +1678,8 @@ def annotate(d, model_b=False):
              "exit, eight trapdoors, 20 doors (a door is also a wall), 29 "
              "objects, and a key only when a door is waiting for one, which "
              "links the two. With a key chosen, SPACE on an unlinked door "
-             "makes it the door waiting for its key.")
+             "makes it the door waiting for its key.",
+              on_entry={"cursor_x": "the cell's column", "cursor_y": "the cell's row", "current_item": "the item to place"}, on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x2C29, "What is here?"),
         (0x2C2C, "Nothing: place the item"),
@@ -1730,7 +1751,8 @@ def annotate(d, model_b=False):
         main.label(addr, name)
 
     main.sub(0x2CD7, "restore_waiting_door", "Show the waiting door as it was",
-             "Put the waiting door's own sprite back in its slot and plot it.")
+             "Put the waiting door's own sprite back in its slot and plot it.",
+              on_exit={"A": "corrupted", "X": "corrupted", "Y": "preserved"})
     comments(main, [
         (0x2CD7, "The waiting door's slot..."),
         (0x2CDA, "...and sprite..."),
@@ -1777,7 +1799,8 @@ def annotate(d, model_b=False):
     main.sub(0x2D11, "delete_item", "Delete what is in the cursor's cell",
              "Uncount the item and remove it. Deleting a door removes its key "
              "too, and deleting a key removes its door (and the door's wall). "
-             "A waiting door is left alone. A wall is cleared.")
+             "A waiting door is left alone. A wall is cleared.",
+              on_entry={"cursor_x": "the cell's column", "cursor_y": "the cell's row"}, on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(main, [
         (0x2D11, "What is here?"),
         (0x2D14, "Nothing: remove (nothing)"),
@@ -1848,7 +1871,8 @@ def annotate(d, model_b=False):
     main.sub(0x2DB2, "line_x_to_graphics", "Convert line_x to graphics x",
              "line_gx = line_x x 32: a cell is two screen bytes, four MODE 2 "
              "pixels, 32 graphics units wide. (delete_item also falls into it, "
-             "harmlessly, when a key has no link.)")
+             "harmlessly, when a key has no link.)",
+              on_entry={"line_x": "a map column"}, on_exit={"line_gx": "its graphics x, column x 32", "A": "corrupted", "X": "preserved", "Y": "preserved"})
     comments(main, [
         (0x2DB2, "Clear the result"),
         (0x2DB4, "..."), (0x2DB7, "..."),
@@ -1863,7 +1887,8 @@ def annotate(d, model_b=False):
 
     main.sub(0x2DCD, "line_y_to_graphics", "Convert line_y to graphics y",
              "line_gy = &3FF - line_y x 20: a cell is five pixel rows, 20 "
-             "graphics units, counted down from the top of the screen.")
+             "graphics units, counted down from the top of the screen.",
+              on_entry={"line_y": "a map row"}, on_exit={"line_gy": "its graphics y, &3FF - row x 20", "A": "corrupted", "X": "preserved", "Y": "preserved"})
     comments(main, [
         (0x2DCD, "Clear the result"),
         (0x2DCF, "..."), (0x2DD2, "..."),
@@ -1898,7 +1923,8 @@ def annotate(d, model_b=False):
     main.sub(0x2E36, "draw_links", "Draw each door-key link as a line",
              "For each link in use, PLOT 68 at the door's cell and PLOT 5 to "
              "its key's: exclusive-OR lines (GCOL 3), so drawing them again "
-             "rubs them out.")
+             "rubs them out.",
+              on_exit={"A": "corrupted", "X": "corrupted", "Y": "preserved"})
     comments(main, [
         (0x2E36, "For links 19 to 0..."),
         (0x2E38, "..."), (0x2E39, "..."),
@@ -1941,7 +1967,8 @@ def annotate(d, model_b=False):
                   "putting each item in the next slot down from &4F: objects "
                   "(with their editor items found from item_types), each door "
                   "and then its key (linked), and the trapdoors. Copy the wall "
-                  "map and object-free map. Count the objects and doors.")
+                  "map and object-free map. Count the objects and doors.",
+                   on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(in_unpack, [
         (0x7B00, "No doors..."),
         (0x7B02, "..."),
@@ -2012,7 +2039,8 @@ def annotate(d, model_b=False):
     in_unpack.label(0x7BCB, "next_type")
 
     in_free_cell.sub(0x7D80, "free_cell", "Mark the cursor's cell as holding an object",
-                     "Clear its bit in the object-free map (laid out as the wall map).")
+                     "Clear its bit in the object-free map (laid out as the wall map).",
+                      on_entry={"cursor_x": "the cell's column", "cursor_y": "the cell's row"}, on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(in_free_cell, [
         (0x7D80, "(y AND &F8) x 4..."),
         (0x7D82, "..."), (0x7D84, "..."), (0x7D85, "..."), (0x7D86, "..."),
@@ -2050,6 +2078,8 @@ def annotate(d, model_b=False):
     for operand_addr, expression in EDITOR_OPERANDS:
         if 0x7B00 <= operand_addr < 0x7BCE:
             d.expr(operand_addr, expression, move=unpack)
+        elif 0x7D80 <= operand_addr < 0x7DC3:
+            d.expr(operand_addr, expression, move=free_cell)
         else:
             d.expr(operand_addr, expression)
     for operand_addr in EDITOR_CHAR_OPERANDS:
