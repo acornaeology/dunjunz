@@ -42,7 +42,7 @@ main.banner(0x23E8, "Unused",
 main.byte(0x23E8, 0x2400 - 0x23E8, cols=8)
 main.c(0x23E8, "Not used")
 main.byte(0x25FF, 1)
-main.c(0x25FF, "Not referenced on this side (the Master's table_loaded_flag)")
+main.c(0x25FF, "Not referenced")
 
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)

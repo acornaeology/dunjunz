@@ -456,7 +456,7 @@
         111,
         114
       ],
-      "comment_inline": "...",
+      "comment_inline": "The author credit's heading",
       "type": "string",
       "string": "Author"
     },
@@ -491,7 +491,7 @@
         105,
         115
       ],
-      "comment_inline": "...",
+      "comment_inline": "The author's name",
       "type": "string",
       "string": "Julian  Avis"
     },
@@ -530,7 +530,7 @@
         56,
         54
       ],
-      "comment_inline": "...",
+      "comment_inline": "The copyright line",
       "type": "string",
       "string": "(c) Bugbyte 1986"
     },
@@ -953,7 +953,7 @@
       "labels": [
         "send_mode_vdu"
       ],
-      "comment_inline": "...",
+      "comment_inline": "Next byte of the MODE 5 and palette set-up...",
       "xref_summaries": [
         "&38c8 referenced 1 time by &38d2"
       ],
@@ -982,7 +982,7 @@
         238,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...to the VDU drivers",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -994,7 +994,7 @@
       "bytes": [
         232
       ],
-      "comment_inline": "...",
+      "comment_inline": "...on to the next",
       "type": "code",
       "mnemonic": "inx"
     },
@@ -1003,7 +1003,7 @@
       "bytes": [
         138
       ],
-      "comment_inline": "...",
+      "comment_inline": "...count into A for the test",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -1013,7 +1013,7 @@
         201,
         8
       ],
-      "comment_inline": "...",
+      "comment_inline": "...all eight sent?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#page_text - mode_vdu",
@@ -1036,7 +1036,7 @@
         208,
         244
       ],
-      "comment_inline": "...",
+      "comment_inline": "No: send the next",
       "type": "code",
       "mnemonic": "bne",
       "operand": "send_mode_vdu",
@@ -1069,7 +1069,7 @@
         133,
         113
       ],
-      "comment_inline": "...",
+      "comment_inline": "...copy_from's high byte",
       "type": "code",
       "mnemonic": "sta",
       "operand": "copy_from_high",
@@ -1093,7 +1093,7 @@
         133,
         112
       ],
-      "comment_inline": "...",
+      "comment_inline": "...copy_from's low byte",
       "type": "code",
       "mnemonic": "sta",
       "operand": "copy_from",
@@ -1106,7 +1106,7 @@
         133,
         128
       ],
-      "comment_inline": "...",
+      "comment_inline": "...copy_to's low byte",
       "type": "code",
       "mnemonic": "sta",
       "operand": "copy_to",
@@ -1119,7 +1119,7 @@
         169,
         88
       ],
-      "comment_inline": "...",
+      "comment_inline": "...the MODE 5 screen's page...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#>(mode5_screen)",
@@ -1139,7 +1139,7 @@
         133,
         129
       ],
-      "comment_inline": "...",
+      "comment_inline": "...as copy_to's high byte",
       "type": "code",
       "mnemonic": "sta",
       "operand": "copy_to_high",
@@ -1192,7 +1192,7 @@
         145,
         128
       ],
-      "comment_inline": "...",
+      "comment_inline": "...stripes on alternate pixel rows",
       "type": "code",
       "mnemonic": "sta",
       "operand": "(copy_to),y",
@@ -1204,7 +1204,7 @@
       "bytes": [
         200
       ],
-      "comment_inline": "...",
+      "comment_inline": "...next byte of the cell",
       "type": "code",
       "mnemonic": "iny"
     },
@@ -1213,7 +1213,7 @@
       "bytes": [
         152
       ],
-      "comment_inline": "...",
+      "comment_inline": "...count into A for the test",
       "type": "code",
       "mnemonic": "tya"
     },
@@ -1223,7 +1223,7 @@
         201,
         8
       ],
-      "comment_inline": "...",
+      "comment_inline": "...all eight rows of the cell?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#8"
@@ -1234,7 +1234,7 @@
         208,
         246
       ],
-      "comment_inline": "...",
+      "comment_inline": "No: copy the next row",
       "type": "code",
       "mnemonic": "bne",
       "operand": "fill_stripes",
@@ -1256,7 +1256,7 @@
         165,
         128
       ],
-      "comment_inline": "...",
+      "comment_inline": "...low byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "copy_to",
@@ -1269,7 +1269,7 @@
         105,
         8
       ],
-      "comment_inline": "...",
+      "comment_inline": "...plus 8: one character cell",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#8"
@@ -1280,7 +1280,7 @@
         133,
         128
       ],
-      "comment_inline": "...",
+      "comment_inline": "...stored back",
       "type": "code",
       "mnemonic": "sta",
       "operand": "copy_to",
@@ -1293,7 +1293,7 @@
         165,
         129
       ],
-      "comment_inline": "...",
+      "comment_inline": "...high byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "copy_to_high",
@@ -1306,7 +1306,7 @@
         105,
         0
       ],
-      "comment_inline": "...",
+      "comment_inline": "...with the carry",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#0"
@@ -1317,7 +1317,7 @@
         133,
         129
       ],
-      "comment_inline": "...",
+      "comment_inline": "...stored back",
       "type": "code",
       "mnemonic": "sta",
       "operand": "copy_to_high",
@@ -1354,7 +1354,7 @@
         201,
         128
       ],
-      "comment_inline": "...",
+      "comment_inline": "...at the top of screen memory?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#>(screen_end)",
@@ -1374,7 +1374,7 @@
         208,
         225
       ],
-      "comment_inline": "...",
+      "comment_inline": "No: stripe the next cell",
       "type": "code",
       "mnemonic": "bne",
       "operand": "fill_stripes",
@@ -1407,7 +1407,7 @@
         133,
         113
       ],
-      "comment_inline": "...",
+      "comment_inline": "...as copy_from's high byte",
       "type": "code",
       "mnemonic": "sta",
       "operand": "copy_from_high",
@@ -1420,7 +1420,7 @@
         169,
         0
       ],
-      "comment_inline": "...",
+      "comment_inline": "...page-aligned...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -1431,7 +1431,7 @@
         133,
         112
       ],
-      "comment_inline": "...",
+      "comment_inline": "...so copy_from's low byte is 0",
       "type": "code",
       "mnemonic": "sta",
       "operand": "copy_from",
@@ -1464,7 +1464,7 @@
         133,
         128
       ],
-      "comment_inline": "...",
+      "comment_inline": "...low byte: character row 1",
       "type": "code",
       "mnemonic": "sta",
       "operand": "copy_to",
@@ -1477,7 +1477,7 @@
         169,
         89
       ],
-      "comment_inline": "...",
+      "comment_inline": "...high byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#>(title_picture_screen)",
@@ -1497,7 +1497,7 @@
         133,
         129
       ],
-      "comment_inline": "...",
+      "comment_inline": "...as copy_to's high byte",
       "type": "code",
       "mnemonic": "sta",
       "operand": "copy_to_high",
@@ -1535,7 +1535,7 @@
         145,
         128
       ],
-      "comment_inline": "...",
+      "comment_inline": "...over the stripes",
       "type": "code",
       "mnemonic": "sta",
       "operand": "(copy_to),y",
@@ -1557,7 +1557,7 @@
         165,
         112
       ],
-      "comment_inline": "...",
+      "comment_inline": "...low byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "copy_from",
@@ -1570,7 +1570,7 @@
         105,
         1
       ],
-      "comment_inline": "...",
+      "comment_inline": "...plus one",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#1"
@@ -1581,7 +1581,7 @@
         133,
         112
       ],
-      "comment_inline": "...",
+      "comment_inline": "...stored back",
       "type": "code",
       "mnemonic": "sta",
       "operand": "copy_from",
@@ -1594,7 +1594,7 @@
         165,
         113
       ],
-      "comment_inline": "...",
+      "comment_inline": "...high byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "copy_from_high",
@@ -1607,7 +1607,7 @@
         105,
         0
       ],
-      "comment_inline": "...",
+      "comment_inline": "...with the carry",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#0"
@@ -1618,7 +1618,7 @@
         133,
         113
       ],
-      "comment_inline": "...",
+      "comment_inline": "...stored back",
       "type": "code",
       "mnemonic": "sta",
       "operand": "copy_from_high",
@@ -1640,7 +1640,7 @@
         165,
         128
       ],
-      "comment_inline": "...",
+      "comment_inline": "...low byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "copy_to",
@@ -1653,7 +1653,7 @@
         105,
         1
       ],
-      "comment_inline": "...",
+      "comment_inline": "...plus one",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#1"
@@ -1664,7 +1664,7 @@
         133,
         128
       ],
-      "comment_inline": "...",
+      "comment_inline": "...stored back",
       "type": "code",
       "mnemonic": "sta",
       "operand": "copy_to",
@@ -1677,7 +1677,7 @@
         165,
         129
       ],
-      "comment_inline": "...",
+      "comment_inline": "...high byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "copy_to_high",
@@ -1690,7 +1690,7 @@
         105,
         0
       ],
-      "comment_inline": "...",
+      "comment_inline": "...with the carry",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#0"
@@ -1701,7 +1701,7 @@
         133,
         129
       ],
-      "comment_inline": "...",
+      "comment_inline": "...stored back",
       "type": "code",
       "mnemonic": "sta",
       "operand": "copy_to_high",
@@ -1727,7 +1727,7 @@
         201,
         68
       ],
-      "comment_inline": "...",
+      "comment_inline": "...past the picture's last page?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#>(title_picture + &0a00)",
@@ -1754,7 +1754,7 @@
         208,
         220
       ],
-      "comment_inline": "...",
+      "comment_inline": "No: copy the next byte",
       "type": "code",
       "mnemonic": "bne",
       "operand": "copy_picture",
@@ -1782,7 +1782,7 @@
       "labels": [
         "print_page_text"
       ],
-      "comment_inline": "...",
+      "comment_inline": "...this byte of the credits, title and keys...",
       "xref_summaries": [
         "&3939 referenced 1 time by &3945"
       ],
@@ -1805,7 +1805,7 @@
         238,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...printed or obeyed as VDU codes",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -1817,7 +1817,7 @@
       "bytes": [
         232
       ],
-      "comment_inline": "...",
+      "comment_inline": "...on to the next",
       "type": "code",
       "mnemonic": "inx"
     },
@@ -1828,7 +1828,7 @@
         16,
         56
       ],
-      "comment_inline": "...",
+      "comment_inline": "...look at it...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "page_text,x",
@@ -1841,7 +1841,7 @@
         201,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...is it the terminator?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#text_end",
@@ -1858,7 +1858,7 @@
         208,
         242
       ],
-      "comment_inline": "...",
+      "comment_inline": "No: print it",
       "type": "code",
       "mnemonic": "bne",
       "operand": "print_page_text",
@@ -1888,7 +1888,7 @@
         162,
         0
       ],
-      "comment_inline": "...",
+      "comment_inline": "...X = 0 and Y = &FF ask for the machine type...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#0"
@@ -1899,7 +1899,7 @@
         160,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...rather than a key",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#&ff"
@@ -1911,7 +1911,7 @@
         244,
         255
       ],
-      "comment_inline": "... Read the OS version (INKEY(-256))",
+      "comment_inline": "...X = 1 on an Electron Read the OS version (INKEY(-256))",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -1935,7 +1935,7 @@
         240,
         16
       ],
-      "comment_inline": "...",
+      "comment_inline": "...so it skips the blank line",
       "type": "code",
       "mnemonic": "beq",
       "operand": "open_black_window",
@@ -1963,7 +1963,7 @@
       "labels": [
         "print_blank_line"
       ],
-      "comment_inline": "...",
+      "comment_inline": "...this byte of the line...",
       "xref_summaries": [
         "&3956 referenced 1 time by &3962"
       ],
@@ -1986,7 +1986,7 @@
         238,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...printed",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -1998,7 +1998,7 @@
       "bytes": [
         232
       ],
-      "comment_inline": "...",
+      "comment_inline": "...on to the next",
       "type": "code",
       "mnemonic": "inx"
     },
@@ -2009,7 +2009,7 @@
         159,
         56
       ],
-      "comment_inline": "...",
+      "comment_inline": "...look at it...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "blank_line_text,x",
@@ -2022,7 +2022,7 @@
         201,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...is it the terminator?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#text_end",
@@ -2039,7 +2039,7 @@
         208,
         242
       ],
-      "comment_inline": "...",
+      "comment_inline": "No: print it",
       "type": "code",
       "mnemonic": "bne",
       "operand": "print_blank_line",
@@ -2079,7 +2079,7 @@
       "labels": [
         "print_black_window"
       ],
-      "comment_inline": "...",
+      "comment_inline": "...this byte of the window set-up...",
       "xref_summaries": [
         "&3966 referenced 1 time by &3972"
       ],
@@ -2102,7 +2102,7 @@
         238,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...obeyed as VDU codes",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -2114,7 +2114,7 @@
       "bytes": [
         232
       ],
-      "comment_inline": "...",
+      "comment_inline": "...on to the next",
       "type": "code",
       "mnemonic": "inx"
     },
@@ -2125,7 +2125,7 @@
         178,
         56
       ],
-      "comment_inline": "...",
+      "comment_inline": "...look at it...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "black_window_vdu,x",
@@ -2138,7 +2138,7 @@
         201,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...is it the terminator?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#text_end",
@@ -2155,7 +2155,7 @@
         208,
         242
       ],
-      "comment_inline": "...",
+      "comment_inline": "No: send it",
       "type": "code",
       "mnemonic": "bne",
       "operand": "print_black_window",
@@ -2180,7 +2180,7 @@
         0,
         254
       ],
-      "comment_inline": "...",
+      "comment_inline": "...selected in the 6845...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "crtc_address_register",
@@ -2193,7 +2193,7 @@
         169,
         32
       ],
-      "comment_inline": "...",
+      "comment_inline": "...&20: cursor display off...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&20"
@@ -2205,7 +2205,7 @@
         1,
         254
       ],
-      "comment_inline": "...",
+      "comment_inline": "...written to it, so no cursor shows",
       "type": "code",
       "mnemonic": "sta",
       "operand": "crtc_register_data",
@@ -2236,7 +2236,7 @@
         244,
         255
       ],
-      "comment_inline": "... Flush selected class of buffer",
+      "comment_inline": "...so an early key press doesn't end the page Flush selected class of buffer",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -2266,7 +2266,7 @@
         162,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...X and Y: the time limit, &2FF centiseconds...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&ff"
@@ -2277,7 +2277,7 @@
         160,
         2
       ],
-      "comment_inline": "...",
+      "comment_inline": "...high byte of the limit",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#2"
@@ -2289,7 +2289,7 @@
         244,
         255
       ],
-      "comment_inline": "... Read a key, waiting up to 767 centiseconds",
+      "comment_inline": "...a key, or the time, ends the title page Read a key, waiting up to 767 centiseconds",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",

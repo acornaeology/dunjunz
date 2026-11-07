@@ -178,7 +178,7 @@
       "addr": 9801,
       "name": "dunjunz_start",
       "title": "*DUNJUNZ: load the private-RAM code and show the title",
-      "description": "Run by BOOT on a Master 128. Load Code2, Code3 and Table into the Master's private RAM (HAZEL, &C000-&DFFF), which MOS 3.20 leaves paged in for a *RUN program, then carry on into the Model B loader's start-up at title_start."
+      "description": "Run by BOOT on a Master 128. Load Code2, Code3 and Table into the Master's private RAM (HAZEL, &C000-&DFFF), which MOS 3.20 leaves paged in for a *RUN program, then carry on with the start-up at title_start."
     },
     {
       "addr": 9840,
@@ -213,13 +213,13 @@
       "addr": 9938,
       "name": "leave_title",
       "title": "Blank the display and run Coder",
-      "description": "Where the Model B loader ends with VDU 21 and *CODER, this version blanks the display and chooses between CODER and CODER2. It never returns."
+      "description": "Blank the display, then choose between CODER and CODER2 by whether a joystick is present. It never returns."
     },
     {
       "addr": 9984,
       "name": "title_start",
       "title": "Set up, show the title and run Coder",
-      "description": "The Model B loader's start-up. Disable ESCAPE, make the cursor keys return codes, set the Model B release's level counter and menu tables in page &08 (not used by this side's game), point the BREAK intercept at &15B5 but leave it disabled, load and show the title screen, twinkle stars on it until a key is pressed, then select the game's display and run Coder.",
+      "description": "Disable ESCAPE, make the cursor keys return codes, set bytes in page &08 that the game does not read (a level counter, level digits and two hero tables), point the BREAK intercept at &15B5 but leave it disabled, load and show the title screen, twinkle stars on it until a key is pressed, then select the game's display and run Coder.",
       "on_exit": {
         "A": "corrupted",
         "X": "corrupted",
@@ -253,7 +253,7 @@
       "addr": 10358,
       "name": "title_screen_address",
       "title": "Calculate a title screen address",
-      "description": "The game's screen_address, reading the row offsets from Table at &C675 in private RAM where the Model B loader reads MOS 1.20's at &C375.",
+      "description": "The game's screen_address, reading the row offsets from Table at &C675 in private RAM.",
       "on_entry": {
         "plot_x": "byte column",
         "plot_y": "pixel row"
@@ -314,7 +314,7 @@
     {
       "addr": 9946,
       "title": "Unused",
-      "description": "Leftover bytes, never run: the tail of the Model B loader's *CODER call, then data.",
+      "description": "Leftover bytes, never run: the tail of a *CODER call (its JSR OSCLI), then data.",
       "align": "before_label"
     },
     {
@@ -382,10 +382,10 @@
     "ind2v": 562,
     "ind3v": 564,
     "os_break_intercept": 647,
-    "modelb_hero_score_ten_thousands": 2224,
-    "modelb_hero_absent": 2228,
-    "modelb_levels_started": 2236,
-    "modelb_level_digits": 2237,
+    "unread_digit_table": 2224,
+    "unread_hero_table": 2228,
+    "unread_level_count": 2236,
+    "unread_level_digits": 2237,
     "row_offsets": 50805,
     "scsi_data": 64576,
     "scsi_status": 64577,
@@ -613,41 +613,41 @@
     },
     {
       "addr": 2224,
-      "name": "modelb_hero_score_ten_thousands",
+      "name": "unread_digit_table",
       "group": "loader",
       "access": [
         "w",
         "b"
       ],
-      "description": "The Model B side's per-hero ten-thousands digits, in the game's Dunj3; set up as the Model B loader does, but this side's game does not read it."
+      "description": "In the game's Dunj3: four bytes set to &69 by title_start, which the game never reads."
     },
     {
       "addr": 2228,
-      "name": "modelb_hero_absent",
+      "name": "unread_hero_table",
       "group": "loader",
       "access": [
         "w",
         "b"
       ],
-      "description": "The Model B side's per-hero absent flags, in the game's Dunj3; set up as the Model B loader does, but this side's game does not read it."
+      "description": "In the game's Dunj3: four bytes set to 0 by title_start, which the game never reads."
     },
     {
       "addr": 2236,
-      "name": "modelb_levels_started",
+      "name": "unread_level_count",
       "group": "loader",
       "access": [
         "w"
       ],
-      "description": "The Model B side's count of levels started, in the game's Dunj3; set up as the Model B loader does, but this side's game does not read it."
+      "description": "In the game's Dunj3: a byte set to 0 by title_start, which the game never reads."
     },
     {
       "addr": 2237,
-      "name": "modelb_level_digits",
+      "name": "unread_level_digits",
       "group": "loader",
       "access": [
         "w"
       ],
-      "description": "The Model B side's ASCII level digits, in the game's Dunj3; set up as the Model B loader does, but this side's game does not read them."
+      "description": "In the game's Dunj3: two bytes set to \"0 \" by title_start, which the game never reads."
     },
     {
       "addr": 50805,
@@ -673,14 +673,14 @@
     },
     {
       "anchor": 2237,
-      "name": "modelb_level_digits",
+      "name": "unread_level_digits",
       "window": [
         0,
         1
       ],
       "named_slots": false,
       "group": "loader",
-      "description": "The Model B side's ASCII level digits, in the game's Dunj3; set up as the Model B loader does, but this side's game does not read them."
+      "description": "In the game's Dunj3: two bytes set to \"0 \" by title_start, which the game never reads."
     },
     {
       "anchor": 50805,
@@ -724,7 +724,7 @@
         160,
         38
       ],
-      "comment_inline": "...",
+      "comment_inline": "...command's high byte",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(load_code2_command)",
@@ -745,7 +745,7 @@
         247,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...and run it: Code2 into private RAM",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -778,7 +778,7 @@
         160,
         38
       ],
-      "comment_inline": "...",
+      "comment_inline": "...command's high byte",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(load_code3_command)",
@@ -799,7 +799,7 @@
         247,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...and run it: Code3 into private RAM",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -897,7 +897,7 @@
         162,
         1
       ],
-      "comment_inline": "...",
+      "comment_inline": "...channel 1",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#1"
@@ -909,7 +909,7 @@
         244,
         255
       ],
-      "comment_inline": "... Read ADC channel X or buffer status",
+      "comment_inline": "...Y = the reading's high byte Read ADC channel X or buffer status",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -990,7 +990,7 @@
         160,
         39
       ],
-      "comment_inline": "...",
+      "comment_inline": "...command's high byte",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(coder_command)",
@@ -1011,7 +1011,7 @@
         247,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...and run it; the game takes over from here",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -1060,7 +1060,7 @@
         160,
         38
       ],
-      "comment_inline": "...",
+      "comment_inline": "...command's high byte",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(coder2_command)",
@@ -1081,7 +1081,7 @@
         247,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...and run it; the game takes over from here",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -1138,7 +1138,7 @@
       "labels": [
         "blank_display_loop"
       ],
-      "comment_inline": "...",
+      "comment_inline": "Next byte of the VDU sequence...",
       "xref_summaries": [
         "&2696 referenced 1 time by &269f"
       ],
@@ -1161,7 +1161,7 @@
         238,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...to the VDU drivers",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -1173,7 +1173,7 @@
       "bytes": [
         232
       ],
-      "comment_inline": "...",
+      "comment_inline": "...on to the next",
       "type": "code",
       "mnemonic": "inx"
     },
@@ -1183,7 +1183,7 @@
         224,
         11
       ],
-      "comment_inline": "...",
+      "comment_inline": "...until all eleven are sent",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#&0b"
@@ -1194,7 +1194,7 @@
         208,
         245
       ],
-      "comment_inline": "...",
+      "comment_inline": "Not yet: send the next",
       "type": "code",
       "mnemonic": "bne",
       "operand": "blank_display_loop",
@@ -1290,7 +1290,7 @@
         160,
         38
       ],
-      "comment_inline": "...",
+      "comment_inline": "...command's high byte",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(load_table_command)",
@@ -1311,7 +1311,7 @@
         247,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...and run it: Table into private RAM",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -1325,7 +1325,7 @@
         0,
         39
       ],
-      "comment_inline": "Carry on with the Model B loader's start-up",
+      "comment_inline": "Carry on with the start-up at title_start",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "title_start",
@@ -1381,7 +1381,7 @@
         238,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...so the load leaves no messages on screen",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -1414,7 +1414,7 @@
         160,
         39
       ],
-      "comment_inline": "...",
+      "comment_inline": "...command's high byte",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(load_screen_command)",
@@ -1435,7 +1435,7 @@
         247,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...and run it: the picture into screen memory",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -1460,7 +1460,7 @@
         238,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...so later text is seen again",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -1516,7 +1516,7 @@
       "bytes": [
         234
       ],
-      "comment_inline": "...",
+      "comment_inline": "...the second padding byte",
       "type": "code",
       "mnemonic": "nop"
     },
@@ -1654,7 +1654,7 @@
         162,
         1
       ],
-      "comment_inline": "...",
+      "comment_inline": "...X = 1: ESCAPE disabled, BREAK as normal...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#1"
@@ -1665,7 +1665,7 @@
         160,
         0
       ],
-      "comment_inline": "...",
+      "comment_inline": "...Y = 0: X replaces the old setting",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -1677,7 +1677,7 @@
         244,
         255
       ],
-      "comment_inline": "... osbyte: escape break effect",
+      "comment_inline": "...so ESCAPE cannot interrupt the title osbyte: escape break effect",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -1707,7 +1707,7 @@
         162,
         1
       ],
-      "comment_inline": "...",
+      "comment_inline": "...X = 1: cursor keys return codes",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#1"
@@ -1719,7 +1719,7 @@
         244,
         255
       ],
-      "comment_inline": "... Set cursor editing keys",
+      "comment_inline": "...so the game can read them as keys Set cursor editing keys",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -1732,7 +1732,7 @@
         169,
         0
       ],
-      "comment_inline": "Levels started = 0, for the Model B release's Coder",
+      "comment_inline": "Level count = 0, in a byte the game does not read",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -1744,12 +1744,12 @@
         188,
         8
       ],
-      "comment_inline": "...",
+      "comment_inline": "...in page &08, which survives a reset",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "modelb_levels_started",
+      "operand": "unread_level_count",
       "target": 2236,
-      "target_label": "modelb_levels_started"
+      "target_label": "unread_level_count"
     },
     {
       "addr": 10005,
@@ -1776,12 +1776,12 @@
         189,
         8
       ],
-      "comment_inline": "...",
+      "comment_inline": "...first digit '0'...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "modelb_level_digits",
+      "operand": "unread_level_digits",
       "target": 2237,
-      "target_label": "modelb_level_digits"
+      "target_label": "unread_level_digits"
     },
     {
       "addr": 10010,
@@ -1789,7 +1789,7 @@
         169,
         32
       ],
-      "comment_inline": "...",
+      "comment_inline": "...second digit a space",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#' '",
@@ -1808,10 +1808,10 @@
         190,
         8
       ],
-      "comment_inline": "...",
+      "comment_inline": "...for the level filename",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "modelb_level_digits + 1",
+      "operand": "unread_level_digits + 1",
       "target": 2238
     },
     {
@@ -1864,9 +1864,9 @@
       "comment_inline": "...at &08B0...",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "modelb_hero_score_ten_thousands,x",
+      "operand": "unread_digit_table,x",
       "target": 2224,
-      "target_label": "modelb_hero_score_ten_thousands"
+      "target_label": "unread_digit_table"
     },
     {
       "addr": 10022,
@@ -1886,19 +1886,19 @@
         180,
         8
       ],
-      "comment_inline": "...at &08B4 (the Model B release's menu tables)",
+      "comment_inline": "...at &08B4, bytes the game does not read",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "modelb_hero_absent,x",
+      "operand": "unread_hero_table,x",
       "target": 2228,
-      "target_label": "modelb_hero_absent"
+      "target_label": "unread_hero_table"
     },
     {
       "addr": 10027,
       "bytes": [
         202
       ],
-      "comment_inline": "...",
+      "comment_inline": "Next hero",
       "type": "code",
       "mnemonic": "dex"
     },
@@ -1908,7 +1908,7 @@
         16,
         243
       ],
-      "comment_inline": "...",
+      "comment_inline": "Until all four heroes are set",
       "type": "code",
       "mnemonic": "bpl",
       "operand": "init_hero_tables",
@@ -1921,7 +1921,7 @@
         169,
         181
       ],
-      "comment_inline": "BREAK intercept address = &15B5 (the Model B game's next-level intercept)...",
+      "comment_inline": "BREAK intercept address = &15B5, which the game does not use...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#<(game_next_level_intercept)",
@@ -1942,7 +1942,7 @@
         136,
         2
       ],
-      "comment_inline": "...",
+      "comment_inline": "...into the intercept's address low byte",
       "type": "code",
       "mnemonic": "sta",
       "operand": "os_break_intercept + 1",
@@ -1954,7 +1954,7 @@
         169,
         21
       ],
-      "comment_inline": "...",
+      "comment_inline": "...high byte",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#>(game_next_level_intercept)",
@@ -1975,7 +1975,7 @@
         137,
         2
       ],
-      "comment_inline": "...",
+      "comment_inline": "...into the intercept's address high byte",
       "type": "code",
       "mnemonic": "sta",
       "operand": "os_break_intercept + 2",
@@ -1999,7 +1999,7 @@
         135,
         2
       ],
-      "comment_inline": "...",
+      "comment_inline": "...into &0287, so no JMP: the intercept is off",
       "type": "code",
       "mnemonic": "sta",
       "operand": "os_break_intercept",
@@ -2032,7 +2032,7 @@
         160,
         39
       ],
-      "comment_inline": "...",
+      "comment_inline": "...command's high byte",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(tv_title_command)",
@@ -2053,7 +2053,7 @@
         247,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...and run it",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -2115,7 +2115,7 @@
         238,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...VDU 19 starts the palette change...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -2127,7 +2127,7 @@
       "bytes": [
         138
       ],
-      "comment_inline": "...",
+      "comment_inline": "...logical colour X...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -2138,7 +2138,7 @@
         238,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...sent as the first parameter",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -2151,7 +2151,7 @@
         169,
         0
       ],
-      "comment_inline": "...",
+      "comment_inline": "...zero, for the rest of the command",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -2163,7 +2163,7 @@
         238,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...physical colour 0: black",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -2177,7 +2177,7 @@
         238,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...first padding byte",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -2191,7 +2191,7 @@
         238,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...second padding byte",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -2205,7 +2205,7 @@
         238,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...third padding byte",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -2217,7 +2217,7 @@
       "bytes": [
         202
       ],
-      "comment_inline": "...",
+      "comment_inline": "Next logical colour",
       "type": "code",
       "mnemonic": "dex"
     },
@@ -2227,7 +2227,7 @@
         16,
         230
       ],
-      "comment_inline": "...",
+      "comment_inline": "Until colours 15 to 0 are all black",
       "type": "code",
       "mnemonic": "bpl",
       "operand": "black_colours",
@@ -2262,7 +2262,7 @@
       "bytes": [
         234
       ],
-      "comment_inline": "...",
+      "comment_inline": "...second padding byte",
       "type": "code",
       "mnemonic": "nop"
     },
@@ -2271,7 +2271,7 @@
       "bytes": [
         234
       ],
-      "comment_inline": "...",
+      "comment_inline": "...third padding byte",
       "type": "code",
       "mnemonic": "nop"
     },
@@ -2280,7 +2280,7 @@
       "bytes": [
         234
       ],
-      "comment_inline": "...",
+      "comment_inline": "...fourth padding byte",
       "type": "code",
       "mnemonic": "nop"
     },
@@ -2302,7 +2302,7 @@
         238,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...so the loaded picture appears all at once",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -2326,7 +2326,7 @@
         133,
         123
       ],
-      "comment_inline": "...",
+      "comment_inline": "...so title_plot_star steps right across a row",
       "type": "code",
       "mnemonic": "sta",
       "operand": "title_plot_reversed",
@@ -2362,7 +2362,7 @@
         244,
         255
       ],
-      "comment_inline": "... Flush specific buffer X",
+      "comment_inline": "...X is whatever OSCLI left: buffer unknown Flush specific buffer X",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -2409,7 +2409,7 @@
         160,
         39
       ],
-      "comment_inline": "...",
+      "comment_inline": "...command's high byte",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(tv_game_command)",
@@ -2430,7 +2430,7 @@
         247,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...and run it",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -2477,7 +2477,7 @@
         160,
         39
       ],
-      "comment_inline": "...",
+      "comment_inline": "...command's high byte",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(disc_command)",
@@ -2498,7 +2498,7 @@
         247,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...and run it, so Coder loads from disc",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -2523,7 +2523,7 @@
         135,
         2
       ],
-      "comment_inline": "...",
+      "comment_inline": "...into &0287, the intercept's opcode byte",
       "type": "code",
       "mnemonic": "sta",
       "operand": "os_break_intercept",
@@ -2560,7 +2560,7 @@
       "bytes": [
         234
       ],
-      "comment_inline": "...",
+      "comment_inline": "...never run: leave_title does not return",
       "type": "byte",
       "values": [
         234
@@ -2571,7 +2571,7 @@
       "bytes": [
         234
       ],
-      "comment_inline": "...",
+      "comment_inline": "...never run",
       "type": "byte",
       "values": [
         234
@@ -2582,7 +2582,7 @@
       "bytes": [
         234
       ],
-      "comment_inline": "...",
+      "comment_inline": "...never run",
       "type": "byte",
       "values": [
         234
@@ -2711,7 +2711,7 @@
         238,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...selects a mode...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -2724,7 +2724,7 @@
         169,
         2
       ],
-      "comment_inline": "...",
+      "comment_inline": "...mode 2: 16 colours, 20 columns",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#2"
@@ -2736,7 +2736,7 @@
         238,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...sent as the mode number",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -2764,7 +2764,7 @@
       "labels": [
         "send_cursor_off_vdu"
       ],
-      "comment_inline": "...",
+      "comment_inline": "Next byte of the VDU sequence...",
       "xref_summaries": [
         "&27cb referenced 1 time by &27d4"
       ],
@@ -2787,7 +2787,7 @@
         238,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...to the VDU drivers",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -2799,7 +2799,7 @@
       "bytes": [
         232
       ],
-      "comment_inline": "...",
+      "comment_inline": "...on to the next",
       "type": "code",
       "mnemonic": "inx"
     },
@@ -2809,7 +2809,7 @@
         224,
         11
       ],
-      "comment_inline": "...",
+      "comment_inline": "...until all eleven are sent",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#&0b"
@@ -2820,7 +2820,7 @@
         208,
         245
       ],
-      "comment_inline": "...",
+      "comment_inline": "Not yet: send the next",
       "type": "code",
       "mnemonic": "bne",
       "operand": "send_cursor_off_vdu",
@@ -2985,7 +2985,7 @@
         133,
         114
       ],
-      "comment_inline": "...",
+      "comment_inline": "...as the plotter's width",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_width",
@@ -3009,7 +3009,7 @@
         133,
         115
       ],
-      "comment_inline": "...",
+      "comment_inline": "...as the plotter's height",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_height",
@@ -3036,7 +3036,7 @@
         192,
         40
       ],
-      "comment_inline": "...",
+      "comment_inline": "...low byte from star_frames_lo",
       "type": "code",
       "mnemonic": "lda",
       "operand": "star_frames_lo,x",
@@ -3049,7 +3049,7 @@
         133,
         120
       ],
-      "comment_inline": "...",
+      "comment_inline": "...into the data pointer",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_data_ptr",
@@ -3063,7 +3063,7 @@
         208,
         40
       ],
-      "comment_inline": "...",
+      "comment_inline": "...high byte from star_frames_hi",
       "type": "code",
       "mnemonic": "lda",
       "operand": "star_frames_hi,x",
@@ -3076,7 +3076,7 @@
         133,
         121
       ],
-      "comment_inline": "...",
+      "comment_inline": "...into the data pointer",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_data_ptr_hi",
@@ -3141,7 +3141,7 @@
         133,
         118
       ],
-      "comment_inline": "...",
+      "comment_inline": "...low byte, to step down from later",
       "type": "code",
       "mnemonic": "sta",
       "operand": "row_start_ptr",
@@ -3154,7 +3154,7 @@
         165,
         117
       ],
-      "comment_inline": "...",
+      "comment_inline": "...high byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "screen_ptr_hi",
@@ -3167,7 +3167,7 @@
         133,
         119
       ],
-      "comment_inline": "...",
+      "comment_inline": "...kept with the low byte",
       "type": "code",
       "mnemonic": "sta",
       "operand": "row_start_ptr_hi",
@@ -3179,7 +3179,7 @@
       "bytes": [
         138
       ],
-      "comment_inline": "...",
+      "comment_inline": "...and keep the row count...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -3188,7 +3188,7 @@
       "bytes": [
         72
       ],
-      "comment_inline": "...",
+      "comment_inline": "...on the stack while X counts bytes",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -3236,7 +3236,7 @@
         81,
         116
       ],
-      "comment_inline": "...",
+      "comment_inline": "...flip the screen pixels the frame sets...",
       "type": "code",
       "mnemonic": "eor",
       "operand": "(screen_ptr),y",
@@ -3249,7 +3249,7 @@
         145,
         116
       ],
-      "comment_inline": "...",
+      "comment_inline": "...so plotting twice erases the star",
       "type": "code",
       "mnemonic": "sta",
       "operand": "(screen_ptr),y",
@@ -3280,7 +3280,7 @@
         208,
         13
       ],
-      "comment_inline": "...",
+      "comment_inline": "Non-zero: step left instead",
       "type": "code",
       "mnemonic": "bne",
       "operand": "plot_star_left",
@@ -3302,7 +3302,7 @@
         165,
         116
       ],
-      "comment_inline": "...",
+      "comment_inline": "...screen pointer low byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "screen_ptr",
@@ -3315,7 +3315,7 @@
         105,
         8
       ],
-      "comment_inline": "...",
+      "comment_inline": "...plus 8: the next cell to the right",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#8"
@@ -3326,7 +3326,7 @@
         133,
         116
       ],
-      "comment_inline": "...",
+      "comment_inline": "...stored back",
       "type": "code",
       "mnemonic": "sta",
       "operand": "screen_ptr",
@@ -3339,7 +3339,7 @@
         144,
         15
       ],
-      "comment_inline": "...",
+      "comment_inline": "No carry: pointer done",
       "type": "code",
       "mnemonic": "bcc",
       "operand": "plot_star_next_data",
@@ -3352,7 +3352,7 @@
         230,
         117
       ],
-      "comment_inline": "...",
+      "comment_inline": "Carry into the high byte",
       "type": "code",
       "mnemonic": "inc",
       "operand": "screen_ptr_hi",
@@ -3399,7 +3399,7 @@
         165,
         116
       ],
-      "comment_inline": "...",
+      "comment_inline": "...screen pointer low byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "screen_ptr",
@@ -3412,7 +3412,7 @@
         233,
         8
       ],
-      "comment_inline": "...",
+      "comment_inline": "...minus 8: the next cell to the left",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "#8"
@@ -3423,7 +3423,7 @@
         133,
         116
       ],
-      "comment_inline": "...",
+      "comment_inline": "...stored back",
       "type": "code",
       "mnemonic": "sta",
       "operand": "screen_ptr",
@@ -3436,7 +3436,7 @@
         176,
         2
       ],
-      "comment_inline": "...",
+      "comment_inline": "No borrow: pointer done",
       "type": "code",
       "mnemonic": "bcs",
       "operand": "plot_star_next_data",
@@ -3449,7 +3449,7 @@
         198,
         117
       ],
-      "comment_inline": "...",
+      "comment_inline": "Borrow from the high byte",
       "type": "code",
       "mnemonic": "dec",
       "operand": "screen_ptr_hi",
@@ -3495,7 +3495,7 @@
         208,
         2
       ],
-      "comment_inline": "...",
+      "comment_inline": "No carry: pointer done",
       "type": "code",
       "mnemonic": "bne",
       "operand": "plot_star_next_byte",
@@ -3508,7 +3508,7 @@
         230,
         121
       ],
-      "comment_inline": "...",
+      "comment_inline": "Carry into the high byte",
       "type": "code",
       "mnemonic": "inc",
       "operand": "sprite_data_ptr_hi",
@@ -3542,7 +3542,7 @@
         208,
         213
       ],
-      "comment_inline": "...",
+      "comment_inline": "More bytes in this row: plot the next",
       "type": "code",
       "mnemonic": "bne",
       "operand": "plot_star_byte",
@@ -3564,7 +3564,7 @@
         165,
         118
       ],
-      "comment_inline": "...",
+      "comment_inline": "...from the row's start, low byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "row_start_ptr",
@@ -3577,7 +3577,7 @@
         105,
         1
       ],
-      "comment_inline": "...",
+      "comment_inline": "...plus one pixel row",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#1"
@@ -3588,7 +3588,7 @@
         133,
         116
       ],
-      "comment_inline": "...",
+      "comment_inline": "...as the new screen pointer",
       "type": "code",
       "mnemonic": "sta",
       "operand": "screen_ptr",
@@ -3601,7 +3601,7 @@
         165,
         119
       ],
-      "comment_inline": "...",
+      "comment_inline": "...high byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "row_start_ptr_hi",
@@ -3614,7 +3614,7 @@
         105,
         0
       ],
-      "comment_inline": "...",
+      "comment_inline": "...with the carry",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#0"
@@ -3625,7 +3625,7 @@
         133,
         117
       ],
-      "comment_inline": "...",
+      "comment_inline": "...as the new screen pointer",
       "type": "code",
       "mnemonic": "sta",
       "operand": "screen_ptr_hi",
@@ -3651,7 +3651,7 @@
         41,
         7
       ],
-      "comment_inline": "...",
+      "comment_inline": "...pixel row within the character row",
       "type": "code",
       "mnemonic": "and",
       "operand": "#7"
@@ -3662,7 +3662,7 @@
         208,
         13
       ],
-      "comment_inline": "...",
+      "comment_inline": "Not 0: still in the same character row",
       "type": "code",
       "mnemonic": "bne",
       "operand": "plot_star_next_row",
@@ -3674,7 +3674,7 @@
       "bytes": [
         24
       ],
-      "comment_inline": "...",
+      "comment_inline": "Row 0: moved into the next character row...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -3684,7 +3684,7 @@
         165,
         116
       ],
-      "comment_inline": "...",
+      "comment_inline": "...so add 640 - 8 to the pointer...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "screen_ptr",
@@ -3697,7 +3697,7 @@
         105,
         120
       ],
-      "comment_inline": "...",
+      "comment_inline": "...low byte of &278...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#&78"
@@ -3708,7 +3708,7 @@
         133,
         116
       ],
-      "comment_inline": "...",
+      "comment_inline": "...stored back",
       "type": "code",
       "mnemonic": "sta",
       "operand": "screen_ptr",
@@ -3721,7 +3721,7 @@
         165,
         117
       ],
-      "comment_inline": "...",
+      "comment_inline": "...high byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "screen_ptr_hi",
@@ -3734,7 +3734,7 @@
         105,
         2
       ],
-      "comment_inline": "...",
+      "comment_inline": "...plus &02 with the carry",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#2"
@@ -3745,7 +3745,7 @@
         133,
         117
       ],
-      "comment_inline": "...",
+      "comment_inline": "...stored back",
       "type": "code",
       "mnemonic": "sta",
       "operand": "screen_ptr_hi",
@@ -3778,7 +3778,7 @@
       "bytes": [
         170
       ],
-      "comment_inline": "...",
+      "comment_inline": "...into X...",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -3787,7 +3787,7 @@
       "bytes": [
         202
       ],
-      "comment_inline": "...",
+      "comment_inline": "...one row fewer to go",
       "type": "code",
       "mnemonic": "dex"
     },
@@ -3797,7 +3797,7 @@
         208,
         164
       ],
-      "comment_inline": "...",
+      "comment_inline": "More rows: plot the next",
       "type": "code",
       "mnemonic": "bne",
       "operand": "plot_star_row",
@@ -3843,7 +3843,7 @@
       "bytes": [
         74
       ],
-      "comment_inline": "...",
+      "comment_inline": "...divide plot_y by 4...",
       "type": "code",
       "mnemonic": "lsr"
     },
@@ -3852,7 +3852,7 @@
       "bytes": [
         74
       ],
-      "comment_inline": "...",
+      "comment_inline": "...(character row x 2)...",
       "type": "code",
       "mnemonic": "lsr"
     },
@@ -3862,7 +3862,7 @@
         41,
         254
       ],
-      "comment_inline": "...",
+      "comment_inline": "...even, to index the table's byte pairs",
       "type": "code",
       "mnemonic": "and",
       "operand": "#&fe"
@@ -3872,7 +3872,7 @@
       "bytes": [
         168
       ],
-      "comment_inline": "...",
+      "comment_inline": "...into Y",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -3905,7 +3905,7 @@
         105,
         48
       ],
-      "comment_inline": "...",
+      "comment_inline": "...the screen starts at &3000",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#>(screen_start)",
@@ -3925,7 +3925,7 @@
         133,
         117
       ],
-      "comment_inline": "...",
+      "comment_inline": "...as the high byte",
       "type": "code",
       "mnemonic": "sta",
       "operand": "screen_ptr_hi",
@@ -3951,7 +3951,7 @@
         133,
         116
       ],
-      "comment_inline": "...",
+      "comment_inline": "...as the low byte",
       "type": "code",
       "mnemonic": "sta",
       "operand": "screen_ptr",
@@ -3977,7 +3977,7 @@
         41,
         7
       ],
-      "comment_inline": "...",
+      "comment_inline": "...plot_y MOD 8...",
       "type": "code",
       "mnemonic": "and",
       "operand": "#7"
@@ -3988,7 +3988,7 @@
         101,
         116
       ],
-      "comment_inline": "...",
+      "comment_inline": "...added to the low byte (no carry out)",
       "type": "code",
       "mnemonic": "adc",
       "operand": "screen_ptr",
@@ -4001,7 +4001,7 @@
         133,
         116
       ],
-      "comment_inline": "...",
+      "comment_inline": "...stored back",
       "type": "code",
       "mnemonic": "sta",
       "operand": "screen_ptr",
@@ -4023,7 +4023,7 @@
         165,
         112
       ],
-      "comment_inline": "...",
+      "comment_inline": "...byte column...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "plot_x",
@@ -4036,7 +4036,7 @@
         41,
         224
       ],
-      "comment_inline": "...",
+      "comment_inline": "...top three bits, worth &100 each x 8...",
       "type": "code",
       "mnemonic": "and",
       "operand": "#&e0"
@@ -4046,7 +4046,7 @@
       "bytes": [
         42
       ],
-      "comment_inline": "...",
+      "comment_inline": "...rotated down...",
       "type": "code",
       "mnemonic": "rol"
     },
@@ -4055,7 +4055,7 @@
       "bytes": [
         42
       ],
-      "comment_inline": "...",
+      "comment_inline": "...towards the bottom...",
       "type": "code",
       "mnemonic": "rol"
     },
@@ -4064,7 +4064,7 @@
       "bytes": [
         42
       ],
-      "comment_inline": "...",
+      "comment_inline": "...of the byte...",
       "type": "code",
       "mnemonic": "rol"
     },
@@ -4073,7 +4073,7 @@
       "bytes": [
         42
       ],
-      "comment_inline": "...",
+      "comment_inline": "...as bits 2-0: the high byte's share",
       "type": "code",
       "mnemonic": "rol"
     },
@@ -4082,7 +4082,7 @@
       "bytes": [
         24
       ],
-      "comment_inline": "...",
+      "comment_inline": "...to add to the high byte...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -4092,7 +4092,7 @@
         101,
         117
       ],
-      "comment_inline": "...",
+      "comment_inline": "...added...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "screen_ptr_hi",
@@ -4105,7 +4105,7 @@
         133,
         117
       ],
-      "comment_inline": "...",
+      "comment_inline": "...stored back",
       "type": "code",
       "mnemonic": "sta",
       "operand": "screen_ptr_hi",
@@ -4130,7 +4130,7 @@
       "bytes": [
         10
       ],
-      "comment_inline": "...",
+      "comment_inline": "...x 2...",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -4139,7 +4139,7 @@
       "bytes": [
         10
       ],
-      "comment_inline": "...",
+      "comment_inline": "...x 4...",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -4148,7 +4148,7 @@
       "bytes": [
         10
       ],
-      "comment_inline": "...",
+      "comment_inline": "...x 8: eight bytes per character cell",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -4157,7 +4157,7 @@
       "bytes": [
         24
       ],
-      "comment_inline": "...",
+      "comment_inline": "...to add to the low byte...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -4167,7 +4167,7 @@
         101,
         116
       ],
-      "comment_inline": "...",
+      "comment_inline": "...added...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "screen_ptr",
@@ -4180,7 +4180,7 @@
         133,
         116
       ],
-      "comment_inline": "...",
+      "comment_inline": "...stored back",
       "type": "code",
       "mnemonic": "sta",
       "operand": "screen_ptr",
@@ -4193,7 +4193,7 @@
         144,
         2
       ],
-      "comment_inline": "...",
+      "comment_inline": "No carry: address done",
       "type": "code",
       "mnemonic": "bcc",
       "operand": "title_screen_address_done",
@@ -4206,7 +4206,7 @@
         230,
         117
       ],
-      "comment_inline": "...",
+      "comment_inline": "Carry into the high byte",
       "type": "code",
       "mnemonic": "inc",
       "operand": "screen_ptr_hi",
@@ -4499,7 +4499,7 @@
         169,
         0
       ],
-      "comment_inline": "...",
+      "comment_inline": "...0 for every star",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -4514,7 +4514,7 @@
       "labels": [
         "clear_star_showing"
       ],
-      "comment_inline": "...",
+      "comment_inline": "...cleared...",
       "xref_summaries": [
         "&2904 referenced 1 time by &2908"
       ],
@@ -4535,7 +4535,7 @@
       "bytes": [
         202
       ],
-      "comment_inline": "...",
+      "comment_inline": "...next star",
       "type": "code",
       "mnemonic": "dex"
     },
@@ -4545,7 +4545,7 @@
         16,
         250
       ],
-      "comment_inline": "...",
+      "comment_inline": "Until stars 2 to 0 are cleared",
       "type": "code",
       "mnemonic": "bpl",
       "operand": "clear_star_showing",
@@ -4584,7 +4584,7 @@
         41,
         3
       ],
-      "comment_inline": "...",
+      "comment_inline": "...lowest two bits, 0-3...",
       "type": "code",
       "mnemonic": "and",
       "operand": "#3"
@@ -4595,7 +4595,7 @@
         208,
         3
       ],
-      "comment_inline": "...",
+      "comment_inline": "Not 0: no new star this time",
       "type": "code",
       "mnemonic": "bne",
       "operand": "twinkle_advance",
@@ -4666,7 +4666,7 @@
         244,
         255
       ],
-      "comment_inline": "... Scan keyboard from key 16",
+      "comment_inline": "...X = &FF if none Scan keyboard from key 16",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -4679,7 +4679,7 @@
         224,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...no key?",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#&ff"
@@ -4718,7 +4718,7 @@
       "labels": [
         "erase_stars"
       ],
-      "comment_inline": "...",
+      "comment_inline": "...star Y showing?",
       "xref_summaries": [
         "&2922 referenced 1 time by &292b"
       ],
@@ -4740,7 +4740,7 @@
         240,
         3
       ],
-      "comment_inline": "...",
+      "comment_inline": "No: nothing to erase",
       "type": "code",
       "mnemonic": "beq",
       "operand": "erase_next_star",
@@ -4754,7 +4754,7 @@
         185,
         41
       ],
-      "comment_inline": "...",
+      "comment_inline": "Yes: plot it again to erase it",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "plot_star",
@@ -4769,7 +4769,7 @@
       "labels": [
         "erase_next_star"
       ],
-      "comment_inline": "...",
+      "comment_inline": "Next star",
       "xref_summaries": [
         "&292a referenced 1 time by &2925"
       ],
@@ -4788,7 +4788,7 @@
         16,
         245
       ],
-      "comment_inline": "...",
+      "comment_inline": "Until stars 2 to 0 are done",
       "type": "code",
       "mnemonic": "bpl",
       "operand": "erase_stars",
@@ -4837,7 +4837,7 @@
       "labels": [
         "find_free_star"
       ],
-      "comment_inline": "...",
+      "comment_inline": "...star Y showing?",
       "xref_summaries": [
         "&2930 referenced 1 time by &2938"
       ],
@@ -4859,7 +4859,7 @@
         240,
         6
       ],
-      "comment_inline": "...",
+      "comment_inline": "No: use this one",
       "type": "code",
       "mnemonic": "beq",
       "operand": "star_found",
@@ -4871,7 +4871,7 @@
       "bytes": [
         200
       ],
-      "comment_inline": "...",
+      "comment_inline": "Yes: try the next",
       "type": "code",
       "mnemonic": "iny"
     },
@@ -4881,7 +4881,7 @@
         192,
         3
       ],
-      "comment_inline": "...",
+      "comment_inline": "...of the three",
       "type": "code",
       "mnemonic": "cpy",
       "operand": "#3"
@@ -4892,7 +4892,7 @@
         208,
         246
       ],
-      "comment_inline": "...",
+      "comment_inline": "Not all tried: carry on looking",
       "type": "code",
       "mnemonic": "bne",
       "operand": "find_free_star",
@@ -4938,7 +4938,7 @@
         218,
         41
       ],
-      "comment_inline": "...",
+      "comment_inline": "...in star_showing",
       "type": "code",
       "mnemonic": "sta",
       "operand": "star_showing,y",
@@ -4963,7 +4963,7 @@
         137,
         0
       ],
-      "comment_inline": "...",
+      "comment_inline": "...the frame grows",
       "type": "code",
       "mnemonic": "sta",
       "operand": "star_frame_step,y",
@@ -4993,7 +4993,7 @@
         134,
         0
       ],
-      "comment_inline": "...",
+      "comment_inline": "...the smallest",
       "type": "code",
       "mnemonic": "sta",
       "operand": "star_frame,y",
@@ -5037,7 +5037,7 @@
         69,
         250
       ],
-      "comment_inline": "...",
+      "comment_inline": "...mixed with OS workspace...",
       "type": "code",
       "mnemonic": "eor",
       "operand": "os_zp_fa",
@@ -5050,7 +5050,7 @@
         69,
         252
       ],
-      "comment_inline": "...",
+      "comment_inline": "...and the last interrupt's A...",
       "type": "code",
       "mnemonic": "eor",
       "operand": "os_irq_a",
@@ -5063,7 +5063,7 @@
         41,
         7
       ],
-      "comment_inline": "...",
+      "comment_inline": "...one of the eight places",
       "type": "code",
       "mnemonic": "and",
       "operand": "#7"
@@ -5073,7 +5073,7 @@
       "bytes": [
         170
       ],
-      "comment_inline": "...",
+      "comment_inline": "...as the place index",
       "type": "code",
       "mnemonic": "tax"
     },
@@ -5097,7 +5097,7 @@
         48,
         241
       ],
-      "comment_inline": "...",
+      "comment_inline": "Taken (&FF): pick again",
       "type": "code",
       "mnemonic": "bmi",
       "operand": "pick_place",
@@ -5130,7 +5130,7 @@
         240,
         41
       ],
-      "comment_inline": "...",
+      "comment_inline": "...its pixel row...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "star_places_y,x",
@@ -5144,7 +5144,7 @@
         131,
         0
       ],
-      "comment_inline": "...",
+      "comment_inline": "...as the star's row",
       "type": "code",
       "mnemonic": "sta",
       "operand": "star_y,y",
@@ -5192,7 +5192,7 @@
         224,
         41
       ],
-      "comment_inline": "...",
+      "comment_inline": "...by setting its column to &FF",
       "type": "code",
       "mnemonic": "sta",
       "operand": "star_places_x,x",
@@ -5314,7 +5314,7 @@
         134,
         0
       ],
-      "comment_inline": "...",
+      "comment_inline": "...current frame...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "star_frame,y",
@@ -5333,7 +5333,7 @@
         137,
         0
       ],
-      "comment_inline": "...",
+      "comment_inline": "...plus the step, +1 or -1...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "star_frame_step,y",
@@ -5352,7 +5352,7 @@
         134,
         0
       ],
-      "comment_inline": "...",
+      "comment_inline": "...stored back",
       "type": "code",
       "mnemonic": "sta",
       "operand": "star_frame,y",
@@ -5419,7 +5419,7 @@
         134,
         0
       ],
-      "comment_inline": "...",
+      "comment_inline": "...stored...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "star_frame,y",
@@ -5449,7 +5449,7 @@
         137,
         0
       ],
-      "comment_inline": "...",
+      "comment_inline": "...step -1, so the star shrinks",
       "type": "code",
       "mnemonic": "sta",
       "operand": "star_frame_step,y",
@@ -5504,7 +5504,7 @@
         218,
         41
       ],
-      "comment_inline": "...",
+      "comment_inline": "...cleared in star_showing...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "star_showing,y",
@@ -5536,7 +5536,7 @@
         182,
         140
       ],
-      "comment_inline": "...",
+      "comment_inline": "...by putting its column back...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "star_place,y",
@@ -5555,7 +5555,7 @@
         224,
         41
       ],
-      "comment_inline": "...",
+      "comment_inline": "...into star_places_x",
       "type": "code",
       "mnemonic": "sta",
       "operand": "star_places_x,x",
@@ -5631,7 +5631,7 @@
       "bytes": [
         72
       ],
-      "comment_inline": "...",
+      "comment_inline": "...keeping Y, the star...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -5641,7 +5641,7 @@
         162,
         5
       ],
-      "comment_inline": "...",
+      "comment_inline": "...5 x 256 loops between stars",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#5"
@@ -5681,7 +5681,7 @@
       "labels": [
         "star_pause_inner"
       ],
-      "comment_inline": "...",
+      "comment_inline": "...count the inner loop...",
       "xref_summaries": [
         "&29ab referenced 1 time by &29ac"
       ],
@@ -5700,7 +5700,7 @@
         208,
         253
       ],
-      "comment_inline": "...",
+      "comment_inline": "Inner loop not done: keep waiting",
       "type": "code",
       "mnemonic": "bne",
       "operand": "star_pause_inner",
@@ -5712,7 +5712,7 @@
       "bytes": [
         202
       ],
-      "comment_inline": "...",
+      "comment_inline": "...count the outer loop...",
       "type": "code",
       "mnemonic": "dex"
     },
@@ -5722,7 +5722,7 @@
         208,
         248
       ],
-      "comment_inline": "...",
+      "comment_inline": "Outer loop not done: keep waiting",
       "type": "code",
       "mnemonic": "bne",
       "operand": "star_pause_outer",
@@ -5734,7 +5734,7 @@
       "bytes": [
         104
       ],
-      "comment_inline": "...",
+      "comment_inline": "...recover the star...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -5743,7 +5743,7 @@
       "bytes": [
         168
       ],
-      "comment_inline": "...",
+      "comment_inline": "...into Y",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -5762,7 +5762,7 @@
         192,
         3
       ],
-      "comment_inline": "...",
+      "comment_inline": "...of the three",
       "type": "code",
       "mnemonic": "cpy",
       "operand": "#3"
@@ -5773,7 +5773,7 @@
         208,
         183
       ],
-      "comment_inline": "...",
+      "comment_inline": "More stars: advance the next",
       "type": "code",
       "mnemonic": "bne",
       "operand": "advance_star",
@@ -5838,7 +5838,7 @@
         133,
         112
       ],
-      "comment_inline": "...",
+      "comment_inline": "...as the plotter's column",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_x",
@@ -5870,7 +5870,7 @@
         133,
         113
       ],
-      "comment_inline": "...",
+      "comment_inline": "...as the plotter's row",
       "type": "code",
       "mnemonic": "sta",
       "operand": "plot_y",
@@ -5902,7 +5902,7 @@
         133,
         122
       ],
-      "comment_inline": "...",
+      "comment_inline": "...as the frame to plot",
       "type": "code",
       "mnemonic": "sta",
       "operand": "sprite_number",
@@ -5923,7 +5923,7 @@
       "bytes": [
         72
       ],
-      "comment_inline": "...",
+      "comment_inline": "...on the stack",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -5934,7 +5934,7 @@
         0,
         40
       ],
-      "comment_inline": "...",
+      "comment_inline": "...exclusive-OR the frame on screen",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "title_plot_star",
@@ -5946,7 +5946,7 @@
       "bytes": [
         104
       ],
-      "comment_inline": "...",
+      "comment_inline": "...recover the star...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -5955,7 +5955,7 @@
       "bytes": [
         168
       ],
-      "comment_inline": "...",
+      "comment_inline": "...into Y",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -5994,7 +5994,7 @@
       "bytes": [
         72
       ],
-      "comment_inline": "...",
+      "comment_inline": "...keeping Y, the star...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -6004,7 +6004,7 @@
         162,
         20
       ],
-      "comment_inline": "...",
+      "comment_inline": "...20 x 256 loops instead of 5 x 256",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#&14"

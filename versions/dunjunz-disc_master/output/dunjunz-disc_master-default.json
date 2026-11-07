@@ -156,7 +156,7 @@
       "addr": 4784,
       "name": "level_1_original",
       "title": "The original levels",
-      "description": "Levels 1 to 25 as the game loads them: &2B0 bytes each, encrypted (each byte XORed with the low byte of its address at &6B00). They are byte for byte the Model B side's Level1-Level24 and the end of Stones, except level 6, which is the cassette's (see findings.md). *DEFAULT finds level N at &1000 + N x &2B0.",
+      "description": "Levels 1 to 25 as the game loads them: &2B0 bytes each, encrypted (each byte XORed with the low byte of its address at &6B00). *DEFAULT finds level N at &1000 + N x &2B0.",
       "align": "before_label"
     }
   ],
@@ -331,7 +331,7 @@
         162,
         1
       ],
-      "comment_inline": "...",
+      "comment_inline": "...X = 1: ESCAPE disabled, BREAK as normal...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#1"
@@ -342,7 +342,7 @@
         160,
         0
       ],
-      "comment_inline": "...",
+      "comment_inline": "...Y = 0: X replaces the old setting",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -354,7 +354,7 @@
         244,
         255
       ],
-      "comment_inline": "... osbyte: escape break effect",
+      "comment_inline": "...so ESCAPE cannot interrupt a save osbyte: escape break effect",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -385,7 +385,7 @@
         244,
         255
       ],
-      "comment_inline": "... Flush selected class of buffer",
+      "comment_inline": "...so earlier key presses are not taken as input Flush selected class of buffer",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -410,7 +410,7 @@
         238,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...for a fresh prompt",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -438,7 +438,7 @@
       "labels": [
         "print_prompt"
       ],
-      "comment_inline": "...",
+      "comment_inline": "...next character of level_prompt...",
       "xref_summaries": [
         "&0e15 referenced 1 time by &0e1e"
       ],
@@ -461,7 +461,7 @@
         238,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...printed...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -473,7 +473,7 @@
       "bytes": [
         232
       ],
-      "comment_inline": "...",
+      "comment_inline": "...on to the next",
       "type": "code",
       "mnemonic": "inx"
     },
@@ -483,7 +483,7 @@
         201,
         0
       ],
-      "comment_inline": "...",
+      "comment_inline": "...was it the zero that ends it?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#0"
@@ -494,7 +494,7 @@
         208,
         245
       ],
-      "comment_inline": "...",
+      "comment_inline": "No: print the next",
       "type": "code",
       "mnemonic": "bne",
       "operand": "print_prompt",
@@ -527,7 +527,7 @@
         160,
         15
       ],
-      "comment_inline": "...",
+      "comment_inline": "...block's high byte",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(read_level_block)",
@@ -568,7 +568,7 @@
         27,
         15
       ],
-      "comment_inline": "...",
+      "comment_inline": "...buffer address low byte",
       "type": "code",
       "mnemonic": "sta",
       "operand": "read_level_block",
@@ -581,7 +581,7 @@
         169,
         15
       ],
-      "comment_inline": "...",
+      "comment_inline": "...high byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#>(level_digits)",
@@ -602,7 +602,7 @@
         28,
         15
       ],
-      "comment_inline": "...",
+      "comment_inline": "...buffer address high byte",
       "type": "code",
       "mnemonic": "sta",
       "operand": "read_level_block + 1",
@@ -626,7 +626,7 @@
         29,
         15
       ],
-      "comment_inline": "...",
+      "comment_inline": "...as the maximum length",
       "type": "code",
       "mnemonic": "sta",
       "operand": "read_level_block + 2",
@@ -657,7 +657,7 @@
         30,
         15
       ],
-      "comment_inline": "...",
+      "comment_inline": "...as the lowest character accepted",
       "type": "code",
       "mnemonic": "sta",
       "operand": "read_level_block + 3",
@@ -688,7 +688,7 @@
         31,
         15
       ],
-      "comment_inline": "...",
+      "comment_inline": "...as the highest character accepted",
       "type": "code",
       "mnemonic": "sta",
       "operand": "read_level_block + 4",
@@ -718,7 +718,7 @@
         241,
         255
       ],
-      "comment_inline": "... Read line from input stream (exits with C=1 if ESCAPE pressed)",
+      "comment_inline": "...Y = the number of characters typed Read line from input stream (exits with C=1 if ESCAPE pressed)",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osword",
@@ -766,7 +766,7 @@
         240,
         27
       ],
-      "comment_inline": "Yes",
+      "comment_inline": "Yes: one digit",
       "type": "code",
       "mnemonic": "beq",
       "operand": "one_digit",
@@ -792,7 +792,7 @@
       "bytes": [
         56
       ],
-      "comment_inline": "...",
+      "comment_inline": "...ready to subtract...",
       "type": "code",
       "mnemonic": "sec"
     },
@@ -802,7 +802,7 @@
         233,
         48
       ],
-      "comment_inline": "...",
+      "comment_inline": "...'0': the tens digit's value",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "#'0'",
@@ -829,7 +829,7 @@
         133,
         112
       ],
-      "comment_inline": "...",
+      "comment_inline": "...kept as tens x 2",
       "type": "code",
       "mnemonic": "sta",
       "operand": "tens_times_ten",
@@ -850,7 +850,7 @@
       "bytes": [
         10
       ],
-      "comment_inline": "...",
+      "comment_inline": "...x 8 (with the first ASL: x 4, then x 8)",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -859,7 +859,7 @@
       "bytes": [
         24
       ],
-      "comment_inline": "...",
+      "comment_inline": "...ready to add...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -882,7 +882,7 @@
         133,
         112
       ],
-      "comment_inline": "...",
+      "comment_inline": "...tens x 10, kept",
       "type": "code",
       "mnemonic": "sta",
       "operand": "tens_times_ten",
@@ -907,7 +907,7 @@
       "bytes": [
         56
       ],
-      "comment_inline": "...",
+      "comment_inline": "...ready to subtract...",
       "type": "code",
       "mnemonic": "sec"
     },
@@ -917,7 +917,7 @@
         233,
         48
       ],
-      "comment_inline": "...",
+      "comment_inline": "...'0': the units digit's value",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "#'0'",
@@ -934,7 +934,7 @@
       "bytes": [
         24
       ],
-      "comment_inline": "...",
+      "comment_inline": "...ready to add...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -944,7 +944,7 @@
         101,
         112
       ],
-      "comment_inline": "...",
+      "comment_inline": "...plus tens x 10: the level number",
       "type": "code",
       "mnemonic": "adc",
       "operand": "tens_times_ten",
@@ -1001,7 +1001,7 @@
         33,
         15
       ],
-      "comment_inline": "...",
+      "comment_inline": "...so the filename is \"LevelN \"",
       "type": "code",
       "mnemonic": "sta",
       "operand": "level_digits + 1",
@@ -1026,7 +1026,7 @@
       "bytes": [
         56
       ],
-      "comment_inline": "...",
+      "comment_inline": "...ready to subtract...",
       "type": "code",
       "mnemonic": "sec"
     },
@@ -1036,7 +1036,7 @@
         233,
         48
       ],
-      "comment_inline": "...",
+      "comment_inline": "...'0': the level number",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "#'0'",
@@ -1090,7 +1090,7 @@
         176,
         140
       ],
-      "comment_inline": "...",
+      "comment_inline": "Too high: ask again",
       "type": "code",
       "mnemonic": "bcs",
       "operand": "default_start",
@@ -1114,7 +1114,7 @@
         240,
         136
       ],
-      "comment_inline": "...",
+      "comment_inline": "Level 0: ask again",
       "type": "code",
       "mnemonic": "beq",
       "operand": "default_start",
@@ -1162,7 +1162,7 @@
         133,
         113
       ],
-      "comment_inline": "...",
+      "comment_inline": "...low byte...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "read_ptr",
@@ -1175,7 +1175,7 @@
         169,
         16
       ],
-      "comment_inline": "...",
+      "comment_inline": "...high byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#>(level_1_original - level_length)",
@@ -1201,7 +1201,7 @@
         133,
         114
       ],
-      "comment_inline": "...",
+      "comment_inline": "...so adding N x &2B0 reaches level N",
       "type": "code",
       "mnemonic": "sta",
       "operand": "read_ptr_hi",
@@ -1238,7 +1238,7 @@
       "bytes": [
         24
       ],
-      "comment_inline": "...",
+      "comment_inline": "...ready to add...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -1248,7 +1248,7 @@
         105,
         176
       ],
-      "comment_inline": "...",
+      "comment_inline": "...one level's length, low byte...",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#<(level_length)",
@@ -1268,7 +1268,7 @@
         133,
         113
       ],
-      "comment_inline": "...",
+      "comment_inline": "...stored back",
       "type": "code",
       "mnemonic": "sta",
       "operand": "read_ptr",
@@ -1281,7 +1281,7 @@
         165,
         114
       ],
-      "comment_inline": "...",
+      "comment_inline": "...high byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "read_ptr_hi",
@@ -1294,7 +1294,7 @@
         105,
         2
       ],
-      "comment_inline": "...",
+      "comment_inline": "...one level's length, high byte, with carry",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#>(level_length)",
@@ -1314,7 +1314,7 @@
         133,
         114
       ],
-      "comment_inline": "...",
+      "comment_inline": "...stored back",
       "type": "code",
       "mnemonic": "sta",
       "operand": "read_ptr_hi",
@@ -1326,7 +1326,7 @@
       "bytes": [
         202
       ],
-      "comment_inline": "...",
+      "comment_inline": "...one level fewer to step over",
       "type": "code",
       "mnemonic": "dex"
     },
@@ -1360,7 +1360,7 @@
         133,
         115
       ],
-      "comment_inline": "...",
+      "comment_inline": "...low byte...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "put_ptr",
@@ -1373,7 +1373,7 @@
         169,
         107
       ],
-      "comment_inline": "...",
+      "comment_inline": "...high byte: the game's level buffer",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#>(level_buffer)",
@@ -1393,7 +1393,7 @@
         133,
         116
       ],
-      "comment_inline": "...",
+      "comment_inline": "...stored",
       "type": "code",
       "mnemonic": "sta",
       "operand": "put_ptr_hi",
@@ -1446,7 +1446,7 @@
         145,
         115
       ],
-      "comment_inline": "...",
+      "comment_inline": "...into the level buffer",
       "type": "code",
       "mnemonic": "sta",
       "operand": "(put_ptr),y",
@@ -1475,7 +1475,7 @@
         208,
         2
       ],
-      "comment_inline": "...",
+      "comment_inline": "No carry: pointer done",
       "type": "code",
       "mnemonic": "bne",
       "operand": "copy_put_next",
@@ -1488,7 +1488,7 @@
         230,
         114
       ],
-      "comment_inline": "...",
+      "comment_inline": "Carry into the high byte",
       "type": "code",
       "mnemonic": "inc",
       "operand": "read_ptr_hi",
@@ -1526,7 +1526,7 @@
         208,
         2
       ],
-      "comment_inline": "...",
+      "comment_inline": "No carry: pointer done",
       "type": "code",
       "mnemonic": "bne",
       "operand": "copy_check_end",
@@ -1539,7 +1539,7 @@
         230,
         116
       ],
-      "comment_inline": "...",
+      "comment_inline": "Carry into the high byte",
       "type": "code",
       "mnemonic": "inc",
       "operand": "put_ptr_hi",
@@ -1577,7 +1577,7 @@
         201,
         176
       ],
-      "comment_inline": "...",
+      "comment_inline": "...end of the level, low byte?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#<(level_buffer_end)",
@@ -1597,7 +1597,7 @@
         208,
         234
       ],
-      "comment_inline": "...",
+      "comment_inline": "No: copy the next byte",
       "type": "code",
       "mnemonic": "bne",
       "operand": "copy_level",
@@ -1610,7 +1610,7 @@
         165,
         116
       ],
-      "comment_inline": "...",
+      "comment_inline": "...and high byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "put_ptr_hi",
@@ -1623,7 +1623,7 @@
         201,
         109
       ],
-      "comment_inline": "...",
+      "comment_inline": "...end of the level, high byte?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#>(level_buffer_end)",
@@ -1643,7 +1643,7 @@
         208,
         228
       ],
-      "comment_inline": "...",
+      "comment_inline": "No: copy the next byte",
       "type": "code",
       "mnemonic": "bne",
       "operand": "copy_level",
@@ -1671,7 +1671,7 @@
         82,
         15
       ],
-      "comment_inline": "...",
+      "comment_inline": "...first digit into the filename",
       "type": "code",
       "mnemonic": "sta",
       "operand": "save_command + 10",
@@ -1684,7 +1684,7 @@
         33,
         15
       ],
-      "comment_inline": "...",
+      "comment_inline": "...second digit (or a space)...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "level_digits + 1",
@@ -1697,7 +1697,7 @@
         83,
         15
       ],
-      "comment_inline": "...",
+      "comment_inline": "...into the filename",
       "type": "code",
       "mnemonic": "sta",
       "operand": "save_command + 11",
@@ -1729,7 +1729,7 @@
         160,
         15
       ],
-      "comment_inline": "...",
+      "comment_inline": "...command's high byte",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(save_command)",
@@ -1750,7 +1750,7 @@
         247,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...and run it: the level file is restored",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -1775,7 +1775,7 @@
         238,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...carriage return...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -1788,7 +1788,7 @@
         169,
         10
       ],
-      "comment_inline": "...",
+      "comment_inline": "...line feed...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&0a"
@@ -1800,7 +1800,7 @@
         238,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...after the SAVE's own output",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -1828,7 +1828,7 @@
       "labels": [
         "print_question"
       ],
-      "comment_inline": "...",
+      "comment_inline": "...next character of another_question...",
       "xref_summaries": [
         "&0ed6 referenced 1 time by &0edf"
       ],
@@ -1851,7 +1851,7 @@
         238,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...printed...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -1863,7 +1863,7 @@
       "bytes": [
         232
       ],
-      "comment_inline": "...",
+      "comment_inline": "...on to the next",
       "type": "code",
       "mnemonic": "inx"
     },
@@ -1873,7 +1873,7 @@
         201,
         0
       ],
-      "comment_inline": "...",
+      "comment_inline": "...was it the zero that ends it?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#0"
@@ -1884,7 +1884,7 @@
         208,
         245
       ],
-      "comment_inline": "...",
+      "comment_inline": "No: print the next",
       "type": "code",
       "mnemonic": "bne",
       "operand": "print_question",
@@ -1915,7 +1915,7 @@
         244,
         255
       ],
-      "comment_inline": "... Flush selected class of buffer",
+      "comment_inline": "...so a key pressed early is not the answer Flush selected class of buffer",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -1972,7 +1972,7 @@
         240,
         7
       ],
-      "comment_inline": "...",
+      "comment_inline": "Yes: ask for another level",
       "type": "code",
       "mnemonic": "beq",
       "operand": "another_level",

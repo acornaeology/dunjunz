@@ -47,11 +47,11 @@ coder2.sub(0x2000, "coder2_start", "Coder2: install the joystick handler and run
            "it, and *CODER is run, which does not return.")
 comments(coder2, [
     (0x2000, "*L. Code: load the joystick handler at &C500"),
-    (0x2002, "..."), (0x2004, "..."),
+    (0x2002, "...command's high byte"), (0x2004, "...and run it: Code into private RAM"),
     (0x2007, "BYTEV = &C500, the joystick handler..."),
-    (0x2009, "..."), (0x200C, "..."), (0x200E, "..."),
+    (0x2009, "...low byte, so OSBYTE calls reach it..."), (0x200C, "...high byte..."), (0x200E, "...and the game's key scans read the joystick"),
     (0x2011, "*CODER: load and start the game (no return)"),
-    (0x2013, "..."), (0x2015, "..."),
+    (0x2013, "...command's high byte"), (0x2015, "...and run it; the game takes over from here"),
 ])
 coder2.label(0x2018, "load_code_command")
 coder2.stringcr(0x2018)

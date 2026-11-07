@@ -79,27 +79,27 @@ for addr, text in [
     (0x5000, "Select *TAPE and apply the cheat"),
     (0x5003, ""),
     (0x5004, "Destination &0400..."),
-    (0x5006, "..."),
+    (0x5006, "...as the destination pointer's page"),
     (0x5008, "...source &2400 (both low bytes 0)"),
-    (0x500A, "..."),
-    (0x500C, "..."),
+    (0x500A, "...as the source pointer's page"),
+    (0x500C, "...source low byte 0 (Y = 0)"),
     (0x500E, "Copy a page..."),
-    (0x5010, "..."),
-    (0x5012, "..."),
-    (0x5013, "..."),
+    (0x5010, "...to where the game runs"),
+    (0x5012, "...next byte"),
+    (0x5013, "Until the page is done"),
     (0x5015, "Next page"),
-    (0x5017, "..."),
+    (0x5017, "...and the source's"),
     (0x5019, "Until the source reaches &5000..."),
-    (0x501B, "..."),
-    (0x501D, "..."),
+    (0x501B, "...source page &50?"),
+    (0x501D, "No: copy the next page"),
     (0x501F, "Save WRCHV..."),
-    (0x5022, "..."),
-    (0x5025, "..."),
+    (0x5022, "...low byte"),
+    (0x5025, "...high byte"),
     (0x5028, "...in saved_wrchv"),
     (0x502B, "Point WRCHV at wrch_handler..."),
-    (0x502D, "..."),
-    (0x5030, "..."),
-    (0x5032, "..."),
+    (0x502D, "...low byte"),
+    (0x5030, "...high byte"),
+    (0x5032, "...so text prints in the game's font"),
     (0x5035, "Start a new game"),
 ]:
     if text:
@@ -115,7 +115,7 @@ annotator.c(0x503A, "...at 1200 baud")
 annotator.c(0x503F, "Start level chosen with the loader's cheat...")
 annotator.c(0x5042, "...into the operand of first_level's LDA, at its stored address")
 annotator.c(0x5045, "Y = 0 and plot_x = 0 for the copy")
-annotator.c(0x5047, "...")
+annotator.c(0x5047, "...destination low byte 0")
 annotator.c(0x5049, "Return")
 
 annotator.sub(0x148B, "first_level", "Set the starting level",
@@ -124,7 +124,7 @@ annotator.sub(0x148B, "first_level", "Set the starting level",
               "has patched it.",
                on_exit={"A": "the level before the first to play (0, or the cheat's choice)", "X": "preserved", "Y": "preserved"})
 annotator.c(0x148B, "Level before the first (patched by the cheat)")
-annotator.c(0x148D, "...")
+annotator.c(0x148D, "...as level_bcd: new_game adds one")
 annotator.c(0x1490, "Return")
 
 annotator.label(0x16D0, "level_command", length=8, description=(
@@ -154,37 +154,37 @@ for addr, text in [
     (0x5003, "(unused)"),
     (0x0E00, "New game: level_bcd = the level before the first played"),
     (0x0E03, "level_number = 0"),
-    (0x0E05, "..."),
+    (0x0E05, "...counting from the first level played"),
     (0x1446, "Reset the page numbers of the copy loops below to &0E and "
              "&4E..."),
-    (0x1448, "..."), (0x144B, "..."), (0x144E, "...(in the copy at &545C)"),
-    (0x1451, "..."), (0x1453, "..."), (0x1456, "...(in the copy at &545C)"),
+    (0x1448, "...for save_game_pages' source..."), (0x144B, "...its cleared page..."), (0x144E, "...(in the copy at &545C)"),
+    (0x1451, "...and &4E..."), (0x1453, "...for save_game_pages' destination..."), (0x1456, "...(in the copy at &545C)"),
     (0x1459, "...and move the game out of the way"),
     (0x0450, "Keep the level number's digits, which are about to be "
              "cleared..."),
-    (0x0453, "..."), (0x0454, "..."), (0x0457, "..."),
+    (0x0453, "...tens digit pushed"), (0x0454, "...units digit..."), (0x0457, "...pushed"),
     (0x0458, "Copy pages &0E-&18 to &4E-&58, clearing the originals"),
-    (0x045A, "..."), (0x045D, "..."), (0x045E, "..."), (0x0460, "..."),
-    (0x0463, "..."), (0x0464, "..."), (0x0467, "..."), (0x0468, "..."),
+    (0x045A, "...take a byte of the game..."), (0x045D, "...kept"), (0x045E, "...zero..."), (0x0460, "...cleared for the filing system"),
+    (0x0463, "...the byte again..."), (0x0464, "...saved above &4E00"), (0x0467, "...next byte"), (0x0468, "Until the page is done"),
     (0x046A, "Next page: advance the three page operands"),
-    (0x046D, "..."), (0x0470, "..."),
+    (0x046D, "...the cleared page..."), (0x0470, "...and the save page"),
     (0x0473, "Until page &19"),
-    (0x0476, "..."), (0x0478, "..."),
+    (0x0476, "...page &19 reached?"), (0x0478, "No: the next page"),
     (0x047A, "Put the digits into the moved copy of level_command"),
-    (0x047B, "..."), (0x047E, "..."), (0x047F, "..."),
+    (0x047B, "...units digit into the moved command"), (0x047E, "...tens digit..."), (0x047F, "...into the moved command"),
     (0x0482, "Continue in the moved copy of load_level_from_copy"),
     (0x145C, "*D. (*DISC), from the moved copy of the command at &149D"),
-    (0x145E, "..."), (0x1460, "..."),
+    (0x145E, "...high byte of the command"), (0x1460, "...on the disc filing system"),
     (0x1463, "*L.$.Ln (*LOAD), from the moved copy of level_command"),
-    (0x1465, "..."), (0x1467, "..."),
+    (0x1465, "...high byte of the command"), (0x1467, "...load the level file to &6B00"),
     (0x146A, "OSBYTE &8C: back to *TAPE..."),
     (0x146C, "...at 1200 baud"),
-    (0x146E, "..."),
+    (0x146E, "...the filing system the game began on"),
     (0x1471, "Copy pages &4E-&58 back to &0E-&18"),
-    (0x1473, "..."), (0x1476, "..."), (0x1479, "..."), (0x147A, "..."),
+    (0x1473, "...each saved byte..."), (0x1476, "...back into the game"), (0x1479, "...next byte"), (0x147A, "Until the page is done"),
     (0x147C, "Next page: advance the page operands (in this copy)"),
-    (0x147F, "..."), (0x1482, "Until page &19"), (0x1485, "..."),
-    (0x1487, "..."),
+    (0x147F, "...and the destination page"), (0x1482, "Until page &19"), (0x1485, "...page &19 reached?"),
+    (0x1487, "No: the next page"),
     (0x1489, "Return to start_level"),
 ]:
     annotator.c(addr, text)
@@ -234,6 +234,29 @@ d.expr(0x5031, hi(sym("wrch_handler")))
 annotator.c(0x0D6E, "Not referenced")  # after game_entry
 annotator.c(0x0772, "Not referenced")
 annotator.c(0x07F8, "Not referenced")
+
+
+def table_entry_comment(addr):
+    """What a split-off entry of one of the moved tables holds."""
+    tables = [(0x0B2A, "returning_hero_queue", 5), (0x0B80, "missile_damage", 12),
+              (0x0B90, "trapdoor_x", 8), (0x0B98, "trapdoor_y", 8),
+              (0x0D15, "hero_y", 4), (0x0D1A, "hero_direction", 4),
+              (0x0D20, "hero_frame", 4), (0x0D90, "hero_health_tens", 4),
+              (0x0DA0, "view_room", 8)]
+    base, name, length = max(t for t in tables if t[0] <= addr)
+    k = addr - base
+    if k >= length:
+        return ("Not read: page &0D is refreshed from workspace_template"
+                if 0x0D00 <= addr < 0x0E00 else "Not referenced")
+    if name.startswith("trapdoor"):
+        return f"Trapdoor {k + 1}'s {name[-1]}"
+    if name == "view_room":
+        return f"Hero {k // 2}'s view room, {'high' if k % 2 else 'low'} byte"
+    if name == "missile_damage":
+        return f"Missile slot {k}'s damage"
+    if name == "returning_hero_queue":
+        return f"Queue entry {k}"
+    return f"Hero {k}'s {name[5:].replace('_', ' ')}"
 
 # ---------------------------------------------------------------------------
 # Data no instruction refers to, and the entries of moved tables that the
@@ -292,13 +315,15 @@ TAPE_TABLE_ENTRIES = [
     ('game_image', 0x0DA7),
 ]
 moves_by_name = {"game_image": game_image, None: None}
-for entries, text in ((TAPE_UNREFERENCED, "Not referenced"), (TAPE_TABLE_ENTRIES, "...")):
-    for move_name, addr in entries:
-        d.comment(addr, text, align=dasmos.Align.INLINE, move=moves_by_name[move_name])
+for move_name, addr in TAPE_UNREFERENCED:
+    d.comment(addr, "Not referenced", align=dasmos.Align.INLINE, move=moves_by_name[move_name])
+for move_name, addr in TAPE_TABLE_ENTRIES:
+    d.comment(addr, table_entry_comment(addr), align=dasmos.Align.INLINE,
+              move=moves_by_name[move_name])
 # The checksum table survives, but the crack's level loader never reads it.
 d.comment(0x0490, "The level checksums, never read by the crack", align=dasmos.Align.INLINE,
           move=game_image)
-d.comment(0x049C, "...", align=dasmos.Align.INLINE, move=game_image)
+d.comment(0x049C, "...levels 12-25", align=dasmos.Align.INLINE, move=game_image)
 
 # DUNJ3 past &7FFF: loaded into the sideways ROM area, so never in RAM.
 d.banner(0x8000, title="DUNJ3 beyond the game",
@@ -308,7 +333,7 @@ d.banner(0x8000, title="DUNJ3 beyond the game",
          "file was saved.")
 for row in range(0x8000, 0x9D00, 0x100):
     d.byte(row, 0x100, cols=16, override=True)
-    d.comment(row, "Never in RAM" if row == 0x8000 else "...", align=dasmos.Align.INLINE)
+    d.comment(row, f"&{row:04X}-&{row + 0xFF:04X}: never in RAM", align=dasmos.Align.INLINE)
 
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)

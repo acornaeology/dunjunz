@@ -275,7 +275,7 @@
         160,
         32
       ],
-      "comment_inline": "...",
+      "comment_inline": "...command's high byte",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(load_code_command)",
@@ -296,7 +296,7 @@
         247,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...and run it: Code into private RAM",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",
@@ -330,7 +330,7 @@
         10,
         2
       ],
-      "comment_inline": "...",
+      "comment_inline": "...low byte, so OSBYTE calls reach it...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "bytev",
@@ -343,7 +343,7 @@
         169,
         197
       ],
-      "comment_inline": "...",
+      "comment_inline": "...high byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#>(joystick_handler)",
@@ -364,7 +364,7 @@
         11,
         2
       ],
-      "comment_inline": "...",
+      "comment_inline": "...and the game's key scans read the joystick",
       "type": "code",
       "mnemonic": "sta",
       "operand": "bytev + 1",
@@ -396,7 +396,7 @@
         160,
         32
       ],
-      "comment_inline": "...",
+      "comment_inline": "...command's high byte",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(coder_command)",
@@ -417,7 +417,7 @@
         247,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...and run it; the game takes over from here",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oscli",

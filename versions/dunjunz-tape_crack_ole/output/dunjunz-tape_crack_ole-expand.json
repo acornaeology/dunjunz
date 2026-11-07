@@ -448,7 +448,7 @@
         208,
         2
       ],
-      "comment_inline": "...",
+      "comment_inline": "No carry: pointer done",
       "type": "code",
       "mnemonic": "bne",
       "operand": "check_separator",
@@ -461,7 +461,7 @@
         230,
         133
       ],
-      "comment_inline": "...",
+      "comment_inline": "Carry into the high byte",
       "type": "code",
       "mnemonic": "inc",
       "operand": "command_ptr + 1",
@@ -503,7 +503,7 @@
         240,
         244
       ],
-      "comment_inline": "...",
+      "comment_inline": "A space: read on",
       "type": "code",
       "mnemonic": "beq",
       "operand": "skip_separators_loop",
@@ -534,7 +534,7 @@
         240,
         240
       ],
-      "comment_inline": "...",
+      "comment_inline": "A comma: read on",
       "type": "code",
       "mnemonic": "beq",
       "operand": "skip_separators_loop",
@@ -584,7 +584,7 @@
         165,
         132
       ],
-      "comment_inline": "...",
+      "comment_inline": "...did the low byte wrap...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "command_ptr",
@@ -597,7 +597,7 @@
         201,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...from &00 to &FF?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#&ff"
@@ -608,7 +608,7 @@
         208,
         2
       ],
-      "comment_inline": "...",
+      "comment_inline": "No: pointer done",
       "type": "code",
       "mnemonic": "bne",
       "operand": "no_argument",
@@ -621,7 +621,7 @@
         198,
         133
       ],
-      "comment_inline": "...",
+      "comment_inline": "Yes: borrow from the high byte",
       "type": "code",
       "mnemonic": "dec",
       "operand": "command_ptr + 1",
@@ -723,7 +723,7 @@
         244,
         255
       ],
-      "comment_inline": "... Read character at text cursor position and current screen MODE",
+      "comment_inline": "...Y = the current screen mode Read character at text cursor position and current screen MODE",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -834,7 +834,7 @@
       "bytes": [
         72
       ],
-      "comment_inline": "...",
+      "comment_inline": "...low byte of command_ptr...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -844,7 +844,7 @@
         165,
         133
       ],
-      "comment_inline": "...",
+      "comment_inline": "...next byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "command_ptr + 1",
@@ -855,7 +855,7 @@
       "bytes": [
         72
       ],
-      "comment_inline": "...",
+      "comment_inline": "...pushed...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -865,7 +865,7 @@
         165,
         134
       ],
-      "comment_inline": "...",
+      "comment_inline": "...third byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "command_ptr + 2",
@@ -876,7 +876,7 @@
       "bytes": [
         72
       ],
-      "comment_inline": "...",
+      "comment_inline": "...pushed...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -886,7 +886,7 @@
         165,
         135
       ],
-      "comment_inline": "...",
+      "comment_inline": "...fourth byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "command_ptr + 3",
@@ -897,7 +897,7 @@
       "bytes": [
         72
       ],
-      "comment_inline": "...",
+      "comment_inline": "...pushed, to restore before returning",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -918,7 +918,7 @@
         162,
         132
       ],
-      "comment_inline": "...",
+      "comment_inline": "...into command_ptr...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#command_ptr",
@@ -935,7 +935,7 @@
         160,
         0
       ],
-      "comment_inline": "...",
+      "comment_inline": "...Y = 0 for this call...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#0"
@@ -947,7 +947,7 @@
         218,
         255
       ],
-      "comment_inline": "... Get address of remaining command line into zero page address X (A=1, Y=0)",
+      "comment_inline": "...so command_ptr points past \"EXPAND\" Get address of remaining command line into zero page address X (A=1, Y=0)",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osargs",
@@ -996,7 +996,7 @@
         133,
         135
       ],
-      "comment_inline": "...",
+      "comment_inline": "...its fourth byte...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "command_ptr + 3",
@@ -1007,7 +1007,7 @@
       "bytes": [
         104
       ],
-      "comment_inline": "...",
+      "comment_inline": "...the third...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -1017,7 +1017,7 @@
         133,
         134
       ],
-      "comment_inline": "...",
+      "comment_inline": "...restored...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "command_ptr + 2",
@@ -1028,7 +1028,7 @@
       "bytes": [
         104
       ],
-      "comment_inline": "...",
+      "comment_inline": "...the second...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -1038,7 +1038,7 @@
         133,
         133
       ],
-      "comment_inline": "...",
+      "comment_inline": "...restored...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "command_ptr + 1",
@@ -1049,7 +1049,7 @@
       "bytes": [
         104
       ],
-      "comment_inline": "...",
+      "comment_inline": "...the first...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -1059,7 +1059,7 @@
         133,
         132
       ],
-      "comment_inline": "...",
+      "comment_inline": "...restored, so the caller's zero page is intact",
       "type": "code",
       "mnemonic": "sta",
       "operand": "command_ptr",
@@ -1156,7 +1156,7 @@
         164,
         133
       ],
-      "comment_inline": "...",
+      "comment_inline": "...high byte into Y...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "command_ptr + 1",
@@ -1167,7 +1167,7 @@
       "bytes": [
         202
       ],
-      "comment_inline": "...",
+      "comment_inline": "...low byte minus one...",
       "type": "code",
       "mnemonic": "dex"
     },
@@ -1177,7 +1177,7 @@
         224,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...wrapped to &FF?",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#&ff"
@@ -1188,7 +1188,7 @@
         208,
         1
       ],
-      "comment_inline": "...",
+      "comment_inline": "No: no borrow",
       "type": "code",
       "mnemonic": "bne",
       "operand": "filename_found",
@@ -1200,7 +1200,7 @@
       "bytes": [
         136
       ],
-      "comment_inline": "...",
+      "comment_inline": "Yes: borrow from the high byte",
       "type": "code",
       "mnemonic": "dey"
     },
@@ -1213,7 +1213,7 @@
       "labels": [
         "filename_found"
       ],
-      "comment_inline": "...",
+      "comment_inline": "...stored back, low byte...",
       "xref_summaries": [
         "&2e97 referenced 1 time by &2e94"
       ],
@@ -1235,7 +1235,7 @@
         132,
         133
       ],
-      "comment_inline": "...",
+      "comment_inline": "...and high byte; XY = the filename too",
       "type": "code",
       "mnemonic": "sty",
       "operand": "command_ptr + 1",
@@ -1265,7 +1265,7 @@
         206,
         255
       ],
-      "comment_inline": "... osfind: open file for input",
+      "comment_inline": "...A = the handle, or 0 if not found osfind: open file for input",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osfind",
@@ -1309,7 +1309,7 @@
         133,
         135
       ],
-      "comment_inline": "...",
+      "comment_inline": "...its fourth byte...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "command_ptr + 3",
@@ -1320,7 +1320,7 @@
       "bytes": [
         104
       ],
-      "comment_inline": "...",
+      "comment_inline": "...the third...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -1330,7 +1330,7 @@
         133,
         134
       ],
-      "comment_inline": "...",
+      "comment_inline": "...restored...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "command_ptr + 2",
@@ -1341,7 +1341,7 @@
       "bytes": [
         104
       ],
-      "comment_inline": "...",
+      "comment_inline": "...the second...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -1351,7 +1351,7 @@
         133,
         133
       ],
-      "comment_inline": "...",
+      "comment_inline": "...restored...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "command_ptr + 1",
@@ -1362,7 +1362,7 @@
       "bytes": [
         104
       ],
-      "comment_inline": "...",
+      "comment_inline": "...the first...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -1372,7 +1372,7 @@
         133,
         132
       ],
-      "comment_inline": "...",
+      "comment_inline": "...restored, so the caller's zero page is intact",
       "type": "code",
       "mnemonic": "sta",
       "operand": "command_ptr",
@@ -1514,7 +1514,7 @@
       "bytes": [
         72
       ],
-      "comment_inline": "...",
+      "comment_inline": "...on the stack, for restoring afterwards",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -1539,7 +1539,7 @@
         0,
         12
       ],
-      "comment_inline": "...",
+      "comment_inline": "...in the block at &0C00",
       "type": "code",
       "mnemonic": "sta",
       "operand": "osfile_block,x",
@@ -1561,7 +1561,7 @@
         16,
         243
       ],
-      "comment_inline": "...",
+      "comment_inline": "Until all 18 bytes are set",
       "type": "code",
       "mnemonic": "bpl",
       "operand": "set_up_osfile_block",
@@ -1588,7 +1588,7 @@
         0,
         12
       ],
-      "comment_inline": "...",
+      "comment_inline": "...low byte...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "osfile_block",
@@ -1601,7 +1601,7 @@
         165,
         133
       ],
-      "comment_inline": "...",
+      "comment_inline": "...high byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "command_ptr + 1",
@@ -1614,7 +1614,7 @@
         1,
         12
       ],
-      "comment_inline": "...",
+      "comment_inline": "...into the block's filename address",
       "type": "code",
       "mnemonic": "sta",
       "operand": "osfile_block + 1",
@@ -1638,7 +1638,7 @@
       "bytes": [
         72
       ],
-      "comment_inline": "...",
+      "comment_inline": "...packed_ptr low byte pushed...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -1648,7 +1648,7 @@
         165,
         129
       ],
-      "comment_inline": "...",
+      "comment_inline": "...high byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "packed_ptr + 1",
@@ -1659,7 +1659,7 @@
       "bytes": [
         72
       ],
-      "comment_inline": "...",
+      "comment_inline": "...pushed...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -1669,7 +1669,7 @@
         165,
         130
       ],
-      "comment_inline": "...",
+      "comment_inline": "...screen_ptr low byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "screen_ptr",
@@ -1681,7 +1681,7 @@
       "bytes": [
         72
       ],
-      "comment_inline": "...",
+      "comment_inline": "...pushed...",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -1691,7 +1691,7 @@
         165,
         131
       ],
-      "comment_inline": "...",
+      "comment_inline": "...high byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "screen_ptr + 1",
@@ -1702,7 +1702,7 @@
       "bytes": [
         72
       ],
-      "comment_inline": "...",
+      "comment_inline": "...pushed, to restore before returning",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -1729,7 +1729,7 @@
         169,
         2
       ],
-      "comment_inline": "...",
+      "comment_inline": "...reason 2: the file's length",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#2"
@@ -1741,7 +1741,7 @@
         218,
         255
       ],
-      "comment_inline": "... Get length of file into zero page address X (A=2)",
+      "comment_inline": "...four bytes into packed_ptr onwards Get length of file into zero page address X (A=2)",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osargs",
@@ -1764,7 +1764,7 @@
       "bytes": [
         56
       ],
-      "comment_inline": "...",
+      "comment_inline": "...ready to subtract...",
       "type": "code",
       "mnemonic": "sec"
     },
@@ -1774,7 +1774,7 @@
         229,
         128
       ],
-      "comment_inline": "...",
+      "comment_inline": "...the length's low byte...",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "packed_ptr",
@@ -1788,7 +1788,7 @@
         2,
         12
       ],
-      "comment_inline": "...",
+      "comment_inline": "...into the block's load address, low byte",
       "type": "code",
       "mnemonic": "sta",
       "operand": "osfile_block + 2",
@@ -1809,7 +1809,7 @@
         169,
         128
       ],
-      "comment_inline": "...",
+      "comment_inline": "...&80, the top of the screen's page...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#>(screen_end)",
@@ -1829,7 +1829,7 @@
         229,
         129
       ],
-      "comment_inline": "...",
+      "comment_inline": "...minus the length's high byte...",
       "type": "code",
       "mnemonic": "sbc",
       "operand": "packed_ptr + 1",
@@ -1842,7 +1842,7 @@
         3,
         12
       ],
-      "comment_inline": "...",
+      "comment_inline": "...into the block's load address, high byte",
       "type": "code",
       "mnemonic": "sta",
       "operand": "osfile_block + 3",
@@ -1853,7 +1853,7 @@
       "bytes": [
         72
       ],
-      "comment_inline": "...",
+      "comment_inline": "...and keep it too",
       "type": "code",
       "mnemonic": "pha"
     },
@@ -1881,7 +1881,7 @@
         206,
         255
       ],
-      "comment_inline": "... osfind: close one or all files",
+      "comment_inline": "...the length is known, so it is not needed open osfind: close one or all files",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osfind",
@@ -1929,7 +1929,7 @@
         238,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...starts a palette change...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -1941,7 +1941,7 @@
       "bytes": [
         138
       ],
-      "comment_inline": "...",
+      "comment_inline": "...logical colour X...",
       "type": "code",
       "mnemonic": "txa"
     },
@@ -1952,7 +1952,7 @@
         238,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...sent...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -1965,7 +1965,7 @@
         169,
         0
       ],
-      "comment_inline": "...",
+      "comment_inline": "...physical colour 0, black, and three zeros...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -1976,7 +1976,7 @@
         160,
         4
       ],
-      "comment_inline": "...",
+      "comment_inline": "...four bytes to send...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#4"
@@ -1991,7 +1991,7 @@
       "labels": [
         "send_zeros"
       ],
-      "comment_inline": "...",
+      "comment_inline": "...each sent...",
       "xref_summaries": [
         "&2f1d referenced 1 time by &2f21"
       ],
@@ -2012,7 +2012,7 @@
       "bytes": [
         136
       ],
-      "comment_inline": "...",
+      "comment_inline": "...one fewer to go...",
       "type": "code",
       "mnemonic": "dey"
     },
@@ -2022,7 +2022,7 @@
         208,
         250
       ],
-      "comment_inline": "...",
+      "comment_inline": "Not all four: send another",
       "type": "code",
       "mnemonic": "bne",
       "operand": "send_zeros",
@@ -2044,7 +2044,7 @@
         16,
         234
       ],
-      "comment_inline": "...",
+      "comment_inline": "Until colours 15 to 0 are black",
       "type": "code",
       "mnemonic": "bpl",
       "operand": "blacken_colours",
@@ -2074,7 +2074,7 @@
         162,
         0
       ],
-      "comment_inline": "...",
+      "comment_inline": "...XY = the block at &0C00...",
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#<(osfile_block)",
@@ -2094,7 +2094,7 @@
         160,
         12
       ],
-      "comment_inline": "...",
+      "comment_inline": "...its high byte...",
       "type": "code",
       "mnemonic": "ldy",
       "operand": "#>(osfile_block)",
@@ -2115,7 +2115,7 @@
         221,
         255
       ],
-      "comment_inline": "... osfile: load file",
+      "comment_inline": "...so the file lands ending at &8000 osfile: load file",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osfile",
@@ -2137,7 +2137,7 @@
         133,
         129
       ],
-      "comment_inline": "...",
+      "comment_inline": "...high byte first, as pushed last...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "packed_ptr + 1",
@@ -2148,7 +2148,7 @@
       "bytes": [
         104
       ],
-      "comment_inline": "...",
+      "comment_inline": "...then the low byte...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -2158,7 +2158,7 @@
         133,
         128
       ],
-      "comment_inline": "...",
+      "comment_inline": "...into packed_ptr",
       "type": "code",
       "mnemonic": "sta",
       "operand": "packed_ptr",
@@ -2181,7 +2181,7 @@
       "bytes": [
         168
       ],
-      "comment_inline": "...",
+      "comment_inline": "...Y = 0 for the (pointer),Y accesses...",
       "type": "code",
       "mnemonic": "tay"
     },
@@ -2191,7 +2191,7 @@
         133,
         130
       ],
-      "comment_inline": "...",
+      "comment_inline": "...screen_ptr low byte...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "screen_ptr",
@@ -2204,7 +2204,7 @@
         169,
         48
       ],
-      "comment_inline": "...",
+      "comment_inline": "...the screen's page...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#>(screen_start)",
@@ -2224,7 +2224,7 @@
         133,
         131
       ],
-      "comment_inline": "...",
+      "comment_inline": "...as screen_ptr's high byte",
       "type": "code",
       "mnemonic": "sta",
       "operand": "screen_ptr + 1",
@@ -2290,7 +2290,7 @@
       "bytes": [
         42
       ],
-      "comment_inline": "...",
+      "comment_inline": "...bit 7 into the carry...",
       "type": "code",
       "mnemonic": "rol"
     },
@@ -2299,7 +2299,7 @@
       "bytes": [
         42
       ],
-      "comment_inline": "...",
+      "comment_inline": "...bit 6 into the carry, bit 7 into bit 0...",
       "type": "code",
       "mnemonic": "rol"
     },
@@ -2308,7 +2308,7 @@
       "bytes": [
         42
       ],
-      "comment_inline": "...",
+      "comment_inline": "...and bit 6 into bit 0: the code, 0-3",
       "type": "code",
       "mnemonic": "rol"
     },
@@ -2376,7 +2376,7 @@
       "bytes": [
         232
       ],
-      "comment_inline": "...",
+      "comment_inline": "...plus one: 1-256 (0 wraps to 256)",
       "type": "code",
       "mnemonic": "inx"
     },
@@ -2395,7 +2395,7 @@
         41,
         63
       ],
-      "comment_inline": "...",
+      "comment_inline": "...pixel bits only, dropping the run code",
       "type": "code",
       "mnemonic": "and",
       "operand": "#&3f"
@@ -2444,7 +2444,7 @@
         208,
         4
       ],
-      "comment_inline": "...",
+      "comment_inline": "No carry: same page",
       "type": "code",
       "mnemonic": "bne",
       "operand": "next_in_run",
@@ -2457,7 +2457,7 @@
         230,
         131
       ],
-      "comment_inline": "...",
+      "comment_inline": "Carry: the next page",
       "type": "code",
       "mnemonic": "inc",
       "operand": "screen_ptr + 1",
@@ -2503,7 +2503,7 @@
         208,
         243
       ],
-      "comment_inline": "...",
+      "comment_inline": "More of the run: write it again",
       "type": "code",
       "mnemonic": "bne",
       "operand": "write_run",
@@ -2551,7 +2551,7 @@
         133,
         131
       ],
-      "comment_inline": "...",
+      "comment_inline": "...screen_ptr high byte...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "screen_ptr + 1",
@@ -2562,7 +2562,7 @@
       "bytes": [
         104
       ],
-      "comment_inline": "...",
+      "comment_inline": "...its low byte...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -2572,7 +2572,7 @@
         133,
         130
       ],
-      "comment_inline": "...",
+      "comment_inline": "...restored...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "screen_ptr",
@@ -2584,7 +2584,7 @@
       "bytes": [
         104
       ],
-      "comment_inline": "...",
+      "comment_inline": "...packed_ptr high byte...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -2594,7 +2594,7 @@
         133,
         129
       ],
-      "comment_inline": "...",
+      "comment_inline": "...restored...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "packed_ptr + 1",
@@ -2605,7 +2605,7 @@
       "bytes": [
         104
       ],
-      "comment_inline": "...",
+      "comment_inline": "...its low byte...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -2615,7 +2615,7 @@
         133,
         128
       ],
-      "comment_inline": "...",
+      "comment_inline": "...restored",
       "type": "code",
       "mnemonic": "sta",
       "operand": "packed_ptr",
@@ -2641,7 +2641,7 @@
       "labels": [
         "restore_osfile_block"
       ],
-      "comment_inline": "...",
+      "comment_inline": "...each from the stack...",
       "xref_summaries": [
         "&2f72 referenced 1 time by &2f79"
       ],
@@ -2661,7 +2661,7 @@
         0,
         12
       ],
-      "comment_inline": "...",
+      "comment_inline": "...back into the block's place",
       "type": "code",
       "mnemonic": "sta",
       "operand": "osfile_block,x",
@@ -2673,7 +2673,7 @@
       "bytes": [
         232
       ],
-      "comment_inline": "...",
+      "comment_inline": "...next byte...",
       "type": "code",
       "mnemonic": "inx"
     },
@@ -2683,7 +2683,7 @@
         224,
         18
       ],
-      "comment_inline": "...",
+      "comment_inline": "...all 18?",
       "type": "code",
       "mnemonic": "cpx",
       "operand": "#osfile_block_length",
@@ -2700,7 +2700,7 @@
         208,
         247
       ],
-      "comment_inline": "...",
+      "comment_inline": "No: restore the next",
       "type": "code",
       "mnemonic": "bne",
       "operand": "restore_osfile_block",
@@ -2722,7 +2722,7 @@
         133,
         135
       ],
-      "comment_inline": "...",
+      "comment_inline": "...its fourth byte...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "command_ptr + 3",
@@ -2733,7 +2733,7 @@
       "bytes": [
         104
       ],
-      "comment_inline": "...",
+      "comment_inline": "...the third...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -2743,7 +2743,7 @@
         133,
         134
       ],
-      "comment_inline": "...",
+      "comment_inline": "...restored...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "command_ptr + 2",
@@ -2754,7 +2754,7 @@
       "bytes": [
         104
       ],
-      "comment_inline": "...",
+      "comment_inline": "...the second...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -2764,7 +2764,7 @@
         133,
         133
       ],
-      "comment_inline": "...",
+      "comment_inline": "...restored...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "command_ptr + 1",
@@ -2775,7 +2775,7 @@
       "bytes": [
         104
       ],
-      "comment_inline": "...",
+      "comment_inline": "...the first...",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -2785,7 +2785,7 @@
         133,
         132
       ],
-      "comment_inline": "...",
+      "comment_inline": "...restored",
       "type": "code",
       "mnemonic": "sta",
       "operand": "command_ptr",
@@ -2810,7 +2810,7 @@
         238,
         255
       ],
-      "comment_inline": "...",
+      "comment_inline": "...OSWRCH returns to EXPAND's caller",
       "type": "code",
       "mnemonic": "jmp",
       "operand": "oswrch",
@@ -2865,7 +2865,7 @@
         208,
         2
       ],
-      "comment_inline": "...",
+      "comment_inline": "No carry: pointer done",
       "type": "code",
       "mnemonic": "bne",
       "operand": "read_packed_byte_done",
@@ -2878,7 +2878,7 @@
         230,
         129
       ],
-      "comment_inline": "...",
+      "comment_inline": "Carry into the high byte",
       "type": "code",
       "mnemonic": "inc",
       "operand": "packed_ptr + 1",
