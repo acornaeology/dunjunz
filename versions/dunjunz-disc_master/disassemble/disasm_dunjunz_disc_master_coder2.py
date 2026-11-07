@@ -54,11 +54,9 @@ comments(coder2, [
     (0x2013, "..."), (0x2015, "..."),
 ])
 coder2.label(0x2018, "load_code_command")
-coder2.string(0x2018, 7)
-coder2.byte(0x201F)
+coder2.stringcr(0x2018)
 coder2.label(0x2020, "coder_command")
-coder2.string(0x2020, 5)
-coder2.byte(0x2025)
+coder2.stringcr(0x2020)
 
 coder2.label(0xC500, "joystick_handler", group="private_ram", description=(
     "Code's joystick handler in private RAM (HAZEL), which BYTEV is "

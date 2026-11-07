@@ -174,8 +174,7 @@ for addr, name in [(0x1916, "ask_level"), (0x192B, "print_prompt"),
 
 d.banner(0x1A0D, title="Prompts, the input block and the commands")
 d.label(0x1A0D, "level_prompt")
-d.string(0x1A0D, 0x1A30 - 0x1A0D)
-d.byte(0x1A30)
+d.stringz(0x1A0D)
 d.label(0x1A31, "read_level_block", length=5, description=(
     "OSWORD 0 block: buffer address, maximum length, lowest and highest "
     "character; *DEFAULT fills it in before each call."))
@@ -187,17 +186,14 @@ d.label(0x1A36, "level_digits", length=3, description=(
 d.byte(0x1A36, 3, cols=3)
 d.expr_label(0x1A37, "level_digits+1")
 d.label(0x1A39, "another_question")
-d.string(0x1A39, 0x1A5D - 0x1A39)
-d.byte(0x1A5D)
+d.stringz(0x1A39)
 d.label(0x1A5E, "save_command", description=(
     "*SAVE LevelN 6B00+2B0, with the digits at +10 and +11."))
-d.string(0x1A5E, 21)
-d.byte(0x1A73)
+d.stringcr(0x1A5E)
 d.expr_label(0x1A68, "save_command+10")
 d.expr_label(0x1A69, "save_command+11")
 d.label(0x1A74, "tv_command")
-d.string(0x1A74, 7)
-d.byte(0x1A7B)
+d.stringcr(0x1A74)
 
 for operand_addr, name in [(0x1901, "tv_command"), (0x1937, "read_level_block"),
                            (0x19DA, "save_command")]:

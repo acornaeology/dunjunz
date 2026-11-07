@@ -167,8 +167,7 @@ d.label(0x0E9F, "copy_read_next")
 
 d.banner(0x0EF7, title="Prompts, the input block and the SAVE command")
 d.label(0x0EF7, "level_prompt")
-d.string(0x0EF7, 0x0F1A - 0x0EF7)
-d.byte(0x0F1A)
+d.stringz(0x0EF7)
 d.label(0x0F1B, "read_level_block", length=5, description=(
     "OSWORD 0 block: buffer address, maximum length, lowest and highest "
     "character; *DEFAULT fills it in before each call."))
@@ -180,12 +179,10 @@ d.label(0x0F20, "level_digits", length=3, description=(
 d.byte(0x0F20, 3, cols=3)
 d.expr_label(0x0F21, "level_digits+1")
 d.label(0x0F23, "another_question")
-d.string(0x0F23, 0x0F47 - 0x0F23)
-d.byte(0x0F47)
+d.stringz(0x0F23)
 d.label(0x0F48, "save_command", description=(
     "*SAVE LevelN 6B00+2B0, with the digits at +10 and +11."))
-d.string(0x0F48, 21)
-d.byte(0x0F5D)
+d.stringcr(0x0F48)
 d.expr_label(0x0F52, "save_command+10")
 d.expr_label(0x0F53, "save_command+11")
 

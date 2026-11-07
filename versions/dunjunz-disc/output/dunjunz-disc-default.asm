@@ -195,8 +195,7 @@ reset_vector   = &fffc  ; The 6502 reset vector: the MOS's reset entry.
 ; Prompts, the input block and the commands
 ; &1a0d used as index base 1 time by &192b
 .level_prompt
-    equs "Which level do you wish to reset ? "
-    equb &00
+    equs "Which level do you wish to reset ? ", &00
 ; &1a31 referenced 1 time by &193c
 .read_level_block
 ; &1a32 referenced 1 time by &1941
@@ -210,16 +209,13 @@ reset_vector   = &fffc  ; The 6502 reset vector: the MOS's reset entry.
     equb &2a, &2a, &2a
 ; &1a39 used as index base 1 time by &19ec
 .another_question
-    equs "Reset another level (A) or quit (Q) "
-    equb &00
+    equs "Reset another level (A) or quit (Q) ", &00
 .save_command
 ; &1a68 referenced 1 time by &19d0
 ; &1a69 referenced 1 time by &19d6
-    equs "SAVE Level11 6B00+2B0"
-    equb &0d
+    equs "SAVE Level11 6B00+2B0", &0d
 .tv_command
-    equs "TV255 1"
-    equb &0d
+    equs "TV255 1", &0d
 ; ***************************************************************************************
 ; Leftovers
 ;
@@ -1388,7 +1384,7 @@ save "Default", dasmos_start, dasmos_end, &1900, &1900
 ;     Data                     = 17443 bytes (98%)
 ;
 ;     Number of instructions   = 125
-;     Number of data bytes     = 17344 bytes
+;     Number of data bytes     = 17340 bytes
 ;     Number of data words     = 0 bytes
-;     Number of string bytes   = 99 bytes
+;     Number of string bytes   = 103 bytes
 ;     Number of strings        = 4

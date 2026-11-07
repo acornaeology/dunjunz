@@ -433,23 +433,14 @@
         67,
         111,
         100,
-        101
+        101,
+        13
       ],
       "labels": [
         "load_code_command"
       ],
       "type": "string",
-      "string": "L. Code"
-    },
-    {
-      "addr": 8223,
-      "bytes": [
-        13
-      ],
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "L. Code."
     },
     {
       "addr": 8224,
@@ -458,23 +449,14 @@
         79,
         68,
         69,
-        82
+        82,
+        13
       ],
       "labels": [
         "coder_command"
       ],
       "type": "string",
-      "string": "CODER"
-    },
-    {
-      "addr": 8229,
-      "bytes": [
-        13
-      ],
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "CODER."
     }
   ]
 }

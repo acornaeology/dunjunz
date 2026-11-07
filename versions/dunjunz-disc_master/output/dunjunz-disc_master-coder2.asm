@@ -26,11 +26,9 @@ oscli            = &fff7
     ldy #>(coder_command)               ; ...
     jsr oscli                           ; ...
 .load_code_command
-    equs "L. Code"
-    equb &0d
+    equs "L. Code", &0d
 .coder_command
-    equs "CODER"
-    equb &0d
+    equs "CODER", &0d
 .dasmos_end
 
 save "Coder2", dasmos_start, dasmos_end, &2000, &2000
@@ -46,7 +44,7 @@ save "Coder2", dasmos_start, dasmos_end, &2000, &2000
 ;     Data                     = 14 bytes (37%)
 ;
 ;     Number of instructions   = 10
-;     Number of data bytes     = 2 bytes
+;     Number of data bytes     = 0 bytes
 ;     Number of data words     = 0 bytes
-;     Number of string bytes   = 12 bytes
+;     Number of string bytes   = 14 bytes
 ;     Number of strings        = 2

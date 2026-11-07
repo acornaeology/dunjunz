@@ -2216,7 +2216,8 @@
         116,
         32,
         63,
-        32
+        32,
+        0
       ],
       "labels": [
         "level_prompt"
@@ -2231,17 +2232,7 @@
         }
       ],
       "type": "string",
-      "string": "Which level do you wish to reset ? "
-    },
-    {
-      "addr": 6704,
-      "bytes": [
-        0
-      ],
-      "type": "byte",
-      "values": [
-        0
-      ]
+      "string": "Which level do you wish to reset ? ."
     },
     {
       "addr": 6705,
@@ -2350,7 +2341,8 @@
         40,
         81,
         41,
-        32
+        32,
+        0
       ],
       "labels": [
         "another_question"
@@ -2365,17 +2357,7 @@
         }
       ],
       "type": "string",
-      "string": "Reset another level (A) or quit (Q) "
-    },
-    {
-      "addr": 6749,
-      "bytes": [
-        0
-      ],
-      "type": "byte",
-      "values": [
-        0
-      ]
+      "string": "Reset another level (A) or quit (Q) ."
     },
     {
       "addr": 6750,
@@ -2400,7 +2382,8 @@
         43,
         50,
         66,
-        48
+        48,
+        13
       ],
       "labels": [
         "save_command"
@@ -2410,17 +2393,7 @@
         "&1a69 referenced 1 time by &19d6"
       ],
       "type": "string",
-      "string": "SAVE Level11 6B00+2B0"
-    },
-    {
-      "addr": 6771,
-      "bytes": [
-        13
-      ],
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "SAVE Level11 6B00+2B0."
     },
     {
       "addr": 6772,
@@ -2431,23 +2404,14 @@
         53,
         53,
         32,
-        49
+        49,
+        13
       ],
       "labels": [
         "tv_command"
       ],
       "type": "string",
-      "string": "TV255 1"
-    },
-    {
-      "addr": 6779,
-      "bytes": [
-        13
-      ],
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "TV255 1."
     },
     {
       "addr": 6780,
