@@ -1,7 +1,7 @@
 {
     "slug": "dunjunz",
     "name": "Dunjunz",
-    "description": "Annotated disassemblies of Dunjunz, the four-player dungeon game for the BBC Micro by Julian Avis, published by Bug-Byte on cassette in 1986 and on a flippy disc in 1987. The reference version is the official disc's Model B side, from flux captures of both its sides; its Master 128 side, the official Master conversion, is disassembled too; the others are Ole's crack of the cassette and an unofficial sideways RAM hack built from the crack and the disc. The game code is annotated once and applied to all four, and every listing reassembles byte for byte to the original files. The original game is © 1986–1987 Bug-Byte; the annotations and disassembly scripts here are © 2026 Acornaeology.",
+    "description": "Annotated disassemblies of Dunjunz, the four-player dungeon game for the BBC Micro by Julian Avis, published by Bug-Byte on cassette in 1986 and on a flippy disc in 1987. The reference version is the official disc's Model B side, from flux captures of both its sides; its Master 128 side, the official Master conversion, is disassembled too, with its loaders, level editor and level restorer as programs of their own; the others are Ole's crack of the cassette and an unofficial sideways RAM hack built from the crack and the disc. The game code is annotated once and applied to all four, and every listing reassembles byte for byte to the original files. The original game is © 1986–1987 Bug-Byte; the annotations and disassembly scripts here are © 2026 Acornaeology.",
     "versions": [
         "disc",
         "disc_master",
@@ -19,7 +19,7 @@
             "label": "The Master 128 version",
             "url": "docs/analysis/the-master-128-version.md",
             "icon": "doc",
-            "note": "The Master side of the official disc: what it shares with the Model B releases and what it changes, its music and keys, its code in the Master's private RAM, and how it works with the WD1770 and DFS 2.24 by protecting the filing system's page &0D."
+            "note": "The Master side of the official disc: what it shares with the Model B releases and what it changes, its music and keys, its code in the Master's private RAM, how it works with the WD1770 and DFS 2.24 by protecting the filing system's page &0D, and its level editor and level restorer."
         },
         {
             "label": "The level format",

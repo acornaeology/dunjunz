@@ -26,7 +26,8 @@ Four versions live under `versions/` (see `versions/README.md`):
   (`disasm_dunjunz_disc_master_<program>.py`), declared to the site under
   `disassemblies` in `binary.json`; the game (nine files) is the primary
   listing. Programs are not merged into one listing even when they share
-  addresses.
+  addresses. The Model B side's `Dunjunz`, `Editor` and `Default` are
+  not disassembled yet.
 - `dunjunz-tape_crack_ole/`: Ole's crack of the 1986 cassette. No image of
   the original cassette has been found; it would go in `dunjunz-tape/`.
 - `dunjunz-swram_hack/`: the unofficial sideways RAM hack, built from the
@@ -61,6 +62,8 @@ on the official release.
 | `Coder` (Master) | &0400 | &0740 | &03FF | game &0400–&07FE; loader at &0740 saves page &0D at &C400, loads `Dunj2`–`Dunj5`, enters &0E00 |
 | `Dunj3`/`Dunj4`/`Dunj5`/`Dunj2` (Master) | &08C0/&0E00/&2000/&6E80 | same | &43F/&1200/&1000/&1180 | the resident game |
 | `Code`/`Table`/`Code2`/`Code3` (Master) | &C500/&C5A0/&C700/&D800 | same | &6C/&158/&105A/&FF | HAZEL: joystick handler; level 25, game over, row offsets, pause; music; plotter copy |
+| `Editor` (Master) | &1910 | &23B2 | &158E | `*EDITOR`, the level editor; copies &2700–&28FF to &0900, &1910 to &7B00 and &1A00 to &7D80 |
+| `Default` (Master) | &0E00 | &0E00 | &47E0 | `*DEFAULT`, the level restorer; levels 1–25 encrypted at &12B0 |
 
 - CPU: 6502 (NMOS), BBC Model B. The disc's Master 128 side runs on the
   65C12 but uses no 65C12-only instruction, so it is disassembled as 6502

@@ -21,7 +21,7 @@ turned up yet. See
 | Directory | Release |
 |---|---|
 | `versions/dunjunz-disc/` | The official 1987 flippy disc, Model B side, from HFE captures (both sides' captures are kept here) |
-| `versions/dunjunz-disc_master/` | The same disc's Master 128 side |
+| `versions/dunjunz-disc_master/` | The same disc's Master 128 side: the game, its loaders, the level editor and the level restorer, each its own listing |
 | `versions/dunjunz-tape_crack_ole/` | Ole's crack of the 1986 cassette |
 | `versions/dunjunz-swram_hack/` | An unofficial sideways RAM hack, with the levels in ROMFS |
 

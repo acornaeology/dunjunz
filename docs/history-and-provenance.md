@@ -74,7 +74,7 @@ captures' **[confirmed]**. The contents of the two sides are:
   editor) and `*DEFAULT` (restores an edited level to its original form),
   "for the BBC model B ONLY" **[confirmed]**. Each side in fact has its own
   `Editor` and `Default`. The Master side's are conversions of the Model B
-  side's, and are disassembled with it.
+  side's; the Master pair is disassembled in `versions/dunjunz-disc_master/`.
 - **The disc's levels were edited with `*EDITOR`.** Eight of the disc's
   levels (1, 2, 4, 5, 6, 12, 22, 24) differ from the cassette's, with
   their tables reversed as `*EDITOR` saves them and their checksums kept
