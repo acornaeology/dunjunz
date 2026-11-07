@@ -974,6 +974,31 @@ In the separate programs (Master addresses for the Editor):
 | Editor | &2340 | - | `save_level`'s two checksum branches compute the same value, so the comparison changes nothing |
 | `*DUNJUNZ` (Model B) | `title_start` | 10 | Arms the BREAK intercept at &0287, which Coder clears straight away (see above) |
 
+### Constraints on moving the code
+
+Reusing space means moving code and data, and these assumptions in the
+game do not show in a byte comparison **[confirmed from the code]**:
+
+- `room_walls` (&0C00) and `object_free_map` (&2100) must start on a page
+  boundary. `test_wall`, `test_object_free`, `draw_room` and
+  `update_game` build a pointer from the table's high byte (`#>`) and
+  the room's offset (up to &BF) as the low byte, with no low byte of the
+  table's own.
+- The exit animation runs on from &1FFD (`lda hero_sprites,x`) into
+  &2000 with no jump, so the two sides of &2000 must stay together.
+- `collect_objects` reaches `magic_sword` (&756B) with a branch at &7518,
+  so the two must stay within branch range.
+- The sprite address tables (`sprite_addr_lo`, `sprite_addr_hi`) hold
+  each sprite's data address. The listings write them as `<label` and
+  `>label`, so they follow moved sprites. Three sprites (&15, &1A, &77)
+  share `sprite_blank`, zeros in page &04, and all twelve energy-drainer
+  sprites share `sprite_drainer`. The Editor's own tables point at its
+  item sprites, `wall_blocks` (Stones at &6E80), `blank_sprite` (&7FF0)
+  and part of the screen (`screen_start` + &200).
+- A `#>label` with no matching `#<label` marks such a page assumption:
+  besides the two tables above, `screen_start`, `level_object_x` (the
+  level buffer's page, &6B) and Coder's page constants.
+
 ## Minor observations
 
 None of these matters in normal play; all are **[confirmed from the

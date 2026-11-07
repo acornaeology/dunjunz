@@ -24548,6 +24548,736 @@
         5,
         0,
         0
+      ],
+      "expressions": [
+        {
+          "text": "<(item_sprites)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10752,
+              "name": "item_sprites"
+            }
+          }
+        },
+        {
+          "text": "<(item_sprites + 10)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 10,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(item_sprites + 20)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 20,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(item_sprites + 30)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 30,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(item_sprites + 40)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 40,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(item_sprites + 50)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 50,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(item_sprites + 60)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 60,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(item_sprites + 70)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 70,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(item_sprites + 80)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 80,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(item_sprites + 90)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 90,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(item_sprites + 100)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 100,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(item_sprites + 110)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 110,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(item_sprites + 120)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 120,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(item_sprites + 130)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 130,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(item_sprites + 140)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 140,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(item_sprites + 150)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 150,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(blank_sprite)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 32752,
+              "name": "blank_sprite"
+            }
+          }
+        },
+        {
+          "text": "<(waiting_door_sprite)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10912,
+              "name": "waiting_door_sprite"
+            }
+          }
+        },
+        {
+          "text": "<(wall_blocks)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 28288,
+              "name": "wall_blocks"
+            }
+          }
+        },
+        {
+          "text": "<(wall_blocks + &30)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 48,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(wall_blocks + &60)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 96,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(wall_blocks + &90)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 144,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(wall_blocks + &c0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 192,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(wall_blocks + &f0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 240,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(wall_blocks + &0120)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 288,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(wall_blocks + &0150)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 336,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(wall_blocks + &0180)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 384,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(wall_blocks + &01b0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 432,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(wall_blocks + &01e0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 480,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(wall_blocks + &0210)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 528,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(wall_blocks + &0240)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 576,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(wall_blocks + &0270)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 624,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(wall_blocks + &02a0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 672,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(wall_blocks + &02d0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 720,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(wall_blocks + &0300)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 768,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(wall_blocks + &0330)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 816,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(wall_blocks + &0360)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 864,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(wall_blocks + &0390)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 912,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(wall_blocks + &03c0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 960,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(wall_blocks + &03f0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 1008,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(wall_blocks + &0420)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 1056,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(wall_blocks + &0450)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 1104,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(frame_sprite)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 9600,
+              "name": "frame_sprite"
+            }
+          }
+        },
+        {
+          "text": "<(screen_start + &0200)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "sym": "screen_start"
+              },
+              "right": {
+                "int": 512,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(cursor_sprite)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10742,
+              "name": "cursor_sprite"
+            }
+          }
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
       ]
     },
     {
@@ -24677,6 +25407,736 @@
         0,
         0,
         0
+      ],
+      "expressions": [
+        {
+          "text": ">(item_sprites)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10752,
+              "name": "item_sprites"
+            }
+          }
+        },
+        {
+          "text": ">(item_sprites + 10)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 10,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(item_sprites + 20)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 20,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(item_sprites + 30)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 30,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(item_sprites + 40)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 40,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(item_sprites + 50)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 50,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(item_sprites + 60)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 60,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(item_sprites + 70)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 70,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(item_sprites + 80)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 80,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(item_sprites + 90)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 90,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(item_sprites + 100)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 100,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(item_sprites + 110)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 110,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(item_sprites + 120)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 120,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(item_sprites + 130)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 130,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(item_sprites + 140)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 140,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(item_sprites + 150)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 10752,
+                "name": "item_sprites"
+              },
+              "right": {
+                "int": 150,
+                "radix": "dec"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(blank_sprite)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 32752,
+              "name": "blank_sprite"
+            }
+          }
+        },
+        {
+          "text": ">(waiting_door_sprite)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10912,
+              "name": "waiting_door_sprite"
+            }
+          }
+        },
+        {
+          "text": ">(wall_blocks)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 28288,
+              "name": "wall_blocks"
+            }
+          }
+        },
+        {
+          "text": ">(wall_blocks + &30)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 48,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(wall_blocks + &60)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 96,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(wall_blocks + &90)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 144,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(wall_blocks + &c0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 192,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(wall_blocks + &f0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 240,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(wall_blocks + &0120)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 288,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(wall_blocks + &0150)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 336,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(wall_blocks + &0180)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 384,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(wall_blocks + &01b0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 432,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(wall_blocks + &01e0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 480,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(wall_blocks + &0210)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 528,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(wall_blocks + &0240)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 576,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(wall_blocks + &0270)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 624,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(wall_blocks + &02a0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 672,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(wall_blocks + &02d0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 720,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(wall_blocks + &0300)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 768,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(wall_blocks + &0330)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 816,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(wall_blocks + &0360)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 864,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(wall_blocks + &0390)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 912,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(wall_blocks + &03c0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 960,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(wall_blocks + &03f0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 1008,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(wall_blocks + &0420)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 1056,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(wall_blocks + &0450)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "ref": 28288,
+                "name": "wall_blocks"
+              },
+              "right": {
+                "int": 1104,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(frame_sprite)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 9600,
+              "name": "frame_sprite"
+            }
+          }
+        },
+        {
+          "text": ">(screen_start + &0200)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "sym": "screen_start"
+              },
+              "right": {
+                "int": 512,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(cursor_sprite)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10742,
+              "name": "cursor_sprite"
+            }
+          }
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
       ]
     },
     {

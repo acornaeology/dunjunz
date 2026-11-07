@@ -677,15 +677,35 @@ oscli                 = &fff7
 ; Each sprite's data address, low byte.
 ; &0a00 used as index base 2 times by &23ab, &2702
 .sprite_addr_lo
-    equb &00, &0a, &14, &1e, &28, &32, &3c, &46, &50, &5a, &64, &6e, &78, &82, &8c, &96, &f0
-    equb &a0, &80, &b0, &e0, &10, &40, &70, &a0, &d0, &00, &30, &60, &90, &c0, &f0, &20, &50
-    equb &80, &b0, &e0, &10, &40, &70, &a0, &d0, &80, &00, &f6, &0a, &25, &00, &05, &00, &00
+    equb <(item_sprites), <(item_sprites + 10), <(item_sprites + 20), <(item_sprites + 30)
+    equb <(item_sprites + 40), <(item_sprites + 50), <(item_sprites + 60), <(item_sprites + 70)
+    equb <(item_sprites + 80), <(item_sprites + 90), <(item_sprites + 100), <(item_sprites + 110)
+    equb <(item_sprites + 120), <(item_sprites + 130), <(item_sprites + 140), <(item_sprites + 150)
+    equb <(blank_sprite), <(waiting_door_sprite), <(wall_blocks), <(wall_blocks + &30)
+    equb <(wall_blocks + &60), <(wall_blocks + &90), <(wall_blocks + &c0), <(wall_blocks + &f0)
+    equb <(wall_blocks + &0120), <(wall_blocks + &0150), <(wall_blocks + &0180), <(wall_blocks + &01b0)
+    equb <(wall_blocks + &01e0), <(wall_blocks + &0210), <(wall_blocks + &0240), <(wall_blocks + &0270)
+    equb <(wall_blocks + &02a0), <(wall_blocks + &02d0), <(wall_blocks + &0300), <(wall_blocks + &0330)
+    equb <(wall_blocks + &0360), <(wall_blocks + &0390), <(wall_blocks + &03c0), <(wall_blocks + &03f0)
+    equb <(wall_blocks + &0420), <(wall_blocks + &0450), <(frame_sprite), <(screen_start + &0200)
+    equb <(cursor_sprite), &0a, &25, &00
+    equb &05, &00, &00
 ; Each sprite's data address, high byte.
 ; &0a33 used as index base 1 time by &2707
 .sprite_addr_hi
-    equb &2a, &2a, &2a, &2a, &2a, &2a, &2a, &2a, &2a, &2a, &2a, &2a, &2a, &2a, &2a, &2a, &7f
-    equb &2a, &6e, &6e, &6e, &6f, &6f, &6f, &6f, &6f, &70, &70, &70, &70, &70, &70, &71, &71
-    equb &71, &71, &71, &72, &72, &72, &72, &72, &25, &32, &29, &00, &00, &00, &00, &00, &00
+    equb >(item_sprites), >(item_sprites + 10), >(item_sprites + 20), >(item_sprites + 30)
+    equb >(item_sprites + 40), >(item_sprites + 50), >(item_sprites + 60), >(item_sprites + 70)
+    equb >(item_sprites + 80), >(item_sprites + 90), >(item_sprites + 100), >(item_sprites + 110)
+    equb >(item_sprites + 120), >(item_sprites + 130), >(item_sprites + 140), >(item_sprites + 150)
+    equb >(blank_sprite), >(waiting_door_sprite), >(wall_blocks), >(wall_blocks + &30)
+    equb >(wall_blocks + &60), >(wall_blocks + &90), >(wall_blocks + &c0), >(wall_blocks + &f0)
+    equb >(wall_blocks + &0120), >(wall_blocks + &0150), >(wall_blocks + &0180), >(wall_blocks + &01b0)
+    equb >(wall_blocks + &01e0), >(wall_blocks + &0210), >(wall_blocks + &0240), >(wall_blocks + &0270)
+    equb >(wall_blocks + &02a0), >(wall_blocks + &02d0), >(wall_blocks + &0300), >(wall_blocks + &0330)
+    equb >(wall_blocks + &0360), >(wall_blocks + &0390), >(wall_blocks + &03c0), >(wall_blocks + &03f0)
+    equb >(wall_blocks + &0420), >(wall_blocks + &0450), >(frame_sprite), >(screen_start + &0200)
+    equb >(cursor_sprite), &00, &00, &00
+    equb &00, &00, &00
 ; Each sprite's width in screen bytes.
 ; &0a66 used as index base 1 time by &270c
 .sprite_widths

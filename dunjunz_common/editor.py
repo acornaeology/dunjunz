@@ -13,7 +13,7 @@ address to the Model B's and drops those the Model B lacks.
 """
 
 import dasmos
-from dasmos.expr import char, hi, lo, sym
+from dasmos.expr import char, declit, hi, lo, ref, sym
 
 from dunjunz_common import game
 from dunjunz_common.annotator import Annotator
@@ -297,7 +297,14 @@ def annotate(d, model_b=False):
         (0x0A99, "sprite_heights", "Each sprite's height in pixel rows."),
     ]:
         in_plotter.label(addr, name, length=51, description=text)
-        in_plotter.byte(addr, 51, cols=17)
+        in_plotter.byte(addr, 51, cols=4 if name.startswith("sprite_addr") else 17)
+    for sprite, target in enumerate(
+            [ref(0x2A00)] + [ref(0x2A00) + declit(10 * n) for n in range(1, 16)]
+            + [ref(0x7FF0), ref(0x2AA0)]
+            + [ref(0x6E80)] + [ref(0x6E80) + 0x30 * n for n in range(1, 24)]
+            + [ref(0x2580), sym("screen_start") + 0x200, ref(0x29F6)]):
+        in_plotter.expr(0x0A00 + sprite, lo(target))
+        in_plotter.expr(0x0A33 + sprite, hi(target))
     in_plotter.banner(0x0ACC, "Unused", "Leftover bytes.")
     in_plotter.byte(0x0ACC, 0x34, cols=8)
     in_plotter.c(0x0ACC, "Not used")

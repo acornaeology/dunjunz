@@ -7,7 +7,7 @@ Where the versions differ, the drivers add their own annotations.
 """
 
 import dasmos
-from dasmos.expr import char, declit, hexlit, hi, lo, sym
+from dasmos.expr import char, declit, hexlit, hi, lo, ref, sym
 
 from dunjunz_common.annotator import Annotator
 
@@ -2751,12 +2751,23 @@ def annotate_data(a: Annotator) -> None:
             annotate_sound_block(a, addr)
 
     # Sprite tables
-    for addr in (0x1AE0, 0x1B58, 0x1BD0, 0x1C48):
+    for addr in (0x1AE0, 0x1B58):
+        a.byte(addr, 120, cols=4)
+    for addr in (0x1BD0, 0x1C48):
         a.byte(addr, 120, cols=8)
+    # Each sprite's address halves name the sprite data they point at.
+    for sprite in range(120):
+        low, high = a.byte_value(0x1AE0 + sprite), a.byte_value(0x1B58 + sprite)
+        if low is None or high is None:
+            continue
+        a.expr(0x1AE0 + sprite, lo(ref(low + 256 * high)))
+        a.expr(0x1B58 + sprite, hi(ref(low + 256 * high)))
     a.banner(0x1AE0, "Sprite tables",
              "Four tables of 120 entries, indexed by sprite number: data "
              "address low bytes, high bytes, widths in bytes and heights in "
-             "rows.")
+             "rows. Sprites may share data: the twelve energy-drainer "
+             "sprites all point at sprite_drainer, and sprites &15, &1A and "
+             "&77 at sprite_blank, zeros in page &04.")
 
     # The heroes' magic keys
     a.inkey_number(0x0B24, 2)

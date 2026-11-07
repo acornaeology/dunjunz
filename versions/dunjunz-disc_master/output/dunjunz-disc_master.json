@@ -1853,7 +1853,7 @@
       "addr": 6880,
       "name": "sprite_addr_lo",
       "title": "Sprite tables",
-      "description": "Four tables of 120 entries, indexed by sprite number: data address low bytes, high bytes, widths in bytes and heights in rows.",
+      "description": "Four tables of 120 entries, indexed by sprite number: data address low bytes, high bytes, widths in bytes and heights in rows. Sprites may share data: the twelve energy-drainer sprites all point at sprite_drainer, and sprites &15, &1A and &77 at sprite_blank, zeros in page &04.",
       "align": "before_label"
     },
     {
@@ -31966,6 +31966,1208 @@
         108,
         120,
         207
+      ],
+      "expressions": [
+        {
+          "text": "<(wall_sprite)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 11520,
+              "name": "wall_sprite"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_ranger_up_0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 11568,
+              "name": "sprite_ranger_up_0"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_ranger_up_1)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 11616,
+              "name": "sprite_ranger_up_1"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_ranger_right_0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 11664,
+              "name": "sprite_ranger_right_0"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_ranger_right_1)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 11712,
+              "name": "sprite_ranger_right_1"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_ranger_down_0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 11760,
+              "name": "sprite_ranger_down_0"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_ranger_down_1)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 11808,
+              "name": "sprite_ranger_down_1"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_ranger_left_0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 11856,
+              "name": "sprite_ranger_left_0"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_ranger_left_1)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 6592,
+              "name": "sprite_ranger_left_1"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_monster_up_0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 11904,
+              "name": "sprite_monster_up_0"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_monster_up_1)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 11952,
+              "name": "sprite_monster_up_1"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_monster_right_0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 12000,
+              "name": "sprite_monster_right_0"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_monster_right_1)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 12048,
+              "name": "sprite_monster_right_1"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_monster_down_0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 12096,
+              "name": "sprite_monster_down_0"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_monster_down_1)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 12144,
+              "name": "sprite_monster_down_1"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_monster_left_0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 12192,
+              "name": "sprite_monster_left_0"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_monster_left_1)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 12240,
+              "name": "sprite_monster_left_1"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_arrow_up)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 11264,
+              "name": "sprite_arrow_up"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_arrow_right)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 11312,
+              "name": "sprite_arrow_right"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_arrow_down)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 11360,
+              "name": "sprite_arrow_down"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_arrow_left)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 11408,
+              "name": "sprite_arrow_left"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_blank)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 1231,
+              "name": "sprite_blank"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_sparkle_0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 11008,
+              "name": "sprite_sparkle_0"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_sparkle_1)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 11056,
+              "name": "sprite_sparkle_1"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_sparkle_2)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 11104,
+              "name": "sprite_sparkle_2"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_sparkle_3)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 11152,
+              "name": "sprite_sparkle_3"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_blank)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 1231,
+              "name": "sprite_blank"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_key)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10496,
+              "name": "sprite_key"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_door_vertical)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 11456,
+              "name": "sprite_door_vertical"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_door_horizontal)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10952,
+              "name": "sprite_door_horizontal"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_digit_0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10752,
+              "name": "sprite_digit_0"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_digit_1)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10772,
+              "name": "sprite_digit_1"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_digit_2)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10792,
+              "name": "sprite_digit_2"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_digit_3)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10812,
+              "name": "sprite_digit_3"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_digit_4)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10832,
+              "name": "sprite_digit_4"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_digit_5)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10852,
+              "name": "sprite_digit_5"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_digit_6)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10872,
+              "name": "sprite_digit_6"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_digit_7)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10892,
+              "name": "sprite_digit_7"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_digit_8)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10912,
+              "name": "sprite_digit_8"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_digit_9)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10932,
+              "name": "sprite_digit_9"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_treasure)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10544,
+              "name": "sprite_treasure"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_food)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10592,
+              "name": "sprite_food"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_cross)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 2800,
+              "name": "sprite_cross"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_teleporter)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10688,
+              "name": "sprite_teleporter"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_trapdoor)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 11200,
+              "name": "sprite_trapdoor"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_magic_user_up_0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 8960,
+              "name": "sprite_magic_user_up_0"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_magic_user_up_1)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 9008,
+              "name": "sprite_magic_user_up_1"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_magic_user_right_0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 9056,
+              "name": "sprite_magic_user_right_0"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_magic_user_right_1)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 9104,
+              "name": "sprite_magic_user_right_1"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_magic_user_down_0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 9152,
+              "name": "sprite_magic_user_down_0"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_magic_user_down_1)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 9200,
+              "name": "sprite_magic_user_down_1"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_magic_user_left_0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 9248,
+              "name": "sprite_magic_user_left_0"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_magic_user_left_1)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 9296,
+              "name": "sprite_magic_user_left_1"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_barbarian_up_0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 9344,
+              "name": "sprite_barbarian_up_0"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_barbarian_up_1)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 9392,
+              "name": "sprite_barbarian_up_1"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_barbarian_right_0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 9440,
+              "name": "sprite_barbarian_right_0"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_barbarian_right_1)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 9488,
+              "name": "sprite_barbarian_right_1"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_barbarian_down_0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 9536,
+              "name": "sprite_barbarian_down_0"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_barbarian_down_1)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 9584,
+              "name": "sprite_barbarian_down_1"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_barbarian_left_0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 9632,
+              "name": "sprite_barbarian_left_0"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_barbarian_left_1)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 9680,
+              "name": "sprite_barbarian_left_1"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_fighter_up_0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 9728,
+              "name": "sprite_fighter_up_0"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_fighter_up_1)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 9776,
+              "name": "sprite_fighter_up_1"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_fighter_right_0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 9824,
+              "name": "sprite_fighter_right_0"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_fighter_right_1)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 9872,
+              "name": "sprite_fighter_right_1"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_fighter_down_0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 9920,
+              "name": "sprite_fighter_down_0"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_fighter_down_1)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 9968,
+              "name": "sprite_fighter_down_1"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_fighter_left_0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10016,
+              "name": "sprite_fighter_left_0"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_fighter_left_1)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10064,
+              "name": "sprite_fighter_left_1"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_fireball_up)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10112,
+              "name": "sprite_fireball_up"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_fireball_right)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10160,
+              "name": "sprite_fireball_right"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_fireball_down)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10208,
+              "name": "sprite_fireball_down"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_fireball_left)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10256,
+              "name": "sprite_fireball_left"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_sword_up)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 5888,
+              "name": "sprite_sword_up"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_sword_right)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 5936,
+              "name": "sprite_sword_right"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_sword_down)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 5984,
+              "name": "sprite_sword_down"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_sword_left)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 6032,
+              "name": "sprite_sword_left"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_axe_up)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10304,
+              "name": "sprite_axe_up"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_axe_right)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10352,
+              "name": "sprite_axe_right"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_axe_down)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10400,
+              "name": "sprite_axe_down"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_axe_left)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 10448,
+              "name": "sprite_axe_left"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_exit)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 8864,
+              "name": "sprite_exit"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_key_icon)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 8912,
+              "name": "sprite_key_icon"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_drainer)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 8656,
+              "name": "sprite_drainer"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_drainer)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 8656,
+              "name": "sprite_drainer"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_drainer)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 8656,
+              "name": "sprite_drainer"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_drainer)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 8656,
+              "name": "sprite_drainer"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_drainer)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 8656,
+              "name": "sprite_drainer"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_drainer)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 8656,
+              "name": "sprite_drainer"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_drainer)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 8656,
+              "name": "sprite_drainer"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_drainer)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 8656,
+              "name": "sprite_drainer"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_drainer)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 8656,
+              "name": "sprite_drainer"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_drainer)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 8656,
+              "name": "sprite_drainer"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_drainer)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 8656,
+              "name": "sprite_drainer"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_drainer)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 8656,
+              "name": "sprite_drainer"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_boots)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 2560,
+              "name": "sprite_boots"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_helmet)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 2608,
+              "name": "sprite_helmet"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_potion)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 2656,
+              "name": "sprite_potion"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_weapons)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 2752,
+              "name": "sprite_weapons"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_magic_sword)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 2704,
+              "name": "sprite_magic_sword"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_skull_0)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 6640,
+              "name": "sprite_skull_0"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_skull_1)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 6688,
+              "name": "sprite_skull_1"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_skull_2)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 6736,
+              "name": "sprite_skull_2"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_skull_3)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 6784,
+              "name": "sprite_skull_3"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_skull_4)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 6832,
+              "name": "sprite_skull_4"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_shield)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 6144,
+              "name": "sprite_shield"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_small_digit_1)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 6180,
+              "name": "sprite_small_digit_1"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_small_digit_2)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 6185,
+              "name": "sprite_small_digit_2"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_small_digit_3)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 6190,
+              "name": "sprite_small_digit_3"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_small_digit_4)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 6195,
+              "name": "sprite_small_digit_4"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_small_digit_5)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 6200,
+              "name": "sprite_small_digit_5"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_small_digit_6)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 6205,
+              "name": "sprite_small_digit_6"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_small_digit_7)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 6210,
+              "name": "sprite_small_digit_7"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_small_digit_8)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 6215,
+              "name": "sprite_small_digit_8"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_small_digit_9)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 6220,
+              "name": "sprite_small_digit_9"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_chalice)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 4624,
+              "name": "sprite_chalice"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_missile_icon)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 6240,
+              "name": "sprite_missile_icon"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_boots_icon)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 6252,
+              "name": "sprite_boots_icon"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_level_word)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 6264,
+              "name": "sprite_level_word"
+            }
+          }
+        },
+        {
+          "text": "<(sprite_blank)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "ref": 1231,
+              "name": "sprite_blank"
+            }
+          }
+        }
       ]
     },
     {
@@ -32234,6 +33436,1208 @@
         24,
         24,
         4
+      ],
+      "expressions": [
+        {
+          "text": ">(wall_sprite)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 11520,
+              "name": "wall_sprite"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_ranger_up_0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 11568,
+              "name": "sprite_ranger_up_0"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_ranger_up_1)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 11616,
+              "name": "sprite_ranger_up_1"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_ranger_right_0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 11664,
+              "name": "sprite_ranger_right_0"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_ranger_right_1)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 11712,
+              "name": "sprite_ranger_right_1"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_ranger_down_0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 11760,
+              "name": "sprite_ranger_down_0"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_ranger_down_1)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 11808,
+              "name": "sprite_ranger_down_1"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_ranger_left_0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 11856,
+              "name": "sprite_ranger_left_0"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_ranger_left_1)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 6592,
+              "name": "sprite_ranger_left_1"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_monster_up_0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 11904,
+              "name": "sprite_monster_up_0"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_monster_up_1)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 11952,
+              "name": "sprite_monster_up_1"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_monster_right_0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 12000,
+              "name": "sprite_monster_right_0"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_monster_right_1)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 12048,
+              "name": "sprite_monster_right_1"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_monster_down_0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 12096,
+              "name": "sprite_monster_down_0"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_monster_down_1)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 12144,
+              "name": "sprite_monster_down_1"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_monster_left_0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 12192,
+              "name": "sprite_monster_left_0"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_monster_left_1)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 12240,
+              "name": "sprite_monster_left_1"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_arrow_up)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 11264,
+              "name": "sprite_arrow_up"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_arrow_right)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 11312,
+              "name": "sprite_arrow_right"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_arrow_down)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 11360,
+              "name": "sprite_arrow_down"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_arrow_left)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 11408,
+              "name": "sprite_arrow_left"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_blank)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 1231,
+              "name": "sprite_blank"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_sparkle_0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 11008,
+              "name": "sprite_sparkle_0"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_sparkle_1)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 11056,
+              "name": "sprite_sparkle_1"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_sparkle_2)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 11104,
+              "name": "sprite_sparkle_2"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_sparkle_3)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 11152,
+              "name": "sprite_sparkle_3"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_blank)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 1231,
+              "name": "sprite_blank"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_key)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10496,
+              "name": "sprite_key"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_door_vertical)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 11456,
+              "name": "sprite_door_vertical"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_door_horizontal)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10952,
+              "name": "sprite_door_horizontal"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_digit_0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10752,
+              "name": "sprite_digit_0"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_digit_1)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10772,
+              "name": "sprite_digit_1"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_digit_2)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10792,
+              "name": "sprite_digit_2"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_digit_3)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10812,
+              "name": "sprite_digit_3"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_digit_4)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10832,
+              "name": "sprite_digit_4"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_digit_5)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10852,
+              "name": "sprite_digit_5"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_digit_6)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10872,
+              "name": "sprite_digit_6"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_digit_7)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10892,
+              "name": "sprite_digit_7"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_digit_8)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10912,
+              "name": "sprite_digit_8"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_digit_9)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10932,
+              "name": "sprite_digit_9"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_treasure)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10544,
+              "name": "sprite_treasure"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_food)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10592,
+              "name": "sprite_food"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_cross)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 2800,
+              "name": "sprite_cross"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_teleporter)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10688,
+              "name": "sprite_teleporter"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_trapdoor)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 11200,
+              "name": "sprite_trapdoor"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_magic_user_up_0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 8960,
+              "name": "sprite_magic_user_up_0"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_magic_user_up_1)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 9008,
+              "name": "sprite_magic_user_up_1"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_magic_user_right_0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 9056,
+              "name": "sprite_magic_user_right_0"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_magic_user_right_1)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 9104,
+              "name": "sprite_magic_user_right_1"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_magic_user_down_0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 9152,
+              "name": "sprite_magic_user_down_0"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_magic_user_down_1)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 9200,
+              "name": "sprite_magic_user_down_1"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_magic_user_left_0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 9248,
+              "name": "sprite_magic_user_left_0"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_magic_user_left_1)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 9296,
+              "name": "sprite_magic_user_left_1"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_barbarian_up_0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 9344,
+              "name": "sprite_barbarian_up_0"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_barbarian_up_1)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 9392,
+              "name": "sprite_barbarian_up_1"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_barbarian_right_0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 9440,
+              "name": "sprite_barbarian_right_0"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_barbarian_right_1)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 9488,
+              "name": "sprite_barbarian_right_1"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_barbarian_down_0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 9536,
+              "name": "sprite_barbarian_down_0"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_barbarian_down_1)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 9584,
+              "name": "sprite_barbarian_down_1"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_barbarian_left_0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 9632,
+              "name": "sprite_barbarian_left_0"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_barbarian_left_1)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 9680,
+              "name": "sprite_barbarian_left_1"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_fighter_up_0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 9728,
+              "name": "sprite_fighter_up_0"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_fighter_up_1)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 9776,
+              "name": "sprite_fighter_up_1"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_fighter_right_0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 9824,
+              "name": "sprite_fighter_right_0"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_fighter_right_1)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 9872,
+              "name": "sprite_fighter_right_1"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_fighter_down_0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 9920,
+              "name": "sprite_fighter_down_0"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_fighter_down_1)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 9968,
+              "name": "sprite_fighter_down_1"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_fighter_left_0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10016,
+              "name": "sprite_fighter_left_0"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_fighter_left_1)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10064,
+              "name": "sprite_fighter_left_1"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_fireball_up)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10112,
+              "name": "sprite_fireball_up"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_fireball_right)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10160,
+              "name": "sprite_fireball_right"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_fireball_down)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10208,
+              "name": "sprite_fireball_down"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_fireball_left)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10256,
+              "name": "sprite_fireball_left"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_sword_up)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 5888,
+              "name": "sprite_sword_up"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_sword_right)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 5936,
+              "name": "sprite_sword_right"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_sword_down)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 5984,
+              "name": "sprite_sword_down"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_sword_left)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 6032,
+              "name": "sprite_sword_left"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_axe_up)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10304,
+              "name": "sprite_axe_up"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_axe_right)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10352,
+              "name": "sprite_axe_right"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_axe_down)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10400,
+              "name": "sprite_axe_down"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_axe_left)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 10448,
+              "name": "sprite_axe_left"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_exit)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 8864,
+              "name": "sprite_exit"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_key_icon)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 8912,
+              "name": "sprite_key_icon"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_drainer)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 8656,
+              "name": "sprite_drainer"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_drainer)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 8656,
+              "name": "sprite_drainer"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_drainer)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 8656,
+              "name": "sprite_drainer"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_drainer)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 8656,
+              "name": "sprite_drainer"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_drainer)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 8656,
+              "name": "sprite_drainer"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_drainer)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 8656,
+              "name": "sprite_drainer"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_drainer)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 8656,
+              "name": "sprite_drainer"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_drainer)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 8656,
+              "name": "sprite_drainer"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_drainer)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 8656,
+              "name": "sprite_drainer"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_drainer)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 8656,
+              "name": "sprite_drainer"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_drainer)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 8656,
+              "name": "sprite_drainer"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_drainer)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 8656,
+              "name": "sprite_drainer"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_boots)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 2560,
+              "name": "sprite_boots"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_helmet)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 2608,
+              "name": "sprite_helmet"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_potion)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 2656,
+              "name": "sprite_potion"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_weapons)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 2752,
+              "name": "sprite_weapons"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_magic_sword)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 2704,
+              "name": "sprite_magic_sword"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_skull_0)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 6640,
+              "name": "sprite_skull_0"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_skull_1)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 6688,
+              "name": "sprite_skull_1"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_skull_2)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 6736,
+              "name": "sprite_skull_2"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_skull_3)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 6784,
+              "name": "sprite_skull_3"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_skull_4)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 6832,
+              "name": "sprite_skull_4"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_shield)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 6144,
+              "name": "sprite_shield"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_small_digit_1)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 6180,
+              "name": "sprite_small_digit_1"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_small_digit_2)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 6185,
+              "name": "sprite_small_digit_2"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_small_digit_3)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 6190,
+              "name": "sprite_small_digit_3"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_small_digit_4)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 6195,
+              "name": "sprite_small_digit_4"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_small_digit_5)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 6200,
+              "name": "sprite_small_digit_5"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_small_digit_6)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 6205,
+              "name": "sprite_small_digit_6"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_small_digit_7)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 6210,
+              "name": "sprite_small_digit_7"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_small_digit_8)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 6215,
+              "name": "sprite_small_digit_8"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_small_digit_9)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 6220,
+              "name": "sprite_small_digit_9"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_chalice)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 4624,
+              "name": "sprite_chalice"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_missile_icon)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 6240,
+              "name": "sprite_missile_icon"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_boots_icon)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 6252,
+              "name": "sprite_boots_icon"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_level_word)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 6264,
+              "name": "sprite_level_word"
+            }
+          }
+        },
+        {
+          "text": ">(sprite_blank)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "ref": 1231,
+              "name": "sprite_blank"
+            }
+          }
+        }
       ]
     },
     {
