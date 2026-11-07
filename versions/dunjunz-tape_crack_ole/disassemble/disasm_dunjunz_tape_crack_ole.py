@@ -232,6 +232,8 @@ d.expr(0x502C, lo(sym("wrch_handler")))
 d.expr(0x5031, hi(sym("wrch_handler")))
 
 annotator.c(0x0D6E, "Not referenced")  # after game_entry
+annotator.c(0x0772, "Not referenced")
+annotator.c(0x07F8, "Not referenced")
 
 # DUNJ3 past &7FFF: loaded into the sideways ROM area, so never in RAM.
 d.banner(0x8000, title="DUNJ3 beyond the game",

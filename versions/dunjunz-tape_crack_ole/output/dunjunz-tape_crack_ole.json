@@ -7994,6 +7994,7 @@
       "binary_addr": 10098,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -8245,6 +8246,7 @@
       "binary_addr": 10232,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         13,

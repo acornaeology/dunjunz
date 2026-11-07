@@ -7291,6 +7291,7 @@
         0
       ],
       "image": 0,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -7709,6 +7710,7 @@
         0
       ],
       "image": 0,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         13,
