@@ -39,14 +39,21 @@ jobs:
           make -C /tmp/beebasm/build -j$(nproc)
           sudo cp /tmp/beebasm/build/beebasm /usr/local/bin/
 
+      # A version may hold several programs, each with its own driver.
       - name: Disassemble Dunjunz ${{ matrix.version }}
-        run: uv run --no-dev fantasm disassemble ${{ matrix.version }}
+        run: |
+          for driver in versions/dunjunz-${{ matrix.version }}/disassemble/disasm_*.py; do
+            uv run --no-dev python "$driver"
+          done
 
       - name: Check the committed listing is current
         run: git diff --exit-code -- versions/dunjunz-${{ matrix.version }}/output
 
       - name: Lint
-        run: uv run --no-dev fantasm lint
+        run: |
+          for target in $(sed -n 's/^id = "\(.*\)"$/\1/p' fantasm.toml); do
+            uv run --no-dev fantasm lint "$target"
+          done
 
       # One driver saves every file of a version, so verify them all.
       - name: Verify Dunjunz (all files)

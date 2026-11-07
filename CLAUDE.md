@@ -21,8 +21,12 @@ Four versions live under `versions/` (see `versions/README.md`):
   `Coder` exported from the Model B side's SSD.
 - `dunjunz-disc_master/`: the same disc's Master 128 side, the official
   Master conversion (`docs/analysis/the-master-128-version.md`). `binary/`
-  holds its eleven machine-code files, exported from the Master side's
-  HFE in `dunjunz-disc/`.
+  holds its machine-code files, exported from the Master side's HFE in
+  `dunjunz-disc/`. Each separate program has its own driver and listing
+  (`disasm_dunjunz_disc_master_<program>.py`), declared to the site under
+  `disassemblies` in `binary.json`; the game (nine files) is the primary
+  listing. Programs are not merged into one listing even when they share
+  addresses.
 - `dunjunz-tape_crack_ole/`: Ole's crack of the 1986 cassette. No image of
   the original cassette has been found; it would go in `dunjunz-tape/`.
 - `dunjunz-swram_hack/`: the unofficial sideways RAM hack, built from the
@@ -139,18 +143,10 @@ feature or defect met along the way, and note the workaround here.
   &7F read ID returns no IDs.
 - `Beebium.launch` needs `variant=` repeated alongside `preset=`
   (rob-smallshire/beebium#269).
-- On the Master side, `*DUNJUNZ` and `Coder2` run where `Dunj5` later
-  loads. An annotation with no move at a run address a move also covers
-  goes into the move (acornaeology/dasmos#57), and an identity move is
-  refused, so all three are stored at spare addresses (&3649, &3000,
-  &4000) and moved; the Master driver's `placements` sends &2000-&2FFF to
-  the `dunj5` move, and `Dunj5` needs an explicit entry at &2000 because
-  `Dunj4`'s code falls through into it.
 - dasmos traces a jump's target even from bytes declared as data
-  (acornaeology/dasmos#58). The Master driver hooks `leave_title` with a
-  no-return hook and gives `Dunj5` an entry at &202C, so the command
-  strings "L. Code" and "LOAD SCREEN" (which read as JMPs) do not split
-  real code.
+  (acornaeology/dasmos#58). The *DUNJUNZ driver hooks `leave_title` with a
+  no-return hook, so the command strings after its call (which read as
+  JMPs) are not traced.
 - dasmos's OSBYTE &81 hook takes X >= &80 as a key scan even when Y is a
   time limit (acornaeology/dasmos#59): `d.expr(0x0EC4, hexlit(0xF4))` in
   the Master driver; the hook's "Test for f5" inline comment remains.

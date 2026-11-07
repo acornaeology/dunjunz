@@ -83,24 +83,25 @@ asm = "versions/dunjunz-disc/output/dunjunz-disc.asm"
 json = "versions/dunjunz-disc/output/dunjunz-disc.json"
 verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Coder" }
 
-# The official disc release, Master 128 side: the game in five files at
-# their run addresses, four files in the Master's private RAM (HAZEL), and
-# the two loaders, all in one listing.
+# The official disc release, Master 128 side. Each program has its own
+# driver and listing: *DUNJUNZ (Dunjunz), Coder2, *EDITOR (Editor),
+# *DEFAULT (Default), and the game, whose nine files (five at their run
+# addresses, four in the Master's private RAM, HAZEL) make one listing.
 
 [[targets]]
 id = "disc_master-dunjunz"
 binary = "versions/dunjunz-disc_master/binary/Dunjunz"
-driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master.py"
-asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master.asm"
-json = "versions/dunjunz-disc_master/output/dunjunz-disc_master.json"
+driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master_dunjunz.py"
+asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master-dunjunz.asm"
+json = "versions/dunjunz-disc_master/output/dunjunz-disc_master-dunjunz.json"
 verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunjunz" }
 
 [[targets]]
 id = "disc_master-coder2"
 binary = "versions/dunjunz-disc_master/binary/Coder2"
-driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master.py"
-asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master.asm"
-json = "versions/dunjunz-disc_master/output/dunjunz-disc_master.json"
+driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master_coder2.py"
+asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master-coder2.asm"
+json = "versions/dunjunz-disc_master/output/dunjunz-disc_master-coder2.json"
 verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Coder2" }
 
 [[targets]]

@@ -1,10 +1,4 @@
 ; Constants
-title_plot_reversed                  = &7b  ; Zero page flag for title_plot_star: non-zero plots each row right to left
-star_x                               = &80  ; Zero page: each star's byte column (three stars)
-star_y                               = &83  ; Zero page: each star's pixel row
-star_frame                           = &86  ; Zero page: each star's animation frame, 0-6
-star_frame_step                      = &89  ; Zero page: each star's frame step, +1 or -1
-star_place                           = &8c  ; Zero page: each star's place in star_places_x
 osbyte_flush_buffer_class            = &0f
 osbyte_kbd_status                    = &ca
 osbyte_sound_suppression             = &d2
@@ -17,9 +11,6 @@ inkey_key_f5                         = &8b
 osword_envelope                      = &08
 osword_sound                         = &07
 osbyte_read_adc_or_get_buffer_status = &80
-osbyte_escape_break_effect           = &c8
-osbyte_set_cursor_editing            = &04
-osbyte_flush_buffer                  = &15
 osbyte_scan_keyboard_from_16         = &7a
 osbyte_enable_event                  = &0e
 event_interval_timer_crossing_zero   = &05
@@ -30,27 +21,27 @@ osword_write_interval_timer          = &04
 tune_ptr                        = &00  ; The music's place in the tune: the current three-byte step.
 ; &00 referenced 12 times by &10e6, &1413, &146f, &c735, &c774, &c783, &c795, &c7a5, &c7aa, &c7f2, &c80f, &c818
 plot_x                          = &70  ; Sprite position: screen byte column, 0-79 (two MODE 2 pixels per byte). Also used as a scratch byte and pointer low byte by other routines.
-; &70 referenced 44 times by &0422, &0439, &043b, &0452, &045a, &045c, &045e, &0465, &046b, &05a7, &05ab, &0984, &0991, &0f68, &1458, &154d, &1558, &155c, &1da6, &1e1c, &1e77, &3893, &38a0, &39bc, &40c6, &726d, &7282, &72c6, &72db, &72eb, &72fb, &75b8, &75d9, &75e4, &75fb, &7823, &7846, &784a, &78a1, &78bb, &78d5, &78ef, &d884, &d891
+; &70 referenced 41 times by &0422, &0439, &043b, &0452, &045a, &045c, &045e, &0465, &046b, &05a7, &05ab, &0984, &0991, &0f68, &1458, &154d, &1558, &155c, &1da6, &1e1c, &1e77, &20c6, &726d, &7282, &72c6, &72db, &72eb, &72fb, &75b8, &75d9, &75e4, &75fb, &7823, &7846, &784a, &78a1, &78bb, &78d5, &78ef, &d884, &d891
 plot_y                          = &71  ; Sprite position: pixel row from the top of the screen. Also used as a pointer high byte by other routines.
-; &71 referenced 33 times by &042a, &0458, &0469, &0471, &0967, &097b, &0f77, &145c, &1da2, &1e18, &1e73, &3876, &388a, &39c1, &40c2, &7269, &72c2, &75b4, &75d5, &75ec, &7603, &7797, &77a9, &77bb, &77cd, &77ef, &77f3, &78a8, &78c2, &78dc, &78f6, &d867, &d87b
+; &71 referenced 30 times by &042a, &0458, &0469, &0471, &0967, &097b, &0f77, &145c, &1da2, &1e18, &1e73, &20c2, &7269, &72c2, &75b4, &75d5, &75ec, &7603, &7797, &77a9, &77bb, &77cd, &77ef, &77f3, &78a8, &78c2, &78dc, &78f6, &d867, &d87b
 sprite_width                    = &72  ; Width of the sprite being plotted, in screen bytes.
-; &72 referenced 10 times by &0454, &0461, &0463, &047a, &090f, &0927, &3802, &3823, &d80f, &d827
+; &72 referenced 8 times by &0454, &0461, &0463, &047a, &090f, &0927, &d80f, &d827
 sprite_height                   = &73  ; Height of the sprite being plotted, in pixel rows.
-; &73 referenced 6 times by &0914, &091b, &3806, &3817, &d814, &d81b
+; &73 referenced 4 times by &0914, &091b, &d814, &d81b
 screen_ptr                      = &74  ; Screen address being written, low byte.
-; &74 referenced 42 times by &091d, &092b, &092e, &0932, &0946, &094e, &0955, &0959, &0979, &097f, &0981, &0997, &0999, &3819, &3827, &3829, &3830, &3834, &383d, &3841, &3855, &385d, &3864, &3868, &3888, &388e, &3890, &38a6, &38a8, &d81d, &d82b, &d82e, &d832, &d846, &d84e, &d855, &d859, &d879, &d87f, &d881, &d897, &d899
+; &74 referenced 26 times by &091d, &092b, &092e, &0932, &0946, &094e, &0955, &0959, &0979, &097f, &0981, &0997, &0999, &d81d, &d82b, &d82e, &d832, &d846, &d84e, &d855, &d859, &d879, &d87f, &d881, &d897, &d899
 screen_ptr_hi                   = &75  ; Screen address being written, high byte.
-; &75 referenced 28 times by &0921, &0936, &094c, &095b, &095f, &0974, &098d, &098f, &099d, &381d, &3838, &3845, &385b, &386a, &386e, &3883, &389c, &389e, &38ac, &d821, &d836, &d84c, &d85b, &d85f, &d874, &d88d, &d88f, &d89d
+; &75 referenced 18 times by &0921, &0936, &094c, &095b, &095f, &0974, &098d, &098f, &099d, &d821, &d836, &d84c, &d85b, &d85f, &d874, &d88d, &d88f, &d89d
 row_start_ptr                   = &76  ; Screen address of the first byte of the sprite row being plotted, low byte.
-; &76 referenced 6 times by &091f, &0942, &381b, &3851, &d81f, &d842
+; &76 referenced 4 times by &091f, &0942, &d81f, &d842
 row_start_ptr_hi                = &77  ; Screen address of the first byte of the sprite row being plotted, high byte.
-; &77 referenced 6 times by &0923, &0948, &381f, &3857, &d823, &d848
+; &77 referenced 4 times by &0923, &0948, &d823, &d848
 sprite_data_ptr                 = &78  ; Address of the next sprite data byte to plot, low byte.
-; &78 referenced 9 times by &0905, &0929, &0938, &380d, &3825, &3847, &d805, &d829, &d838
+; &78 referenced 6 times by &0905, &0929, &0938, &d805, &d829, &d838
 sprite_data_ptr_hi              = &79  ; Address of the next sprite data byte to plot, high byte.
-; &79 referenced 6 times by &090a, &093c, &3812, &384b, &d80a, &d83c
+; &79 referenced 4 times by &090a, &093c, &d80a, &d83c
 sprite_number                   = &7a  ; Sprite to plot: an index into the sprite tables at sprite_addr_lo, sprite_addr_hi, sprite_widths and sprite_heights.
-; &7a referenced 47 times by &041e, &0433, &0900, &0f6a, &11a6, &11fe, &1d2e, &1d9a, &1dca, &1e10, &1e57, &1e6b, &1f69, &1fb5, &1fd1, &3808, &39c6, &40ba, &7077, &70a2, &70e9, &720f, &7242, &7272, &727e, &72cb, &72d7, &72e7, &72f7, &731c, &75c0, &75dd, &75f4, &7608, &760f, &7663, &767a, &7695, &76f5, &7813, &7836, &7840, &79cb, &79fb, &7b17, &7b50, &d800
+; &7a referenced 45 times by &041e, &0433, &0900, &0f6a, &11a6, &11fe, &1d2e, &1d9a, &1dca, &1e10, &1e57, &1e6b, &1f69, &1fb5, &1fd1, &20ba, &7077, &70a2, &70e9, &720f, &7242, &7272, &727e, &72cb, &72d7, &72e7, &72f7, &731c, &75c0, &75dd, &75f4, &7608, &760f, &7663, &767a, &7695, &76f5, &7813, &7836, &7840, &79cb, &79fb, &7b17, &7b50, &d800
 map_ptr                         = &7b  ; Pointer into room_walls or object_free_map at a cell's room, low byte; set by test_wall and test_object_free.
 ; &7b referenced 21 times by &1d5b, &1d62, &1d64, &1d80, &1d85, &7046, &7542, &767f, &77a1, &77b3, &77c5, &77d7, &77e4, &790e, &7915, &7917, &792f, &794a, &7951, &7953, &796b
 map_ptr_hi                      = &7c  ; Pointer into a map, high byte.
@@ -74,11 +65,9 @@ victory_steps_left              = &8e  ; Rises left in the victory tone.
 victory_pitch                   = &8f  ; Pitch of the victory tone.
 ; &8f referenced 6 times by &10fc, &110b, &110f, &1124, &7934, &7970
 os_zp_fa                        = &fa  ; MOS zero-page workspace, read by dissolve_chalice to vary its random choice.
-; &fa referenced 2 times by &11c3, &394d
+; &fa referenced 1 time by &11c3
 os_irq_a                        = &fc  ; MOS 1.20: A at the last interrupt, read by dissolve_chalice to vary its random choice.
-; &fc referenced 2 times by &11c1, &394f
-bytev                           = &020a
-; &020a referenced 1 time by &3009
+; &fc referenced 1 time by &11c1
 wrchv                           = &020e
 ; &020e referenced 1 time by &1568
 evntv                           = &0220
@@ -86,23 +75,18 @@ evntv                           = &0220
 os_vsync_counter                = &0240  ; MOS 1.20 counter decremented on every vertical sync interrupt. The game sets it and waits for it to run out to pace itself.
 ; &0240 referenced 7 times by &0e62, &0eb9, &11e9, &11ec, &1f00, &1f07, &c6ea
 os_break_intercept              = &0287  ; MOS BREAK intercept: a JMP here is called during a reset. *DUNJUNZ sets its address but leaves it disabled.
-; &0287 referenced 2 times by &373a, &378e
 modelb_hero_score_ten_thousands = &08b0  ; Where *DUNJUNZ sets up the Model B side's per-hero ten-thousands digits, as the Model B loader does; this side's game does not read it.
-; &08b0 used as index base 1 time by &3723
 modelb_hero_absent              = &08b4  ; Where *DUNJUNZ sets up the Model B side's per-hero absent flags, as the Model B loader does; this side's game does not read it.
-; &08b4 used as index base 1 time by &3728
 modelb_levels_started           = &08bc  ; Where *DUNJUNZ sets up the Model B side's count of levels started, as the Model B loader does; this side's game does not read it.
-; &08bc referenced 1 time by &3712
 modelb_level_digits             = &08bd  ; Where *DUNJUNZ sets up the Model B side's ASCII level digits, as the Model B loader does; this side's game does not read it.
-; &08bd referenced 1 time by &3717
 scratch                         = &0d00  ; General-purpose scratch byte.
-; &0d00 referenced 49 times by &1cc5, &1d00, &1d4e, &1d52, &1d55, &1d58, &1d77, &1d82, &4006, &400d, &401e, &405a, &4063, &4070, &6f19, &6f1e, &6f25, &6f71, &6fd7, &7002, &7007, &713c, &74b6, &74c3, &74d8, &77e6, &782c, &7857, &785b, &785e, &7861, &7886, &788b, &7901, &7905, &7908, &790b, &7926, &7931, &793d, &7941, &7944, &7947, &7962, &796d, &7976, &7990, &7a89, &7ce3; also used as index base 3 times by &0745, &1488, &1512
+; &0d00 referenced 49 times by &1cc5, &1d00, &1d4e, &1d52, &1d55, &1d58, &1d77, &1d82, &2006, &200d, &201e, &205a, &2063, &2070, &6f19, &6f1e, &6f25, &6f71, &6fd7, &7002, &7007, &713c, &74b6, &74c3, &74d8, &77e6, &782c, &7857, &785b, &785e, &7861, &7886, &788b, &7901, &7905, &7908, &790b, &7926, &7931, &793d, &7941, &7944, &7947, &7962, &796d, &7976, &7990, &7a89, &7ce3; also used as index base 3 times by &0745, &1488, &1512
 scratch2                        = &0d01  ; Second scratch byte.
-; &0d01 referenced 8 times by &403a, &407b, &74d2, &7503, &7509, &750c, &7829, &782f
+; &0d01 referenced 8 times by &203a, &207b, &74d2, &7503, &7509, &750c, &7829, &782f
 cell_x                          = &0d02  ; Map x of the cell being drawn, tested or moved to. plot_at_cell replaces it with the pixel offset within the room.
-; &0d02 referenced 59 times by &119c, &11f4, &1ccb, &1cdb, &1d26, &1d3c, &1d5d, &1d6c, &1dd1, &1e38, &1e48, &1f58, &1faa, &1fd6, &4094, &40a7, &40de, &40e9, &40fa, &6fa7, &700f, &707c, &70aa, &70ee, &7120, &715b, &7176, &71e3, &7310, &732c, &733a, &73f0, &752f, &766a, &777d, &779b, &77ad, &77bf, &77d1, &7801, &7820, &7867, &7872, &787c, &789e, &78b8, &78d2, &78ec, &7910, &791d, &794c, &7959, &797b, &7997, &79d0, &79ea, &7a48, &7b07, &7b44
+; &0d02 referenced 59 times by &119c, &11f4, &1ccb, &1cdb, &1d26, &1d3c, &1d5d, &1d6c, &1dd1, &1e38, &1e48, &1f58, &1faa, &1fd6, &2094, &20a7, &20de, &20e9, &20fa, &6fa7, &700f, &707c, &70aa, &70ee, &7120, &715b, &7176, &71e3, &7310, &732c, &733a, &73f0, &752f, &766a, &777d, &779b, &77ad, &77bf, &77d1, &7801, &7820, &7867, &7872, &787c, &789e, &78b8, &78d2, &78ec, &7910, &791d, &794c, &7959, &797b, &7997, &79d0, &79ea, &7a48, &7b07, &7b44
 cell_y                          = &0d03  ; Map y of the cell being drawn, tested or moved to. plot_at_cell replaces it with the pixel offset within the room.
-; &0d03 referenced 55 times by &11a1, &11f9, &1cd1, &1ce6, &1d20, &1d42, &1d49, &1d7a, &1dd7, &1e3e, &1e50, &1f5e, &1fb0, &1fdc, &409a, &40ad, &40d0, &40db, &40ec, &40f7, &6fad, &7017, &7082, &70b0, &70f4, &7126, &7161, &717e, &71eb, &7316, &7332, &7345, &73fc, &7535, &7670, &7783, &7807, &7852, &787f, &7890, &78a5, &78bf, &78d9, &78f3, &78fc, &7929, &7938, &7965, &7983, &799f, &79d6, &79f3, &7a4e, &7b0d, &7b4a
+; &0d03 referenced 55 times by &11a1, &11f9, &1cd1, &1ce6, &1d20, &1d42, &1d49, &1d7a, &1dd7, &1e3e, &1e50, &1f5e, &1fb0, &1fdc, &209a, &20ad, &20d0, &20db, &20ec, &20f7, &6fad, &7017, &7082, &70b0, &70f4, &7126, &7161, &717e, &71eb, &7316, &7332, &7345, &73fc, &7535, &7670, &7783, &7807, &7852, &787f, &7890, &78a5, &78bf, &78d9, &78f3, &78fc, &7929, &7938, &7965, &7983, &799f, &79d6, &79f3, &7a4e, &7b0d, &7b4a
 cell_room                       = &0d04  ; Room of the cell being drawn, as an offset into room_walls.
 ; &0d04 referenced 7 times by &7864, &786c, &786f, &7896, &78b0, &78ca, &78e4
 previous_x                      = &0d06  ; Map x of the creature being moved, before the move.
@@ -114,9 +98,9 @@ previous_offset_x               = &0d08  ; Pixel offset of the hero being moved,
 previous_offset_y               = &0d09  ; Pixel offset of the hero being moved, before the move.
 ; &0d09 referenced 2 times by &6eac, &708a
 hero_x                          = &0d10  ; Map x of each hero.
-; &0d10 used as index base 29 times by &06e7, &1dfd, &1e35, &1e89, &1f38, &1f55, &1f74, &4091, &6e97, &6f39, &6f59, &6f87, &6f95, &6f98, &6fa4, &6fbe, &6fe8, &700c, &7024, &706c, &70a7, &71e0, &7329, &73ed, &752c, &777a, &799a, &7bbd, &7bcb
+; &0d10 used as index base 29 times by &06e7, &1dfd, &1e35, &1e89, &1f38, &1f55, &1f74, &2091, &6e97, &6f39, &6f59, &6f87, &6f95, &6f98, &6fa4, &6fbe, &6fe8, &700c, &7024, &706c, &70a7, &71e0, &7329, &73ed, &752c, &777a, &799a, &7bbd, &7bcb
 hero_y                          = &0d15  ; Map y of each hero.
-; &0d15 used as index base 27 times by &1e03, &1e3b, &1e8f, &1f40, &1f5b, &4097, &6e9d, &6f3f, &6f5f, &6f80, &6f8e, &6f9e, &6faa, &6fc4, &6fee, &7014, &702a, &7072, &70ad, &71e8, &732f, &73f9, &7532, &7780, &79a2, &7bb6, &7bc4
+; &0d15 used as index base 27 times by &1e03, &1e3b, &1e8f, &1f40, &1f5b, &2097, &6e9d, &6f3f, &6f5f, &6f80, &6f8e, &6f9e, &6faa, &6fc4, &6fee, &7014, &702a, &7072, &70ad, &71e8, &732f, &73f9, &7532, &7780, &79a2, &7bb6, &7bc4
 hero_direction                  = &0d1a  ; Direction each hero faces: 1 up, 3 right, 5 down, 7 left; 0 when the hero is not in play.
 ; &0d1a used as index base 18 times by &06d0, &1de6, &1f52, &6e82, &6ecb, &6ede, &6ef1, &6f04, &6f2d, &6f79, &701c, &7097, &7221, &7249, &7452, &7711, &7b67, &7baf
 hero_frame                      = &0d20  ; Animation frame of each hero (0 or 1), added to its sprite.
@@ -154,13 +138,13 @@ view_room                       = &0da0  ; The room each hero's view shows: a po
 hero_missile_sprites            = &0db0  ; Sprite base of each hero's missiles: arrows, fireballs, axes, swords.
 ; &0db0 used as index base 1 time by &6f50
 hero_sprites                    = &0db5  ; Sprite base of each hero, to which direction and frame are added.
-; &0db5 used as index base 4 times by &1fcb, &1ffd, &4051, &709f
+; &0db5 used as index base 4 times by &1fcb, &1ffd, &2051, &709f
 hero_has_boots                  = &0dbc  ; Non-zero while the hero wears Boots of Speed.
 ; &0dbc used as index base 3 times by &7056, &7351, &74e7
 bit_masks                       = &0dc0  ; Bit masks for the cells of a room row, left to right: &80, &40 ... &01.
 ; &0dc0 used as index base 3 times by &1d72, &7923, &795f
 hero_panel_y                    = &0dd0  ; Pixel row of each hero's section of the status panel.
-; &0dd0 used as index base 10 times by &1d9c, &1e12, &1e6d, &40bc, &7266, &72bd, &75af, &75cf, &75e7, &75fe
+; &0dd0 used as index base 10 times by &1d9c, &1e12, &1e6d, &20bc, &7266, &72bd, &75af, &75cf, &75e7, &75fe
 teleport_last                   = &0dfd  ; Index of the last object to search when looking backwards for a teleporter (&1E, from workspace_template).
 ; &0dfd referenced 1 time by &73d3
 victory_sprite_copy             = &0dff  ; Written by draw_victory_ring; not read.
@@ -199,2280 +183,21 @@ mos320_oswrch_default           = &e822  ; MOS 3.20's default OSWRCH routine, WR
 mos320_osbyte_default           = &eeb1  ; MOS 3.20's default OSBYTE routine, BYTEV's initial value.
 ; &eeb1 referenced 2 times by &c518, &c569
 system_via_t1c_l                = &fe44
-; &fe44 referenced 5 times by &11be, &390a, &394a, &7a6f, &7aac
+; &fe44 referenced 3 times by &11be, &7a6f, &7aac
 osrdch                          = &ffe0
 ; &ffe0 referenced 2 times by &058f, &10d7
 osasci                          = &ffe3
 ; &ffe3 referenced 3 times by &0eb1, &10bd, &10ca
 oswrch                          = &ffee
-; &ffee referenced 67 times by &0502, &0507, &050c, &0511, &0516, &051b, &0530, &0536, &053d, &0544, &076f, &07c2, &07c7, &0e8d, &0e92, &0e97, &0e9c, &0ea1, &109c, &10a1, &10a6, &10ab, &10b0, &10b5, &112d, &1430, &1435, &143a, &143f, &1444, &1447, &144a, &144d, &1450, &1453, &14c1, &14c6, &14cb, &14d0, &14d5, &14d8, &14db, &14de, &14e1, &14e4, &1548, &154f, &161b, &1620, &1625, &162a, &162f, &1634, &3699, &36c2, &36ce, &374b, &374f, &3754, &3757, &375a, &375d, &376c, &37c1, &37c6, &37ce, &c605
+; &ffee referenced 54 times by &0502, &0507, &050c, &0511, &0516, &051b, &0530, &0536, &053d, &0544, &076f, &07c2, &07c7, &0e8d, &0e92, &0e97, &0e9c, &0ea1, &109c, &10a1, &10a6, &10ab, &10b0, &10b5, &112d, &1430, &1435, &143a, &143f, &1444, &1447, &144a, &144d, &1450, &1453, &14c1, &14c6, &14cb, &14d0, &14d5, &14d8, &14db, &14de, &14e1, &14e4, &1548, &154f, &161b, &1620, &1625, &162a, &162f, &1634, &c605
 osword                          = &fff1
 ; &fff1 referenced 24 times by &16a6, &16af, &1d18, &1ead, &1eb6, &736d, &7376, &73b9, &73e3, &748c, &74a9, &74b2, &7586, &7634, &763d, &c706, &c70f, &c718, &c721, &c790, &c7a2, &c7d4, &c7dd, &c7e6
 osbyte                          = &fff4
-; &fff4 referenced 28 times by &0583, &058c, &05ed, &07d6, &07df, &07e8, &07f1, &0ec0, &0ec9, &10d4, &10ed, &1128, &3674, &3706, &370d, &3775, &3919, &7c9e, &c51f, &c52d, &c53c, &c54a, &c559, &c6d2, &c6de, &c6f0, &c75a, &c766
+; &fff4 referenced 23 times by &0583, &058c, &05ed, &07d6, &07df, &07e8, &07f1, &0ec0, &0ec9, &10d4, &10ed, &1128, &7c9e, &c51f, &c52d, &c53c, &c54a, &c559, &c6d2, &c6de, &c6f0, &c75a, &c766
 oscli                           = &fff7
-; &fff7 referenced 17 times by &0752, &0759, &0760, &0767, &14f5, &3004, &3015, &364d, &3654, &3683, &368a, &36b1, &36c9, &3741, &377f, &3789, &c5a4
+; &fff7 referenced 6 times by &0752, &0759, &0760, &0767, &14f5, &c5a4
 reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; &fffc referenced 1 time by &10da
-
-
-    org &3000
-
-; Move 1: &3000 to &2000 for length 38
-    org &2000
-; ***************************************************************************************
-; Coder2: install the joystick handler and run Coder
-;
-; Run by *DUNJUNZ when a joystick is present. *L. Code loads the joystick handler into
-; private RAM at &C500, BYTEV is pointed at it, and *CODER is run, which does not return.
-.coder2_start
-    ldx #&18                            ; *L. Code: load the joystick handler at &C500
-    ldy #&20 ; ' '                      ; ...
-    jsr oscli                           ; ...
-    lda #0                              ; BYTEV = &C500, the joystick handler...
-    sta bytev                           ; ...
-    lda #&c5                            ; ...
-    sta bytev + 1                       ; ...
-    ldx #&20 ; ' '                      ; *CODER: load and start the game (no return)
-    ldy #&20 ; ' '                      ; ...
-    jsr oscli                           ; ...
-.load_code_command
-    equs "L. Code"
-    equb &0d
-.coder_command2
-    equs "CODER"
-    equb &0d
-
-
-    ; Copy the newly assembled block of code back to it's proper place in the binary
-    ; file.
-    ; (Note the parameter order: 'copyblock <start>,<end>,<dest>')
-    copyblock coder2_start, *, &3000
-
-    ; Clear the area of memory we just temporarily used to assemble the new block,
-    ; allowing us to assemble there again if needed
-    clear coder2_start, &2026
-
-    ; Set the program counter to the next position in the binary file.
-    org &3000 + (* - coder2_start)
-
-
-    org &3649
-
-; Move 2: &3649 to &2649 for length 2323
-    org &2649
-; ***************************************************************************************
-; *DUNJUNZ: load the private-RAM code and show the title
-;
-; Run by BOOT on a Master 128. Load Code2, Code3 and Table into the Master's private RAM
-; (HAZEL, &C000-&DFFF), which MOS 3.20 leaves paged in for a *RUN program, then carry on
-; into the Model B loader's start-up at title_start.
-.dunjunz_start
-    ldx #&5a ; 'Z'                      ; *LOAD Code2 (the music, at &C700)
-    ldy #&26 ; '&'                      ; ...
-    jsr oscli                           ; ...
-    ldx #&65 ; 'e'                      ; *LOAD Code3 (a copy of the sprite plotter, at &D800)
-    ldy #&26 ; '&'                      ; ...
-    jsr oscli                           ; ...
-    jmp code_26ad                       ; Load Table and start the title
-.load_code2_command
-    equs "LOAD Code2"
-    equb &0d
-.load_code3_command
-    equs "LOAD Code3"
-    equb &0d
-; ***************************************************************************************
-; Run Coder, through Coder2 if a joystick is present
-;
-; Read joystick channel 1. A reading with high byte &80 or &81 (a joystick at rest) runs
-; CODER2, which installs the joystick handler and runs CODER; anything else runs CODER
-; directly. Neither returns.
-; &2670 referenced 1 time by &36d7
-.run_coder
-    lda #osbyte_read_adc_or_get_buffer_status  ; OSBYTE &80: read ADC channel 1 (joystick 1, horizontal)...
-    ldx #1                              ; ...
-    jsr osbyte                          ; ...  Read ADC channel X or buffer status
-    cpy #&80                            ; High byte &80 (at rest)?
-    beq code_2686                       ; Yes: a joystick
-    cpy #&81                            ; High byte &81?
-    beq code_2686                       ; Yes: a joystick
-    ldx #&a9                            ; No joystick: *CODER, which does not return
-    ldy #&27                            ; ...
-    jsr oscli                           ; ...
-; &2686 referenced 2 times by &3679, &367d
-.code_2686
-    ldx #&8d                            ; Joystick: *CODER2, which does not return
-    ldy #&26 ; '&'                      ; ...
-    jsr oscli                           ; ...
-.coder2_command
-    equs "CODER2"
-    equb &0d
-; ***************************************************************************************
-; Blank the display and disable VDU output
-;
-; Send VDU 23,0,1,0,0,0,0,0,0,0 (6845 register 1, characters per row, set to 0) and VDU
-; 21, from blank_display_vdu.
-; &2694 referenced 1 time by &36d2
-.blank_display
-    ldx #0                              ; Send the eleven bytes of blank_display_vdu
-; &2696 referenced 1 time by &369f
-.code_2696
-    lda blank_display_vdu,x             ; ...
-    jsr oswrch                          ; ...
-    inx                                 ; ...
-    cpx #&0b                            ; ...
-    bne code_2696                       ; ...
-    rts                                 ; Return
-; &26a2 used as index base 1 time by &3696
-.blank_display_vdu
-    equb &17, &00, &01, &00, &00, &00, &00, &00, &00, &00, &15
-; &26ad referenced 1 time by &3657
-.code_26ad
-    ldx #&b7                            ; *L. TABLE (level 25, game over, row offsets, pause, at &C5A0)
-    ldy #&26 ; '&'                      ; ...
-    jsr oscli                           ; ...
-    jmp title_start                     ; Carry on with the Model B loader's start-up
-.load_table_command
-    equs "L. TABLE"
-    equb &0d
-; ***************************************************************************************
-; Load the title screen while output is off
-;
-; VDU 21, *LOAD SCREEN (the MODE 2 picture, to &3280), VDU 6.
-; &26c0 referenced 1 time by &3763
-.load_title_screen
-    lda #&15                            ; VDU 21: disable VDU output
-    jsr oswrch                          ; ...
-    ldx #&98                            ; *LOAD SCREEN
-    ldy #&27                            ; ...
-    jsr oscli                           ; ...
-    lda #6                              ; VDU 6: enable VDU output
-    jsr oswrch                          ; ...
-    rts                                 ; Return
-; ***************************************************************************************
-; Blank the display and run Coder
-;
-; Where the Model B loader ends with VDU 21 and *CODER, this version blanks the display
-; and chooses between CODER and CODER2. It never returns.
-; &26d2 referenced 1 time by &3791
-.leave_title
-    jsr blank_display                   ; Blank the display and disable output
-    nop                                 ; Padding
-    nop                                 ; ...
-    jmp run_coder                       ; Run Coder (no return)
-; ***************************************************************************************
-; Unused
-;
-; Leftover bytes, never run: the tail of the Model B loader's *CODER call, then data.
-    equb &27, &20, &f7, &ff, &0d, &36, &17, &00
-    equb &0d, &1e, &00, &2a, &05, &14, &00, &15
-    equb &00, &00, &00, &00, &2a, &00, &00, &04
-    equb &08, &00, &2a, &04, &08, &2a, &15, &3c
-    equb &3d, &00, &33, &3c, &39, &00
-; ***************************************************************************************
-; Set up, show the title and run Coder
-;
-; The Model B loader's start-up. Disable ESCAPE, make the cursor keys return codes, set
-; the Model B release's level counter and menu tables in page &08 (not used by this
-; side's game), point the BREAK intercept at &15B5 but leave it disabled, load and show
-; the title screen, twinkle stars on it until a key is pressed, then select the game's
-; display and run Coder.
-; &2700 referenced 1 time by &36b4
-.title_start
-    lda #osbyte_escape_break_effect     ; OSBYTE &C8: ESCAPE disabled...
-    ldx #1                              ; ...
-    ldy #0                              ; ...
-    jsr osbyte                          ; ...  osbyte: escape break effect
-    lda #osbyte_set_cursor_editing      ; OSBYTE 4, 1: cursor keys return codes
-    ldx #1                              ; ...
-    jsr osbyte                          ; ...  Set cursor editing keys
-    lda #0                              ; Levels started = 0, for the Model B release's Coder
-    sta modelb_levels_started           ; ...
-    lda #&30 ; '0'                      ; Level digits = "0 "...
-    sta modelb_level_digits             ; ...
-    lda #&20 ; ' '                      ; ...
-    sta modelb_level_digits + 1         ; ...
-    ldx #3                              ; For each hero...
-; &2721 referenced 1 time by &372c
-.code_2721
-    lda #&69 ; 'i'                      ; ...no ten-thousands digit (sprite &69)...
-    sta modelb_hero_score_ten_thousands,x  ; ...at &08B0...
-    lda #0                              ; ...and switched on...
-    sta modelb_hero_absent,x            ; ...at &08B4 (the Model B release's menu tables)
-    dex                                 ; ...
-    bpl code_2721                       ; ...
-    lda #&b5                            ; BREAK intercept address = &15B5 (the Model B game's next-level intercept)...
-    sta os_break_intercept + 1          ; ...
-    lda #&15                            ; ...
-    sta os_break_intercept + 2          ; ...
-    lda #0                              ; ...but disabled: &0287 is not a JMP
-    sta os_break_intercept              ; ...
-    ldx #&b7                            ; *TV 255,1: vertical offset for the title's MODE 2
-    ldy #&27                            ; ...
-    jsr oscli                           ; ...
-    jsr mode2_cursor_off                ; MODE 2, cursor off
-    ldx #&0f                            ; Make all sixteen logical colours black...
-; &2749 referenced 1 time by &3761
-.code_2749
-    lda #&13                            ; ...VDU 19, colour, 0, 0, 0, 0...
-    jsr oswrch                          ; ...
-    txa                                 ; ...
-    jsr oswrch                          ; ...
-    lda #0                              ; ...
-    jsr oswrch                          ; ...
-    jsr oswrch                          ; ...
-    jsr oswrch                          ; ...
-    jsr oswrch                          ; ...
-    dex                                 ; ...
-    bpl code_2749                       ; ...
-    jsr load_title_screen               ; Load the title screen unseen
-    nop                                 ; Padding
-    nop                                 ; ...
-    nop                                 ; ...
-    nop                                 ; ...
-    lda #&14                            ; VDU 20: default colours, showing the picture
-    jsr oswrch                          ; ...
-    lda #0                              ; Plot the stars left to right
-    sta title_plot_reversed             ; ...
-    lda #osbyte_flush_buffer            ; OSBYTE &15: flush the buffer X
-    jsr osbyte                          ; ...  Flush specific buffer X
-    jsr twinkle_stars                   ; Twinkle stars until a key is pressed
-    ldx #&af                            ; *TV 252,1: vertical offset for the game's display
-    ldy #&27                            ; ...
-    jsr oscli                           ; ...
-    jsr mode2_cursor_off                ; MODE 2, cursor off
-    ldx #&a4                            ; *DISC
-    ldy #&27                            ; ...
-    jsr oscli                           ; ...
-    lda #0                              ; BREAK intercept stays disabled
-    sta os_break_intercept              ; ...
-    jsr leave_title                     ; Blank the display and run Coder (no return)
-    equb &ea                            ; Padding
-    equb &ea                            ; ...
-    equb &ea                            ; ...
-    equb &ea                            ; ...
-.load_screen_command
-    equs "LOAD SCREEN"
-    equb &0d
-.disc_command
-    equs "DISC"
-    equb &0d
-.coder_command
-    equs "CODER"
-    equb &0d
-.tv_game_command
-    equs "TV252 1"
-    equb &0d
-.tv_title_command
-    equs "TV255 1"
-    equb &0d
-; ***************************************************************************************
-; Select MODE 2 and turn the cursor off
-;
-; VDU 22,2 then VDU 23,0,10,&20,0,0,0,0,0,0 (6845 register 10: no cursor), from
-; cursor_off_vdu.
-; &27bf referenced 2 times by &3744, &3782
-.mode2_cursor_off
-    lda #&16                            ; VDU 22, 2: MODE 2
-    jsr oswrch                          ; ...
-    lda #2                              ; ...
-    jsr oswrch                          ; ...
-    ldx #0                              ; Send the eleven bytes of cursor_off_vdu
-; &27cb referenced 1 time by &37d4
-.code_27cb
-    lda cursor_off_vdu,x                ; ...
-    jsr oswrch                          ; ...
-    inx                                 ; ...
-    cpx #&0b                            ; ...
-    bne code_27cb                       ; ...
-    rts                                 ; Return
-; ***************************************************************************************
-; Unused
-;
-; Leftover bytes.
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &0a, &00, &00, &00, &0a
-    equb &00, &00, &00, &0a, &00, &00, &00, &0a
-    equb &00
-; &27f0 used as index base 1 time by &37cb
-.cursor_off_vdu
-    equb &17, &00, &0a, &20, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &05, &07, &00
-; ***************************************************************************************
-; Plot a star frame on the title screen
-;
-; Exclusive-OR a 7-byte by 28-row frame of the star animation onto the MODE 2 screen at
-; byte column plot_x and pixel row plot_y, row by row and left to right (or right to left
-; if title_plot_reversed is set). A version of the game's plot_sprite with its own
-; frames.
-;
-; On Entry:
-;     PLOT_X: byte column
-;     PLOT_Y: pixel row
-;     SPRITE_NUMBER: frame, 0-6
-; &2800 referenced 1 time by &39ca
-.title_plot_star
-    lda #7                              ; Seven bytes wide...
-    sta sprite_width                    ; ...
-    lda #&1c                            ; ...and 28 rows high
-    sta sprite_height                   ; ...
-    ldx sprite_number                   ; Point at the frame's data...
-    lda star_frames_lo,x                ; ...
-    sta sprite_data_ptr                 ; ...
-    lda star_frames_hi,x                ; ...
-    sta sprite_data_ptr_hi              ; ...
-    jsr title_screen_address            ; Screen address of the top left
-    ldx sprite_height                   ; For each row...
-; &2819 referenced 1 time by &3873
-.code_2819
-    lda screen_ptr                      ; ...remember its start...
-    sta row_start_ptr                   ; ...
-    lda screen_ptr_hi                   ; ...
-    sta row_start_ptr_hi                ; ...
-    txa                                 ; ...
-    pha                                 ; ...
-    ldx sprite_width                    ; ...for each byte across...
-; &2825 referenced 1 time by &384e
-.code_2825
-    lda (sprite_data_ptr),y             ; ...exclusive-OR the frame onto the screen...
-    eor (screen_ptr),y                  ; ...
-    sta (screen_ptr),y                  ; ...
-    lda title_plot_reversed             ; ...and step a character cell (8 bytes) right or left
-    bne code_283c                       ; ...
-    clc                                 ; Right...
-    lda screen_ptr                      ; ...
-    adc #8                              ; ...
-    sta screen_ptr                      ; ...
-    bcc code_2847                       ; ...
-    inc screen_ptr_hi                   ; ...
-    bne code_2847                       ; ...(always branches)
-; &283c referenced 1 time by &382d
-.code_283c
-    sec                                 ; Left...
-    lda screen_ptr                      ; ...
-    sbc #8                              ; ...
-    sta screen_ptr                      ; ...
-    bcs code_2847                       ; ...
-    dec screen_ptr_hi                   ; ...
-; &2847 referenced 3 times by &3836, &383a, &3843
-.code_2847
-    inc sprite_data_ptr                 ; Next byte of the frame
-    bne code_284d                       ; ...
-    inc sprite_data_ptr_hi              ; ...
-; &284d referenced 1 time by &3849
-.code_284d
-    dex                                 ; Next byte across
-    bne code_2825                       ; ...
-    clc                                 ; Down one pixel row from the row's start...
-    lda row_start_ptr                   ; ...
-    adc #1                              ; ...
-    sta screen_ptr                      ; ...
-    lda row_start_ptr_hi                ; ...
-    adc #0                              ; ...
-    sta screen_ptr_hi                   ; ...
-    lda screen_ptr                      ; ...crossing into the next character row every eight (640 - 8 bytes on)
-    and #7                              ; ...
-    bne code_2870                       ; ...
-    clc                                 ; ...
-    lda screen_ptr                      ; ...
-    adc #&78 ; 'x'                      ; ...
-    sta screen_ptr                      ; ...
-    lda screen_ptr_hi                   ; ...
-    adc #2                              ; ...
-    sta screen_ptr_hi                   ; ...
-; &2870 referenced 1 time by &3861
-.code_2870
-    pla                                 ; Next row
-    tax                                 ; ...
-    dex                                 ; ...
-    bne code_2819                       ; ...
-    rts                                 ; Return
-; ***************************************************************************************
-; Calculate a title screen address
-;
-; The game's screen_address, reading the row offsets from Table at &C675 in private RAM
-; where the Model B loader reads MOS 1.20's at &C375.
-;
-; On Entry:
-;     PLOT_X: byte column
-;     PLOT_Y: pixel row
-;
-; On Exit:
-;     SCREEN_PTR: screen address
-;     Y: 0
-; &2876 referenced 1 time by &3814
-.title_screen_address
-    lda plot_y                          ; Character row x 2...
-    lsr a                               ; ...
-    lsr a                               ; ...
-    and #&fe                            ; ...
-    tay                                 ; ...
-    lda row_offsets,y                   ; High byte of row x 640, from Table's copy of the MOS table...
-    clc                                 ; ...plus &3000, the screen start
-    adc #&30 ; '0'                      ; ...
-    sta screen_ptr_hi                   ; ...
-    lda row_offsets_lo,y                ; Low byte of row x 640
-    sta screen_ptr                      ; ...
-    lda plot_y                          ; Plus the pixel row within the character row
-    and #7                              ; ...
-    adc screen_ptr                      ; ...
-    sta screen_ptr                      ; ...
-    clc                                 ; Plus 8 x byte column: high part...
-    lda plot_x                          ; ...
-    and #&e0                            ; ...
-    rol a                               ; ...
-    rol a                               ; ...
-    rol a                               ; ...
-    rol a                               ; ...
-    clc                                 ; ...
-    adc screen_ptr_hi                   ; ...
-    sta screen_ptr_hi                   ; ...
-    lda plot_x                          ; ...low part
-    asl a                               ; ...
-    asl a                               ; ...
-    asl a                               ; ...
-    clc                                 ; ...
-    adc screen_ptr                      ; ...
-    sta screen_ptr                      ; ...
-    bcc code_28ae                       ; ...
-    inc screen_ptr_hi                   ; ...
-; &28ae referenced 1 time by &38aa
-.code_28ae
-    ldy #0                              ; Y = 0 for the plotting loop
-    rts                                 ; Return
-; ***************************************************************************************
-; Unused
-;
-; Leftover bytes.
-    equb &0d, &18, &a5, &74, &69, &78, &85, &74
-    equb &a5, &75, &69, &02, &85, &75, &68
-; &28c0 used as index base 1 time by &380a
-.star_frames_lo
-    equb &00, &c4, &88, &4c, &10, &d4, &98
-    equb &15, &4a, &29, &fe, &a8, &b9, &75, &c3, &18
-; &28d0 used as index base 1 time by &380f
-.star_frames_hi
-    equb &2a, &2a, &2b, &2c, &2d, &2d, &2e
-    equb &22, &74, &a5, &71, &29, &07, &65, &74
-    equb &85, &2a, &2a, &2b, &2c, &2d, &2d, &2e
-    equb &22, &2a, &2a, &18, &65, &75, &85, &75
-    equb &a5, &70, &0a, &0a, &0a, &18, &65, &74
-    equb &85, &74, &90, &02, &e6, &75, &a0, &00
-    equb &00
-; ***************************************************************************************
-; Twinkle stars on the title screen until a key is pressed
-;
-; Up to three stars at once, each at one of the eight places in star_places_x and
-; star_places_y, picked at random. A star grows through frames 0-6 and shrinks back
-; through 5-0. When a key is pressed the stars still showing are erased.
-; &2900 referenced 1 time by &3778
-.twinkle_stars
-    ldx #2                              ; No stars showing
-    lda #0                              ; ...
-; &2904 referenced 1 time by &3908
-.code_2904
-    sta star_showing,x                  ; ...
-    dex                                 ; ...
-    bpl code_2904                       ; ...
-; &290a referenced 1 time by &391e
-.code_290a
-    lda system_via_t1c_l                ; One time in four (System VIA timer 1, low bits)...
-    and #3                              ; ...
-    bne code_2914                       ; ...
-    jsr start_star                      ; ...start a star
-; &2914 referenced 1 time by &390f
-.code_2914
-    jsr advance_stars                   ; Advance every star
-    lda #osbyte_scan_keyboard_from_16   ; OSBYTE &7A: any key pressed?
-    jsr osbyte                          ; ...  Scan keyboard from key 16
-    cpx #&ff                            ; ...
-    beq code_290a                       ; No: carry on
-    ldy #2                              ; Yes: erase the stars still showing...
-; &2922 referenced 1 time by &392b
-.code_2922
-    lda star_showing,y                  ; ...
-    beq code_292a                       ; ...
-    jsr plot_star                       ; ...
-; &292a referenced 1 time by &3925
-.code_292a
-    dey                                 ; ...
-    bpl code_2922                       ; ...
-    rts                                 ; Return
-; ***************************************************************************************
-; Start a star at a free place
-;
-; Take the first star not showing, if any, give it frame 0 and step +1, choose a free
-; place at random, mark the place taken and plot the first frame.
-; &292e referenced 1 time by &3911
-.start_star
-    ldy #0                              ; Find a star not showing...
-; &2930 referenced 1 time by &3938
-.code_2930
-    lda star_showing,y                  ; ...
-    beq code_293b                       ; ...
-    iny                                 ; ...
-    cpy #3                              ; ...
-    bne code_2930                       ; ...
-    rts                                 ; All three showing: return
-; &293b referenced 1 time by &3933
-.code_293b
-    lda #1                              ; Mark it showing
-    sta star_showing,y                  ; ...
-    lda #1                              ; Frame step +1...
-    sta star_frame_step,y               ; ...
-    lda #0                              ; ...from frame 0
-    sta star_frame,y                    ; ...
-; &294a referenced 1 time by &3957
-.code_294a
-    lda system_via_t1c_l                ; Pick a place at random (timer, &FA and &FC mixed)...
-    eor os_zp_fa                        ; ...
-    eor os_irq_a                        ; ...
-    and #7                              ; ...
-    tax                                 ; ...
-    lda star_places_x,x                 ; ...that is free
-    bmi code_294a                       ; ...
-    sta star_x,y                        ; Star position from the place...
-    lda star_places_y,x                 ; ...
-    sta star_y,y                        ; ...
-    stx star_place,y                    ; ...remembering the place
-    lda #&ff                            ; Mark the place taken
-    sta star_places_x,x                 ; ...
-    jsr plot_star                       ; Plot the first frame
-    rts                                 ; Return
-; ***************************************************************************************
-; Advance each star by one frame
-;
-; For each showing star, erase the frame (exclusive-OR) and step it; past frame 6 it
-; turns back at 5, and below 0 it is finished and its place freed. Then plot the new
-; frame and pause, longer for a star not showing so the timing stays even.
-; &296d referenced 1 time by &3914
-.advance_stars
-    ldy #0                              ; For each star...
-; &296f referenced 1 time by &39b6
-.code_296f
-    lda star_showing,y                  ; ...showing?
-    beq code_29d0                       ; No: just pause
-    jsr plot_star                       ; Erase its frame
-    clc                                 ; Step the frame
-    lda star_frame,y                    ; ...
-    adc star_frame_step,y               ; ...
-    sta star_frame,y                    ; ...
-    bmi code_2993                       ; Below 0: finished
-    cmp #7                              ; Past 6?
-    bcc code_29a2                       ; No: plot it
-    lda #5                              ; Yes: frame 5...
-    sta star_frame,y                    ; ...
-    lda #&ff                            ; ...stepping back
-    sta star_frame_step,y               ; ...
-    bmi code_29a2                       ; ...and plot it (always branches)
-; &2993 referenced 1 time by &3981
-.code_2993
-    lda #0                              ; Finished: not showing...
-    sta star_showing,y                  ; ...
-    lda star_x,y                        ; ...and free its place
-    ldx star_place,y                    ; ...
-    sta star_places_x,x                 ; ...
-    bpl code_29a5                       ; ...(always branches)
-; &29a2 referenced 2 times by &3985, &3991
-.code_29a2
-    jsr plot_star                       ; Plot the new frame
-; &29a5 referenced 1 time by &39a0
-.code_29a5
-    tya                                 ; Pause...
-    pha                                 ; ...
-    ldx #5                              ; ...
-; &29a9 referenced 2 times by &39af, &39d4
-.code_29a9
-    ldy #&ff                            ; ...X x 256 iterations...
-; &29ab referenced 1 time by &39ac
-.code_29ab
-    dey                                 ; ...
-    bne code_29ab                       ; ...
-    dex                                 ; ...
-    bne code_29a9                       ; ...
-    pla                                 ; ...
-    tay                                 ; ...
-    iny                                 ; Next star
-    cpy #3                              ; ...
-    bne code_296f                       ; ...
-    rts                                 ; Return
-; ***************************************************************************************
-; Plot star Y's current frame
-;
-; Call title_plot_star with the star's position and frame, keeping Y.
-;
-; On Entry:
-;     Y: star, 0-2
-;
-; On Exit:
-;     Y: preserved
-; &29b9 referenced 4 times by &3927, &3969, &3974, &39a2
-.plot_star
-    lda star_x,y                        ; plot_x = star's column
-    sta plot_x                          ; ...
-    lda star_y,y                        ; plot_y = star's row
-    sta plot_y                          ; ...
-    lda star_frame,y                    ; sprite_number = star's frame
-    sta sprite_number                   ; ...
-    tya                                 ; Plot it, keeping Y
-    pha                                 ; ...
-    jsr title_plot_star                 ; ...
-    pla                                 ; ...
-    tay                                 ; ...
-    rts                                 ; Return
-; &29d0 referenced 1 time by &3972
-.code_29d0
-    tya                                 ; Star not showing: pause for longer...
-    pha                                 ; ...
-    ldx #&14                            ; ...
-    bne code_29a9                       ; ...(always branches)
-    equb &38, &38, &3e, &3e
-; &29da used as index base 6 times by &3904, &3922, &3930, &393d, &396f, &3995
-.star_showing
-    equb &38, &38, &3e
-    equb &3e, &38, &38
-; &29e0 used as index base 3 times by &3954, &3966, &399d
-.star_places_x
-    equb &2f, &20, &05, &00, &1f, &46, &46, &14
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-; &29f0 used as index base 1 time by &395c
-.star_places_y
-    equb &0f, &0f, &24, &42, &33, &0f, &48, &15
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-; ***************************************************************************************
-; Star frames
-;
-; Seven 7-byte by 28-row MODE 2 frames of the title screen's twinkling star, from small
-; (frame 0) to large (frame 6).
-.star_frame_data
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &15, &1f, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &2a, &0a, &2a, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &15, &2a, &00, &3f, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &2a, &2a, &00, &2a, &2a, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &15, &15, &2a, &00, &3f, &15, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &2a, &2a, &2a, &00, &2a, &2a, &2a
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &2a, &3f, &2a, &00, &3f, &2a, &2a
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
-
-
-    ; Copy the newly assembled block of code back to it's proper place in the binary
-    ; file.
-    ; (Note the parameter order: 'copyblock <start>,<end>,<dest>')
-    copyblock dunjunz_start, *, &3649
-
-    ; Clear the area of memory we just temporarily used to assemble the new block,
-    ; allowing us to assemble there again if needed
-    clear dunjunz_start, &2f5c
-
-    ; Set the program counter to the next position in the binary file.
-    org &3649 + (* - dunjunz_start)
-
-
-    org &4000
-
-; Move 3: &4000 to &2000 for length 4096
-    org &2000
-    adc #1                              ; ...
-    tay                                 ; ...
-    tax                                 ; ...
-    adc #7                              ; ...
-    sta scratch                         ; ...
-; &2009 referenced 1 time by &4010
-.code_2009
-    dec sprite_widths,x                 ; ...
-    inx                                 ; ...
-    cpx scratch                         ; ...
-    bne code_2009                       ; ...
-    tya                                 ; Three rows shorter...
-    tax                                 ; ...
-; &2014 referenced 1 time by &4021
-.code_2014
-    sec                                 ; ...
-    lda sprite_heights,x                ; ...
-    sbc #3                              ; ...
-    sta sprite_heights,x                ; ...
-    inx                                 ; ...
-    cpx scratch                         ; ...
-    bne code_2014                       ; ...
-    jmp play_level                      ; ...three rows shorter. Next frame
-; &2026 referenced 1 time by &1ffa
-.code_2026
-    lda exit_saved_x                    ; Put the exit back...
-    sta exit_x                          ; ...
-    lda exit_saved_y                    ; ...
-    sta exit_y                          ; ...
-    lda #0                              ; ...and end the animation
-    sta exit_busy                       ; ...
-    jmp play_level                      ; Next frame
-; ***************************************************************************************
-; Start a hero going down the exit
-;
-; Play the exit sound, restore any hero shrunk before, and start the animation of hero X
-; spinning and shrinking on the exit. Ends by jumping to play_level rather than
-; returning.
-;
-; On Entry:
-;     X: hero number (0-3)
-; &203a referenced 1 time by &1f8b
-.hero_enters_exit
-    stx scratch2                        ; Keep the hero number
-    jsr queue_exit_marker               ; Sound the exit and queue a marker
-    lda #4                              ; ...
-    sta exit_offsets_x                  ; ...
-    ldx shrunk_hero                     ; Restore the sprites of any hero shrunk before
-    bmi code_2076                       ; ...
-    jsr restore_hero_sprites            ; ...
-    jmp code_2076                       ; ...
-; ***************************************************************************************
-; Restore a hero's sprite sizes
-;
-; Put back the width and height of all eight of hero X's sprites, which the exit
-; animation shrinks.
-;
-; On Entry:
-;     X: hero number (0-3)
-; &2050 referenced 2 times by &1f32, &404a
-.restore_hero_sprites
-    clc                                 ; The hero's eight sprites, from base + 1
-    lda hero_sprites,x                  ; ...
-    adc #1                              ; ...
-    tax                                 ; ...
-    tay                                 ; ...
-    adc #7                              ; ...
-    sta scratch                         ; ...
-    lda #4                              ; Widths back to 4...
-; &205f referenced 1 time by &4066
-.code_205f
-    sta sprite_widths,y                 ; ...
-    iny                                 ; ...
-    cpy scratch                         ; ...
-    bne code_205f                       ; ...
-    txa                                 ; ...
-    tay                                 ; ...
-    lda #&0c                            ; ...heights back to 12
-; &206c referenced 1 time by &4073
-.code_206c
-    sta sprite_heights,y                ; ...
-    iny                                 ; ...
-    cpy scratch                         ; ...
-    bne code_206c                       ; ...
-    rts                                 ; Return
-; &2076 referenced 2 times by &4048, &404d
-.code_2076
-    lda #1                              ; Start the animation for this hero...
-    sta exit_busy                       ; ...
-    lda scratch2                        ; ...
-    sta exiting_hero                    ; ...
-    sta shrunk_hero                     ; ...
-    lda #&ff                            ; ...turning from the start...
-    sta exit_spin                       ; ...
-    lda #4                              ; ...for four turns
-    sta exit_shrinks_left               ; ...
-    jmp play_level                      ; Back to play_level, without returning
-; ***************************************************************************************
-; Drop the key a hero carries
-;
-; Put hero X's key in a free cell next to them, and remove it from their panel section.
-;
-; On Entry:
-;     X: hero number (0-3)
-;
-; On Exit:
-;     X: preserved
-; &2091 referenced 1 time by &1f48
-.drop_key
-    lda hero_x,x                        ; From the hero's cell...
-    sta cell_x                          ; ...
-    lda hero_y,x                        ; ...
-    sta cell_y                          ; ...
-    txa                                 ; ...find a free cell next to it
-    pha                                 ; ...
-    jsr find_open_neighbour             ; ...
-    pla                                 ; ...
-    tax                                 ; ...
-    ldy hero_key,x                      ; Put the hero's key there
-    lda cell_x                          ; ...
-    sta key_x,y                         ; ...
-    lda cell_y                          ; ...
-    sta key_y,y                         ; ...
-    lda #0                              ; The hero carries no key
-    sta hero_key,x                      ; ...
-    lda #&1a                            ; Erase the key icon from the panel
-    sta sprite_number                   ; ...
-    lda hero_panel_y,x                  ; ...
-    sec                                 ; ...
-    sbc #&0d                            ; ...
-    sta plot_y                          ; ...
-    lda #&4a ; 'J'                      ; ...
-    sta plot_x                          ; ...
-    txa                                 ; ...
-    pha                                 ; ...
-    jsr plot_sprite                     ; ...
-    pla                                 ; ...
-    tax                                 ; ...
-    rts                                 ; Return
-; ***************************************************************************************
-; Find a free cell next to a cell
-;
-; Starting with cell_x, cell_y, try the cells above, to the right, below and to the left,
-; and leave cell_x, cell_y at the first without a wall.
-; &20d0 referenced 1 time by &409f
-.find_open_neighbour
-    dec cell_y                          ; The cell above
-    jsr test_wall                       ; ...free?
-    cpy #0                              ; ...
-    bne code_20db                       ; No
-    rts                                 ; Yes: return
-; &20db referenced 1 time by &40d8
-.code_20db
-    inc cell_y                          ; The cell to the right
-    inc cell_x                          ; ...
-    jsr test_wall                       ; ...free?
-    cpy #0                              ; ...
-    bne code_20e9                       ; No
-    rts                                 ; Yes: return
-; &20e9 referenced 1 time by &40e6
-.code_20e9
-    dec cell_x                          ; The cell below
-    inc cell_y                          ; ...
-    jsr test_wall                       ; ...free?
-    cpy #0                              ; ...
-    bne code_20f7                       ; No
-    rts                                 ; Yes: return
-; &20f7 referenced 1 time by &40f4
-.code_20f7
-    dec cell_y                          ; Otherwise the cell to the left
-    dec cell_x                          ; ...
-    rts                                 ; Return
-    equb &01, &3f
-; &2100 used as index base 1 time by &15ce
-.object_free_map
-    equb &00
-    equb &02
-    equb &07
-    equb &07
-    equb &1f
-    equb &3f
-    equb &7d
-    equb &7f
-    equb &00
-    equb &30
-    equb &78
-    equb &fd
-    equb &7f
-    equb &ff
-    equb &80
-    equb &00
-    equb &00
-    equb &60
-    equb &e0
-    equb &c0
-    equb &df
-    equb &c0
-    equb &1f
-    equb &0f
-    equb &00
-    equb &58
-    equb &58
-    equb &58
-    equb &d8
-    equb &18
-    equb &f8
-    equb &80
-    equb &76
-    equb &3e
-    equb &5f
-    equb &6e
-    equb &7e
-    equb &00
-    equb &7f
-    equb &7f
-    equb &00
-    equb &66
-    equb &66
-    equb &7e
-    equb &7e
-    equb &66
-    equb &66
-    equb &00
-    equb &1f
-    equb &1f
-    equb &03
-    equb &03
-    equb &ff
-    equb &03
-    equb &03
-    equb &03
-    equb &80
-    equb &80
-; &213a used as index base 1 time by &10c7
-    equb &80
-    equb &80
-    equb &80
-    equb &f6
-    equb &fe
-    equb &f6
-    equb &7f
-    equb &00
-    equb &3f
-    equb &2f
-    equb &37
-    equb &37
-    equb &2f
-    equb &37
-    equb &c0
-    equb &03
-    equb &c4
-    equb &86
-    equb &40
-    equb &00
-    equb &80
-    equb &c1
-    equb &03
-    equb &e3
-    equb &e0
-    equb &e1
-    equb &41
-    equb &41
-    equb &00
-    equb &ff
-    equb &fe
-    equb &fe
-    equb &00
-    equb &00
-    equb &00
-    equb &00
-    equb &00
-    equb &8a
-    equb &00
-    equb &00
-    equb &00
-    equb &00
-    equb &7e
-    equb &7f
-    equb &7e
-    equb &00
-    equb &01
-    equb &01
-    equb &01
-    equb &3f
-    equb &3f
-    equb &bf
-    equb &3f
-    equb &3f
-    equb &f7
-    equb &ff
-    equb &c1
-    equb &f7
-    equb &c1
-    equb &ff
-    equb &f7
-    equb &bf
-    equb &8e
-    equb &9e
-    equb &de
-    equb &9c
-    equb &9e
-    equb &8e
-    equb &8e
-    equb &80
-    equb &7e
-    equb &3e
-    equb &7e
-    equb &00
-    equb &7c
-    equb &7a
-    equb &7e
-    equb &00
-    equb &2f
-    equb &1f
-    equb &00
-    equb &00
-    equb &00
-    equb &ce
-    equb &ae
-    equb &5e
-    equb &1f
-    equb &1f
-    equb &1f
-    equb &1b
-    equb &17
-    equb &1f
-    equb &00
-    equb &01
-    equb &80
-    equb &80
-    equb &80
-    equb &80
-    equb &80
-    equb &80
-    equb &02
-    equb &02
-    equb &7e
-    equb &7a
-    equb &7e
-    equb &00
-    equb &7e
-    equb &3e
-    equb &7f
-    equb &00
-    equb &be
-    equb &0e
-    equb &0e
-    equb &0f
-    equb &0e
-    equb &0e
-    equb &be
-    equb &00
-    equb &01
-    equb &01
-    equb &0f
-    equb &df
-    equb &07
-    equb &03
-    equb &01
-    equb &00
-    equb &08
-    equb &08
-    equb &5a
-    equb &fe
-    equb &fe
-    equb &fc
-    equb &b8
-    equb &00
-    equb &00
-    equb &00
-    equb &00
-    equb &00
-    equb &00
-    equb &00
-    equb &00
-    equb &00
-    equb &00, &08, &2a, &00, &00, &00, &00, &00
-.sprite_drainer
-    equb &11, &33, &33, &22
-    equb &33, &33, &33, &33
-    equb &33, &ff, &c0, &33
-    equb &33, &ff, &c0, &33
-    equb &33, &ff, &c0, &33
-    equb &33, &ff, &c0, &33
-    equb &33, &ff, &c0, &33
-    equb &33, &ff, &c0, &33
-    equb &33, &ff, &c0, &33
-    equb &33, &ff, &c0, &33
-    equb &33, &33, &33, &33
-    equb &11, &33, &33, &22
-; &2200 used as index base 4 times by &158d, &1cd8, &1d8b, &77fe
-.door_x
-    equb &ff, &ff, &ff, &04, &ff, &ff, &06, &ff
-    equb &11, &ff, &ff, &ff, &1a, &03, &03, &0b
-    equb &ff, &03, &09, &12, &ff, &ff, &ff, &ff
-    equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
-; &2220 used as index base 4 times by &1593, &1ce3, &1d8e, &7804
-.door_y
-    equb &ff, &ff, &ff, &0d, &ff, &ff, &11, &ff
-    equb &16, &ff, &ff, &ff, &1a
-    equs "#'%"
-    equb &ff
-    equs "+.+"
-    equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
-    equb &ff, &ff, &ff, &ff
-; &2240 used as index base 2 times by &1599, &7810
-.door_sprite
-    equb &ff, &1c, &1c, &1d, &1c, &1c, &1d, &1d
-    equb &1d, &1d, &1d, &1c, &1c, &1d, &1d, &1c
-    equb &1d, &1d, &1c, &1c, &ff, &ff, &ff, &ff
-    equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
-; &2260 used as index base 7 times by &15a4, &1dce, &1e00, &1e45, &1e8c, &1ea1, &40aa
-.key_x
-    equb &13, &ff, &ff, &1b, &ff, &ff, &17, &ff
-    equb &1c, &ff, &ff, &ff, &02, &15, &04, &09
-    equb &ff, &04, &19, &17, &ff, &ff, &ff, &ff
-    equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
-; &2280 used as index base 7 times by &15aa, &1dd4, &1e06, &1e4d, &1e92, &1ea4, &40b0
-.key_y
-    equb &25, &ff, &ff, &06, &ff, &ff, &09, &ff
-    equb &18, &ff, &ff, &ff, &29, &04, &0c, &14
-    equb &ff, &0f, &03, &04, &ff, &ff, &ff, &ff
-    equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
-.sprite_exit
-    equb &03, &03, &03, &03
-    equb &02, &00, &00, &01
-    equb &02, &00, &00, &01
-    equb &02, &00, &00, &01
-    equb &02, &00, &00, &01
-    equb &02, &00, &00, &01
-    equb &02, &00, &00, &01
-    equb &02, &00, &00, &01
-    equb &02, &00, &00, &01
-    equb &02, &00, &00, &01
-    equb &02, &00, &00, &01
-    equb &03, &03, &03, &03
-.sprite_key_icon
-    equb &00, &05
-    equb &0f, &0f
-    equb &0f, &05
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00
-; &22e0 used as index base 10 times by &1600, &1cf2, &1d95, &1deb, &1dfa, &1e0b, &1e86, &1e97, &40a4, &40b5
-.hero_key
-    equb &00, &00, &00, &00, &00
-; &22e5 used as index base 4 times by &1603, &1e28, &1e2f, &1e9c
-.hero_key_dropped
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00
-; &22f0 used as index base 4 times by &1079, &1606, &1cc8, &6f9b
-.hero_door_x
-    equb &1a, &09, &00, &16, &00
-; &22f5 used as index base 4 times by &108a, &1609, &1cce, &6fa1
-.hero_door_y
-    equb &06, &1d, &00, &09, &00, &00, &00, &00
-    equb &00, &00, &00
-.sprite_magic_user_up_0
-    equb &01, &0a, &00, &00
-    equb &03, &0a, &0b, &00
-    equb &03, &00, &0b, &02
-    equb &03, &00, &00, &03
-    equb &03, &00, &0a, &03
-    equb &03, &10, &1a, &01
-    equb &01, &27, &0f, &23
-    equb &01, &33, &33, &23
-    equb &01, &13, &33, &00
-    equb &03, &13, &33, &00
-    equb &03, &03, &22, &00
-    equb &03, &03, &00, &00
-.sprite_magic_user_up_1
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &0f, &00, &00, &0f
-    equb &03, &00, &0a, &03
-    equb &03, &10, &1a, &01
-    equb &01, &27, &0f, &23
-    equb &01, &33, &33, &23
-    equb &01, &13, &33, &03
-    equb &00, &13, &33, &03
-    equb &00, &03, &23, &03
-    equb &00, &01, &01, &03
-.sprite_magic_user_right_0
-    equb &03, &00, &03, &00
-    equb &03, &03, &03, &02
-    equb &03, &13, &00, &0f
-    equb &03, &27, &00, &00
-    equb &13, &32, &00, &00
-    equb &13, &27, &0a, &00
-    equb &13, &27, &0a, &00
-    equb &13, &32, &00, &00
-    equb &01, &27, &00, &0a
-    equb &00, &13, &01, &0a
-    equb &00, &03, &03, &0a
-    equb &00, &01, &03, &00
-.sprite_magic_user_right_1
-    equb &00, &00, &00, &00
-    equb &00, &01, &03, &0a
-    equb &00, &13, &07, &00
-    equb &01, &27, &00, &00
-    equb &11, &32, &00, &00
-    equb &11, &27, &0a, &00
-    equb &13, &27, &0a, &00
-    equb &13, &32, &00, &00
-    equb &03, &27, &05, &00
-    equb &03, &13, &07, &00
-    equb &03, &03, &07, &00
-    equb &03, &01, &02, &00
-.sprite_magic_user_down_0
-    equb &00, &00, &03, &03
-    equb &00, &11, &03, &03
-    equb &00, &33, &23, &03
-    equb &00, &33, &23, &02
-    equb &13, &33, &33, &02
-    equb &13, &0f, &1b, &02
-    equb &02, &25, &20, &03
-    equb &03, &05, &00, &03
-    equb &03, &00, &00, &03
-    equb &01, &07, &00, &03
-    equb &00, &07, &05, &03
-    equb &00, &00, &05, &02
-.sprite_magic_user_down_1
-    equb &03, &02, &02, &00
-    equb &03, &13, &03, &00
-    equb &03, &33, &23, &00
-    equb &03, &33, &23, &02
-    equb &13, &33, &33, &02
-    equb &13, &0f, &1b, &02
-    equb &02, &25, &20, &03
-    equb &03, &05, &00, &03
-    equb &0f, &00, &00, &0f
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-.sprite_magic_user_left_0
-    equb &00, &03, &02, &00
-    equb &05, &03, &03, &00
-    equb &05, &02, &23, &00
-    equb &05, &00, &1b, &02
-    equb &00, &00, &31, &23
-    equb &00, &05, &1b, &23
-    equb &00, &05, &1b, &23
-    equb &00, &00, &31, &23
-    equb &00, &00, &1b, &03
-    equb &0f, &00, &23, &03
-    equb &01, &03, &03, &03
-    equb &00, &03, &00, &03
-.sprite_magic_user_left_1
-    equb &00, &01, &02, &03
-    equb &00, &0b, &03, &03
-    equb &00, &0b, &23, &03
-    equb &00, &0a, &1b, &03
-    equb &00, &00, &31, &23
-    equb &00, &05, &1b, &23
-    equb &00, &05, &1b, &22
-    equb &00, &00, &31, &22
-    equb &00, &00, &1b, &02
-    equb &00, &0b, &23, &00
-    equb &05, &03, &02, &00
-    equb &00, &00, &00, &00
-.sprite_barbarian_up_0
-    equb &00, &00, &3f, &3f
-    equb &00, &0f, &05, &0a
-    equb &01, &0f, &2d, &1e
-    equb &01, &0f, &05, &0a
-    equb &0b, &02, &00, &03
-    equb &0f, &1a, &20, &0f
-    equb &0f, &34, &38, &0f
-    equb &0f, &30, &30, &0f
-    equb &0f, &34, &38, &0f
-    equb &0b, &1a, &25, &07
-    equb &05, &03, &0b, &0a
-    equb &00, &0b, &07, &00
-.sprite_barbarian_up_1
-    equb &00, &15, &3f, &2a
-    equb &05, &0a, &0f, &00
-    equb &07, &1e, &0f, &28
-    equb &07, &0a, &0f, &00
-    equb &03, &02, &01, &02
-    equb &0f, &10, &25, &0a
-    equb &0f, &34, &38, &0f
-    equb &0f, &30, &30, &0f
-    equb &0f, &34, &38, &0f
-    equb &0f, &12, &21, &0f
-    equb &01, &0b, &07, &02
-    equb &00, &07, &03, &00
-.sprite_barbarian_right_0
-    equb &00, &0f, &02, &00
-    equb &05, &0b, &0f, &0a
-    equb &05, &0b, &0f, &0a
-    equb &0b, &1a, &05, &0a
-    equb &07, &34, &20, &28
-    equb &0b, &34, &20, &28
-    equb &03, &34, &20, &28
-    equb &07, &34, &20, &3d
-    equb &0b, &12, &05, &1f
-    equb &01, &0f, &07, &1f
-    equb &05, &0f, &07, &1f
-    equb &00, &0f, &03, &3d
-.sprite_barbarian_right_1
-    equb &00, &0f, &02, &28
-    equb &05, &0b, &0f, &0a
-    equb &05, &0b, &0f, &0a
-    equb &03, &1a, &05, &0a
-    equb &0b, &34, &20, &28
-    equb &03, &34, &20, &3d
-    equb &0b, &34, &25, &1f
-    equb &07, &34, &25, &1f
-    equb &0b, &1a, &07, &1f
-    equb &05, &0f, &07, &15
-    equb &05, &0f, &03, &00
-    equb &00, &0f, &00, &00
-.sprite_barbarian_down_0
-    equb &00, &0b, &07, &00
-    equb &05, &07, &03, &0a
-    equb &0b, &1a, &25, &07
-    equb &0f, &34, &38, &0f
-    equb &0f, &30, &30, &0f
-    equb &0f, &34, &38, &0f
-    equb &0f, &10, &25, &0f
-    equb &03, &00, &01, &07
-    equb &05, &0a, &0f, &02
-    equb &2d, &1e, &0f, &02
-    equb &05, &0a, &0f, &00
-    equb &3f, &3f, &00, &00
-.sprite_barbarian_down_1
-    equb &00, &03, &0b, &00
-    equb &01, &0b, &07, &02
-    equb &0f, &12, &21, &0f
-    equb &0f, &34, &38, &0f
-    equb &0f, &30, &30, &0f
-    equb &0f, &34, &38, &0f
-    equb &05, &1a, &20, &0f
-    equb &01, &02, &01, &03
-    equb &00, &0f, &05, &0b
-    equb &14, &0f, &2d, &0b
-    equb &00, &0f, &05, &0a
-    equb &15, &3f, &2a, &00
-.sprite_barbarian_left_0
-    equb &3e, &03, &0f, &00
-    equb &2f, &0b, &0f, &0a
-    equb &2f, &0b, &0f, &02
-    equb &2f, &0a, &21, &07
-    equb &3e, &10, &38, &0b
-    equb &14, &10, &38, &03
-    equb &14, &10, &38, &07
-    equb &14, &10, &38, &0b
-    equb &05, &0a, &25, &07
-    equb &05, &0f, &07, &0a
-    equb &05, &0f, &07, &0a
-    equb &00, &01, &0f, &00
-.sprite_barbarian_left_1
-    equb &00, &00, &0f, &00
-    equb &00, &03, &0f, &0a
-    equb &2a, &0b, &0f, &0a
-    equb &2f, &0b, &25, &07
-    equb &2f, &1a, &38, &0b
-    equb &2f, &1a, &38, &07
-    equb &3e, &10, &38, &03
-    equb &14, &10, &38, &07
-    equb &05, &0a, &25, &03
-    equb &05, &0f, &07, &0a
-    equb &05, &0f, &07, &0a
-    equb &14, &01, &0f, &00
-.sprite_fighter_up_0
-    equb &00, &15, &00, &00
-    equb &00, &00, &2a, &00
-    equb &28, &0a, &15, &00
-    equb &2d, &0e, &00, &2b
-    equb &39, &0e, &00, &03
-    equb &39, &26, &0a, &33
-    equb &39, &23, &0b, &33
-    equb &39, &27, &0f, &33
-    equb &00, &36, &3c, &22
-    equb &00, &3e, &3c, &2a
-    equb &15, &00, &0c, &15
-    equb &00, &00, &0c, &00
-.sprite_fighter_up_1
-    equb &00, &28, &00, &15
-    equb &00, &28, &00, &15
-    equb &14, &00, &00, &15
-    equb &14, &27, &04, &1d
-    equb &39, &27, &04, &1d
-    equb &39, &22, &0e, &1d
-    equb &11, &32, &1a, &03
-    equb &00, &27, &0f, &33
-    equb &00, &36, &3c, &33
-    equb &00, &3e, &3c, &2a
-    equb &15, &04, &08, &15
-    equb &00, &04, &08, &00
-.sprite_fighter_right_0
-    equb &00, &3c, &3c, &28
-    equb &00, &11, &22, &00
-    equb &2a, &33, &27, &0a
-    equb &15, &39, &05, &00
-    equb &14, &06, &08, &00
-    equb &14, &0f, &08, &00
-    equb &14, &0f, &00, &00
-    equb &1c, &02, &00, &15
-    equb &1d, &28, &00, &2a
-    equb &3b, &33, &17, &00
-    equb &00, &33, &0a, &00
-    equb &00, &01, &0a, &00
-.sprite_fighter_right_1
-    equb &00, &00, &28, &00
-    equb &2a, &33, &36, &00
-    equb &15, &39, &33, &28
-    equb &1c, &02, &11, &1e
-    equb &1c, &0f, &00, &0a
-    equb &14, &0f, &00, &00
-    equb &14, &02, &00, &00
-    equb &15, &2c, &08, &00
-    equb &3b, &26, &08, &00
-    equb &11, &23, &00, &00
-    equb &11, &23, &3f, &3f
-    equb &00, &00, &00, &00
-.sprite_fighter_down_0
-    equb &00, &0c, &00, &00
-    equb &2a, &0c, &00, &2a
-    equb &15, &3c, &3d, &00
-    equb &11, &3c, &39, &00
-    equb &33, &0f, &1b, &36
-    equb &33, &07, &13, &36
-    equb &33, &05, &19, &36
-    equb &03, &00, &0d, &36
-    equb &17, &00, &0d, &1e
-    equb &00, &2a, &05, &14
-    equb &00, &15, &00, &00
-    equb &00, &00, &2a, &00
-.sprite_fighter_down_1
-    equb &00, &04, &08, &00
-    equb &2a, &04, &08, &2a
-    equb &15, &3c, &3d, &00
-    equb &33, &3c, &39, &00
-    equb &33, &0f, &1b, &00
-    equb &03, &25, &31, &22
-    equb &2e, &0d, &11, &36
-    equb &2e, &08, &1b, &36
-    equb &2e, &08, &1b, &28
-    equb &2a, &00, &00, &28
-    equb &2a, &00, &14, &00
-    equb &2a, &00, &14, &00
-.sprite_fighter_left_0
-    equb &00, &05, &02, &00
-    equb &00, &05, &33, &00
-    equb &00, &2b, &33, &37
-    equb &15, &00, &14, &2e
-    equb &2a, &00, &01, &2c
-    equb &00, &00, &0f, &28
-    equb &00, &04, &0f, &28
-    equb &00, &04, &09, &28
-    equb &00, &0a, &36, &2a
-    equb &05, &1b, &33, &15
-    equb &00, &11, &22, &00
-    equb &14, &3c, &3c, &00
-.sprite_fighter_left_1
-    equb &3f, &3f, &13, &22
-    equb &00, &00, &13, &22
-    equb &00, &04, &19, &37
-    equb &00, &04, &1c, &2a
-    equb &00, &00, &01, &28
-    equb &00, &00, &0f, &28
-    equb &05, &00, &0f, &2c
-    equb &2d, &22, &01, &2c
-    equb &14, &33, &36, &2a
-    equb &00, &39, &33, &15
-    equb &00, &14, &00, &00
-    equb &00, &00, &00, &00
-.sprite_fireball_up
-    equb &00, &00, &0a, &00
-    equb &00, &01, &03, &00
-    equb &00, &05, &07, &00
-    equb &00, &01, &0b, &00
-    equb &00, &05, &07, &00
-    equb &00, &05, &07, &00
-    equb &00, &05, &0f, &00
-    equb &00, &00, &0a, &00
-    equb &00, &00, &0a, &00
-    equb &00, &00, &0a, &00
-    equb &00, &00, &0a, &00
-    equb &00, &00, &0a, &00
-.sprite_fireball_right
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &05, &0a
-    equb &00, &0f, &0b, &07
-    equb &0f, &0b, &07, &07
-    equb &00, &0f, &0b, &07
-    equb &00, &00, &05, &0a
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-.sprite_fireball_down
-    equb &00, &00, &0a, &00
-    equb &00, &00, &0a, &00
-    equb &00, &00, &0a, &00
-    equb &00, &00, &0a, &00
-    equb &00, &00, &0a, &00
-    equb &00, &05, &0f, &00
-    equb &00, &05, &07, &00
-    equb &00, &05, &07, &00
-    equb &00, &01, &0b, &00
-    equb &00, &05, &07, &00
-    equb &00, &01, &03, &00
-    equb &00, &00, &0a, &00
-.sprite_fireball_left
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &05, &0a, &00, &00
-    equb &0b, &07, &0f, &00
-    equb &0b, &0b, &07, &0f
-    equb &0b, &07, &0f, &00
-    equb &05, &0a, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-.sprite_axe_up
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &15, &2a
-    equb &00, &00, &3f, &3f
-    equb &00, &00, &15, &2a
-    equb &14, &3c, &3c, &3c
-    equb &00, &00, &15, &2a
-    equb &00, &00, &3f, &3f
-    equb &00, &00, &15, &2a
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-.sprite_axe_right
-    equb &00, &00, &00, &00
-    equb &00, &14, &00, &00
-    equb &00, &14, &00, &00
-    equb &00, &14, &00, &00
-    equb &00, &14, &00, &00
-    equb &15, &14, &15, &00
-    equb &15, &3e, &3f, &00
-    equb &15, &3e, &3f, &00
-    equb &15, &3e, &3f, &00
-    equb &15, &14, &15, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-.sprite_axe_down
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &15, &2a, &00, &00
-    equb &3f, &3f, &00, &00
-    equb &15, &2a, &00, &00
-    equb &3c, &3c, &3c, &28
-    equb &15, &2a, &00, &00
-    equb &3f, &3f, &00, &00
-    equb &15, &2a, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-.sprite_axe_left
-    equb &00, &00, &00, &00
-    equb &00, &2a, &28, &2a
-    equb &00, &3f, &3d, &2a
-    equb &00, &3f, &3d, &2a
-    equb &00, &3f, &3d, &2a
-    equb &00, &2a, &28, &2a
-    equb &00, &00, &28, &00
-    equb &00, &00, &28, &00
-    equb &00, &00, &28, &00
-    equb &00, &00, &28, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-.sprite_key
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &0a
-    equb &00, &00, &05, &05
-    equb &00, &00, &05, &05
-    equb &0f, &0f, &0f, &05
-    equb &0a, &0a, &05, &05
-    equb &0a, &0a, &05, &05
-    equb &0a, &0a, &00, &0a
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-.sprite_treasure
-    equb &03, &03, &02, &02
-    equb &13, &50, &02, &02
-    equb &02, &24, &17, &03
-    equb &47, &00, &02, &03
-    equb &12, &0d, &02, &03
-    equb &02, &4f, &02, &03
-    equb &06, &32, &02, &03
-    equb &47, &02, &02, &03
-    equb &12, &a5, &02, &03
-    equb &07, &08, &17, &03
-    equb &06, &b0, &02, &02
-    equb &03, &03, &02, &02
-.sprite_food
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &2a, &00, &00, &00
-    equb &2a, &00, &00, &00
-    equb &15, &00, &00, &00
-    equb &2f, &2a, &0f, &00
-    equb &2f, &0f, &0f, &0a
-    equb &00, &0f, &03, &0b
-    equb &00, &05, &0f, &03
-    equb &00, &05, &07, &02
-    equb &00, &00, &03, &02
-    equb &00, &00, &03, &00
-    equb &05, &0f, &0f, &00, &0a, &0f, &0f, &0a
-    equb &0a, &00, &05, &00, &05, &30, &20, &0a
-    equb &05, &00, &00, &0a, &00, &1a, &30, &05
-    equb &00, &0a, &00, &05, &0f, &1a, &30, &25
-    equb &0f, &00, &00, &0a, &0a, &30, &30, &0a
-    equb &05
-    equb &00, &00, &0a, &00, &0f, &0f, &00
-.sprite_teleporter
-    equb &3f, &3f, &3f, &3f
-    equb &3e, &3c, &3c, &38
-    equb &3e, &3c, &3c, &38
-    equb &3e, &3f, &3f, &38
-    equb &3e, &3e, &38, &38
-    equb &3e, &3e, &38, &38
-    equb &3e, &3e, &38, &38
-    equb &3e, &3e, &38, &38
-    equb &3e, &30, &30, &38
-    equb &3e, &3c, &3c, &38
-    equb &3e, &3c, &3c, &38
-    equb &30, &30, &30, &30
-    equb &00, &2c, &00, &00, &00, &2c, &08, &00
-    equb &00, &0c, &08, &00, &04, &0f, &0e, &00
-.sprite_digit_0
-    equb &04, &08
-    equb &08, &0c
-    equb &08, &0c
-    equb &08, &0c
-    equb &08, &0c
-    equb &0c, &04
-    equb &0c, &04
-    equb &0c, &04
-    equb &0c, &04
-    equb &04, &08
-.sprite_digit_1
-    equb &04, &00
-    equb &0c, &00
-    equb &04, &00
-    equb &04, &00
-    equb &04, &00
-    equb &04, &00
-    equb &04, &00
-    equb &04, &00
-    equb &04, &00
-    equb &0c, &00
-.sprite_digit_2
-    equb &04, &08
-    equb &08, &04
-    equb &08, &04
-    equb &00, &04
-    equb &00, &08
-    equb &04, &00
-    equb &08, &00
-    equb &08, &04
-    equb &08, &08
-    equb &0c, &0c
-.sprite_digit_3
-    equb &04, &08
-    equb &08, &04
-    equb &00, &04
-    equb &00, &04
-    equb &04, &08
-    equb &04, &08
-    equb &00, &04
-    equb &00, &04
-    equb &0c, &04
-    equb &04, &08
-.sprite_digit_4
-    equb &00, &08
-    equb &04, &08
-    equb &04, &08
-    equb &08, &08
-    equb &08, &0c
-    equb &0c, &08
-    equb &00, &0c
-    equb &00, &08
-    equb &00, &08
-    equb &04, &08
-.sprite_digit_5
-    equb &0c, &0c
-    equb &08, &04
-    equb &08, &00
-    equb &08, &00
-    equb &04, &00
-    equb &00, &08
-    equb &00, &04
-    equb &04, &04
-    equb &08, &04
-    equb &04, &08
-.sprite_digit_6
-    equb &00, &04
-    equb &00, &08
-    equb &04, &00
-    equb &04, &00
-    equb &04, &08
-    equb &08, &04
-    equb &08, &04
-    equb &08, &04
-    equb &08, &04
-    equb &04, &08
-.sprite_digit_7
-    equb &0c, &0c
-    equb &00, &04
-    equb &00, &08
-    equb &00, &08
-    equb &00, &08
-    equb &04, &00
-    equb &04, &00
-    equb &04, &00
-    equb &04, &00
-    equb &0c, &08
-.sprite_digit_8
-    equb &04, &08
-    equb &08, &04
-    equb &08, &04
-    equb &08, &04
-    equb &04, &08
-    equb &08, &04
-    equb &08, &04
-    equb &08, &04
-    equb &08, &04
-    equb &04, &08
-.sprite_digit_9
-    equb &04, &08
-    equb &08, &04
-    equb &08, &04
-    equb &08, &04
-    equb &08, &04
-    equb &04, &08
-    equb &00, &08
-    equb &00, &08
-    equb &04, &00
-    equb &08, &00
-.sprite_door_horizontal
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &3f, &3f, &3f, &3f
-    equb &3e, &3c, &3c, &38
-    equb &3e, &3c, &3c, &38
-    equb &3e, &3c, &3c, &38
-    equb &3e, &3c, &3c, &38
-    equb &30, &30, &30, &30
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &0f, &1a, &30, &20, &00, &00, &00, &25
-.sprite_sparkle_0
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &15, &2a, &00
-    equb &00, &3f, &3f, &00
-    equb &00, &3f, &3f, &00
-    equb &00, &15, &2a, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-.sprite_sparkle_1
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &3f, &3f, &00
-    equb &00, &00, &00, &00
-    equb &15, &15, &2a, &2a
-    equb &15, &00, &00, &2a
-    equb &15, &00, &00, &2a
-    equb &15, &15, &2a, &2a
-    equb &00, &00, &00, &00
-    equb &00, &3f, &3f, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-.sprite_sparkle_2
-    equb &00, &00, &00, &00
-    equb &15, &3f, &3f, &2a
-    equb &00, &3f, &3f, &00
-    equb &2a, &00, &00, &15
-    equb &3f, &00, &00, &3f
-    equb &3f, &15, &2a, &3f
-    equb &3f, &15, &2a, &3f
-    equb &3f, &00, &00, &3f
-    equb &2a, &00, &00, &15
-    equb &00, &3f, &3f, &00
-    equb &15, &3f, &3f, &2a
-    equb &00, &00, &00, &00
-.sprite_sparkle_3
-    equb &3f, &00, &00, &3f
-    equb &3f, &2a, &15, &3f
-    equb &2a, &2a, &15, &15
-    equb &2a, &00, &00, &15
-    equb &3f, &15, &2a, &3f
-    equb &15, &2a, &15, &2a
-    equb &15, &2a, &15, &2a
-    equb &3f, &15, &2a, &3f
-    equb &2a, &00, &00, &15
-    equb &2a, &2a, &15, &15
-    equb &3f, &2a, &15, &3f
-    equb &3f, &00, &00, &3f
-.sprite_trapdoor
-    equb &3c, &3c, &3c, &3c
-    equb &29, &03, &03, &16
-    equb &3f, &12, &03, &16
-    equb &3f, &03, &03, &34
-    equb &29, &03, &21, &16
-    equb &29, &03, &03, &16
-    equb &29, &21, &21, &16
-    equb &29, &03, &03, &34
-    equb &3f, &03, &21, &16
-    equb &3f, &03, &03, &16
-    equb &29, &21, &12, &16
-    equb &3c, &3c, &3c, &3c
-    equb &00, &00, &00, &00, &04, &00, &00, &00
-    equb &20, &00, &00, &00, &fd, &14, &93, &00
-.sprite_arrow_up
-    equb &00, &00, &00, &00
-    equb &00, &15, &00, &00
-    equb &00, &15, &00, &00
-    equb &00, &05, &00, &00
-    equb &00, &05, &00, &00
-    equb &00, &05, &00, &00
-    equb &00, &05, &00, &00
-    equb &00, &05, &00, &00
-    equb &00, &05, &00, &00
-    equb &00, &0c, &08, &00
-    equb &00, &08, &08, &00
-    equb &00, &00, &00, &00
-.sprite_arrow_right
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &0c, &00, &00, &00
-    equb &04, &0f, &0f, &2a
-    equb &0c, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-.sprite_arrow_down
-    equb &00, &00, &00, &00
-    equb &00, &04, &04, &00
-    equb &00, &04, &0c, &00
-    equb &00, &00, &0a, &00
-    equb &00, &00, &0a, &00
-    equb &00, &00, &0a, &00
-    equb &00, &00, &0a, &00
-    equb &00, &00, &0a, &00
-    equb &00, &00, &0a, &00
-    equb &00, &00, &2a, &00
-    equb &00, &00, &2a, &00
-    equb &00, &00, &00, &00
-.sprite_arrow_left
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &0c
-    equb &15, &0f, &0f, &08
-    equb &00, &00, &00, &0c
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-    equb &00, &00, &00, &00
-.sprite_door_vertical
-    equb &00, &3f, &3a, &00
-    equb &00, &3e, &38, &00
-    equb &00, &3e, &38, &00
-    equb &00, &3e, &38, &00
-    equb &00, &3e, &38, &00
-    equb &00, &3e, &38, &00
-    equb &00, &3e, &38, &00
-    equb &00, &3e, &38, &00
-    equb &00, &3e, &38, &00
-    equb &00, &3e, &38, &00
-    equb &00, &3e, &38, &00
-    equb &00, &30, &30, &00
-    equb &01, &00, &00, &00, &17, &00, &00, &90
-    equb &17, &00, &00, &00, &00, &00, &00, &00
-; &2d00 used as index base 1 time by &15db
-.wall_sprite
-    equb &0f, &0b, &0f, &07
-    equb &03, &0f, &0f, &0f
-    equb &0f, &1f, &2f, &0b
-    equb &0f, &2f, &0b, &0f
-    equb &1f, &0f, &0f, &07
-    equb &1f, &1f, &0f, &07
-    equb &17, &0f, &07, &07
-    equb &1f, &0f, &0f, &07
-    equb &0f, &2f, &0b, &0f
-    equb &07, &0b, &07, &0f
-    equb &0f, &0f, &0f, &03
-    equb &0b, &0f, &0f, &0f
-.sprite_ranger_up_0
-    equb &00, &03, &0b, &00
-    equb &01, &00, &0a, &02
-    equb &02, &00, &04, &01
-    equb &01, &02, &04, &00
-    equb &0b, &02, &00, &08
-    equb &0b, &07, &00, &08
-    equb &1c, &25, &34, &08
-    equb &1c, &0f, &1e, &08
-    equb &04, &3c, &29, &08
-    equb &04, &3c, &0c, &00
-    equb &00, &0c, &09, &00
-    equb &00, &00, &03, &00
-.sprite_ranger_up_1
-    equb &00, &03, &02, &00
-    equb &00, &00, &01, &00
-    equb &00, &00, &00, &0a
-    equb &05, &00, &03, &0a
-    equb &05, &00, &03, &09
-    equb &04, &05, &03, &09
-    equb &0c, &25, &34, &09
-    equb &1c, &0f, &1e, &09
-    equb &04, &3c, &28, &08
-    equb &04, &3c, &0c, &00
-    equb &01, &0c, &08, &00
-    equb &01, &02, &00, &00
-.sprite_ranger_right_0
-    equb &00, &04, &0b, &00
-    equb &00, &0c, &0b, &00
-    equb &04, &09, &02, &02
-    equb &04, &3c, &02, &03
-    equb &14, &1a, &02, &01
-    equb &3c, &0f, &0a, &01
-    equb &3c, &0f, &0a, &0d
-    equb &16, &1a, &04, &0d
-    equb &03, &3c, &0c, &03
-    equb &03, &06, &08, &02
-    equb &00, &00, &01, &00
-    equb &00, &00, &01, &00
-.sprite_ranger_right_1
-    equb &00, &00, &08, &00
-    equb &00, &0c, &0d, &00
-    equb &06, &0c, &05, &00
-    equb &06, &3c, &00, &00
-    equb &16, &1a, &00, &01
-    equb &3c, &0f, &0a, &01
-    equb &3c, &0f, &0a, &01
-    equb &14, &1a, &03, &01
-    equb &00, &3c, &09, &03
-    equb &00, &0c, &0d, &02
-    equb &00, &04, &07, &02
-    equb &00, &03, &02, &00
-.sprite_ranger_down_0
-    equb &00, &03, &00, &00
-    equb &00, &06, &0c, &00
-    equb &00, &0c, &3c, &08
-    equb &04, &16, &3c, &08
-    equb &04, &2d, &0f, &2c
-    equb &04, &38, &1a, &2c
-    equb &04, &00, &0b, &07
-    equb &04, &00, &01, &07
-    equb &00, &08, &01, &02
-    equb &02, &08, &00, &01
-    equb &01, &05, &00, &02
-    equb &00, &07, &03, &00
-.sprite_ranger_down_1
-    equb &00, &00, &01, &02
-    equb &00, &04, &0c, &02
-    equb &00, &0c, &3c, &08
-    equb &04, &14, &3c, &08
-    equb &06, &2d, &0f, &2c
-    equb &06, &38, &1a, &0c
-    equb &06, &03, &0a, &08
-    equb &06, &03, &00, &0a
-    equb &05, &03, &00, &0a
-    equb &05, &00, &00, &00
-    equb &00, &02, &00, &00
-    equb &00, &01, &03, &00
-.sprite_ranger_left_0
-    equb &00, &02, &00, &00
-    equb &00, &02, &00, &00
-    equb &01, &04, &09, &03
-    equb &03, &0c, &3c, &03
-    equb &0e, &08, &25, &29
-    equb &0e, &05, &0f, &3c
-    equb &02, &05, &0f, &3c
-    equb &02, &01, &25, &28
-    equb &03, &01, &3c, &08
-    equb &01, &01, &06, &08
-    equb &00, &07, &0c, &00
-    equb &00, &07, &08, &00
-.sprite_monster_up_0
-    equb &00, &00, &00, &02
-    equb &00, &00, &01, &13
-    equb &04, &08, &01, &13
-    equb &45, &30, &8b, &13
-    equb &10, &30, &20, &02
-    equb &1a, &30, &20, &02
-    equb &1a, &30, &25, &07
-    equb &1e, &30, &2d, &0f
-    equb &3c, &3c, &2d, &0a
-    equb &14, &3c, &2c, &00
-    equb &00, &00, &0c, &00
-    equb &00, &00, &0c, &00
-.sprite_monster_up_1
-    equb &00, &04, &08, &00
-    equb &00, &04, &08, &02
-    equb &45, &30, &8b, &13
-    equb &10, &30, &21, &13
-    equb &10, &30, &21, &13
-    equb &1a, &30, &20, &02
-    equb &0f, &30, &00, &02
-    equb &1e, &3c, &2d, &07
-    equb &1e, &3c, &2d, &0f
-    equb &14, &3c, &2d, &0a
-    equb &04, &08, &00, &00
-    equb &04, &08, &00, &00
-.sprite_monster_right_0
-    equb &00, &2d, &0a, &00
-    equb &14, &2d, &00, &00
-    equb &14, &38, &8e, &08
-    equb &14, &30, &24, &08
-    equb &14, &30, &24, &08
-    equb &14, &30, &20, &00
-    equb &1c, &30, &20, &00
-    equb &1c, &38, &8a, &00
-    equb &0c, &28, &00, &00
-    equb &00, &3c, &01, &02
-    equb &00, &0f, &03, &03
-    equb &00, &0f, &11, &22
-.sprite_monster_right_1
-    equb &00, &2d, &0a, &00
-    equb &14, &2d, &00, &00
-    equb &1c, &38, &8a, &00
-    equb &1c, &30, &20, &00
-    equb &1c, &30, &20, &00
-    equb &14, &30, &24, &08
-    equb &3c, &30, &24, &08
-    equb &3c, &10, &8e, &08
-    equb &0f, &00, &00, &00
-    equb &0f, &01, &02, &00
-    equb &0b, &03, &03, &00
-    equb &00, &11, &22, &00
-.sprite_monster_down_0
-    equb &00, &0c, &00, &00
-    equb &00, &0c, &00, &00
-    equb &00, &1c, &3c, &28
-    equb &05, &1e, &3c, &3c
-    equb &0f, &1e, &30, &2d
-    equb &0b, &1a, &30, &25
-    equb &01, &10, &30, &25
-    equb &01, &10, &30, &20
-    equb &23, &47, &30, &8a
-    equb &23, &02, &04, &08
-    equb &23, &02, &00, &00
-    equb &01, &00, &00, &00
-.sprite_monster_down_1
-    equb &00, &00, &04, &08
-    equb &00, &00, &04, &08
-    equb &05, &1e, &3c, &28
-    equb &0f, &1e, &3c, &2d
-    equb &0b, &1e, &3c, &2d
-    equb &01, &00, &30, &0f
-    equb &01, &10, &30, &25
-    equb &23, &12, &30, &20
-    equb &23, &12, &30, &20
-    equb &23, &47, &30, &8a
-    equb &01, &04, &08, &00
-    equb &00, &04, &08, &00
-.sprite_monster_left_0
-    equb &11, &22, &0f, &00
-    equb &03, &03, &0f, &00
-    equb &01, &02, &3c, &00
-    equb &00, &00, &14, &0c
-    equb &00, &45, &34, &2c
-    equb &00, &10, &30, &2c
-    equb &00, &10, &30, &28
-    equb &04, &18, &30, &28
-    equb &04, &18, &30, &28
-    equb &04, &4d, &34, &28
-    equb &00, &00, &1e, &28
-    equb &00, &05, &1e, &00
-.sprite_monster_left_1
-    equb &00, &11, &22, &00
-    equb &00, &03, &03, &07
-    equb &00, &01, &02, &0f
-    equb &00, &00, &00, &0f
-    equb &04, &4d, &20, &3c
-    equb &04, &18, &30, &3c
-    equb &04, &18, &30, &28
-    equb &00, &10, &30, &2c
-    equb &00, &10, &30, &2c
-    equb &00, &45, &34, &2c
-    equb &00, &00, &1e, &28
-    equb &00, &05, &1e, &00
-
-
-    ; Copy the newly assembled block of code back to it's proper place in the binary
-    ; file.
-    ; (Note the parameter order: 'copyblock <start>,<end>,<dest>')
-    copyblock &2000, *, &4000
-
-    ; Clear the area of memory we just temporarily used to assemble the new block,
-    ; allowing us to assemble there again if needed
-    clear &2000, &3000
-
-    ; Set the program counter to the next position in the binary file.
-    org &4000 + (* - &2000)
 
 
     org &0400
@@ -3061,7 +786,7 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ;     X: 0
 ;     Y: 0
 ; On this side start_music overwrites the first three bytes with JMP &D800, so from the first level on every sprite is plotted by the identical copy in Code3, plot_sprite_hazel. The menu, before start_music first runs, uses this one.
-; &0900 referenced 21 times by &042e, &043d, &0f79, &1daa, &1e20, &1e7d, &40ca, &7276, &7286, &72cf, &72df, &72ef, &72ff, &7613, &7838, &7842, &78aa, &78c4, &78de, &78f8, &c726
+; &0900 referenced 21 times by &042e, &043d, &0f79, &1daa, &1e20, &1e7d, &20ca, &7276, &7286, &72cf, &72df, &72ef, &72ff, &7613, &7838, &7842, &78aa, &78c4, &78de, &78f8, &c726
 .plot_sprite
 ; &0901 referenced 1 time by &c72b
     ldx sprite_number                   ; X = sprite number
@@ -3194,25 +919,25 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-; &09f0 referenced 4 times by &1f7a, &1fa7, &1fd3, &4026
+; &09f0 referenced 4 times by &1f7a, &1fa7, &1fd3, &2026
 .exit_saved_x
     equb &04
-; &09f1 referenced 4 times by &1f80, &1fad, &1fd9, &402c
+; &09f1 referenced 4 times by &1f80, &1fad, &1fd9, &202c
 .exit_saved_y
     equb &2c
-; &09f2 referenced 5 times by &151a, &1f10, &1f96, &4034, &4078
+; &09f2 referenced 5 times by &151a, &1f10, &1f96, &2034, &2078
 .exit_busy
     equb &00
-; &09f3 referenced 5 times by &1fbe, &1fc3, &1fce, &1ff4, &4086
+; &09f3 referenced 5 times by &1fbe, &1fc3, &1fce, &1ff4, &2086
 .exit_spin
     equb &ff
-; &09f4 referenced 3 times by &1fdf, &1ff7, &408b
+; &09f4 referenced 3 times by &1fdf, &1ff7, &208b
 .exit_shrinks_left
     equb &00
-; &09f5 referenced 3 times by &1f9e, &1fba, &407e
+; &09f5 referenced 3 times by &1f9e, &1fba, &207e
 .exiting_hero
     equb &03
-; &09f6 referenced 1 time by &4042; also used as index base 1 time by &1fe2
+; &09f6 referenced 1 time by &2042; also used as index base 1 time by &1fe2
 .exit_offsets_x
     equb &04
 ; &09f7 referenced 1 time by &152b
@@ -3239,7 +964,7 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; &09fe referenced 1 time by &1523
 .exit_offset_y_4
     equb &00
-; &09ff referenced 4 times by &1536, &1f2d, &4045, &4081
+; &09ff referenced 4 times by &1536, &1f2d, &2045, &2081
 .shrunk_hero
     equb &ff
 .sprite_boots
@@ -4490,7 +2215,7 @@ clear_text_area_top = code_162d+1
 ; Sound the exit and add a queue marker
 ;
 ; Play the exit sound and put a &64 entry in the first free slot of returning_hero_queue.
-; &16a0 referenced 1 time by &403d
+; &16a0 referenced 1 time by &203d
 .queue_exit_marker
     ldx #<(exit_envelope)               ; Define the exit envelope...
     ldy #>(exit_envelope)               ; ...
@@ -4847,7 +2572,7 @@ clear_text_area_top = code_162d+1
     equb &0a, &0a, &0a, &0a, &19, &1a, &1a, &1a
     equb &1a, &18, &18, &18, &18, &18, &18, &18
     equb &18, &18, &18, &12, &18, &18, &18, &04
-; &1bd0 used as index base 4 times by &090c, &4009, &405f, &d80c
+; &1bd0 used as index base 4 times by &090c, &2009, &205f, &d80c
 .sprite_widths
     equb &04, &04, &04, &04, &04, &04, &04, &04
     equb &04, &04, &04, &04, &04, &04, &04, &04
@@ -4864,7 +2589,7 @@ clear_text_area_top = code_162d+1
     equb &04, &04, &04, &04, &04, &04, &04, &04
     equb &04, &03, &01, &01, &01, &01, &01, &01
     equb &01, &01, &01, &08, &04, &02, &0c, &02
-; &1c48 used as index base 5 times by &0911, &4015, &401a, &406c, &d811
+; &1c48 used as index base 5 times by &0911, &2015, &201a, &206c, &d811
 .sprite_heights
     equb &0c, &0c, &0c, &0c, &0c, &0c, &0c, &0c
     equb &0c, &0c, &0c, &0c, &0c, &0c, &0c, &0c
@@ -5207,7 +2932,7 @@ clear_text_area_top = code_162d+1
 ; return address on the stack (it ends with a jump back here), so the first RTS at the
 ; end of a level returns into this loop, once for each hero who left by the exit, before
 ; the last returns to the caller.
-; &1f00 referenced 7 times by &0e65, &1f03, &1f9b, &1fef, &4023, &4037, &408e
+; &1f00 referenced 7 times by &0e65, &1f03, &1f9b, &1fef, &2023, &2037, &208e
 .play_level
     lda os_vsync_counter                ; Wait for the vertical sync counter to pass zero...
     bpl play_level                      ; ...
@@ -5334,25 +3059,1240 @@ clear_text_area_top = code_162d+1
     lda hero_sprites,x                  ; ...
 .dasmos_dunj4_end
 
-    org &3000
-
-.dasmos_coder2_start
-
-    org &3026
-.dasmos_coder2_end
-
-    org &3649
-
-.dasmos_dunjunz_start
-
-    org &3f5c
-.dasmos_dunjunz_end
-
-    org &4000
+    org &2000
 
 .dasmos_dunj5_start
-
-    org &5000
+    adc #1                              ; ...
+    tay                                 ; ...
+    tax                                 ; ...
+    adc #7                              ; ...
+    sta scratch                         ; ...
+; &2009 referenced 1 time by &2010
+.loop_2009
+    dec sprite_widths,x                 ; ...
+    inx                                 ; ...
+    cpx scratch                         ; ...
+    bne loop_2009                       ; ...
+    tya                                 ; Three rows shorter...
+    tax                                 ; ...
+; &2014 referenced 1 time by &2021
+.loop_2014
+    sec                                 ; ...
+    lda sprite_heights,x                ; ...
+    sbc #3                              ; ...
+    sta sprite_heights,x                ; ...
+    inx                                 ; ...
+    cpx scratch                         ; ...
+    bne loop_2014                       ; ...
+    jmp play_level                      ; ...three rows shorter. Next frame
+; &2026 referenced 1 time by &1ffa
+.code_2026
+    lda exit_saved_x                    ; Put the exit back...
+    sta exit_x                          ; ...
+    lda exit_saved_y                    ; ...
+    sta exit_y                          ; ...
+    lda #0                              ; ...and end the animation
+    sta exit_busy                       ; ...
+    jmp play_level                      ; Next frame
+; ***************************************************************************************
+; Start a hero going down the exit
+;
+; Play the exit sound, restore any hero shrunk before, and start the animation of hero X
+; spinning and shrinking on the exit. Ends by jumping to play_level rather than
+; returning.
+;
+; On Entry:
+;     X: hero number (0-3)
+; &203a referenced 1 time by &1f8b
+.hero_enters_exit
+    stx scratch2                        ; Keep the hero number
+    jsr queue_exit_marker               ; Sound the exit and queue a marker
+    lda #4                              ; ...
+    sta exit_offsets_x                  ; ...
+    ldx shrunk_hero                     ; Restore the sprites of any hero shrunk before
+    bmi code_2076                       ; ...
+    jsr restore_hero_sprites            ; ...
+    jmp code_2076                       ; ...
+; ***************************************************************************************
+; Restore a hero's sprite sizes
+;
+; Put back the width and height of all eight of hero X's sprites, which the exit
+; animation shrinks.
+;
+; On Entry:
+;     X: hero number (0-3)
+; &2050 referenced 2 times by &1f32, &204a
+.restore_hero_sprites
+    clc                                 ; The hero's eight sprites, from base + 1
+    lda hero_sprites,x                  ; ...
+    adc #1                              ; ...
+    tax                                 ; ...
+    tay                                 ; ...
+    adc #7                              ; ...
+    sta scratch                         ; ...
+    lda #4                              ; Widths back to 4...
+; &205f referenced 1 time by &2066
+.loop_205f
+    sta sprite_widths,y                 ; ...
+    iny                                 ; ...
+    cpy scratch                         ; ...
+    bne loop_205f                       ; ...
+    txa                                 ; ...
+    tay                                 ; ...
+    lda #&0c                            ; ...heights back to 12
+; &206c referenced 1 time by &2073
+.loop_206c
+    sta sprite_heights,y                ; ...
+    iny                                 ; ...
+    cpy scratch                         ; ...
+    bne loop_206c                       ; ...
+    rts                                 ; Return
+; &2076 referenced 2 times by &2048, &204d
+.code_2076
+    lda #1                              ; Start the animation for this hero...
+    sta exit_busy                       ; ...
+    lda scratch2                        ; ...
+    sta exiting_hero                    ; ...
+    sta shrunk_hero                     ; ...
+    lda #&ff                            ; ...turning from the start...
+    sta exit_spin                       ; ...
+    lda #4                              ; ...for four turns
+    sta exit_shrinks_left               ; ...
+    jmp play_level                      ; Back to play_level, without returning
+; ***************************************************************************************
+; Drop the key a hero carries
+;
+; Put hero X's key in a free cell next to them, and remove it from their panel section.
+;
+; On Entry:
+;     X: hero number (0-3)
+;
+; On Exit:
+;     X: preserved
+; &2091 referenced 1 time by &1f48
+.drop_key
+    lda hero_x,x                        ; From the hero's cell...
+    sta cell_x                          ; ...
+    lda hero_y,x                        ; ...
+    sta cell_y                          ; ...
+    txa                                 ; ...find a free cell next to it
+    pha                                 ; ...
+    jsr find_open_neighbour             ; ...
+    pla                                 ; ...
+    tax                                 ; ...
+    ldy hero_key,x                      ; Put the hero's key there
+    lda cell_x                          ; ...
+    sta key_x,y                         ; ...
+    lda cell_y                          ; ...
+    sta key_y,y                         ; ...
+    lda #0                              ; The hero carries no key
+    sta hero_key,x                      ; ...
+    lda #&1a                            ; Erase the key icon from the panel
+    sta sprite_number                   ; ...
+    lda hero_panel_y,x                  ; ...
+    sec                                 ; ...
+    sbc #&0d                            ; ...
+    sta plot_y                          ; ...
+    lda #&4a ; 'J'                      ; ...
+    sta plot_x                          ; ...
+    txa                                 ; ...
+    pha                                 ; ...
+    jsr plot_sprite                     ; ...
+    pla                                 ; ...
+    tax                                 ; ...
+    rts                                 ; Return
+; ***************************************************************************************
+; Find a free cell next to a cell
+;
+; Starting with cell_x, cell_y, try the cells above, to the right, below and to the left,
+; and leave cell_x, cell_y at the first without a wall.
+; &20d0 referenced 1 time by &209f
+.find_open_neighbour
+    dec cell_y                          ; The cell above
+    jsr test_wall                       ; ...free?
+    cpy #0                              ; ...
+    bne code_20db                       ; No
+    rts                                 ; Yes: return
+; &20db referenced 1 time by &20d8
+.code_20db
+    inc cell_y                          ; The cell to the right
+    inc cell_x                          ; ...
+    jsr test_wall                       ; ...free?
+    cpy #0                              ; ...
+    bne code_20e9                       ; No
+    rts                                 ; Yes: return
+; &20e9 referenced 1 time by &20e6
+.code_20e9
+    dec cell_x                          ; The cell below
+    inc cell_y                          ; ...
+    jsr test_wall                       ; ...free?
+    cpy #0                              ; ...
+    bne code_20f7                       ; No
+    rts                                 ; Yes: return
+; &20f7 referenced 1 time by &20f4
+.code_20f7
+    dec cell_y                          ; Otherwise the cell to the left
+    dec cell_x                          ; ...
+    rts                                 ; Return
+    equb &01, &3f
+; &2100 used as index base 1 time by &15ce
+.object_free_map
+    equb &00, &02, &07, &07, &1f, &3f, &7d, &7f
+    equb &00, &30, &78, &fd, &7f, &ff, &80, &00
+    equb &00, &60, &e0, &c0, &df, &c0, &1f, &0f
+    equb &00
+    equs "XXX"
+    equb &d8, &18, &f8, &80
+    equs "v>_n~"
+    equb &00, &7f, &7f, &00
+    equs "ff~~ff"
+    equb &00, &1f, &1f, &03, &03, &ff, &03, &03
+    equb &03, &80, &80, &80, &80, &80, &f6, &fe
+    equb &f6, &7f, &00
+    equs "?/77/7"
+    equb &c0, &03, &c4, &86, &40, &00, &80, &c1
+    equb &03, &e3, &e0, &e1, &41, &41, &00, &ff
+    equb &fe, &fe, &00, &00, &00, &00, &00, &8a
+    equb &00, &00, &00, &00, &7e, &7f, &7e, &00
+    equb &01, &01, &01, &3f, &3f, &bf, &3f, &3f
+    equb &f7, &ff, &c1, &f7, &c1, &ff, &f7, &bf
+    equb &8e, &9e, &de, &9c, &9e, &8e, &8e, &80
+    equs "~>~"
+    equb &00
+    equs "|z~"
+    equb &00, &2f, &1f, &00, &00, &00, &ce, &ae
+    equb &5e, &1f, &1f, &1f, &1b, &17, &1f, &00
+    equb &01, &80, &80, &80, &80, &80, &80, &02
+    equb &02
+    equs "~z~"
+    equb &00, &7e, &3e, &7f, &00, &be, &0e, &0e
+    equb &0f, &0e, &0e, &be, &00, &01, &01, &0f
+    equb &df, &07, &03, &01, &00, &08, &08, &5a
+    equb &fe, &fe, &fc, &b8, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &08, &2a
+    equb &00, &00, &00, &00, &00
+.sprite_drainer
+    equb &11, &33, &33, &22
+    equb &33, &33, &33, &33
+    equb &33, &ff, &c0, &33
+    equb &33, &ff, &c0, &33
+    equb &33, &ff, &c0, &33
+    equb &33, &ff, &c0, &33
+    equb &33, &ff, &c0, &33
+    equb &33, &ff, &c0, &33
+    equb &33, &ff, &c0, &33
+    equb &33, &ff, &c0, &33
+    equb &33, &33, &33, &33
+    equb &11, &33, &33, &22
+; &2200 used as index base 4 times by &158d, &1cd8, &1d8b, &77fe
+.door_x
+    equb &ff, &ff, &ff, &04, &ff, &ff, &06, &ff
+    equb &11, &ff, &ff, &ff, &1a, &03, &03, &0b
+    equb &ff, &03, &09, &12, &ff, &ff, &ff, &ff
+    equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
+; &2220 used as index base 4 times by &1593, &1ce3, &1d8e, &7804
+.door_y
+    equb &ff, &ff, &ff, &0d, &ff, &ff, &11, &ff
+    equb &16, &ff, &ff, &ff, &1a
+    equs "#'%"
+    equb &ff
+    equs "+.+"
+    equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
+    equb &ff, &ff, &ff, &ff
+; &2240 used as index base 2 times by &1599, &7810
+.door_sprite
+    equb &ff, &1c, &1c, &1d, &1c, &1c, &1d, &1d
+    equb &1d, &1d, &1d, &1c, &1c, &1d, &1d, &1c
+    equb &1d, &1d, &1c, &1c, &ff, &ff, &ff, &ff
+    equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
+; &2260 used as index base 7 times by &15a4, &1dce, &1e00, &1e45, &1e8c, &1ea1, &20aa
+.key_x
+    equb &13, &ff, &ff, &1b, &ff, &ff, &17, &ff
+    equb &1c, &ff, &ff, &ff, &02, &15, &04, &09
+    equb &ff, &04, &19, &17, &ff, &ff, &ff, &ff
+    equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
+; &2280 used as index base 7 times by &15aa, &1dd4, &1e06, &1e4d, &1e92, &1ea4, &20b0
+.key_y
+    equb &25, &ff, &ff, &06, &ff, &ff, &09, &ff
+    equb &18, &ff, &ff, &ff, &29, &04, &0c, &14
+    equb &ff, &0f, &03, &04, &ff, &ff, &ff, &ff
+    equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
+.sprite_exit
+    equb &03, &03, &03, &03
+    equb &02, &00, &00, &01
+    equb &02, &00, &00, &01
+    equb &02, &00, &00, &01
+    equb &02, &00, &00, &01
+    equb &02, &00, &00, &01
+    equb &02, &00, &00, &01
+    equb &02, &00, &00, &01
+    equb &02, &00, &00, &01
+    equb &02, &00, &00, &01
+    equb &02, &00, &00, &01
+    equb &03, &03, &03, &03
+.sprite_key_icon
+    equb &00, &05
+    equb &0f, &0f
+    equb &0f, &05
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00
+; &22e0 used as index base 10 times by &1600, &1cf2, &1d95, &1deb, &1dfa, &1e0b, &1e86, &1e97, &20a4, &20b5
+.hero_key
+    equb &00, &00, &00, &00, &00
+; &22e5 used as index base 4 times by &1603, &1e28, &1e2f, &1e9c
+.hero_key_dropped
+    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00
+; &22f0 used as index base 4 times by &1079, &1606, &1cc8, &6f9b
+.hero_door_x
+    equb &1a, &09, &00, &16, &00
+; &22f5 used as index base 4 times by &108a, &1609, &1cce, &6fa1
+.hero_door_y
+    equb &06, &1d, &00, &09, &00, &00, &00, &00
+    equb &00, &00, &00
+.sprite_magic_user_up_0
+    equb &01, &0a, &00, &00
+    equb &03, &0a, &0b, &00
+    equb &03, &00, &0b, &02
+    equb &03, &00, &00, &03
+    equb &03, &00, &0a, &03
+    equb &03, &10, &1a, &01
+    equb &01, &27, &0f, &23
+    equb &01, &33, &33, &23
+    equb &01, &13, &33, &00
+    equb &03, &13, &33, &00
+    equb &03, &03, &22, &00
+    equb &03, &03, &00, &00
+.sprite_magic_user_up_1
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &0f, &00, &00, &0f
+    equb &03, &00, &0a, &03
+    equb &03, &10, &1a, &01
+    equb &01, &27, &0f, &23
+    equb &01, &33, &33, &23
+    equb &01, &13, &33, &03
+    equb &00, &13, &33, &03
+    equb &00, &03, &23, &03
+    equb &00, &01, &01, &03
+.sprite_magic_user_right_0
+    equb &03, &00, &03, &00
+    equb &03, &03, &03, &02
+    equb &03, &13, &00, &0f
+    equb &03, &27, &00, &00
+    equb &13, &32, &00, &00
+    equb &13, &27, &0a, &00
+    equb &13, &27, &0a, &00
+    equb &13, &32, &00, &00
+    equb &01, &27, &00, &0a
+    equb &00, &13, &01, &0a
+    equb &00, &03, &03, &0a
+    equb &00, &01, &03, &00
+.sprite_magic_user_right_1
+    equb &00, &00, &00, &00
+    equb &00, &01, &03, &0a
+    equb &00, &13, &07, &00
+    equb &01, &27, &00, &00
+    equb &11, &32, &00, &00
+    equb &11, &27, &0a, &00
+    equb &13, &27, &0a, &00
+    equb &13, &32, &00, &00
+    equb &03, &27, &05, &00
+    equb &03, &13, &07, &00
+    equb &03, &03, &07, &00
+    equb &03, &01, &02, &00
+.sprite_magic_user_down_0
+    equb &00, &00, &03, &03
+    equb &00, &11, &03, &03
+    equb &00, &33, &23, &03
+    equb &00, &33, &23, &02
+    equb &13, &33, &33, &02
+    equb &13, &0f, &1b, &02
+    equb &02, &25, &20, &03
+    equb &03, &05, &00, &03
+    equb &03, &00, &00, &03
+    equb &01, &07, &00, &03
+    equb &00, &07, &05, &03
+    equb &00, &00, &05, &02
+.sprite_magic_user_down_1
+    equb &03, &02, &02, &00
+    equb &03, &13, &03, &00
+    equb &03, &33, &23, &00
+    equb &03, &33, &23, &02
+    equb &13, &33, &33, &02
+    equb &13, &0f, &1b, &02
+    equb &02, &25, &20, &03
+    equb &03, &05, &00, &03
+    equb &0f, &00, &00, &0f
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+.sprite_magic_user_left_0
+    equb &00, &03, &02, &00
+    equb &05, &03, &03, &00
+    equb &05, &02, &23, &00
+    equb &05, &00, &1b, &02
+    equb &00, &00, &31, &23
+    equb &00, &05, &1b, &23
+    equb &00, &05, &1b, &23
+    equb &00, &00, &31, &23
+    equb &00, &00, &1b, &03
+    equb &0f, &00, &23, &03
+    equb &01, &03, &03, &03
+    equb &00, &03, &00, &03
+.sprite_magic_user_left_1
+    equb &00, &01, &02, &03
+    equb &00, &0b, &03, &03
+    equb &00, &0b, &23, &03
+    equb &00, &0a, &1b, &03
+    equb &00, &00, &31, &23
+    equb &00, &05, &1b, &23
+    equb &00, &05, &1b, &22
+    equb &00, &00, &31, &22
+    equb &00, &00, &1b, &02
+    equb &00, &0b, &23, &00
+    equb &05, &03, &02, &00
+    equb &00, &00, &00, &00
+.sprite_barbarian_up_0
+    equb &00, &00, &3f, &3f
+    equb &00, &0f, &05, &0a
+    equb &01, &0f, &2d, &1e
+    equb &01, &0f, &05, &0a
+    equb &0b, &02, &00, &03
+    equb &0f, &1a, &20, &0f
+    equb &0f, &34, &38, &0f
+    equb &0f, &30, &30, &0f
+    equb &0f, &34, &38, &0f
+    equb &0b, &1a, &25, &07
+    equb &05, &03, &0b, &0a
+    equb &00, &0b, &07, &00
+.sprite_barbarian_up_1
+    equb &00, &15, &3f, &2a
+    equb &05, &0a, &0f, &00
+    equb &07, &1e, &0f, &28
+    equb &07, &0a, &0f, &00
+    equb &03, &02, &01, &02
+    equb &0f, &10, &25, &0a
+    equb &0f, &34, &38, &0f
+    equb &0f, &30, &30, &0f
+    equb &0f, &34, &38, &0f
+    equb &0f, &12, &21, &0f
+    equb &01, &0b, &07, &02
+    equb &00, &07, &03, &00
+.sprite_barbarian_right_0
+    equb &00, &0f, &02, &00
+    equb &05, &0b, &0f, &0a
+    equb &05, &0b, &0f, &0a
+    equb &0b, &1a, &05, &0a
+    equb &07, &34, &20, &28
+    equb &0b, &34, &20, &28
+    equb &03, &34, &20, &28
+    equb &07, &34, &20, &3d
+    equb &0b, &12, &05, &1f
+    equb &01, &0f, &07, &1f
+    equb &05, &0f, &07, &1f
+    equb &00, &0f, &03, &3d
+.sprite_barbarian_right_1
+    equb &00, &0f, &02, &28
+    equb &05, &0b, &0f, &0a
+    equb &05, &0b, &0f, &0a
+    equb &03, &1a, &05, &0a
+    equb &0b, &34, &20, &28
+    equb &03, &34, &20, &3d
+    equb &0b, &34, &25, &1f
+    equb &07, &34, &25, &1f
+    equb &0b, &1a, &07, &1f
+    equb &05, &0f, &07, &15
+    equb &05, &0f, &03, &00
+    equb &00, &0f, &00, &00
+.sprite_barbarian_down_0
+    equb &00, &0b, &07, &00
+    equb &05, &07, &03, &0a
+    equb &0b, &1a, &25, &07
+    equb &0f, &34, &38, &0f
+    equb &0f, &30, &30, &0f
+    equb &0f, &34, &38, &0f
+    equb &0f, &10, &25, &0f
+    equb &03, &00, &01, &07
+    equb &05, &0a, &0f, &02
+    equb &2d, &1e, &0f, &02
+    equb &05, &0a, &0f, &00
+    equb &3f, &3f, &00, &00
+.sprite_barbarian_down_1
+    equb &00, &03, &0b, &00
+    equb &01, &0b, &07, &02
+    equb &0f, &12, &21, &0f
+    equb &0f, &34, &38, &0f
+    equb &0f, &30, &30, &0f
+    equb &0f, &34, &38, &0f
+    equb &05, &1a, &20, &0f
+    equb &01, &02, &01, &03
+    equb &00, &0f, &05, &0b
+    equb &14, &0f, &2d, &0b
+    equb &00, &0f, &05, &0a
+    equb &15, &3f, &2a, &00
+.sprite_barbarian_left_0
+    equb &3e, &03, &0f, &00
+    equb &2f, &0b, &0f, &0a
+    equb &2f, &0b, &0f, &02
+    equb &2f, &0a, &21, &07
+    equb &3e, &10, &38, &0b
+    equb &14, &10, &38, &03
+    equb &14, &10, &38, &07
+    equb &14, &10, &38, &0b
+    equb &05, &0a, &25, &07
+    equb &05, &0f, &07, &0a
+    equb &05, &0f, &07, &0a
+    equb &00, &01, &0f, &00
+.sprite_barbarian_left_1
+    equb &00, &00, &0f, &00
+    equb &00, &03, &0f, &0a
+    equb &2a, &0b, &0f, &0a
+    equb &2f, &0b, &25, &07
+    equb &2f, &1a, &38, &0b
+    equb &2f, &1a, &38, &07
+    equb &3e, &10, &38, &03
+    equb &14, &10, &38, &07
+    equb &05, &0a, &25, &03
+    equb &05, &0f, &07, &0a
+    equb &05, &0f, &07, &0a
+    equb &14, &01, &0f, &00
+.sprite_fighter_up_0
+    equb &00, &15, &00, &00
+    equb &00, &00, &2a, &00
+    equb &28, &0a, &15, &00
+    equb &2d, &0e, &00, &2b
+    equb &39, &0e, &00, &03
+    equb &39, &26, &0a, &33
+    equb &39, &23, &0b, &33
+    equb &39, &27, &0f, &33
+    equb &00, &36, &3c, &22
+    equb &00, &3e, &3c, &2a
+    equb &15, &00, &0c, &15
+    equb &00, &00, &0c, &00
+.sprite_fighter_up_1
+    equb &00, &28, &00, &15
+    equb &00, &28, &00, &15
+    equb &14, &00, &00, &15
+    equb &14, &27, &04, &1d
+    equb &39, &27, &04, &1d
+    equb &39, &22, &0e, &1d
+    equb &11, &32, &1a, &03
+    equb &00, &27, &0f, &33
+    equb &00, &36, &3c, &33
+    equb &00, &3e, &3c, &2a
+    equb &15, &04, &08, &15
+    equb &00, &04, &08, &00
+.sprite_fighter_right_0
+    equb &00, &3c, &3c, &28
+    equb &00, &11, &22, &00
+    equb &2a, &33, &27, &0a
+    equb &15, &39, &05, &00
+    equb &14, &06, &08, &00
+    equb &14, &0f, &08, &00
+    equb &14, &0f, &00, &00
+    equb &1c, &02, &00, &15
+    equb &1d, &28, &00, &2a
+    equb &3b, &33, &17, &00
+    equb &00, &33, &0a, &00
+    equb &00, &01, &0a, &00
+.sprite_fighter_right_1
+    equb &00, &00, &28, &00
+    equb &2a, &33, &36, &00
+    equb &15, &39, &33, &28
+    equb &1c, &02, &11, &1e
+    equb &1c, &0f, &00, &0a
+    equb &14, &0f, &00, &00
+    equb &14, &02, &00, &00
+    equb &15, &2c, &08, &00
+    equb &3b, &26, &08, &00
+    equb &11, &23, &00, &00
+    equb &11, &23, &3f, &3f
+    equb &00, &00, &00, &00
+.sprite_fighter_down_0
+    equb &00, &0c, &00, &00
+    equb &2a, &0c, &00, &2a
+    equb &15, &3c, &3d, &00
+    equb &11, &3c, &39, &00
+    equb &33, &0f, &1b, &36
+    equb &33, &07, &13, &36
+    equb &33, &05, &19, &36
+    equb &03, &00, &0d, &36
+    equb &17, &00, &0d, &1e
+    equb &00, &2a, &05, &14
+    equb &00, &15, &00, &00
+    equb &00, &00, &2a, &00
+.sprite_fighter_down_1
+    equb &00, &04, &08, &00
+    equb &2a, &04, &08, &2a
+    equb &15, &3c, &3d, &00
+    equb &33, &3c, &39, &00
+    equb &33, &0f, &1b, &00
+    equb &03, &25, &31, &22
+    equb &2e, &0d, &11, &36
+    equb &2e, &08, &1b, &36
+    equb &2e, &08, &1b, &28
+    equb &2a, &00, &00, &28
+    equb &2a, &00, &14, &00
+    equb &2a, &00, &14, &00
+.sprite_fighter_left_0
+    equb &00, &05, &02, &00
+    equb &00, &05, &33, &00
+    equb &00, &2b, &33, &37
+    equb &15, &00, &14, &2e
+    equb &2a, &00, &01, &2c
+    equb &00, &00, &0f, &28
+    equb &00, &04, &0f, &28
+    equb &00, &04, &09, &28
+    equb &00, &0a, &36, &2a
+    equb &05, &1b, &33, &15
+    equb &00, &11, &22, &00
+    equb &14, &3c, &3c, &00
+.sprite_fighter_left_1
+    equb &3f, &3f, &13, &22
+    equb &00, &00, &13, &22
+    equb &00, &04, &19, &37
+    equb &00, &04, &1c, &2a
+    equb &00, &00, &01, &28
+    equb &00, &00, &0f, &28
+    equb &05, &00, &0f, &2c
+    equb &2d, &22, &01, &2c
+    equb &14, &33, &36, &2a
+    equb &00, &39, &33, &15
+    equb &00, &14, &00, &00
+    equb &00, &00, &00, &00
+.sprite_fireball_up
+    equb &00, &00, &0a, &00
+    equb &00, &01, &03, &00
+    equb &00, &05, &07, &00
+    equb &00, &01, &0b, &00
+    equb &00, &05, &07, &00
+    equb &00, &05, &07, &00
+    equb &00, &05, &0f, &00
+    equb &00, &00, &0a, &00
+    equb &00, &00, &0a, &00
+    equb &00, &00, &0a, &00
+    equb &00, &00, &0a, &00
+    equb &00, &00, &0a, &00
+.sprite_fireball_right
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &05, &0a
+    equb &00, &0f, &0b, &07
+    equb &0f, &0b, &07, &07
+    equb &00, &0f, &0b, &07
+    equb &00, &00, &05, &0a
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+.sprite_fireball_down
+    equb &00, &00, &0a, &00
+    equb &00, &00, &0a, &00
+    equb &00, &00, &0a, &00
+    equb &00, &00, &0a, &00
+    equb &00, &00, &0a, &00
+    equb &00, &05, &0f, &00
+    equb &00, &05, &07, &00
+    equb &00, &05, &07, &00
+    equb &00, &01, &0b, &00
+    equb &00, &05, &07, &00
+    equb &00, &01, &03, &00
+    equb &00, &00, &0a, &00
+.sprite_fireball_left
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &05, &0a, &00, &00
+    equb &0b, &07, &0f, &00
+    equb &0b, &0b, &07, &0f
+    equb &0b, &07, &0f, &00
+    equb &05, &0a, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+.sprite_axe_up
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &15, &2a
+    equb &00, &00, &3f, &3f
+    equb &00, &00, &15, &2a
+    equb &14, &3c, &3c, &3c
+    equb &00, &00, &15, &2a
+    equb &00, &00, &3f, &3f
+    equb &00, &00, &15, &2a
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+.sprite_axe_right
+    equb &00, &00, &00, &00
+    equb &00, &14, &00, &00
+    equb &00, &14, &00, &00
+    equb &00, &14, &00, &00
+    equb &00, &14, &00, &00
+    equb &15, &14, &15, &00
+    equb &15, &3e, &3f, &00
+    equb &15, &3e, &3f, &00
+    equb &15, &3e, &3f, &00
+    equb &15, &14, &15, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+.sprite_axe_down
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &15, &2a, &00, &00
+    equb &3f, &3f, &00, &00
+    equb &15, &2a, &00, &00
+    equb &3c, &3c, &3c, &28
+    equb &15, &2a, &00, &00
+    equb &3f, &3f, &00, &00
+    equb &15, &2a, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+.sprite_axe_left
+    equb &00, &00, &00, &00
+    equb &00, &2a, &28, &2a
+    equb &00, &3f, &3d, &2a
+    equb &00, &3f, &3d, &2a
+    equb &00, &3f, &3d, &2a
+    equb &00, &2a, &28, &2a
+    equb &00, &00, &28, &00
+    equb &00, &00, &28, &00
+    equb &00, &00, &28, &00
+    equb &00, &00, &28, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+.sprite_key
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &0a
+    equb &00, &00, &05, &05
+    equb &00, &00, &05, &05
+    equb &0f, &0f, &0f, &05
+    equb &0a, &0a, &05, &05
+    equb &0a, &0a, &05, &05
+    equb &0a, &0a, &00, &0a
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+.sprite_treasure
+    equb &03, &03, &02, &02
+    equb &13, &50, &02, &02
+    equb &02, &24, &17, &03
+    equb &47, &00, &02, &03
+    equb &12, &0d, &02, &03
+    equb &02, &4f, &02, &03
+    equb &06, &32, &02, &03
+    equb &47, &02, &02, &03
+    equb &12, &a5, &02, &03
+    equb &07, &08, &17, &03
+    equb &06, &b0, &02, &02
+    equb &03, &03, &02, &02
+.sprite_food
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &2a, &00, &00, &00
+    equb &2a, &00, &00, &00
+    equb &15, &00, &00, &00
+    equb &2f, &2a, &0f, &00
+    equb &2f, &0f, &0f, &0a
+    equb &00, &0f, &03, &0b
+    equb &00, &05, &0f, &03
+    equb &00, &05, &07, &02
+    equb &00, &00, &03, &02
+    equb &00, &00, &03, &00
+    equb &05, &0f, &0f, &00, &0a, &0f, &0f, &0a
+    equb &0a, &00, &05, &00, &05, &30, &20, &0a
+    equb &05, &00, &00, &0a, &00, &1a, &30, &05
+    equb &00, &0a, &00, &05, &0f, &1a, &30, &25
+    equb &0f, &00, &00, &0a, &0a, &30, &30, &0a
+    equb &05, &00, &00, &0a, &00, &0f, &0f, &00
+.sprite_teleporter
+    equb &3f, &3f, &3f, &3f
+    equb &3e, &3c, &3c, &38
+    equb &3e, &3c, &3c, &38
+    equb &3e, &3f, &3f, &38
+    equb &3e, &3e, &38, &38
+    equb &3e, &3e, &38, &38
+    equb &3e, &3e, &38, &38
+    equb &3e, &3e, &38, &38
+    equb &3e, &30, &30, &38
+    equb &3e, &3c, &3c, &38
+    equb &3e, &3c, &3c, &38
+    equb &30, &30, &30, &30
+    equb &00, &2c, &00, &00, &00, &2c, &08, &00
+    equb &00, &0c, &08, &00, &04, &0f, &0e, &00
+.sprite_digit_0
+    equb &04, &08
+    equb &08, &0c
+    equb &08, &0c
+    equb &08, &0c
+    equb &08, &0c
+    equb &0c, &04
+    equb &0c, &04
+    equb &0c, &04
+    equb &0c, &04
+    equb &04, &08
+.sprite_digit_1
+    equb &04, &00
+    equb &0c, &00
+    equb &04, &00
+    equb &04, &00
+    equb &04, &00
+    equb &04, &00
+    equb &04, &00
+    equb &04, &00
+    equb &04, &00
+    equb &0c, &00
+.sprite_digit_2
+    equb &04, &08
+    equb &08, &04
+    equb &08, &04
+    equb &00, &04
+    equb &00, &08
+    equb &04, &00
+    equb &08, &00
+    equb &08, &04
+    equb &08, &08
+    equb &0c, &0c
+.sprite_digit_3
+    equb &04, &08
+    equb &08, &04
+    equb &00, &04
+    equb &00, &04
+    equb &04, &08
+    equb &04, &08
+    equb &00, &04
+    equb &00, &04
+    equb &0c, &04
+    equb &04, &08
+.sprite_digit_4
+    equb &00, &08
+    equb &04, &08
+    equb &04, &08
+    equb &08, &08
+    equb &08, &0c
+    equb &0c, &08
+    equb &00, &0c
+    equb &00, &08
+    equb &00, &08
+    equb &04, &08
+.sprite_digit_5
+    equb &0c, &0c
+    equb &08, &04
+    equb &08, &00
+    equb &08, &00
+    equb &04, &00
+    equb &00, &08
+    equb &00, &04
+    equb &04, &04
+    equb &08, &04
+    equb &04, &08
+.sprite_digit_6
+    equb &00, &04
+    equb &00, &08
+    equb &04, &00
+    equb &04, &00
+    equb &04, &08
+    equb &08, &04
+    equb &08, &04
+    equb &08, &04
+    equb &08, &04
+    equb &04, &08
+.sprite_digit_7
+    equb &0c, &0c
+    equb &00, &04
+    equb &00, &08
+    equb &00, &08
+    equb &00, &08
+    equb &04, &00
+    equb &04, &00
+    equb &04, &00
+    equb &04, &00
+    equb &0c, &08
+.sprite_digit_8
+    equb &04, &08
+    equb &08, &04
+    equb &08, &04
+    equb &08, &04
+    equb &04, &08
+    equb &08, &04
+    equb &08, &04
+    equb &08, &04
+    equb &08, &04
+    equb &04, &08
+.sprite_digit_9
+    equb &04, &08
+    equb &08, &04
+    equb &08, &04
+    equb &08, &04
+    equb &08, &04
+    equb &04, &08
+    equb &00, &08
+    equb &00, &08
+    equb &04, &00
+    equb &08, &00
+.sprite_door_horizontal
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &3f, &3f, &3f, &3f
+    equb &3e, &3c, &3c, &38
+    equb &3e, &3c, &3c, &38
+    equb &3e, &3c, &3c, &38
+    equb &3e, &3c, &3c, &38
+    equb &30, &30, &30, &30
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &0f, &1a, &30, &20, &00, &00, &00, &25
+.sprite_sparkle_0
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &15, &2a, &00
+    equb &00, &3f, &3f, &00
+    equb &00, &3f, &3f, &00
+    equb &00, &15, &2a, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+.sprite_sparkle_1
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &3f, &3f, &00
+    equb &00, &00, &00, &00
+    equb &15, &15, &2a, &2a
+    equb &15, &00, &00, &2a
+    equb &15, &00, &00, &2a
+    equb &15, &15, &2a, &2a
+    equb &00, &00, &00, &00
+    equb &00, &3f, &3f, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+.sprite_sparkle_2
+    equb &00, &00, &00, &00
+    equb &15, &3f, &3f, &2a
+    equb &00, &3f, &3f, &00
+    equb &2a, &00, &00, &15
+    equb &3f, &00, &00, &3f
+    equb &3f, &15, &2a, &3f
+    equb &3f, &15, &2a, &3f
+    equb &3f, &00, &00, &3f
+    equb &2a, &00, &00, &15
+    equb &00, &3f, &3f, &00
+    equb &15, &3f, &3f, &2a
+    equb &00, &00, &00, &00
+.sprite_sparkle_3
+    equb &3f, &00, &00, &3f
+    equb &3f, &2a, &15, &3f
+    equb &2a, &2a, &15, &15
+    equb &2a, &00, &00, &15
+    equb &3f, &15, &2a, &3f
+    equb &15, &2a, &15, &2a
+    equb &15, &2a, &15, &2a
+    equb &3f, &15, &2a, &3f
+    equb &2a, &00, &00, &15
+    equb &2a, &2a, &15, &15
+    equb &3f, &2a, &15, &3f
+    equb &3f, &00, &00, &3f
+.sprite_trapdoor
+    equb &3c, &3c, &3c, &3c
+    equb &29, &03, &03, &16
+    equb &3f, &12, &03, &16
+    equb &3f, &03, &03, &34
+    equb &29, &03, &21, &16
+    equb &29, &03, &03, &16
+    equb &29, &21, &21, &16
+    equb &29, &03, &03, &34
+    equb &3f, &03, &21, &16
+    equb &3f, &03, &03, &16
+    equb &29, &21, &12, &16
+    equb &3c, &3c, &3c, &3c
+    equb &00, &00, &00, &00, &04, &00, &00, &00
+    equb &20, &00, &00, &00, &fd, &14, &93, &00
+.sprite_arrow_up
+    equb &00, &00, &00, &00
+    equb &00, &15, &00, &00
+    equb &00, &15, &00, &00
+    equb &00, &05, &00, &00
+    equb &00, &05, &00, &00
+    equb &00, &05, &00, &00
+    equb &00, &05, &00, &00
+    equb &00, &05, &00, &00
+    equb &00, &05, &00, &00
+    equb &00, &0c, &08, &00
+    equb &00, &08, &08, &00
+    equb &00, &00, &00, &00
+.sprite_arrow_right
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &0c, &00, &00, &00
+    equb &04, &0f, &0f, &2a
+    equb &0c, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+.sprite_arrow_down
+    equb &00, &00, &00, &00
+    equb &00, &04, &04, &00
+    equb &00, &04, &0c, &00
+    equb &00, &00, &0a, &00
+    equb &00, &00, &0a, &00
+    equb &00, &00, &0a, &00
+    equb &00, &00, &0a, &00
+    equb &00, &00, &0a, &00
+    equb &00, &00, &0a, &00
+    equb &00, &00, &2a, &00
+    equb &00, &00, &2a, &00
+    equb &00, &00, &00, &00
+.sprite_arrow_left
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &0c
+    equb &15, &0f, &0f, &08
+    equb &00, &00, &00, &0c
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+    equb &00, &00, &00, &00
+.sprite_door_vertical
+    equb &00, &3f, &3a, &00
+    equb &00, &3e, &38, &00
+    equb &00, &3e, &38, &00
+    equb &00, &3e, &38, &00
+    equb &00, &3e, &38, &00
+    equb &00, &3e, &38, &00
+    equb &00, &3e, &38, &00
+    equb &00, &3e, &38, &00
+    equb &00, &3e, &38, &00
+    equb &00, &3e, &38, &00
+    equb &00, &3e, &38, &00
+    equb &00, &30, &30, &00
+    equb &01, &00, &00, &00, &17, &00, &00, &90
+    equb &17, &00, &00, &00, &00, &00, &00, &00
+; &2d00 used as index base 1 time by &15db
+.wall_sprite
+    equb &0f, &0b, &0f, &07
+    equb &03, &0f, &0f, &0f
+    equb &0f, &1f, &2f, &0b
+    equb &0f, &2f, &0b, &0f
+    equb &1f, &0f, &0f, &07
+    equb &1f, &1f, &0f, &07
+    equb &17, &0f, &07, &07
+    equb &1f, &0f, &0f, &07
+    equb &0f, &2f, &0b, &0f
+    equb &07, &0b, &07, &0f
+    equb &0f, &0f, &0f, &03
+    equb &0b, &0f, &0f, &0f
+.sprite_ranger_up_0
+    equb &00, &03, &0b, &00
+    equb &01, &00, &0a, &02
+    equb &02, &00, &04, &01
+    equb &01, &02, &04, &00
+    equb &0b, &02, &00, &08
+    equb &0b, &07, &00, &08
+    equb &1c, &25, &34, &08
+    equb &1c, &0f, &1e, &08
+    equb &04, &3c, &29, &08
+    equb &04, &3c, &0c, &00
+    equb &00, &0c, &09, &00
+    equb &00, &00, &03, &00
+.sprite_ranger_up_1
+    equb &00, &03, &02, &00
+    equb &00, &00, &01, &00
+    equb &00, &00, &00, &0a
+    equb &05, &00, &03, &0a
+    equb &05, &00, &03, &09
+    equb &04, &05, &03, &09
+    equb &0c, &25, &34, &09
+    equb &1c, &0f, &1e, &09
+    equb &04, &3c, &28, &08
+    equb &04, &3c, &0c, &00
+    equb &01, &0c, &08, &00
+    equb &01, &02, &00, &00
+.sprite_ranger_right_0
+    equb &00, &04, &0b, &00
+    equb &00, &0c, &0b, &00
+    equb &04, &09, &02, &02
+    equb &04, &3c, &02, &03
+    equb &14, &1a, &02, &01
+    equb &3c, &0f, &0a, &01
+    equb &3c, &0f, &0a, &0d
+    equb &16, &1a, &04, &0d
+    equb &03, &3c, &0c, &03
+    equb &03, &06, &08, &02
+    equb &00, &00, &01, &00
+    equb &00, &00, &01, &00
+.sprite_ranger_right_1
+    equb &00, &00, &08, &00
+    equb &00, &0c, &0d, &00
+    equb &06, &0c, &05, &00
+    equb &06, &3c, &00, &00
+    equb &16, &1a, &00, &01
+    equb &3c, &0f, &0a, &01
+    equb &3c, &0f, &0a, &01
+    equb &14, &1a, &03, &01
+    equb &00, &3c, &09, &03
+    equb &00, &0c, &0d, &02
+    equb &00, &04, &07, &02
+    equb &00, &03, &02, &00
+.sprite_ranger_down_0
+    equb &00, &03, &00, &00
+    equb &00, &06, &0c, &00
+    equb &00, &0c, &3c, &08
+    equb &04, &16, &3c, &08
+    equb &04, &2d, &0f, &2c
+    equb &04, &38, &1a, &2c
+    equb &04, &00, &0b, &07
+    equb &04, &00, &01, &07
+    equb &00, &08, &01, &02
+    equb &02, &08, &00, &01
+    equb &01, &05, &00, &02
+    equb &00, &07, &03, &00
+.sprite_ranger_down_1
+    equb &00, &00, &01, &02
+    equb &00, &04, &0c, &02
+    equb &00, &0c, &3c, &08
+    equb &04, &14, &3c, &08
+    equb &06, &2d, &0f, &2c
+    equb &06, &38, &1a, &0c
+    equb &06, &03, &0a, &08
+    equb &06, &03, &00, &0a
+    equb &05, &03, &00, &0a
+    equb &05, &00, &00, &00
+    equb &00, &02, &00, &00
+    equb &00, &01, &03, &00
+.sprite_ranger_left_0
+    equb &00, &02, &00, &00
+    equb &00, &02, &00, &00
+    equb &01, &04, &09, &03
+    equb &03, &0c, &3c, &03
+    equb &0e, &08, &25, &29
+    equb &0e, &05, &0f, &3c
+    equb &02, &05, &0f, &3c
+    equb &02, &01, &25, &28
+    equb &03, &01, &3c, &08
+    equb &01, &01, &06, &08
+    equb &00, &07, &0c, &00
+    equb &00, &07, &08, &00
+.sprite_monster_up_0
+    equb &00, &00, &00, &02
+    equb &00, &00, &01, &13
+    equb &04, &08, &01, &13
+    equb &45, &30, &8b, &13
+    equb &10, &30, &20, &02
+    equb &1a, &30, &20, &02
+    equb &1a, &30, &25, &07
+    equb &1e, &30, &2d, &0f
+    equb &3c, &3c, &2d, &0a
+    equb &14, &3c, &2c, &00
+    equb &00, &00, &0c, &00
+    equb &00, &00, &0c, &00
+.sprite_monster_up_1
+    equb &00, &04, &08, &00
+    equb &00, &04, &08, &02
+    equb &45, &30, &8b, &13
+    equb &10, &30, &21, &13
+    equb &10, &30, &21, &13
+    equb &1a, &30, &20, &02
+    equb &0f, &30, &00, &02
+    equb &1e, &3c, &2d, &07
+    equb &1e, &3c, &2d, &0f
+    equb &14, &3c, &2d, &0a
+    equb &04, &08, &00, &00
+    equb &04, &08, &00, &00
+.sprite_monster_right_0
+    equb &00, &2d, &0a, &00
+    equb &14, &2d, &00, &00
+    equb &14, &38, &8e, &08
+    equb &14, &30, &24, &08
+    equb &14, &30, &24, &08
+    equb &14, &30, &20, &00
+    equb &1c, &30, &20, &00
+    equb &1c, &38, &8a, &00
+    equb &0c, &28, &00, &00
+    equb &00, &3c, &01, &02
+    equb &00, &0f, &03, &03
+    equb &00, &0f, &11, &22
+.sprite_monster_right_1
+    equb &00, &2d, &0a, &00
+    equb &14, &2d, &00, &00
+    equb &1c, &38, &8a, &00
+    equb &1c, &30, &20, &00
+    equb &1c, &30, &20, &00
+    equb &14, &30, &24, &08
+    equb &3c, &30, &24, &08
+    equb &3c, &10, &8e, &08
+    equb &0f, &00, &00, &00
+    equb &0f, &01, &02, &00
+    equb &0b, &03, &03, &00
+    equb &00, &11, &22, &00
+.sprite_monster_down_0
+    equb &00, &0c, &00, &00
+    equb &00, &0c, &00, &00
+    equb &00, &1c, &3c, &28
+    equb &05, &1e, &3c, &3c
+    equb &0f, &1e, &30, &2d
+    equb &0b, &1a, &30, &25
+    equb &01, &10, &30, &25
+    equb &01, &10, &30, &20
+    equb &23, &47, &30, &8a
+    equb &23, &02, &04, &08
+    equb &23, &02, &00, &00
+    equb &01, &00, &00, &00
+.sprite_monster_down_1
+    equb &00, &00, &04, &08
+    equb &00, &00, &04, &08
+    equb &05, &1e, &3c, &28
+    equb &0f, &1e, &3c, &2d
+    equb &0b, &1e, &3c, &2d
+    equb &01, &00, &30, &0f
+    equb &01, &10, &30, &25
+    equb &23, &12, &30, &20
+    equb &23, &12, &30, &20
+    equb &23, &47, &30, &8a
+    equb &01, &04, &08, &00
+    equb &00, &04, &08, &00
+.sprite_monster_left_0
+    equb &11, &22, &0f, &00
+    equb &03, &03, &0f, &00
+    equb &01, &02, &3c, &00
+    equb &00, &00, &14, &0c
+    equb &00, &45, &34, &2c
+    equb &00, &10, &30, &2c
+    equb &00, &10, &30, &28
+    equb &04, &18, &30, &28
+    equb &04, &18, &30, &28
+    equb &04, &4d, &34, &28
+    equb &00, &00, &1e, &28
+    equb &00, &05, &1e, &00
+.sprite_monster_left_1
+    equb &00, &11, &22, &00
+    equb &00, &03, &03, &07
+    equb &00, &01, &02, &0f
+    equb &00, &00, &00, &0f
+    equb &04, &4d, &20, &3c
+    equb &04, &18, &30, &3c
+    equb &04, &18, &30, &28
+    equb &00, &10, &30, &2c
+    equb &00, &10, &30, &2c
+    equb &00, &45, &34, &2c
+    equb &00, &00, &1e, &28
+    equb &00, &05, &1e, &00
 .dasmos_dunj5_end
 
     org &6e80
@@ -7091,7 +6031,7 @@ clear_text_area_top = code_162d+1
 ;     A: wall bit
 ;     Y: wall bit
 ;     Z: set if no wall
-; &78fc referenced 8 times by &40d3, &40e1, &40ef, &6fb2, &712b, &753a, &7675, &7a51
+; &78fc referenced 8 times by &20d3, &20e1, &20ef, &6fb2, &712b, &753a, &7675, &7a51
 .test_wall
     lda cell_y                          ; Room offset = (cell_y AND &F8) x 4 + (cell_x AND &F8)...
     and #&f8                            ; ...
@@ -7854,7 +6794,7 @@ clear_text_area_top = code_162d+1
     equb &04, &05, &ff, &ff, &ff, &ff, &ff, &ff
     equb &ff, &ff, &ff, &ff, &ff, &01, &07, &04
     equb &04, &ff, &ff, &ff, &ff, &ff
-; &7f3e referenced 4 times by &1f3b, &1f77, &1f85, &4029
+; &7f3e referenced 4 times by &1f3b, &1f77, &1f85, &2029
 .exit_x
     equb &04
 ; &7f3f used as index base 9 times by &157c, &717b, &719d, &7313, &7342, &73f3, &7416, &746c, &74be
@@ -7864,7 +6804,7 @@ clear_text_area_top = code_162d+1
     equb &ff, &ff, &ff, &ff, &ff
     equs "**+."
     equb &ff, &ff, &ff, &ff, &ff
-; &7f5d referenced 4 times by &1f43, &1f7d, &1f88, &402f
+; &7f5d referenced 4 times by &1f43, &1f7d, &1f88, &202f
 .exit_y
     equb &2c
 ; &7f5e used as index base 7 times by &1582, &7183, &718e, &7191, &7319, &735c, &73c8
@@ -8049,9 +6989,9 @@ clear_text_area_top = code_162d+1
 ;
 ; Row x 640 for character rows 0-24, high byte first: the table screen_address and the
 ; title's star plotter read here instead of in MOS 1.20.
-; &c675 used as index base 3 times by &096e, &387d, &d86e
+; &c675 used as index base 2 times by &096e, &d86e
 .row_offsets
-; &c676 used as index base 3 times by &0976, &3885, &d876
+; &c676 used as index base 2 times by &0976, &d876
 row_offsets_lo = row_offsets+1
     equb &00, &00, &02, &80, &05, &00, &07, &80, &0a, &00
     equb &0c, &80, &0f, &00, &11, &80, &14, &00, &16, &80
@@ -8816,8 +7756,6 @@ row_offsets_lo = row_offsets+1
 save "Coder", dasmos_coder_start, dasmos_coder_end, &0740, &0400
 save "Dunj3", dasmos_dunj3_start, dasmos_dunj3_end, &08c0, &08c0
 save "Dunj4", dasmos_dunj4_start, dasmos_dunj4_end, &0e00, &0e00
-save "Coder2", dasmos_coder2_start, dasmos_coder2_end, &2000, &2000
-save "Dunjunz", dasmos_dunjunz_start, dasmos_dunjunz_end, &2649, &2649
 save "Dunj5", dasmos_dunj5_start, dasmos_dunj5_end, &2000, &2000
 save "Dunj2", dasmos_dunj2_start, dasmos_dunj2_end, &6e80, &6e80
 save "Code", dasmos_code_start, dasmos_code_end, &c500, &c500
@@ -8826,677 +7764,615 @@ save "Code2", dasmos_code2_start, dasmos_code2_end, &c700, &c700
 save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 
 ; Label references by decreasing frequency:
-;     oswrch:                           67
-;     cell_x:                           59
-;     cell_y:                           55
-;     scratch:                          52
-;     sprite_number:                    47
-;     plot_x:                           44
-;     screen_ptr:                       42
-;     plot_y:                           33
-;     hero_x:                           29
-;     osbyte:                           28
-;     screen_ptr_hi:                    28
-;     hero_y:                           27
-;     osword:                           24
-;     map_ptr:                          21
-;     plot_sprite:                      21
-;     hero_offset_y:                    20
-;     hero_offset_x:                    19
-;     monster_sprite:                   19
-;     plot_at_cell:                     19
-;     hero_direction:                   18
-;     plot_offset_x:                    18
-;     plot_offset_y:                    18
-;     monster_offset_y:                 17
-;     monster_x:                        17
-;     oscli:                            17
-;     monster_y:                        16
-;     monster_offset_x:                 15
-;     hero_frame:                       14
-;     hero_step:                        12
-;     missile_direction:                12
-;     plot_victory_sprite:              12
-;     tune_ptr:                         12
-;     previous_x:                       11
-;     previous_y:                       11
-;     hero_health_tens:                 10
-;     hero_key:                         10
-;     hero_panel_y:                     10
-;     sprite_width:                     10
-;     hero_max_missiles:                 9
-;     level_bcd:                         9
-;     object_x:                          9
-;     object_y:                          9
-;     returning_hero_queue:              9
-;     sprite_data_ptr:                   9
-;     lose_health_point:                 8
-;     panel_hero:                        8
-;     ring_x:                            8
-;     scratch2:                          8
-;     test_wall:                         8
-;     cell_room:                         7
-;     hero_damage_taken:                 7
-;     hero_health_units:                 7
-;     hero_missile_damage:               7
-;     hero_score_units:                  7
-;     key_x:                             7
-;     key_y:                             7
-;     level_number:                      7
-;     menu_text:                         7
-;     monster_step:                      7
-;     object_type:                       7
-;     os_vsync_counter:                  7
-;     play_level:                        7
-;     ring_y:                            7
-;     draw_monster:                      6
-;     hero_score_ten_thousands:          6
-;     menu_key_loop:                     6
-;     missile_x:                         6
-;     missile_y:                         6
-;     music_rhythm_step:                 6
-;     music_section:                     6
-;     row_start_ptr:                     6
-;     row_start_ptr_hi:                  6
-;     sprite_data_ptr_hi:                6
-;     sprite_height:                     6
-;     star_showing:                      6
-;     test_key:                          6
-;     tune_ptr + 1:                      6
-;     victory_pitch:                     6
-;     victory_sprite:                    6
-;     add_point:                         5
-;     code_71d9:                         5
-;     code_c566:                         5
-;     count:                             5
-;     erase_hero:                        5
-;     exit_busy:                         5
-;     exit_spin:                         5
-;     hero_score_hundreds:               5
-;     hero_score_tens:                   5
-;     hero_score_thousands:              5
-;     music_transpose:                   5
-;     next_trapdoor:                     5
-;     plot_panel_sprite:                 5
-;     sprite_heights:                    5
-;     system_via_t1c_l:                  5
-;     victory_delay:                     5
-;     view_room:                         5
-;     add_ten_points:                    4
-;     code_1ec6:                         4
-;     code_703b:                         4
-;     code_7aea:                         4
-;     door_x:                            4
-;     door_y:                            4
-;     draw_moved_hero:                   4
-;     draw_room:                         4
-;     exit_saved_x:                      4
-;     exit_saved_y:                      4
-;     exit_x:                            4
-;     exit_y:                            4
-;     find_creature:                     4
-;     hero_absent:                       4
-;     hero_door_x:                       4
-;     hero_door_y:                       4
-;     hero_key_dropped:                  4
-;     hero_sprites:                      4
-;     map_ptr_hi:                        4
-;     menu_text + 1:                     4
-;     missile_sprite_base:               4
-;     monster_hit_points:                4
-;     next_hero:                         4
-;     plot_keeping_x:                    4
-;     plot_star:                         4
-;     shrunk_hero:                       4
-;     sprite_widths:                     4
-;     start_hero_step:                   4
-;     step_hero:                         4
-;     bit_masks:                         3
-;     code_1db2:                         3
-;     code_1f36:                         3
-;     code_2847:                         3
-;     code_7266:                         3
-;     code_72bc:                         3
-;     code_7470:                         3
-;     code_76d4:                         3
-;     code_798d:                         3
-;     exit_shrinks_left:                 3
-;     exiting_hero:                      3
-;     first_level_flag:                  3
-;     hero_has_boots:                    3
-;     hero_magic_delay:                  3
-;     magic_kill_count:                  3
-;     missile_damage:                    3
-;     monster_done:                      3
-;     monster_frame:                     3
-;     monster_start_hit_points:          3
-;     next_victory_sprite:               3
-;     osasci:                            3
-;     print_menu:                        3
-;     row_offsets:                       3
-;     row_offsets_lo:                    3
-;     star_places_x:                     3
-;     victory_pitch_step:                3
-;     wait_p_released:                   3
-;     clear_text_area:                   2
-;     code_0e00:                         2
-;     code_108a:                         2
-;     code_1097:                         2
-;     code_111c:                         2
-;     code_11bb:                         2
-;     code_1e28:                         2
-;     code_1ebe:                         2
-;     code_1f91:                         2
-;     code_2076:                         2
-;     code_2686:                         2
-;     code_29a2:                         2
-;     code_29a9:                         2
-;     code_7156:                         2
-;     code_71d4:                         2
-;     code_71d7:                         2
-;     code_7201:                         2
-;     code_73c7:                         2
-;     code_7467:                         2
-;     code_7652:                         2
-;     code_7692:                         2
-;     code_79b7:                         2
-;     code_7adc:                         2
-;     code_7af8:                         2
-;     code_7c6f:                         2
-;     code_7cae:                         2
-;     credit_missile_owner:              2
-;     decrypt_level:                     2
-;     decrypt_level_loop:                2
-;     door_sprite:                       2
-;     draw_hero:                         2
-;     draw_missile_damage:               2
-;     draw_ten_thousands:                2
-;     draw_victory_ring:                 2
-;     draw_view_0:                       2
-;     draw_view_1:                       2
-;     draw_view_2:                       2
-;     draw_view_3:                       2
-;     exit_offsets_x:                    2
-;     exit_offsets_y:                    2
-;     food_sound + 4:                    2
-;     get_hero_cell:                     2
-;     hero_frame + 1:                    2
-;     hero_frame + 2:                    2
-;     hero_frame + 3:                    2
-;     hit_sound + 4:                     2
-;     level_command_digits:              2
-;     level_command_digits + 1:          2
-;     level_filename_digits:             2
-;     menu_text + 2:                     2
-;     missile_spent_pop:                 2
-;     mode2_cursor_off:                  2
-;     monster_x + 35:                    2
-;     monster_y + 35:                    2
-;     mos320_osbyte_default:             2
-;     next_missile:                      2
-;     os_break_intercept:                2
-;     os_irq_a:                          2
-;     os_zp_fa:                          2
-;     osrdch:                            2
-;     play_pickup_sound:                 2
-;     plot_chalice:                      2
-;     point_at_boots_icon:               2
-;     previous_offset_x:                 2
-;     previous_offset_y:                 2
-;     read_hero_keys:                    2
-;     reset_hero:                        2
-;     restore_hero_sprites:              2
-;     return_10:                         2
-;     returning_hero_queue + 1:          2
-;     returning_hero_queue + 2:          2
-;     returning_hero_queue + 3:          2
-;     saved_page_0d:                     2
-;     show_hero_room:                    2
-;     sprite_addr_hi:                    2
-;     sprite_addr_lo:                    2
-;     stop_music:                        2
-;     test_object_free:                  2
-;     trapdoor_x:                        2
-;     trapdoor_y:                        2
-;     victory_steps_left:                2
-;     view_room + 2:                     2
-;     view_room + 4:                     2
-;     view_room + 6:                     2
-;     workspace_template + 208:          2
-;     add_thousand_points:               1
-;     add_thousand_points_done:          1
-;     advance_dying_monster:             1
-;     advance_stars:                     1
-;     animate_absent_hero:               1
-;     blank_display:                     1
-;     blank_display_vdu:                 1
-;     bytev:                             1
-;     bytev + 1:                         1
-;     channel_1_sound + 4:               1
-;     channel_2_sound + 4:               1
-;     channel_3_sound + 2:               1
-;     channel_3_sound + 4:               1
-;     check_for_victory:                 1
-;     check_hero_keys:                   1
-;     check_magic:                       1
-;     clear_text_area_top:               1
-;     code_07c0:                         1
-;     code_0938:                         1
-;     code_093e:                         1
-;     code_0961:                         1
-;     code_0e34:                         1
-;     code_0e36:                         1
-;     code_0e52:                         1
-;     code_0e7a:                         1
-;     code_110a:                         1
-;     code_1124:                         1
-;     code_113c:                         1
-;     code_11d3:                         1
-;     code_1419:                         1
-;     code_147d:                         1
-;     code_14a7:                         1
-;     code_14bf:                         1
-;     code_14f1:                         1
-;     code_16bf:                         1
-;     code_1cc5:                         1
-;     code_1cd8:                         1
-;     code_1ce3:                         1
-;     code_1cee:                         1
-;     code_1cfa:                         1
-;     code_1db8:                         1
-;     code_1dba:                         1
-;     code_1df3:                         1
-;     code_1e35:                         1
-;     code_1e45:                         1
-;     code_1ec4:                         1
-;     code_1f2a:                         1
-;     code_1f96:                         1
-;     code_1f9e:                         1
-;     code_1ff2:                         1
-;     code_2009:                         1
-;     code_2014:                         1
-;     code_2026:                         1
-;     code_205f:                         1
-;     code_206c:                         1
-;     code_20db:                         1
-;     code_20e9:                         1
-;     code_20f7:                         1
-;     code_2696:                         1
-;     code_26ad:                         1
-;     code_2721:                         1
-;     code_2749:                         1
-;     code_27cb:                         1
-;     code_2819:                         1
-;     code_2825:                         1
-;     code_283c:                         1
-;     code_284d:                         1
-;     code_2870:                         1
-;     code_28ae:                         1
-;     code_2904:                         1
-;     code_290a:                         1
-;     code_2914:                         1
-;     code_2922:                         1
-;     code_292a:                         1
-;     code_2930:                         1
-;     code_293b:                         1
-;     code_294a:                         1
-;     code_296f:                         1
-;     code_2993:                         1
-;     code_29a5:                         1
-;     code_29ab:                         1
-;     code_29d0:                         1
-;     code_6e82:                         1
-;     code_6e91:                         1
-;     code_6e97:                         1
-;     code_6eba:                         1
-;     code_6ed4:                         1
-;     code_6ee7:                         1
-;     code_6efa:                         1
-;     code_6f0d:                         1
-;     code_6f70:                         1
-;     code_6f83:                         1
-;     code_6f8a:                         1
-;     code_6f91:                         1
-;     code_6f98:                         1
-;     code_6fc7:                         1
-;     code_6fd5:                         1
-;     code_7002:                         1
-;     code_7053:                         1
-;     code_7069:                         1
-;     code_70d2:                         1
-;     code_70da:                         1
-;     code_70e7:                         1
-;     code_70fe:                         1
-;     code_7108:                         1
-;     code_710f:                         1
-;     code_7116:                         1
-;     code_711d:                         1
-;     code_713a:                         1
-;     code_7150:                         1
-;     code_71a0:                         1
-;     code_71b4:                         1
-;     code_71c0:                         1
-;     code_71cc:                         1
-;     code_7227:                         1
-;     code_7263:                         1
-;     code_7337:                         1
-;     code_7342:                         1
-;     code_734d:                         1
-;     code_738a:                         1
-;     code_73a0:                         1
-;     code_73c3:                         1
-;     code_73d9:                         1
-;     code_740d:                         1
-;     code_7429:                         1
-;     code_744c:                         1
-;     code_7464:                         1
-;     code_7477:                         1
-;     code_74b6:                         1
-;     code_74eb:                         1
-;     code_74fc:                         1
-;     code_74ff:                         1
-;     code_7516:                         1
-;     code_7529:                         1
-;     code_7551:                         1
-;     code_755b:                         1
-;     code_7565:                         1
-;     code_756b:                         1
-;     code_757c:                         1
-;     code_75a6:                         1
-;     code_761f:                         1
-;     code_7650:                         1
-;     code_769c:                         1
-;     code_76ab:                         1
-;     code_76ae:                         1
-;     code_76c0:                         1
-;     code_76c9:                         1
-;     code_76d2:                         1
-;     code_76e0:                         1
-;     code_770b:                         1
-;     code_772e:                         1
-;     code_7757:                         1
-;     code_7764:                         1
-;     code_7771:                         1
-;     code_783e:                         1
-;     code_7845:                         1
-;     code_78ad:                         1
-;     code_78c7:                         1
-;     code_78e1:                         1
-;     code_79bc:                         1
-;     code_7a17:                         1
-;     code_7a23:                         1
-;     code_7a2d:                         1
-;     code_7a34:                         1
-;     code_7a3b:                         1
-;     code_7a42:                         1
-;     code_7a81:                         1
-;     code_7a87:                         1
-;     code_7ac1:                         1
-;     code_7b3f:                         1
-;     code_7b79:                         1
-;     code_7b88:                         1
-;     code_7b97:                         1
-;     code_7bb9:                         1
-;     code_7bc0:                         1
-;     code_7bc7:                         1
-;     code_7bce:                         1
-;     code_7bd6:                         1
-;     code_7c02:                         1
-;     code_7c11:                         1
-;     code_7c20:                         1
-;     code_7c42:                         1
-;     code_7c49:                         1
-;     code_7c50:                         1
-;     code_7c57:                         1
-;     code_7c5f:                         1
-;     code_7c6c:                         1
-;     code_7c82:                         1
-;     code_7cc2:                         1
-;     code_7cfb:                         1
-;     code_c51b:                         1
-;     code_c529:                         1
-;     code_c538:                         1
-;     code_c546:                         1
-;     code_c555:                         1
-;     code_c569:                         1
-;     code_c77a:                         1
-;     code_c781:                         1
-;     code_c793:                         1
-;     code_c7a5:                         1
-;     code_c7be:                         1
-;     code_c7e0:                         1
-;     code_c7f0:                         1
-;     code_c80b:                         1
-;     code_d838:                         1
-;     code_d83e:                         1
-;     code_d861:                         1
-;     coder_display_vdu:                 1
-;     collect_objects:                   1
-;     continue_hero_step:                1
-;     continue_monster_step:             1
-;     count_level:                       1
-;     cursor_off_vdu:                    1
-;     dasmos_start:                      1
-;     decrypt_level_done:                1
-;     decrypt_level_next:                1
-;     dissolve_chalice:                  1
-;     draw_all_views:                    1
-;     draw_armour_rating:                1
-;     draw_keys:                         1
-;     draw_new_missile_icon:             1
-;     draw_room_row:                     1
-;     draw_status_panel:                 1
-;     draw_ten_thousands_loop:           1
-;     draw_view_frames:                  1
-;     drop_key:                          1
-;     erase_boots_icon:                  1
-;     evntv:                             1
-;     evntv + 1:                         1
-;     exit_offset_x_1:                   1
-;     exit_offset_x_2:                   1
-;     exit_offset_x_3:                   1
-;     exit_offset_y_1:                   1
-;     exit_offset_y_2:                   1
-;     exit_offset_y_3:                   1
-;     exit_offset_y_4:                   1
-;     find_open_neighbour:               1
-;     fire_missile:                      1
-;     flip_firer_frame:                  1
-;     game_over_message:                 1
-;     game_over_music:                   1
-;     hero_appearance_sprites:           1
-;     hero_direction - 1:                1
-;     hero_enters_exit:                  1
-;     hero_faces:                        1
-;     hero_frame - 1:                    1
-;     hero_health_tens - 1:              1
-;     hero_key_down:                     1
-;     hero_key_fire:                     1
-;     hero_key_left:                     1
-;     hero_key_right:                    1
-;     hero_key_up:                       1
-;     hero_magic_key:                    1
-;     hero_menu:                         1
-;     hero_missile_sprites:              1
-;     hero_start_damage_taken:           1
-;     hero_start_max_missiles:           1
-;     hero_start_missile_damage:         1
-;     leave_title:                       1
-;     level_checksums:                   1
-;     level_door_sprite:                 1
-;     level_door_x:                      1
-;     level_door_y:                      1
-;     level_filename_digits + 1:         1
-;     level_key_x:                       1
-;     level_key_y:                       1
-;     level_loop:                        1
-;     level_object_free_map:             1
-;     level_object_type:                 1
-;     level_object_x:                    1
-;     level_object_y:                    1
-;     level_trapdoor_x:                  1
-;     level_trapdoor_y:                  1
-;     level_wall_sprite:                 1
-;     level_walls:                       1
-;     load_level:                        1
-;     load_stones:                       1
-;     load_title_screen:                 1
-;     loop_0745:                         1
-;     loop_076c:                         1
-;     loop_091d:                         1
-;     loop_0929:                         1
-;     loop_0e09:                         1
-;     loop_0e6d:                         1
-;     loop_0ea8:                         1
-;     loop_0eae:                         1
-;     loop_0eb9:                         1
-;     loop_0efc:                         1
-;     loop_0f3a:                         1
-;     loop_1079:                         1
-;     loop_1084:                         1
-;     loop_10ba:                         1
-;     loop_10c7:                         1
-;     loop_113e:                         1
-;     loop_1140:                         1
-;     loop_11de:                         1
-;     loop_11ec:                         1
-;     loop_1485:                         1
-;     loop_150f:                         1
-;     loop_1546:                         1
-;     loop_154d:                         1
-;     loop_1573:                         1
-;     loop_158a:                         1
-;     loop_15a1:                         1
-;     loop_15b2:                         1
-;     loop_15c5:                         1
-;     loop_15d8:                         1
-;     loop_15e6:                         1
-;     loop_15fd:                         1
-;     loop_16b4:                         1
-;     loop_1d03:                         1
-;     loop_1dce:                         1
-;     loop_1f17:                         1
-;     loop_1f38:                         1
-;     loop_6f28:                         1
-;     loop_7007:                         1
-;     loop_7173:                         1
-;     loop_71dd:                         1
-;     loop_71f4:                         1
-;     loop_7256:                         1
-;     loop_730d:                         1
-;     loop_73a7:                         1
-;     loop_742b:                         1
-;     loop_7498:                         1
-;     loop_7667:                         1
-;     loop_77e4:                         1
-;     loop_77fe:                         1
-;     loop_7827:                         1
-;     loop_7976:                         1
-;     loop_7997:                         1
-;     loop_79aa:                         1
-;     loop_79cd:                         1
-;     loop_c6dc:                         1
-;     loop_d81d:                         1
-;     loop_d829:                         1
-;     menu_done:                         1
-;     menu_hero_off:                     1
-;     menu_reprint:                      1
-;     menu_set_sound:                    1
-;     menu_sound_key:                    1
-;     menu_sound_off:                    1
-;     menu_space:                        1
-;     menu_space_check_hero:             1
-;     missile_spent:                     1
-;     modelb_hero_absent:                1
-;     modelb_hero_score_ten_thousands:   1
-;     modelb_level_digits:               1
-;     modelb_level_digits + 1:           1
-;     modelb_levels_started:             1
-;     monster_reappears:                 1
-;     mos120_reset_entry:                1
-;     move_heroes:                       1
-;     move_missiles:                     1
-;     music_event:                       1
-;     next_monster_update:               1
-;     object_free_map:                   1
-;     object_free_map + 58:              1
-;     os_break_intercept + 1:            1
-;     os_break_intercept + 2:            1
-;     panel_hero - 1:                    1
-;     pause_check:                       1
-;     plot_boots_icon:                   1
-;     plot_sprite + 1:                   1
-;     plot_sprite + 2:                   1
-;     print_menu_loop:                   1
-;     print_menu_string:                 1
-;     print_menu_string_loop:            1
-;     queue_exit_marker:                 1
-;     remove_absent_heroes:              1
-;     remove_absent_heroes_check:        1
-;     remove_absent_heroes_loop:         1
-;     remove_absent_heroes_next:         1
-;     reset_call_address:                1
-;     reset_call_address + 1:            1
-;     reset_monsters:                    1
-;     reset_vector:                      1
-;     reset_vector + 1:                  1
-;     reset_workspace:                   1
-;     return_1:                          1
-;     return_11:                         1
-;     return_12:                         1
-;     return_2:                          1
-;     return_3:                          1
-;     return_4:                          1
-;     return_5:                          1
-;     return_6:                          1
-;     return_7:                          1
-;     return_8:                          1
-;     return_9:                          1
-;     rhythm_pattern:                    1
-;     room_walls:                        1
-;     room_walls + 58:                   1
-;     run_coder:                         1
-;     screen_address:                    1
-;     screen_address_hazel:              1
-;     section_ptrs_hi:                   1
-;     section_ptrs_lo:                   1
-;     set_bell:                          1
-;     set_menu_no:                       1
-;     set_menu_off:                      1
-;     set_menu_on:                       1
-;     set_menu_yes:                      1
-;     sprite_axe_left:                   1
-;     sprite_axe_right:                  1
-;     sprite_chalice:                    1
-;     sprite_chalice - 1:                1
-;     sprite_fighter_down_0:             1
-;     sprite_key:                        1
-;     sprite_treasure:                   1
-;     star_frames_hi:                    1
-;     star_frames_lo:                    1
-;     star_places_y:                     1
-;     start_level:                       1
-;     start_monster_step:                1
-;     start_music:                       1
-;     start_star:                        1
-;     sub_7305:                          1
-;     teleport_last:                     1
-;     title_plot_star:                   1
-;     title_screen_address:              1
-;     title_start:                       1
-;     trapdoor_x - 1:                    1
-;     trapdoor_y - 1:                    1
-;     twinkle_stars:                     1
-;     unpack_level:                      1
-;     update_game:                       1
-;     update_monsters:                   1
-;     update_rest:                       1
-;     victory_sequence:                  1
-;     victory_sprite_copy:               1
-;     wall_sprite:                       1
-;     workspace_template:                1
-;     wrchv:                             1
-;     wrchv + 1:                         1
+;     cell_x:                      59
+;     cell_y:                      55
+;     oswrch:                      54
+;     scratch:                     52
+;     sprite_number:               45
+;     plot_x:                      41
+;     plot_y:                      30
+;     hero_x:                      29
+;     hero_y:                      27
+;     screen_ptr:                  26
+;     osword:                      24
+;     osbyte:                      23
+;     map_ptr:                     21
+;     plot_sprite:                 21
+;     hero_offset_y:               20
+;     hero_offset_x:               19
+;     monster_sprite:              19
+;     plot_at_cell:                19
+;     hero_direction:              18
+;     plot_offset_x:               18
+;     plot_offset_y:               18
+;     screen_ptr_hi:               18
+;     monster_offset_y:            17
+;     monster_x:                   17
+;     monster_y:                   16
+;     monster_offset_x:            15
+;     hero_frame:                  14
+;     hero_step:                   12
+;     missile_direction:           12
+;     plot_victory_sprite:         12
+;     tune_ptr:                    12
+;     previous_x:                  11
+;     previous_y:                  11
+;     hero_health_tens:            10
+;     hero_key:                    10
+;     hero_panel_y:                10
+;     hero_max_missiles:            9
+;     level_bcd:                    9
+;     object_x:                     9
+;     object_y:                     9
+;     returning_hero_queue:         9
+;     lose_health_point:            8
+;     panel_hero:                   8
+;     ring_x:                       8
+;     scratch2:                     8
+;     sprite_width:                 8
+;     test_wall:                    8
+;     cell_room:                    7
+;     hero_damage_taken:            7
+;     hero_health_units:            7
+;     hero_missile_damage:          7
+;     hero_score_units:             7
+;     key_x:                        7
+;     key_y:                        7
+;     level_number:                 7
+;     menu_text:                    7
+;     monster_step:                 7
+;     object_type:                  7
+;     os_vsync_counter:             7
+;     play_level:                   7
+;     ring_y:                       7
+;     draw_monster:                 6
+;     hero_score_ten_thousands:     6
+;     menu_key_loop:                6
+;     missile_x:                    6
+;     missile_y:                    6
+;     music_rhythm_step:            6
+;     music_section:                6
+;     oscli:                        6
+;     sprite_data_ptr:              6
+;     test_key:                     6
+;     tune_ptr + 1:                 6
+;     victory_pitch:                6
+;     victory_sprite:               6
+;     add_point:                    5
+;     code_71d9:                    5
+;     code_c566:                    5
+;     count:                        5
+;     erase_hero:                   5
+;     exit_busy:                    5
+;     exit_spin:                    5
+;     hero_score_hundreds:          5
+;     hero_score_tens:              5
+;     hero_score_thousands:         5
+;     music_transpose:              5
+;     next_trapdoor:                5
+;     plot_panel_sprite:            5
+;     sprite_heights:               5
+;     victory_delay:                5
+;     view_room:                    5
+;     add_ten_points:               4
+;     code_1ec6:                    4
+;     code_703b:                    4
+;     code_7aea:                    4
+;     door_x:                       4
+;     door_y:                       4
+;     draw_moved_hero:              4
+;     draw_room:                    4
+;     exit_saved_x:                 4
+;     exit_saved_y:                 4
+;     exit_x:                       4
+;     exit_y:                       4
+;     find_creature:                4
+;     hero_absent:                  4
+;     hero_door_x:                  4
+;     hero_door_y:                  4
+;     hero_key_dropped:             4
+;     hero_sprites:                 4
+;     map_ptr_hi:                   4
+;     menu_text + 1:                4
+;     missile_sprite_base:          4
+;     monster_hit_points:           4
+;     next_hero:                    4
+;     plot_keeping_x:               4
+;     row_start_ptr:                4
+;     row_start_ptr_hi:             4
+;     shrunk_hero:                  4
+;     sprite_data_ptr_hi:           4
+;     sprite_height:                4
+;     sprite_widths:                4
+;     start_hero_step:              4
+;     step_hero:                    4
+;     bit_masks:                    3
+;     code_1db2:                    3
+;     code_1f36:                    3
+;     code_7266:                    3
+;     code_72bc:                    3
+;     code_7470:                    3
+;     code_76d4:                    3
+;     code_798d:                    3
+;     exit_shrinks_left:            3
+;     exiting_hero:                 3
+;     first_level_flag:             3
+;     hero_has_boots:               3
+;     hero_magic_delay:             3
+;     magic_kill_count:             3
+;     missile_damage:               3
+;     monster_done:                 3
+;     monster_frame:                3
+;     monster_start_hit_points:     3
+;     next_victory_sprite:          3
+;     osasci:                       3
+;     print_menu:                   3
+;     system_via_t1c_l:             3
+;     victory_pitch_step:           3
+;     wait_p_released:              3
+;     clear_text_area:              2
+;     code_0e00:                    2
+;     code_108a:                    2
+;     code_1097:                    2
+;     code_111c:                    2
+;     code_11bb:                    2
+;     code_1e28:                    2
+;     code_1ebe:                    2
+;     code_1f91:                    2
+;     code_2076:                    2
+;     code_7156:                    2
+;     code_71d4:                    2
+;     code_71d7:                    2
+;     code_7201:                    2
+;     code_73c7:                    2
+;     code_7467:                    2
+;     code_7652:                    2
+;     code_7692:                    2
+;     code_79b7:                    2
+;     code_7adc:                    2
+;     code_7af8:                    2
+;     code_7c6f:                    2
+;     code_7cae:                    2
+;     credit_missile_owner:         2
+;     decrypt_level:                2
+;     decrypt_level_loop:           2
+;     door_sprite:                  2
+;     draw_hero:                    2
+;     draw_missile_damage:          2
+;     draw_ten_thousands:           2
+;     draw_victory_ring:            2
+;     draw_view_0:                  2
+;     draw_view_1:                  2
+;     draw_view_2:                  2
+;     draw_view_3:                  2
+;     exit_offsets_x:               2
+;     exit_offsets_y:               2
+;     food_sound + 4:               2
+;     get_hero_cell:                2
+;     hero_frame + 1:               2
+;     hero_frame + 2:               2
+;     hero_frame + 3:               2
+;     hit_sound + 4:                2
+;     level_command_digits:         2
+;     level_command_digits + 1:     2
+;     level_filename_digits:        2
+;     menu_text + 2:                2
+;     missile_spent_pop:            2
+;     monster_x + 35:               2
+;     monster_y + 35:               2
+;     mos320_osbyte_default:        2
+;     next_missile:                 2
+;     osrdch:                       2
+;     play_pickup_sound:            2
+;     plot_chalice:                 2
+;     point_at_boots_icon:          2
+;     previous_offset_x:            2
+;     previous_offset_y:            2
+;     read_hero_keys:               2
+;     reset_hero:                   2
+;     restore_hero_sprites:         2
+;     return_10:                    2
+;     returning_hero_queue + 1:     2
+;     returning_hero_queue + 2:     2
+;     returning_hero_queue + 3:     2
+;     row_offsets:                  2
+;     row_offsets_lo:               2
+;     saved_page_0d:                2
+;     show_hero_room:               2
+;     sprite_addr_hi:               2
+;     sprite_addr_lo:               2
+;     stop_music:                   2
+;     test_object_free:             2
+;     trapdoor_x:                   2
+;     trapdoor_y:                   2
+;     victory_steps_left:           2
+;     view_room + 2:                2
+;     view_room + 4:                2
+;     view_room + 6:                2
+;     workspace_template + 208:     2
+;     add_thousand_points:          1
+;     add_thousand_points_done:     1
+;     advance_dying_monster:        1
+;     animate_absent_hero:          1
+;     channel_1_sound + 4:          1
+;     channel_2_sound + 4:          1
+;     channel_3_sound + 2:          1
+;     channel_3_sound + 4:          1
+;     check_for_victory:            1
+;     check_hero_keys:              1
+;     check_magic:                  1
+;     clear_text_area_top:          1
+;     code_07c0:                    1
+;     code_0938:                    1
+;     code_093e:                    1
+;     code_0961:                    1
+;     code_0e34:                    1
+;     code_0e36:                    1
+;     code_0e52:                    1
+;     code_0e7a:                    1
+;     code_110a:                    1
+;     code_1124:                    1
+;     code_113c:                    1
+;     code_11d3:                    1
+;     code_1419:                    1
+;     code_147d:                    1
+;     code_14a7:                    1
+;     code_14bf:                    1
+;     code_14f1:                    1
+;     code_16bf:                    1
+;     code_1cc5:                    1
+;     code_1cd8:                    1
+;     code_1ce3:                    1
+;     code_1cee:                    1
+;     code_1cfa:                    1
+;     code_1db8:                    1
+;     code_1dba:                    1
+;     code_1df3:                    1
+;     code_1e35:                    1
+;     code_1e45:                    1
+;     code_1ec4:                    1
+;     code_1f2a:                    1
+;     code_1f96:                    1
+;     code_1f9e:                    1
+;     code_1ff2:                    1
+;     code_2026:                    1
+;     code_20db:                    1
+;     code_20e9:                    1
+;     code_20f7:                    1
+;     code_6e82:                    1
+;     code_6e91:                    1
+;     code_6e97:                    1
+;     code_6eba:                    1
+;     code_6ed4:                    1
+;     code_6ee7:                    1
+;     code_6efa:                    1
+;     code_6f0d:                    1
+;     code_6f70:                    1
+;     code_6f83:                    1
+;     code_6f8a:                    1
+;     code_6f91:                    1
+;     code_6f98:                    1
+;     code_6fc7:                    1
+;     code_6fd5:                    1
+;     code_7002:                    1
+;     code_7053:                    1
+;     code_7069:                    1
+;     code_70d2:                    1
+;     code_70da:                    1
+;     code_70e7:                    1
+;     code_70fe:                    1
+;     code_7108:                    1
+;     code_710f:                    1
+;     code_7116:                    1
+;     code_711d:                    1
+;     code_713a:                    1
+;     code_7150:                    1
+;     code_71a0:                    1
+;     code_71b4:                    1
+;     code_71c0:                    1
+;     code_71cc:                    1
+;     code_7227:                    1
+;     code_7263:                    1
+;     code_7337:                    1
+;     code_7342:                    1
+;     code_734d:                    1
+;     code_738a:                    1
+;     code_73a0:                    1
+;     code_73c3:                    1
+;     code_73d9:                    1
+;     code_740d:                    1
+;     code_7429:                    1
+;     code_744c:                    1
+;     code_7464:                    1
+;     code_7477:                    1
+;     code_74b6:                    1
+;     code_74eb:                    1
+;     code_74fc:                    1
+;     code_74ff:                    1
+;     code_7516:                    1
+;     code_7529:                    1
+;     code_7551:                    1
+;     code_755b:                    1
+;     code_7565:                    1
+;     code_756b:                    1
+;     code_757c:                    1
+;     code_75a6:                    1
+;     code_761f:                    1
+;     code_7650:                    1
+;     code_769c:                    1
+;     code_76ab:                    1
+;     code_76ae:                    1
+;     code_76c0:                    1
+;     code_76c9:                    1
+;     code_76d2:                    1
+;     code_76e0:                    1
+;     code_770b:                    1
+;     code_772e:                    1
+;     code_7757:                    1
+;     code_7764:                    1
+;     code_7771:                    1
+;     code_783e:                    1
+;     code_7845:                    1
+;     code_78ad:                    1
+;     code_78c7:                    1
+;     code_78e1:                    1
+;     code_79bc:                    1
+;     code_7a17:                    1
+;     code_7a23:                    1
+;     code_7a2d:                    1
+;     code_7a34:                    1
+;     code_7a3b:                    1
+;     code_7a42:                    1
+;     code_7a81:                    1
+;     code_7a87:                    1
+;     code_7ac1:                    1
+;     code_7b3f:                    1
+;     code_7b79:                    1
+;     code_7b88:                    1
+;     code_7b97:                    1
+;     code_7bb9:                    1
+;     code_7bc0:                    1
+;     code_7bc7:                    1
+;     code_7bce:                    1
+;     code_7bd6:                    1
+;     code_7c02:                    1
+;     code_7c11:                    1
+;     code_7c20:                    1
+;     code_7c42:                    1
+;     code_7c49:                    1
+;     code_7c50:                    1
+;     code_7c57:                    1
+;     code_7c5f:                    1
+;     code_7c6c:                    1
+;     code_7c82:                    1
+;     code_7cc2:                    1
+;     code_7cfb:                    1
+;     code_c51b:                    1
+;     code_c529:                    1
+;     code_c538:                    1
+;     code_c546:                    1
+;     code_c555:                    1
+;     code_c569:                    1
+;     code_c77a:                    1
+;     code_c781:                    1
+;     code_c793:                    1
+;     code_c7a5:                    1
+;     code_c7be:                    1
+;     code_c7e0:                    1
+;     code_c7f0:                    1
+;     code_c80b:                    1
+;     code_d838:                    1
+;     code_d83e:                    1
+;     code_d861:                    1
+;     coder_display_vdu:            1
+;     collect_objects:              1
+;     continue_hero_step:           1
+;     continue_monster_step:        1
+;     count_level:                  1
+;     dasmos_start:                 1
+;     decrypt_level_done:           1
+;     decrypt_level_next:           1
+;     dissolve_chalice:             1
+;     draw_all_views:               1
+;     draw_armour_rating:           1
+;     draw_keys:                    1
+;     draw_new_missile_icon:        1
+;     draw_room_row:                1
+;     draw_status_panel:            1
+;     draw_ten_thousands_loop:      1
+;     draw_view_frames:             1
+;     drop_key:                     1
+;     erase_boots_icon:             1
+;     evntv:                        1
+;     evntv + 1:                    1
+;     exit_offset_x_1:              1
+;     exit_offset_x_2:              1
+;     exit_offset_x_3:              1
+;     exit_offset_y_1:              1
+;     exit_offset_y_2:              1
+;     exit_offset_y_3:              1
+;     exit_offset_y_4:              1
+;     find_open_neighbour:          1
+;     fire_missile:                 1
+;     flip_firer_frame:             1
+;     game_over_message:            1
+;     game_over_music:              1
+;     hero_appearance_sprites:      1
+;     hero_direction - 1:           1
+;     hero_enters_exit:             1
+;     hero_faces:                   1
+;     hero_frame - 1:               1
+;     hero_health_tens - 1:         1
+;     hero_key_down:                1
+;     hero_key_fire:                1
+;     hero_key_left:                1
+;     hero_key_right:               1
+;     hero_key_up:                  1
+;     hero_magic_key:               1
+;     hero_menu:                    1
+;     hero_missile_sprites:         1
+;     hero_start_damage_taken:      1
+;     hero_start_max_missiles:      1
+;     hero_start_missile_damage:    1
+;     level_checksums:              1
+;     level_door_sprite:            1
+;     level_door_x:                 1
+;     level_door_y:                 1
+;     level_filename_digits + 1:    1
+;     level_key_x:                  1
+;     level_key_y:                  1
+;     level_loop:                   1
+;     level_object_free_map:        1
+;     level_object_type:            1
+;     level_object_x:               1
+;     level_object_y:               1
+;     level_trapdoor_x:             1
+;     level_trapdoor_y:             1
+;     level_wall_sprite:            1
+;     level_walls:                  1
+;     load_level:                   1
+;     load_stones:                  1
+;     loop_0745:                    1
+;     loop_076c:                    1
+;     loop_091d:                    1
+;     loop_0929:                    1
+;     loop_0e09:                    1
+;     loop_0e6d:                    1
+;     loop_0ea8:                    1
+;     loop_0eae:                    1
+;     loop_0eb9:                    1
+;     loop_0efc:                    1
+;     loop_0f3a:                    1
+;     loop_1079:                    1
+;     loop_1084:                    1
+;     loop_10ba:                    1
+;     loop_10c7:                    1
+;     loop_113e:                    1
+;     loop_1140:                    1
+;     loop_11de:                    1
+;     loop_11ec:                    1
+;     loop_1485:                    1
+;     loop_150f:                    1
+;     loop_1546:                    1
+;     loop_154d:                    1
+;     loop_1573:                    1
+;     loop_158a:                    1
+;     loop_15a1:                    1
+;     loop_15b2:                    1
+;     loop_15c5:                    1
+;     loop_15d8:                    1
+;     loop_15e6:                    1
+;     loop_15fd:                    1
+;     loop_16b4:                    1
+;     loop_1d03:                    1
+;     loop_1dce:                    1
+;     loop_1f17:                    1
+;     loop_1f38:                    1
+;     loop_2009:                    1
+;     loop_2014:                    1
+;     loop_205f:                    1
+;     loop_206c:                    1
+;     loop_6f28:                    1
+;     loop_7007:                    1
+;     loop_7173:                    1
+;     loop_71dd:                    1
+;     loop_71f4:                    1
+;     loop_7256:                    1
+;     loop_730d:                    1
+;     loop_73a7:                    1
+;     loop_742b:                    1
+;     loop_7498:                    1
+;     loop_7667:                    1
+;     loop_77e4:                    1
+;     loop_77fe:                    1
+;     loop_7827:                    1
+;     loop_7976:                    1
+;     loop_7997:                    1
+;     loop_79aa:                    1
+;     loop_79cd:                    1
+;     loop_c6dc:                    1
+;     loop_d81d:                    1
+;     loop_d829:                    1
+;     menu_done:                    1
+;     menu_hero_off:                1
+;     menu_reprint:                 1
+;     menu_set_sound:               1
+;     menu_sound_key:               1
+;     menu_sound_off:               1
+;     menu_space:                   1
+;     menu_space_check_hero:        1
+;     missile_spent:                1
+;     monster_reappears:            1
+;     mos120_reset_entry:           1
+;     move_heroes:                  1
+;     move_missiles:                1
+;     music_event:                  1
+;     next_monster_update:          1
+;     object_free_map:              1
+;     object_free_map + 58:         1
+;     os_irq_a:                     1
+;     os_zp_fa:                     1
+;     panel_hero - 1:               1
+;     pause_check:                  1
+;     plot_boots_icon:              1
+;     plot_sprite + 1:              1
+;     plot_sprite + 2:              1
+;     print_menu_loop:              1
+;     print_menu_string:            1
+;     print_menu_string_loop:       1
+;     queue_exit_marker:            1
+;     remove_absent_heroes:         1
+;     remove_absent_heroes_check:   1
+;     remove_absent_heroes_loop:    1
+;     remove_absent_heroes_next:    1
+;     reset_call_address:           1
+;     reset_call_address + 1:       1
+;     reset_monsters:               1
+;     reset_vector:                 1
+;     reset_vector + 1:             1
+;     reset_workspace:              1
+;     return_1:                     1
+;     return_11:                    1
+;     return_12:                    1
+;     return_2:                     1
+;     return_3:                     1
+;     return_4:                     1
+;     return_5:                     1
+;     return_6:                     1
+;     return_7:                     1
+;     return_8:                     1
+;     return_9:                     1
+;     rhythm_pattern:               1
+;     room_walls:                   1
+;     room_walls + 58:              1
+;     screen_address:               1
+;     screen_address_hazel:         1
+;     section_ptrs_hi:              1
+;     section_ptrs_lo:              1
+;     set_bell:                     1
+;     set_menu_no:                  1
+;     set_menu_off:                 1
+;     set_menu_on:                  1
+;     set_menu_yes:                 1
+;     sprite_chalice:               1
+;     sprite_chalice - 1:           1
+;     start_level:                  1
+;     start_monster_step:           1
+;     start_music:                  1
+;     sub_7305:                     1
+;     teleport_last:                1
+;     trapdoor_x - 1:               1
+;     trapdoor_y - 1:               1
+;     unpack_level:                 1
+;     update_game:                  1
+;     update_monsters:              1
+;     update_rest:                  1
+;     victory_sequence:             1
+;     victory_sprite_copy:          1
+;     wall_sprite:                  1
+;     workspace_template:           1
+;     wrchv:                        1
+;     wrchv + 1:                    1
 
 ; Automatically generated labels:
 ;     code_07c0
@@ -9544,43 +8420,11 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     code_1f96
 ;     code_1f9e
 ;     code_1ff2
-;     code_2009
-;     code_2014
 ;     code_2026
-;     code_205f
-;     code_206c
 ;     code_2076
 ;     code_20db
 ;     code_20e9
 ;     code_20f7
-;     code_2686
-;     code_2696
-;     code_26ad
-;     code_2721
-;     code_2749
-;     code_27cb
-;     code_2819
-;     code_2825
-;     code_283c
-;     code_2847
-;     code_284d
-;     code_2870
-;     code_28ae
-;     code_2904
-;     code_290a
-;     code_2914
-;     code_2922
-;     code_292a
-;     code_2930
-;     code_293b
-;     code_294a
-;     code_296f
-;     code_2993
-;     code_29a2
-;     code_29a5
-;     code_29a9
-;     code_29ab
-;     code_29d0
 ;     code_6e82
 ;     code_6e91
 ;     code_6e97
@@ -9765,6 +8609,10 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     loop_1dce
 ;     loop_1f17
 ;     loop_1f38
+;     loop_2009
+;     loop_2014
+;     loop_205f
+;     loop_206c
 ;     loop_6f28
 ;     loop_7007
 ;     loop_7173
@@ -9801,12 +8649,12 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     sub_7305
 
 ; Stats:
-;     Total size (Code + Data) = 22548 bytes
-;     Code                     = 8119 bytes (36%)
-;     Data                     = 14429 bytes (64%)
+;     Total size (Code + Data) = 20187 bytes
+;     Code                     = 7436 bytes (37%)
+;     Data                     = 12751 bytes (63%)
 ;
-;     Number of instructions   = 3759
-;     Number of data bytes     = 13560 bytes
+;     Number of instructions   = 3430
+;     Number of data bytes     = 11933 bytes
 ;     Number of data words     = 0 bytes
-;     Number of string bytes   = 869 bytes
-;     Number of strings        = 106
+;     Number of string bytes   = 818 bytes
+;     Number of strings        = 102
