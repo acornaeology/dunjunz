@@ -154,9 +154,35 @@ class Annotator:
         for move, _ in self._each(addr):
             self.d.inkey_number(addr, count, move=move)
 
+    def word(self, addr, length=2, cols=None):
+        for move, _ in self._each(addr):
+            self.d.word(addr, length, cols=cols, move=move)
+
+    def stringcr(self, addr):
+        """A string ended by a carriage return, which it includes."""
+        for move, _ in self._each(addr):
+            self.d.stringcr(addr, move=move)
+
+    def stringz(self, addr):
+        """A string ended by a zero byte, which it includes."""
+        for move, _ in self._each(addr):
+            self.d.stringz(addr, move=move)
+
     def string(self, addr, length):
         for move, _ in self._each(addr):
             self.d.string(addr, length, move=move)
+
+    def byte_value(self, addr):
+        """The byte at runtime address addr in its first placement, or None
+        where this version skips the address."""
+        for move, _ in self._each(addr):
+            binary_addr = addr if move is None else move.convert_runtime_to_binary_addr(addr)
+            return self.d.memory.get_u8(binary_addr)
+        return None
+
+    def word_value(self, addr):
+        low, high = self.byte_value(addr), self.byte_value(addr + 1)
+        return None if low is None or high is None else low + 256 * high
 
     def _loaded(self, addr):
         return any(lo <= addr < hi for lo, hi in RESIDENT_RANGES)

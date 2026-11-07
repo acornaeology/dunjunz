@@ -563,16 +563,10 @@ reset_vector             = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &10, &10, &10, &10, &10, &10, &10, &10
     equb &10, &10, &10, &10
 .teleport_sound
-    equb &13, &00
-    equb &04, &00
-    equb &64, &00
-    equb &1e, &00
+    equw &0013, &0004, &0064, &001e     ; SOUND channel 3 (flush), envelope 4, pitch 100, duration 30
 .food_sound
 ; &333c referenced 2 times by &444f, &445d
-    equb &13, &00
-    equb &02, &00
-    equb &c8, &00
-    equb &02, &00
+    equw &0013, &0002, &00c8, &0002     ; SOUND channel 3 (flush), envelope 2, pitch 200, duration 2
 ; &0c00 used as index base 3 times by &3ca7, &7fc8, &7feb
 .room_walls
     equb &54
@@ -785,10 +779,7 @@ reset_vector             = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &c9, &00, &00, &00, &00, &00, &00, &00
 .hit_sound
 ; &3434 referenced 2 times by &7481, &7491
-    equb &10, &00
-    equb &01, &00
-    equb &06, &00
-    equb &06, &00
+    equw &0010, &0001, &0006, &0006     ; SOUND channel 0 (flush), envelope 1, pitch 6, duration 6
     equb &12, &00, &03, &00, &c8, &00, &0a, &00
 ; &0d00 referenced 49 times by &2006, &200d, &201e, &205a, &2063, &2070, &4405, &4440, &448e, &4492, &4495, &4498, &44b7, &44c2, &6f19, &6f1e, &6f25, &6f71, &6fd7, &7002, &7007, &713c, &74b6, &74c3, &74d8, &77e6, &782c, &7857, &785b, &785e, &7861, &7886, &788b, &7901, &7905, &7908, &790b, &7926, &7931, &793d, &7941, &7944, &7947, &7962, &796d, &7976, &7990, &7a89, &7ce3; also used as index base 1 time by &3be5
 .scratch
@@ -1216,40 +1207,30 @@ hero_key_fire = start_new_game+1
 ; ALL" never appears.
 ; &0f90 used as index base 1 time by &35ee
 .game_over_message
-    equs "FAREWELL!        "
-    equb &0d
-    equs "THE QUEST HAS    "
-    equb &0d
-    equs "FAILED AND THE   "
-    equb &0d
-    equs "GODS ARE IN NO   "
-    equb &0d
-    equs "MOOD TO RESURRECT"
-    equb &0d
+    equs "FAREWELL!        ", &0d
+    equs "THE QUEST HAS    ", &0d
+    equs "FAILED AND THE   ", &0d
+    equs "GODS ARE IN NO   ", &0d
+    equs "MOOD TO RESURRECT", &0d
 .game_over_you_all
 ; &3730 used as index base 1 time by &35e8
 ; &3731 referenced 8 times by &3639, &363c, &3658, &3668, &368d, &369d, &36a0, &36ad
 panel_hero = game_over_you_all+7
 ; &3732 referenced 5 times by &35aa, &35b7, &35bf, &3675, &3688
 count = game_over_you_all+8
-    equs "YOU ALL.         "
-    equb &0d
-    equs "NEW ADVENTURERS  "
-    equb &0d
-    equs "MUST TAKE YOUR   "
-    equb &0d
-    equs "PLACE,BEGINNING  "
-    equb &0d
-    equs "BACK ON THE UPPER"
-    equb &0d
-    equs "MOST LEVEL.      "
-    equb &0d
-    equb &0a
-    equs "FIND THE CHALICE!"
-    equb &00
-    equs "ND!"
-    equb &00
-    equs "&C2"
+    equs "YOU ALL.         ", &0d
+    equs "NEW ADVENTURERS  ", &0d
+    equs "MUST TAKE YOUR   ", &0d
+    equs "PLACE,BEGINNING  ", &0d
+    equs "BACK ON THE UPPER", &0d
+    equs "MOST LEVEL.      ", &0d
+    equb &0a                            ; Line feed: a blank line
+    equs "FIND THE CHALICE!", &00
+; ***************************************************************************************
+; Unused
+;
+; Leftover bytes: "ND!" and a zero, the end of an earlier message, then "&C2".
+    equb &4e, &44, &21, &00, &26, &43, &32
 ; ***************************************************************************************
 ; Check whether the Chalice has been found
 ;
@@ -2275,40 +2256,50 @@ text_window_bottom = set_text_window_bottom+1
     equb &1a, &35, &03, &8f, &7d, &9a, &82, &03
     equb &00, &00, &00, &6d, &19, &00, &00, &00
 .magic_envelope
-    equb &03, &01, &0a, &0a, &ec, &03, &03, &03, &80, &00, &00, &ff, &80, &80
+    equb &03                            ; Envelope 3
+    equb &01                            ; Step length 1 centisecond
+    equb &0a, &0a, &ec                  ; Pitch change per step in sections 1-3: 10, 10, -20
+    equb &03, &03, &03                  ; Steps in pitch sections 1-3: 3, 3, 3
+    equb &80, &00, &00, &ff             ; Amplitude change per step in attack, decay, sustain, release: -128, 0, 0, -1
+    equb &80, &80                       ; Target levels at the end of attack and decay: 128, 128
 .magic_sound
-    equb &12, &00
-    equb &03, &00
-    equb &00, &00
-    equb &02, &00
+    equw &0012, &0003, &0000, &0002     ; SOUND channel 2 (flush), envelope 3, pitch 0, duration 2
 .treasure_envelope
-    equb &03, &02, &01, &01, &01, &01, &01, &01, &80, &00, &00, &f8, &80, &80
+    equb &03                            ; Envelope 3
+    equb &02                            ; Step length 2 centiseconds
+    equb &01, &01, &01                  ; Pitch change per step in sections 1-3: 1, 1, 1
+    equb &01, &01, &01                  ; Steps in pitch sections 1-3: 1, 1, 1
+    equb &80, &00, &00, &f8             ; Amplitude change per step in attack, decay, sustain, release: -128, 0, 0, -8
+    equb &80, &80                       ; Target levels at the end of attack and decay: 128, 128
 .treasure_sound
-    equb &12, &00
-    equb &03, &00
-    equb &c8, &00
-    equb &05, &00
+    equw &0012, &0003, &00c8, &0005     ; SOUND channel 2 (flush), envelope 3, pitch 200, duration 5
 .pickup_envelope
-    equb &03, &80, &00, &00, &00, &0a, &0a, &0a, &0a, &00, &00, &fd, &80, &80
+    equb &03                            ; Envelope 3
+    equb &80                            ; Step length 0 centiseconds, no auto-repeat
+    equb &00, &00, &00                  ; Pitch change per step in sections 1-3: 0, 0, 0
+    equb &0a, &0a, &0a                  ; Steps in pitch sections 1-3: 10, 10, 10
+    equb &0a, &00, &00, &fd             ; Amplitude change per step in attack, decay, sustain, release: 10, 0, 0, -3
+    equb &80, &80                       ; Target levels at the end of attack and decay: 128, 128
 .pickup_sound
-    equb &10, &00
-    equb &03, &00
-    equb &0a, &00
-    equb &05, &00
+    equw &0010, &0003, &000a, &0005     ; SOUND channel 0 (flush), envelope 3, pitch 10, duration 5
 .key_envelope
-    equb &03, &80, &00, &00, &00, &01, &1e, &1e, &80, &00, &00, &fe, &80, &80
+    equb &03                            ; Envelope 3
+    equb &80                            ; Step length 0 centiseconds, no auto-repeat
+    equb &00, &00, &00                  ; Pitch change per step in sections 1-3: 0, 0, 0
+    equb &01, &1e, &1e                  ; Steps in pitch sections 1-3: 1, 30, 30
+    equb &80, &00, &00, &fe             ; Amplitude change per step in attack, decay, sustain, release: -128, 0, 0, -2
+    equb &80, &80                       ; Target levels at the end of attack and decay: 128, 128
 .key_sound
-    equb &12, &00
-    equb &03, &00
-    equb &f0, &00
-    equb &01, &00
+    equw &0012, &0003, &00f0, &0001     ; SOUND channel 2 (flush), envelope 3, pitch 240, duration 1
 .exit_envelope
-    equb &03, &82, &ff, &ff, &fe, &01, &01, &80, &80, &00, &00, &ff, &80, &80
+    equb &03                            ; Envelope 3
+    equb &82                            ; Step length 2 centiseconds, no auto-repeat
+    equb &ff, &ff, &fe                  ; Pitch change per step in sections 1-3: -1, -1, -2
+    equb &01, &01, &80                  ; Steps in pitch sections 1-3: 1, 1, 128
+    equb &80, &00, &00, &ff             ; Amplitude change per step in attack, decay, sustain, release: -128, 0, 0, -1
+    equb &80, &80                       ; Target levels at the end of attack and decay: 128, 128
 .exit_sound
-    equb &12, &00
-    equb &03, &00
-    equb &fa, &00
-    equb &01, &00
+    equw &0012, &0003, os_zp_fa, &0001  ; SOUND channel 2 (flush), envelope 3, pitch 250, duration 1
     equb &00, &00, &00, &00, &04
     equs "50:50:$"
     equb &0c, &0c, &08, &00, &00, &00, &00, &00
@@ -3311,55 +3302,39 @@ text_window_bottom = set_text_window_bottom+1
 ; &0600 used as index base 7 times by &52e3, &52ea, &52f1, &52ff, &530f, &531f, &5328
 .menu_text
 ; &53b1 used as index base 8 times by &5304, &5314, &5322, &532d, &5704, &5714, &5722, &572d
-    equb &06, &00
+    equb &06, &00                       ; Column 6, row 0
 ; &0602 used as index base 4 times by &5309, &5319, &5709, &5719
-    equs "DUNJUNZ"
-    equb &0d
-    equb &00, &02
-    equs "HERO"
-    equb &0d
-    equb &0c, &02
-    equs "PLAYING"
-    equb &0d
-    equb &00, &04
-    equs "1 RANGER"
-    equb &0d
-    equb &00, &05
-    equs "2 MAGIC-USER"
-    equb &0d
-    equb &00, &06
-    equs "3 BARBARIAN"
-    equb &0d
-    equb &00, &07
-    equs "4 FIGHTER"
-    equb &0d
-    equb &0e, &04
-    equs "YES"
-    equb &0d
-    equb &0e, &05
-    equs "YES"
-    equb &0d
-    equb &0e, &06
-    equs "YES"
-    equb &0d
-    equb &0e, &07
-    equs "YES"
-    equb &0d
-    equb &00, &09
-    equs "TYPE NUMBER"
-    equb &0d
-    equb &00, &0a
-    equs "TO TOGGLE"
-    equb &0d
-    equb &00, &0d
-    equs "SOUND ON(5) OFF(6)"
-    equb &0d
-    equb &07, &0f
-    equs "ON "
-    equb &0d
-    equb &03, &14
-    equs "SPACE TO PLAY"
-    equb &0d
+    equs "DUNJUNZ", &0d
+    equb &00, &02                       ; Column 0, row 2
+    equs "HERO", &0d
+    equb &0c, &02                       ; Column 12, row 2
+    equs "PLAYING", &0d
+    equb &00, &04                       ; Column 0, row 4
+    equs "1 RANGER", &0d
+    equb &00, &05                       ; Column 0, row 5
+    equs "2 MAGIC-USER", &0d
+    equb &00, &06                       ; Column 0, row 6
+    equs "3 BARBARIAN", &0d
+    equb &00, &07                       ; Column 0, row 7
+    equs "4 FIGHTER", &0d
+    equb &0e, &04                       ; Column 14, row 4
+    equs "YES", &0d
+    equb &0e, &05                       ; Column 14, row 5
+    equs "YES", &0d
+    equb &0e, &06                       ; Column 14, row 6
+    equs "YES", &0d
+    equb &0e, &07                       ; Column 14, row 7
+    equs "YES", &0d
+    equb &00, &09                       ; Column 0, row 9
+    equs "TYPE NUMBER", &0d
+    equb &00, &0a                       ; Column 0, row 10
+    equs "TO TOGGLE", &0d
+    equb &00, &0d                       ; Column 0, row 13
+    equs "SOUND ON(5) OFF(6)", &0d
+    equb &07, &0f                       ; Column 7, row 15
+    equs "ON ", &0d
+    equb &03, &14                       ; Column 3, row 20
+    equs "SPACE TO PLAY", &0d
     equb &00, &0d, &a9, &63
 ; ***************************************************************************************
 ; Take the heroes nobody plays out of the game
@@ -3855,55 +3830,39 @@ text_window_bottom = set_text_window_bottom+1
 ; Sixteen entries of: column, row, text, carriage return; printed by print_menu.
 ; &0600 used as index base 7 times by &56e3, &56ea, &56f1, &56ff, &570f, &571f, &5728
 .menu_text_joystick
-    equb &06, &00
+    equb &06, &00                       ; Column 6, row 0
 ; &0602 used as index base 4 times by &5309, &5319, &5709, &5719
-    equs "DUNJUNZ"
-    equb &0d
-    equb &00, &02
-    equs "HERO"
-    equb &0d
-    equb &0c, &02
-    equs "PLAYING"
-    equb &0d
-    equb &00, &04
-    equs "1 RANGER"
-    equb &0d
-    equb &00, &05
-    equs "2 MAGIC-USER"
-    equb &0d
-    equb &00, &06
-    equs "3 BARBARIAN"
-    equb &0d
-    equb &00, &07
-    equs "4 FIGHTER"
-    equb &0d
-    equb &0e, &04
-    equs "YES"
-    equb &0d
-    equb &0e, &05
-    equs "YES"
-    equb &0d
-    equb &0e, &06
-    equs "YES"
-    equb &0d
-    equb &0e, &07
-    equs "YES"
-    equb &0d
-    equb &00, &09
-    equs "TYPE NUMBER"
-    equb &0d
-    equb &00, &0a
-    equs "TO TOGGLE"
-    equb &0d
-    equb &00, &0d
-    equs "SOUND ON(5) OFF(6)"
-    equb &0d
-    equb &07, &0f
-    equs "ON "
-    equb &0d
-    equb &03, &14
-    equs "SPACE TO PLAY"
-    equb &0d
+    equs "DUNJUNZ", &0d
+    equb &00, &02                       ; Column 0, row 2
+    equs "HERO", &0d
+    equb &0c, &02                       ; Column 12, row 2
+    equs "PLAYING", &0d
+    equb &00, &04                       ; Column 0, row 4
+    equs "1 RANGER", &0d
+    equb &00, &05                       ; Column 0, row 5
+    equs "2 MAGIC-USER", &0d
+    equb &00, &06                       ; Column 0, row 6
+    equs "3 BARBARIAN", &0d
+    equb &00, &07                       ; Column 0, row 7
+    equs "4 FIGHTER", &0d
+    equb &0e, &04                       ; Column 14, row 4
+    equs "YES", &0d
+    equb &0e, &05                       ; Column 14, row 5
+    equs "YES", &0d
+    equb &0e, &06                       ; Column 14, row 6
+    equs "YES", &0d
+    equb &0e, &07                       ; Column 14, row 7
+    equs "YES", &0d
+    equb &00, &09                       ; Column 0, row 9
+    equs "TYPE NUMBER", &0d
+    equb &00, &0a                       ; Column 0, row 10
+    equs "TO TOGGLE", &0d
+    equb &00, &0d                       ; Column 0, row 13
+    equs "SOUND ON(5) OFF(6)", &0d
+    equb &07, &0f                       ; Column 7, row 15
+    equs "ON ", &0d
+    equb &03, &14                       ; Column 3, row 20
+    equs "SPACE TO PLAY", &0d
     equb &00, &0d, &a9, &63
 ; ***************************************************************************************
 ; Take the heroes nobody plays out of the game
@@ -9963,7 +9922,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     Data                     = 16788 bytes (68%)
 ;
 ;     Number of instructions   = 3574
-;     Number of data bytes     = 15875 bytes
-;     Number of data words     = 0 bytes
-;     Number of string bytes   = 913 bytes
-;     Number of strings        = 118
+;     Number of data bytes     = 15773 bytes
+;     Number of data words     = 64 bytes
+;     Number of string bytes   = 951 bytes
+;     Number of strings        = 116

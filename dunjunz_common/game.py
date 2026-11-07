@@ -1712,6 +1712,55 @@ SOUND_BLOCKS = [
 ]
 
 
+
+def _signed(value):
+    return value - 256 if value >= 128 else value
+
+
+def annotate_sound_block(a: Annotator, addr: int) -> None:
+    """An OSWORD 7 block: channel, amplitude, pitch and duration words."""
+    words = [a.word_value(addr + 2 * i) for i in range(4)]
+    if None in words:
+        return
+    channel, amplitude, pitch, duration = words
+    a.word(addr, 8, cols=4)
+    flags = []
+    if channel & 0x0F00:
+        flags.append(f"synchronised with {(channel >> 8) & 3} other")
+    if channel & 0x0010:
+        flags.append("flush")
+    if channel & 0x1000:
+        flags.append("hold")
+    level = (f"envelope {amplitude}" if 1 <= amplitude <= 16
+             else f"volume {-_signed(amplitude & 0xFF)}")
+    a.c(addr, f"SOUND channel {channel & 0x0F}"
+        + (f" ({', '.join(flags)})" if flags else "")
+        + f", {level}, pitch {pitch}, duration {duration}")
+
+
+def annotate_envelope_block(a: Annotator, addr: int) -> None:
+    """An OSWORD 8 block: the fourteen parameters of ENVELOPE."""
+    values = [a.byte_value(addr + i) for i in range(14)]
+    if None in values:
+        return
+    for offset, length, text in [
+        (0, 1, f"Envelope {values[0]}"),
+        (1, 1, f"Step length {values[1] & 0x7F} centisecond"
+               + ("" if values[1] & 0x7F == 1 else "s")
+               + (", no auto-repeat" if values[1] & 0x80 else "")),
+        (2, 3, "Pitch change per step in sections 1-3: "
+               + ", ".join(str(_signed(v)) for v in values[2:5])),
+        (5, 3, "Steps in pitch sections 1-3: "
+               + ", ".join(str(v) for v in values[5:8])),
+        (8, 4, "Amplitude change per step in attack, decay, sustain, "
+               "release: " + ", ".join(str(_signed(v)) for v in values[8:12])),
+        (12, 2, f"Target levels at the end of attack and decay: "
+                f"{values[12]}, {values[13]}"),
+    ]:
+        a.byte(addr + offset, length, cols=length)
+        a.c(addr + offset, text)
+
+
 def annotate_data(a: Annotator) -> None:
     # Menu text
     a.label(0x0600, "menu_text", group="text", description=(
@@ -1722,9 +1771,11 @@ def annotate_data(a: Annotator) -> None:
              "Sixteen entries of: column, row, text, carriage return; printed "
              "by print_menu.")
     for addr, length in MENU_STRINGS:
-        a.byte(addr, 2)
-        a.string(addr + 2, length)
-        a.byte(addr + 2 + length, 1)
+        column, row = a.byte_value(addr), a.byte_value(addr + 1)
+        a.byte(addr, 2, cols=2)
+        if column is not None:
+            a.c(addr, f"Column {column}, row {row}")
+        a.stringcr(addr + 2)
 
     # The game-over message
     a.banner(0x0F90, "Game-over message",
@@ -1735,12 +1786,14 @@ def annotate_data(a: Annotator) -> None:
              "\"YOU ALL\" never appears.")
     addr = 0x0F90
     for _ in range(11):
-        a.string(addr, 17)
-        a.byte(addr + 17, 1)
+        a.stringcr(addr)
         addr += 18
     a.byte(addr, 1)
-    a.string(addr + 1, 17)
-    a.byte(addr + 18, 1)
+    a.c(addr, "Line feed: a blank line")
+    a.stringz(addr + 1)
+    a.banner(0x1069, "Unused", "Leftover bytes: \"ND!\" and a zero, the end of "
+             "an earlier message, then \"&C2\".")
+    a.byte(0x1069, 0x1070 - 0x1069, cols=7)
 
     # Sound blocks
     for addr, name, is_envelope, use in SOUND_BLOCKS:
@@ -1748,7 +1801,10 @@ def annotate_data(a: Annotator) -> None:
         length = 14 if is_envelope else 8
         a.label(addr, name, length=length, group="sound", description=(
             f"{kind} parameter block for {use}."))
-        a.byte(addr, length, cols=length if is_envelope else 2)
+        if is_envelope:
+            annotate_envelope_block(a, addr)
+        else:
+            annotate_sound_block(a, addr)
 
     # Sprite tables
     for addr in (0x1AE0, 0x1B58, 0x1BD0, 0x1C48):

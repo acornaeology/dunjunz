@@ -1647,6 +1647,14 @@
       "align": "before_label"
     },
     {
+      "addr": 4201,
+      "binary_addr": 14249,
+      "move": "game_core",
+      "title": "Unused",
+      "description": "Leftover bytes: \"ND!\" and a zero, the end of an earlier message, then \"&C2\".",
+      "align": "before_label"
+    },
+    {
       "addr": 4823,
       "binary_addr": 14871,
       "move": "game_core",
@@ -17449,16 +17457,13 @@
       "labels": [
         "teleport_sound"
       ],
-      "type": "byte",
+      "comment_inline": "SOUND channel 3 (flush), envelope 4, pitch 100, duration 30",
+      "type": "word",
       "values": [
         19,
-        0,
         4,
-        0,
         100,
-        0,
-        30,
-        0
+        30
       ]
     },
     {
@@ -17478,19 +17483,16 @@
       "labels": [
         "food_sound"
       ],
+      "comment_inline": "SOUND channel 3 (flush), envelope 2, pitch 200, duration 2",
       "xref_summaries": [
         "&333c referenced 2 times by &1d0f[1], &1d1d[1]"
       ],
-      "type": "byte",
+      "type": "word",
       "values": [
         19,
-        0,
         2,
-        0,
         200,
-        0,
-        2,
-        0
+        2
       ]
     },
     {
@@ -20083,19 +20085,16 @@
       "labels": [
         "hit_sound"
       ],
+      "comment_inline": "SOUND channel 0 (flush), envelope 1, pitch 6, duration 6",
       "xref_summaries": [
         "&3434 referenced 2 times by &7481, &7491"
       ],
-      "type": "byte",
+      "type": "word",
       "values": [
         16,
-        0,
         1,
-        0,
         6,
-        0,
-        6,
-        0
+        6
       ]
     },
     {
@@ -26433,7 +26432,8 @@
         32,
         32,
         32,
-        32
+        32,
+        13
       ],
       "binary_addr": 14032,
       "move": "game_core",
@@ -26452,19 +26452,7 @@
         }
       ],
       "type": "string",
-      "string": "FAREWELL!        "
-    },
-    {
-      "addr": 4001,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 14049,
-      "move": "game_core",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "FAREWELL!        ."
     },
     {
       "addr": 4002,
@@ -26485,24 +26473,13 @@
         32,
         32,
         32,
-        32
+        32,
+        13
       ],
       "binary_addr": 14050,
       "move": "game_core",
       "type": "string",
-      "string": "THE QUEST HAS    "
-    },
-    {
-      "addr": 4019,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 14067,
-      "move": "game_core",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "THE QUEST HAS    ."
     },
     {
       "addr": 4020,
@@ -26523,24 +26500,13 @@
         69,
         32,
         32,
-        32
+        32,
+        13
       ],
       "binary_addr": 14068,
       "move": "game_core",
       "type": "string",
-      "string": "FAILED AND THE   "
-    },
-    {
-      "addr": 4037,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 14085,
-      "move": "game_core",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "FAILED AND THE   ."
     },
     {
       "addr": 4038,
@@ -26561,24 +26527,13 @@
         79,
         32,
         32,
-        32
+        32,
+        13
       ],
       "binary_addr": 14086,
       "move": "game_core",
       "type": "string",
-      "string": "GODS ARE IN NO   "
-    },
-    {
-      "addr": 4055,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 14103,
-      "move": "game_core",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "GODS ARE IN NO   ."
     },
     {
       "addr": 4056,
@@ -26599,24 +26554,13 @@
         82,
         69,
         67,
-        84
+        84,
+        13
       ],
       "binary_addr": 14104,
       "move": "game_core",
       "type": "string",
-      "string": "MOOD TO RESURRECT"
-    },
-    {
-      "addr": 4073,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 14121,
-      "move": "game_core",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "MOOD TO RESURRECT."
     },
     {
       "addr": 4074,
@@ -26637,7 +26581,8 @@
         32,
         32,
         32,
-        32
+        32,
+        13
       ],
       "binary_addr": 14122,
       "move": "game_core",
@@ -26658,19 +26603,7 @@
         "&3732 referenced 5 times by &0e6a[1], &0e77[1], &0e7f[1], &0f35[1], &0f48[1]"
       ],
       "type": "string",
-      "string": "YOU ALL.         "
-    },
-    {
-      "addr": 4091,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 14139,
-      "move": "game_core",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "YOU ALL.         ."
     },
     {
       "addr": 4092,
@@ -26691,24 +26624,13 @@
         82,
         83,
         32,
-        32
+        32,
+        13
       ],
       "binary_addr": 14140,
       "move": "game_core",
       "type": "string",
-      "string": "NEW ADVENTURERS  "
-    },
-    {
-      "addr": 4109,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 14157,
-      "move": "game_core",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "NEW ADVENTURERS  ."
     },
     {
       "addr": 4110,
@@ -26729,24 +26651,13 @@
         82,
         32,
         32,
-        32
+        32,
+        13
       ],
       "binary_addr": 14158,
       "move": "game_core",
       "type": "string",
-      "string": "MUST TAKE YOUR   "
-    },
-    {
-      "addr": 4127,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 14175,
-      "move": "game_core",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "MUST TAKE YOUR   ."
     },
     {
       "addr": 4128,
@@ -26767,24 +26678,13 @@
         78,
         71,
         32,
-        32
+        32,
+        13
       ],
       "binary_addr": 14176,
       "move": "game_core",
       "type": "string",
-      "string": "PLACE,BEGINNING  "
-    },
-    {
-      "addr": 4145,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 14193,
-      "move": "game_core",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "PLACE,BEGINNING  ."
     },
     {
       "addr": 4146,
@@ -26805,24 +26705,13 @@
         80,
         80,
         69,
-        82
+        82,
+        13
       ],
       "binary_addr": 14194,
       "move": "game_core",
       "type": "string",
-      "string": "BACK ON THE UPPER"
-    },
-    {
-      "addr": 4163,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 14211,
-      "move": "game_core",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "BACK ON THE UPPER."
     },
     {
       "addr": 4164,
@@ -26843,24 +26732,13 @@
         32,
         32,
         32,
-        32
+        32,
+        13
       ],
       "binary_addr": 14212,
       "move": "game_core",
       "type": "string",
-      "string": "MOST LEVEL.      "
-    },
-    {
-      "addr": 4181,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 14229,
-      "move": "game_core",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "MOST LEVEL.      ."
     },
     {
       "addr": 4182,
@@ -26869,6 +26747,7 @@
       ],
       "binary_addr": 14230,
       "move": "game_core",
+      "comment_inline": "Line feed: a blank line",
       "type": "byte",
       "values": [
         10
@@ -26893,60 +26772,37 @@
         73,
         67,
         69,
-        33
+        33,
+        0
       ],
       "binary_addr": 14231,
       "move": "game_core",
       "type": "string",
-      "string": "FIND THE CHALICE!"
-    },
-    {
-      "addr": 4200,
-      "bytes": [
-        0
-      ],
-      "binary_addr": 14248,
-      "move": "game_core",
-      "type": "byte",
-      "values": [
-        0
-      ]
+      "string": "FIND THE CHALICE!."
     },
     {
       "addr": 4201,
       "bytes": [
         78,
         68,
-        33
-      ],
-      "binary_addr": 14249,
-      "move": "game_core",
-      "type": "string",
-      "string": "ND!"
-    },
-    {
-      "addr": 4204,
-      "bytes": [
-        0
-      ],
-      "binary_addr": 14252,
-      "move": "game_core",
-      "type": "byte",
-      "values": [
-        0
-      ]
-    },
-    {
-      "addr": 4205,
-      "bytes": [
+        33,
+        0,
         38,
         67,
         50
       ],
-      "binary_addr": 14253,
+      "binary_addr": 14249,
       "move": "game_core",
-      "type": "string",
-      "string": "&C2"
+      "type": "byte",
+      "values": [
+        78,
+        68,
+        33,
+        0,
+        38,
+        67,
+        50
+      ]
     },
     {
       "addr": 4208,
@@ -37378,40 +37234,96 @@
     {
       "addr": 6400,
       "bytes": [
-        3,
-        1,
-        10,
-        10,
-        236,
-        3,
-        3,
-        3,
-        128,
-        0,
-        0,
-        255,
-        128,
-        128
+        3
       ],
       "binary_addr": 16448,
       "move": "game_core",
       "labels": [
         "magic_envelope"
       ],
+      "comment_inline": "Envelope 3",
+      "type": "byte",
+      "values": [
+        3
+      ]
+    },
+    {
+      "addr": 6401,
+      "bytes": [
+        1
+      ],
+      "binary_addr": 16449,
+      "move": "game_core",
+      "comment_inline": "Step length 1 centisecond",
+      "type": "byte",
+      "values": [
+        1
+      ]
+    },
+    {
+      "addr": 6402,
+      "bytes": [
+        10,
+        10,
+        236
+      ],
+      "binary_addr": 16450,
+      "move": "game_core",
+      "comment_inline": "Pitch change per step in sections 1-3: 10, 10, -20",
+      "type": "byte",
+      "values": [
+        10,
+        10,
+        236
+      ]
+    },
+    {
+      "addr": 6405,
+      "bytes": [
+        3,
+        3,
+        3
+      ],
+      "binary_addr": 16453,
+      "move": "game_core",
+      "comment_inline": "Steps in pitch sections 1-3: 3, 3, 3",
       "type": "byte",
       "values": [
         3,
-        1,
-        10,
-        10,
-        236,
         3,
-        3,
-        3,
+        3
+      ]
+    },
+    {
+      "addr": 6408,
+      "bytes": [
         128,
         0,
         0,
-        255,
+        255
+      ],
+      "binary_addr": 16456,
+      "move": "game_core",
+      "comment_inline": "Amplitude change per step in attack, decay, sustain, release: -128, 0, 0, -1",
+      "type": "byte",
+      "values": [
+        128,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "addr": 6412,
+      "bytes": [
+        128,
+        128
+      ],
+      "binary_addr": 16460,
+      "move": "game_core",
+      "comment_inline": "Target levels at the end of attack and decay: 128, 128",
+      "type": "byte",
+      "values": [
         128,
         128
       ]
@@ -37433,55 +37345,108 @@
       "labels": [
         "magic_sound"
       ],
-      "type": "byte",
+      "comment_inline": "SOUND channel 2 (flush), envelope 3, pitch 0, duration 2",
+      "type": "word",
       "values": [
         18,
-        0,
         3,
         0,
-        0,
-        0,
-        2,
-        0
+        2
       ]
     },
     {
       "addr": 6422,
       "bytes": [
-        3,
-        2,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        128,
-        0,
-        0,
-        248,
-        128,
-        128
+        3
       ],
       "binary_addr": 16470,
       "move": "game_core",
       "labels": [
         "treasure_envelope"
       ],
+      "comment_inline": "Envelope 3",
       "type": "byte",
       "values": [
-        3,
-        2,
+        3
+      ]
+    },
+    {
+      "addr": 6423,
+      "bytes": [
+        2
+      ],
+      "binary_addr": 16471,
+      "move": "game_core",
+      "comment_inline": "Step length 2 centiseconds",
+      "type": "byte",
+      "values": [
+        2
+      ]
+    },
+    {
+      "addr": 6424,
+      "bytes": [
         1,
         1,
+        1
+      ],
+      "binary_addr": 16472,
+      "move": "game_core",
+      "comment_inline": "Pitch change per step in sections 1-3: 1, 1, 1",
+      "type": "byte",
+      "values": [
         1,
         1,
+        1
+      ]
+    },
+    {
+      "addr": 6427,
+      "bytes": [
         1,
         1,
+        1
+      ],
+      "binary_addr": 16475,
+      "move": "game_core",
+      "comment_inline": "Steps in pitch sections 1-3: 1, 1, 1",
+      "type": "byte",
+      "values": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "addr": 6430,
+      "bytes": [
         128,
         0,
         0,
-        248,
+        248
+      ],
+      "binary_addr": 16478,
+      "move": "game_core",
+      "comment_inline": "Amplitude change per step in attack, decay, sustain, release: -128, 0, 0, -8",
+      "type": "byte",
+      "values": [
+        128,
+        0,
+        0,
+        248
+      ]
+    },
+    {
+      "addr": 6434,
+      "bytes": [
+        128,
+        128
+      ],
+      "binary_addr": 16482,
+      "move": "game_core",
+      "comment_inline": "Target levels at the end of attack and decay: 128, 128",
+      "type": "byte",
+      "values": [
         128,
         128
       ]
@@ -37503,55 +37468,108 @@
       "labels": [
         "treasure_sound"
       ],
-      "type": "byte",
+      "comment_inline": "SOUND channel 2 (flush), envelope 3, pitch 200, duration 5",
+      "type": "word",
       "values": [
         18,
-        0,
         3,
-        0,
         200,
-        0,
-        5,
-        0
+        5
       ]
     },
     {
       "addr": 6444,
       "bytes": [
-        3,
-        128,
-        0,
-        0,
-        0,
-        10,
-        10,
-        10,
-        10,
-        0,
-        0,
-        253,
-        128,
-        128
+        3
       ],
       "binary_addr": 16492,
       "move": "game_core",
       "labels": [
         "pickup_envelope"
       ],
+      "comment_inline": "Envelope 3",
       "type": "byte",
       "values": [
-        3,
+        3
+      ]
+    },
+    {
+      "addr": 6445,
+      "bytes": [
+        128
+      ],
+      "binary_addr": 16493,
+      "move": "game_core",
+      "comment_inline": "Step length 0 centiseconds, no auto-repeat",
+      "type": "byte",
+      "values": [
+        128
+      ]
+    },
+    {
+      "addr": 6446,
+      "bytes": [
+        0,
+        0,
+        0
+      ],
+      "binary_addr": 16494,
+      "move": "game_core",
+      "comment_inline": "Pitch change per step in sections 1-3: 0, 0, 0",
+      "type": "byte",
+      "values": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 6449,
+      "bytes": [
+        10,
+        10,
+        10
+      ],
+      "binary_addr": 16497,
+      "move": "game_core",
+      "comment_inline": "Steps in pitch sections 1-3: 10, 10, 10",
+      "type": "byte",
+      "values": [
+        10,
+        10,
+        10
+      ]
+    },
+    {
+      "addr": 6452,
+      "bytes": [
+        10,
+        0,
+        0,
+        253
+      ],
+      "binary_addr": 16500,
+      "move": "game_core",
+      "comment_inline": "Amplitude change per step in attack, decay, sustain, release: 10, 0, 0, -3",
+      "type": "byte",
+      "values": [
+        10,
+        0,
+        0,
+        253
+      ]
+    },
+    {
+      "addr": 6456,
+      "bytes": [
         128,
-        0,
-        0,
-        0,
-        10,
-        10,
-        10,
-        10,
-        0,
-        0,
-        253,
+        128
+      ],
+      "binary_addr": 16504,
+      "move": "game_core",
+      "comment_inline": "Target levels at the end of attack and decay: 128, 128",
+      "type": "byte",
+      "values": [
         128,
         128
       ]
@@ -37573,55 +37591,108 @@
       "labels": [
         "pickup_sound"
       ],
-      "type": "byte",
+      "comment_inline": "SOUND channel 0 (flush), envelope 3, pitch 10, duration 5",
+      "type": "word",
       "values": [
         16,
-        0,
         3,
-        0,
         10,
-        0,
-        5,
-        0
+        5
       ]
     },
     {
       "addr": 6466,
       "bytes": [
-        3,
-        128,
-        0,
-        0,
-        0,
-        1,
-        30,
-        30,
-        128,
-        0,
-        0,
-        254,
-        128,
-        128
+        3
       ],
       "binary_addr": 16514,
       "move": "game_core",
       "labels": [
         "key_envelope"
       ],
+      "comment_inline": "Envelope 3",
       "type": "byte",
       "values": [
-        3,
-        128,
+        3
+      ]
+    },
+    {
+      "addr": 6467,
+      "bytes": [
+        128
+      ],
+      "binary_addr": 16515,
+      "move": "game_core",
+      "comment_inline": "Step length 0 centiseconds, no auto-repeat",
+      "type": "byte",
+      "values": [
+        128
+      ]
+    },
+    {
+      "addr": 6468,
+      "bytes": [
         0,
         0,
+        0
+      ],
+      "binary_addr": 16516,
+      "move": "game_core",
+      "comment_inline": "Pitch change per step in sections 1-3: 0, 0, 0",
+      "type": "byte",
+      "values": [
         0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 6471,
+      "bytes": [
         1,
         30,
+        30
+      ],
+      "binary_addr": 16519,
+      "move": "game_core",
+      "comment_inline": "Steps in pitch sections 1-3: 1, 30, 30",
+      "type": "byte",
+      "values": [
+        1,
         30,
+        30
+      ]
+    },
+    {
+      "addr": 6474,
+      "bytes": [
         128,
         0,
         0,
-        254,
+        254
+      ],
+      "binary_addr": 16522,
+      "move": "game_core",
+      "comment_inline": "Amplitude change per step in attack, decay, sustain, release: -128, 0, 0, -2",
+      "type": "byte",
+      "values": [
+        128,
+        0,
+        0,
+        254
+      ]
+    },
+    {
+      "addr": 6478,
+      "bytes": [
+        128,
+        128
+      ],
+      "binary_addr": 16526,
+      "move": "game_core",
+      "comment_inline": "Target levels at the end of attack and decay: 128, 128",
+      "type": "byte",
+      "values": [
         128,
         128
       ]
@@ -37643,55 +37714,108 @@
       "labels": [
         "key_sound"
       ],
-      "type": "byte",
+      "comment_inline": "SOUND channel 2 (flush), envelope 3, pitch 240, duration 1",
+      "type": "word",
       "values": [
         18,
-        0,
         3,
-        0,
         240,
-        0,
-        1,
-        0
+        1
       ]
     },
     {
       "addr": 6488,
       "bytes": [
-        3,
-        130,
-        255,
-        255,
-        254,
-        1,
-        1,
-        128,
-        128,
-        0,
-        0,
-        255,
-        128,
-        128
+        3
       ],
       "binary_addr": 16536,
       "move": "game_core",
       "labels": [
         "exit_envelope"
       ],
+      "comment_inline": "Envelope 3",
       "type": "byte",
       "values": [
-        3,
-        130,
+        3
+      ]
+    },
+    {
+      "addr": 6489,
+      "bytes": [
+        130
+      ],
+      "binary_addr": 16537,
+      "move": "game_core",
+      "comment_inline": "Step length 2 centiseconds, no auto-repeat",
+      "type": "byte",
+      "values": [
+        130
+      ]
+    },
+    {
+      "addr": 6490,
+      "bytes": [
         255,
         255,
-        254,
+        254
+      ],
+      "binary_addr": 16538,
+      "move": "game_core",
+      "comment_inline": "Pitch change per step in sections 1-3: -1, -1, -2",
+      "type": "byte",
+      "values": [
+        255,
+        255,
+        254
+      ]
+    },
+    {
+      "addr": 6493,
+      "bytes": [
         1,
         1,
-        128,
+        128
+      ],
+      "binary_addr": 16541,
+      "move": "game_core",
+      "comment_inline": "Steps in pitch sections 1-3: 1, 1, 128",
+      "type": "byte",
+      "values": [
+        1,
+        1,
+        128
+      ]
+    },
+    {
+      "addr": 6496,
+      "bytes": [
         128,
         0,
         0,
-        255,
+        255
+      ],
+      "binary_addr": 16544,
+      "move": "game_core",
+      "comment_inline": "Amplitude change per step in attack, decay, sustain, release: -128, 0, 0, -1",
+      "type": "byte",
+      "values": [
+        128,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "addr": 6500,
+      "bytes": [
+        128,
+        128
+      ],
+      "binary_addr": 16548,
+      "move": "game_core",
+      "comment_inline": "Target levels at the end of attack and decay: 128, 128",
+      "type": "byte",
+      "values": [
         128,
         128
       ]
@@ -37713,16 +37837,13 @@
       "labels": [
         "exit_sound"
       ],
-      "type": "byte",
+      "comment_inline": "SOUND channel 2 (flush), envelope 3, pitch 250, duration 1",
+      "type": "word",
       "values": [
         18,
-        0,
         3,
-        0,
         250,
-        0,
-        1,
-        0
+        1
       ]
     },
     {
@@ -56571,6 +56692,7 @@
       "labels": [
         "menu_text"
       ],
+      "comment_inline": "Column 6, row 0",
       "xref_summaries": [
         "&53b0 used as index base 7 times by &0533[2], &053a[2], &0541[2], &054f[2], &055f[2], &056f[2], &0578[2]",
         "&53b1 used as index base 8 times by &0554[2], &0554[3], &0564[2], &0564[3], &0572[2], &0572[3], &057d[2], &057d[3]"
@@ -56634,7 +56756,8 @@
         74,
         85,
         78,
-        90
+        90,
+        13
       ],
       "binary_addr": 21426,
       "move": "low_keyboard",
@@ -56668,19 +56791,7 @@
         }
       ],
       "type": "string",
-      "string": "DUNJUNZ"
-    },
-    {
-      "addr": 1545,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 21433,
-      "move": "low_keyboard",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "DUNJUNZ."
     },
     {
       "addr": 1546,
@@ -56690,6 +56801,7 @@
       ],
       "binary_addr": 21434,
       "move": "low_keyboard",
+      "comment_inline": "Column 0, row 2",
       "type": "byte",
       "values": [
         0,
@@ -56702,24 +56814,13 @@
         72,
         69,
         82,
-        79
+        79,
+        13
       ],
       "binary_addr": 21436,
       "move": "low_keyboard",
       "type": "string",
-      "string": "HERO"
-    },
-    {
-      "addr": 1552,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 21440,
-      "move": "low_keyboard",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "HERO."
     },
     {
       "addr": 1553,
@@ -56729,6 +56830,7 @@
       ],
       "binary_addr": 21441,
       "move": "low_keyboard",
+      "comment_inline": "Column 12, row 2",
       "type": "byte",
       "values": [
         12,
@@ -56744,24 +56846,13 @@
         89,
         73,
         78,
-        71
+        71,
+        13
       ],
       "binary_addr": 21443,
       "move": "low_keyboard",
       "type": "string",
-      "string": "PLAYING"
-    },
-    {
-      "addr": 1562,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 21450,
-      "move": "low_keyboard",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "PLAYING."
     },
     {
       "addr": 1563,
@@ -56771,6 +56862,7 @@
       ],
       "binary_addr": 21451,
       "move": "low_keyboard",
+      "comment_inline": "Column 0, row 4",
       "type": "byte",
       "values": [
         0,
@@ -56787,24 +56879,13 @@
         78,
         71,
         69,
-        82
+        82,
+        13
       ],
       "binary_addr": 21453,
       "move": "low_keyboard",
       "type": "string",
-      "string": "1 RANGER"
-    },
-    {
-      "addr": 1573,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 21461,
-      "move": "low_keyboard",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "1 RANGER."
     },
     {
       "addr": 1574,
@@ -56814,6 +56895,7 @@
       ],
       "binary_addr": 21462,
       "move": "low_keyboard",
+      "comment_inline": "Column 0, row 5",
       "type": "byte",
       "values": [
         0,
@@ -56834,24 +56916,13 @@
         85,
         83,
         69,
-        82
+        82,
+        13
       ],
       "binary_addr": 21464,
       "move": "low_keyboard",
       "type": "string",
-      "string": "2 MAGIC-USER"
-    },
-    {
-      "addr": 1588,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 21476,
-      "move": "low_keyboard",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "2 MAGIC-USER."
     },
     {
       "addr": 1589,
@@ -56861,6 +56932,7 @@
       ],
       "binary_addr": 21477,
       "move": "low_keyboard",
+      "comment_inline": "Column 0, row 6",
       "type": "byte",
       "values": [
         0,
@@ -56880,24 +56952,13 @@
         82,
         73,
         65,
-        78
+        78,
+        13
       ],
       "binary_addr": 21479,
       "move": "low_keyboard",
       "type": "string",
-      "string": "3 BARBARIAN"
-    },
-    {
-      "addr": 1602,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 21490,
-      "move": "low_keyboard",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "3 BARBARIAN."
     },
     {
       "addr": 1603,
@@ -56907,6 +56968,7 @@
       ],
       "binary_addr": 21491,
       "move": "low_keyboard",
+      "comment_inline": "Column 0, row 7",
       "type": "byte",
       "values": [
         0,
@@ -56924,24 +56986,13 @@
         72,
         84,
         69,
-        82
+        82,
+        13
       ],
       "binary_addr": 21493,
       "move": "low_keyboard",
       "type": "string",
-      "string": "4 FIGHTER"
-    },
-    {
-      "addr": 1614,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 21502,
-      "move": "low_keyboard",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "4 FIGHTER."
     },
     {
       "addr": 1615,
@@ -56951,6 +57002,7 @@
       ],
       "binary_addr": 21503,
       "move": "low_keyboard",
+      "comment_inline": "Column 14, row 4",
       "type": "byte",
       "values": [
         14,
@@ -56962,24 +57014,13 @@
       "bytes": [
         89,
         69,
-        83
+        83,
+        13
       ],
       "binary_addr": 21505,
       "move": "low_keyboard",
       "type": "string",
-      "string": "YES"
-    },
-    {
-      "addr": 1620,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 21508,
-      "move": "low_keyboard",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "YES."
     },
     {
       "addr": 1621,
@@ -56989,6 +57030,7 @@
       ],
       "binary_addr": 21509,
       "move": "low_keyboard",
+      "comment_inline": "Column 14, row 5",
       "type": "byte",
       "values": [
         14,
@@ -57000,24 +57042,13 @@
       "bytes": [
         89,
         69,
-        83
+        83,
+        13
       ],
       "binary_addr": 21511,
       "move": "low_keyboard",
       "type": "string",
-      "string": "YES"
-    },
-    {
-      "addr": 1626,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 21514,
-      "move": "low_keyboard",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "YES."
     },
     {
       "addr": 1627,
@@ -57027,6 +57058,7 @@
       ],
       "binary_addr": 21515,
       "move": "low_keyboard",
+      "comment_inline": "Column 14, row 6",
       "type": "byte",
       "values": [
         14,
@@ -57038,24 +57070,13 @@
       "bytes": [
         89,
         69,
-        83
+        83,
+        13
       ],
       "binary_addr": 21517,
       "move": "low_keyboard",
       "type": "string",
-      "string": "YES"
-    },
-    {
-      "addr": 1632,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 21520,
-      "move": "low_keyboard",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "YES."
     },
     {
       "addr": 1633,
@@ -57065,6 +57086,7 @@
       ],
       "binary_addr": 21521,
       "move": "low_keyboard",
+      "comment_inline": "Column 14, row 7",
       "type": "byte",
       "values": [
         14,
@@ -57076,24 +57098,13 @@
       "bytes": [
         89,
         69,
-        83
+        83,
+        13
       ],
       "binary_addr": 21523,
       "move": "low_keyboard",
       "type": "string",
-      "string": "YES"
-    },
-    {
-      "addr": 1638,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 21526,
-      "move": "low_keyboard",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "YES."
     },
     {
       "addr": 1639,
@@ -57103,6 +57114,7 @@
       ],
       "binary_addr": 21527,
       "move": "low_keyboard",
+      "comment_inline": "Column 0, row 9",
       "type": "byte",
       "values": [
         0,
@@ -57122,24 +57134,13 @@
         77,
         66,
         69,
-        82
+        82,
+        13
       ],
       "binary_addr": 21529,
       "move": "low_keyboard",
       "type": "string",
-      "string": "TYPE NUMBER"
-    },
-    {
-      "addr": 1652,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 21540,
-      "move": "low_keyboard",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "TYPE NUMBER."
     },
     {
       "addr": 1653,
@@ -57149,6 +57150,7 @@
       ],
       "binary_addr": 21541,
       "move": "low_keyboard",
+      "comment_inline": "Column 0, row 10",
       "type": "byte",
       "values": [
         0,
@@ -57166,24 +57168,13 @@
         71,
         71,
         76,
-        69
+        69,
+        13
       ],
       "binary_addr": 21543,
       "move": "low_keyboard",
       "type": "string",
-      "string": "TO TOGGLE"
-    },
-    {
-      "addr": 1664,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 21552,
-      "move": "low_keyboard",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "TO TOGGLE."
     },
     {
       "addr": 1665,
@@ -57193,6 +57184,7 @@
       ],
       "binary_addr": 21553,
       "move": "low_keyboard",
+      "comment_inline": "Column 0, row 13",
       "type": "byte",
       "values": [
         0,
@@ -57219,24 +57211,13 @@
         70,
         40,
         54,
-        41
+        41,
+        13
       ],
       "binary_addr": 21555,
       "move": "low_keyboard",
       "type": "string",
-      "string": "SOUND ON(5) OFF(6)"
-    },
-    {
-      "addr": 1685,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 21573,
-      "move": "low_keyboard",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "SOUND ON(5) OFF(6)."
     },
     {
       "addr": 1686,
@@ -57246,6 +57227,7 @@
       ],
       "binary_addr": 21574,
       "move": "low_keyboard",
+      "comment_inline": "Column 7, row 15",
       "type": "byte",
       "values": [
         7,
@@ -57257,24 +57239,13 @@
       "bytes": [
         79,
         78,
-        32
+        32,
+        13
       ],
       "binary_addr": 21576,
       "move": "low_keyboard",
       "type": "string",
-      "string": "ON "
-    },
-    {
-      "addr": 1691,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 21579,
-      "move": "low_keyboard",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "ON ."
     },
     {
       "addr": 1692,
@@ -57284,6 +57255,7 @@
       ],
       "binary_addr": 21580,
       "move": "low_keyboard",
+      "comment_inline": "Column 3, row 20",
       "type": "byte",
       "values": [
         3,
@@ -57305,24 +57277,13 @@
         80,
         76,
         65,
-        89
+        89,
+        13
       ],
       "binary_addr": 21582,
       "move": "low_keyboard",
       "type": "string",
-      "string": "SPACE TO PLAY"
-    },
-    {
-      "addr": 1707,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 21595,
-      "move": "low_keyboard",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "SPACE TO PLAY."
     },
     {
       "addr": 1708,
@@ -62401,6 +62362,7 @@
       "labels": [
         "menu_text_joystick"
       ],
+      "comment_inline": "Column 6, row 0",
       "xref_summaries": [
         "&57b0 used as index base 7 times by &0533[3], &053a[3], &0541[3], &054f[3], &055f[3], &056f[3], &0578[3]",
         "&57b1 used as index base 8 times by &0554[2], &0554[3], &0564[2], &0564[3], &0572[2], &0572[3], &057d[2], &057d[3]"
@@ -62464,7 +62426,8 @@
         74,
         85,
         78,
-        90
+        90,
+        13
       ],
       "binary_addr": 22450,
       "move": "low_joystick",
@@ -62498,19 +62461,7 @@
         }
       ],
       "type": "string",
-      "string": "DUNJUNZ"
-    },
-    {
-      "addr": 1545,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 22457,
-      "move": "low_joystick",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "DUNJUNZ."
     },
     {
       "addr": 1546,
@@ -62520,6 +62471,7 @@
       ],
       "binary_addr": 22458,
       "move": "low_joystick",
+      "comment_inline": "Column 0, row 2",
       "type": "byte",
       "values": [
         0,
@@ -62532,24 +62484,13 @@
         72,
         69,
         82,
-        79
+        79,
+        13
       ],
       "binary_addr": 22460,
       "move": "low_joystick",
       "type": "string",
-      "string": "HERO"
-    },
-    {
-      "addr": 1552,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 22464,
-      "move": "low_joystick",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "HERO."
     },
     {
       "addr": 1553,
@@ -62559,6 +62500,7 @@
       ],
       "binary_addr": 22465,
       "move": "low_joystick",
+      "comment_inline": "Column 12, row 2",
       "type": "byte",
       "values": [
         12,
@@ -62574,24 +62516,13 @@
         89,
         73,
         78,
-        71
+        71,
+        13
       ],
       "binary_addr": 22467,
       "move": "low_joystick",
       "type": "string",
-      "string": "PLAYING"
-    },
-    {
-      "addr": 1562,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 22474,
-      "move": "low_joystick",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "PLAYING."
     },
     {
       "addr": 1563,
@@ -62601,6 +62532,7 @@
       ],
       "binary_addr": 22475,
       "move": "low_joystick",
+      "comment_inline": "Column 0, row 4",
       "type": "byte",
       "values": [
         0,
@@ -62617,24 +62549,13 @@
         78,
         71,
         69,
-        82
+        82,
+        13
       ],
       "binary_addr": 22477,
       "move": "low_joystick",
       "type": "string",
-      "string": "1 RANGER"
-    },
-    {
-      "addr": 1573,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 22485,
-      "move": "low_joystick",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "1 RANGER."
     },
     {
       "addr": 1574,
@@ -62644,6 +62565,7 @@
       ],
       "binary_addr": 22486,
       "move": "low_joystick",
+      "comment_inline": "Column 0, row 5",
       "type": "byte",
       "values": [
         0,
@@ -62664,24 +62586,13 @@
         85,
         83,
         69,
-        82
+        82,
+        13
       ],
       "binary_addr": 22488,
       "move": "low_joystick",
       "type": "string",
-      "string": "2 MAGIC-USER"
-    },
-    {
-      "addr": 1588,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 22500,
-      "move": "low_joystick",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "2 MAGIC-USER."
     },
     {
       "addr": 1589,
@@ -62691,6 +62602,7 @@
       ],
       "binary_addr": 22501,
       "move": "low_joystick",
+      "comment_inline": "Column 0, row 6",
       "type": "byte",
       "values": [
         0,
@@ -62710,24 +62622,13 @@
         82,
         73,
         65,
-        78
+        78,
+        13
       ],
       "binary_addr": 22503,
       "move": "low_joystick",
       "type": "string",
-      "string": "3 BARBARIAN"
-    },
-    {
-      "addr": 1602,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 22514,
-      "move": "low_joystick",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "3 BARBARIAN."
     },
     {
       "addr": 1603,
@@ -62737,6 +62638,7 @@
       ],
       "binary_addr": 22515,
       "move": "low_joystick",
+      "comment_inline": "Column 0, row 7",
       "type": "byte",
       "values": [
         0,
@@ -62754,24 +62656,13 @@
         72,
         84,
         69,
-        82
+        82,
+        13
       ],
       "binary_addr": 22517,
       "move": "low_joystick",
       "type": "string",
-      "string": "4 FIGHTER"
-    },
-    {
-      "addr": 1614,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 22526,
-      "move": "low_joystick",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "4 FIGHTER."
     },
     {
       "addr": 1615,
@@ -62781,6 +62672,7 @@
       ],
       "binary_addr": 22527,
       "move": "low_joystick",
+      "comment_inline": "Column 14, row 4",
       "type": "byte",
       "values": [
         14,
@@ -62792,24 +62684,13 @@
       "bytes": [
         89,
         69,
-        83
+        83,
+        13
       ],
       "binary_addr": 22529,
       "move": "low_joystick",
       "type": "string",
-      "string": "YES"
-    },
-    {
-      "addr": 1620,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 22532,
-      "move": "low_joystick",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "YES."
     },
     {
       "addr": 1621,
@@ -62819,6 +62700,7 @@
       ],
       "binary_addr": 22533,
       "move": "low_joystick",
+      "comment_inline": "Column 14, row 5",
       "type": "byte",
       "values": [
         14,
@@ -62830,24 +62712,13 @@
       "bytes": [
         89,
         69,
-        83
+        83,
+        13
       ],
       "binary_addr": 22535,
       "move": "low_joystick",
       "type": "string",
-      "string": "YES"
-    },
-    {
-      "addr": 1626,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 22538,
-      "move": "low_joystick",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "YES."
     },
     {
       "addr": 1627,
@@ -62857,6 +62728,7 @@
       ],
       "binary_addr": 22539,
       "move": "low_joystick",
+      "comment_inline": "Column 14, row 6",
       "type": "byte",
       "values": [
         14,
@@ -62868,24 +62740,13 @@
       "bytes": [
         89,
         69,
-        83
+        83,
+        13
       ],
       "binary_addr": 22541,
       "move": "low_joystick",
       "type": "string",
-      "string": "YES"
-    },
-    {
-      "addr": 1632,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 22544,
-      "move": "low_joystick",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "YES."
     },
     {
       "addr": 1633,
@@ -62895,6 +62756,7 @@
       ],
       "binary_addr": 22545,
       "move": "low_joystick",
+      "comment_inline": "Column 14, row 7",
       "type": "byte",
       "values": [
         14,
@@ -62906,24 +62768,13 @@
       "bytes": [
         89,
         69,
-        83
+        83,
+        13
       ],
       "binary_addr": 22547,
       "move": "low_joystick",
       "type": "string",
-      "string": "YES"
-    },
-    {
-      "addr": 1638,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 22550,
-      "move": "low_joystick",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "YES."
     },
     {
       "addr": 1639,
@@ -62933,6 +62784,7 @@
       ],
       "binary_addr": 22551,
       "move": "low_joystick",
+      "comment_inline": "Column 0, row 9",
       "type": "byte",
       "values": [
         0,
@@ -62952,24 +62804,13 @@
         77,
         66,
         69,
-        82
+        82,
+        13
       ],
       "binary_addr": 22553,
       "move": "low_joystick",
       "type": "string",
-      "string": "TYPE NUMBER"
-    },
-    {
-      "addr": 1652,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 22564,
-      "move": "low_joystick",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "TYPE NUMBER."
     },
     {
       "addr": 1653,
@@ -62979,6 +62820,7 @@
       ],
       "binary_addr": 22565,
       "move": "low_joystick",
+      "comment_inline": "Column 0, row 10",
       "type": "byte",
       "values": [
         0,
@@ -62996,24 +62838,13 @@
         71,
         71,
         76,
-        69
+        69,
+        13
       ],
       "binary_addr": 22567,
       "move": "low_joystick",
       "type": "string",
-      "string": "TO TOGGLE"
-    },
-    {
-      "addr": 1664,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 22576,
-      "move": "low_joystick",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "TO TOGGLE."
     },
     {
       "addr": 1665,
@@ -63023,6 +62854,7 @@
       ],
       "binary_addr": 22577,
       "move": "low_joystick",
+      "comment_inline": "Column 0, row 13",
       "type": "byte",
       "values": [
         0,
@@ -63049,24 +62881,13 @@
         70,
         40,
         54,
-        41
+        41,
+        13
       ],
       "binary_addr": 22579,
       "move": "low_joystick",
       "type": "string",
-      "string": "SOUND ON(5) OFF(6)"
-    },
-    {
-      "addr": 1685,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 22597,
-      "move": "low_joystick",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "SOUND ON(5) OFF(6)."
     },
     {
       "addr": 1686,
@@ -63076,6 +62897,7 @@
       ],
       "binary_addr": 22598,
       "move": "low_joystick",
+      "comment_inline": "Column 7, row 15",
       "type": "byte",
       "values": [
         7,
@@ -63087,24 +62909,13 @@
       "bytes": [
         79,
         78,
-        32
+        32,
+        13
       ],
       "binary_addr": 22600,
       "move": "low_joystick",
       "type": "string",
-      "string": "ON "
-    },
-    {
-      "addr": 1691,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 22603,
-      "move": "low_joystick",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "ON ."
     },
     {
       "addr": 1692,
@@ -63114,6 +62925,7 @@
       ],
       "binary_addr": 22604,
       "move": "low_joystick",
+      "comment_inline": "Column 3, row 20",
       "type": "byte",
       "values": [
         3,
@@ -63135,24 +62947,13 @@
         80,
         76,
         65,
-        89
+        89,
+        13
       ],
       "binary_addr": 22606,
       "move": "low_joystick",
       "type": "string",
-      "string": "SPACE TO PLAY"
-    },
-    {
-      "addr": 1707,
-      "bytes": [
-        13
-      ],
-      "binary_addr": 22619,
-      "move": "low_joystick",
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "SPACE TO PLAY."
     },
     {
       "addr": 1708,

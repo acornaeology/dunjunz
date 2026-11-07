@@ -2752,6 +2752,12 @@
       "align": "before_label"
     },
     {
+      "addr": 4201,
+      "title": "Unused",
+      "description": "Leftover bytes: \"ND!\" and a zero, the end of an earlier message, then \"&C2\".",
+      "align": "before_label"
+    },
+    {
       "addr": 4823,
       "name": "font_letters",
       "title": "Font: letters A-Z",
@@ -7123,6 +7129,7 @@
       "labels": [
         "menu_text"
       ],
+      "comment_inline": "Column 6, row 0",
       "xref_summaries": [
         "&0600 used as index base 7 times by &0533, &053a, &0541, &054f, &055f, &056f, &0578",
         "&0601 used as index base 4 times by &0554, &0564, &0572, &057d"
@@ -7172,7 +7179,8 @@
         74,
         85,
         78,
-        90
+        90,
+        13
       ],
       "image": 0,
       "xref_summaries": [
@@ -7189,18 +7197,7 @@
         }
       ],
       "type": "string",
-      "string": "DUNJUNZ"
-    },
-    {
-      "addr": 1545,
-      "bytes": [
-        13
-      ],
-      "image": 0,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "DUNJUNZ."
     },
     {
       "addr": 1546,
@@ -7209,6 +7206,7 @@
         2
       ],
       "image": 0,
+      "comment_inline": "Column 0, row 2",
       "type": "byte",
       "values": [
         0,
@@ -7221,22 +7219,12 @@
         72,
         69,
         82,
-        79
+        79,
+        13
       ],
       "image": 0,
       "type": "string",
-      "string": "HERO"
-    },
-    {
-      "addr": 1552,
-      "bytes": [
-        13
-      ],
-      "image": 0,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "HERO."
     },
     {
       "addr": 1553,
@@ -7245,6 +7233,7 @@
         2
       ],
       "image": 0,
+      "comment_inline": "Column 12, row 2",
       "type": "byte",
       "values": [
         12,
@@ -7260,22 +7249,12 @@
         89,
         73,
         78,
-        71
+        71,
+        13
       ],
       "image": 0,
       "type": "string",
-      "string": "PLAYING"
-    },
-    {
-      "addr": 1562,
-      "bytes": [
-        13
-      ],
-      "image": 0,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "PLAYING."
     },
     {
       "addr": 1563,
@@ -7284,6 +7263,7 @@
         4
       ],
       "image": 0,
+      "comment_inline": "Column 0, row 4",
       "type": "byte",
       "values": [
         0,
@@ -7300,22 +7280,12 @@
         78,
         71,
         69,
-        82
+        82,
+        13
       ],
       "image": 0,
       "type": "string",
-      "string": "1 RANGER"
-    },
-    {
-      "addr": 1573,
-      "bytes": [
-        13
-      ],
-      "image": 0,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "1 RANGER."
     },
     {
       "addr": 1574,
@@ -7324,6 +7294,7 @@
         5
       ],
       "image": 0,
+      "comment_inline": "Column 0, row 5",
       "type": "byte",
       "values": [
         0,
@@ -7344,22 +7315,12 @@
         85,
         83,
         69,
-        82
+        82,
+        13
       ],
       "image": 0,
       "type": "string",
-      "string": "2 MAGIC-USER"
-    },
-    {
-      "addr": 1588,
-      "bytes": [
-        13
-      ],
-      "image": 0,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "2 MAGIC-USER."
     },
     {
       "addr": 1589,
@@ -7368,6 +7329,7 @@
         6
       ],
       "image": 0,
+      "comment_inline": "Column 0, row 6",
       "type": "byte",
       "values": [
         0,
@@ -7387,22 +7349,12 @@
         82,
         73,
         65,
-        78
+        78,
+        13
       ],
       "image": 0,
       "type": "string",
-      "string": "3 BARBARIAN"
-    },
-    {
-      "addr": 1602,
-      "bytes": [
-        13
-      ],
-      "image": 0,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "3 BARBARIAN."
     },
     {
       "addr": 1603,
@@ -7411,6 +7363,7 @@
         7
       ],
       "image": 0,
+      "comment_inline": "Column 0, row 7",
       "type": "byte",
       "values": [
         0,
@@ -7428,22 +7381,12 @@
         72,
         84,
         69,
-        82
+        82,
+        13
       ],
       "image": 0,
       "type": "string",
-      "string": "4 FIGHTER"
-    },
-    {
-      "addr": 1614,
-      "bytes": [
-        13
-      ],
-      "image": 0,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "4 FIGHTER."
     },
     {
       "addr": 1615,
@@ -7452,6 +7395,7 @@
         4
       ],
       "image": 0,
+      "comment_inline": "Column 14, row 4",
       "type": "byte",
       "values": [
         14,
@@ -7463,22 +7407,12 @@
       "bytes": [
         89,
         69,
-        83
+        83,
+        13
       ],
       "image": 0,
       "type": "string",
-      "string": "YES"
-    },
-    {
-      "addr": 1620,
-      "bytes": [
-        13
-      ],
-      "image": 0,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "YES."
     },
     {
       "addr": 1621,
@@ -7487,6 +7421,7 @@
         5
       ],
       "image": 0,
+      "comment_inline": "Column 14, row 5",
       "type": "byte",
       "values": [
         14,
@@ -7498,22 +7433,12 @@
       "bytes": [
         89,
         69,
-        83
+        83,
+        13
       ],
       "image": 0,
       "type": "string",
-      "string": "YES"
-    },
-    {
-      "addr": 1626,
-      "bytes": [
-        13
-      ],
-      "image": 0,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "YES."
     },
     {
       "addr": 1627,
@@ -7522,6 +7447,7 @@
         6
       ],
       "image": 0,
+      "comment_inline": "Column 14, row 6",
       "type": "byte",
       "values": [
         14,
@@ -7533,22 +7459,12 @@
       "bytes": [
         89,
         69,
-        83
+        83,
+        13
       ],
       "image": 0,
       "type": "string",
-      "string": "YES"
-    },
-    {
-      "addr": 1632,
-      "bytes": [
-        13
-      ],
-      "image": 0,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "YES."
     },
     {
       "addr": 1633,
@@ -7557,6 +7473,7 @@
         7
       ],
       "image": 0,
+      "comment_inline": "Column 14, row 7",
       "type": "byte",
       "values": [
         14,
@@ -7568,22 +7485,12 @@
       "bytes": [
         89,
         69,
-        83
+        83,
+        13
       ],
       "image": 0,
       "type": "string",
-      "string": "YES"
-    },
-    {
-      "addr": 1638,
-      "bytes": [
-        13
-      ],
-      "image": 0,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "YES."
     },
     {
       "addr": 1639,
@@ -7592,6 +7499,7 @@
         9
       ],
       "image": 0,
+      "comment_inline": "Column 0, row 9",
       "type": "byte",
       "values": [
         0,
@@ -7611,22 +7519,12 @@
         77,
         66,
         69,
-        82
+        82,
+        13
       ],
       "image": 0,
       "type": "string",
-      "string": "TYPE NUMBER"
-    },
-    {
-      "addr": 1652,
-      "bytes": [
-        13
-      ],
-      "image": 0,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "TYPE NUMBER."
     },
     {
       "addr": 1653,
@@ -7635,6 +7533,7 @@
         10
       ],
       "image": 0,
+      "comment_inline": "Column 0, row 10",
       "type": "byte",
       "values": [
         0,
@@ -7652,22 +7551,12 @@
         71,
         71,
         76,
-        69
+        69,
+        13
       ],
       "image": 0,
       "type": "string",
-      "string": "TO TOGGLE"
-    },
-    {
-      "addr": 1664,
-      "bytes": [
-        13
-      ],
-      "image": 0,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "TO TOGGLE."
     },
     {
       "addr": 1665,
@@ -7676,6 +7565,7 @@
         13
       ],
       "image": 0,
+      "comment_inline": "Column 0, row 13",
       "type": "byte",
       "values": [
         0,
@@ -7702,22 +7592,12 @@
         70,
         40,
         54,
-        41
+        41,
+        13
       ],
       "image": 0,
       "type": "string",
-      "string": "SOUND ON(5) OFF(6)"
-    },
-    {
-      "addr": 1685,
-      "bytes": [
-        13
-      ],
-      "image": 0,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "SOUND ON(5) OFF(6)."
     },
     {
       "addr": 1686,
@@ -7726,6 +7606,7 @@
         15
       ],
       "image": 0,
+      "comment_inline": "Column 7, row 15",
       "type": "byte",
       "values": [
         7,
@@ -7737,22 +7618,12 @@
       "bytes": [
         79,
         78,
-        32
+        32,
+        13
       ],
       "image": 0,
       "type": "string",
-      "string": "ON "
-    },
-    {
-      "addr": 1691,
-      "bytes": [
-        13
-      ],
-      "image": 0,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "ON ."
     },
     {
       "addr": 1692,
@@ -7761,6 +7632,7 @@
         20
       ],
       "image": 0,
+      "comment_inline": "Column 3, row 20",
       "type": "byte",
       "values": [
         3,
@@ -7782,22 +7654,12 @@
         80,
         76,
         65,
-        89
+        89,
+        13
       ],
       "image": 0,
       "type": "string",
-      "string": "SPACE TO PLAY"
-    },
-    {
-      "addr": 1707,
-      "bytes": [
-        13
-      ],
-      "image": 0,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "SPACE TO PLAY."
     },
     {
       "addr": 1708,
@@ -13345,16 +13207,13 @@
       "labels": [
         "teleport_sound"
       ],
-      "type": "byte",
+      "comment_inline": "SOUND channel 3 (flush), envelope 4, pitch 100, duration 30",
+      "type": "word",
       "values": [
         19,
-        0,
         4,
-        0,
         100,
-        0,
-        30,
-        0
+        30
       ]
     },
     {
@@ -13373,19 +13232,16 @@
       "labels": [
         "food_sound"
       ],
+      "comment_inline": "SOUND channel 3 (flush), envelope 2, pitch 200, duration 2",
       "xref_summaries": [
         "&0bfc referenced 2 times by &1d0f, &1d1d"
       ],
-      "type": "byte",
+      "type": "word",
       "values": [
         19,
-        0,
         2,
-        0,
         200,
-        0,
-        2,
-        0
+        2
       ]
     },
     {
@@ -13963,19 +13819,16 @@
       "labels": [
         "hit_sound"
       ],
+      "comment_inline": "SOUND channel 0 (flush), envelope 1, pitch 6, duration 6",
       "xref_summaries": [
         "&0cf4 referenced 2 times by &7481, &7491"
       ],
-      "type": "byte",
+      "type": "word",
       "values": [
         16,
-        0,
         1,
-        0,
         6,
-        0,
-        6,
-        0
+        6
       ]
     },
     {
@@ -16681,7 +16534,8 @@
         32,
         32,
         32,
-        32
+        32,
+        13
       ],
       "image": 2,
       "labels": [
@@ -16697,18 +16551,7 @@
         }
       ],
       "type": "string",
-      "string": "FAREWELL!        "
-    },
-    {
-      "addr": 4001,
-      "bytes": [
-        13
-      ],
-      "image": 2,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "FAREWELL!        ."
     },
     {
       "addr": 4002,
@@ -16729,22 +16572,12 @@
         32,
         32,
         32,
-        32
+        32,
+        13
       ],
       "image": 2,
       "type": "string",
-      "string": "THE QUEST HAS    "
-    },
-    {
-      "addr": 4019,
-      "bytes": [
-        13
-      ],
-      "image": 2,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "THE QUEST HAS    ."
     },
     {
       "addr": 4020,
@@ -16765,22 +16598,12 @@
         69,
         32,
         32,
-        32
+        32,
+        13
       ],
       "image": 2,
       "type": "string",
-      "string": "FAILED AND THE   "
-    },
-    {
-      "addr": 4037,
-      "bytes": [
-        13
-      ],
-      "image": 2,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "FAILED AND THE   ."
     },
     {
       "addr": 4038,
@@ -16801,22 +16624,12 @@
         79,
         32,
         32,
-        32
+        32,
+        13
       ],
       "image": 2,
       "type": "string",
-      "string": "GODS ARE IN NO   "
-    },
-    {
-      "addr": 4055,
-      "bytes": [
-        13
-      ],
-      "image": 2,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "GODS ARE IN NO   ."
     },
     {
       "addr": 4056,
@@ -16837,22 +16650,12 @@
         82,
         69,
         67,
-        84
+        84,
+        13
       ],
       "image": 2,
       "type": "string",
-      "string": "MOOD TO RESURRECT"
-    },
-    {
-      "addr": 4073,
-      "bytes": [
-        13
-      ],
-      "image": 2,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "MOOD TO RESURRECT."
     },
     {
       "addr": 4074,
@@ -16873,7 +16676,8 @@
         32,
         32,
         32,
-        32
+        32,
+        13
       ],
       "image": 2,
       "labels": [
@@ -16893,18 +16697,7 @@
         "&0ff2 referenced 5 times by &0e6a, &0e77, &0e7f, &0f35, &0f48"
       ],
       "type": "string",
-      "string": "YOU ALL.         "
-    },
-    {
-      "addr": 4091,
-      "bytes": [
-        13
-      ],
-      "image": 2,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "YOU ALL.         ."
     },
     {
       "addr": 4092,
@@ -16925,22 +16718,12 @@
         82,
         83,
         32,
-        32
+        32,
+        13
       ],
       "image": 2,
       "type": "string",
-      "string": "NEW ADVENTURERS  "
-    },
-    {
-      "addr": 4109,
-      "bytes": [
-        13
-      ],
-      "image": 2,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "NEW ADVENTURERS  ."
     },
     {
       "addr": 4110,
@@ -16961,22 +16744,12 @@
         82,
         32,
         32,
-        32
+        32,
+        13
       ],
       "image": 2,
       "type": "string",
-      "string": "MUST TAKE YOUR   "
-    },
-    {
-      "addr": 4127,
-      "bytes": [
-        13
-      ],
-      "image": 2,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "MUST TAKE YOUR   ."
     },
     {
       "addr": 4128,
@@ -16997,22 +16770,12 @@
         78,
         71,
         32,
-        32
+        32,
+        13
       ],
       "image": 2,
       "type": "string",
-      "string": "PLACE,BEGINNING  "
-    },
-    {
-      "addr": 4145,
-      "bytes": [
-        13
-      ],
-      "image": 2,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "PLACE,BEGINNING  ."
     },
     {
       "addr": 4146,
@@ -17033,22 +16796,12 @@
         80,
         80,
         69,
-        82
+        82,
+        13
       ],
       "image": 2,
       "type": "string",
-      "string": "BACK ON THE UPPER"
-    },
-    {
-      "addr": 4163,
-      "bytes": [
-        13
-      ],
-      "image": 2,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "BACK ON THE UPPER."
     },
     {
       "addr": 4164,
@@ -17069,22 +16822,12 @@
         32,
         32,
         32,
-        32
+        32,
+        13
       ],
       "image": 2,
       "type": "string",
-      "string": "MOST LEVEL.      "
-    },
-    {
-      "addr": 4181,
-      "bytes": [
-        13
-      ],
-      "image": 2,
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "MOST LEVEL.      ."
     },
     {
       "addr": 4182,
@@ -17092,6 +16835,7 @@
         10
       ],
       "image": 2,
+      "comment_inline": "Line feed: a blank line",
       "type": "byte",
       "values": [
         10
@@ -17116,55 +16860,35 @@
         73,
         67,
         69,
-        33
+        33,
+        0
       ],
       "image": 2,
       "type": "string",
-      "string": "FIND THE CHALICE!"
-    },
-    {
-      "addr": 4200,
-      "bytes": [
-        0
-      ],
-      "image": 2,
-      "type": "byte",
-      "values": [
-        0
-      ]
+      "string": "FIND THE CHALICE!."
     },
     {
       "addr": 4201,
       "bytes": [
         78,
         68,
-        33
-      ],
-      "image": 2,
-      "type": "string",
-      "string": "ND!"
-    },
-    {
-      "addr": 4204,
-      "bytes": [
-        0
-      ],
-      "image": 2,
-      "type": "byte",
-      "values": [
-        0
-      ]
-    },
-    {
-      "addr": 4205,
-      "bytes": [
+        33,
+        0,
         38,
         67,
         50
       ],
       "image": 2,
-      "type": "string",
-      "string": "&C2"
+      "type": "byte",
+      "values": [
+        78,
+        68,
+        33,
+        0,
+        38,
+        67,
+        50
+      ]
     },
     {
       "addr": 4208,
@@ -27093,39 +26817,90 @@
     {
       "addr": 6400,
       "bytes": [
-        3,
-        1,
-        10,
-        10,
-        236,
-        3,
-        3,
-        3,
-        128,
-        0,
-        0,
-        255,
-        128,
-        128
+        3
       ],
       "image": 2,
       "labels": [
         "magic_envelope"
       ],
+      "comment_inline": "Envelope 3",
+      "type": "byte",
+      "values": [
+        3
+      ]
+    },
+    {
+      "addr": 6401,
+      "bytes": [
+        1
+      ],
+      "image": 2,
+      "comment_inline": "Step length 1 centisecond",
+      "type": "byte",
+      "values": [
+        1
+      ]
+    },
+    {
+      "addr": 6402,
+      "bytes": [
+        10,
+        10,
+        236
+      ],
+      "image": 2,
+      "comment_inline": "Pitch change per step in sections 1-3: 10, 10, -20",
+      "type": "byte",
+      "values": [
+        10,
+        10,
+        236
+      ]
+    },
+    {
+      "addr": 6405,
+      "bytes": [
+        3,
+        3,
+        3
+      ],
+      "image": 2,
+      "comment_inline": "Steps in pitch sections 1-3: 3, 3, 3",
       "type": "byte",
       "values": [
         3,
-        1,
-        10,
-        10,
-        236,
         3,
-        3,
-        3,
+        3
+      ]
+    },
+    {
+      "addr": 6408,
+      "bytes": [
         128,
         0,
         0,
-        255,
+        255
+      ],
+      "image": 2,
+      "comment_inline": "Amplitude change per step in attack, decay, sustain, release: -128, 0, 0, -1",
+      "type": "byte",
+      "values": [
+        128,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "addr": 6412,
+      "bytes": [
+        128,
+        128
+      ],
+      "image": 2,
+      "comment_inline": "Target levels at the end of attack and decay: 128, 128",
+      "type": "byte",
+      "values": [
         128,
         128
       ]
@@ -27146,54 +26921,102 @@
       "labels": [
         "magic_sound"
       ],
-      "type": "byte",
+      "comment_inline": "SOUND channel 2 (flush), envelope 3, pitch 0, duration 2",
+      "type": "word",
       "values": [
         18,
-        0,
         3,
         0,
-        0,
-        0,
-        2,
-        0
+        2
       ]
     },
     {
       "addr": 6422,
       "bytes": [
-        3,
-        2,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        128,
-        0,
-        0,
-        248,
-        128,
-        128
+        3
       ],
       "image": 2,
       "labels": [
         "treasure_envelope"
       ],
+      "comment_inline": "Envelope 3",
       "type": "byte",
       "values": [
-        3,
-        2,
+        3
+      ]
+    },
+    {
+      "addr": 6423,
+      "bytes": [
+        2
+      ],
+      "image": 2,
+      "comment_inline": "Step length 2 centiseconds",
+      "type": "byte",
+      "values": [
+        2
+      ]
+    },
+    {
+      "addr": 6424,
+      "bytes": [
         1,
         1,
+        1
+      ],
+      "image": 2,
+      "comment_inline": "Pitch change per step in sections 1-3: 1, 1, 1",
+      "type": "byte",
+      "values": [
         1,
         1,
+        1
+      ]
+    },
+    {
+      "addr": 6427,
+      "bytes": [
         1,
         1,
+        1
+      ],
+      "image": 2,
+      "comment_inline": "Steps in pitch sections 1-3: 1, 1, 1",
+      "type": "byte",
+      "values": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "addr": 6430,
+      "bytes": [
         128,
         0,
         0,
-        248,
+        248
+      ],
+      "image": 2,
+      "comment_inline": "Amplitude change per step in attack, decay, sustain, release: -128, 0, 0, -8",
+      "type": "byte",
+      "values": [
+        128,
+        0,
+        0,
+        248
+      ]
+    },
+    {
+      "addr": 6434,
+      "bytes": [
+        128,
+        128
+      ],
+      "image": 2,
+      "comment_inline": "Target levels at the end of attack and decay: 128, 128",
+      "type": "byte",
+      "values": [
         128,
         128
       ]
@@ -27214,54 +27037,102 @@
       "labels": [
         "treasure_sound"
       ],
-      "type": "byte",
+      "comment_inline": "SOUND channel 2 (flush), envelope 3, pitch 200, duration 5",
+      "type": "word",
       "values": [
         18,
-        0,
         3,
-        0,
         200,
-        0,
-        5,
-        0
+        5
       ]
     },
     {
       "addr": 6444,
       "bytes": [
-        3,
-        128,
-        0,
-        0,
-        0,
-        10,
-        10,
-        10,
-        10,
-        0,
-        0,
-        253,
-        128,
-        128
+        3
       ],
       "image": 2,
       "labels": [
         "pickup_envelope"
       ],
+      "comment_inline": "Envelope 3",
       "type": "byte",
       "values": [
-        3,
+        3
+      ]
+    },
+    {
+      "addr": 6445,
+      "bytes": [
+        128
+      ],
+      "image": 2,
+      "comment_inline": "Step length 0 centiseconds, no auto-repeat",
+      "type": "byte",
+      "values": [
+        128
+      ]
+    },
+    {
+      "addr": 6446,
+      "bytes": [
+        0,
+        0,
+        0
+      ],
+      "image": 2,
+      "comment_inline": "Pitch change per step in sections 1-3: 0, 0, 0",
+      "type": "byte",
+      "values": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 6449,
+      "bytes": [
+        10,
+        10,
+        10
+      ],
+      "image": 2,
+      "comment_inline": "Steps in pitch sections 1-3: 10, 10, 10",
+      "type": "byte",
+      "values": [
+        10,
+        10,
+        10
+      ]
+    },
+    {
+      "addr": 6452,
+      "bytes": [
+        10,
+        0,
+        0,
+        253
+      ],
+      "image": 2,
+      "comment_inline": "Amplitude change per step in attack, decay, sustain, release: 10, 0, 0, -3",
+      "type": "byte",
+      "values": [
+        10,
+        0,
+        0,
+        253
+      ]
+    },
+    {
+      "addr": 6456,
+      "bytes": [
         128,
-        0,
-        0,
-        0,
-        10,
-        10,
-        10,
-        10,
-        0,
-        0,
-        253,
+        128
+      ],
+      "image": 2,
+      "comment_inline": "Target levels at the end of attack and decay: 128, 128",
+      "type": "byte",
+      "values": [
         128,
         128
       ]
@@ -27282,54 +27153,102 @@
       "labels": [
         "pickup_sound"
       ],
-      "type": "byte",
+      "comment_inline": "SOUND channel 0 (flush), envelope 3, pitch 10, duration 5",
+      "type": "word",
       "values": [
         16,
-        0,
         3,
-        0,
         10,
-        0,
-        5,
-        0
+        5
       ]
     },
     {
       "addr": 6466,
       "bytes": [
-        3,
-        128,
-        0,
-        0,
-        0,
-        1,
-        30,
-        30,
-        128,
-        0,
-        0,
-        254,
-        128,
-        128
+        3
       ],
       "image": 2,
       "labels": [
         "key_envelope"
       ],
+      "comment_inline": "Envelope 3",
       "type": "byte",
       "values": [
-        3,
-        128,
+        3
+      ]
+    },
+    {
+      "addr": 6467,
+      "bytes": [
+        128
+      ],
+      "image": 2,
+      "comment_inline": "Step length 0 centiseconds, no auto-repeat",
+      "type": "byte",
+      "values": [
+        128
+      ]
+    },
+    {
+      "addr": 6468,
+      "bytes": [
         0,
         0,
+        0
+      ],
+      "image": 2,
+      "comment_inline": "Pitch change per step in sections 1-3: 0, 0, 0",
+      "type": "byte",
+      "values": [
         0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 6471,
+      "bytes": [
         1,
         30,
+        30
+      ],
+      "image": 2,
+      "comment_inline": "Steps in pitch sections 1-3: 1, 30, 30",
+      "type": "byte",
+      "values": [
+        1,
         30,
+        30
+      ]
+    },
+    {
+      "addr": 6474,
+      "bytes": [
         128,
         0,
         0,
-        254,
+        254
+      ],
+      "image": 2,
+      "comment_inline": "Amplitude change per step in attack, decay, sustain, release: -128, 0, 0, -2",
+      "type": "byte",
+      "values": [
+        128,
+        0,
+        0,
+        254
+      ]
+    },
+    {
+      "addr": 6478,
+      "bytes": [
+        128,
+        128
+      ],
+      "image": 2,
+      "comment_inline": "Target levels at the end of attack and decay: 128, 128",
+      "type": "byte",
+      "values": [
         128,
         128
       ]
@@ -27350,54 +27269,102 @@
       "labels": [
         "key_sound"
       ],
-      "type": "byte",
+      "comment_inline": "SOUND channel 2 (flush), envelope 3, pitch 240, duration 1",
+      "type": "word",
       "values": [
         18,
-        0,
         3,
-        0,
         240,
-        0,
-        1,
-        0
+        1
       ]
     },
     {
       "addr": 6488,
       "bytes": [
-        3,
-        130,
-        255,
-        255,
-        254,
-        1,
-        1,
-        128,
-        128,
-        0,
-        0,
-        255,
-        128,
-        128
+        3
       ],
       "image": 2,
       "labels": [
         "exit_envelope"
       ],
+      "comment_inline": "Envelope 3",
       "type": "byte",
       "values": [
-        3,
-        130,
+        3
+      ]
+    },
+    {
+      "addr": 6489,
+      "bytes": [
+        130
+      ],
+      "image": 2,
+      "comment_inline": "Step length 2 centiseconds, no auto-repeat",
+      "type": "byte",
+      "values": [
+        130
+      ]
+    },
+    {
+      "addr": 6490,
+      "bytes": [
         255,
         255,
-        254,
+        254
+      ],
+      "image": 2,
+      "comment_inline": "Pitch change per step in sections 1-3: -1, -1, -2",
+      "type": "byte",
+      "values": [
+        255,
+        255,
+        254
+      ]
+    },
+    {
+      "addr": 6493,
+      "bytes": [
         1,
         1,
-        128,
+        128
+      ],
+      "image": 2,
+      "comment_inline": "Steps in pitch sections 1-3: 1, 1, 128",
+      "type": "byte",
+      "values": [
+        1,
+        1,
+        128
+      ]
+    },
+    {
+      "addr": 6496,
+      "bytes": [
         128,
         0,
         0,
-        255,
+        255
+      ],
+      "image": 2,
+      "comment_inline": "Amplitude change per step in attack, decay, sustain, release: -128, 0, 0, -1",
+      "type": "byte",
+      "values": [
+        128,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "addr": 6500,
+      "bytes": [
+        128,
+        128
+      ],
+      "image": 2,
+      "comment_inline": "Target levels at the end of attack and decay: 128, 128",
+      "type": "byte",
+      "values": [
         128,
         128
       ]
@@ -27418,16 +27385,13 @@
       "labels": [
         "exit_sound"
       ],
-      "type": "byte",
+      "comment_inline": "SOUND channel 2 (flush), envelope 3, pitch 250, duration 1",
+      "type": "word",
       "values": [
         18,
-        0,
         3,
-        0,
         250,
-        0,
-        1,
-        0
+        1
       ]
     },
     {
