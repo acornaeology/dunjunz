@@ -132,10 +132,11 @@ is 5, the game reaches `JSR &D9CD` at &0481 with &72=&4D. With level 4 it
 returns normally.
 
 Origin **[confirmed by comparing the archived releases]**:
-- All three releases share the same level data. The crack's `L1`–`L25`
-  are the hack's `LEVELn` files already decrypted, and the official disc's
-  `LevelN` and `Stones` hold the same levels in encrypted form. Level 5
-  sums to &4D in all of them.
+- The crack's `L1`–`L25` are the hack's `LEVELn` files already
+  decrypted. The official disc's `LevelN` and `Stones` hold the same
+  levels in encrypted form, except for eight it revises (see "The disc
+  revises eight of the cassette's levels" below). Level 5 sums to &4D in
+  all of them.
 - The checksum table at &0491 is the same in the crack and the hack, with
   &1A for level 5. The official disc's table has &4D.
 - The crack never checks the sum: Ole replaced the routine at &0450 with
@@ -150,6 +151,42 @@ original cassette.
 
 Fix: set &0495 in `Dunjun4` to &4D. Confirmed in beebium: with that byte
 changed, loading level 5 passes the check.
+
+### The disc revises eight of the cassette's levels
+
+Seventeen of the official disc's levels decrypt to exactly the cassette's
+(the crack's `Ln` and the hack's `LEVELn`). Levels 1, 2, 4, 5, 6, 12, 22
+and 24 differ **[confirmed by comparing the files]**:
+
+| Level | What changes on the disc |
+|---|---|
+| 1 | walls (34 bytes) and the object-free map |
+| 2 | walls (37 bytes), the object-free map, and one key moved (30,14 to 28,11) |
+| 4 | walls (19 bytes), the object-free map, and one object at (30,30) changed from &28 to &2A |
+| 5 | one wall byte, and a door at (4,45) and a key at (7,23) removed |
+| 6 | nothing in play: only the tables' order and one byte of the wall block |
+| 12 | the object at (13,20) changed from &28 to &61 |
+| 22 | walls (6 bytes), the object-free map, and three objects and three keys moved |
+| 24 | one byte of the object-free map |
+
+The details:
+- **Every changed level was re-saved.** In all eight, entries 1–29 of the
+  object table are in reverse order (the exit, entry 30, stays last), and
+  the door, key and trapdoor tables are reordered too. On level 6 that,
+  plus a stray &D7 in the unused entry 0, is the only change
+  **[confirmed]**. So the eight were saved by a tool that writes the
+  tables backwards, presumably the level editor **[inference]**.
+- **Each revised level keeps the cassette level's sum, so it passes the
+  same checksum table.** On level 6 the &D7 in entry 0 (&28 below the
+  cassette's &FF) is offset by &28 added to &6D80, the first byte of the
+  level's wall block. So on the disc, level 6's wall graphic differs in
+  its top-left pixels **[confirmed in the bytes]**.
+- **The Master side's `Default` has the cassette's level 6** but the
+  disc's versions of the other seven. Its other copies match the Model B
+  side's level files **[confirmed]**. So level 6 was evidently re-saved
+  after the Master `Default` was built **[inference]**. `*DEFAULT` on a
+  Master therefore "restores" level 6 to a version the disc never
+  shipped.
 
 ## Provenance of this disc
 

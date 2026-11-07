@@ -13,7 +13,7 @@ decodes a level and draws its map as text.
 | Ole's crack | `L1`–`L25` | Decrypted |
 | Sideways RAM hack | `LEVEL1`–`LEVEL25` in two Beebug ROMFS images | Encrypted |
 
-All three hold the same level data. In the encrypted form each byte is
+The three hold the same level data, except that the official disc revises levels 1, 2, 4, 5, 6, 12, 22 and 24 (see [findings.md](findings.md), "The disc revises eight of the cassette's levels"). In the encrypted form each byte is
 XORed with the low byte of its own address (&6B00 + offset).
 `decrypt_level` (&0450) reverses this in place and checks the sum of the
 decrypted bytes, modulo 256, against `level_checksums` (&0491–&04A9),
