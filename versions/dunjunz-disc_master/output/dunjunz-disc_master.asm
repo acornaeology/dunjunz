@@ -263,6 +263,7 @@ mos120_reset_entry    = &d9cd  ; The MOS 1.20 reset entry, which decrypt_level c
 mos120_oswrch_default = &e0a4  ; MOS 1.20's default OSWRCH routine, where the unused handler would pass characters on; MOS 3.20's is elsewhere.
 ; &e0a4 referenced 2 times by &7fd7, &7ffc
 mos320_oswrch_default = &e822  ; MOS 3.20's default OSWRCH routine, WRCHV's initial value.
+; &e822 referenced 1 time by &7f8f
 mos320_osbyte_default = &eeb1  ; MOS 3.20's default OSBYTE routine, BYTEV's initial value.
 ; &eeb1 referenced 2 times by &c518, &c569
 system_via_t1c_l      = &fe44
@@ -2414,9 +2415,9 @@ level_command_digits = level_command+10
     dex                                 ; Count the PLOT done
     bne draw_view_frame                 ; Until all twenty are drawn
     jsr draw_all_views                  ; Draw the four views
-    lda #&8f                            ; Point WRCHV at &7F8F...
+    lda #<(wrch_handler)                ; Point WRCHV at &7F8F...
     sta wrchv                           ; ...low byte...
-    lda #&7f                            ; ...high byte...
+    lda #>(wrch_handler)                ; ...high byte...
     sta wrchv + 1                       ; ...the WRCHV entry again, for text
     rts                                 ; Return
 ; ***************************************************************************************
@@ -7160,7 +7161,7 @@ clear_text_area_top = set_text_window_top+1
     jsr find_creature                   ; Look for a creature on the trapdoor
     cmp #0                              ; A = 0 if the trapdoor is free
     beq emerge_done                     ; No: done
-    pla                                 ; Yes: wait off the map, to try again next frame
+    pla                                 ; Taken: park it off the map, still alive
     pha                                 ; ...keeping it stacked for monster_done
     tax                                 ; ...the monster number in X
     lda #off_map                        ; Off the map...
@@ -7320,7 +7321,19 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00                       ; Not referenced
-    equb &4c, &22, &e8                  ; Pass every character straight to MOS 3.20's OSWRCH (&E822)
+; ***************************************************************************************
+; WRCHV handler: pass every character to the MOS
+;
+; The game points WRCHV here; it jumps straight to MOS 3.20's OSWRCH, so text appears in
+; the MOS font.
+;
+; On Entry:
+;     A: the character
+;
+; On Exit:
+;     A: preserved
+.wrch_handler
+    jmp mos320_oswrch_default           ; Pass every character straight to MOS 3.20's OSWRCH (&E822)
 ; ***************************************************************************************
 ; The game-font WRCHV handler, unused
 ;
@@ -8837,6 +8850,7 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     monster_step_right:             1
 ;     monster_vertical:               1
 ;     mos120_reset_entry:             1
+;     mos320_oswrch_default:          1
 ;     move_hero:                      1
 ;     move_heroes:                    1
 ;     move_heroes_done:               1
@@ -9004,11 +9018,11 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 
 ; Stats:
 ;     Total size (Code + Data) = 20187 bytes
-;     Code                     = 7553 bytes (37%)
-;     Data                     = 12634 bytes (63%)
+;     Code                     = 7556 bytes (37%)
+;     Data                     = 12631 bytes (63%)
 ;
-;     Number of instructions   = 3499
-;     Number of data bytes     = 11970 bytes
+;     Number of instructions   = 3500
+;     Number of data bytes     = 11967 bytes
 ;     Number of data words     = 64 bytes
 ;     Number of string bytes   = 600 bytes
 ;     Number of strings        = 55

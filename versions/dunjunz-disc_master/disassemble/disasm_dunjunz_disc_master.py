@@ -335,6 +335,10 @@ for addr in range(0x6F45, 0x6F4A):
     master.c(addr, "Padding: no bell when a missile is fired"
              if addr == 0x6F45 else "Padding: does nothing")
 
+master.sub(0x7F8F, "wrch_handler", "WRCHV handler: pass every character to the MOS",
+           "The game points WRCHV here; it jumps straight to MOS 3.20's OSWRCH, "
+           "so text appears in the MOS font.",
+           on_entry={"A": "the character"}, on_exit={"A": "preserved"})
 master.c(0x7F8F, "Pass every character straight to MOS 3.20's OSWRCH (&E822)")
 master.banner(0x7F92, "The game-font WRCHV handler, unused",
               "The rest of a WRCHV handler that prints letters and digits in "
@@ -803,6 +807,7 @@ for operand_addr in (0xC505, 0xC509, 0xC50D, 0xC511, 0xC515):
 
 # Addresses passed as immediate halves.
 for lo_addr, hi_addr, name in [
+    (0x1567, 0x156C, "wrch_handler"),
     (0x074F, 0x0751, "load_dunj2_command"), (0x0756, 0x0758, "load_dunj3_command"),
     (0x075D, 0x075F, "load_dunj4_command"), (0x0764, 0x0766, "load_dunj5_command"),
     (0x1457, 0x145B, "view_frame_plots"), (0x14F2, 0x14F4, "level_command"),

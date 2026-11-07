@@ -333,10 +333,10 @@ save_dest_page = store_saved_byte+2
 ;
 ; Zero bytes, which nothing reads.
     equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00  ; Zeros
-    equb &00, &62, &cd, &0c, &44, &1a, &22, &f6  ; The level checksums, never read by the crack
-    equs "B!}]"
-    equb &d8, &a0, &f1, &0f, &cc, &d3, &53, &3b
-    equb &83, &71, &b2, &6f, &f3, &f1   ; ...levels 12-25
+    equb &00, &62, &cd, &0c, &44, &1a, &22, &f6  ; Level checksums (entry 0, levels 1-7), never read
+    equb &42, &21, &7d, &5d, &d8, &a0, &f1, &0f  ; ...levels 8-15
+    equb &cc, &d3, &53, &3b, &83, &71, &b2, &6f  ; ...levels 16-23
+    equb &f3, &f1                       ; ...levels 24-25
 ; ***************************************************************************************
 ; Unused
 ;
@@ -7345,7 +7345,7 @@ restore_dest_page = put_back_byte+2
     jsr find_creature                   ; Look for a creature on the trapdoor
     cmp #0                              ; A = 0 if the trapdoor is free
     beq emerge_done                     ; No: done
-    pla                                 ; Yes: wait off the map, to try again next frame
+    pla                                 ; Taken: park it off the map, still alive
     pha                                 ; ...keeping it stacked for monster_done
     tax                                 ; ...the monster number in X
     lda #off_map                        ; Off the map...
@@ -8666,7 +8666,7 @@ save "DUNJ3", dasmos_dunj3_start, dasmos_dunj3_end, &0000, &6e80
 ;     Data                     = 16206 bytes (70%)
 ;
 ;     Number of instructions   = 3228
-;     Number of data bytes     = 15577 bytes
+;     Number of data bytes     = 15581 bytes
 ;     Number of data words     = 64 bytes
-;     Number of string bytes   = 565 bytes
-;     Number of strings        = 56
+;     Number of string bytes   = 561 bytes
+;     Number of strings        = 55

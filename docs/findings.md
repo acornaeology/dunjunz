@@ -514,6 +514,26 @@ bytes, a full MODE 2 screen, and a coherent picture.
 
 ## Game (all releases)
 
+### A monster that emerges onto an occupied trapdoor is lost
+
+When a monster's death animation ends, `monster_reappears` (&7CB3) puts
+it on the next trapdoor, facing up, alive. If `find_creature` finds
+something already on that trapdoor, the code at &7CED sets the monster's
+map x and y to &FF and goes on to the next monster. Its sprite is still
+"facing up", so on later frames `update_monsters` moves it as a live
+monster at &FF,&FF, outside every room. Nothing returns it to a trapdoor,
+so the level has one monster fewer from then on **[inference from the
+code; not yet seen in play]**.
+
+### A missile stops at a dead hero's skull
+
+A dead hero keeps their map position while the skull shows. The missile
+loop at &71DD compares a missile's new cell with every hero's, whether
+in play or not. On a match it calls `lose_health_point`, which does
+nothing for a hero out of play, and then spends the missile. So a skull
+stops missiles, though the dead hero loses nothing **[confirmed from the
+code]**.
+
 ### "YOU ALL" loses its full stop
 
 The game-over message (&0F90) contains "YOU ALL." with the full stop at

@@ -2568,7 +2568,7 @@ def annotate_monster_comments(a: Annotator) -> None:
         (0x7CE1, "Is anything else on the trapdoor? (A hero there is hurt)"),
         (0x7CE2, "...keeping the monster number"), (0x7CE3, "Leave this monster out of the search"), (0x7CE6, "Look for a creature on the trapdoor"), (0x7CE9, "A = 0 if the trapdoor is free"),
         (0x7CEB, "No: done"),
-        (0x7CED, "Yes: wait off the map, to try again next frame"),
+        (0x7CED, "Taken: park it off the map, still alive"),
         (0x7CEE, "...keeping it stacked for monster_done"), (0x7CEF, "...the monster number in X"), (0x7CF0, "Off the map..."), (0x7CF2, "...as its x"),
         (0x7CF5, "...and its y"), (0x7CF8, "On to the next monster"),
         (0x7CFB, "Done"),

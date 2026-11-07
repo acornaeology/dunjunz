@@ -3521,7 +3521,7 @@
       "binary_addr": 9360,
       "image": 0,
       "move": "game_image",
-      "comment_inline": "The level checksums, never read by the crack",
+      "comment_inline": "Level checksums (entry 0, levels 1-7), never read",
       "type": "byte",
       "values": [
         0,
@@ -3540,21 +3540,31 @@
         66,
         33,
         125,
-        93
+        93,
+        216,
+        160,
+        241,
+        15
       ],
       "binary_addr": 9368,
       "image": 0,
       "move": "game_image",
-      "type": "string",
-      "string": "B!}]"
-    },
-    {
-      "addr": 1180,
-      "bytes": [
+      "comment_inline": "...levels 8-15",
+      "type": "byte",
+      "values": [
+        66,
+        33,
+        125,
+        93,
         216,
         160,
         241,
-        15,
+        15
+      ]
+    },
+    {
+      "addr": 1184,
+      "bytes": [
         204,
         211,
         83,
@@ -3562,28 +3572,36 @@
         131,
         113,
         178,
-        111,
+        111
+      ],
+      "binary_addr": 9376,
+      "image": 0,
+      "move": "game_image",
+      "comment_inline": "...levels 16-23",
+      "type": "byte",
+      "values": [
+        204,
+        211,
+        83,
+        59,
+        131,
+        113,
+        178,
+        111
+      ]
+    },
+    {
+      "addr": 1192,
+      "bytes": [
         243,
         241
       ],
-      "binary_addr": 9372,
+      "binary_addr": 9384,
       "image": 0,
       "move": "game_image",
-      "comment_inline": "...levels 12-25",
+      "comment_inline": "...levels 24-25",
       "type": "byte",
       "values": [
-        216,
-        160,
-        241,
-        15,
-        204,
-        211,
-        83,
-        59,
-        131,
-        113,
-        178,
-        111,
         243,
         241
       ]
@@ -84437,7 +84455,7 @@
         104
       ],
       "image": 1,
-      "comment_inline": "Yes: wait off the map, to try again next frame",
+      "comment_inline": "Taken: park it off the map, still alive",
       "type": "code",
       "mnemonic": "pla"
     },

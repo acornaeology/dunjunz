@@ -9048,7 +9048,7 @@ level_command_digits = level_command+10
     jsr find_creature                   ; Look for a creature on the trapdoor
     cmp #0                              ; A = 0 if the trapdoor is free
     beq emerge_done                     ; No: done
-    pla                                 ; Yes: wait off the map, to try again next frame
+    pla                                 ; Taken: park it off the map, still alive
     pha                                 ; ...keeping it stacked for monster_done
     tax                                 ; ...the monster number in X
     lda #off_map                        ; Off the map...

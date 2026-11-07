@@ -1430,6 +1430,18 @@
       }
     },
     {
+      "addr": 32655,
+      "name": "wrch_handler",
+      "title": "WRCHV handler: pass every character to the MOS",
+      "description": "The game points WRCHV here; it jumps straight to MOS 3.20's OSWRCH, so text appears in the MOS font.",
+      "on_entry": {
+        "A": "the character"
+      },
+      "on_exit": {
+        "A": "preserved"
+      }
+    },
+    {
       "addr": 5120,
       "name": "start_level",
       "title": "Set up and draw a new level",
@@ -25899,7 +25911,16 @@
       "comment_inline": "Point WRCHV at &7F8F...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&8f"
+      "operand": "#<(wrch_handler)",
+      "expr": {
+        "text": "<(wrch_handler)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "wrch_handler"
+          }
+        }
+      }
     },
     {
       "addr": 5480,
@@ -25926,7 +25947,16 @@
       "comment_inline": "...high byte...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&7f"
+      "operand": "#>(wrch_handler)",
+      "expr": {
+        "text": ">(wrch_handler)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "wrch_handler"
+          }
+        }
+      }
     },
     {
       "addr": 5485,
@@ -74581,7 +74611,7 @@
         104
       ],
       "image": 4,
-      "comment_inline": "Yes: wait off the map, to try again next frame",
+      "comment_inline": "Taken: park it off the map, still alive",
       "type": "code",
       "mnemonic": "pla"
     },
@@ -77774,13 +77804,15 @@
         232
       ],
       "image": 4,
+      "labels": [
+        "wrch_handler"
+      ],
       "comment_inline": "Pass every character straight to MOS 3.20's OSWRCH (&E822)",
-      "type": "byte",
-      "values": [
-        76,
-        34,
-        232
-      ]
+      "type": "code",
+      "mnemonic": "jmp",
+      "operand": "mos320_oswrch_default",
+      "target": 59426,
+      "target_label": "mos320_oswrch_default"
     },
     {
       "addr": 32658,

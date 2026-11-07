@@ -321,9 +321,11 @@ for move_name, addr in TAPE_TABLE_ENTRIES:
     d.comment(addr, table_entry_comment(addr), align=dasmos.Align.INLINE,
               move=moves_by_name[move_name])
 # The checksum table survives, but the crack's level loader never reads it.
-d.comment(0x0490, "The level checksums, never read by the crack", align=dasmos.Align.INLINE,
-          move=game_image)
-d.comment(0x049C, "...levels 12-25", align=dasmos.Align.INLINE, move=game_image)
+for row, text in [(0x0490, "Level checksums (entry 0, levels 1-7), never read"),
+                  (0x0498, "...levels 8-15"), (0x04A0, "...levels 16-23"),
+                  (0x04A8, "...levels 24-25")]:
+    d.byte(row, 2 if row == 0x04A8 else 8, cols=8, move=game_image, override=True)
+    d.comment(row, text, align=dasmos.Align.INLINE, move=game_image)
 
 # DUNJ3 past &7FFF: loaded into the sideways ROM area, so never in RAM.
 d.banner(0x8000, title="DUNJ3 beyond the game",
