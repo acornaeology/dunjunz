@@ -1706,6 +1706,12 @@ def annotate_data(a: Annotator) -> None:
              "rows.")
 
     # Workspace template
+    # The heroes' magic keys, and the keys in the workspace template.
+    a.inkey_number(0x0B24, 2)
+    for table_addr in range(0x7D70, 0x7D84, 4):
+        a.byte(table_addr, 4, cols=4)
+    a.inkey_number(0x7D70, 0x14)
+
     a.banner(0x7D00, "Workspace template",
              "The starting contents of page &0D for each level, copied there "
              "by reset_workspace: the heroes' starting positions, directions, "

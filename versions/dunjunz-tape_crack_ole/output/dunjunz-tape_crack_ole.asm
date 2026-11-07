@@ -12,6 +12,28 @@ osbyte_tape                  = &8c
 osword_envelope              = &08
 osword_sound                 = &07
 osbyte_scan_keyboard_from_16 = &7a
+inkey_key_ctrl               = &fe
+inkey_key_return             = &b6
+inkey_key_caps_lock          = &bf
+inkey_key_right              = &86
+inkey_key_k                  = &b9
+inkey_key_g                  = &ac
+inkey_key_shift_lock         = &af
+inkey_key_up                 = &c6
+inkey_key_comma              = &99
+inkey_key_b                  = &9b
+inkey_key_z                  = &9e
+inkey_key_copy               = &96
+inkey_key_slash              = &97
+inkey_key_i                  = &da
+inkey_key_shift              = &ff
+inkey_key_delete             = &a6
+inkey_key_full_stop          = &98
+inkey_key_u                  = &ca
+inkey_key_tab                = &9f
+inkey_key_down               = &d6
+inkey_key_space              = &9d
+inkey_key_o                  = &c9
 
 ; Memory locations
 data_0000             = &00
@@ -953,7 +975,7 @@ data_0466 = code_0464+2
     equb &03, &02, &01, &03
 ; &0b24 used as index base 1 time by &7624
 .hero_magic_key
-    equb &fe, &b6
+    equb inkey_key_ctrl, inkey_key_return
 ; &0b26 used as index base 3 times by &7619, &7621, &7644
 .hero_magic_delay
     equb &01, &01
@@ -7222,10 +7244,13 @@ data_1478 = code_1476+2
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &15, &85, &7a, &8a
     equb &48, &20, &00, &09, &68, &aa, &bd, &08
-    equb &bf, &86, &b9, &ac, &af, &c6, &99, &9b
-    equb &9e, &96, &97, &da, &ff, &a6, &98, &ca
-    equb &9f, &d6, &9d, &c9, &0d, &c9, &05, &d0
-    equb &09, &18, &bd, &04, &0d, &69, &03, &9d
+    equb inkey_key_caps_lock, inkey_key_right, inkey_key_k, inkey_key_g
+    equb inkey_key_shift_lock, inkey_key_up, inkey_key_comma, inkey_key_b
+    equb inkey_key_z, inkey_key_copy, inkey_key_slash, inkey_key_i
+    equb inkey_key_shift, inkey_key_delete, inkey_key_full_stop, inkey_key_u
+    equb inkey_key_tab, inkey_key_down, inkey_key_space, inkey_key_o
+    equb &0d, &c9, &05, &d0, &09, &18, &bd, &04
+    equb &0d, &69, &03, &9d
     equs "''''"
     equb &d0
     equs "(((("

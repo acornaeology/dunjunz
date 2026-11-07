@@ -15,6 +15,28 @@ osbyte_enable_event                  = &0e
 event_interval_timer_crossing_zero   = &05
 osbyte_disable_event                 = &0d
 osword_write_interval_timer          = &04
+inkey_key_ctrl                       = &fe
+inkey_key_keypad_enter               = &c3
+inkey_key_caps_lock                  = &bf
+inkey_key_keypad_hash                = &a5
+inkey_key_g                          = &ac
+inkey_key_underscore                 = &d7
+inkey_key_shift_lock                 = &af
+inkey_key_keypad_del                 = &b4
+inkey_key_b                          = &9b
+inkey_key_return                     = &b6
+inkey_key_z                          = &9e
+inkey_key_keypad_comma               = &a3
+inkey_key_m                          = &9a
+inkey_key_copy                       = &96
+inkey_key_shift                      = &ff
+inkey_key_keypad_3                   = &93
+inkey_key_n                          = &aa
+inkey_key_delete                     = &a6
+inkey_key_tab                        = &9f
+inkey_key_keypad_asterisk            = &a4
+inkey_key_space                      = &9d
+inkey_key_left_square_bracket        = &c7
 
 ; Memory locations
 tune_ptr                        = &00  ; The music's place in the tune: the current three-byte step.
@@ -1049,7 +1071,7 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &03, &02, &01, &03
 ; &0b24 used as index base 1 time by &7624
 .hero_magic_key
-    equb &fe, &c3
+    equb inkey_key_ctrl, inkey_key_keypad_enter
 ; &0b26 used as index base 3 times by &7619, &7621, &7644
 .hero_magic_delay
     equb &01, &01
@@ -6705,10 +6727,13 @@ clear_text_area_top = code_162d+1
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &15, &85, &7a, &8a
     equb &48, &20, &00, &09, &68, &aa, &bd, &08
-    equb &bf, &a5, &ac, &d7, &af, &b4, &9b, &b6
-    equb &9e, &a3, &9a, &96, &ff, &93, &aa, &a6
-    equb &9f, &a4, &9d, &c7, &0d, &c9, &05, &d0
-    equb &09, &18, &bd, &04, &0d, &69, &03, &9d
+    equb inkey_key_caps_lock, inkey_key_keypad_hash, inkey_key_g, inkey_key_underscore
+    equb inkey_key_shift_lock, inkey_key_keypad_del, inkey_key_b, inkey_key_return
+    equb inkey_key_z, inkey_key_keypad_comma, inkey_key_m, inkey_key_copy
+    equb inkey_key_shift, inkey_key_keypad_3, inkey_key_n, inkey_key_delete
+    equb inkey_key_tab, inkey_key_keypad_asterisk, inkey_key_space, inkey_key_left_square_bracket
+    equb &0d, &c9, &05, &d0, &09, &18, &bd, &04
+    equb &0d, &69, &03, &9d
     equs "''''"
     equb &d0
     equs "(((("

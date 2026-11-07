@@ -46,7 +46,7 @@ class Remapped:
     ADDRESSED = {
         "entry", "banner", "subroutine", "comment", "expr", "label",
         "index_region", "expr_label", "optional_label", "index_base",
-        "byte", "string", "hook_subroutine",
+        "byte", "string", "hook_subroutine", "inkey_number",
     }
 
     def __init__(self, disassembler, remap):
@@ -350,13 +350,13 @@ def annotate(d, model_b=False):
         (0x1C43, "..."),
         (0x1C46, "...and *L. TABLE (the row offsets and *FREE)"),
         (0x1C48, "..."), (0x1C4A, "..."),
-        (0x1C4D, "Cursor keys: ',' left..."),
+        (0x1C4D, "Cursor keys: left..."),
         (0x1C4F, "..."),
-        (0x1C51, "...'.' right..."),
+        (0x1C51, "...right..."),
         (0x1C53, "..."),
-        (0x1C55, "...'A' up..."),
+        (0x1C55, "...up..."),
         (0x1C57, "..."),
-        (0x1C59, "...'Z' down"),
+        (0x1C59, "...down"),
         (0x1C5B, "..."),
         (0x1C5D, "80 item slots, 0-&4F"),
         (0x1C5F, "..."),
@@ -1195,23 +1195,23 @@ def annotate(d, model_b=False):
     comments(main, [
         (0x24A9, "Remember the block chosen"),
         (0x24AC, "..."),
-        (0x24AF, "'.'?"),
+        (0x24AF, "Pressed?"),
         (0x24B1, "..."), (0x24B4, "..."),
         (0x24B6, "Yes: the next block..."),
         (0x24B9, "..."), (0x24BC, "..."), (0x24BE, "..."),
         (0x24C0, "...but not past 23"),
-        (0x24C2, "','?"),
+        (0x24C2, "Pressed?"),
         (0x24C4, "..."), (0x24C7, "..."),
         (0x24C9, "Yes: the previous block..."),
         (0x24CC, "..."),
         (0x24CE, "...but not before 0"),
-        (0x24D0, "'Z'?"),
+        (0x24D0, "Pressed?"),
         (0x24D2, "..."), (0x24D5, "..."),
         (0x24D7, "Yes: a row on..."),
         (0x24D8, "..."), (0x24DB, "..."), (0x24DD, "..."), (0x24E0, "..."),
         (0x24E2, "..."),
         (0x24E4, "...but not past 23"),
-        (0x24E6, "'A'?"),
+        (0x24E6, "Pressed?"),
         (0x24E8, "..."), (0x24EB, "..."),
         (0x24ED, "Yes: a row back..."),
         (0x24EE, "..."), (0x24F1, "..."), (0x24F3, "..."), (0x24F6, "..."),
@@ -1441,19 +1441,19 @@ def annotate(d, model_b=False):
         (0x2B0A, "Anything here?"),
         (0x2B0D, "No"),
         (0x2B0F, "Yes: plot it again"),
-        (0x2B12, "'.'?"),
+        (0x2B12, "Right key pressed?"),
         (0x2B14, "..."), (0x2B17, "..."),
         (0x2B19, "Yes: right (always branches)"),
         (0x2B1B, "..."),
-        (0x2B1D, "','?"),
+        (0x2B1D, "Left key pressed?"),
         (0x2B1F, "..."), (0x2B22, "..."),
         (0x2B24, "Yes: left, to at least 0"),
         (0x2B26, "..."), (0x2B28, "..."), (0x2B2A, "..."),
-        (0x2B2C, "'A'?"),
+        (0x2B2C, "Up key pressed?"),
         (0x2B2E, "..."), (0x2B31, "..."),
         (0x2B33, "Yes: up, to at least 0"),
         (0x2B35, "..."), (0x2B37, "..."), (0x2B39, "..."), (0x2B3B, "..."),
-        (0x2B3D, "'Z'?"),
+        (0x2B3D, "Down key pressed?"),
         (0x2B3F, "..."), (0x2B42, "..."),
         (0x2B44, "Yes: down (always branches)"),
         (0x2B46, "..."),
@@ -1973,6 +1973,11 @@ def annotate(d, model_b=False):
     main.byte(0x19DE, 0x22, cols=8)
     main.banner(0x1A43, "Unused", "Leftover bytes, among them the text PAGE.")
     main.byte(0x1A43, 0x1C10 - 0x1A43, cols=16)
+
+    # Operands that are negative INKEY numbers: the default cursor keys
+    # and the wall-block chooser's keys.
+    for operand_addr in (0x1C4E, 0x1C52, 0x1C56, 0x1C5A, 0x24B0, 0x24C3, 0x24D1):
+        d.inkey_number(operand_addr)
 
     # Operands that are addresses of the editor's own data.
     for operand_addr, name, part in [

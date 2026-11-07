@@ -65,8 +65,20 @@
       "value": 129
     },
     {
+      "name": "inkey_key_comma",
+      "value": 153
+    },
+    {
+      "name": "inkey_key_full_stop",
+      "value": 152
+    },
+    {
       "name": "inkey_key_a",
       "value": 190
+    },
+    {
+      "name": "inkey_key_z",
+      "value": 158
     }
   ],
   "macros": [],
@@ -4647,10 +4659,11 @@
         169,
         153
       ],
-      "comment_inline": "Cursor keys: ',' left...",
+      "comment_inline": "Cursor keys: left...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&99"
+      "operand": "#inkey_key_comma",
+      "format_hint": "inkey_number"
     },
     {
       "addr": 7228,
@@ -4671,10 +4684,11 @@
         169,
         152
       ],
-      "comment_inline": "...'.' right...",
+      "comment_inline": "...right...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&98"
+      "operand": "#inkey_key_full_stop",
+      "format_hint": "inkey_number"
     },
     {
       "addr": 7232,
@@ -4695,10 +4709,11 @@
         169,
         190
       ],
-      "comment_inline": "...'A' up...",
+      "comment_inline": "...up...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&be"
+      "operand": "#inkey_key_a",
+      "format_hint": "inkey_number"
     },
     {
       "addr": 7236,
@@ -4719,10 +4734,11 @@
         169,
         158
       ],
-      "comment_inline": "...'Z' down",
+      "comment_inline": "...down",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&9e"
+      "operand": "#inkey_key_z",
+      "format_hint": "inkey_number"
     },
     {
       "addr": 7240,
@@ -17929,10 +17945,11 @@
         162,
         152
       ],
-      "comment_inline": "'.'?",
+      "comment_inline": "Pressed?",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&98"
+      "operand": "#inkey_key_full_stop",
+      "format_hint": "inkey_number"
     },
     {
       "addr": 9393,
@@ -18035,7 +18052,7 @@
       "labels": [
         "check_back"
       ],
-      "comment_inline": "','?",
+      "comment_inline": "Pressed?",
       "xref_summaries": [
         "&24c2 referenced 1 time by &24b4"
       ],
@@ -18047,7 +18064,8 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&99"
+      "operand": "#inkey_key_comma",
+      "format_hint": "inkey_number"
     },
     {
       "addr": 9412,
@@ -18125,7 +18143,7 @@
       "labels": [
         "check_row_on"
       ],
-      "comment_inline": "'Z'?",
+      "comment_inline": "Pressed?",
       "xref_summaries": [
         "&24d0 referenced 1 time by &24c7"
       ],
@@ -18137,7 +18155,8 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&9e"
+      "operand": "#inkey_key_z",
+      "format_hint": "inkey_number"
     },
     {
       "addr": 9426,
@@ -18260,7 +18279,7 @@
       "labels": [
         "check_row_back"
       ],
-      "comment_inline": "'A'?",
+      "comment_inline": "Pressed?",
       "xref_summaries": [
         "&24e6 referenced 1 time by &24d5"
       ],
@@ -18273,12 +18292,7 @@
       "type": "code",
       "mnemonic": "ldx",
       "operand": "#inkey_key_a",
-      "expr": {
-        "text": "inkey_key_a",
-        "tree": {
-          "sym": "inkey_key_a"
-        }
-      }
+      "format_hint": "inkey_number"
     },
     {
       "addr": 9448,
@@ -24966,7 +24980,7 @@
       "labels": [
         "check_right"
       ],
-      "comment_inline": "'.'?",
+      "comment_inline": "Right key pressed?",
       "xref_summaries": [
         "&2b12 referenced 1 time by &2b0d"
       ],
@@ -25044,7 +25058,7 @@
       "labels": [
         "check_left"
       ],
-      "comment_inline": "','?",
+      "comment_inline": "Left key pressed?",
       "xref_summaries": [
         "&2b1d referenced 1 time by &2b17"
       ],
@@ -25146,7 +25160,7 @@
       "labels": [
         "check_up"
       ],
-      "comment_inline": "'A'?",
+      "comment_inline": "Up key pressed?",
       "xref_summaries": [
         "&2b2c referenced 3 times by &2b1b, &2b22, &2b26"
       ],
@@ -25269,7 +25283,7 @@
       "labels": [
         "check_down"
       ],
-      "comment_inline": "'Z'?",
+      "comment_inline": "Down key pressed?",
       "xref_summaries": [
         "&2b3d referenced 1 time by &2b31"
       ],

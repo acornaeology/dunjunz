@@ -92,6 +92,94 @@
     {
       "name": "osbyte_sound_suppression",
       "value": 210
+    },
+    {
+      "name": "inkey_key_ctrl",
+      "value": 254
+    },
+    {
+      "name": "inkey_key_return",
+      "value": 182
+    },
+    {
+      "name": "inkey_key_caps_lock",
+      "value": 191
+    },
+    {
+      "name": "inkey_key_right",
+      "value": 134
+    },
+    {
+      "name": "inkey_key_k",
+      "value": 185
+    },
+    {
+      "name": "inkey_key_g",
+      "value": 172
+    },
+    {
+      "name": "inkey_key_shift_lock",
+      "value": 175
+    },
+    {
+      "name": "inkey_key_up",
+      "value": 198
+    },
+    {
+      "name": "inkey_key_comma",
+      "value": 153
+    },
+    {
+      "name": "inkey_key_b",
+      "value": 155
+    },
+    {
+      "name": "inkey_key_z",
+      "value": 158
+    },
+    {
+      "name": "inkey_key_copy",
+      "value": 150
+    },
+    {
+      "name": "inkey_key_slash",
+      "value": 151
+    },
+    {
+      "name": "inkey_key_i",
+      "value": 218
+    },
+    {
+      "name": "inkey_key_shift",
+      "value": 255
+    },
+    {
+      "name": "inkey_key_delete",
+      "value": 166
+    },
+    {
+      "name": "inkey_key_full_stop",
+      "value": 152
+    },
+    {
+      "name": "inkey_key_u",
+      "value": 202
+    },
+    {
+      "name": "inkey_key_tab",
+      "value": 159
+    },
+    {
+      "name": "inkey_key_down",
+      "value": 214
+    },
+    {
+      "name": "inkey_key_space",
+      "value": 157
+    },
+    {
+      "name": "inkey_key_o",
+      "value": 201
     }
   ],
   "macros": [],
@@ -15593,6 +15681,10 @@
       "values": [
         254,
         182
+      ],
+      "format_hints": [
+        "inkey_number",
+        "inkey_number"
       ]
     },
     {
@@ -99159,39 +99251,7 @@
         104,
         170,
         189,
-        8,
-        191,
-        134,
-        185,
-        172,
-        175,
-        198,
-        153,
-        155,
-        158,
-        150,
-        151,
-        218,
-        255,
-        166,
-        152,
-        202,
-        159,
-        214,
-        157,
-        201,
-        13,
-        201,
-        5,
-        208,
-        9,
-        24,
-        189,
-        4,
-        13,
-        105,
-        3,
-        157
+        8
       ],
       "type": "byte",
       "values": [
@@ -99242,27 +99302,137 @@
         104,
         170,
         189,
-        8,
+        8
+      ]
+    },
+    {
+      "addr": 32112,
+      "bytes": [
         191,
         134,
         185,
-        172,
+        172
+      ],
+      "type": "byte",
+      "values": [
+        191,
+        134,
+        185,
+        172
+      ],
+      "format_hints": [
+        "inkey_number",
+        "inkey_number",
+        "inkey_number",
+        "inkey_number"
+      ]
+    },
+    {
+      "addr": 32116,
+      "bytes": [
         175,
         198,
         153,
-        155,
+        155
+      ],
+      "type": "byte",
+      "values": [
+        175,
+        198,
+        153,
+        155
+      ],
+      "format_hints": [
+        "inkey_number",
+        "inkey_number",
+        "inkey_number",
+        "inkey_number"
+      ]
+    },
+    {
+      "addr": 32120,
+      "bytes": [
         158,
         150,
         151,
-        218,
+        218
+      ],
+      "type": "byte",
+      "values": [
+        158,
+        150,
+        151,
+        218
+      ],
+      "format_hints": [
+        "inkey_number",
+        "inkey_number",
+        "inkey_number",
+        "inkey_number"
+      ]
+    },
+    {
+      "addr": 32124,
+      "bytes": [
         255,
         166,
         152,
-        202,
+        202
+      ],
+      "type": "byte",
+      "values": [
+        255,
+        166,
+        152,
+        202
+      ],
+      "format_hints": [
+        "inkey_number",
+        "inkey_number",
+        "inkey_number",
+        "inkey_number"
+      ]
+    },
+    {
+      "addr": 32128,
+      "bytes": [
         159,
         214,
         157,
+        201
+      ],
+      "type": "byte",
+      "values": [
+        159,
+        214,
+        157,
+        201
+      ],
+      "format_hints": [
+        "inkey_number",
+        "inkey_number",
+        "inkey_number",
+        "inkey_number"
+      ]
+    },
+    {
+      "addr": 32132,
+      "bytes": [
+        13,
         201,
+        5,
+        208,
+        9,
+        24,
+        189,
+        4,
+        13,
+        105,
+        3,
+        157
+      ],
+      "type": "byte",
+      "values": [
         13,
         201,
         5,

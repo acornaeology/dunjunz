@@ -149,6 +149,11 @@ class Annotator:
         for move, _ in self._each(addr):
             self.d.byte(addr, length, cols=cols, move=move)
 
+    def inkey_number(self, addr, count=1):
+        """Bytes holding negative INKEY numbers, shown as inkey_key_<name>."""
+        for move, _ in self._each(addr):
+            self.d.inkey_number(addr, count, move=move)
+
     def string(self, addr, length):
         for move, _ in self._each(addr):
             self.d.string(addr, length, move=move)
