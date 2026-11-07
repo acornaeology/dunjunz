@@ -1,4 +1,6 @@
 ; Constants
+screen_end                = &8000  ; The top of screen memory
+text_end                  = &ff  ; The byte that ends TITLE's text
 osbyte_inkey              = &81
 osbyte_flush_buffer_class = &0f
 
@@ -113,7 +115,7 @@ osbyte                = &fff4
     jsr oswrch                          ; ...
     inx                                 ; ...
     txa                                 ; ...
-    cmp #&08                            ; ...
+    cmp #page_text - mode_vdu           ; ...
     bne send_mode_vdu                   ; ...
     lda #>(stripe_pattern)              ; Point copy_from at stripe_pattern and copy_to at mode5_screen
     sta copy_from_high                  ; ...
@@ -140,7 +142,7 @@ osbyte                = &fff4
     sta copy_to_high                    ; ...
     ldy #0                              ; Back to the pattern's first byte
     lda copy_to_high                    ; Repeat until copy_to reaches &8000, the top of the screen
-    cmp #&80                            ; ...
+    cmp #>(screen_end)                  ; ...
     bne fill_stripes                    ; ...
     lda #>(title_picture)               ; copy_from = title_picture
     sta copy_from_high                  ; ...
@@ -178,7 +180,7 @@ osbyte                = &fff4
     jsr oswrch                          ; ...
     inx                                 ; ...
     lda page_text,x                     ; ...
-    cmp #&ff                            ; ...
+    cmp #text_end                       ; ...
     bne print_page_text                 ; ...
     lda #osbyte_inkey                   ; Read the machine type, INKEY(-256)
     ldx #0                              ; ...
@@ -193,7 +195,7 @@ osbyte                = &fff4
     jsr oswrch                          ; ...
     inx                                 ; ...
     lda blank_line_text,x               ; ...
-    cmp #&ff                            ; ...
+    cmp #text_end                       ; ...
     bne print_blank_line                ; ...
 ; &3964 referenced 1 time by &3952
 .open_black_window
@@ -204,7 +206,7 @@ osbyte                = &fff4
     jsr oswrch                          ; ...
     inx                                 ; ...
     lda black_window_vdu,x              ; ...
-    cmp #&ff                            ; ...
+    cmp #text_end                       ; ...
     bne print_black_window              ; ...
     lda #&0a                            ; 6845 register 10 (cursor start) = &20: no cursor
     sta crtc_address_register           ; ...
@@ -221,21 +223,14 @@ osbyte                = &fff4
 ; Unused
 ;
 ; Zeros up to the picture, which starts on a page boundary.
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00                  ; Zeros
 ; ***************************************************************************************
 ; The title picture
 ;
@@ -243,7 +238,6 @@ osbyte                = &fff4
 ; first), copied by title_start to character rows 1-8. A blue frame holds a white panel
 ; at the left, the name BUG BYTE in large white letters and a red and blue face at the
 ; right.
-; Character row 1 (screen &5940)
 .title_picture
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -284,8 +278,7 @@ osbyte                = &fff4
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-; Character row 2 (screen &5A80)
+    equb &00, &00, &00, &00, &00, &00, &00, &00  ; Character row 1 (screen &5940)
     equb &f0, &f0, &f0, &f0, &80, &80, &80, &80
     equb &f0, &f0, &f0, &f0, &00, &00, &00, &00
     equb &f0, &f0, &f0, &f0, &00, &00, &00, &00
@@ -325,8 +318,7 @@ osbyte                = &fff4
     equb &0e, &0b, &c1, &c1, &e1, &e1, &70, &b8
     equb &00, &00, &0c, &0c, &0c, &08, &00, &80
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-; Character row 3 (screen &5BC0)
+    equb &00, &00, &00, &00, &00, &00, &00, &00  ; Character row 2 (screen &5A80)
     equb &b3, &b3, &b3, &b3, &b3, &b3, &b3, &b3
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
@@ -366,8 +358,7 @@ osbyte                = &fff4
     equb &54, &b8, &dc, &54, &54, &54, &dc, &b8
     equb &80, &80, &c0, &83, &83, &07, &07, &0f
     equb &00, &0c, &0e, &0e, &0e, &0f, &0e, &06
-    equb &00, &00, &00, &00, &08, &0c, &0c, &0c
-; Character row 4 (screen &5D00)
+    equb &00, &00, &00, &00, &08, &0c, &0c, &0c  ; Character row 3 (screen &5BC0)
     equb &b3, &b3, &b3, &b3, &b3, &b3, &b3, &b3
     equb &ff, &ff, &ff, &ff, &ff, &ff, &cc, &ff
     equb &ff, &ff, &ee, &fe, &00, &fc, &00, &fc
@@ -407,8 +398,7 @@ osbyte                = &fff4
     equb &70, &f0, &f0, &f0, &f0, &70, &70, &60
     equb &0f, &0e, &05, &82, &c1, &07, &07, &0f
     equb &06, &0d, &0f, &06, &0b, &0f, &0c, &0d
-    equb &0c, &08, &00, &0c, &0c, &0c, &08, &00
-; Character row 5 (screen &5E40)
+    equb &0c, &08, &00, &0c, &0c, &0c, &08, &00  ; Character row 4 (screen &5D00)
     equb &b3, &b3, &b3, &b3, &b3, &b3, &b3, &b3
     equb &00, &ff, &cc, &ff, &ff, &ff, &ff, &ff
     equb &00, &fc, &00, &fc, &00, &fe, &ee, &ff
@@ -448,8 +438,7 @@ osbyte                = &fff4
     equb &60, &61, &61, &61, &e0, &f0, &f0, &10
     equb &0f, &0e, &0e, &0d, &0b, &04, &83, &0f
     equb &0f, &0d, &0d, &0b, &0e, &0d, &07, &0b
-    equb &08, &08, &08, &00, &00, &08, &08, &08
-; Character row 6 (screen &5F80)
+    equb &08, &08, &08, &00, &00, &08, &08, &08  ; Character row 5 (screen &5E40)
     equb &b3, &b3, &b3, &b3, &b3, &b3, &b3, &b3
     equb &ff, &88, &aa, &88, &aa, &aa, &aa, &ff
     equb &ff, &88, &aa, &99, &aa, &aa, &aa, &ff
@@ -489,8 +478,7 @@ osbyte                = &fff4
     equb &dc, &45, &21, &03, &43, &c3, &e1, &f0
     equb &0f, &0f, &0e, &0e, &0d, &0b, &0f, &0f
     equb &0b, &00, &0d, &0f, &0b, &0d, &0e, &0f
-    equb &00, &00, &00, &08, &08, &00, &00, &00
-; Character row 7 (screen &60C0)
+    equb &00, &00, &00, &08, &08, &00, &00, &00  ; Character row 6 (screen &5F80)
     equb &80, &80, &80, &80, &f0, &f0, &f0, &f0
     equb &00, &00, &00, &00, &f0, &f0, &f0, &f0
     equb &00, &00, &00, &00, &f0, &f0, &f0, &f0
@@ -530,9 +518,7 @@ osbyte                = &fff4
     equb &f0, &f0, &e0, &e0, &e0, &a0, &80, &80
     equb &0e, &0c, &80, &00, &00, &00, &00, &00
     equb &0f, &03, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
-; Character row 8 (screen &6200)
-    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00  ; Character row 7 (screen &60C0)
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -572,6 +558,7 @@ osbyte                = &fff4
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00  ; Character row 8 (screen &6200)
 .dasmos_end
 
 save "TITLE", dasmos_start, dasmos_end, &38c6, &3800

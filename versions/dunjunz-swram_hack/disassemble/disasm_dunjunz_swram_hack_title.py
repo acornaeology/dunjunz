@@ -174,7 +174,12 @@ d.label(0x3964, "open_black_window")
 d.label(0x3966, "print_black_window")
 
 operand(0x38C9, sym("mode_vdu"))
-operand(0x38D1, hexlit(8))
+operand(0x38D1, sym("page_text") - sym("mode_vdu"))
+d.constant(0x8000, "screen_end", comment="The top of screen memory")
+d.constant(0xFF, "text_end", comment="The byte that ends TITLE's text")
+operand(0x3900, hi(sym("screen_end")))
+for operand_addr in (0x3944, 0x3961, 0x3971):
+    operand(operand_addr, sym("text_end"))
 operand(0x38D5, hi(sym("stripe_pattern")))
 operand(0x38DF, hi(sym("mode5_screen")))
 operand(0x3904, hi(sym("title_picture")))
@@ -242,7 +247,8 @@ comments([
 d.banner(0x398D, title="Unused",
          description="Zeros up to the picture, which starts on a page "
                      "boundary.")
-d.byte(0x398D, 0x3A00 - 0x398D)
+d.byte(0x398D, 0x3A00 - 0x398D, cols=16)
+d.comment(0x398D, "Zeros", align=dasmos.Align.INLINE)
 
 d.label(0x3A00, "title_picture")
 d.banner(0x3A00, title="The title picture",
@@ -253,7 +259,8 @@ d.banner(0x3A00, title="The title picture",
                      "white letters and a red and blue face at the right.")
 for row in range(8):
     addr = 0x3A00 + row * 0x140
-    d.comment(addr, "Character row %d (screen &%04X)" % (row + 1, 0x5940 + row * 0x140))
+    d.comment(addr, "Character row %d (screen &%04X)" % (row + 1, 0x5940 + row * 0x140),
+              align=dasmos.Align.INLINE)
     d.byte(addr, 0x140, cols=8)
 
 ir = d.disassemble()

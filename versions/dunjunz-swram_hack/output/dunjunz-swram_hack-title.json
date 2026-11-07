@@ -18,6 +18,16 @@
   },
   "constants": [
     {
+      "name": "screen_end",
+      "value": 32768,
+      "comment": "The top of screen memory"
+    },
+    {
+      "name": "text_end",
+      "value": 255,
+      "comment": "The byte that ends TITLE's text"
+    },
+    {
       "name": "osbyte_inkey",
       "value": 129
     },
@@ -1001,12 +1011,17 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&08",
+      "operand": "#page_text - mode_vdu",
       "expr": {
-        "text": "&08",
+        "text": "page_text - mode_vdu",
         "tree": {
-          "int": 8,
-          "radix": "hex"
+          "op": "sub",
+          "left": {
+            "sym": "page_text"
+          },
+          "right": {
+            "sym": "mode_vdu"
+          }
         }
       }
     },
@@ -1337,7 +1352,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&80"
+      "operand": "#>(screen_end)",
+      "expr": {
+        "text": ">(screen_end)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "screen_end"
+          }
+        }
+      }
     },
     {
       "addr": 14593,
@@ -1815,7 +1839,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&ff"
+      "operand": "#text_end",
+      "expr": {
+        "text": "text_end",
+        "tree": {
+          "sym": "text_end"
+        }
+      }
     },
     {
       "addr": 14661,
@@ -1990,7 +2020,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&ff"
+      "operand": "#text_end",
+      "expr": {
+        "text": "text_end",
+        "tree": {
+          "sym": "text_end"
+        }
+      }
     },
     {
       "addr": 14690,
@@ -2100,7 +2136,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&ff"
+      "operand": "#text_end",
+      "expr": {
+        "text": "text_end",
+        "tree": {
+          "sym": "text_end"
+        }
+      }
     },
     {
       "addr": 14706,
@@ -2377,6 +2419,7 @@
         0,
         0
       ],
+      "comment_inline": "Zeros",
       "type": "byte",
       "values": [
         0,
@@ -2823,9 +2866,7 @@
       "labels": [
         "title_picture"
       ],
-      "comments_before_label": [
-        "Character row 1 (screen &5940)"
-      ],
+      "comment_inline": "Character row 1 (screen &5940)",
       "type": "byte",
       "values": [
         0,
@@ -3474,9 +3515,7 @@
         0,
         0
       ],
-      "comments_before_label": [
-        "Character row 2 (screen &5A80)"
-      ],
+      "comment_inline": "Character row 2 (screen &5A80)",
       "type": "byte",
       "values": [
         240,
@@ -4125,9 +4164,7 @@
         12,
         12
       ],
-      "comments_before_label": [
-        "Character row 3 (screen &5BC0)"
-      ],
+      "comment_inline": "Character row 3 (screen &5BC0)",
       "type": "byte",
       "values": [
         179,
@@ -4776,9 +4813,7 @@
         8,
         0
       ],
-      "comments_before_label": [
-        "Character row 4 (screen &5D00)"
-      ],
+      "comment_inline": "Character row 4 (screen &5D00)",
       "type": "byte",
       "values": [
         179,
@@ -5427,9 +5462,7 @@
         8,
         8
       ],
-      "comments_before_label": [
-        "Character row 5 (screen &5E40)"
-      ],
+      "comment_inline": "Character row 5 (screen &5E40)",
       "type": "byte",
       "values": [
         179,
@@ -6078,9 +6111,7 @@
         0,
         0
       ],
-      "comments_before_label": [
-        "Character row 6 (screen &5F80)"
-      ],
+      "comment_inline": "Character row 6 (screen &5F80)",
       "type": "byte",
       "values": [
         179,
@@ -6729,9 +6760,7 @@
         0,
         0
       ],
-      "comments_before_label": [
-        "Character row 7 (screen &60C0)"
-      ],
+      "comment_inline": "Character row 7 (screen &60C0)",
       "type": "byte",
       "values": [
         128,
@@ -7380,9 +7409,7 @@
         0,
         0
       ],
-      "comments_before_label": [
-        "Character row 8 (screen &6200)"
-      ],
+      "comment_inline": "Character row 8 (screen &6200)",
       "type": "byte",
       "values": [
         0,
