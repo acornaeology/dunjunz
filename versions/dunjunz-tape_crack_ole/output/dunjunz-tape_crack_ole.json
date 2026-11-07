@@ -28,6 +28,186 @@
   },
   "constants": [
     {
+      "name": "spr_wall",
+      "value": 0,
+      "comment": "Sprite &00"
+    },
+    {
+      "name": "spr_monster_up_0",
+      "value": 9,
+      "comment": "Sprite &09"
+    },
+    {
+      "name": "spr_monster_down_0",
+      "value": 13,
+      "comment": "Sprite &0D"
+    },
+    {
+      "name": "spr_arrow_up",
+      "value": 17,
+      "comment": "Sprite &11"
+    },
+    {
+      "name": "spr_blank",
+      "value": 21,
+      "comment": "Sprite &15"
+    },
+    {
+      "name": "spr_sparkle_0",
+      "value": 22,
+      "comment": "Sprite &16"
+    },
+    {
+      "name": "spr_sparkle_3",
+      "value": 25,
+      "comment": "Sprite &19"
+    },
+    {
+      "name": "spr_blank_key_icon",
+      "value": 26,
+      "comment": "Sprite &1A"
+    },
+    {
+      "name": "spr_key",
+      "value": 27,
+      "comment": "Sprite &1B"
+    },
+    {
+      "name": "spr_digit_0",
+      "value": 30,
+      "comment": "Sprite &1E"
+    },
+    {
+      "name": "spr_digit_3",
+      "value": 33,
+      "comment": "Sprite &21"
+    },
+    {
+      "name": "spr_digit_9",
+      "value": 39,
+      "comment": "Sprite &27"
+    },
+    {
+      "name": "spr_treasure",
+      "value": 40,
+      "comment": "Sprite &28"
+    },
+    {
+      "name": "spr_food",
+      "value": 41,
+      "comment": "Sprite &29"
+    },
+    {
+      "name": "spr_cross",
+      "value": 42,
+      "comment": "Sprite &2A"
+    },
+    {
+      "name": "spr_teleporter",
+      "value": 43,
+      "comment": "Sprite &2B"
+    },
+    {
+      "name": "spr_trapdoor",
+      "value": 44,
+      "comment": "Sprite &2C"
+    },
+    {
+      "name": "spr_fireball_up",
+      "value": 69,
+      "comment": "Sprite &45"
+    },
+    {
+      "name": "spr_axe_up",
+      "value": 77,
+      "comment": "Sprite &4D"
+    },
+    {
+      "name": "spr_exit",
+      "value": 81,
+      "comment": "Sprite &51"
+    },
+    {
+      "name": "spr_key_icon",
+      "value": 82,
+      "comment": "Sprite &52"
+    },
+    {
+      "name": "spr_drainer_0",
+      "value": 83,
+      "comment": "Sprite &53"
+    },
+    {
+      "name": "spr_drainer_11",
+      "value": 94,
+      "comment": "Sprite &5E"
+    },
+    {
+      "name": "spr_boots",
+      "value": 95,
+      "comment": "Sprite &5F"
+    },
+    {
+      "name": "spr_helmet",
+      "value": 96,
+      "comment": "Sprite &60"
+    },
+    {
+      "name": "spr_potion",
+      "value": 97,
+      "comment": "Sprite &61"
+    },
+    {
+      "name": "spr_weapons",
+      "value": 98,
+      "comment": "Sprite &62"
+    },
+    {
+      "name": "spr_shield",
+      "value": 105,
+      "comment": "Sprite &69"
+    },
+    {
+      "name": "spr_small_digit_1",
+      "value": 106,
+      "comment": "Sprite &6A"
+    },
+    {
+      "name": "spr_small_digit_8",
+      "value": 113,
+      "comment": "Sprite &71"
+    },
+    {
+      "name": "spr_small_digit_9",
+      "value": 114,
+      "comment": "Sprite &72"
+    },
+    {
+      "name": "spr_chalice",
+      "value": 115,
+      "comment": "Sprite &73"
+    },
+    {
+      "name": "spr_missile_icon",
+      "value": 116,
+      "comment": "Sprite &74"
+    },
+    {
+      "name": "spr_boots_icon",
+      "value": 117,
+      "comment": "Sprite &75"
+    },
+    {
+      "name": "spr_level_word",
+      "value": 118,
+      "comment": "Sprite &76"
+    },
+    {
+      "name": "spr_blank_boots_icon",
+      "value": 119,
+      "comment": "Sprite &77"
+    },
+    {
       "name": "boot_osfile_block",
       "value": 27392,
       "comment": "OSFILE control block built by boot_loader (in the level buffer)"
@@ -2033,7 +2213,20 @@
       "comment_inline": "Past 9?",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&28"
+      "operand": "#spr_digit_9 + 1",
+      "expr": {
+        "text": "spr_digit_9 + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "spr_digit_9"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 1032,
@@ -2064,7 +2257,13 @@
       "comment_inline": "Yes: thousands 0...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&1e"
+      "operand": "#spr_digit_0",
+      "expr": {
+        "text": "spr_digit_0",
+        "tree": {
+          "sym": "spr_digit_0"
+        }
+      }
     },
     {
       "addr": 1036,
@@ -2132,7 +2331,20 @@
       "comment_inline": "Past 9?",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&73"
+      "operand": "#spr_small_digit_9 + 1",
+      "expr": {
+        "text": "spr_small_digit_9 + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "spr_small_digit_9"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 1047,
@@ -2163,7 +2375,13 @@
       "comment_inline": "Yes: keep it at 9",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&72"
+      "operand": "#spr_small_digit_9",
+      "expr": {
+        "text": "spr_small_digit_9",
+        "tree": {
+          "sym": "spr_small_digit_9"
+        }
+      }
     },
     {
       "addr": 1051,
@@ -2361,7 +2579,13 @@
       "comment_inline": "...with four of sprite &71 beside it",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&71"
+      "operand": "#spr_small_digit_8",
+      "expr": {
+        "text": "spr_small_digit_8",
+        "tree": {
+          "sym": "spr_small_digit_8"
+        }
+      }
     },
     {
       "addr": 1075,
@@ -6306,7 +6530,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&6a"
+      "operand": "#spr_small_digit_1",
+      "expr": {
+        "text": "spr_small_digit_1",
+        "tree": {
+          "sym": "spr_small_digit_1"
+        }
+      }
     },
     {
       "addr": 1721,
@@ -6614,7 +6844,20 @@
       "comment_inline": "...dead...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&1d"
+      "operand": "#spr_digit_0 - 1",
+      "expr": {
+        "text": "spr_digit_0 - 1",
+        "tree": {
+          "op": "sub",
+          "left": {
+            "sym": "spr_digit_0"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 1759,
@@ -20048,7 +20291,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&1d"
+      "operand": "#spr_digit_0 - 1",
+      "expr": {
+        "text": "spr_digit_0 - 1",
+        "tree": {
+          "op": "sub",
+          "left": {
+            "sym": "spr_digit_0"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 3698,
@@ -20883,7 +21139,13 @@
       "comment_inline": "Score 000...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&1e"
+      "operand": "#spr_digit_0",
+      "expr": {
+        "text": "spr_digit_0",
+        "tree": {
+          "sym": "spr_digit_0"
+        }
+      }
     },
     {
       "addr": 3811,
@@ -20951,7 +21213,20 @@
       "comment_inline": "...with the units one below 0, for draw_status_panel to add a point",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&1d"
+      "operand": "#spr_digit_0 - 1",
+      "expr": {
+        "text": "spr_digit_0 - 1",
+        "tree": {
+          "op": "sub",
+          "left": {
+            "sym": "spr_digit_0"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 3822,
@@ -20983,7 +21258,20 @@
       "comment_inline": "No ten-thousands digit",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&69"
+      "operand": "#spr_small_digit_1 - 1",
+      "expr": {
+        "text": "spr_small_digit_1 - 1",
+        "tree": {
+          "op": "sub",
+          "left": {
+            "sym": "spr_small_digit_1"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 3827,
@@ -21231,7 +21519,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&69"
+      "operand": "#spr_shield",
+      "expr": {
+        "text": "spr_shield",
+        "tree": {
+          "sym": "spr_shield"
+        }
+      }
     },
     {
       "addr": 3861,
@@ -21547,7 +21841,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&74"
+      "operand": "#spr_missile_icon",
+      "expr": {
+        "text": "spr_missile_icon",
+        "tree": {
+          "sym": "spr_missile_icon"
+        }
+      }
     },
     {
       "addr": 3904,
@@ -21712,7 +22012,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
-      "operand": "#&69"
+      "operand": "#spr_small_digit_1 - 1",
+      "expr": {
+        "text": "spr_small_digit_1 - 1",
+        "tree": {
+          "op": "sub",
+          "left": {
+            "sym": "spr_small_digit_1"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 3926,
@@ -23835,7 +24148,13 @@
       "comment_inline": "The ring starts with the first sparkle",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&16"
+      "operand": "#spr_sparkle_0",
+      "expr": {
+        "text": "spr_sparkle_0",
+        "tree": {
+          "sym": "spr_sparkle_0"
+        }
+      }
     },
     {
       "addr": 4344,
@@ -25378,7 +25697,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&15"
+      "operand": "#spr_blank",
+      "expr": {
+        "text": "spr_blank",
+        "tree": {
+          "sym": "spr_blank"
+        }
+      }
     },
     {
       "addr": 4528,
@@ -25435,7 +25760,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&1a"
+      "operand": "#spr_sparkle_3 + 1",
+      "expr": {
+        "text": "spr_sparkle_3 + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "spr_sparkle_3"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 4535,
@@ -25466,7 +25804,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&16"
+      "operand": "#spr_sparkle_0",
+      "expr": {
+        "text": "spr_sparkle_0",
+        "tree": {
+          "sym": "spr_sparkle_0"
+        }
+      }
     },
     {
       "addr": 4539,
@@ -25724,7 +26068,13 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&15"
+      "operand": "#spr_blank",
+      "expr": {
+        "text": "spr_blank",
+        "tree": {
+          "sym": "spr_blank"
+        }
+      }
     },
     {
       "addr": 4565,
@@ -26053,7 +26403,13 @@
       "comment_inline": "...sprite &73...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&73"
+      "operand": "#spr_chalice",
+      "expr": {
+        "text": "spr_chalice",
+        "tree": {
+          "sym": "spr_chalice"
+        }
+      }
     },
     {
       "addr": 4606,
@@ -30567,7 +30923,13 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&15"
+      "operand": "#spr_blank",
+      "expr": {
+        "text": "spr_blank",
+        "tree": {
+          "sym": "spr_blank"
+        }
+      }
     },
     {
       "addr": 5511,
@@ -31052,7 +31414,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&76"
+      "operand": "#spr_level_word",
+      "expr": {
+        "text": "spr_level_word",
+        "tree": {
+          "sym": "spr_level_word"
+        }
+      }
     },
     {
       "addr": 5579,
@@ -37284,7 +37652,13 @@
       "comment_inline": "...erase the door...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&15"
+      "operand": "#spr_blank",
+      "expr": {
+        "text": "spr_blank",
+        "tree": {
+          "sym": "spr_blank"
+        }
+      }
     },
     {
       "addr": 7470,
@@ -38061,7 +38435,13 @@
       "comment_inline": "Erase the key icon from the panel",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&1a"
+      "operand": "#spr_blank_key_icon",
+      "expr": {
+        "text": "spr_blank_key_icon",
+        "tree": {
+          "sym": "spr_blank_key_icon"
+        }
+      }
     },
     {
       "addr": 7578,
@@ -38511,7 +38891,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&1b"
+      "operand": "#spr_key",
+      "expr": {
+        "text": "spr_key",
+        "tree": {
+          "sym": "spr_key"
+        }
+      }
     },
     {
       "addr": 7626,
@@ -39036,7 +39422,13 @@
       "comment_inline": "Erase the key icon from the panel",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&1a"
+      "operand": "#spr_blank_key_icon",
+      "expr": {
+        "text": "spr_blank_key_icon",
+        "tree": {
+          "sym": "spr_blank_key_icon"
+        }
+      }
     },
     {
       "addr": 7696,
@@ -39589,7 +39981,13 @@
       "comment_inline": "Yes: erase it from the floor",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&15"
+      "operand": "#spr_blank",
+      "expr": {
+        "text": "spr_blank",
+        "tree": {
+          "sym": "spr_blank"
+        }
+      }
     },
     {
       "addr": 7767,
@@ -39766,7 +40164,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&52"
+      "operand": "#spr_key_icon",
+      "expr": {
+        "text": "spr_key_icon",
+        "tree": {
+          "sym": "spr_key_icon"
+        }
+      }
     },
     {
       "addr": 7787,
@@ -41291,7 +41695,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&1d"
+      "operand": "#spr_digit_0 - 1",
+      "expr": {
+        "text": "spr_digit_0 - 1",
+        "tree": {
+          "op": "sub",
+          "left": {
+            "sym": "spr_digit_0"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 7969,
@@ -41850,7 +42267,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&15"
+      "operand": "#spr_blank",
+      "expr": {
+        "text": "spr_blank",
+        "tree": {
+          "sym": "spr_blank"
+        }
+      }
     },
     {
       "addr": 8041,
@@ -42411,7 +42834,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&51"
+      "operand": "#spr_exit",
+      "expr": {
+        "text": "spr_exit",
+        "tree": {
+          "sym": "spr_exit"
+        }
+      }
     },
     {
       "addr": 8117,
@@ -44342,7 +44771,13 @@
       "comment_inline": "Erase the key icon from the panel",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&1a"
+      "operand": "#spr_blank_key_icon",
+      "expr": {
+        "text": "spr_blank_key_icon",
+        "tree": {
+          "sym": "spr_blank_key_icon"
+        }
+      }
     },
     {
       "addr": 8378,
@@ -60225,7 +60660,13 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&15"
+      "operand": "#spr_blank",
+      "expr": {
+        "text": "spr_blank",
+        "tree": {
+          "sym": "spr_blank"
+        }
+      }
     },
     {
       "addr": 28791,
@@ -61031,7 +61472,13 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&15"
+      "operand": "#spr_blank",
+      "expr": {
+        "text": "spr_blank",
+        "tree": {
+          "sym": "spr_blank"
+        }
+      }
     },
     {
       "addr": 28905,
@@ -61708,7 +62155,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&16"
+      "operand": "#spr_sparkle_0",
+      "expr": {
+        "text": "spr_sparkle_0",
+        "tree": {
+          "sym": "spr_sparkle_0"
+        }
+      }
     },
     {
       "addr": 29001,
@@ -62141,7 +62594,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&53"
+      "operand": "#spr_drainer_0",
+      "expr": {
+        "text": "spr_drainer_0",
+        "tree": {
+          "sym": "spr_drainer_0"
+        }
+      }
     },
     {
       "addr": 29064,
@@ -62167,7 +62626,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&5f"
+      "operand": "#spr_drainer_11 + 1",
+      "expr": {
+        "text": "spr_drainer_11 + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "spr_drainer_11"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 29068,
@@ -62223,7 +62695,20 @@
       "comment_inline": "Worn away?",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&5f"
+      "operand": "#spr_drainer_11 + 1",
+      "expr": {
+        "text": "spr_drainer_11 + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "spr_drainer_11"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 29078,
@@ -63440,7 +63925,20 @@
       "comment_inline": "Below 0?",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&1d"
+      "operand": "#spr_digit_0 - 1",
+      "expr": {
+        "text": "spr_digit_0 - 1",
+        "tree": {
+          "op": "sub",
+          "left": {
+            "sym": "spr_digit_0"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 29231,
@@ -63466,7 +63964,13 @@
       "comment_inline": "Yes: units 9...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&27"
+      "operand": "#spr_digit_9",
+      "expr": {
+        "text": "spr_digit_9",
+        "tree": {
+          "sym": "spr_digit_9"
+        }
+      }
     },
     {
       "addr": 29235,
@@ -63526,7 +64030,20 @@
       "comment_inline": "Below 0: the hero has died",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&1d"
+      "operand": "#spr_digit_0 - 1",
+      "expr": {
+        "text": "spr_digit_0 - 1",
+        "tree": {
+          "op": "sub",
+          "left": {
+            "sym": "spr_digit_0"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 29246,
@@ -63552,7 +64069,13 @@
       "comment_inline": "Erase the hero...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&15"
+      "operand": "#spr_blank",
+      "expr": {
+        "text": "spr_blank",
+        "tree": {
+          "sym": "spr_blank"
+        }
+      }
     },
     {
       "addr": 29250,
@@ -64161,7 +64684,20 @@
       "comment_inline": "Past 9?",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&28"
+      "operand": "#spr_digit_9 + 1",
+      "expr": {
+        "text": "spr_digit_9 + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "spr_digit_9"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 29332,
@@ -64187,7 +64723,13 @@
       "comment_inline": "Yes: units 0, and carry into the tens",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&1e"
+      "operand": "#spr_digit_0",
+      "expr": {
+        "text": "spr_digit_0",
+        "tree": {
+          "sym": "spr_digit_0"
+        }
+      }
     },
     {
       "addr": 29336,
@@ -64271,7 +64813,20 @@
       "comment_inline": "Past 9?",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&28"
+      "operand": "#spr_digit_9 + 1",
+      "expr": {
+        "text": "spr_digit_9 + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "spr_digit_9"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 29347,
@@ -64297,7 +64852,13 @@
       "comment_inline": "Yes: tens 0...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&1e"
+      "operand": "#spr_digit_0",
+      "expr": {
+        "text": "spr_digit_0",
+        "tree": {
+          "sym": "spr_digit_0"
+        }
+      }
     },
     {
       "addr": 29351,
@@ -64357,7 +64918,20 @@
       "comment_inline": "Past 9?",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&28"
+      "operand": "#spr_digit_9 + 1",
+      "expr": {
+        "text": "spr_digit_9 + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "spr_digit_9"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 29362,
@@ -64383,7 +64957,13 @@
       "comment_inline": "Yes: hundreds 0...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&1e"
+      "operand": "#spr_digit_0",
+      "expr": {
+        "text": "spr_digit_0",
+        "tree": {
+          "sym": "spr_digit_0"
+        }
+      }
     },
     {
       "addr": 29366,
@@ -65572,7 +66152,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&28"
+      "operand": "#spr_treasure",
+      "expr": {
+        "text": "spr_treasure",
+        "tree": {
+          "sym": "spr_treasure"
+        }
+      }
     },
     {
       "addr": 29537,
@@ -65925,7 +66511,13 @@
       ],
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&29"
+      "operand": "#spr_food",
+      "expr": {
+        "text": "spr_food",
+        "tree": {
+          "sym": "spr_food"
+        }
+      }
     },
     {
       "addr": 29580,
@@ -65983,7 +66575,20 @@
       "comment_inline": "...to at most 99",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&28"
+      "operand": "#spr_digit_9 + 1",
+      "expr": {
+        "text": "spr_digit_9 + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "spr_digit_9"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 29590,
@@ -66009,7 +66614,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&27"
+      "operand": "#spr_digit_9",
+      "expr": {
+        "text": "spr_digit_9",
+        "tree": {
+          "sym": "spr_digit_9"
+        }
+      }
     },
     {
       "addr": 29594,
@@ -66365,7 +66976,13 @@
       ],
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&2b"
+      "operand": "#spr_teleporter",
+      "expr": {
+        "text": "spr_teleporter",
+        "tree": {
+          "sym": "spr_teleporter"
+        }
+      }
     },
     {
       "addr": 29637,
@@ -66432,7 +67049,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&2b"
+      "operand": "#spr_teleporter",
+      "expr": {
+        "text": "spr_teleporter",
+        "tree": {
+          "sym": "spr_teleporter"
+        }
+      }
     },
     {
       "addr": 29645,
@@ -66885,7 +67508,13 @@
       ],
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&2a"
+      "operand": "#spr_cross",
+      "expr": {
+        "text": "spr_cross",
+        "tree": {
+          "sym": "spr_cross"
+        }
+      }
     },
     {
       "addr": 29711,
@@ -67636,7 +68265,13 @@
       ],
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&5f"
+      "operand": "#spr_boots",
+      "expr": {
+        "text": "spr_boots",
+        "tree": {
+          "sym": "spr_boots"
+        }
+      }
     },
     {
       "addr": 29817,
@@ -68382,7 +69017,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&5f"
+      "operand": "#spr_boots",
+      "expr": {
+        "text": "spr_boots",
+        "tree": {
+          "sym": "spr_boots"
+        }
+      }
     },
     {
       "addr": 29917,
@@ -68488,7 +69129,13 @@
       ],
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&60"
+      "operand": "#spr_helmet",
+      "expr": {
+        "text": "spr_helmet",
+        "tree": {
+          "sym": "spr_helmet"
+        }
+      }
     },
     {
       "addr": 29933,
@@ -68627,7 +69274,13 @@
       ],
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&61"
+      "operand": "#spr_potion",
+      "expr": {
+        "text": "spr_potion",
+        "tree": {
+          "sym": "spr_potion"
+        }
+      }
     },
     {
       "addr": 29953,
@@ -68770,7 +69423,13 @@
       ],
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&62"
+      "operand": "#spr_weapons",
+      "expr": {
+        "text": "spr_weapons",
+        "tree": {
+          "sym": "spr_weapons"
+        }
+      }
     },
     {
       "addr": 29976,
@@ -69733,7 +70392,13 @@
       "comment_inline": "No: start it dying...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&15"
+      "operand": "#spr_blank",
+      "expr": {
+        "text": "spr_blank",
+        "tree": {
+          "sym": "spr_blank"
+        }
+      }
     },
     {
       "addr": 30104,
@@ -69979,7 +70644,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&73"
+      "operand": "#spr_chalice",
+      "expr": {
+        "text": "spr_chalice",
+        "tree": {
+          "sym": "spr_chalice"
+        }
+      }
     },
     {
       "addr": 30140,
@@ -70200,7 +70871,13 @@
       "comment_inline": "...missile icon...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&74"
+      "operand": "#spr_missile_icon",
+      "expr": {
+        "text": "spr_missile_icon",
+        "tree": {
+          "sym": "spr_missile_icon"
+        }
+      }
     },
     {
       "addr": 30173,
@@ -70361,7 +71038,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
-      "operand": "#&69"
+      "operand": "#spr_small_digit_1 - 1",
+      "expr": {
+        "text": "spr_small_digit_1 - 1",
+        "tree": {
+          "op": "sub",
+          "left": {
+            "sym": "spr_small_digit_1"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 30196,
@@ -70518,7 +71208,13 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&75"
+      "operand": "#spr_boots_icon",
+      "expr": {
+        "text": "spr_boots_icon",
+        "tree": {
+          "sym": "spr_boots_icon"
+        }
+      }
     },
     {
       "addr": 30216,
@@ -70571,7 +71267,13 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&77"
+      "operand": "#spr_blank_boots_icon",
+      "expr": {
+        "text": "spr_blank_boots_icon",
+        "tree": {
+          "sym": "spr_blank_boots_icon"
+        }
+      }
     },
     {
       "addr": 30223,
@@ -71490,7 +72192,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&15"
+      "operand": "#spr_blank",
+      "expr": {
+        "text": "spr_blank",
+        "tree": {
+          "sym": "spr_blank"
+        }
+      }
     },
     {
       "addr": 30344,
@@ -71516,7 +72224,13 @@
       "comment_inline": "Yes: start it dying...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&15"
+      "operand": "#spr_blank",
+      "expr": {
+        "text": "spr_blank",
+        "tree": {
+          "sym": "spr_blank"
+        }
+      }
     },
     {
       "addr": 30348,
@@ -71883,7 +72597,20 @@
       "comment_inline": "Arrows: the Ranger",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&10"
+      "operand": "#spr_arrow_up - 1",
+      "expr": {
+        "text": "spr_arrow_up - 1",
+        "tree": {
+          "op": "sub",
+          "left": {
+            "sym": "spr_arrow_up"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 30393,
@@ -71948,7 +72675,20 @@
       ],
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&44"
+      "operand": "#spr_fireball_up - 1",
+      "expr": {
+        "text": "spr_fireball_up - 1",
+        "tree": {
+          "op": "sub",
+          "left": {
+            "sym": "spr_fireball_up"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 30402,
@@ -72013,7 +72753,20 @@
       ],
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&4c"
+      "operand": "#spr_axe_up - 1",
+      "expr": {
+        "text": "spr_axe_up - 1",
+        "tree": {
+          "op": "sub",
+          "left": {
+            "sym": "spr_axe_up"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 30411,
@@ -72635,7 +73388,13 @@
       "comment_inline": "...and health 33, drawn by taking a point",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&21"
+      "operand": "#spr_digit_3",
+      "expr": {
+        "text": "spr_digit_3",
+        "tree": {
+          "sym": "spr_digit_3"
+        }
+      }
     },
     {
       "addr": 30500,
@@ -72926,7 +73685,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&10"
+      "operand": "#spr_arrow_up - 1",
+      "expr": {
+        "text": "spr_arrow_up - 1",
+        "tree": {
+          "op": "sub",
+          "left": {
+            "sym": "spr_arrow_up"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 30540,
@@ -73018,7 +73790,20 @@
       ],
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&44"
+      "operand": "#spr_fireball_up - 1",
+      "expr": {
+        "text": "spr_fireball_up - 1",
+        "tree": {
+          "op": "sub",
+          "left": {
+            "sym": "spr_fireball_up"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 30553,
@@ -73108,7 +73893,20 @@
       ],
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&4c"
+      "operand": "#spr_axe_up - 1",
+      "expr": {
+        "text": "spr_axe_up - 1",
+        "tree": {
+          "op": "sub",
+          "left": {
+            "sym": "spr_axe_up"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 30566,
@@ -74583,7 +75381,13 @@
       "comment_inline": "Yes: plot the wall block (sprite 0)",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#0"
+      "operand": "#spr_wall",
+      "expr": {
+        "text": "spr_wall",
+        "tree": {
+          "sym": "spr_wall"
+        }
+      }
     },
     {
       "addr": 30774,
@@ -74652,7 +75456,13 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&15"
+      "operand": "#spr_blank",
+      "expr": {
+        "text": "spr_blank",
+        "tree": {
+          "sym": "spr_blank"
+        }
+      }
     },
     {
       "addr": 30784,
@@ -77458,7 +78268,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&2c"
+      "operand": "#spr_trapdoor",
+      "expr": {
+        "text": "spr_trapdoor",
+        "tree": {
+          "sym": "spr_trapdoor"
+        }
+      }
     },
     {
       "addr": 31179,
@@ -77775,7 +78591,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&15"
+      "operand": "#spr_blank",
+      "expr": {
+        "text": "spr_blank",
+        "tree": {
+          "sym": "spr_blank"
+        }
+      }
     },
     {
       "addr": 31227,
@@ -77919,7 +78741,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&15"
+      "operand": "#spr_blank",
+      "expr": {
+        "text": "spr_blank",
+        "tree": {
+          "sym": "spr_blank"
+        }
+      }
     },
     {
       "addr": 31250,
@@ -78068,7 +78896,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#9"
+      "operand": "#spr_monster_up_0",
+      "expr": {
+        "text": "spr_monster_up_0",
+        "tree": {
+          "sym": "spr_monster_up_0"
+        }
+      }
     },
     {
       "addr": 31272,
@@ -79067,7 +79901,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#9"
+      "operand": "#spr_monster_up_0",
+      "expr": {
+        "text": "spr_monster_up_0",
+        "tree": {
+          "sym": "spr_monster_up_0"
+        }
+      }
     },
     {
       "addr": 31432,
@@ -79093,7 +79933,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&0d"
+      "operand": "#spr_monster_down_0",
+      "expr": {
+        "text": "spr_monster_down_0",
+        "tree": {
+          "sym": "spr_monster_down_0"
+        }
+      }
     },
     {
       "addr": 31436,
@@ -79867,7 +80713,20 @@
       "comment_inline": "Animation over?",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&1a"
+      "operand": "#spr_sparkle_3 + 1",
+      "expr": {
+        "text": "spr_sparkle_3 + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "spr_sparkle_3"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 31546,
@@ -81119,7 +81978,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#9"
+      "operand": "#spr_monster_up_0",
+      "expr": {
+        "text": "spr_monster_up_0",
+        "tree": {
+          "sym": "spr_monster_up_0"
+        }
+      }
     },
     {
       "addr": 31733,
@@ -81587,7 +82452,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#9"
+      "operand": "#spr_monster_up_0",
+      "expr": {
+        "text": "spr_monster_up_0",
+        "tree": {
+          "sym": "spr_monster_up_0"
+        }
+      }
     },
     {
       "addr": 31805,
@@ -82663,7 +83534,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#9"
+      "operand": "#spr_monster_up_0",
+      "expr": {
+        "text": "spr_monster_up_0",
+        "tree": {
+          "sym": "spr_monster_up_0"
+        }
+      }
     },
     {
       "addr": 31955,

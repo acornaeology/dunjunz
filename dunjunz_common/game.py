@@ -32,6 +32,7 @@ def annotate(a: Annotator) -> None:
     annotate_victory_and_helpers(a)
     annotate_shared_continuations(a)
     annotate_branch_labels(a)
+    annotate_sprite_numbers(a)
     a.expr(0x1506, lo(sym("wrch_handler")))
     a.expr(0x150B, hi(sym("wrch_handler")))
 
@@ -3613,6 +3614,60 @@ def annotate_branch_labels(a: Annotator) -> None:
         0x7FF6: "pass_character",
     }.items():
         a.label(addr, name)
+
+
+
+# Operands that are sprite numbers, as expressions in the sprite constants.
+# A digit "past 9" is the sprite after digit 9, and a dead hero's health
+# digit is the one before digit 0; missile sprite bases are the sprite
+# before each weapon's up sprite.
+SPRITE_OPERANDS = [
+    (0x0407, "digit_9", 1), (0x040B, "digit_0", 0),
+    (0x0416, "small_digit_9", 1), (0x041A, "small_digit_9", 0),
+    (0x0432, "small_digit_8", 0), (0x06B8, "small_digit_1", 0),
+    (0x06DE, "digit_0", -1), (0x0E71, "digit_0", -1),
+    (0x0EE2, "digit_0", 0), (0x0EED, "digit_0", -1),
+    (0x0EF2, "small_digit_1", -1), (0x0F14, "shield", 0),
+    (0x0F3F, "missile_icon", 0), (0x0F55, "small_digit_1", -1),
+    (0x10F7, "sparkle_0", 0), (0x11AF, "blank", 0), (0x11B6, "sparkle_3", 1),
+    (0x11BA, "sparkle_0", 0), (0x11D4, "blank", 0), (0x11FD, "chalice", 0),
+    (0x1586, "blank", 0), (0x15CA, "level_word", 0), (0x1D2D, "blank", 0),
+    (0x1D99, "blank_key_icon", 0), (0x1DC9, "key", 0),
+    (0x1E0F, "blank_key_icon", 0), (0x1E56, "blank", 0), (0x1E6A, "key_icon", 0),
+    (0x1F20, "digit_0", -1), (0x1F68, "blank", 0), (0x1FB4, "exit", 0),
+    (0x20B9, "blank_key_icon", 0), (0x7076, "blank", 0), (0x70E8, "blank", 0),
+    (0x7148, "sparkle_0", 0), (0x7187, "drainer_0", 0), (0x718B, "drainer_11", 1),
+    (0x7195, "drainer_11", 1), (0x722E, "digit_0", -1), (0x7232, "digit_9", 0),
+    (0x723D, "digit_0", -1), (0x7241, "blank", 0),
+    (0x7293, "digit_9", 1), (0x7297, "digit_0", 0), (0x72A2, "digit_9", 1),
+    (0x72A6, "digit_0", 0), (0x72B1, "digit_9", 1), (0x72B5, "digit_0", 0),
+    (0x7360, "treasure", 0), (0x738B, "food", 0), (0x7395, "digit_9", 1),
+    (0x7399, "digit_9", 0), (0x73C4, "teleporter", 0), (0x73CC, "teleporter", 0),
+    (0x740E, "cross", 0), (0x7478, "boots", 0), (0x74DC, "boots", 0),
+    (0x74EC, "helmet", 0), (0x7500, "potion", 0), (0x7517, "weapons", 0),
+    (0x7597, "blank", 0), (0x75BB, "chalice", 0), (0x75DC, "missile_icon", 0),
+    (0x75F3, "small_digit_1", -1), (0x7607, "boots_icon", 0),
+    (0x760E, "blank_boots_icon", 0), (0x7687, "blank", 0), (0x768B, "blank", 0),
+    (0x76B8, "arrow_up", -1), (0x76C1, "fireball_up", -1), (0x76CA, "axe_up", -1),
+    (0x7723, "digit_3", 0), (0x774B, "arrow_up", -1), (0x7758, "fireball_up", -1),
+    (0x7765, "axe_up", -1), (0x7835, "wall", 0), (0x783F, "blank", 0),
+    (0x79CA, "trapdoor", 0), (0x79FA, "blank", 0), (0x7A11, "blank", 0),
+    (0x7A27, "monster_up_0", 0), (0x7AC7, "monster_up_0", 0),
+    (0x7ACB, "monster_down_0", 0), (0x7B39, "sparkle_3", 1),
+    (0x7BF4, "monster_up_0", 0), (0x7C3C, "monster_up_0", 0),
+    (0x7CD2, "monster_up_0", 0),
+]
+
+
+def annotate_sprite_numbers(a: Annotator) -> None:
+    numbers = {name: number for number, name, *_ in SPRITES}
+    for name in sorted({name for _, name, _ in SPRITE_OPERANDS}, key=numbers.get):
+        a.d.constant(numbers[name], f"spr_{name}", comment=f"Sprite &{numbers[name]:02X}")
+    for operand_addr, name, offset in SPRITE_OPERANDS:
+        expression = sym(f"spr_{name}")
+        if offset:
+            expression = expression + offset if offset > 0 else expression - (-offset)
+        a.expr(operand_addr, expression)
 
 
 def annotate_regions(a: Annotator) -> None:
