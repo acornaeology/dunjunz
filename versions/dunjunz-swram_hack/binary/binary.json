@@ -23,5 +23,35 @@
         "level_file": "Level file (&6B00)",
         "disc_state": "Disc release: level loading",
         "leftovers": "Leftovers from development"
-    }
+    },
+    "files": [
+        {
+            "name": "Dunjun4",
+            "load": "0x0400",
+            "exec": "0x0400",
+            "size": 2304,
+            "sha256": "580fd7d2ad629d34c8786527e45a8b7327b42b005d4a4fdbd89b00793d1904b3"
+        },
+        {
+            "name": "Dunjun7",
+            "load": "0x0D00",
+            "exec": "0x0D00",
+            "size": 1024,
+            "sha256": "44dc3f0b221d28f72d7f9acb9ee6b78153fff91e71a04b6499b644fbe8192682"
+        },
+        {
+            "name": "Dunjun5",
+            "load": "0x1100",
+            "exec": "0x1100",
+            "size": 7936,
+            "sha256": "3870c311ac4c48641a459b7be3eed1725b48d8af92556bb0901025b93b8e2843"
+        },
+        {
+            "name": "Dunjun6",
+            "load": "0x6E80",
+            "exec": "0x6E80",
+            "size": 4480,
+            "sha256": "b9ddb831abd82a11a3abd7bc874ca357655cdd360f5c992d366ef6f95e9c47c6"
+        }
+    ]
 }

@@ -23,5 +23,21 @@
         "level_file": "Level file (&6B00)",
         "disc_state": "Disc release: level loading",
         "leftovers": "Leftovers from development"
-    }
+    },
+    "files": [
+        {
+            "name": "Dun1",
+            "load": "0x2000",
+            "exec": "0x2000",
+            "size": 24576,
+            "sha256": "5f40fe371da5d4a388d6abfd0cda3c683992b363c425fb90746e02f505c77f31"
+        },
+        {
+            "name": "Coder",
+            "load": "0x5000",
+            "exec": "0x5000",
+            "size": 2480,
+            "sha256": "2809c2aca27673963f795033190d0668c59789161483f173b331a8b468ae1775"
+        }
+    ]
 }

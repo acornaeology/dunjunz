@@ -22,5 +22,21 @@
         "level_file": "Level file (&6B00)",
         "disc_state": "Disc release: level loading",
         "leftovers": "Leftovers from development"
-    }
+    },
+    "files": [
+        {
+            "name": "DUNJ4",
+            "load": "0x2400",
+            "exec": "0x5000",
+            "size": 11344,
+            "sha256": "11edee179e7ff74561c0131cf715a77635d1478106e45d83d96986e0d34dae83"
+        },
+        {
+            "name": "DUNJ3",
+            "load": "0x6E80",
+            "exec": "0x0000",
+            "size": 11904,
+            "sha256": "03d92abc11b36d22e2a9a7365ee90aa47f32aa6d2e243188e3f5fdc423abbd22"
+        }
+    ]
 }
