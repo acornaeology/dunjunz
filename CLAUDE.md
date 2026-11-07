@@ -111,9 +111,20 @@ on the official release.
   memory at a breakpoint. Its docstring says how to build beebjit outside
   its checkout.
 
+- `uv run python tools/quality.py LISTING_JSON ... [--list KIND]` reports what
+  comment coverage does not: dasmos-generated labels, routines without a
+  calling convention, uncommented data, raw-address operands and hex
+  immediates. `tools/registers.py` suggests a routine's register inputs
+  and what it corrupts (following calls); `tools/address_pairs.py` finds
+  immediate pairs that are the halves of a labelled address.
+
 ## Conventions
 
 - Hex as &XXXX in prose and comments, 0xXXXX in Python.
+- No dasmos-generated label names: name every branch target (the
+  game's are in `game.annotate_branch_labels`). Sprite numbers are `spr_`
+  constants from `game.SPRITES`; counts, pages and addresses are written
+  from labels and constants rather than as numbers.
 - Comment every instruction; banner every routine and data region.
 - Published text describes the program as it is; no history of the
   disassembly in comments, banners or docs.
