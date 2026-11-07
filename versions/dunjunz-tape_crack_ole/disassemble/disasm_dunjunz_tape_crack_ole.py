@@ -231,6 +231,8 @@ d.expr(0x5043, sym("first_level") + 1 + sym("image_offset"))
 d.expr(0x502C, lo(sym("wrch_handler")))
 d.expr(0x5031, hi(sym("wrch_handler")))
 
+annotator.c(0x0D6E, "Not referenced")  # after game_entry
+
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)
 asm_filepath.write_text(str(ir.render("beebasm")), encoding="utf-8")

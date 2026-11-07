@@ -10331,6 +10331,7 @@
       "binary_addr": 10656,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -12074,6 +12075,7 @@
       "binary_addr": 11065,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         16,
@@ -13631,6 +13633,7 @@
       "binary_addr": 11465,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         231,
@@ -13802,6 +13805,7 @@
       "binary_addr": 11512,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         18,
@@ -16463,6 +16467,7 @@
       "binary_addr": 11630,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -16832,6 +16837,7 @@
       "binary_addr": 11673,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         24,
@@ -17135,6 +17141,7 @@
       "binary_addr": 11705,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -17401,6 +17408,7 @@
       "binary_addr": 11757,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         222,
@@ -20549,6 +20557,7 @@
       "binary_addr": 12157,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -21082,6 +21091,7 @@
       "binary_addr": 12393,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         78,
@@ -25032,6 +25042,7 @@
       "binary_addr": 13008,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         61,
@@ -29808,6 +29819,7 @@
       "binary_addr": 13307,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         2,
@@ -34048,6 +34060,7 @@
       "binary_addr": 13881,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         96
@@ -34275,6 +34288,7 @@
       "binary_addr": 13982,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         8
@@ -34688,6 +34702,7 @@
       "binary_addr": 14018,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         2,
@@ -34860,6 +34875,7 @@
       "binary_addr": 14053,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -35399,6 +35415,7 @@
       "binary_addr": 14272,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         128,
@@ -35434,6 +35451,7 @@
       "binary_addr": 14280,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -35477,6 +35495,7 @@
       "binary_addr": 14301,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         129
@@ -35533,6 +35552,7 @@
       "binary_addr": 14328,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         13,
@@ -35869,6 +35889,7 @@
       "binary_addr": 14417,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         10,
@@ -36217,6 +36238,7 @@
       "binary_addr": 14552,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         8,
@@ -36923,6 +36945,7 @@
       "binary_addr": 14702,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -36978,6 +37001,7 @@
       "binary_addr": 14714,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         12,
@@ -37032,6 +37056,7 @@
       "binary_addr": 14740,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         15,
@@ -37076,6 +37101,7 @@
       "binary_addr": 14750,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -37131,6 +37157,7 @@
       "binary_addr": 14766,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         24,
@@ -47606,6 +47633,7 @@
       "binary_addr": 16638,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         1,
@@ -48201,6 +48229,7 @@
       "binary_addr": 16841,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         8,
@@ -48436,6 +48465,7 @@
       "binary_addr": 16917,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         255,
@@ -48565,6 +48595,7 @@
       "binary_addr": 16949,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         255,
@@ -48682,6 +48713,7 @@
       "binary_addr": 16981,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         255,
@@ -48831,6 +48863,7 @@
       "binary_addr": 17013,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         255,
@@ -48980,6 +49013,7 @@
       "binary_addr": 17045,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         255,
@@ -53336,6 +53370,7 @@
       "binary_addr": 18832,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         5,
@@ -53521,6 +53556,7 @@
       "binary_addr": 18928,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -54206,6 +54242,7 @@
       "binary_addr": 19192,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         15,
@@ -54791,6 +54828,7 @@
       "binary_addr": 19440,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -55384,6 +55422,7 @@
       "binary_addr": 19696,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         1,
@@ -59196,6 +59235,7 @@
         184
       ],
       "image": 1,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         136,
@@ -74622,6 +74662,7 @@
         115
       ],
       "image": 1,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         115
@@ -75238,6 +75279,7 @@
         96
       ],
       "image": 1,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         96
@@ -83673,6 +83715,7 @@
         96
       ],
       "image": 1,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         222,
@@ -84446,6 +84489,7 @@
         0
       ],
       "image": 1,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0
@@ -87523,6 +87567,7 @@
         0
       ],
       "image": 1,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -88794,6 +88839,7 @@
         0
       ],
       "image": 1,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,

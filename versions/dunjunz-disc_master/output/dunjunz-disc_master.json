@@ -4088,6 +4088,7 @@
         241
       ],
       "image": 0,
+      "comment_inline": "Levels 1-25, five to a row",
       "type": "byte",
       "values": [
         98,
@@ -10062,6 +10063,7 @@
         0
       ],
       "image": 1,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -11569,6 +11571,7 @@
         16
       ],
       "image": 1,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         16,
@@ -12871,6 +12874,7 @@
         144
       ],
       "image": 1,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         231,
@@ -13031,6 +13035,7 @@
         10
       ],
       "image": 1,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         18,
@@ -15665,6 +15670,7 @@
         96
       ],
       "image": 2,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -16152,6 +16158,7 @@
         50
       ],
       "image": 2,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         78,
@@ -19568,6 +19575,7 @@
         0
       ],
       "image": 2,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         61,
@@ -23709,6 +23717,7 @@
         116
       ],
       "image": 2,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         2,
@@ -27575,6 +27584,7 @@
         8
       ],
       "image": 2,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         8
@@ -27940,6 +27950,7 @@
         141
       ],
       "image": 2,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         2,
@@ -28064,6 +28075,7 @@
         140
       ],
       "image": 2,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -28591,6 +28603,7 @@
         0
       ],
       "image": 2,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         128,
@@ -28622,6 +28635,7 @@
         0
       ],
       "image": 2,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -28661,6 +28675,7 @@
         129
       ],
       "image": 2,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         129
@@ -28713,6 +28728,7 @@
         44
       ],
       "image": 2,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         13,
@@ -29027,6 +29043,7 @@
         5
       ],
       "image": 2,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         10,
@@ -29367,6 +29384,7 @@
         0
       ],
       "image": 2,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         8,
@@ -30001,6 +30019,7 @@
         4
       ],
       "image": 2,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -30052,6 +30071,7 @@
         3
       ],
       "image": 2,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         12,
@@ -30102,6 +30122,7 @@
         3
       ],
       "image": 2,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         15,
@@ -30142,6 +30163,7 @@
         4
       ],
       "image": 2,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -30193,6 +30215,7 @@
         0
       ],
       "image": 2,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         24,
@@ -39154,6 +39177,7 @@
         63
       ],
       "image": 3,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         1,
@@ -39719,6 +39743,7 @@
         0
       ],
       "image": 3,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         8,
@@ -39940,6 +39965,7 @@
         255
       ],
       "image": 3,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         255,
@@ -40057,6 +40083,7 @@
         255
       ],
       "image": 3,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         255,
@@ -40166,6 +40193,7 @@
         255
       ],
       "image": 3,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         255,
@@ -40295,6 +40323,7 @@
         255
       ],
       "image": 3,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         255,
@@ -40424,6 +40453,7 @@
         255
       ],
       "image": 3,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         255,
@@ -44654,6 +44684,7 @@
         0
       ],
       "image": 3,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         5,
@@ -44835,6 +44866,7 @@
         0
       ],
       "image": 3,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -45496,6 +45528,7 @@
         37
       ],
       "image": 3,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         15,
@@ -46069,6 +46102,7 @@
         0
       ],
       "image": 3,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -46650,6 +46684,7 @@
         0
       ],
       "image": 3,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         1,
@@ -49869,6 +49904,7 @@
         184
       ],
       "image": 4,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         136,
@@ -65036,6 +65072,7 @@
         115
       ],
       "image": 4,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         115
@@ -65642,6 +65679,7 @@
         96
       ],
       "image": 4,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         96
@@ -73928,6 +73966,7 @@
         96
       ],
       "image": 4,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         222,
@@ -74694,6 +74733,7 @@
         0
       ],
       "image": 4,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0
@@ -77735,6 +77775,7 @@
         0
       ],
       "image": 4,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -78730,6 +78771,7 @@
         0
       ],
       "image": 4,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0

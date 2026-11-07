@@ -36,6 +36,7 @@ def annotate(a: Annotator) -> None:
     annotate_sprite_numbers(a)
     annotate_named_operands(a)
     annotate_runtime_tables(a)
+    annotate_unreferenced(a)
     a.expr(0x1506, lo(sym("wrch_handler")))
     a.expr(0x150B, hi(sym("wrch_handler")))
 
@@ -945,6 +946,7 @@ def annotate_level_check(a: Annotator) -> None:
         "The expected sum of each decrypted level, for levels 1-25 at "
         "level_checksums+1 to level_checksums+25."))
     a.byte(0x0491, 25, cols=5)
+    a.c(0x0491, "Levels 1-25, five to a row")
     a.banner(0x0491, "Level checksums",
              "One byte per level, 1-25: the sum, modulo 256, of the level's "
              "decrypted bytes.")
@@ -3964,6 +3966,63 @@ def annotate_runtime_tables(a: Annotator) -> None:
         for row in range(0, length, 16):
             a.byte(addr + row, min(16, length - row), cols=16)
             a.c(addr + row, "Zeros" if row == 0 else "...")
+
+
+
+# Bytes between the game's tables and routines that no instruction
+# refers to: (address, length).
+UNREFERENCED = [
+    (0x09A0, 80),
+    (0x0B39, 7),
+    (0x0CC9, 7),
+    (0x0CF8, 8),
+    (0x0D99, 7),
+    (0x0DB9, 3),
+    (0x0DED, 16),
+    (0x0F7D, 3),
+    (0x1069, 7),
+    (0x12D0, 3),
+    (0x13FB, 5),
+    (0x1639, 1),
+    (0x169E, 1),
+    (0x16C2, 14),
+    (0x16E5, 26),
+    (0x17C0, 5),
+    (0x17C8, 6),
+    (0x17DD, 1),
+    (0x17F8, 8),
+    (0x1851, 15),
+    (0x18D8, 40),
+    (0x196E, 5),
+    (0x197A, 22),
+    (0x1994, 7),
+    (0x199E, 13),
+    (0x19AE, 18),
+    (0x20FE, 2),
+    (0x21C9, 7),
+    (0x2215, 11),
+    (0x2235, 11),
+    (0x2255, 11),
+    (0x2275, 11),
+    (0x2295, 11),
+    (0x2990, 48),
+    (0x29F0, 16),
+    (0x2AF8, 8),
+    (0x2BF0, 16),
+    (0x2CF0, 16),
+    (0x6F6D, 3),
+    (0x7787, 1),
+    (0x77DD, 1),
+    (0x7C8C, 9),
+    (0x7CFE, 1),
+    (0x7F7D, 18),
+    (0x7FFF, 1),
+]
+
+
+def annotate_unreferenced(a: Annotator) -> None:
+    for addr, _ in UNREFERENCED:
+        a.c(addr, "Not referenced")
 
 
 def annotate_regions(a: Annotator) -> None:

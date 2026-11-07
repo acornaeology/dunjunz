@@ -325,7 +325,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &22, &f6, &42, &21, &7d
     equb &5d, &d8, &a0, &f1, &0f
     equb &cc, &d3, &53, &3b, &83
-    equb &71, &b2, &6f, &f3, &f1
+    equb &71, &b2, &6f, &f3, &f1        ; Levels 1-25, five to a row
 ; ***************************************************************************************
 ; Unused
 ;
@@ -904,7 +904,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00  ; Not referenced
 ; &09f0 referenced 4 times by &1f7a, &1fa7, &1fd3, &2026
 .exit_saved_x
     equb &04
@@ -1056,7 +1056,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 .hero_appearance_sprites
     equb &16, &17, &18, &19
     equs "defgh"
-    equb &10, &10, &10, &10, &10, &10, &10
+    equb &10, &10, &10, &10, &10, &10, &10  ; Not referenced
 ; &0b40 used as index base 4 times by &1592, &758d, &759e, &75a6
 .monster_hit_points
     equb &10, &08, &08, &08, &08, &08, &08, &08
@@ -1122,7 +1122,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &f4, &e9, &e7, &fa, &84, &e4, &f4, &e2, &88, &ea, &e5, &e5, &ff, &e4, &ea, &ea  ; ...
     equb &e2, &f8, &fc, &f4, &94, &f0, &e4, &f6, &eb, &f0, &f4, &fc, &9c, &e9, &f6, &f6  ; ...
     equb &93, &e1, &8f, &86, &97, &96, &87, &80, &8d  ; ...
-    equb &e7, &9e, &83, &8d, &83, &85, &90
+    equb &e7, &9e, &83, &8d, &83, &85, &90  ; Not referenced
 ; &0cd0 used as index base 7 times by &0ede, &0f1e, &74ef, &74f2, &74f9, &75bd, &79a7
 .hero_damage_taken
     equb &89, &9e, &87, &f3, &95, &9b, &92, &f7
@@ -1132,7 +1132,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 .hit_sound
 ; &0cf4 referenced 2 times by &7481, &7491
     equw &0010, &0001, &0006, &0006     ; SOUND channel 0 (flush), envelope 1, pitch 6, duration 6
-    equb &12, &00, &03, &00, &c8, &00, &0a, &00
+    equb &12, &00, &03, &00, &c8, &00, &0a, &00  ; Not referenced
 .dasmos_dunjun4_end
 
     org &0d00
@@ -1234,7 +1234,7 @@ missile_sprite_base = set_wrchv_low+1
     lda #>(wrch_handler)                ; ...
     sta wrchv + 1                       ; ...
     jmp new_game                        ; Start a new game
-    equb &00, &00
+    equb &00, &00                       ; Not referenced
 ; &0d70 used as index base 1 time by &6ec1
 .hero_key_up
     equs "Dunj"
@@ -1258,7 +1258,7 @@ missile_sprite_base = set_wrchv_low+1
 ; &0d95 used as index base 7 times by &7227, &722a, &7233, &727b, &739d, &750f, &7727
 .hero_health_units
     equs "''''"
-    equb &18, &bd, &08, &0d, &6d, &40, &0d
+    equb &18, &bd, &08, &0d, &6d, &40, &0d  ; Not referenced
 ; &0da0 referenced 2 times by &779e, &7893; also used as index base 3 times by &7043, &7544, &767c
 .view_room
 ; &0da2 referenced 2 times by &77b0, &78ad
@@ -1274,7 +1274,7 @@ missile_sprite_base = set_wrchv_low+1
 .hero_sprites
     equb &00
     equs ",4<"
-    equb &00, &0d, &d9
+    equb &00, &0d, &d9                  ; Not referenced
 ; &0dbc used as index base 3 times by &7056, &7351, &74e7
 .hero_has_boots
     equb &00, &00, &00, &00
@@ -1290,7 +1290,7 @@ missile_sprite_base = set_wrchv_low+1
     equb &68, &aa
     equs "h(`"
     equb &de, &dd, &df, &f0, &f2, &f1, &f3, &f8
-    equb &fa, &f9, &fb, &f4, &f6, &f5, &f7, &fc
+    equb &fa, &f9, &fb, &f4, &f6, &f5, &f7, &fc  ; Not referenced
 ; &0dfd referenced 1 time by &73d3
 .teleport_last
     equb &1e, &fd
@@ -1534,7 +1534,7 @@ missile_sprite_base = set_wrchv_low+1
     sta plot_y                          ; ...
     jsr plot_sprite                     ; Plot it
     rts                                 ; Return
-    equb &00, &09, &60
+    equb &00, &09, &60                  ; Not referenced
 ; ***************************************************************************************
 ; Heroes' starting attributes
 ;
@@ -1584,7 +1584,7 @@ count = game_over_you_all+8
 ; Unused
 ;
 ; Leftover bytes: "ND!" and a zero, the end of an earlier message, then "&C2".
-    equb &4e, &44, &21, &00, &26, &43, &32
+    equb &4e, &44, &21, &00, &26, &43, &32  ; Not referenced
 ; ***************************************************************************************
 ; Check whether the Chalice has been found
 ;
@@ -1933,7 +1933,7 @@ reset_call_address = reset_call+1
     equb &00, &05, &0b, &03, &03, &07, &0a, &00
     equb &00, &00, &0f, &07, &0b, &0f, &00, &00
     equb &00, &00, &05, &0f, &0f, &0a, &00, &00
-    equb &3d, &26, &00
+    equb &3d, &26, &00                  ; Not referenced
 ; &12d3 referenced 2 times by &0d58, &14d7
 .saved_wrchv
 ; &12d4 referenced 2 times by &0d5e, &14dd
@@ -2241,7 +2241,7 @@ reset_call_address = reset_call+1
     equb %00011000
     equb %00000000
     equs "<BB>"
-    equb &02, &04, &18, &00, &74
+    equb &02, &04, &18, &00, &74        ; Not referenced
 ; ***************************************************************************************
 ; Set up and draw a new level
 ;
@@ -2603,7 +2603,7 @@ filev_call_address = load_level_call+1
     lda #&0c                            ; ...VDU 12 to clear it
     jsr oswrch                          ; ...
     rts                                 ; Return
-    equb &60
+    equb &60                            ; Not referenced
 ; ***************************************************************************************
 ; View frame PLOT commands
 ;
@@ -2629,7 +2629,7 @@ filev_call_address = load_level_call+1
     equb &01, &08, &02, &00, &00
     equb &01, &00, &00, &84, &01
     equb &05, &28, &02, &66, &02
-    equb &08
+    equb &08                            ; Not referenced
 ; &169f referenced 6 times by &0477, &0e02, &0e14, &0e29, &1070, &15be
 .level_number
     equb &01
@@ -2665,7 +2665,7 @@ filev_call_address = load_level_call+1
     inx                                 ; Next entry
     bne find_queue_end                  ; ...
     equb &02, &02, &00, &00, &83, &00, &00, &00
-    equb &00, &00, &00, &31, &00, &8d
+    equb &00, &00, &00, &31, &00, &8d   ; Not referenced
 .level_filename
     equs "LEVEL"
 ; &16d5 referenced 1 time by &0e4f; also used as index base 1 time by &0e3e
@@ -2677,7 +2677,7 @@ filev_call_address = load_level_call+1
     equb &00, &54, &12, &03, &17, &74, &00, &8c
     equb &50, &00, &00, &00, &fa, &16, &78, &00
     equb &8c, &50, &20, &00, &00, &02, &00, &79
-    equb &00, &8c
+    equb &00, &8c                       ; Not referenced
 ; &16ff referenced 6 times by &0e05, &0e20, &0e25, &0e36, &0e45, &15df
 .level_bcd
     equb &01
@@ -2733,13 +2733,13 @@ filev_call_address = load_level_call+1
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
-    equb &80, &00, &00, &32, &00
+    equb &80, &00, &00, &32, &00        ; Not referenced
     equs "eco"
-    equb &00, &8e, &0b, &94, &00, &00
+    equb &00, &8e, &0b, &94, &00, &00   ; Not referenced
     equs "?&A66=(rx%-lx%)"
-    equb &81
+    equb &81                            ; Not referenced
     equs "2+1:sprite%?&A99=by%-ty%+1"
-    equb &0d, &03, &d4, &1d, &20, &d4, &31, &2c
+    equb &0d, &03, &d4, &1d, &20, &d4, &31, &2c  ; Not referenced
 .sprite_shield
     equb &3f, &3f, &3e
     equb &2a, &00, &14
@@ -2808,7 +2808,7 @@ filev_call_address = load_level_call+1
     equb &01
     equb &01
     equb &0a, &00, &05, &00, &00, &00, &0a, &00
-    equb &05, &00, &00, &00, &0a, &00, &05
+    equb &05, &00, &00, &00, &0a, &00, &05  ; Not referenced
 .sprite_missile_icon
     equb &00, &00, &01, &00
     equb &3f, &3f, &2b, &03
@@ -2833,7 +2833,7 @@ filev_call_address = load_level_call+1
     equb &00, &00, &08, &00, &0c, &0c, &04, &0c
     equb &08, &00, &08, &04, &0c, &08, &0c, &0c
     equb &1a, &35, &03, &8f, &7d, &9a, &82, &03
-    equb &00, &00, &00, &6d, &19, &00, &00, &00
+    equb &00, &00, &00, &6d, &19, &00, &00, &00  ; Not referenced
 .magic_envelope
     equb &03                            ; Envelope 3
     equb &01                            ; Step length 1 centisecond
@@ -2879,20 +2879,20 @@ filev_call_address = load_level_call+1
     equb &80, &80                       ; Target levels at the end of attack and decay: 128, 128
 .exit_sound
     equw &0012, &0003, os_zp_fa, &0001  ; SOUND channel 2 (flush), envelope 3, pitch 250, duration 1
-    equb &00, &00, &00, &00, &04
+    equb &00, &00, &00, &00, &04        ; Not referenced
     equs "50:50:$"
     equb &0c, &0c, &08, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &0a, &00, &00, &00
-    equb &00, &14, &34, &38, &03, &03
+    equb &00, &14, &34, &38, &03, &03   ; Not referenced
     equs "4<:%"
-    equb &0f, &0f, &0f, &1e, &31, &38, &03
+    equb &0f, &0f, &0f, &1e, &31, &38, &03  ; Not referenced
     equs "48<"
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &04
+    equb &00, &00, &00, &00, &04        ; Not referenced
     equs "5?:"
     equb &18, &3f, &3a, &0c, &0c, &08, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &35, &00
+    equb &35, &00                       ; Not referenced
 .sprite_ranger_left_1
     equb &00, &01, &03, &00
     equb &01, &0b, &08, &00
@@ -3703,7 +3703,7 @@ filev_call_address = load_level_call+1
     dec cell_y                          ; Otherwise the cell to the left
     dec cell_x                          ; ...
     rts                                 ; Return
-    equb &01, &3f
+    equb &01, &3f                       ; Not referenced
 ; &2100 used as index base 1 time by &156d
 .object_free_map
     equb &00, &02, &07, &07, &1f, &3f, &7d, &7f, &00, &30, &78, &fd, &7f, &ff, &80, &00  ; Not read: unpack_level copies each level's object-free map here
@@ -3719,7 +3719,7 @@ filev_call_address = load_level_call+1
     equb &7e, &7a, &7e, &00, &7e, &3e, &7f, &00, &be, &0e, &0e, &0f, &0e, &0e, &be, &00  ; ...
     equb &01, &01, &0f, &df, &07, &03, &01, &00, &08, &08, &5a, &fe, &fe, &fc, &b8, &00  ; ...
     equb &00, &00, &00, &00, &00, &00, &00, &00, &00  ; ...
-    equb &08, &2a, &00, &00, &00, &00, &00
+    equb &08, &2a, &00, &00, &00, &00, &00  ; Not referenced
 .sprite_drainer
     equb &11, &33, &33, &22
     equb &33, &33, &33, &33
@@ -3738,31 +3738,31 @@ filev_call_address = load_level_call+1
     equb &ff, &ff, &ff, &04, &ff, &ff, &06, &ff, &11, &ff, &ff, &ff, &1a, &03, &03, &0b  ; Not read: unpack_level copies each level's doors here
     equb &ff, &03, &09, &12, &ff        ; ...
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
-    equb &ff, &ff, &ff
+    equb &ff, &ff, &ff                  ; Not referenced
 ; &2220 used as index base 4 times by &1532, &1ce3, &1d8e, &7804
 .door_y
     equb &ff, &ff, &ff, &0d, &ff, &ff, &11, &ff, &16, &ff, &ff, &ff, &1a, &23, &27, &25  ; Not read: unpack_level copies each level's doors here
     equb &ff, &2b, &2e, &2b, &ff        ; ...
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
-    equb &ff, &ff, &ff
+    equb &ff, &ff, &ff                  ; Not referenced
 ; &2240 used as index base 2 times by &1538, &7810
 .door_sprite
     equb &ff, &1c, &1c, &1d, &1c, &1c, &1d, &1d, &1d, &1d, &1d, &1c, &1c, &1d, &1d, &1c  ; Not read: unpack_level copies each level's door sprites here
     equb &1d, &1d, &1c, &1c, &ff        ; ...
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
-    equb &ff, &ff, &ff
+    equb &ff, &ff, &ff                  ; Not referenced
 ; &2260 used as index base 7 times by &1543, &1dce, &1e00, &1e45, &1e8c, &1ea1, &20aa
 .key_x
     equb &13, &ff, &ff, &1b, &ff, &ff, &17, &ff, &1c, &ff, &ff, &ff, &02, &15, &04, &09  ; Not read: unpack_level copies each level's keys here
     equb &ff, &04, &19, &17, &ff        ; ...
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
-    equb &ff, &ff, &ff
+    equb &ff, &ff, &ff                  ; Not referenced
 ; &2280 used as index base 7 times by &1549, &1dd4, &1e06, &1e4d, &1e92, &1ea4, &20b0
 .key_y
     equb &25, &ff, &ff, &06, &ff, &ff, &09, &ff, &18, &ff, &ff, &ff, &29, &04, &0c, &14  ; Not read: unpack_level copies each level's keys here
     equb &ff, &0f, &03, &04, &ff        ; ...
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
-    equb &ff, &ff, &ff
+    equb &ff, &ff, &ff                  ; Not referenced
 .sprite_exit
     equb &03, &03, &03, &03
     equb &02, &00, &00, &01
@@ -4259,7 +4259,7 @@ filev_call_address = load_level_call+1
     equb &05, &00, &00, &0a, &00, &1a, &30, &05
     equb &00, &0a, &00, &05, &0f, &1a, &30, &25
     equb &0f, &00, &00, &0a, &0a, &30, &30, &0a
-    equb &05, &00, &00, &0a, &00, &0f, &0f, &00
+    equb &05, &00, &00, &0a, &00, &0f, &0f, &00  ; Not referenced
 .sprite_teleporter
     equb &3f, &3f, &3f, &3f
     equb &3e, &3c, &3c, &38
@@ -4274,7 +4274,7 @@ filev_call_address = load_level_call+1
     equb &3e, &3c, &3c, &38
     equb &30, &30, &30, &30
     equb &00, &2c, &00, &00, &00, &2c, &08, &00
-    equb &00, &0c, &08, &00, &04, &0f, &0e, &00
+    equb &00, &0c, &08, &00, &04, &0f, &0e, &00  ; Not referenced
 .sprite_digit_0
     equb &04, &08
     equb &08, &0c
@@ -4398,7 +4398,7 @@ filev_call_address = load_level_call+1
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
-    equb &0f, &1a, &30, &20, &00, &00, &00, &25
+    equb &0f, &1a, &30, &20, &00, &00, &00, &25  ; Not referenced
 .sprite_sparkle_0
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
@@ -4465,7 +4465,7 @@ filev_call_address = load_level_call+1
     equb &29, &21, &12, &16
     equb &3c, &3c, &3c, &3c
     equb &00, &00, &00, &00, &04, &00, &00, &00
-    equb &20, &00, &00, &00, &fd, &14, &93, &00
+    equb &20, &00, &00, &00, &fd, &14, &93, &00  ; Not referenced
 .sprite_arrow_up
     equb &00, &00, &00, &00
     equb &00, &15, &00, &00
@@ -4532,7 +4532,7 @@ filev_call_address = load_level_call+1
     equb &00, &3e, &38, &00
     equb &00, &30, &30, &00
     equb &01, &00, &00, &00, &17, &00, &00, &90
-    equb &17, &00, &00, &00, &00, &00, &00, &00
+    equb &17, &00, &00, &00, &00, &00, &00, &00  ; Not referenced
 ; &2d00 used as index base 1 time by &157a
 .wall_sprite
     equb &0f, &0b, &0f, &07
@@ -4873,7 +4873,7 @@ filev_call_address = load_level_call+1
     eor #1                              ; ...
     sta hero_frame,x                    ; ...
     jmp draw_moved_hero                 ; Redraw the hero
-    equb &88, &d0, &b8
+    equb &88, &d0, &b8                  ; Not referenced
 ; &6f70 referenced 1 time by &6f2b
 .next_missile_slot
     iny                                 ; Next slot
@@ -6244,7 +6244,7 @@ filev_call_address = load_level_call+1
     lda hero_y,x                        ; cell_y = hero_y
     sta cell_y                          ; ...
     rts                                 ; Return
-    equb &73
+    equb &73                            ; Not referenced
 ; ***************************************************************************************
 ; Draw all four views
 ;
@@ -6349,7 +6349,7 @@ filev_call_address = load_level_call+1
     sta map_ptr                         ; ...
     jsr draw_room                       ; Draw it
     rts                                 ; Return
-    equb &60
+    equb &60                            ; Not referenced
 ; ***************************************************************************************
 ; Draw a room
 ;
@@ -7136,7 +7136,7 @@ filev_call_address = load_level_call+1
 .monster_step_done
     rts                                 ; Return
     equb &de, &35, &0d, &bd, &35, &0d, &d0, &00
-    equb &60
+    equb &60                            ; Not referenced
 ; ***************************************************************************************
 ; Test whether a key is pressed
 ;
@@ -7210,7 +7210,7 @@ filev_call_address = load_level_call+1
 ; &7cfb referenced 1 time by &7ceb
 .emerge_done
     jmp monster_done                    ; Done
-    equb &00
+    equb &00                            ; Not referenced
 ; &7cff referenced 3 times by &0e1b, &158f, &759b
 .monster_start_hit_points
     equb &08
@@ -7359,7 +7359,7 @@ filev_call_address = load_level_call+1
     equb &51                            ; ...the exit's entry
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00
+    equb &00, &00                       ; Not referenced
 ; ***************************************************************************************
 ; WRCHV handler: print letters and digits in the game font
 ;
@@ -7461,7 +7461,7 @@ filev_call_address = load_level_call+1
     tax                                 ; ...
     lda plot_x                          ; Recover the character
     jmp mos_oswrch_default              ; ...and print it through the MOS 1.20 OSWRCH routine
-    equb &00
+    equb &00                            ; Not referenced
 .dasmos_dunjun6_end
 
 save "Dunjun4", dasmos_dunjun4_start, dasmos_dunjun4_end, &0400, &0400

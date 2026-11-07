@@ -821,6 +821,8 @@ for lo_addr, hi_addr, name in [
     master.expr(lo_addr, lo(sym(name)))
     master.expr(hi_addr, hi(sym(name)))
 
+master.c(0x0D6E, "Not referenced")  # after game_entry
+
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)
 asm_filepath.write_text(str(ir.render("beebasm")), encoding="utf-8")

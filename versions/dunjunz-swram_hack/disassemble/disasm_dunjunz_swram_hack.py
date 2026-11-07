@@ -121,6 +121,8 @@ for lo_addr, hi_addr, name in [(0x146F, 0x1471, "level_osfile_block"),
     annotator.expr(hi_addr, hi(sym(name)))
 annotator.expr(0x1488, hi(sym("level_object_x")))  # the level file's page, &6B
 
+annotator.c(0x0D6E, "Not referenced")  # after game_entry
+
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)
 asm_filepath.write_text(str(ir.render("beebasm")), encoding="utf-8")
