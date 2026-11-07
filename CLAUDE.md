@@ -134,6 +134,8 @@ on the official release.
   game's are in `game.annotate_branch_labels`). Sprite numbers are `spr_`
   constants from `game.SPRITES`; counts, pages and addresses are written
   from labels and constants rather than as numbers.
+  VDU parameter bytes, bit masks, sound pitches and similar values stay
+  as numbers, explained by their inline comments.
 - Comment every instruction; banner every routine and data region.
 - Published text describes the program as it is; no history of the
   disassembly in comments, banners or docs.
