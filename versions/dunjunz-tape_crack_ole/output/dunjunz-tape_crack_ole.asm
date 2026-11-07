@@ -333,10 +333,10 @@ save_dest_page = store_saved_byte+2
 ;
 ; Zero bytes, which nothing reads.
     equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00  ; Zeros
-    equb &00, &62, &cd, &0c, &44, &1a, &22, &f6
+    equb &00, &62, &cd, &0c, &44, &1a, &22, &f6  ; The level checksums, never read by the crack
     equs "B!}]"
     equb &d8, &a0, &f1, &0f, &cc, &d3, &53, &3b
-    equb &83, &71, &b2, &6f, &f3, &f1
+    equb &83, &71, &b2, &6f, &f3, &f1   ; ...
 ; ***************************************************************************************
 ; Unused
 ;
@@ -754,7 +754,7 @@ save_dest_page = store_saved_byte+2
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &15, &2a, &00, &00, &3f, &3f, &00, &00
-    equb &15, &2a, &00, &00
+    equb &15, &2a, &00, &00             ; Not referenced
     equs "<<<("
     equb &15, &2a, &00, &00, &3f, &3f, &00, &00
     equb &80, &05, &05, &05, &05, &05, &05, &80
@@ -764,7 +764,7 @@ save_dest_page = store_saved_byte+2
     equb &80, &00, &00, &00, &01, &1e, &1e, &80
     equb &00, &00, &fe, &80, &80, &00, &00, &00
     equb &01, &14, &0a, &05, &02, &02, &02, &01
-    equb &00, &00, &ff, &80, &80, &00, &00, &00
+    equb &00, &00, &ff, &80, &80, &00, &00, &00  ; Not referenced
 ; ***************************************************************************************
 ; Plot a sprite
 ;
@@ -1058,12 +1058,12 @@ save_dest_page = store_saved_byte+2
 .returning_hero_queue
     equb &03
 ; &0b2b referenced 2 times by &742f, &7438
-    equb &02
+    equb &02                            ; ...
 ; &0b2c referenced 2 times by &7435, &743e
-    equb &01
+    equb &01                            ; ...
 ; &0b2d referenced 2 times by &743b, &7441
-    equb &04
-    equb &10
+    equb &04                            ; ...
+    equb &10                            ; ...
 ; &0b2f referenced 5 times by &34b9, &7cb3, &7cb6, &7cbf, &7cc2
 .next_trapdoor
     equb &04
@@ -1089,28 +1089,28 @@ save_dest_page = store_saved_byte+2
     equb &02, &02, &02, &03, &03, &04, &09, &09
     equb &10, &03, &03, &03, &10, &10, &10
 ; &0b8f used as index base 1 time by &79cd
-    equb &10
+    equb &10                            ; ...
 ; &0b90 used as index base 2 times by &3554, &7cc5
 .trapdoor_x
     equb &0b
-    equb &15
-    equb &17
-    equb &10
-    equb &03
-    equb &17
-    equb &0d
+    equb &15                            ; ...
+    equb &17                            ; ...
+    equb &10                            ; ...
+    equb &03                            ; ...
+    equb &17                            ; ...
+    equb &0d                            ; ...
 ; &0b97 used as index base 1 time by &79d3
-    equb &1a
+    equb &1a                            ; ...
 ; &0b98 used as index base 2 times by &355a, &7ccb
 .trapdoor_y
     equb &04
-    equb &0c
-    equb &14
-    equb &1d
-    equb &25
-    equb &20
-    equb &28
-    equb &2c
+    equb &0c                            ; ...
+    equb &14                            ; ...
+    equb &1d                            ; ...
+    equb &25                            ; ...
+    equb &20                            ; ...
+    equb &28                            ; ...
+    equb &2c                            ; ...
 ; &0ba0 used as index base 5 times by &2ee6, &72aa, &72ad, &72b6, &72d4
 .hero_score_hundreds
     equb &1e, &1e, &1e, &1e
@@ -1196,24 +1196,24 @@ save_dest_page = store_saved_byte+2
 .hero_y
     equb &80, &a0, &0d, &a9
 ; &0d19 used as index base 1 time by &3f17
-    equb &00
+    equb &00                            ; ...
 ; &0d1a used as index base 18 times by &26d0, &3de6, &3f52, &6e82, &6ecb, &6ede, &6ef1, &6f04, &6f2d, &6f79, &701c, &7097, &7221, &7249, &7452, &7711, &7b67, &7baf
 .hero_direction
     equb &8d
-    equb &84
-    equb &0d
-    equb &8d, &85
+    equb &84                            ; ...
+    equb &0d                            ; ...
+    equb &8d, &85                       ; ...
 ; &0d1f used as index base 1 time by &3f23
-    equb &0d
+    equb &0d                            ; ...
 ; &0d20 referenced 2 times by &774e, &7753; also used as index base 12 times by &26da, &3df3, &6f62, &6f67, &709c, &7457, &76ee, &76ff, &771f, &772e, &7ba2, &7ba7
 .hero_frame
     equb &ad
 ; &0d21 referenced 2 times by &775b, &7760
-    equb &12
+    equb &12                            ; ...
 ; &0d22 referenced 2 times by &7768, &776d
-    equb &02
+    equb &02                            ; ...
 ; &0d23 referenced 2 times by &7771, &7776
-    equb &8d, &2f
+    equb &8d, &2f                       ; ...
 ; &0d25 used as index base 12 times by &26d5, &3f4d, &6e87, &6eaf, &6fc9, &6ff3, &702f, &7063, &7401, &7716, &7b64, &7baa
 .hero_step
     equb &0d, &ad, &13, &02, &8d
@@ -1282,15 +1282,15 @@ missile_sprite_base = set_wrchv_low+1
 ; &0d80 used as index base 1 time by &6f0d
 .hero_key_fire
     equs "Dungeon5"
-    equb &0d, &18, &bd, &04, &0d, &69, &03
+    equb &0d, &18, &bd, &04, &0d, &69, &03  ; Not referenced
 ; &0d8f used as index base 1 time by &3f1c
-    equb &9d
+    equb &9d                            ; Not referenced
 ; &0d90 used as index base 10 times by &26df, &2e6d, &7236, &7239, &726f, &738e, &7391, &739a, &7506, &7724
 .hero_health_tens
     equb &1d
-    equb &1d
-    equb &1d
-    equb &1d, &d0
+    equb &1d                            ; ...
+    equb &1d                            ; ...
+    equb &1d, &d0                       ; ...
 ; &0d95 used as index base 7 times by &7227, &722a, &7233, &727b, &739d, &750f, &7727
 .hero_health_units
     equs "''''"
@@ -1298,17 +1298,17 @@ missile_sprite_base = set_wrchv_low+1
 ; &0da0 referenced 2 times by &779e, &7893; also used as index base 3 times by &7043, &7544, &767c
 .view_room
     equb &18
-    equb &0c
+    equb &0c                            ; ...
 ; &0da2 referenced 2 times by &77b0, &78ad
-    equb &68
-    equb &0c
+    equb &68                            ; ...
+    equb &0c                            ; ...
 ; &0da4 referenced 2 times by &77c2, &78c7
-    equb &28
-    equb &0c
+    equb &28                            ; ...
+    equb &0c                            ; ...
 ; &0da6 referenced 2 times by &77d4, &78e1
-    equb &30
+    equb &30                            ; ...
     equb &0c, &00, &00, &bd, &04, &0d, &85, &71
-    equb &8a
+    equb &8a                            ; ...
 ; &0db0 used as index base 1 time by &6f50
 .hero_missile_sprites
     equb &10
@@ -1946,7 +1946,7 @@ reset_call_address = reset_call+1
     rts                                 ; Return
     equs "Rx`(&1900+F"
 ; &120f used as index base 1 time by &31de
-    equb &25
+    equb &25                            ; Not referenced
 ; &1210 used as index base 1 time by &31cc
 .sprite_chalice
     equb &00, &00, &05, &0f, &0f, &0a, &00, &00
@@ -1978,7 +1978,7 @@ reset_call_address = reset_call+1
 .saved_wrchv
     equb &a4
 ; &12d4 referenced 3 times by &2d5e, &34dd, &5028
-    equb &e0, &00, &73
+    equb &e0, &00, &73                  ; Not referenced
 ; ***************************************************************************************
 ; Font: letters A-Z
 ;
@@ -2383,7 +2383,7 @@ restore_dest_page = put_back_byte+2
     cmp #&19                            ; ...
     bne restore_page_byte               ; ...
     rts                                 ; Return to start_level
-    equb &60
+    equb &60                            ; Not referenced
 ; ***************************************************************************************
 ; Set the starting level
 ;
@@ -2399,7 +2399,7 @@ restore_dest_page = put_back_byte+2
     lda #0                              ; Level before the first (patched by the cheat)
     sta level_bcd                       ; ...
     rts                                 ; Return
-    equb &ea, &ea, &ea, &ea
+    equb &ea, &ea, &ea, &ea             ; Not referenced
     equs "L.$.L"
 .level_command_digits
     equb &31, &0d, &0d, &44, &2e, &0d
@@ -2741,7 +2741,7 @@ restore_dest_page = put_back_byte+2
     equb &31
 ; &16d6 referenced 1 time by &2454; also used as index base 1 time by &2e54
     equb &0d, &0d, &70, &00, &8d, &35, &f8, &00
-    equb &00, &00, &00
+    equb &00, &00, &00                  ; Not referenced
     equs "code"
     equb &00, &54, &12, &03, &17, &74, &00, &8c
     equb &50, &00, &00, &00, &fa, &16, &78, &00
@@ -4886,7 +4886,7 @@ restore_dest_page = put_back_byte+2
     ldy #0                              ; Y = 0 and plot_x = 0 for the copy
     sty plot_x                          ; ...
     rts                                 ; Return
-    equb &ea, &ea, &ea, &ea, &ea, &ea
+    equb &ea, &ea, &ea, &ea, &ea, &ea   ; Not referenced
 .dasmos_dunj4_end
 
     org &6e80

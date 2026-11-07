@@ -3521,6 +3521,7 @@
       "binary_addr": 9360,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "The level checksums, never read by the crack",
       "type": "byte",
       "values": [
         0,
@@ -3568,6 +3569,7 @@
       "binary_addr": 9372,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "type": "byte",
       "values": [
         216,
@@ -8456,6 +8458,7 @@
       "binary_addr": 10328,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -8645,6 +8648,7 @@
       "binary_addr": 10424,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         21,
@@ -11901,6 +11905,7 @@
       "binary_addr": 11051,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "xref_summaries": [
         "&2b2b referenced 2 times by &742f, &7438"
       ],
@@ -11927,6 +11932,7 @@
       "binary_addr": 11052,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "xref_summaries": [
         "&2b2c referenced 2 times by &7435, &743e"
       ],
@@ -11953,6 +11959,7 @@
       "binary_addr": 11053,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "xref_summaries": [
         "&2b2d referenced 2 times by &743b, &7441"
       ],
@@ -11979,6 +11986,7 @@
       "binary_addr": 11054,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "type": "byte",
       "values": [
         16
@@ -12384,6 +12392,7 @@
       "binary_addr": 11151,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "xref_summaries": [
         "&2b8f used as index base 1 time by &79cd"
       ],
@@ -12437,6 +12446,7 @@
       "binary_addr": 11153,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "type": "byte",
       "values": [
         21
@@ -12450,6 +12460,7 @@
       "binary_addr": 11154,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "type": "byte",
       "values": [
         23
@@ -12463,6 +12474,7 @@
       "binary_addr": 11155,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "type": "byte",
       "values": [
         16
@@ -12476,6 +12488,7 @@
       "binary_addr": 11156,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "type": "byte",
       "values": [
         3
@@ -12489,6 +12502,7 @@
       "binary_addr": 11157,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "type": "byte",
       "values": [
         23
@@ -12502,6 +12516,7 @@
       "binary_addr": 11158,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "type": "byte",
       "values": [
         13
@@ -12515,6 +12530,7 @@
       "binary_addr": 11159,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "xref_summaries": [
         "&2b97 used as index base 1 time by &79d3"
       ],
@@ -12568,6 +12584,7 @@
       "binary_addr": 11161,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "type": "byte",
       "values": [
         12
@@ -12581,6 +12598,7 @@
       "binary_addr": 11162,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "type": "byte",
       "values": [
         20
@@ -12594,6 +12612,7 @@
       "binary_addr": 11163,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "type": "byte",
       "values": [
         29
@@ -12607,6 +12626,7 @@
       "binary_addr": 11164,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "type": "byte",
       "values": [
         37
@@ -12620,6 +12640,7 @@
       "binary_addr": 11165,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "type": "byte",
       "values": [
         32
@@ -12633,6 +12654,7 @@
       "binary_addr": 11166,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "type": "byte",
       "values": [
         40
@@ -12646,6 +12668,7 @@
       "binary_addr": 11167,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "type": "byte",
       "values": [
         44
@@ -15281,6 +15304,7 @@
       "binary_addr": 11545,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "xref_summaries": [
         "&2d19 used as index base 1 time by &1f17[1]"
       ],
@@ -15404,6 +15428,7 @@
       "binary_addr": 11547,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "type": "byte",
       "values": [
         132
@@ -15417,6 +15442,7 @@
       "binary_addr": 11548,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "type": "byte",
       "values": [
         13
@@ -15431,6 +15457,7 @@
       "binary_addr": 11549,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "type": "byte",
       "values": [
         141,
@@ -15445,6 +15472,7 @@
       "binary_addr": 11551,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "xref_summaries": [
         "&2d1f used as index base 1 time by &1f23[1]"
       ],
@@ -15550,6 +15578,7 @@
       "binary_addr": 11553,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "xref_summaries": [
         "&2d21 referenced 2 times by &775b, &7760"
       ],
@@ -15576,6 +15605,7 @@
       "binary_addr": 11554,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "xref_summaries": [
         "&2d22 referenced 2 times by &7768, &776d"
       ],
@@ -15603,6 +15633,7 @@
       "binary_addr": 11555,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "xref_summaries": [
         "&2d23 referenced 2 times by &7771, &7776"
       ],
@@ -16644,6 +16675,7 @@
       "binary_addr": 11656,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         13,
@@ -16663,6 +16695,7 @@
       "binary_addr": 11663,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "xref_summaries": [
         "&2d8f used as index base 1 time by &1f1c[1]"
       ],
@@ -16752,6 +16785,7 @@
       "binary_addr": 11665,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "type": "byte",
       "values": [
         29
@@ -16765,6 +16799,7 @@
       "binary_addr": 11666,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "type": "byte",
       "values": [
         29
@@ -16779,6 +16814,7 @@
       "binary_addr": 11667,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "type": "byte",
       "values": [
         29,
@@ -16910,6 +16946,7 @@
       "binary_addr": 11681,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "type": "byte",
       "values": [
         12
@@ -16923,6 +16960,7 @@
       "binary_addr": 11682,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "xref_summaries": [
         "&2da2 referenced 2 times by &77b0, &78ad"
       ],
@@ -16949,6 +16987,7 @@
       "binary_addr": 11683,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "type": "byte",
       "values": [
         12
@@ -16962,6 +17001,7 @@
       "binary_addr": 11684,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "xref_summaries": [
         "&2da4 referenced 2 times by &77c2, &78c7"
       ],
@@ -16988,6 +17028,7 @@
       "binary_addr": 11685,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "type": "byte",
       "values": [
         12
@@ -17001,6 +17042,7 @@
       "binary_addr": 11686,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "xref_summaries": [
         "&2da6 referenced 2 times by &77d4, &78e1"
       ],
@@ -17035,6 +17077,7 @@
       "binary_addr": 11687,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "...",
       "type": "byte",
       "values": [
         12,
@@ -24619,6 +24662,7 @@
       "binary_addr": 12815,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "xref_summaries": [
         "&320f used as index base 1 time by &11de[1]"
       ],
@@ -25109,6 +25153,7 @@
       "binary_addr": 13012,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "xref_summaries": [
         "&32d4 referenced 3 times by &0d5e[1], &14dd[1], &5028"
       ],
@@ -30872,6 +30917,7 @@
       "binary_addr": 13450,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         96
@@ -30946,6 +30992,7 @@
       "binary_addr": 13457,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         234,
@@ -34808,6 +34855,7 @@
       "binary_addr": 14038,
       "image": 0,
       "move": "game_image",
+      "comment_inline": "Not referenced",
       "xref_summaries": [
         "&36d6 referenced 1 time by &0454[1]; also used as index base 1 time by &0e54[1]"
       ],
@@ -57755,6 +57803,7 @@
         234
       ],
       "image": 0,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         234,

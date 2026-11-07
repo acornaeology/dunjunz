@@ -235,6 +235,71 @@ annotator.c(0x0D6E, "Not referenced")  # after game_entry
 annotator.c(0x0772, "Not referenced")
 annotator.c(0x07F8, "Not referenced")
 
+# ---------------------------------------------------------------------------
+# Data no instruction refers to, and the entries of moved tables that the
+# tables' expression labels split into items of their own
+# (acornaeology/dasmos#60): (move name or None, runtime address).
+
+TAPE_UNREFERENCED = [
+    ('game_image', 0x0858),
+    ('game_image', 0x08B8),
+    ('game_image', 0x0D88),
+    ('game_image', 0x0D8F),
+    ('game_image', 0x120F),
+    ('game_image', 0x12D4),
+    ('game_image', 0x148A),
+    ('game_image', 0x1491),
+    ('game_image', 0x16D6),
+    (None, 0x504A),
+]
+TAPE_TABLE_ENTRIES = [
+    ('game_image', 0x0B2B),
+    ('game_image', 0x0B2C),
+    ('game_image', 0x0B2D),
+    ('game_image', 0x0B2E),
+    ('game_image', 0x0B8F),
+    ('game_image', 0x0B91),
+    ('game_image', 0x0B92),
+    ('game_image', 0x0B93),
+    ('game_image', 0x0B94),
+    ('game_image', 0x0B95),
+    ('game_image', 0x0B96),
+    ('game_image', 0x0B97),
+    ('game_image', 0x0B99),
+    ('game_image', 0x0B9A),
+    ('game_image', 0x0B9B),
+    ('game_image', 0x0B9C),
+    ('game_image', 0x0B9D),
+    ('game_image', 0x0B9E),
+    ('game_image', 0x0B9F),
+    ('game_image', 0x0D19),
+    ('game_image', 0x0D1B),
+    ('game_image', 0x0D1C),
+    ('game_image', 0x0D1D),
+    ('game_image', 0x0D1F),
+    ('game_image', 0x0D21),
+    ('game_image', 0x0D22),
+    ('game_image', 0x0D23),
+    ('game_image', 0x0D91),
+    ('game_image', 0x0D92),
+    ('game_image', 0x0D93),
+    ('game_image', 0x0DA1),
+    ('game_image', 0x0DA2),
+    ('game_image', 0x0DA3),
+    ('game_image', 0x0DA4),
+    ('game_image', 0x0DA5),
+    ('game_image', 0x0DA6),
+    ('game_image', 0x0DA7),
+]
+moves_by_name = {"game_image": game_image, None: None}
+for entries, text in ((TAPE_UNREFERENCED, "Not referenced"), (TAPE_TABLE_ENTRIES, "...")):
+    for move_name, addr in entries:
+        d.comment(addr, text, align=dasmos.Align.INLINE, move=moves_by_name[move_name])
+# The checksum table survives, but the crack's level loader never reads it.
+d.comment(0x0490, "The level checksums, never read by the crack", align=dasmos.Align.INLINE,
+          move=game_image)
+d.comment(0x049C, "...", align=dasmos.Align.INLINE, move=game_image)
+
 # DUNJ3 past &7FFF: loaded into the sideways ROM area, so never in RAM.
 d.banner(0x8000, title="DUNJ3 beyond the game",
          description="&8000-&9CFF, loaded into the paged ROM area, where "
