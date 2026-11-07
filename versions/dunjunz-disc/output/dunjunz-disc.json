@@ -57093,6 +57093,7 @@
       ],
       "binary_addr": 21167,
       "move": "low_keyboard",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0
@@ -59099,6 +59100,7 @@
       ],
       "binary_addr": 21414,
       "move": "low_keyboard",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -59727,6 +59729,7 @@
       ],
       "binary_addr": 21596,
       "move": "low_keyboard",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -60439,7 +60442,18 @@
     {
       "addr": 1818,
       "bytes": [
-        13,
+        13
+      ],
+      "binary_addr": 21706,
+      "move": "low_keyboard",
+      "type": "byte",
+      "values": [
+        13
+      ]
+    },
+    {
+      "addr": 1819,
+      "bytes": [
         13,
         84,
         80,
@@ -60448,11 +60462,11 @@
         80,
         13
       ],
-      "binary_addr": 21706,
+      "binary_addr": 21707,
       "move": "low_keyboard",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
-        13,
         13,
         84,
         80,
@@ -62926,6 +62940,7 @@
       ],
       "binary_addr": 22191,
       "move": "low_joystick",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0
@@ -64932,6 +64947,7 @@
       ],
       "binary_addr": 22438,
       "move": "low_joystick",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -65560,6 +65576,7 @@
       ],
       "binary_addr": 22620,
       "move": "low_joystick",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -66273,7 +66290,18 @@
     {
       "addr": 1818,
       "bytes": [
-        13,
+        13
+      ],
+      "binary_addr": 22730,
+      "move": "low_joystick",
+      "type": "byte",
+      "values": [
+        13
+      ]
+    },
+    {
+      "addr": 1819,
+      "bytes": [
         13,
         84,
         80,
@@ -66282,11 +66310,11 @@
         80,
         13
       ],
-      "binary_addr": 22730,
+      "binary_addr": 22731,
       "move": "low_joystick",
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
-        13,
         13,
         84,
         80,

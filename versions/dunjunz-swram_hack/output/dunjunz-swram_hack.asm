@@ -346,7 +346,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
-    equb &00
+    equb &00                            ; Not referenced
 ; ***************************************************************************************
 ; Choose the heroes and the sound
 ;
@@ -553,7 +553,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     jsr print_menu                      ; Reprint the menu
     jmp menu_key_loop                   ; Next key
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &4f
+    equb &00, &4f                       ; Not referenced
 ; ***************************************************************************************
 ; Hero menu text
 ;
@@ -594,7 +594,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equs "ON ", &0d
     equb &03, &14                       ; Column 3, row 20
     equs "SPACE TO PLAY", &0d
-    equb &00, &0d, &a9, &63
+    equb &00, &0d, &a9, &63             ; Not referenced
 ; ***************************************************************************************
 ; Take the heroes nobody plays out of the game
 ;
@@ -667,7 +667,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; fragment of BBC BASIC assembler (label+2:LDA#255:.label JSR&30).
 .line_buffer_leftovers
     equs "*SAVE Dunjunz.K 400 7FF 740"
-    equb &0d, &54, &50, &0d, &0d, &50, &0d
+    equb &0d, &54, &50, &0d, &0d, &50, &0d  ; Not referenced
     equs "Alabel+2:LDA#255:.label JSR&30"
 ; ***************************************************************************************
 ; Load the game file and run it (not used)

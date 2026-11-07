@@ -233,6 +233,16 @@ d.expr(0x5031, hi(sym("wrch_handler")))
 
 annotator.c(0x0D6E, "Not referenced")  # after game_entry
 
+# DUNJ3 past &7FFF: loaded into the sideways ROM area, so never in RAM.
+d.banner(0x8000, title="DUNJ3 beyond the game",
+         description="&8000-&9CFF, loaded into the paged ROM area, where "
+         "it never reaches RAM. From &869A to the end it is byte for byte "
+         "the loading screen DUNJ2's &381A-&4E7F: memory as it lay when the "
+         "file was saved.")
+for row in range(0x8000, 0x9D00, 0x100):
+    d.byte(row, 0x100, cols=16, override=True)
+    d.comment(row, "Never in RAM" if row == 0x8000 else "...", align=dasmos.Align.INLINE)
+
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)
 asm_filepath.write_text(str(ir.render("beebasm")), encoding="utf-8")

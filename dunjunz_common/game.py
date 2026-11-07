@@ -3972,6 +3972,7 @@ def annotate_runtime_tables(a: Annotator) -> None:
 # Bytes between the game's tables and routines that no instruction
 # refers to: (address, length).
 UNREFERENCED = [
+    (0x04FF, 1), (0x05F6, 10), (0x06AC, 4), (0x071B, 7),
     (0x09A0, 80),
     (0x0B39, 7),
     (0x0CC9, 7),

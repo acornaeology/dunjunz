@@ -3674,6 +3674,7 @@
         0
       ],
       "image": 0,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0
@@ -5482,6 +5483,7 @@
         79
       ],
       "image": 0,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -6047,6 +6049,7 @@
         99
       ],
       "image": 0,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -6720,6 +6723,7 @@
         13
       ],
       "image": 0,
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         13,
