@@ -18,6 +18,21 @@
   },
   "constants": [
     {
+      "name": "level_length",
+      "value": 688,
+      "comment": "The length of a level file"
+    },
+    {
+      "name": "level_buffer_end",
+      "value": 28080,
+      "comment": "The end of the level file at &6B00"
+    },
+    {
+      "name": "level_count",
+      "value": 25,
+      "comment": "The levels *DEFAULT carries"
+    },
+    {
       "name": "osbyte_escape_break_effect",
       "value": 200
     },
@@ -626,7 +641,14 @@
       "comment_inline": "...from '0'...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&30"
+      "operand": "#'0'",
+      "expr": {
+        "text": "'0'",
+        "tree": {
+          "int": 48,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 3637,
@@ -650,7 +672,14 @@
       "comment_inline": "...to '9'",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&39"
+      "operand": "#'9'",
+      "expr": {
+        "text": "'9'",
+        "tree": {
+          "int": 57,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 3642,
@@ -776,7 +805,14 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
-      "operand": "#&30"
+      "operand": "#'0'",
+      "expr": {
+        "text": "'0'",
+        "tree": {
+          "int": 48,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 3664,
@@ -884,7 +920,14 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
-      "operand": "#&30"
+      "operand": "#'0'",
+      "expr": {
+        "text": "'0'",
+        "tree": {
+          "int": 48,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 3680,
@@ -942,7 +985,14 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&20"
+      "operand": "#' '",
+      "expr": {
+        "text": "' '",
+        "tree": {
+          "int": 32,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 3687,
@@ -989,7 +1039,14 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
-      "operand": "#&30"
+      "operand": "#'0'",
+      "expr": {
+        "text": "'0'",
+        "tree": {
+          "int": 48,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 3696,
@@ -1012,7 +1069,20 @@
       ],
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&1a"
+      "operand": "#level_count + 1",
+      "expr": {
+        "text": "level_count + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "level_count"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 3698,
@@ -1069,7 +1139,22 @@
       "comment_inline": "read_ptr = &1000...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#0"
+      "operand": "#<(level_1_original - level_length)",
+      "expr": {
+        "text": "<(level_1_original - level_length)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "op": "sub",
+            "left": {
+              "sym": "level_1_original"
+            },
+            "right": {
+              "sym": "level_length"
+            }
+          }
+        }
+      }
     },
     {
       "addr": 3707,
@@ -1093,7 +1178,22 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&10"
+      "operand": "#>(level_1_original - level_length)",
+      "expr": {
+        "text": ">(level_1_original - level_length)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "op": "sub",
+            "left": {
+              "sym": "level_1_original"
+            },
+            "right": {
+              "sym": "level_length"
+            }
+          }
+        }
+      }
     },
     {
       "addr": 3711,
@@ -1151,7 +1251,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
-      "operand": "#&b0"
+      "operand": "#<(level_length)",
+      "expr": {
+        "text": "<(level_length)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "level_length"
+          }
+        }
+      }
     },
     {
       "addr": 3718,
@@ -1188,7 +1297,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
-      "operand": "#2"
+      "operand": "#>(level_length)",
+      "expr": {
+        "text": ">(level_length)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "level_length"
+          }
+        }
+      }
     },
     {
       "addr": 3724,
@@ -1258,7 +1376,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&6b"
+      "operand": "#>(level_buffer)",
+      "expr": {
+        "text": ">(level_buffer)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "level_buffer"
+          }
+        }
+      }
     },
     {
       "addr": 3735,
@@ -1453,7 +1580,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&b0"
+      "operand": "#<(level_buffer_end)",
+      "expr": {
+        "text": "<(level_buffer_end)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "level_buffer_end"
+          }
+        }
+      }
     },
     {
       "addr": 3759,
@@ -1490,7 +1626,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&6d"
+      "operand": "#>(level_buffer_end)",
+      "expr": {
+        "text": ">(level_buffer_end)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "level_buffer_end"
+          }
+        }
+      }
     },
     {
       "addr": 3765,
@@ -1812,7 +1957,14 @@
       "comment_inline": "A: another level",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&41"
+      "operand": "#'A'",
+      "expr": {
+        "text": "'A'",
+        "tree": {
+          "int": 65,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 3819,
@@ -1836,7 +1988,14 @@
       "comment_inline": "Q?",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&51"
+      "operand": "#'Q'",
+      "expr": {
+        "text": "'Q'",
+        "tree": {
+          "int": 81,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 3823,

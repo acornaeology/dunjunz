@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 import dasmos
-from dasmos.expr import sym
+from dasmos.expr import hi, lo, sym
 
 VERSION_DIRPATH = Path(__file__).resolve().parent.parent
 REPO_DIRPATH = VERSION_DIRPATH.parent.parent
@@ -56,9 +56,18 @@ comments(coder2, [
 coder2.label(0x2018, "load_code_command")
 coder2.string(0x2018, 7)
 coder2.byte(0x201F)
-coder2.label(0x2020, "coder_command2")
+coder2.label(0x2020, "coder_command")
 coder2.string(0x2020, 5)
 coder2.byte(0x2025)
+
+coder2.label(0xC500, "joystick_handler", group="private_ram", description=(
+    "Code's joystick handler in private RAM (HAZEL), which BYTEV is "
+    "pointed at."))
+for lo_addr, hi_addr, name in [(0x2001, 0x2003, "load_code_command"),
+                               (0x2008, 0x200D, "joystick_handler"),
+                               (0x2012, 0x2014, "coder_command")]:
+    d.expr(lo_addr, lo(sym(name)))
+    d.expr(hi_addr, hi(sym(name)))
 
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)

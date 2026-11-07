@@ -143,6 +143,7 @@
     "ind1v": 560,
     "ind2v": 562,
     "ind3v": 564,
+    "joystick_handler": 50432,
     "scsi_data": 64576,
     "scsi_status": 64577,
     "scsi_select": 64578,
@@ -235,7 +236,14 @@
     "osbyte": 65524,
     "oscli": 65527
   },
-  "memory_map": [],
+  "memory_map": [
+    {
+      "addr": 50432,
+      "name": "joystick_handler",
+      "group": "private_ram",
+      "description": "Code's joystick handler in private RAM (HAZEL), which BYTEV is pointed at."
+    }
+  ],
   "regions": [],
   "items": [
     {
@@ -250,7 +258,16 @@
       "comment_inline": "*L. Code: load the joystick handler at &C500",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&18"
+      "operand": "#<(load_code_command)",
+      "expr": {
+        "text": "<(load_code_command)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "load_code_command"
+          }
+        }
+      }
     },
     {
       "addr": 8194,
@@ -261,7 +278,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&20"
+      "operand": "#>(load_code_command)",
+      "expr": {
+        "text": ">(load_code_command)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "load_code_command"
+          }
+        }
+      }
     },
     {
       "addr": 8196,
@@ -286,7 +312,16 @@
       "comment_inline": "BYTEV = &C500, the joystick handler...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#0"
+      "operand": "#<(joystick_handler)",
+      "expr": {
+        "text": "<(joystick_handler)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "joystick_handler"
+          }
+        }
+      }
     },
     {
       "addr": 8201,
@@ -311,7 +346,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&c5"
+      "operand": "#>(joystick_handler)",
+      "expr": {
+        "text": ">(joystick_handler)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "joystick_handler"
+          }
+        }
+      }
     },
     {
       "addr": 8206,
@@ -335,7 +379,16 @@
       "comment_inline": "*CODER: load and start the game (no return)",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&20"
+      "operand": "#<(coder_command)",
+      "expr": {
+        "text": "<(coder_command)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "coder_command"
+          }
+        }
+      }
     },
     {
       "addr": 8211,
@@ -346,7 +399,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&20"
+      "operand": "#>(coder_command)",
+      "expr": {
+        "text": ">(coder_command)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "coder_command"
+          }
+        }
+      }
     },
     {
       "addr": 8213,
@@ -399,7 +461,7 @@
         82
       ],
       "labels": [
-        "coder_command2"
+        "coder_command"
       ],
       "type": "string",
       "string": "CODER"

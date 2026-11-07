@@ -17,7 +17,7 @@ import os
 from pathlib import Path
 
 import dasmos
-from dasmos.expr import hi, lo, sym
+from dasmos.expr import char, hi, lo, sym
 
 INLINE = dasmos.Align.INLINE
 
@@ -237,6 +237,22 @@ for n in range(1, LEVEL_COUNT + 1):
             description=f"Level {n}'s file, encrypted.")
     d.byte(level_addr, LEVEL_LENGTH, cols=16)
 assert LEVELS_ADDR + LEVEL_COUNT * LEVEL_LENGTH == END_ADDR
+
+# Values written from names: the level copies' base and length, the
+# level buffer's end, the number of levels and the characters typed.
+d.constant(LEVEL_LENGTH, "level_length", comment="The length of a level file")
+d.constant(0x6DB0, "level_buffer_end", comment="The end of the level file at &6B00")
+d.constant(24, "level_count", comment="The levels *DEFAULT carries")
+d.expr(0x1990, lo(sym("level_1_original") - sym("level_length")))
+d.expr(0x1994, hi(sym("level_1_original") - sym("level_length")))
+d.expr(0x199B, lo(sym("level_length")))
+d.expr(0x19A1, hi(sym("level_length")))
+d.expr(0x19AC, hi(sym("level_buffer")))
+d.expr(0x19C4, lo(sym("level_buffer_end")))
+d.expr(0x19CA, hi(sym("level_buffer_end")))
+d.expr(0x1987, sym("level_count") + 1)
+for operand_addr in (0x194A, 0x194F, 0x1965, 0x1975, 0x1985, 0x197C, 0x1A00, 0x1A04):
+    d.expr(operand_addr, char(d.memory.get_u8(operand_addr)))
 
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)

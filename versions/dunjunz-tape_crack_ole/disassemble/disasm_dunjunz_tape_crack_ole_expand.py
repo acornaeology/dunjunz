@@ -13,7 +13,7 @@ from pathlib import Path
 
 import dasmos
 from dasmos import Align
-from dasmos.expr import hi, lo, sym
+from dasmos.expr import char, hi, lo, sym
 
 VERSION_DIRPATH = Path(__file__).resolve().parent.parent
 BINARY_DIRPATH = VERSION_DIRPATH / "binary"
@@ -263,6 +263,9 @@ comments([
     (0x2F9F, "+10 start address (unused)"),
     (0x2FA3, "+14 end address (unused)"),
 ])
+
+for operand_addr in (0x2E26, 0x2E2A):  # ' ' and ','
+    d.expr(operand_addr, char(d.memory.get_u8(operand_addr)))
 
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)

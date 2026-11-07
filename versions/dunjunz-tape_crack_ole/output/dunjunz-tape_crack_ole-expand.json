@@ -457,7 +457,14 @@
       ],
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&20"
+      "operand": "#' '",
+      "expr": {
+        "text": "' '",
+        "tree": {
+          "int": 32,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 11815,
@@ -481,7 +488,14 @@
       "comment_inline": "Skip commas",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&2c"
+      "operand": "#','",
+      "expr": {
+        "text": "','",
+        "tree": {
+          "int": 44,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 11819,

@@ -57,9 +57,9 @@ osbyte       = &fff4
     inc command_ptr + 1                 ; ...
 ; &2e25 referenced 1 time by &2e21
 .check_separator
-    cmp #&20 ; ' '                      ; Skip spaces
+    cmp #' '                            ; Skip spaces
     beq skip_separators_loop            ; ...
-    cmp #&2c ; ','                      ; Skip commas
+    cmp #','                            ; Skip commas
     beq skip_separators_loop            ; ...
     cmp #&0d                            ; The end of the line?
     bne argument_found                  ; No: an argument starts here
