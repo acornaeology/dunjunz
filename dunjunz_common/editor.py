@@ -89,7 +89,16 @@ EDITOR_CONSTANTS = [
     (0x29B0, "level_file_end", "The end of the level file at &2700"),
     (0x73, "game_chalice_type", "The game's object type for the Chalice"),
     (0x3000, "screen_start", "The start of MODE 2 screen memory"),
+    (0xC9, "map_bytes", "The length of the wall and object-free maps"),
+    (0xFF, "off_map", "A map x or y that leaves an object out of the level"),
+    (0xFF, "no_link", "A free door-key link, or no door waiting"),
+    (24, "max_level", "The highest level number the editor saves"),
+    (24, "wall_block_count", "The wall blocks in Stones"),
+    (0x30, "wall_block_bytes", "The length of a wall block, 4 bytes by 12 rows"),
+    (0x51, "game_exit_type", "The game's object type for the exit"),
 ]
+# The Master side's marker in table_loaded_flag.
+MASTER_CONSTANTS = [(0x6F, "table_loaded_mark", "table_loaded_flag once Table has been loaded")]
 # (operand address, expression); Master addresses.
 def _sp(name, offset=0):
     expression = sym(f"spr_{name}")
@@ -125,6 +134,14 @@ EDITOR_OPERANDS = [
     (0x2335, lo(sym("level_file_end"))), (0x233B, hi(sym("level_file_end"))),
     (0x1F3D, sym("game_chalice_type")),
     (0x2BB7, hi(sym("wall_map"))), (0x7D9B, hi(sym("object_free_map"))),
+    (0x26BC, sym("map_bytes")), (0x7BBA, sym("map_bytes")),
+    (0x1F46, sym("off_map")), (0x1F7D, sym("off_map")),
+    (0x2C99, sym("no_link")), (0x2D4D, sym("no_link")), (0x2D9B, sym("no_link")),
+    (0x22F2, sym("max_level") + 1),
+    (0x2494, sym("wall_block_count") - 1), (0x24BD, sym("wall_block_count")),
+    (0x24E1, sym("wall_block_count")),
+    (0x1EA6, sym("wall_block_bytes") - 1), (0x2461, sym("wall_block_bytes") - 1),
+    (0x263C, sym("game_exit_type")),
 ]
 EDITOR_CHAR_OPERANDS = [
     0x1CD6, 0x1CF8, 0x1E71, 0x1E76, 0x1E95, 0x1C97, 0x1CAB, 0x2368,
@@ -2099,8 +2116,11 @@ def annotate(d, model_b=False):
     # The editor's sprite numbers, limits, characters and keys.
     for number, name in EDITOR_SPRITES:
         d.constant(number, f"spr_{name}", comment=f"Editor sprite &{number:02X}")
-    for value, name, text in EDITOR_CONSTANTS:
+    for value, name, text in EDITOR_CONSTANTS + ([] if model_b else MASTER_CONSTANTS):
         d.constant(value, name, comment=text)
+    if not model_b:
+        d.expr(0x1C3E, sym("table_loaded_mark"))
+        d.expr(0x1C42, sym("table_loaded_mark"))
     for operand_addr, expression in EDITOR_OPERANDS:
         if 0x7B00 <= operand_addr < 0x7BCE:
             d.expr(operand_addr, expression, move=unpack)

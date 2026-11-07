@@ -197,6 +197,41 @@
       "comment": "The start of MODE 2 screen memory"
     },
     {
+      "name": "map_bytes",
+      "value": 201,
+      "comment": "The length of the wall and object-free maps"
+    },
+    {
+      "name": "off_map",
+      "value": 255,
+      "comment": "A map x or y that leaves an object out of the level"
+    },
+    {
+      "name": "no_link",
+      "value": 255,
+      "comment": "A free door-key link, or no door waiting"
+    },
+    {
+      "name": "max_level",
+      "value": 24,
+      "comment": "The highest level number the editor saves"
+    },
+    {
+      "name": "wall_block_count",
+      "value": 24,
+      "comment": "The wall blocks in Stones"
+    },
+    {
+      "name": "wall_block_bytes",
+      "value": 48,
+      "comment": "The length of a wall block, 4 bytes by 12 rows"
+    },
+    {
+      "name": "game_exit_type",
+      "value": 81,
+      "comment": "The game's object type for the exit"
+    },
+    {
       "name": "osbyte_escape_break_effect",
       "value": 200
     },
@@ -3001,7 +3036,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
-      "operand": "#&c9"
+      "operand": "#map_bytes",
+      "expr": {
+        "text": "map_bytes",
+        "tree": {
+          "sym": "map_bytes"
+        }
+      }
     },
     {
       "addr": 31675,
@@ -8051,7 +8092,20 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&2f"
+      "operand": "#wall_block_bytes - 1",
+      "expr": {
+        "text": "wall_block_bytes - 1",
+        "tree": {
+          "op": "sub",
+          "left": {
+            "sym": "wall_block_bytes"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 7826,
@@ -9104,7 +9158,13 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&ff"
+      "operand": "#off_map",
+      "expr": {
+        "text": "off_map",
+        "tree": {
+          "sym": "off_map"
+        }
+      }
     },
     {
       "addr": 7986,
@@ -9488,7 +9548,13 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&ff"
+      "operand": "#off_map",
+      "expr": {
+        "text": "off_map",
+        "tree": {
+          "sym": "off_map"
+        }
+      }
     },
     {
       "addr": 8041,
@@ -15737,7 +15803,20 @@
       ],
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&19"
+      "operand": "#max_level + 1",
+      "expr": {
+        "text": "max_level + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "max_level"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 8926,
@@ -18201,7 +18280,20 @@
       "comment_inline": "Copy its &30 bytes into level_wall_block",
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&2f"
+      "operand": "#wall_block_bytes - 1",
+      "expr": {
+        "text": "wall_block_bytes - 1",
+        "tree": {
+          "op": "sub",
+          "left": {
+            "sym": "wall_block_bytes"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 9314,
@@ -18528,7 +18620,20 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&17"
+      "operand": "#wall_block_count - 1",
+      "expr": {
+        "text": "wall_block_count - 1",
+        "tree": {
+          "op": "sub",
+          "left": {
+            "sym": "wall_block_count"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      }
     },
     {
       "addr": 9365,
@@ -18802,7 +18907,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&18"
+      "operand": "#wall_block_count",
+      "expr": {
+        "text": "wall_block_count",
+        "tree": {
+          "sym": "wall_block_count"
+        }
+      }
     },
     {
       "addr": 9406,
@@ -19029,7 +19140,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&18"
+      "operand": "#wall_block_count",
+      "expr": {
+        "text": "wall_block_count",
+        "tree": {
+          "sym": "wall_block_count"
+        }
+      }
     },
     {
       "addr": 9442,
@@ -21084,7 +21201,13 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&51"
+      "operand": "#game_exit_type",
+      "expr": {
+        "text": "game_exit_type",
+        "tree": {
+          "sym": "game_exit_type"
+        }
+      }
     },
     {
       "addr": 9789,
@@ -21852,7 +21975,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
-      "operand": "#&c9"
+      "operand": "#map_bytes",
+      "expr": {
+        "text": "map_bytes",
+        "tree": {
+          "sym": "map_bytes"
+        }
+      }
     },
     {
       "addr": 9917,
@@ -28829,7 +28958,13 @@
       "comment_inline": "...and nothing waiting",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&ff"
+      "operand": "#no_link",
+      "expr": {
+        "text": "no_link",
+        "tree": {
+          "sym": "no_link"
+        }
+      }
     },
     {
       "addr": 11418,
@@ -30194,7 +30329,13 @@
       "comment_inline": "...free it...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&ff"
+      "operand": "#no_link",
+      "expr": {
+        "text": "no_link",
+        "tree": {
+          "sym": "no_link"
+        }
+      }
     },
     {
       "addr": 11598,
@@ -30744,7 +30885,13 @@
       "comment_inline": "...free the link...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&ff"
+      "operand": "#no_link",
+      "expr": {
+        "text": "no_link",
+        "tree": {
+          "sym": "no_link"
+        }
+      }
     },
     {
       "addr": 11676,
