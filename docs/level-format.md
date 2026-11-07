@@ -75,7 +75,7 @@ sprite number.
 | &53–&5E | Energy drainer | −10 health on contact; each missile hit advances the type, and at &5F it disappears |
 | &5F | Boots of Speed | Worn until lost; 10 points |
 | &60 | Magic helmet | Health lost per hit −1 (to at least 3); 10 points |
-| &61 | Potion of healing | Health becomes the score's last digit, doubled (e.g. 77); 10 points |
+| &61 | Potion of healing | Health becomes the score's last digit, doubled (e.g. 77; a 0 gives 00); 10 points |
 | &62 | Pile of weapons | One more missile in flight (at most 3); 10 points |
 | &63 | Magic sword | Missile damage +1 (at most 9); 10 points |
 | &73 | The Chalice | Level 25 only (object 29, at x &1A, y 4); `check_for_victory` ends the game when a hero reaches it |

@@ -223,6 +223,21 @@ for its release: the delete repeats on every pass of the edit loop
 while TAB is held, at whichever cell the cursor is on. Holding B with an item chosen stalls the
 editor until B is released. &9B looks like a slip for &9F **[inference]**.
 
+### The level editor's top-left cell always reads as a wall
+
+Free item slots are left as item 0, a wall, at (0, 0) (&1EB6, &2D05),
+and `item_at_cursor` (&2B76) checks every slot, free ones included. So
+cell (0, 0) always reports a wall, and `save_level` sets that cell's wall
+bit directly (&230F on the Master side) **[confirmed from the code]**.
+
+### The level editor leaves walls behind refused and deleted doors
+
+`place_door` (&2C70) sets the cell's wall bit before checking the door
+count, so a refused 21st door leaves a wall. Deleting a door with TAB
+(`remove_at_cursor`, &2C14) frees its slot but not its wall bit; deleting
+it through its key does clear the wall (&2D9F) **[confirmed from the
+code; Master-side addresses]**.
+
 ### `*DEFAULT` writes level files the game never reads
 
 `*DEFAULT` accepts levels 1–25. Level 25 is saved as `Level25`, but the
@@ -512,18 +527,62 @@ The packed format **[confirmed by decoding `GIRL1`]**:
 Decoded with this format, `GIRL1`'s 13,765 bytes give exactly &5000
 bytes, a full MODE 2 screen, and a coherent picture.
 
+### `EXPAND` does not check that unpacking cannot overtake the file
+
+The packed file is loaded to end at &8000 and unpacked from &3000 into
+the same memory, which is safe only while each packed unit gives at
+least as many screen bytes as it takes. A code-3 pair with a run length
+of 1 takes two bytes for one; enough of them near the end of a file
+would overwrite packed bytes before they are read **[inference from the
+code]**.
+
+### The start-level cheat in `DUNJ` is broken
+
+Line 120 pokes `?&5100=sl%-1` in binary, but `first_level` holds BCD, so
+only start levels 1-10 are right (17 gives &10, level 11). `new_game`
+still sets `level_number` to 0, and `level_loop` uses that count of
+levels played to choose a one- or two-digit filename (`CMP #9` at &0E2C)
+and the Chalice test uses it too (&1070), so later files are misnamed
+and a game started this way cannot be won **[inference from the code;
+not tested]**.
+
+## Sideways RAM hack
+
+### `TITLE` writes the 6845 directly, even on an Electron
+
+`TITLE` detects an Electron (INKEY(-256) = 1) only to skip a line of
+spaces, then writes the cursor setting to &FE00/&FE01. On an Electron
+those are ULA registers **[inference from the code; not tested]**.
+
 ## Game (all releases)
 
-### A monster that emerges onto an occupied trapdoor is lost
+### A monster emerges onto a trapdoor whatever stands there
 
 When a monster's death animation ends, `monster_reappears` (&7CB3) puts
-it on the next trapdoor, facing up, alive. If `find_creature` finds
-something already on that trapdoor, the code at &7CED sets the monster's
-map x and y to &FF and goes on to the next monster. Its sprite is still
-"facing up", so on later frames `update_monsters` moves it as a live
-monster at &FF,&FF, outside every room. Nothing returns it to a trapdoor,
-so the level has one monster fewer from then on **[inference from the
-code; not yet seen in play]**.
+it on the next trapdoor, facing up, then calls `find_creature` (&7CE6) to
+see whether anything else is there. It never loads `cell_x`/`cell_y`
+with the trapdoor's cell, so `find_creature` tests whatever they still
+hold from the erase at &7A07. That is `plot_at_cell`'s leftovers, not a
+map cell.
+
+**[confirmed in beebium]** On the disc's Model B side in level 1,
+monster 1 was set to its last death frame and monster 2 placed on the
+trapdoor it would use (&0C,&06). At the `find_creature` call, `cell_x`
+and `cell_y` held &00,&48; row &48 is off the 48-row map. Monster 1
+emerged on top of monster 2. With monster 2 placed where monster 1 had
+died instead, it emerged the same way.
+
+What they hold is the dying monster's place within its view:
+`plot_at_cell` replaces `cell_x` with (x AND 7) x 4 + the horizontal
+offset and `cell_y` with (y AND 7) x 12 + the vertical offset. A monster
+that dies in the bottom four rows of its room leaves `cell_y` at 48 or
+more, off the map, so nothing is found and the monster emerges whatever
+is on the trapdoor. One that dies in the top four rows leaves a real
+cell (rows 0, 12, 24 or 36, in the top-left part of the dungeon), and if
+a hero or monster happens to stand there the branch at &7CED is taken.
+That branch parks the monster at &FF,&FF but leaves its sprite alive, so
+nothing brings it back to a trapdoor and it is lost for the rest of the
+level **[inference from the code]**.
 
 ### A missile stops at a dead hero's skull
 
@@ -562,3 +621,92 @@ when it is not reached at all. A fix: while the delay runs, carry on
 with the hero's other keys (`read_hero_keys`, &6EC1) instead of
 returning. The `RTS` at &761E is one byte and &6EC1 is out of branch
 range, so this needs a few bytes elsewhere for a `JMP`.
+
+### A monster on exactly 0 hit points survives
+
+At &7594 a hit subtracts the missile's damage and branches with `BPL`,
+so a monster dies only when its hit points go below zero. On level 1
+(8 hit points) the Ranger's arrows (damage 2) take five hits, not four
+**[confirmed from the code]**.
+
+### A monster killed this frame can be hit again
+
+A kill sets the monster's sprite to `spr_blank` (&15); it moves on to
+the first sparkle only in `update_monsters`, which runs after
+`move_missiles`. The missile test at &7147 counts any sprite below &16
+as live, so a second missile reaching the same cell in that frame hits
+again: the sound plays, the missile is spent, and if its damage is at
+least the reset hit points the firer scores a second kill. The same
+holds for a monster killed by magic earlier in the frame **[inference
+from the code; not seen in play]**.
+
+### A missile bounced by an energy drainer can hit its firer
+
+After turning round at &71A5 the missile heads back, and the hero test
+at &71DD does not ask who fired it **[confirmed from the code]**.
+
+### Finding any object costs the Boots of Speed
+
+`collect_objects` takes the boots off and erases their icon (&734D-&7357)
+before it looks at the object's type, so stepping onto a teleporter, an
+energy drainer or the exit loses them too **[confirmed from the code]**.
+
+### A Potion of Healing can leave a hero on 00 health
+
+The potion (&7503-&7512) sets health's tens digit to the score's units
+digit d and its units digit to d + 1, then takes one point, giving "dd"
+(77 for a score ending in 7). A score ending in 0 gives 00 health: alive,
+one point from death **[confirmed from the code]**.
+
+### Teleport landings are not checked
+
+The hero is put one row above the destination teleporter (&73EA-&73F9)
+without a test for a wall, monster or hero there. A level with one
+teleporter sends the hero back to it **[confirmed from the code]**.
+
+### A Cross of Resurrection is used up when nobody is waiting
+
+The object is removed (&7411) before the returning queue is tested
+(&7421); the 10 points are still given **[confirmed from the code]**.
+
+### Casting magic can kill the caster
+
+Magic's cost is taken through `lose_health_point`, which can end the
+caster's life; `draw_moved_hero` (&7096) checks that the caster is still
+in play before drawing **[confirmed from the code]**.
+
+### A hero standing on a key swaps keys every other frame
+
+A swap (&1E84-&1E9C) sets `hero_key_dropped`; the next frame only clears
+it (&1E2D), and on the frame after that the key just dropped is under the
+hero again, so they swap back. A hero arriving with no key is not
+affected **[confirmed from the code]**. Dying heroes go on doing this:
+at &1DF8 a hero out of play whose death animation has not reached frame 8
+still reaches `check_key_swap` **[confirmed from the code]**.
+
+### Survivors gain a free point at every new level
+
+`draw_status_panel` calls `add_point` (&0F02) to draw each score, and
+only heroes who died (&0E74) are reset first, so each surviving hero
+gains a point per level **[confirmed from the code]**.
+
+### Pause can be missed while another key is held
+
+OSBYTE &7A reports only the lowest-numbered key held from 16 up, so the
+pause key (P, or f1 in the crack and hack) goes unseen while a key
+numbered below it is held, as most movement keys are. The same applies
+to the press that ends the pause **[confirmed from the code]**. On the
+disc's Model B side the game does not wait for P to be released after
+the second press, so a P still held at the next frame's check pauses
+again **[confirmed from the code]**.
+
+### The victory bell is set with a stale Y
+
+OSBYTE &D4 (&10E9) and &D5 (&1124) set their value to (old AND Y) EOR X,
+and Y is not loaded first, so the first pass uses whatever Y the previous
+code left **[confirmed from the code]**.
+
+### Leftover code in `move_heroes`
+
+The bytes at &6F6D, `88 D0 B8` (`DEY: BNE find_missile_slot`), follow a
+`JMP` and are never reached **[confirmed from the code]**.

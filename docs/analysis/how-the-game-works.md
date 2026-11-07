@@ -121,8 +121,8 @@ back the first hero in the queue, who reappears with 32 health.
 
 `move_missiles` moves each of the twelve missiles one cell a frame. A
 missile stops at a wall. It damages a monster (subtracting its damage
-from `monster_hit_points`; at zero the monster dies and the firer gets a
-point) or a hero it meets. It bounces off an energy drainer, wearing it
+from `monster_hit_points`; below zero the monster dies and the firer
+gets a point) or a hero it meets. It bounces off an energy drainer, wearing it
 down a stage per hit, and the firer gets a point for each hit.
 
 ## Monsters
