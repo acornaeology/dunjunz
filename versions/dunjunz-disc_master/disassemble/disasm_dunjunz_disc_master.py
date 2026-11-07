@@ -236,14 +236,25 @@ comments(master, [
 for addr in (0x077A, 0x0783, 0x078C, 0x0795):
     master.string(addr, 8)
     master.byte(addr + 8)
-master.label(0x077A, "load_dunj_commands", length=36, description=(
-    "\"L. DUNJ2\" to \"L. DUNJ5\", each ended by a carriage return."))
+for addr, name in [(0x077A, "load_dunj2_command"), (0x0783, "load_dunj3_command"),
+                   (0x078C, "load_dunj4_command"), (0x0795, "load_dunj5_command")]:
+    master.label(addr, name, description=(
+        f"\"L. {name[5:10].upper()}\", ended by a carriage return."))
 master.label(0x079E, "coder_display_vdu", length=21, description=(
     "VDU 6, then VDU 23,0,6,25,0,0,0,0,0,0 (25 character rows displayed) "
     "and VDU 23,0,1,80,0,0,0,0,0,0 (80 characters per row, undoing "
     "blank_display)."))
-master.byte(0x079E, 21, cols=11)
+master.byte(0x079E, 1)
+master.byte(0x079F, 10, cols=10)
+master.byte(0x07A9, 10, cols=10)
+master.banner(0x07B3, "Unused", "Leftover bytes, all zero.")
 master.byte(0x07B3, 13, cols=13)
+for addr, text in [(0x079E, "VDU 6: enable VDU output"),
+                   (0x079F, "VDU 23,0,6,25: 6845 register 6 = 25 character rows displayed"),
+                   (0x07A9, "VDU 23,0,1,80: 6845 register 1 = 80 characters per row")]:
+    master.c(addr, text)
+master.label(0x07B3, "coder_leftovers")
+master.expr(0x0774, sym("coder_leftovers") - sym("coder_display_vdu"))
 comments(master, [
     (0x07C0, "COLOUR 2..."),
     (0x07C2, "..."), (0x07C5, "..."), (0x07C7, "..."),
@@ -795,6 +806,17 @@ for addr, name in [
 master.label(0x7F92, "unused_font_handler")
 for operand_addr in (0xC505, 0xC509, 0xC50D, 0xC511, 0xC515):
     master.inkey_number(operand_addr)
+
+# Addresses passed as immediate halves.
+for lo_addr, hi_addr, name in [
+    (0x074F, 0x0751, "load_dunj2_command"), (0x0756, 0x0758, "load_dunj3_command"),
+    (0x075D, 0x075F, "load_dunj4_command"), (0x0764, 0x0766, "load_dunj5_command"),
+    (0x1457, 0x145B, "view_frame_plots"), (0x14F2, 0x14F4, "level_command"),
+    (0xC5A1, 0xC5A3, "stones_command"), (0xC72A, 0xC72F, "plot_sprite_hazel"),
+    (0xC734, 0xC738, "tune"), (0xC74B, 0xC750, "music_event"),
+]:
+    master.expr(lo_addr, lo(sym(name)))
+    master.expr(hi_addr, hi(sym(name)))
 
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)

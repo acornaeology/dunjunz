@@ -6,7 +6,7 @@ official disc release (see tools/runtime_images.py for the differences).
 Where the versions differ, the drivers add their own annotations.
 """
 
-from dasmos.expr import hexlit
+from dasmos.expr import hexlit, hi, lo, sym
 
 from dunjunz_common.annotator import Annotator
 
@@ -32,6 +32,8 @@ def annotate(a: Annotator) -> None:
     annotate_victory_and_helpers(a)
     annotate_shared_continuations(a)
     annotate_branch_labels(a)
+    a.expr(0x1506, lo(sym("wrch_handler")))
+    a.expr(0x150B, hi(sym("wrch_handler")))
 
 
 # ---------------------------------------------------------------------------
@@ -874,6 +876,8 @@ def annotate_game_entry(a: Annotator) -> None:
     a.c(0x0D5B, "...")
     a.c(0x0D5E, "...in saved_wrchv")
     a.c(0x0D61, "Point WRCHV at wrch_handler...")
+    a.expr(0x0D62, lo(sym("wrch_handler")))
+    a.expr(0x0D67, hi(sym("wrch_handler")))
     a.c(0x0D63, "...")
     a.c(0x0D66, "...")
     a.c(0x0D68, "...")
@@ -964,6 +968,8 @@ def annotate_start_level(a: Annotator) -> None:
     a.c(0x1421, "...to 25 character rows displayed")
     a.c(0x1426, "...")
     a.c(0x143A, "Point at view_frame_plots...")
+    a.expr(0x143B, lo(sym("view_frame_plots")))
+    a.expr(0x143F, hi(sym("view_frame_plots")))
     a.c(0x143E, "...")
     a.c(0x1442, "...and draw the frames and the views")
     a.c(0x1445, "Return")

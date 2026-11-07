@@ -228,6 +228,8 @@ for operand_addr, name in [(0x145D, "moved_disc_command"), (0x1464, "moved_level
     d.expr(operand_addr, lo(sym(name)), move=game_image)
     d.expr(operand_addr + 2, hi(sym(name)), move=game_image)
 d.expr(0x5043, sym("first_level") + 1 + sym("image_offset"))
+d.expr(0x502C, lo(sym("wrch_handler")))
+d.expr(0x5031, hi(sym("wrch_handler")))
 
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)

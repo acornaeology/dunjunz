@@ -1290,6 +1290,13 @@
       "align": "before_label"
     },
     {
+      "addr": 1971,
+      "name": "coder_leftovers",
+      "title": "Unused",
+      "description": "Leftover bytes, all zero.",
+      "align": "before_label"
+    },
+    {
       "addr": 2037,
       "title": "Leftover filename",
       "description": "The end of \"Dunjunz1\", the name the cassette lineage's &0400 images hold at &07F0, part overwritten by set_bell.",
@@ -7136,7 +7143,16 @@
       "comment_inline": "*L. DUNJ2 (&6E80-&7FFF)",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&7a"
+      "operand": "#<(load_dunj2_command)",
+      "expr": {
+        "text": "<(load_dunj2_command)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "load_dunj2_command"
+          }
+        }
+      }
     },
     {
       "addr": 1872,
@@ -7148,7 +7164,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#7"
+      "operand": "#>(load_dunj2_command)",
+      "expr": {
+        "text": ">(load_dunj2_command)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "load_dunj2_command"
+          }
+        }
+      }
     },
     {
       "addr": 1874,
@@ -7175,7 +7200,16 @@
       "comment_inline": "*L. DUNJ3 (&08C0-&0CFE)",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&83"
+      "operand": "#<(load_dunj3_command)",
+      "expr": {
+        "text": "<(load_dunj3_command)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "load_dunj3_command"
+          }
+        }
+      }
     },
     {
       "addr": 1879,
@@ -7187,7 +7221,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#7"
+      "operand": "#>(load_dunj3_command)",
+      "expr": {
+        "text": ">(load_dunj3_command)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "load_dunj3_command"
+          }
+        }
+      }
     },
     {
       "addr": 1881,
@@ -7214,7 +7257,16 @@
       "comment_inline": "*L. DUNJ4 (&0E00-&1FFF)",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&8c"
+      "operand": "#<(load_dunj4_command)",
+      "expr": {
+        "text": "<(load_dunj4_command)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "load_dunj4_command"
+          }
+        }
+      }
     },
     {
       "addr": 1886,
@@ -7226,7 +7278,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#7"
+      "operand": "#>(load_dunj4_command)",
+      "expr": {
+        "text": ">(load_dunj4_command)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "load_dunj4_command"
+          }
+        }
+      }
     },
     {
       "addr": 1888,
@@ -7253,7 +7314,16 @@
       "comment_inline": "*L. DUNJ5 (&2000-&2FFF)",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&95"
+      "operand": "#<(load_dunj5_command)",
+      "expr": {
+        "text": "<(load_dunj5_command)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "load_dunj5_command"
+          }
+        }
+      }
     },
     {
       "addr": 1893,
@@ -7265,7 +7335,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#7"
+      "operand": "#>(load_dunj5_command)",
+      "expr": {
+        "text": ">(load_dunj5_command)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "load_dunj5_command"
+          }
+        }
+      }
     },
     {
       "addr": 1895,
@@ -7356,7 +7435,19 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
-      "operand": "#&15"
+      "operand": "#coder_leftovers - coder_display_vdu",
+      "expr": {
+        "text": "coder_leftovers - coder_display_vdu",
+        "tree": {
+          "op": "sub",
+          "left": {
+            "sym": "coder_leftovers"
+          },
+          "right": {
+            "sym": "coder_display_vdu"
+          }
+        }
+      }
     },
     {
       "addr": 1909,
@@ -7401,7 +7492,7 @@
       ],
       "image": 0,
       "labels": [
-        "load_dunj_commands"
+        "load_dunj2_command"
       ],
       "type": "string",
       "string": "L. DUNJ2"
@@ -7430,6 +7521,9 @@
         51
       ],
       "image": 0,
+      "labels": [
+        "load_dunj3_command"
+      ],
       "type": "string",
       "string": "L. DUNJ3"
     },
@@ -7457,6 +7551,9 @@
         52
       ],
       "image": 0,
+      "labels": [
+        "load_dunj4_command"
+      ],
       "type": "string",
       "string": "L. DUNJ4"
     },
@@ -7484,6 +7581,9 @@
         53
       ],
       "image": 0,
+      "labels": [
+        "load_dunj5_command"
+      ],
       "type": "string",
       "string": "L. DUNJ5"
     },
@@ -7501,7 +7601,30 @@
     {
       "addr": 1950,
       "bytes": [
-        6,
+        6
+      ],
+      "image": 0,
+      "labels": [
+        "coder_display_vdu"
+      ],
+      "comment_inline": "VDU 6: enable VDU output",
+      "xref_summaries": [
+        "&079e used as index base 1 time by &076c"
+      ],
+      "references": [
+        {
+          "addr": 1900,
+          "kind": "indexed"
+        }
+      ],
+      "type": "byte",
+      "values": [
+        6
+      ]
+    },
+    {
+      "addr": 1951,
+      "bytes": [
         23,
         0,
         6,
@@ -7511,7 +7634,27 @@
         0,
         0,
         0,
+        0
+      ],
+      "image": 0,
+      "comment_inline": "VDU 23,0,6,25: 6845 register 6 = 25 character rows displayed",
+      "type": "byte",
+      "values": [
+        23,
         0,
+        6,
+        25,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "addr": 1961,
+      "bytes": [
         23,
         0,
         1,
@@ -7524,31 +7667,9 @@
         0
       ],
       "image": 0,
-      "labels": [
-        "coder_display_vdu"
-      ],
-      "xref_summaries": [
-        "&079e used as index base 1 time by &076c"
-      ],
-      "references": [
-        {
-          "addr": 1900,
-          "kind": "indexed"
-        }
-      ],
+      "comment_inline": "VDU 23,0,1,80: 6845 register 1 = 80 characters per row",
       "type": "byte",
       "values": [
-        6,
-        23,
-        0,
-        6,
-        25,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         23,
         0,
         1,
@@ -7579,6 +7700,9 @@
         0
       ],
       "image": 0,
+      "labels": [
+        "coder_leftovers"
+      ],
       "type": "byte",
       "values": [
         0,
@@ -20216,7 +20340,16 @@
       "comment_inline": "Point at view_frame_plots...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&3a"
+      "operand": "#<(view_frame_plots)",
+      "expr": {
+        "text": "<(view_frame_plots)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "view_frame_plots"
+          }
+        }
+      }
     },
     {
       "addr": 5208,
@@ -20242,7 +20375,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&16"
+      "operand": "#>(view_frame_plots)",
+      "expr": {
+        "text": ">(view_frame_plots)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "view_frame_plots"
+          }
+        }
+      }
     },
     {
       "addr": 5212,
@@ -21202,7 +21344,16 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&fb"
+      "operand": "#<(level_command)",
+      "expr": {
+        "text": "<(level_command)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "level_command"
+          }
+        }
+      }
     },
     {
       "addr": 5363,
@@ -21214,7 +21365,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&14"
+      "operand": "#>(level_command)",
+      "expr": {
+        "text": ">(level_command)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "level_command"
+          }
+        }
+      }
     },
     {
       "addr": 5365,
@@ -73317,7 +73477,16 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&aa"
+      "operand": "#<(stones_command)",
+      "expr": {
+        "text": "<(stones_command)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "stones_command"
+          }
+        }
+      }
     },
     {
       "addr": 50594,
@@ -73329,7 +73498,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&c5"
+      "operand": "#>(stones_command)",
+      "expr": {
+        "text": ">(stones_command)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "stones_command"
+          }
+        }
+      }
     },
     {
       "addr": 50596,
@@ -74813,7 +74991,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#0"
+      "operand": "#<(plot_sprite_hazel)",
+      "expr": {
+        "text": "<(plot_sprite_hazel)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "plot_sprite_hazel"
+          }
+        }
+      }
     },
     {
       "addr": 50987,
@@ -74839,7 +75026,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&d8"
+      "operand": "#>(plot_sprite_hazel)",
+      "expr": {
+        "text": ">(plot_sprite_hazel)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "plot_sprite_hazel"
+          }
+        }
+      }
     },
     {
       "addr": 50992,
@@ -74865,7 +75061,16 @@
       "comment_inline": "Tune pointer (zero page &00-&01) = the first section...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&cd"
+      "operand": "#<(tune)",
+      "expr": {
+        "text": "<(tune)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "tune"
+          }
+        }
+      }
     },
     {
       "addr": 50997,
@@ -74891,7 +75096,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&c8"
+      "operand": "#>(tune)",
+      "expr": {
+        "text": ">(tune)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "tune"
+          }
+        }
+      }
     },
     {
       "addr": 51001,
@@ -74997,7 +75211,16 @@
       "comment_inline": "EVNTV = music_event...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&6c"
+      "operand": "#<(music_event)",
+      "expr": {
+        "text": "<(music_event)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "music_event"
+          }
+        }
+      }
     },
     {
       "addr": 51020,
@@ -75024,7 +75247,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&c7"
+      "operand": "#>(music_event)",
+      "expr": {
+        "text": ">(music_event)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "music_event"
+          }
+        }
+      }
     },
     {
       "addr": 51025,

@@ -13981,7 +13981,16 @@
       "comment_inline": "Point WRCHV at wrch_handler...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&8f"
+      "operand": "#<(wrch_handler)",
+      "expr": {
+        "text": "<(wrch_handler)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "wrch_handler"
+          }
+        }
+      }
     },
     {
       "addr": 3427,
@@ -14019,7 +14028,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&7f"
+      "operand": "#>(wrch_handler)",
+      "expr": {
+        "text": ">(wrch_handler)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "wrch_handler"
+          }
+        }
+      }
     },
     {
       "addr": 3432,
@@ -22488,7 +22506,16 @@
       "comment_inline": "Point at view_frame_plots...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&3a"
+      "operand": "#<(view_frame_plots)",
+      "expr": {
+        "text": "<(view_frame_plots)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "view_frame_plots"
+          }
+        }
+      }
     },
     {
       "addr": 5180,
@@ -22514,7 +22541,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&16"
+      "operand": "#>(view_frame_plots)",
+      "expr": {
+        "text": ">(view_frame_plots)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "view_frame_plots"
+          }
+        }
+      }
     },
     {
       "addr": 5184,
@@ -22787,7 +22823,16 @@
       "comment_inline": "X, Y = address of the OSFILE block",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&60"
+      "operand": "#<(level_osfile_block)",
+      "expr": {
+        "text": "<(level_osfile_block)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "level_osfile_block"
+          }
+        }
+      }
     },
     {
       "addr": 5232,
@@ -22799,7 +22844,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&6e"
+      "operand": "#>(level_osfile_block)",
+      "expr": {
+        "text": ">(level_osfile_block)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "level_osfile_block"
+          }
+        }
+      }
     },
     {
       "addr": 5234,
@@ -22811,7 +22865,16 @@
       "comment_inline": "Filename address = level_filename...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&d0"
+      "operand": "#<(level_filename)",
+      "expr": {
+        "text": "<(level_filename)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "level_filename"
+          }
+        }
+      }
     },
     {
       "addr": 5236,
@@ -22838,7 +22901,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&16"
+      "operand": "#>(level_filename)",
+      "expr": {
+        "text": ">(level_filename)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "level_filename"
+          }
+        }
+      }
     },
     {
       "addr": 5241,
@@ -22918,7 +22990,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&6b"
+      "operand": "#>(level_object_x)",
+      "expr": {
+        "text": ">(level_object_x)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "level_object_x"
+          }
+        }
+      }
     },
     {
       "addr": 5257,
@@ -23698,7 +23779,16 @@
       "comment_inline": "Point WRCHV back at wrch_handler...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&8f"
+      "operand": "#<(wrch_handler)",
+      "expr": {
+        "text": "<(wrch_handler)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "wrch_handler"
+          }
+        }
+      }
     },
     {
       "addr": 5383,
@@ -23725,7 +23815,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&7f"
+      "operand": "#>(wrch_handler)",
+      "expr": {
+        "text": ">(wrch_handler)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "wrch_handler"
+          }
+        }
+      }
     },
     {
       "addr": 5388,

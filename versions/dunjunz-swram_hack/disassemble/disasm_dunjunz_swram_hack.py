@@ -18,7 +18,7 @@ import sys
 from pathlib import Path
 
 import dasmos
-from dasmos.expr import hexlit
+from dasmos.expr import hexlit, hi, lo, sym
 
 VERSION_DIRPATH = Path(__file__).resolve().parent.parent
 REPO_DIRPATH = VERSION_DIRPATH.parent.parent
@@ -114,6 +114,12 @@ for addr, text in [
 ]:
     annotator.c(addr, text)
 annotator.label(0x149A, "load_level_call")
+
+for lo_addr, hi_addr, name in [(0x146F, 0x1471, "level_osfile_block"),
+                               (0x1473, 0x1478, "level_filename")]:
+    annotator.expr(lo_addr, lo(sym(name)))
+    annotator.expr(hi_addr, hi(sym(name)))
+annotator.expr(0x1488, hi(sym("level_object_x")))  # the level file's page, &6B
 
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)
