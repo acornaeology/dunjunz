@@ -11,7 +11,7 @@ Games Archive, "Sideways RAM version"). Single-sided 40-track DFS, title
 | `!BOOT` | — | — | &0030 | — | `*EXEC` text: `*BASIC`, `PAGE=&1900`, `*FX21`, `CHAIN "DUNJUNZ"` |
 | `DUNJUNZ` | &1900 | &1900 | &2200 | &1900–&3AFF | Tokenised BASIC: instructions and intro sequence; a MODE 7 controls screen is stored after the program at &3700–&3AFF |
 | `PIC` | &3000 | &3000 | &4FFF | &3000–&7FFE | MODE 2 screen: digitised face of Mackscrane, flashed by the intro |
-| `TITLE` | &3800 | &38C6 | &0C00 | &3800–&43FF | Machine code (MODE 4): title/credits and keys page ("f1 Pause On/Off", "5 Sound On", "6 Sound Off") |
+| `TITLE` | &3800 | &38C6 | &0C00 | &3800–&43FF | Machine code (MODE 5): title/credits and keys page ("f1 Pause On/Off", "5 Sound On", "6 Sound Off"); disassembled in its own listing |
 | `DUNK` | &2500 | &8023 | &09E5 | &2500–&2EE4 | Tokenised BASIC: sideways RAM loader and game loader |
 | `Dunjun1` | &8000 | &D9CD | &0D00 | — | Sideways RAM image: Beebug ROMFS, `LEVEL22`–`LEVEL25` |
 | `Dunjun2` | &8000 | &D9CD | &4000 | — | Sideways RAM image: Beebug ROMFS, `LEVEL1`–`LEVEL21`, `!HELP` |
@@ -33,10 +33,25 @@ The load/exec addresses of `Dunjun1`/`Dunjun2` (&8000/&D9CD) are not used:
    instruction pages (MODE 7), then copies its trailing &3700–&3AFF to the
    MODE 7 screen at &7C00 (the controls table), waits for a key, loads
    `PIC` into MODE 2 and plays the scrolling intro (ESCAPE skips it). It
-   then runs `*/TITLE` in MODE 4, does `*FX225` and `*TV255`, sets
+   then, from MODE 4, runs `*/TITLE`, does `*FX225` and `*TV255`, sets
    `PAGE=&2500` and chains `DUNK`.
 3. **`TITLE`** (machine code at &3800, entry &38C6) shows the title/credits
-   page.
+   page **[confirmed]**:
+   - it selects MODE 5, with logical colour 2 blue, and fills the screen
+     with alternating black and blue pixel rows;
+   - it copies the &A00-byte picture it carries (&3A00–&43FF) into
+     character rows 1–8: a framed BUG BYTE logo and a face;
+   - it prints "Author", "Julian  Avis" and "(c) Bugbyte 1986", then the
+     keys (f1 Pause On/Off, 5 Sound On, 6 Sound Off) in a white window;
+   - it hides the cursor (6845 register 10), flushes the keyboard buffer,
+     waits up to 7.67 seconds for a key and returns to BASIC.
+
+   Oddities:
+   - at &3947 it tests `INKEY(-256)` for an Electron, only to skip printing
+     18 spaces onto a row its CLS has already made white;
+   - the strings `*TAPE` and `*/` at &38BD are never used;
+   - it opens a black window at columns 2–17, rows 26–28, and prints
+     nothing in it.
 4. **`DUNK`** (BASIC, `HIMEM=&3C00`):
    - refuses to run on a Master 128 (`INKEY(-256)` = &FD or &F5);
    - `PROCROM` checks that socket 15 is not writable RAM, surveys the
@@ -115,8 +130,8 @@ its socket choice, and where the instructions disagree with the loader.
 - The level format: see [level-format.md](level-format.md).
 - What the game files contain: see
   [analysis/how-the-game-works.md](analysis/how-the-game-works.md).
+- What `TITLE` does: see step 3 of the loading sequence.
 
 ## Open questions
 
-- What `TITLE` (&3800) does beyond drawing the title page; it has not
-  been disassembled.
+- None at present.

@@ -185,7 +185,8 @@ See [the-master-128-version.md](analysis/the-master-128-version.md#the-disc-cont
 not the original cassette. It is a crack **[confirmed]**:
 
 - `PLOAD` (BASIC) runs `EXPAND` (an image unpacker, "(C) 1985 Rhys E.
-  Davies") to unpack the picture `GIRL1`, and scrolls
+  Davies", disassembled in its own listing) to unpack the picture
+  `GIRL1`, and scrolls
   "D U N J U N Z Cracked by Ole , The great Demon from Denmark .You can
   CH. this program with out Pload - GIRL1 and Expand."
 - `DUNJ` (BASIC, the real loader) starts with `REM" HI SIMON PRESS @` and

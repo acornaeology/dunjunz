@@ -220,7 +220,9 @@ game reads level 25 from `Stones`, so restoring it has no effect. A
 leading zero typed is also kept in the filename, so `05` is saved as
 `Level05` rather than `Level5` **[confirmed from the code]**. The Master
 side's copy restores level 6 to the cassette's version, which the disc
-never shipped (see above).
+never shipped (see above). The Model B side's `Default` is a separate
+program that accepts 1–24 only, so on that side only the leading zero
+applies; its copies are that side's level files.
 
 ## Provenance of this disc
 
@@ -471,6 +473,30 @@ All **[confirmed]**; see the analysis document for the details.
 The Model B side's lost ten-thousands digit does not arise here: the game
 is resident, and every routine uses the cassette's tables at &06F8
 (`hero_score_ten_thousands`) **[confirmed]**.
+
+## Ole's crack of the cassette
+
+### `EXPAND` finds a picture's length with OSARGS 2
+
+`EXPAND` (&2E00), which `PLOAD` runs as `*EXPAND GIRL1`, opens the file
+only to read its length with OSARGS 2 (EXT#). It then loads the file with
+OSFILE so that it ends at &8000, ignoring the load address in its
+catalogue entry **[confirmed from the code]**. `GIRL1`'s catalogue load
+address, &FF463B, is not where it is loaded (&4A3B), so the mismatch does
+no harm. Whether the cassette filing system answers OSARGS 2 has not been
+checked. If it does not, the crack's intro would fail when run from tape.
+
+The packed format **[confirmed by decoding `GIRL1`]**:
+- Each byte holds a MODE 2 screen byte in bits 5–0 and a run code in
+  bits 7–6. Codes 0–2 give a run of 1–3 bytes; code 3 takes the run, n+1
+  bytes, from the next byte.
+- Unpacking writes from &3000 and stops at &8000, even within a run;
+  there is no end marker.
+- A pixel's bit 3 (screen-byte bits 7 and 6) is always clear, so a picture
+  uses logical colours 0–7 only.
+
+Decoded with this format, `GIRL1`'s 13,765 bytes give exactly &5000
+bytes, a full MODE 2 screen, and a coherent picture.
 
 ## Game (all releases)
 

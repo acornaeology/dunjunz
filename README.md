@@ -20,10 +20,10 @@ turned up yet. See
 
 | Directory | Release |
 |---|---|
-| `versions/dunjunz-disc/` | The official 1987 flippy disc, Model B side, from HFE captures (both sides' captures are kept here) |
+| `versions/dunjunz-disc/` | The official 1987 flippy disc, Model B side, from HFE captures (both sides' captures are kept here): the game, its loader, the level editor and the level restorer, each its own listing |
 | `versions/dunjunz-disc_master/` | The same disc's Master 128 side: the game, its loaders, the level editor and the level restorer, each its own listing |
-| `versions/dunjunz-tape_crack_ole/` | Ole's crack of the 1986 cassette |
-| `versions/dunjunz-swram_hack/` | An unofficial sideways RAM hack, with the levels in ROMFS |
+| `versions/dunjunz-tape_crack_ole/` | Ole's crack of the 1986 cassette: the game and the intro's picture unpacker, each its own listing, and the BASIC loaders |
+| `versions/dunjunz-swram_hack/` | An unofficial sideways RAM hack, with the levels in ROMFS: the game and the title page, each its own listing, and the BASIC loaders |
 
 The game code is annotated once, in `dunjunz_common/`, keyed by run-time
 address, and applied to each release by its driver

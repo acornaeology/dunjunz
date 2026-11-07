@@ -314,7 +314,10 @@ the Model B side's **[confirmed by comparing the two]**:
 - the screen row table &C375 → &C675, with `*L. TABLE` on the first run;
 - the catalogue's free-space display, now `Table`'s routine.
 
-The rest is the same code, moved 19–21 bytes by those changes.
+The rest is the same code, moved 19–21 bytes by those changes. The two
+are annotated by one set of annotations (`dunjunz_common/editor.py`), and
+the Model B side's has its own listing in `versions/dunjunz-disc/`; after
+its last routine it keeps a stale copy of that routine's end.
 
 **`*DEFAULT`** (&0E00) asks for a level number and saves that level's
 original file. It carries all 25 levels, encrypted, at &12B0 **[confirmed]**:
@@ -327,7 +330,17 @@ original file. It carries all 25 levels, encrypted, at &12B0 **[confirmed]**:
   `*DEFAULT`'s own tokenised BBC BASIC assembler source, lines 1150–1370.
   The listing shows it line by line.
 
-The Model B side's `Default` carries only levels 1–24.
+The Model B side's `Default` (&1900) is a different program doing the
+same job **[confirmed]**:
+- it asks "Which level do you wish to reset ?" and accepts 1–24 only;
+- it carries levels 1–24 at &1DB0, byte for byte that side's level files,
+  so its level 6 is the disc's;
+- the bytes between its code and the levels are leftover memory, among
+  them most of an encrypted copy of level 4 at &1AC0. It sits where the
+  Master's `*DEFAULT` keeps level 4, so it is laid out like the Master's
+  copies.
+
+It has its own listing in `versions/dunjunz-disc/`.
 
 ## Hazards and oddities
 

@@ -18,22 +18,35 @@ Four versions live under `versions/` (see `versions/README.md`):
   It holds HFE flux captures of both sides, the SSDs and track reports
   derived from them (`tools/read_disc_image.py`), and the NVG archive's
   `Dunjunz.zip`, whose files are identical. `binary/` holds `Dun1` and
-  `Coder` exported from the Model B side's SSD.
+  `Coder` (the game) and `Dunjunz`, `Editor` and `Default` (separate
+  programs) exported from the Model B side's SSD.
 - `dunjunz-disc_master/`: the same disc's Master 128 side, the official
   Master conversion (`docs/analysis/the-master-128-version.md`). `binary/`
   holds its machine-code files, exported from the Master side's HFE in
   `dunjunz-disc/`. Each separate program has its own driver and listing
   (`disasm_dunjunz_disc_master_<program>.py`), declared to the site under
   `disassemblies` in `binary.json`; the game (nine files) is the primary
-  listing. Programs are not merged into one listing even when they share
-  addresses. The Model B side's `Dunjunz`, `Editor` and `Default` are
-  not disassembled yet.
+  listing.
 - `dunjunz-tape_crack_ole/`: Ole's crack of the 1986 cassette. No image of
   the original cassette has been found; it would go in `dunjunz-tape/`.
+  `EXPAND` (the intro's picture unpacker) is a separate listing; the BASIC
+  `PLOAD` and `DUNJ`, and the manual `DUNJ` carries, are source files
+  (`basic/`, `text/`).
 - `dunjunz-swram_hack/`: the unofficial sideways RAM hack, built from the
   crack and the disc (the BBC Micro Games Archive "Sideways RAM version",
   `Disc060-DunjunzRx2.ssd`; see `docs/disc-contents-and-loading.md` for
-  its catalogue, boot chain and runtime memory map).
+  its catalogue, boot chain and runtime memory map). `TITLE` is a separate
+  listing; `!BOOT`, `DUNJUNZ` (with its controls page) and `DUNK` are
+  source files.
+
+In every version each separate program has its own driver and listing
+(`disasm_dunjunz_<version>_<program>.py`), declared to the site under
+`disassemblies` in `binary.json`, and the game is the primary listing.
+Programs are not merged into one listing even when they share addresses.
+BASIC and text files are declared under `source_files`. Annotations for a
+program on both sides of the disc live in `dunjunz_common/` (`editor.py`,
+`title_loader.py`); `editor.Remapped` moves the Master side's addresses
+to the Model B side's.
 
 How they relate is written up in `docs/history-and-provenance.md`; keep
 it current as evidence accumulates, tagging statements [confirmed],
@@ -53,10 +66,14 @@ on the official release.
 | `Dunjun7` (hack) | &0D00 | — | &0400 | game code/data; loaded at &3000 then copied to &0D00; game entry &0D31 |
 | `Dunjun5` (hack) | &1100 | — | &1F00 | game code/data |
 | `Dunjun6` (hack) | &6E80 | — | &1180 | game code/data, just above the play screen |
-| `TITLE` (hack) | &3800 | &38C6 | &0C00 | title page machine code (separate program) |
+| `TITLE` (hack) | &3800 | &38C6 | &0C00 | title page (MODE 5), its own listing |
 | `Dunjun1`/`Dunjun2` | SWR | — | &0D00/&4000 | Beebug ROMFS images holding `LEVEL1`–`LEVEL25` |
 | `DUNJUNZ`, `DUNK` | &1900, &2500 | — | — | tokenised BASIC (instructions/intro; SWR and game loader) |
 | `PIC`, `Dunjun3` | &3000, &3280 | — | — | MODE 2 pictures (intro face; loading screen) |
+| `Dunjunz` (disc) | &26C0 | &2700 | &089C | `*DUNJUNZ`: page &08 set-up, title stars, arms the BREAK intercept, `*CODER` |
+| `Editor` (disc) | &1910 | &239D | &158E | `*EDITOR`; the Master's, for MOS 1.20, code from &1C3A on &13–&15 bytes lower |
+| `Default` (disc) | &1900 | &1900 | &4530 | `*DEFAULT`; levels 1–24 encrypted at &1DB0 |
+| `EXPAND` (crack) | &2E00 | &2E00 | &01A7 | `*EXPAND`, run-length picture unpacker (Rhys E. Davies, 1985) |
 | `Dunjunz` (Master) | &2649 | &2649 | &0913 | `*DUNJUNZ`: loads the HAZEL files, title stars, runs `CODER2`/`CODER` |
 | `Coder2` (Master) | &2000 | &2000 | &0026 | `*L. Code`, BYTEV = &C500, `*CODER` |
 | `Coder` (Master) | &0400 | &0740 | &03FF | game &0400–&07FE; loader at &0740 saves page &0D at &C400, loads `Dunj2`–`Dunj5`, enters &0E00 |
