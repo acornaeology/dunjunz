@@ -213,6 +213,16 @@ Other things worth knowing about `*EDITOR` **[confirmed from the code]**:
   blocks, and the game's `*LOAD STONES 6680` puts the level 25 data that
   follows them at &6B00.
 
+### The level editor waits for B, not TAB, after deleting
+
+After TAB deletes the item under the cursor, `*EDITOR` loops at &20D5
+(the Model B side's &20C0) while key &9B is held and an item is chosen.
+&9B is INKEY -101, the B key; TAB is &9F, tested just before at &20C8
+**[confirmed from the code, both sides]**. So holding TAB does not wait
+for its release: the delete repeats on every pass of the edit loop
+while TAB is held, at whichever cell the cursor is on. Holding B with an item chosen stalls the
+editor until B is released. &9B looks like a slip for &9F **[inference]**.
+
 ### `*DEFAULT` writes level files the game never reads
 
 `*DEFAULT` accepts levels 1–25. Level 25 is saved as `Level25`, but the

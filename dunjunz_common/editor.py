@@ -13,7 +13,7 @@ address to the Model B's and drops those the Model B lacks.
 """
 
 import dasmos
-from dasmos.expr import hi, lo, sym
+from dasmos.expr import char, hi, lo, sym
 
 from dunjunz_common import game
 from dunjunz_common.annotator import Annotator
@@ -65,6 +65,74 @@ class Remapped:
             return attr(new_addr, *args, **kwargs)
 
         return remapped
+
+
+# The editor's own sprite numbers (its sprite tables at &0A00).
+EDITOR_SPRITES = [
+    (0x00, "wall"), (0x01, "exit"), (0x02, "drainer"), (0x03, "trapdoor"),
+    (0x04, "treasure"), (0x05, "food"), (0x06, "teleporter"),
+    (0x07, "magic_sword"), (0x08, "helmet"), (0x09, "potion"),
+    (0x0A, "weapons"), (0x0B, "cross"), (0x0C, "boots"),
+    (0x0D, "door_vertical"), (0x0E, "door_horizontal"), (0x0F, "key"),
+    (0x10, "blank"), (0x11, "waiting_door"), (0x12, "wall_block_0"),
+    (0x2A, "chooser_frame"), (0x2B, "chooser_blank"), (0x2C, "cursor"),
+]
+EDITOR_CONSTANTS = [
+    (0x4F, "max_slot", "Item slots are numbered 0 to &4F"),
+    (0x13, "max_link", "Door-key links are numbered 0 to 19"),
+    (30, "max_object", "The level file's objects are numbered 1 to 30; the exit is 30"),
+    (20, "max_door", "Doors are numbered 1 to 20"),
+    (0x20, "map_width", "The map is 32 cells wide..."),
+    (0x30, "map_height", "...and 48 cells high"),
+    (0x4C, "opcode_jmp", "The JMP opcode, which arms the MOS BREAK intercept"),
+    (0x29B0, "level_file_end", "The end of the level file at &2700"),
+    (0x73, "game_chalice_type", "The game's object type for the Chalice"),
+    (0x3000, "screen_start", "The start of MODE 2 screen memory"),
+]
+# (operand address, expression); Master addresses.
+def _sp(name, offset=0):
+    expression = sym(f"spr_{name}")
+    return expression + offset if offset > 0 else (expression - (-offset) if offset else expression)
+
+
+EDITOR_OPERANDS = [
+    (0x2036, _sp("cursor")), (0x2418, _sp("chooser_frame")), (0x248C, _sp("chooser_frame")),
+    (0x2483, _sp("chooser_blank")), (0x2499, _sp("wall_block_0")), (0x2548, _sp("wall_block_0")),
+    (0x261B, _sp("door_vertical")), (0x2665, _sp("key")), (0x2B06, _sp("blank")),
+    (0x2C02, _sp("key")), (0x2C31, _sp("door_vertical")), (0x2C35, _sp("door_horizontal")),
+    (0x2C46, _sp("door_vertical")), (0x2C4A, _sp("door_horizontal")), (0x2C4E, _sp("key")),
+    (0x2CA6, _sp("key")), (0x2CD2, _sp("waiting_door")), (0x2D19, _sp("waiting_door")),
+    (0x2D28, _sp("door_vertical")), (0x2D2C, _sp("door_horizontal")), (0x2D30, _sp("key")),
+    (0x2D57, _sp("blank")), (0x2D8D, _sp("blank")), (0x7B84, _sp("key")),
+    (0x2091, _sp("blank")),
+    (0x1C5E, sym("max_slot")), (0x260C, sym("max_slot")), (0x7B0D, sym("max_slot")),
+    (0x20FC, sym("max_link")), (0x2684, sym("max_link")), (0x2CAC, sym("max_link")),
+    (0x2CF8, sym("max_link")), (0x2D44, sym("max_link")), (0x2D73, sym("max_link")),
+    (0x2E37, sym("max_link")), (0x7B12, sym("max_link")), (0x1F04, sym("max_link") + 1),
+    (0x1F38, sym("max_object") - 1), (0x1F7F, sym("max_object") - 1),
+    (0x2C56, sym("max_object")), (0x263E, sym("max_object")), (0x7B17, sym("max_object")),
+    (0x1F8A, sym("max_door")), (0x7B3E, sym("max_door")), (0x2C7E, sym("max_door") + 1),
+    (0x1F6D, sym("map_width")), (0x1F75, sym("map_height")),
+    (0x20AC, sym("map_width") - 1), (0x20B4, sym("map_height") - 1),
+    (0x222A, sym("map_height") - 1), (0x2235, sym("map_width") - 1),
+    (0x2240, sym("map_width") - 1), (0x224B, sym("map_height") - 1),
+    (0x2B4B, sym("map_width")), (0x2B4F, sym("map_width") - 1),
+    (0x2B55, sym("map_height")), (0x2B59, sym("map_height") - 1),
+    (0x1C1D, sym("opcode_jmp")), (0x225A, sym("opcode_jmp")),
+    (0x2168, hi(sym("level_object_x"))), (0x2322, hi(sym("level_object_x"))),
+    (0x217D, lo(sym("level_file_end"))), (0x2183, hi(sym("level_file_end"))),
+    (0x2335, lo(sym("level_file_end"))), (0x233B, hi(sym("level_file_end"))),
+    (0x1F3D, sym("game_chalice_type")),
+]
+EDITOR_CHAR_OPERANDS = [
+    0x1CD6, 0x1CF8, 0x1E71, 0x1E76, 0x1E95, 0x1C97, 0x1CAB, 0x2368,
+    0x221A, 0x2220, 0x2297, 0x22AE, 0x22B3, 0x22CF, 0x22DB, 0x22E9,
+    0x23D9, 0x23DE, 0x23E3,
+]
+EDITOR_KEY_OPERANDS = [
+    0x1FCD, 0x1FDC, 0x1FE3, 0x1FEA, 0x203B, 0x2052, 0x2059, 0x206B, 0x2075,
+    0x2086, 0x2097, 0x20BE, 0x20C9, 0x20D6, 0x20E1, 0x20EB, 0x242A,
+]
 
 
 def comments(a, pairs):
@@ -770,7 +838,7 @@ def annotate(d, model_b=False):
         (0x20CA, "..."), (0x20CD, "..."),
         (0x20CF, "Yes: delete what is under the cursor..."),
         (0x20D2, "...and show the counts"),
-        (0x20D5, "Wait for SPACE to be released (always, for an item)"),
+        (0x20D5, "While an item is chosen, wait for B (not TAB) to be released..."),
         (0x20D7, "..."), (0x20DA, "..."), (0x20DC, "..."), (0x20DE, "..."),
         (0x20E0, "CTRL?"),
         (0x20E2, "..."), (0x20E5, "..."),
@@ -788,7 +856,7 @@ def annotate(d, model_b=False):
                        (0x206A, "wait_down_released"), (0x2071, "check_item_keys"),
                        (0x2085, "check_next_item"), (0x2096, "check_space"),
                        (0x20A7, "place_not_edge"), (0x20BD, "wait_space_released"),
-                       (0x20C8, "check_tab"), (0x20D5, "wait_tab_released"),
+                       (0x20C8, "check_tab"), (0x20D5, "wait_b_released"),
                        (0x20E0, "check_ctrl"), (0x20EA, "wait_ctrl_released"),
                        (0x20F4, "next_pass")]:
         main.label(addr, name)
@@ -1973,6 +2041,23 @@ def annotate(d, model_b=False):
     main.byte(0x19DE, 0x22, cols=8)
     main.banner(0x1A43, "Unused", "Leftover bytes, among them the text PAGE.")
     main.byte(0x1A43, 0x1C10 - 0x1A43, cols=16)
+
+    # The editor's sprite numbers, limits, characters and keys.
+    for number, name in EDITOR_SPRITES:
+        d.constant(number, f"spr_{name}", comment=f"Editor sprite &{number:02X}")
+    for value, name, text in EDITOR_CONSTANTS:
+        d.constant(value, name, comment=text)
+    for operand_addr, expression in EDITOR_OPERANDS:
+        if 0x7B00 <= operand_addr < 0x7BCE:
+            d.expr(operand_addr, expression, move=unpack)
+        else:
+            d.expr(operand_addr, expression)
+    for operand_addr in EDITOR_CHAR_OPERANDS:
+        new_addr = master_to_model_b(operand_addr) if model_b else operand_addr
+        if new_addr is not None:
+            raw_d.expr(new_addr, char(raw_d.memory.get_u8(new_addr)))
+    for operand_addr in EDITOR_KEY_OPERANDS:
+        d.inkey_number(operand_addr)
 
     # Operands that are negative INKEY numbers: the default cursor keys
     # and the wall-block chooser's keys.

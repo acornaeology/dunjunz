@@ -3805,12 +3805,19 @@ SPRITE_OPERANDS = [
 ]
 
 
+def _annotates_game(a: Annotator) -> bool:
+    """Whether a covers the game itself, rather than a few of its routines
+    reused in another program (such as the editor's copy of the plotter);
+    only then does it define the game's constants."""
+    return a.skip is None or not a.skip(0x0E00)
+
+
 def annotate_sprite_numbers(a: Annotator) -> None:
     numbers = {name: number for number, name, *_ in SPRITES}
     used = {name for _, name, _ in SPRITE_OPERANDS} | {
         "sword_up", "ranger_up_0", "magic_user_up_0", "barbarian_up_0", "fighter_up_0",
         "monster_right_0", "monster_left_0"}
-    for name in sorted(used, key=numbers.get):
+    for name in sorted(used, key=numbers.get) if _annotates_game(a) else ():
         a.d.constant(numbers[name], f"spr_{name}", comment=f"Sprite &{numbers[name]:02X}")
     for operand_addr, name, offset in SPRITE_OPERANDS:
         expression = sym(f"spr_{name}")
@@ -3881,7 +3888,7 @@ CHAR_OPERANDS = [0x0597, 0x05A0, 0x0E3D, 0x0E4E, 0x15E9, 0x15F2, 0x7F98, 0x7FA0,
 
 
 def annotate_named_operands(a: Annotator) -> None:
-    for value, name, text in COUNT_CONSTANTS:
+    for value, name, text in COUNT_CONSTANTS if _annotates_game(a) else ():
         a.d.constant(value, name, comment=text)
     for operand_addr, name in COUNT_OPERANDS:
         a.expr(operand_addr, sym(name))
