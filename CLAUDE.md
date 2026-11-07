@@ -184,6 +184,12 @@ feature or defect met along the way, and note the workaround here.
 - dasmos drops `description=` for labels inside a loaded image
   (acornaeology/dasmos#61); `Annotator.label` and `Annotator.region`
   repeat it as a block comment where the address is loaded.
+- An inline comment on an OS call is joined to the environment's own
+  description of the call, with a single space in the JSON
+  (acornaeology/dasmos#62); end such comments so the join still reads.
+- A block comment at a routine's own address renders as part of its
+  banner in the beebasm output (acornaeology/dasmos#63); put a phase
+  comment for a routine's start into its description instead.
 - `Beebium.launch` needs `variant=` repeated alongside `preset=`
   (rob-smallshire/beebium#269).
 - Shared annotations meet the Master side's differing code through
