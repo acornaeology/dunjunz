@@ -48,6 +48,26 @@
       "comment": "Zero page: each star's place in star_places_x"
     },
     {
+      "name": "game_next_level_intercept",
+      "value": 5557,
+      "comment": "The game's BREAK intercept that runs Coder for the next level"
+    },
+    {
+      "name": "spr_no_small_digit",
+      "value": 105,
+      "comment": "The game's sprite &69, drawn where a hero has no ten-thousands digit"
+    },
+    {
+      "name": "opcode_jmp",
+      "value": 76,
+      "comment": "The JMP opcode, which arms the MOS BREAK intercept"
+    },
+    {
+      "name": "screen_start",
+      "value": 12288,
+      "comment": "The start of MODE 2 screen memory"
+    },
+    {
       "name": "osbyte_escape_break_effect",
       "value": 200
     },
@@ -154,7 +174,12 @@
       "addr": 9920,
       "name": "load_title_screen",
       "title": "Load the title screen while output is off",
-      "description": "VDU 21, *LOAD SCREEN (the MODE 2 picture, to &3280), VDU 6."
+      "description": "VDU 21, *LOAD SCREEN (the MODE 2 picture, to &3280), VDU 6.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 9938,
@@ -168,13 +193,23 @@
       "name": "title_start",
       "title": "Set up, show the title and run Coder",
       "description": "Disable ESCAPE, make the cursor keys return codes, set the level counter, the level digits and the menu tables in page &08 for Coder and the game, point the BREAK intercept at &15B5 (the game's next-level intercept), load and show the title screen, twinkle stars on it until a key is pressed, then select the game's display, arm the BREAK intercept and run Coder.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      },
       "fall_through": true
     },
     {
       "addr": 10175,
       "name": "mode2_cursor_off",
       "title": "Select MODE 2 and turn the cursor off",
-      "description": "VDU 22,2 then VDU 23,0,10,&20,0,0,0,0,0,0 (6845 register 10: no cursor), from cursor_off_vdu."
+      "description": "VDU 22,2 then VDU 23,0,10,&20,0,0,0,0,0,0 (6845 register 10: no cursor), from cursor_off_vdu.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "preserved"
+      }
     },
     {
       "addr": 10240,
@@ -205,19 +240,34 @@
       "addr": 10496,
       "name": "twinkle_stars",
       "title": "Twinkle stars on the title screen until a key is pressed",
-      "description": "Up to three stars at once, each at one of the eight places in star_places_x and star_places_y, picked at random. A star grows through frames 0-6 and shrinks back through 5-0. When a key is pressed the stars still showing are erased."
+      "description": "Up to three stars at once, each at one of the eight places in star_places_x and star_places_y, picked at random. A star grows through frames 0-6 and shrinks back through 5-0. When a key is pressed the stars still showing are erased.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 10542,
       "name": "start_star",
       "title": "Start a star at a free place",
-      "description": "Take the first star not showing, if any, give it frame 0 and step +1, choose a free place at random, mark the place taken and plot the first frame."
+      "description": "Take the first star not showing, if any, give it frame 0 and step +1, choose a free place at random, mark the place taken and plot the first frame.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 10605,
       "name": "advance_stars",
       "title": "Advance each star by one frame",
-      "description": "For each showing star, erase the frame (exclusive-OR) and step it; past frame 6 it turns back at 5, and below 0 it is finished and its place freed. Then plot the new frame and pause, longer for a star not showing so the timing stays even."
+      "description": "For each showing star, erase the frame (exclusive-OR) and step it; past frame 6 it turns back at 5, and below 0 it is finished and its place freed. Then plot the new frame and pause, longer for a star not showing so the timing stays even.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 10681,
@@ -1036,7 +1086,14 @@
       "comment_inline": "Level digits = \"0 \"...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&30"
+      "operand": "#'0'",
+      "expr": {
+        "text": "'0'",
+        "tree": {
+          "int": 48,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 10007,
@@ -1061,7 +1118,14 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&20"
+      "operand": "#' '",
+      "expr": {
+        "text": "' '",
+        "tree": {
+          "int": 32,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 10012,
@@ -1108,7 +1172,13 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&69"
+      "operand": "#spr_no_small_digit",
+      "expr": {
+        "text": "spr_no_small_digit",
+        "tree": {
+          "sym": "spr_no_small_digit"
+        }
+      }
     },
     {
       "addr": 10019,
@@ -1180,7 +1250,16 @@
       "comment_inline": "BREAK intercept address = &15B5 (the game's next-level intercept)...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&b5"
+      "operand": "#<(game_next_level_intercept)",
+      "expr": {
+        "text": "<(game_next_level_intercept)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "game_next_level_intercept"
+          }
+        }
+      }
     },
     {
       "addr": 10032,
@@ -1204,7 +1283,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&15"
+      "operand": "#>(game_next_level_intercept)",
+      "expr": {
+        "text": ">(game_next_level_intercept)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "game_next_level_intercept"
+          }
+        }
+      }
     },
     {
       "addr": 10037,
@@ -1752,7 +1840,13 @@
       "comment_inline": "Arm the BREAK intercept: &0287 = JMP",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&4c"
+      "operand": "#opcode_jmp",
+      "expr": {
+        "text": "opcode_jmp",
+        "tree": {
+          "sym": "opcode_jmp"
+        }
+      }
     },
     {
       "addr": 10126,
@@ -3189,7 +3283,16 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
-      "operand": "#&30"
+      "operand": "#>(screen_start)",
+      "expr": {
+        "text": ">(screen_start)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "screen_start"
+          }
+        }
+      }
     },
     {
       "addr": 10371,

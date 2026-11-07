@@ -12,7 +12,7 @@ the screen's row offsets, at &C675, in place of MOS 1.20's at &C375). The
 two share their addresses from &26C0 on.
 """
 
-from dasmos.expr import hi, lo, sym
+from dasmos.expr import char, hi, lo, sym
 
 from dunjunz_common.annotator import Annotator
 
@@ -52,7 +52,8 @@ def annotate(d, model_b=False):
         annotate_master_prefix(loader)
 
     loader.sub(0x26C0, "load_title_screen", "Load the title screen while output is off",
-               "VDU 21, *LOAD SCREEN (the MODE 2 picture, to &3280), VDU 6.")
+               "VDU 21, *LOAD SCREEN (the MODE 2 picture, to &3280), VDU 6.",
+                on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(loader, [
         (0x26C0, "VDU 21: disable VDU output"),
         (0x26C2, "..."),
@@ -105,7 +106,8 @@ def annotate(d, model_b=False):
             "the title screen, twinkle stars on it until a key is pressed, "
             "then select the game's display and run Coder.")
     loader.sub(0x2700, "title_start", "Set up, show the title and run Coder",
-               title_start_description)
+               title_start_description,
+                on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(loader, [
         (0x2700, "OSBYTE &C8: ESCAPE disabled..."),
         (0x2702, "..."), (0x2704, "..."), (0x2706, "..."),
@@ -173,7 +175,8 @@ def annotate(d, model_b=False):
 
     loader.sub(0x27BF, "mode2_cursor_off", "Select MODE 2 and turn the cursor off",
                "VDU 22,2 then VDU 23,0,10,&20,0,0,0,0,0,0 (6845 register 10: no "
-               "cursor), from cursor_off_vdu.")
+               "cursor), from cursor_off_vdu.",
+                on_exit={"A": "corrupted", "X": "corrupted", "Y": "preserved"})
     comments(loader, [
         (0x27BF, "VDU 22, 2: MODE 2"),
         (0x27C1, "..."), (0x27C4, "..."), (0x27C6, "..."),
@@ -280,7 +283,8 @@ def annotate(d, model_b=False):
                "Up to three stars at once, each at one of the eight places in "
                "star_places_x and star_places_y, picked at random. A star grows "
                "through frames 0-6 and shrinks back through 5-0. When a key is "
-               "pressed the stars still showing are erased.")
+               "pressed the stars still showing are erased.",
+                on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(loader, [
         (0x2900, "No stars showing"),
         (0x2902, "..."), (0x2904, "..."), (0x2907, "..."), (0x2908, "..."),
@@ -299,7 +303,8 @@ def annotate(d, model_b=False):
     loader.sub(0x292E, "start_star", "Start a star at a free place",
                "Take the first star not showing, if any, give it frame 0 and "
                "step +1, choose a free place at random, mark the place taken "
-               "and plot the first frame.")
+               "and plot the first frame.",
+                on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(loader, [
         (0x292E, "Find a star not showing..."),
         (0x2930, "..."), (0x2933, "..."), (0x2935, "..."), (0x2936, "..."),
@@ -327,7 +332,8 @@ def annotate(d, model_b=False):
                "For each showing star, erase the frame (exclusive-OR) and step "
                "it; past frame 6 it turns back at 5, and below 0 it is finished "
                "and its place freed. Then plot the new frame and pause, longer "
-               "for a star not showing so the timing stays even.")
+               "for a star not showing so the timing stays even.",
+                on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
     comments(loader, [
         (0x296D, "For each star..."),
         (0x296F, "...showing?"),
@@ -474,6 +480,23 @@ def annotate(d, model_b=False):
             "character rows, high byte then low byte, a copy of MOS 1.20's table "
             "at &C375."))
 
+    # Values named rather than written as numbers.
+    for value, name, text in [
+        (0x15B5, "game_next_level_intercept", "The game's BREAK intercept that runs Coder for the next level"),
+        (0x69, "spr_no_small_digit", "The game's sprite &69, drawn where a hero has no ten-thousands digit"),
+        (0x4C, "opcode_jmp", "The JMP opcode, which arms the MOS BREAK intercept"),
+        (0x3000, "screen_start", "The start of MODE 2 screen memory"),
+    ]:
+        d.constant(value, name, comment=text)
+    d.expr(0x2716, char(0x30))
+    d.expr(0x271B, char(0x20))
+    d.expr(0x2722, sym("spr_no_small_digit"))
+    d.expr(0x272F, lo(sym("game_next_level_intercept")))
+    d.expr(0x2734, hi(sym("game_next_level_intercept")))
+    d.expr(0x2882, hi(sym("screen_start")))
+    if model_b:
+        d.expr(0x278D, sym("opcode_jmp"))
+
     # The commands passed to OSCLI.
     commands = [(0x26C6, "load_screen_command"), (0x273E, "tv_title_command"),
                 (0x277C, "tv_game_command"), (0x2786, "disc_command")]
@@ -546,7 +569,8 @@ def annotate_master_prefix(loader):
 
     loader.sub(0x2694, "blank_display", "Blank the display and disable VDU output",
                "Send VDU 23,0,1,0,0,0,0,0,0,0 (6845 register 1, characters per "
-               "row, set to 0) and VDU 21, from blank_display_vdu.")
+               "row, set to 0) and VDU 21, from blank_display_vdu.",
+                on_exit={"A": "corrupted", "X": "11", "Y": "preserved"})
     comments(loader, [
         (0x2694, "Send the eleven bytes of blank_display_vdu"),
         (0x2696, "..."), (0x2699, "..."), (0x269C, "..."), (0x269D, "..."),

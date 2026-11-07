@@ -5,6 +5,10 @@ star_y                       = &83  ; Zero page: each star's pixel row
 star_frame                   = &86  ; Zero page: each star's animation frame, 0-6
 star_frame_step              = &89  ; Zero page: each star's frame step, +1 or -1
 star_place                   = &8c  ; Zero page: each star's place in star_places_x
+game_next_level_intercept    = &15b5  ; The game's BREAK intercept that runs Coder for the next level
+spr_no_small_digit           = &69  ; The game's sprite &69, drawn where a hero has no ten-thousands digit
+opcode_jmp                   = &4c  ; The JMP opcode, which arms the MOS BREAK intercept
+screen_start                 = &3000  ; The start of MODE 2 screen memory
 osbyte_escape_break_effect   = &c8
 osbyte_set_cursor_editing    = &04
 osbyte_flush_buffer          = &15
@@ -66,6 +70,11 @@ oscli                    = &fff7
 ; Load the title screen while output is off
 ;
 ; VDU 21, *LOAD SCREEN (the MODE 2 picture, to &3280), VDU 6.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &26c0 referenced 1 time by &2763
 .load_title_screen
     lda #&15                            ; VDU 21: disable VDU output
@@ -104,6 +113,11 @@ oscli                    = &fff7
 ; intercept at &15B5 (the game's next-level intercept), load and show the title screen,
 ; twinkle stars on it until a key is pressed, then select the game's display, arm the
 ; BREAK intercept and run Coder.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 .title_start
     lda #osbyte_escape_break_effect     ; OSBYTE &C8: ESCAPE disabled...
     ldx #1                              ; ...
@@ -114,22 +128,22 @@ oscli                    = &fff7
     jsr osbyte                          ; ...  Set cursor editing keys
     lda #0                              ; Levels started = 0, for Coder
     sta levels_started                  ; ...
-    lda #&30 ; '0'                      ; Level digits = "0 "...
+    lda #'0'                            ; Level digits = "0 "...
     sta level_digits                    ; ...
-    lda #&20 ; ' '                      ; ...
+    lda #' '                            ; ...
     sta level_digits + 1                ; ...
     ldx #3                              ; For each hero...
 ; &2721 referenced 1 time by &272c
 .init_hero_tables
-    lda #&69 ; 'i'                      ; ...no ten-thousands digit (sprite &69)...
+    lda #spr_no_small_digit             ; ...no ten-thousands digit (sprite &69)...
     sta hero_score_ten_thousands,x      ; ...at &08B0...
     lda #0                              ; ...and switched on...
     sta hero_absent,x                   ; ...at &08B4 (the menu tables)
     dex                                 ; ...
     bpl init_hero_tables                ; ...
-    lda #&b5                            ; BREAK intercept address = &15B5 (the game's next-level intercept)...
+    lda #<(game_next_level_intercept)   ; BREAK intercept address = &15B5 (the game's next-level intercept)...
     sta os_break_intercept + 1          ; ...
-    lda #&15                            ; ...
+    lda #>(game_next_level_intercept)   ; ...
     sta os_break_intercept + 2          ; ...
     lda #0                              ; ...disabled for now: &0287 is not a JMP
     sta os_break_intercept              ; ...
@@ -170,7 +184,7 @@ oscli                    = &fff7
     ldx #<(disc_command)                ; *DISC
     ldy #>(disc_command)                ; ...
     jsr oscli                           ; ...
-    lda #&4c ; 'L'                      ; Arm the BREAK intercept: &0287 = JMP
+    lda #opcode_jmp                     ; Arm the BREAK intercept: &0287 = JMP
     sta os_break_intercept              ; ...
     jsr leave_title                     ; Disable output and run Coder (no return)
     equb &ea                            ; Padding
@@ -197,6 +211,11 @@ oscli                    = &fff7
 ;
 ; VDU 22,2 then VDU 23,0,10,&20,0,0,0,0,0,0 (6845 register 10: no cursor), from
 ; cursor_off_vdu.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: preserved
 ; &27bf referenced 2 times by &2744, &2782
 .mode2_cursor_off
     lda #&16                            ; VDU 22, 2: MODE 2
@@ -334,7 +353,7 @@ oscli                    = &fff7
     tay                                 ; ...
     lda mos_row_offsets,y               ; High byte of row x 640, from the MOS table...
     clc                                 ; ...plus &3000, the screen start
-    adc #&30 ; '0'                      ; ...
+    adc #>(screen_start)                ; ...
     sta screen_ptr_hi                   ; ...
     lda mos_row_offsets + 1,y           ; Low byte of row x 640
     sta screen_ptr                      ; ...
@@ -390,6 +409,11 @@ oscli                    = &fff7
 ; Up to three stars at once, each at one of the eight places in star_places_x and
 ; star_places_y, picked at random. A star grows through frames 0-6 and shrinks back
 ; through 5-0. When a key is pressed the stars still showing are erased.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &2900 referenced 1 time by &2778
 .twinkle_stars
     ldx #2                              ; No stars showing
@@ -428,6 +452,11 @@ oscli                    = &fff7
 ;
 ; Take the first star not showing, if any, give it frame 0 and step +1, choose a free
 ; place at random, mark the place taken and plot the first frame.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &292e referenced 1 time by &2911
 .start_star
     ldy #0                              ; Find a star not showing...
@@ -470,6 +499,11 @@ oscli                    = &fff7
 ; For each showing star, erase the frame (exclusive-OR) and step it; past frame 6 it
 ; turns back at 5, and below 0 it is finished and its place freed. Then plot the new
 ; frame and pause, longer for a star not showing so the timing stays even.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &296d referenced 1 time by &2914
 .advance_stars
     ldy #0                              ; For each star...
