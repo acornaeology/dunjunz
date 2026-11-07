@@ -832,23 +832,14 @@
         111,
         100,
         101,
-        50
+        50,
+        13
       ],
       "labels": [
         "load_code2_command"
       ],
       "type": "string",
-      "string": "LOAD Code2"
-    },
-    {
-      "addr": 9828,
-      "bytes": [
-        13
-      ],
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "LOAD Code2."
     },
     {
       "addr": 9829,
@@ -862,23 +853,14 @@
         111,
         100,
         101,
-        51
+        51,
+        13
       ],
       "labels": [
         "load_code3_command"
       ],
       "type": "string",
-      "string": "LOAD Code3"
-    },
-    {
-      "addr": 9839,
-      "bytes": [
-        13
-      ],
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "LOAD Code3."
     },
     {
       "addr": 9840,
@@ -1114,23 +1096,14 @@
         68,
         69,
         82,
-        50
+        50,
+        13
       ],
       "labels": [
         "coder2_command"
       ],
       "type": "string",
-      "string": "CODER2"
-    },
-    {
-      "addr": 9875,
-      "bytes": [
-        13
-      ],
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "CODER2."
     },
     {
       "addr": 9876,
@@ -1369,23 +1342,14 @@
         65,
         66,
         76,
-        69
+        69,
+        13
       ],
       "labels": [
         "load_table_command"
       ],
       "type": "string",
-      "string": "L. TABLE"
-    },
-    {
-      "addr": 9919,
-      "bytes": [
-        13
-      ],
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "L. TABLE."
     },
     {
       "addr": 9920,
@@ -1612,6 +1576,7 @@
         57,
         0
       ],
+      "comment_inline": "Not used",
       "type": "byte",
       "values": [
         39,
@@ -2636,23 +2601,14 @@
         82,
         69,
         69,
-        78
+        78,
+        13
       ],
       "labels": [
         "load_screen_command"
       ],
       "type": "string",
-      "string": "LOAD SCREEN"
-    },
-    {
-      "addr": 10147,
-      "bytes": [
-        13
-      ],
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "LOAD SCREEN."
     },
     {
       "addr": 10148,
@@ -2660,23 +2616,14 @@
         68,
         73,
         83,
-        67
+        67,
+        13
       ],
       "labels": [
         "disc_command"
       ],
       "type": "string",
-      "string": "DISC"
-    },
-    {
-      "addr": 10152,
-      "bytes": [
-        13
-      ],
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "DISC."
     },
     {
       "addr": 10153,
@@ -2685,23 +2632,14 @@
         79,
         68,
         69,
-        82
+        82,
+        13
       ],
       "labels": [
         "coder_command"
       ],
       "type": "string",
-      "string": "CODER"
-    },
-    {
-      "addr": 10158,
-      "bytes": [
-        13
-      ],
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "CODER."
     },
     {
       "addr": 10159,
@@ -2712,23 +2650,14 @@
         53,
         50,
         32,
-        49
+        49,
+        13
       ],
       "labels": [
         "tv_game_command"
       ],
       "type": "string",
-      "string": "TV252 1"
-    },
-    {
-      "addr": 10166,
-      "bytes": [
-        13
-      ],
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "TV252 1."
     },
     {
       "addr": 10167,
@@ -2739,23 +2668,14 @@
         53,
         53,
         32,
-        49
+        49,
+        13
       ],
       "labels": [
         "tv_title_command"
       ],
       "type": "string",
-      "string": "TV255 1"
-    },
-    {
-      "addr": 10174,
-      "bytes": [
-        13
-      ],
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "TV255 1."
     },
     {
       "addr": 10175,
@@ -2945,6 +2865,7 @@
         10,
         0
       ],
+      "comment_inline": "Not used",
       "type": "byte",
       "values": [
         0,
@@ -3025,6 +2946,7 @@
         7,
         0
       ],
+      "comment_inline": "Not used",
       "type": "byte",
       "values": [
         0,
@@ -4342,6 +4264,7 @@
         117,
         104
       ],
+      "comment_inline": "Not used",
       "type": "byte",
       "values": [
         13,
@@ -4408,6 +4331,7 @@
         195,
         24
       ],
+      "comment_inline": "Not used",
       "type": "byte",
       "values": [
         21,
@@ -4500,6 +4424,7 @@
         0,
         0
       ],
+      "comment_inline": "Not used",
       "type": "byte",
       "values": [
         34,
@@ -6105,6 +6030,7 @@
         62,
         62
       ],
+      "comment_inline": "Not used",
       "type": "byte",
       "values": [
         56,
@@ -6166,6 +6092,7 @@
         56,
         56
       ],
+      "comment_inline": "Not used",
       "type": "byte",
       "values": [
         62,
@@ -6229,6 +6156,7 @@
         0,
         0
       ],
+      "comment_inline": "Not used",
       "type": "byte",
       "values": [
         0,
@@ -6289,6 +6217,7 @@
         0,
         0
       ],
+      "comment_inline": "Not used",
       "type": "byte",
       "values": [
         0,
@@ -6504,6 +6433,7 @@
       "labels": [
         "star_frame_data"
       ],
+      "comment_inline": "Frame 0: 7 bytes by 28 rows",
       "type": "byte",
       "values": [
         0,
@@ -6904,6 +6834,7 @@
         0,
         0
       ],
+      "comment_inline": "Frame 1: 7 bytes by 28 rows",
       "type": "byte",
       "values": [
         0,
@@ -7304,6 +7235,7 @@
         0,
         0
       ],
+      "comment_inline": "Frame 2: 7 bytes by 28 rows",
       "type": "byte",
       "values": [
         0,
@@ -7704,6 +7636,7 @@
         0,
         0
       ],
+      "comment_inline": "Frame 3: 7 bytes by 28 rows",
       "type": "byte",
       "values": [
         0,
@@ -8104,6 +8037,7 @@
         0,
         0
       ],
+      "comment_inline": "Frame 4: 7 bytes by 28 rows",
       "type": "byte",
       "values": [
         0,
@@ -8504,6 +8438,7 @@
         0,
         0
       ],
+      "comment_inline": "Frame 5: 7 bytes by 28 rows",
       "type": "byte",
       "values": [
         0,
@@ -8904,6 +8839,7 @@
         0,
         0
       ],
+      "comment_inline": "Frame 6: 7 bytes by 28 rows",
       "type": "byte",
       "values": [
         0,

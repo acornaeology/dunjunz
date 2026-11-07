@@ -74,6 +74,7 @@ def annotate(d, model_b=False):
         ])
         loader.banner(0x26DE, "Unused", "Leftover bytes.")
         loader.byte(0x26DE, 0x22, cols=8)
+        loader.c(0x26DE, "Not used")
     else:
         loader.sub(0x26D2, "leave_title", "Blank the display and run Coder",
                    "Where the Model B loader ends with VDU 21 and *CODER, this "
@@ -88,6 +89,7 @@ def annotate(d, model_b=False):
                       "Leftover bytes, never run: the tail of the Model B loader's "
                       "*CODER call, then data.")
         loader.byte(0x26DA, 0x26, cols=8)
+        loader.c(0x26DA, "Not used")
 
     if model_b:
         title_start_description = (
@@ -170,8 +172,7 @@ def annotate(d, model_b=False):
         (0x27B7, "tv_title_command", 7),
     ]:
         loader.label(addr, name)
-        loader.string(addr, length)
-        loader.byte(addr + length)
+        loader.stringcr(addr)
 
     loader.sub(0x27BF, "mode2_cursor_off", "Select MODE 2 and turn the cursor off",
                "VDU 22,2 then VDU 23,0,10,&20,0,0,0,0,0,0 (6845 register 10: no "
@@ -186,9 +187,11 @@ def annotate(d, model_b=False):
     ])
     loader.banner(0x27D7, "Unused", "Leftover bytes.")
     loader.byte(0x27D7, 0x19, cols=8)
+    loader.c(0x27D7, "Not used")
     loader.label(0x27F0, "cursor_off_vdu", length=11)
     loader.byte(0x27F0, 11, cols=11)
     loader.byte(0x27FB, 5, cols=5)
+    loader.c(0x27FB, "Not used")
 
     loader.sub(0x2800, "title_plot_star", "Plot a star frame on the title screen",
                "Exclusive-OR a 7-byte by 28-row frame of the star animation onto "
@@ -270,14 +273,17 @@ def annotate(d, model_b=False):
     ])
     loader.banner(0x28B1, "Unused", "Leftover bytes.")
     loader.byte(0x28B1, 0x0F, cols=8)
+    loader.c(0x28B1, "Not used")
     loader.label(0x28C0, "star_frames_lo", length=7, description=(
         "Low bytes of the seven star frames' addresses (&2A00 + &C4 x frame)."))
     loader.byte(0x28C0, 7, cols=7)
     loader.byte(0x28C7, 9, cols=9)
+    loader.c(0x28C7, "Not used")
     loader.label(0x28D0, "star_frames_hi", length=7, description=(
         "High bytes of the seven star frames' addresses."))
     loader.byte(0x28D0, 7, cols=7)
     loader.byte(0x28D7, 0x29, cols=8)
+    loader.c(0x28D7, "Not used")
 
     loader.sub(0x2900, "twinkle_stars", "Twinkle stars on the title screen until a key is pressed",
                "Up to three stars at once, each at one of the eight places in "
@@ -393,19 +399,23 @@ def annotate(d, model_b=False):
         loader_sym(operand_addr, name)
     loader_sym(0x2772, "title_plot_reversed")
     loader.byte(0x29D6, 4, cols=4)
+    loader.c(0x29D6, "Not used")
     loader.label(0x29DA, "star_showing", length=3, description=(
         "Non-zero for each of the three stars while it is showing."))
     loader.byte(0x29DA, 3, cols=3)
     loader.byte(0x29DD, 3, cols=3)
+    loader.c(0x29DD, "Not used")
     loader.label(0x29E0, "star_places_x", length=8, description=(
         "The byte columns of the eight places a star can appear; &FF marks a "
         "place taken."))
     loader.byte(0x29E0, 8, cols=8)
     loader.byte(0x29E8, 8, cols=8)
+    loader.c(0x29E8, "Not used")
     loader.label(0x29F0, "star_places_y", length=8, description=(
         "The pixel rows of the eight places."))
     loader.byte(0x29F0, 8, cols=8)
     loader.byte(0x29F8, 8, cols=8)
+    loader.c(0x29F8, "Not used")
     loader.label(0x2A00, "star_frame_data", length=0x55C, description=(
         "The seven frames of the star, 7 bytes by 28 rows each, at &C4-byte "
         "intervals."))
@@ -414,6 +424,7 @@ def annotate(d, model_b=False):
                   "twinkling star, from small (frame 0) to large (frame 6).")
     for frame in range(7):
         loader.byte(0x2A00 + frame * 0xC4, 0xC4, cols=7)
+        loader.c(0x2A00 + frame * 0xC4, f"Frame {frame}: 7 bytes by 28 rows")
 
 
     # ---------------------------------------------------------------------------
@@ -540,11 +551,9 @@ def annotate_master_prefix(loader):
         (0x2657, "Load Table and start the title"),
     ])
     loader.label(0x265A, "load_code2_command")
-    loader.string(0x265A, 10)
-    loader.byte(0x2664)
+    loader.stringcr(0x265A)
     loader.label(0x2665, "load_code3_command")
-    loader.string(0x2665, 10)
-    loader.byte(0x266F)
+    loader.stringcr(0x2665)
 
     loader.sub(0x2670, "run_coder", "Run Coder, through Coder2 if a joystick is present",
                "Read joystick channel 1. A reading with high byte &80 or &81 "
@@ -564,8 +573,7 @@ def annotate_master_prefix(loader):
         (0x2688, "..."), (0x268A, "..."),
     ])
     loader.label(0x268D, "coder2_command")
-    loader.string(0x268D, 6)
-    loader.byte(0x2693)
+    loader.stringcr(0x268D)
 
     loader.sub(0x2694, "blank_display", "Blank the display and disable VDU output",
                "Send VDU 23,0,1,0,0,0,0,0,0,0 (6845 register 1, characters per "
@@ -585,8 +593,7 @@ def annotate_master_prefix(loader):
         (0x26B4, "Carry on with the Model B loader's start-up"),
     ])
     loader.label(0x26B7, "load_table_command")
-    loader.string(0x26B7, 8)
-    loader.byte(0x26BF)
+    loader.stringcr(0x26B7)
     for operand_addr, name in [(0x264A, "load_code2_command"),
                                (0x2651, "load_code3_command"),
                                (0x2680, "coder_command"),

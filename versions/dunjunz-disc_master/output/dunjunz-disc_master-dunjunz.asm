@@ -82,11 +82,9 @@ oscli                           = &fff7
     jsr oscli                           ; ...
     jmp load_table                      ; Load Table and start the title
 .load_code2_command
-    equs "LOAD Code2"
-    equb &0d
+    equs "LOAD Code2", &0d
 .load_code3_command
-    equs "LOAD Code3"
-    equb &0d
+    equs "LOAD Code3", &0d
 ; ***************************************************************************************
 ; Run Coder, through Coder2 if a joystick is present
 ;
@@ -111,8 +109,7 @@ oscli                           = &fff7
     ldy #>(coder2_command)              ; ...
     jsr oscli                           ; ...
 .coder2_command
-    equs "CODER2"
-    equb &0d
+    equs "CODER2", &0d
 ; ***************************************************************************************
 ; Blank the display and disable VDU output
 ;
@@ -144,8 +141,7 @@ oscli                           = &fff7
     jsr oscli                           ; ...
     jmp title_start                     ; Carry on with the Model B loader's start-up
 .load_table_command
-    equs "L. TABLE"
-    equb &0d
+    equs "L. TABLE", &0d
 ; ***************************************************************************************
 ; Load the title screen while output is off
 ;
@@ -184,7 +180,7 @@ oscli                           = &fff7
     equb &0d, &1e, &00, &2a, &05, &14, &00, &15
     equb &00, &00, &00, &00, &2a, &00, &00, &04
     equb &08, &00, &2a, &04, &08, &2a, &15, &3c
-    equb &3d, &00, &33, &3c, &39, &00
+    equb &3d, &00, &33, &3c, &39, &00   ; Not used
 ; ***************************************************************************************
 ; Set up, show the title and run Coder
 ;
@@ -273,20 +269,15 @@ oscli                           = &fff7
     equb &ea                            ; ...
     equb &ea                            ; ...
 .load_screen_command
-    equs "LOAD SCREEN"
-    equb &0d
+    equs "LOAD SCREEN", &0d
 .disc_command
-    equs "DISC"
-    equb &0d
+    equs "DISC", &0d
 .coder_command
-    equs "CODER"
-    equb &0d
+    equs "CODER", &0d
 .tv_game_command
-    equs "TV252 1"
-    equb &0d
+    equs "TV252 1", &0d
 .tv_title_command
-    equs "TV255 1"
-    equb &0d
+    equs "TV255 1", &0d
 ; ***************************************************************************************
 ; Select MODE 2 and turn the cursor off
 ;
@@ -319,11 +310,11 @@ oscli                           = &fff7
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &0a, &00, &00, &00, &0a
     equb &00, &00, &00, &0a, &00, &00, &00, &0a
-    equb &00
+    equb &00                            ; Not used
 ; &27f0 used as index base 1 time by &27cb
 .cursor_off_vdu
     equb &17, &00, &0a, &20, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &05, &07, &00
+    equb &00, &00, &05, &07, &00        ; Not used
 ; ***************************************************************************************
 ; Plot a star frame on the title screen
 ;
@@ -471,11 +462,11 @@ oscli                           = &fff7
 ;
 ; Leftover bytes.
     equb &0d, &18, &a5, &74, &69, &78, &85, &74
-    equb &a5, &75, &69, &02, &85, &75, &68
+    equb &a5, &75, &69, &02, &85, &75, &68  ; Not used
 ; &28c0 used as index base 1 time by &280a
 .star_frames_lo
     equb &00, &c4, &88, &4c, &10, &d4, &98
-    equb &15, &4a, &29, &fe, &a8, &b9, &75, &c3, &18
+    equb &15, &4a, &29, &fe, &a8, &b9, &75, &c3, &18  ; Not used
 ; &28d0 used as index base 1 time by &280f
 .star_frames_hi
     equb &2a, &2a, &2b, &2c, &2d, &2d, &2e
@@ -484,7 +475,7 @@ oscli                           = &fff7
     equb &22, &2a, &2a, &18, &65, &75, &85, &75
     equb &a5, &70, &0a, &0a, &0a, &18, &65, &74
     equb &85, &74, &90, &02, &e6, &75, &a0, &00
-    equb &00
+    equb &00                            ; Not used
 ; ***************************************************************************************
 ; Twinkle stars on the title screen until a key is pressed
 ;
@@ -667,19 +658,19 @@ oscli                           = &fff7
     pha                                 ; ...
     ldx #&14                            ; ...
     bne star_pause_outer                ; ...(always branches)
-    equb &38, &38, &3e, &3e
+    equb &38, &38, &3e, &3e             ; Not used
 ; &29da used as index base 6 times by &2904, &2922, &2930, &293d, &296f, &2995
 .star_showing
     equb &38, &38, &3e
-    equb &3e, &38, &38
+    equb &3e, &38, &38                  ; Not used
 ; &29e0 used as index base 3 times by &2954, &2966, &299d
 .star_places_x
     equb &2f, &20, &05, &00, &1f, &46, &46, &14
-    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00  ; Not used
 ; &29f0 used as index base 1 time by &295c
 .star_places_y
     equb &0f, &0f, &24, &42, &33, &0f, &48, &15
-    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00  ; Not used
 ; ***************************************************************************************
 ; Star frames
 ;
@@ -713,7 +704,7 @@ oscli                           = &fff7
     equb &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00  ; Frame 0: 7 bytes by 28 rows
     equb &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00
@@ -741,7 +732,7 @@ oscli                           = &fff7
     equb &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00  ; Frame 1: 7 bytes by 28 rows
     equb &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00
@@ -769,7 +760,7 @@ oscli                           = &fff7
     equb &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00  ; Frame 2: 7 bytes by 28 rows
     equb &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00
@@ -797,7 +788,7 @@ oscli                           = &fff7
     equb &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00  ; Frame 3: 7 bytes by 28 rows
     equb &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00
@@ -825,7 +816,7 @@ oscli                           = &fff7
     equb &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &2a, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00  ; Frame 4: 7 bytes by 28 rows
     equb &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &2a, &00, &00, &00
@@ -853,7 +844,7 @@ oscli                           = &fff7
     equb &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00  ; Frame 5: 7 bytes by 28 rows
     equb &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &2a, &00, &00, &00
     equb &00, &00, &00, &2a, &00, &00, &00
@@ -881,7 +872,7 @@ oscli                           = &fff7
     equb &00, &00, &00, &2a, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &2a, &00, &00, &00
-    equb &00, &00, &00, &2a, &00, &00, &00
+    equb &00, &00, &00, &2a, &00, &00, &00  ; Frame 6: 7 bytes by 28 rows
 .dasmos_end
 
 save "Dunjunz", dasmos_start, dasmos_end, &2649, &2649
@@ -968,7 +959,7 @@ save "Dunjunz", dasmos_start, dasmos_end, &2649, &2649
 ;     Data                     = 1664 bytes (72%)
 ;
 ;     Number of instructions   = 319
-;     Number of data bytes     = 1596 bytes
+;     Number of data bytes     = 1587 bytes
 ;     Number of data words     = 0 bytes
-;     Number of string bytes   = 68 bytes
+;     Number of string bytes   = 77 bytes
 ;     Number of strings        = 9
