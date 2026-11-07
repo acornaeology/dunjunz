@@ -995,7 +995,8 @@ game do not show in a byte comparison **[confirmed from the code]**:
   sprites share `sprite_drainer`. The Editor's own tables point at its
   item sprites, `wall_blocks` (Stones at &6E80), `blank_sprite` (&7FF0)
   and part of the screen (`screen_start` + &200).
-- A `#>label` with no matching `#<label` marks such a page assumption:
+- A `#>label` with no matching `#<label` marks such a page assumption
+  (`tools/quality.py LISTING_JSON --list hionly` lists them):
   besides the two tables above, `screen_start`, `level_object_x` (the
   level buffer's page, &6B) and Coder's page constants.
 

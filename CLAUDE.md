@@ -128,8 +128,9 @@ on the official release.
 
 - `uv run python tools/quality.py LISTING_JSON ... [--list KIND]` reports what
   comment coverage does not: dasmos-generated labels, routines without a
-  calling convention, uncommented data, raw-address operands and hex
-  immediates. `tools/registers.py` suggests a routine's register inputs
+  calling convention, uncommented data, raw-address operands, hex
+  immediates, and symbols loaded as `#>` with no `#<` (page
+  assumptions that relocation must keep, `--list hionly`). `tools/registers.py` suggests a routine's register inputs
   and what it corrupts (following calls); `tools/address_pairs.py` finds
   immediate pairs that are the halves of a labelled address.
   `tools/cross_check.py REFERENCE_JSON OTHER_JSON ...` flags shared
