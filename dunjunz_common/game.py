@@ -6,7 +6,7 @@ official disc release (see tools/runtime_images.py for the differences).
 Where the versions differ, the drivers add their own annotations.
 """
 
-from dasmos.expr import hexlit, hi, lo, sym
+from dasmos.expr import char, hexlit, hi, lo, sym
 
 from dunjunz_common.annotator import Annotator
 
@@ -33,6 +33,7 @@ def annotate(a: Annotator) -> None:
     annotate_shared_continuations(a)
     annotate_branch_labels(a)
     annotate_sprite_numbers(a)
+    annotate_named_operands(a)
     a.expr(0x1506, lo(sym("wrch_handler")))
     a.expr(0x150B, hi(sym("wrch_handler")))
 
@@ -3804,7 +3805,8 @@ SPRITE_OPERANDS = [
 def annotate_sprite_numbers(a: Annotator) -> None:
     numbers = {name: number for number, name, *_ in SPRITES}
     used = {name for _, name, _ in SPRITE_OPERANDS} | {
-        "sword_up", "ranger_up_0", "magic_user_up_0", "barbarian_up_0", "fighter_up_0"}
+        "sword_up", "ranger_up_0", "magic_user_up_0", "barbarian_up_0", "fighter_up_0",
+        "monster_right_0", "monster_left_0"}
     for name in sorted(used, key=numbers.get):
         a.d.constant(numbers[name], f"spr_{name}", comment=f"Sprite &{numbers[name]:02X}")
     for operand_addr, name, offset in SPRITE_OPERANDS:
@@ -3812,6 +3814,49 @@ def annotate_sprite_numbers(a: Annotator) -> None:
         if offset:
             expression = expression + offset if offset > 0 else expression - (-offset)
         a.expr(operand_addr, expression)
+
+
+
+# Loop counts and other operands that are named quantities.
+COUNT_CONSTANTS = [
+    (30, "max_object", "Objects are numbered 1 to 30"),
+    (30, "max_monster", "Monsters are numbered 1 to 30"),
+    (20, "max_door", "Doors are numbered 1 to 20"),
+    (20, "max_key", "Keys are numbered 1 to 20; key n opens door n"),
+    (0x3000, "screen_start", "The start of screen memory, as the game programs the 6845"),
+]
+COUNT_OPERANDS = [
+    (0x1511, "max_object"), (0x7172, "max_object"), (0x730C, "max_object"),
+    (0x7336, "max_object"),
+    (0x1584, "max_monster"), (0x7666, "max_monster"), (0x7975, "max_monster"),
+    (0x79E4, "max_monster"),
+    (0x1528, "max_door"), (0x1CD7, "max_door"), (0x77FD, "max_door"),
+    (0x153F, "max_key"), (0x1DCD, "max_key"), (0x1E44, "max_key"),
+]
+PAGE_OPERANDS = [(0x1D67, "room_walls"), (0x77DF, "room_walls"), (0x791A, "room_walls"),
+                 (0x0973, "screen_start")]
+MONSTER_SPRITE_OPERANDS = [
+    (0x7A2E, "monster_right_0"), (0x7A35, "monster_down_0"), (0x7A3C, "monster_left_0"),
+    (0x7C03, "monster_right_0"), (0x7C12, "monster_down_0"),
+    (0x7C43, "monster_right_0"), (0x7C4A, "monster_down_0"), (0x7C51, "monster_left_0"),
+]
+CHAR_OPERANDS = [0x0597, 0x05A0, 0x0E3D, 0x0E4E, 0x15E9, 0x15F2, 0x7F98, 0x7FA0,
+                 0x7FA8, 0x7FB1, 0x7FB7, 0x7FDC]
+
+
+def annotate_named_operands(a: Annotator) -> None:
+    for value, name, text in COUNT_CONSTANTS:
+        a.d.constant(value, name, comment=text)
+    for operand_addr, name in COUNT_OPERANDS:
+        a.expr(operand_addr, sym(name))
+    for operand_addr, name in PAGE_OPERANDS:
+        a.expr(operand_addr, hi(sym(name)))
+    for operand_addr, name in MONSTER_SPRITE_OPERANDS:
+        a.expr(operand_addr, sym(f"spr_{name}"))
+    for operand_addr in CHAR_OPERANDS:
+        value = a.byte_value(operand_addr)
+        if value is not None:
+            a.expr(operand_addr, char(value))
 
 
 def annotate_regions(a: Annotator) -> None:

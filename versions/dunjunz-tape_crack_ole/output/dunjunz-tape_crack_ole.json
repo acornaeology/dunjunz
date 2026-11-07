@@ -43,9 +43,19 @@
       "comment": "Sprite &09"
     },
     {
+      "name": "spr_monster_right_0",
+      "value": 11,
+      "comment": "Sprite &0B"
+    },
+    {
       "name": "spr_monster_down_0",
       "value": 13,
       "comment": "Sprite &0D"
+    },
+    {
+      "name": "spr_monster_left_0",
+      "value": 15,
+      "comment": "Sprite &0F"
     },
     {
       "name": "spr_arrow_up",
@@ -231,6 +241,31 @@
       "name": "spr_blank_boots_icon",
       "value": 119,
       "comment": "Sprite &77"
+    },
+    {
+      "name": "max_object",
+      "value": 30,
+      "comment": "Objects are numbered 1 to 30"
+    },
+    {
+      "name": "max_monster",
+      "value": 30,
+      "comment": "Monsters are numbered 1 to 30"
+    },
+    {
+      "name": "max_door",
+      "value": 20,
+      "comment": "Doors are numbered 1 to 20"
+    },
+    {
+      "name": "max_key",
+      "value": 20,
+      "comment": "Keys are numbered 1 to 20; key n opens door n"
+    },
+    {
+      "name": "screen_start",
+      "value": 12288,
+      "comment": "The start of screen memory, as the game programs the 6845"
     },
     {
       "name": "boot_osfile_block",
@@ -4824,7 +4859,14 @@
       "comment_inline": "Ignore anything but 1-6",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&31"
+      "operand": "#'1'",
+      "expr": {
+        "text": "'1'",
+        "tree": {
+          "int": 49,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 1432,
@@ -4898,7 +4940,14 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
-      "operand": "#&31"
+      "operand": "#'1'",
+      "expr": {
+        "text": "'1'",
+        "tree": {
+          "int": 49,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 1441,
@@ -9536,7 +9585,16 @@
       "comment_inline": "...plus &30: the screen starts at &3000",
       "type": "code",
       "mnemonic": "adc",
-      "operand": "#&30"
+      "operand": "#>(screen_start)",
+      "expr": {
+        "text": ">(screen_start)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "screen_start"
+          }
+        }
+      }
     },
     {
       "addr": 2420,
@@ -19754,7 +19812,14 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
-      "operand": "#&30"
+      "operand": "#'0'",
+      "expr": {
+        "text": "'0'",
+        "tree": {
+          "int": 48,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 3646,
@@ -19895,7 +19960,14 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
-      "operand": "#&30"
+      "operand": "#'0'",
+      "expr": {
+        "text": "'0'",
+        "tree": {
+          "int": 48,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 3663,
@@ -29724,7 +29796,13 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&1e"
+      "operand": "#max_object",
+      "expr": {
+        "text": "max_object",
+        "tree": {
+          "sym": "max_object"
+        }
+      }
     },
     {
       "addr": 5394,
@@ -29883,7 +29961,13 @@
       "comment_inline": "Doors 20 to 1: position and sprite",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&14"
+      "operand": "#max_door",
+      "expr": {
+        "text": "max_door",
+        "tree": {
+          "sym": "max_door"
+        }
+      }
     },
     {
       "addr": 5417,
@@ -30045,7 +30129,13 @@
       "comment_inline": "Keys 20 to 1: position",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&14"
+      "operand": "#max_key",
+      "expr": {
+        "text": "max_key",
+        "tree": {
+          "sym": "max_key"
+        }
+      }
     },
     {
       "addr": 5440,
@@ -30586,7 +30676,13 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&1e"
+      "operand": "#max_monster",
+      "expr": {
+        "text": "max_monster",
+        "tree": {
+          "sym": "max_monster"
+        }
+      }
     },
     {
       "addr": 5509,
@@ -31342,7 +31438,14 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
-      "operand": "#&30"
+      "operand": "#'0'",
+      "expr": {
+        "text": "'0'",
+        "tree": {
+          "int": 48,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 5610,
@@ -31411,7 +31514,14 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "adc",
-      "operand": "#&30"
+      "operand": "#'0'",
+      "expr": {
+        "text": "'0'",
+        "tree": {
+          "int": 48,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 5619,
@@ -36919,7 +37029,13 @@
       "comment_inline": "Doors 20 to 1",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&14"
+      "operand": "#max_door",
+      "expr": {
+        "text": "max_door",
+        "tree": {
+          "sym": "max_door"
+        }
+      }
     },
     {
       "addr": 7384,
@@ -38044,7 +38160,16 @@
       "comment_inline": "...in room_walls...",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&0c"
+      "operand": "#>(room_walls)",
+      "expr": {
+        "text": ">(room_walls)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "room_walls"
+          }
+        }
+      }
     },
     {
       "addr": 7528,
@@ -38908,7 +39033,13 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&14"
+      "operand": "#max_key",
+      "expr": {
+        "text": "max_key",
+        "tree": {
+          "sym": "max_key"
+        }
+      }
     },
     {
       "addr": 7630,
@@ -39828,7 +39959,13 @@
       "comment_inline": "...keys 20 to 1",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&14"
+      "operand": "#max_key",
+      "expr": {
+        "text": "max_key",
+        "tree": {
+          "sym": "max_key"
+        }
+      }
     },
     {
       "addr": 7749,
@@ -62446,7 +62583,13 @@
       "comment_inline": "...objects 30 to 1",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&1e"
+      "operand": "#max_object",
+      "expr": {
+        "text": "max_object",
+        "tree": {
+          "sym": "max_object"
+        }
+      }
     },
     {
       "addr": 29043,
@@ -65572,7 +65715,13 @@
       "comment_inline": "Objects 30 to 1: plot each at its cell",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&1e"
+      "operand": "#max_object",
+      "expr": {
+        "text": "max_object",
+        "tree": {
+          "sym": "max_object"
+        }
+      }
     },
     {
       "addr": 29453,
@@ -65852,7 +66001,13 @@
       "comment_inline": "...objects 30 to 1",
       "type": "code",
       "mnemonic": "ldy",
-      "operand": "#&1e"
+      "operand": "#max_object",
+      "expr": {
+        "text": "max_object",
+        "tree": {
+          "sym": "max_object"
+        }
+      }
     },
     {
       "addr": 29495,
@@ -71959,7 +72114,13 @@
       "comment_inline": "For each monster...",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&1e"
+      "operand": "#max_monster",
+      "expr": {
+        "text": "max_monster",
+        "tree": {
+          "sym": "max_monster"
+        }
+      }
     },
     {
       "addr": 30311,
@@ -74746,7 +74907,16 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&0c"
+      "operand": "#>(room_walls)",
+      "expr": {
+        "text": ">(room_walls)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "room_walls"
+          }
+        }
+      }
     },
     {
       "addr": 30688,
@@ -74967,7 +75137,13 @@
       "comment_inline": "Then the doors 20 to 1, in every view showing them",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&14"
+      "operand": "#max_door",
+      "expr": {
+        "text": "max_door",
+        "tree": {
+          "sym": "max_door"
+        }
+      }
     },
     {
       "addr": 30718,
@@ -76994,7 +77170,16 @@
       "comment_inline": "...into room_walls at &0C00",
       "type": "code",
       "mnemonic": "lda",
-      "operand": "#&0c"
+      "operand": "#>(room_walls)",
+      "expr": {
+        "text": ">(room_walls)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "room_walls"
+          }
+        }
+      }
     },
     {
       "addr": 31003,
@@ -77602,7 +77787,13 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&1e"
+      "operand": "#max_monster",
+      "expr": {
+        "text": "max_monster",
+        "tree": {
+          "sym": "max_monster"
+        }
+      }
     },
     {
       "addr": 31094,
@@ -78434,7 +78625,13 @@
       "comment_inline": "For each monster, 30 to 1...",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&1e"
+      "operand": "#max_monster",
+      "expr": {
+        "text": "max_monster",
+        "tree": {
+          "sym": "max_monster"
+        }
+      }
     },
     {
       "addr": 31205,
@@ -78936,7 +79133,13 @@
       ],
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&0b"
+      "operand": "#spr_monster_right_0",
+      "expr": {
+        "text": "spr_monster_right_0",
+        "tree": {
+          "sym": "spr_monster_right_0"
+        }
+      }
     },
     {
       "addr": 31279,
@@ -78989,7 +79192,13 @@
       ],
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&0d"
+      "operand": "#spr_monster_down_0",
+      "expr": {
+        "text": "spr_monster_down_0",
+        "tree": {
+          "sym": "spr_monster_down_0"
+        }
+      }
     },
     {
       "addr": 31286,
@@ -79042,7 +79251,13 @@
       ],
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&0f"
+      "operand": "#spr_monster_left_0",
+      "expr": {
+        "text": "spr_monster_left_0",
+        "tree": {
+          "sym": "spr_monster_left_0"
+        }
+      }
     },
     {
       "addr": 31293,
@@ -82067,7 +82282,13 @@
       ],
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&0b"
+      "operand": "#spr_monster_right_0",
+      "expr": {
+        "text": "spr_monster_right_0",
+        "tree": {
+          "sym": "spr_monster_right_0"
+        }
+      }
     },
     {
       "addr": 31748,
@@ -82169,7 +82390,13 @@
       ],
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&0d"
+      "operand": "#spr_monster_down_0",
+      "expr": {
+        "text": "spr_monster_down_0",
+        "tree": {
+          "sym": "spr_monster_down_0"
+        }
+      }
     },
     {
       "addr": 31763,
@@ -82492,7 +82719,13 @@
       ],
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&0b"
+      "operand": "#spr_monster_right_0",
+      "expr": {
+        "text": "spr_monster_right_0",
+        "tree": {
+          "sym": "spr_monster_right_0"
+        }
+      }
     },
     {
       "addr": 31812,
@@ -82545,7 +82778,13 @@
       ],
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&0d"
+      "operand": "#spr_monster_down_0",
+      "expr": {
+        "text": "spr_monster_down_0",
+        "tree": {
+          "sym": "spr_monster_down_0"
+        }
+      }
     },
     {
       "addr": 31819,
@@ -82598,7 +82837,13 @@
       ],
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&0f"
+      "operand": "#spr_monster_left_0",
+      "expr": {
+        "text": "spr_monster_left_0",
+        "tree": {
+          "sym": "spr_monster_left_0"
+        }
+      }
     },
     {
       "addr": 31826,
@@ -86887,7 +87132,14 @@
       "comment_inline": "Below '0': print it unchanged",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&30"
+      "operand": "#'0'",
+      "expr": {
+        "text": "'0'",
+        "tree": {
+          "int": 48,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 32665,
@@ -86939,7 +87191,14 @@
       "comment_inline": "':'-'@': print it unchanged",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&41"
+      "operand": "#'A'",
+      "expr": {
+        "text": "'A'",
+        "tree": {
+          "int": 65,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 32673,
@@ -86991,7 +87250,14 @@
       "comment_inline": "'['-'`': print it unchanged",
       "type": "code",
       "mnemonic": "cmp",
-      "operand": "#&61"
+      "operand": "#'a'",
+      "expr": {
+        "text": "'a'",
+        "tree": {
+          "int": 97,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 32681,
@@ -87053,7 +87319,14 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
-      "operand": "#&61"
+      "operand": "#'a'",
+      "expr": {
+        "text": "'a'",
+        "tree": {
+          "int": 97,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 32690,
@@ -87102,7 +87375,14 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
-      "operand": "#&41"
+      "operand": "#'A'",
+      "expr": {
+        "text": "'A'",
+        "tree": {
+          "int": 65,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 32696,
@@ -87433,7 +87713,14 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "sbc",
-      "operand": "#&30"
+      "operand": "#'0'",
+      "expr": {
+        "text": "'0'",
+        "tree": {
+          "int": 48,
+          "radix": "char"
+        }
+      }
     },
     {
       "addr": 32733,
