@@ -135,7 +135,7 @@
       "addr": 6400,
       "name": "default_start",
       "title": "*DEFAULT: restore a level file",
-      "description": "Set *TV255 1, MODE 7 and printer off; then, for each level, disable ESCAPE, clear the screen, ask which level to reset and read one or two digits. Accept 1-24, copy that level's original (still encrypted) from the copies at &1DB0 to &6B00 and *SAVE it as LevelN. Then offer another level, or quit through the reset vector. A leading zero (05) is kept in the filename (Level05), which the game does not read."
+      "description": "*DEFAULT is the Model B side's level restorer: it puts back a level file that *EDITOR has changed, from the original copies of levels 1-24 it carries. It is run by typing *DEFAULT, as the README describes, and loads and runs at &1900. Once: *TV255 1, MODE 7 and printer off. Then for each level, in the phases the block comments below mark: disable ESCAPE, flush the buffers, clear the screen, ask \"Which level do you wish to reset ?\" and read one or two digits with OSWORD 0, asking again for nothing typed, 0 or anything above 24. Copy that level's original, still encrypted, from &1B00 + N x &2B0 to the game's level buffer at &6B00, and *SAVE it as LevelN (&6B00, &2B0 bytes) over the edited file on the current drive. Then ask \"Reset another level (A) or quit (Q)\": A asks for another level, Q quits by JMP (&FFFC), which resets the machine. What it leaves behind is the LevelN files it saved. A leading zero typed (05) is kept in the filename (Level05), a file the game does not read."
     }
   ],
   "banners": [
@@ -143,6 +143,7 @@
       "addr": 6669,
       "name": "level_prompt",
       "title": "Prompts, the input block and the commands",
+      "description": "The two zero-terminated questions default_start prints, the OSWORD 0 block it fills in and the buffer that receives the digits typed, and the two OSCLI command lines.",
       "align": "before_label"
     },
     {
@@ -716,7 +717,7 @@
         169,
         26
       ],
-      "comment_inline": "...high byte...",
+      "comment_inline": "...then level_digits' page...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#>(level_digits)",
@@ -773,7 +774,7 @@
         169,
         48
       ],
-      "comment_inline": "...from '0'...",
+      "comment_inline": "...accepting characters from '0'...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#'0'",
@@ -893,7 +894,7 @@
       "comments_before_label": [
         "Turn the digits into the level number, and refuse 0 and anything above 24."
       ],
-      "comment_inline": "One digit?",
+      "comment_inline": "One digit typed: a level from 1 to 9?",
       "type": "code",
       "mnemonic": "cpy",
       "operand": "#1"
@@ -957,7 +958,7 @@
       "bytes": [
         10
       ],
-      "comment_inline": "...x 2...",
+      "comment_inline": "...tens x 2...",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -979,7 +980,7 @@
       "bytes": [
         10
       ],
-      "comment_inline": "...x 8...",
+      "comment_inline": "...tens x 4...",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -988,7 +989,7 @@
       "bytes": [
         10
       ],
-      "comment_inline": "...x 8 (with the first ASL: x 4, then x 8)",
+      "comment_inline": "...tens x 8",
       "type": "code",
       "mnemonic": "asl"
     },
@@ -1241,7 +1242,7 @@
         201,
         0
       ],
-      "comment_inline": "Level 0?",
+      "comment_inline": "Level 0, which does not exist?",
       "type": "code",
       "mnemonic": "cmp",
       "operand": "#0"
@@ -1303,7 +1304,7 @@
         133,
         113
       ],
-      "comment_inline": "...low byte...",
+      "comment_inline": "...its low byte into read_ptr...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "read_ptr",
@@ -1316,7 +1317,7 @@
         169,
         27
       ],
-      "comment_inline": "...high byte...",
+      "comment_inline": "...and its page, &1B...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#>(level_1_original - level_length)",
@@ -1422,7 +1423,7 @@
         165,
         114
       ],
-      "comment_inline": "...high byte...",
+      "comment_inline": "...then read_ptr's page...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "read_ptr_hi",
@@ -1490,7 +1491,7 @@
         169,
         0
       ],
-      "comment_inline": "put_ptr = &6B00",
+      "comment_inline": "put_ptr = &6B00, the game's level buffer...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -1501,7 +1502,7 @@
         133,
         115
       ],
-      "comment_inline": "...low byte...",
+      "comment_inline": "...low byte 0 into put_ptr...",
       "type": "code",
       "mnemonic": "sta",
       "operand": "put_ptr",
@@ -1748,7 +1749,7 @@
         165,
         116
       ],
-      "comment_inline": "...and high byte...",
+      "comment_inline": "...then put_ptr's page...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "put_ptr_hi",
@@ -1904,7 +1905,7 @@
         169,
         13
       ],
-      "comment_inline": "New line",
+      "comment_inline": "Move down a line before the next question...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&0d"
@@ -1916,7 +1917,7 @@
         238,
         255
       ],
-      "comment_inline": "...carriage return...",
+      "comment_inline": "...sending a carriage return...",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",
@@ -1929,7 +1930,7 @@
         169,
         10
       ],
-      "comment_inline": "...line feed...",
+      "comment_inline": "...then a line feed...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#&0a"
@@ -2234,6 +2235,7 @@
       "labels": [
         "level_prompt"
       ],
+      "comment_inline": "The first question, ended by a zero",
       "xref_summaries": [
         "&1a0d used as index base 1 time by &192b"
       ],
@@ -2258,6 +2260,10 @@
       "labels": [
         "read_level_block"
       ],
+      "comments_before_label": [
+        "OSWORD 0 block: buffer address, maximum length, lowest and highest character; default_start fills it in before each call."
+      ],
+      "comment_inline": "Buffer, length, lowest, highest: set at run time",
       "xref_summaries": [
         "&1a31 referenced 1 time by &193c",
         "&1a32 referenced 1 time by &1941",
@@ -2290,6 +2296,10 @@
       "labels": [
         "level_digits"
       ],
+      "comments_before_label": [
+        "The digits typed, and the CR that ends them. A single digit's CR is replaced by a space, so that both bytes can go into save_command's filename."
+      ],
+      "comment_inline": "Two digits and a CR, written by OSWORD 0",
       "xref_summaries": [
         "&1a36 referenced 3 times by &1960, &1980, &19cd",
         "&1a37 referenced 3 times by &1970, &197d, &19d3"
@@ -2359,6 +2369,7 @@
       "labels": [
         "another_question"
       ],
+      "comment_inline": "The second question, ended by a zero",
       "xref_summaries": [
         "&1a39 used as index base 1 time by &19ec"
       ],
@@ -2400,6 +2411,10 @@
       "labels": [
         "save_command"
       ],
+      "comments_before_label": [
+        "*SAVE LevelN 6B00+2B0, with the digits put in at +10 and +11."
+      ],
+      "comment_inline": "OSCLI: save the level buffer as LevelN",
       "xref_summaries": [
         "&1a68 referenced 1 time by &19d0",
         "&1a69 referenced 1 time by &19d6"
@@ -2422,6 +2437,7 @@
       "labels": [
         "tv_command"
       ],
+      "comment_inline": "OSCLI: vertical shift -1, interlace off",
       "type": "string",
       "string": "TV255 1."
     },

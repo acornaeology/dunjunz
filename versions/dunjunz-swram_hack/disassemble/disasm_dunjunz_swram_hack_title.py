@@ -40,10 +40,16 @@ def operand(addr, expression):
 # ---------------------------------------------------------------------------
 # Workspace and screen addresses outside the file.
 
-d.label(0x70, "copy_from", group="zero_page")
-d.label(0x71, "copy_from_high", group="zero_page")
-d.label(0x80, "copy_to", group="zero_page")
-d.label(0x81, "copy_to_high", group="zero_page")
+d.label(0x70, "copy_from", group="zero_page", description=(
+    "Source pointer, low byte: stripe_pattern while striping, then the "
+    "next byte of title_picture."))
+d.label(0x71, "copy_from_high", group="zero_page", description=(
+    "Source pointer, high byte."))
+d.label(0x80, "copy_to", group="zero_page", description=(
+    "Screen pointer, low byte: the next character cell while striping, "
+    "then the next screen byte of the picture."))
+d.label(0x81, "copy_to_high", group="zero_page", description=(
+    "Screen pointer, high byte."))
 d.label(0x5800, "mode5_screen", group="screen",
         description="The start of MODE 5's screen memory (&5800-&7FFF)")
 d.label(0x5940, "title_picture_screen", group="screen",
@@ -55,9 +61,16 @@ d.label(0x5940, "title_picture_screen", group="screen",
 
 d.label(0x3800, "stripe_pattern")
 d.banner(0x3800, title="Background stripe pattern",
-         description="One MODE 5 character cell, copied over the whole "
-                     "screen: even pixel rows black (&00), odd rows four "
-                     "pixels of colour 2 (&F0), which mode_vdu makes blue.")
+         description="TITLE is the title page shown between the intro and "
+                     "the game's loader: the BASIC program DUNJUNZ runs it "
+                     "with */TITLE, and it returns to BASIC, which chains "
+                     "DUNK. Its data comes first and the code, title_start "
+                     "(&38C6), after it; title_start's banner describes the "
+                     "run. "
+                     "This first table is one MODE 5 character cell, copied "
+                     "over the whole screen: even pixel rows black (&00), "
+                     "odd rows four pixels of colour 2 (&F0), which "
+                     "mode_vdu makes blue.")
 d.byte(0x3800, 8)
 d.comment(0x3800, "Rows 0-7 of the cell, black and colour 2 alternately", align=INLINE)
 
@@ -158,13 +171,30 @@ d.comment(0x38C5, "CR", align=INLINE)
 # The program.
 
 d.subroutine(0x38C6, "title_start", title="TITLE: draw the title page and wait for a key",
-             description="Entered by */TITLE from the BASIC program DUNJUNZ. "
-                         "Select MODE 5 with colour 2 blue, fill the screen "
-                         "with stripe_pattern, copy title_picture into "
-                         "character rows 1-8, print the credits, title and "
-                         "keys, open an empty black window at the bottom, hide "
-                         "the cursor, flush the keyboard buffer and wait up to "
-                         "7.67 seconds for a key, then return to BASIC.",
+             description="The title page between the intro and the game's "
+                         "loader. Entered by */TITLE from the BASIC program "
+                         "DUNJUNZ, after its \"Please wait....\" screen in "
+                         "MODE 4; it returns to BASIC, which does *FX225 and "
+                         "*TV255 and chains DUNK, the sideways RAM loader. "
+                         "The run is a straight line in four phases, marked "
+                         "by block comments below. Screen: MODE 5 with "
+                         "colour 2 blue, then stripe_pattern copied into "
+                         "every character cell from &5800 to &7FFF. "
+                         "Picture: title_picture, &A00 bytes, copied a byte "
+                         "at a time over character rows 1-8. Text: "
+                         "page_text (the credits, the title in a black "
+                         "window and the keys in a white one), then "
+                         "blank_line_text unless INKEY(-256) reports an "
+                         "Electron, then black_window_vdu. Wait: the cursor "
+                         "is turned off by writing the 6845 directly "
+                         "(register 10 = &20, at &FE00/&FE01, even on an "
+                         "Electron), the input buffer is flushed and OSBYTE "
+                         "&81 waits up to &2FF centiseconds (7.67 s) for a "
+                         "key. "
+                         "It leaves the page on the screen, with the last "
+                         "text window (columns 2-17, rows 26-28) still set, "
+                         "the cursor off, and the key, if one was pressed, "
+                         "read from the buffer.",
              on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 d.label(0x38C8, "send_mode_vdu")
 d.label(0x38E4, "fill_stripes")
@@ -201,23 +231,24 @@ comments([
     (0x38E6, "...stripes on alternate pixel rows"), (0x38E8, "...next byte of the cell"), (0x38E9, "...count into A for the test"),
     (0x38EA, "...all eight rows of the cell?"), (0x38EC, "No: copy the next row"),
     (0x38EE, "copy_to += 8: on to the next cell"),
-    (0x38EF, "...low byte..."), (0x38F1, "...plus 8: one character cell"), (0x38F3, "...the cell to the right, or the next row's first"),
-    (0x38F5, "...high byte..."), (0x38F7, "...with the carry"), (0x38F9, "...completing the next cell's address"),
+    (0x38EF, "...copy_to's low byte..."), (0x38F1, "...plus 8: one character cell"), (0x38F3, "...the cell to the right, or the next row's first"),
+    (0x38F5, "...then copy_to's page..."), (0x38F7, "...with the carry"), (0x38F9, "...completing the next cell's address"),
     (0x38FB, "Back to the pattern's first byte"),
     (0x38FD, "Repeat until copy_to reaches &8000, the top of the screen"),
     (0x38FF, "...at the top of screen memory?"), (0x3901, "No: stripe the next cell"),
-    (0x3903, "copy_from = title_picture"),
-    (0x3905, "...as copy_from's high byte"), (0x3907, "...page-aligned..."), (0x3909, "...so copy_from's low byte is 0"),
+    (0x3903, "copy_from = title_picture, at &3A00..."),
+    (0x3905, "...as copy_from's high byte"), (0x3907, "...which is page-aligned..."), (0x3909, "...so copy_from's low byte is 0"),
     (0x390B, "copy_to = title_picture_screen (Y stays 0 from here)"),
-    (0x390D, "...low byte: character row 1, below a striped row"), (0x390F, "...high byte..."), (0x3911, "...as copy_to's high byte"),
+    (0x390D, "...low byte: character row 1, below a striped row"),
+    (0x390F, "...then the page of &5940..."), (0x3911, "...as copy_to's high byte"),
     (0x3913, "Copy one byte of the picture to the screen"),
     (0x3915, "...over the stripes"),
-    (0x3917, "copy_from += 1"),
-    (0x3918, "...low byte..."), (0x391A, "...plus one"), (0x391C, "...the picture's next byte"),
-    (0x391E, "...high byte..."), (0x3920, "...with the carry"), (0x3922, "...crossing into its next page"),
-    (0x3924, "copy_to += 1"),
-    (0x3925, "...low byte..."), (0x3927, "...plus one"), (0x3929, "...the screen's next byte"),
-    (0x392B, "...high byte..."), (0x392D, "...with the carry"), (0x392F, "...completing the next screen address"),
+    (0x3917, "Advance copy_from to the picture's next byte..."),
+    (0x3918, "...copy_from's low byte..."), (0x391A, "...plus one, carry into the page"), (0x391C, "...the picture's next byte"),
+    (0x391E, "...then copy_from's page..."), (0x3920, "...with the carry"), (0x3922, "...crossing into its next page"),
+    (0x3924, "Advance copy_to to the screen's next byte..."),
+    (0x3925, "...copy_to's low byte..."), (0x3927, "...plus one, carry into the page"), (0x3929, "...the screen's next byte"),
+    (0x392B, "...then copy_to's page..."), (0x392D, "...with the carry"), (0x392F, "...completing the next screen address"),
     (0x3931, "Repeat until copy_from reaches the end of the file, &4400"),
     (0x3933, "...past the picture's last page?"), (0x3935, "No: copy the next byte"),
     (0x3937, "Print page_text up to its &FF terminator"),
@@ -228,7 +259,7 @@ comments([
     (0x3950, "1: an Electron?"),
     (0x3952, "Yes: leave out the line of spaces"),
     (0x3954, "Print blank_line_text up to its &FF terminator"),
-    (0x3956, "...this byte of the line..."), (0x3959, "...printed"), (0x395C, "...on to the next"),
+    (0x3956, "...this byte of the line..."), (0x3959, "...printed: a space"), (0x395C, "...on to the next"),
     (0x395D, "...look at it..."), (0x3960, "...is it the terminator?"), (0x3962, "No: print it"),
     (0x3964, "Print black_window_vdu up to its &FF terminator"),
     (0x3966, "...this byte of the window set-up..."), (0x3969, "...obeyed as VDU codes"), (0x396C, "...on to the next"),
@@ -242,8 +273,8 @@ comments([
     (0x398C, "Return to BASIC, which chains DUNK"),
 ])
 for addr, text in [
-    (0x38D4, "Stripe the whole MODE 5 screen, &5800-&7FFF, one character "
-             "cell at a time."),
+    (0x38D4, "Screen, with MODE 5 set: stripe all of it, &5800-&7FFF, "
+             "one character cell at a time."),
     (0x3903, "Copy the logo picture, a byte at a time, over character rows "
              "1-8."),
     (0x3937, "Print the credits, title and keys, then (except on an "

@@ -35,17 +35,47 @@ def comments(pairs):
 # ---------------------------------------------------------------------------
 # Workspace
 
-d.index_region(0x0080, "packed_ptr", window=(0, 1), group="zero_page")
-d.index_region(0x0082, "screen_ptr", window=(0, 1), group="zero_page")
-d.index_region(0x0084, "command_ptr", window=(0, 3), group="zero_page")
-d.index_region(0x0C00, "osfile_block", window=(0, 0x11), group="expand_workspace")
+d.index_region(0x0080, "packed_ptr", window=(0, 1), group="zero_page", description=(
+    "The next packed byte to read, from the file's load address up to "
+    "&7FFF; first, with &82-&83, the four bytes OSARGS 2 writes the "
+    "file's length into. Saved and restored by expand."))
+d.index_region(0x0082, "screen_ptr", window=(0, 1), group="zero_page", description=(
+    "The next screen byte to write, from &3000 up to &7FFF; reaching "
+    "&8000 ends the unpacking. Saved and "
+    "restored by expand."))
+d.index_region(0x0084, "command_ptr", window=(0, 3), group="zero_page", description=(
+    "Four bytes OSARGS 1 fills with the address of the command line's "
+    "tail; skip_separators then steps the low two bytes to the "
+    "filename. Saved and restored by expand."))
+d.index_region(0x0C00, "osfile_block", window=(0, 0x11), group="expand_workspace", description=(
+    "The 18-byte OSFILE block for loading the picture, built from "
+    "osfile_block_template over whatever page &0C held, which expand "
+    "saves on the stack and puts back."))
 
 # ---------------------------------------------------------------------------
 # Header
 
 d.subroutine(0x2E00, "expand_start", title="EXPAND: unpack a compressed MODE 2 picture",
-             description="*EXPAND <filename>. Entered at the load address, "
-             "which jumps over the copyright notice.",
+             description="EXPAND unpacks a run-length-compressed MODE 2 "
+             "picture onto the screen. It is run as *EXPAND <filename>: "
+             "the crack's BASIC PLOAD runs *EXPAND GIRL1 for the intro "
+             "picture, in MODE 2 with the palette set up for it. It is "
+             "entered here, at the load address, which jumps over the "
+             "copyright notice to expand. "
+             "The run, in expand: refuse anything but MODE 2; find the "
+             "filename on the command line; open the file only to read its "
+             "length; black out all sixteen colours; load the file so that "
+             "it ends at &8000; unpack it run by run from &3000 until the "
+             "screen is full; put back the zero page (&80-&87) and page "
+             "&0C bytes it borrowed; and VDU 20, which restores the default "
+             "palette and shows the picture. It returns to its caller with "
+             "the picture on the screen, the default palette in place of "
+             "the caller's, the file closed, and the zero page and &0C00 "
+             "bytes as it found them. "
+             "Each packed byte holds a screen byte in bits 5-0 and a run "
+             "code in bits 7-6: codes 0-2 give a run of 1-3, and code 3 "
+             "takes the run, n+1, from the next byte. There is no end "
+             "marker.",
              on_entry={"command line": "the filename, after *EXPAND"},
              on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 comments([(0x2E00, "Skip the copyright notice"),
@@ -60,7 +90,10 @@ d.banner(0x2E03, title="Copyright notice")
 d.subroutine(0x2E1B, "skip_separators",
              title="Find the next argument on the command line",
              description="Step command_ptr past spaces and commas. A carriage "
-             "return (the end of the line) is left for the next call.",
+             "return (the end of the line) is left for the next call. "
+             "Called once, by expand, to find the filename after *EXPAND; "
+             "on success command_ptr is one past the name's first "
+             "character, so expand steps it back by one.",
              on_exit={"C": "set if the line has no more arguments; clear if "
                       "command_ptr is one past the argument's first character"})
 comments([
@@ -68,18 +101,18 @@ comments([
     (0x2E1D, "Read the next character of the command line"),
     (0x2E1F, "Advance command_ptr past it..."),
     (0x2E21, "No carry: pointer done"), (0x2E23, "Carry into the high byte"),
-    (0x2E25, "Skip spaces"),
+    (0x2E25, "A space, which separates arguments?"),
     (0x2E27, "A space: read on"),
-    (0x2E29, "Skip commas"),
+    (0x2E29, "A comma, which separates them too?"),
     (0x2E2B, "A comma: read on"),
     (0x2E2D, "The end of the line?"),
     (0x2E2F, "No: an argument starts here"),
     (0x2E31, "Step command_ptr back onto the carriage return..."),
     (0x2E33, "...did the low byte wrap..."), (0x2E35, "...from &00 to &FF?"), (0x2E37, "No: pointer done"), (0x2E39, "Yes: borrow from the high byte"),
     (0x2E3B, "Carry set: no argument"),
-    (0x2E3C, "Return"),
+    (0x2E3C, "Return with C set: the line has no filename"),
     (0x2E3D, "Carry clear: an argument found"),
-    (0x2E3E, "Return"),
+    (0x2E3E, "Return with C clear: a filename starts one byte back"),
 ])
 d.label(0x2E1D, "skip_separators_loop")
 d.label(0x2E3B, "no_argument")
@@ -91,7 +124,8 @@ d.label(0x2E25, "check_separator")
 
 d.subroutine(0x2E3F, "expand",
              title="Load the named picture and unpack it onto the screen",
-             description="Refuses to run outside MODE 2. Finds the filename "
+             description="The whole of *EXPAND, reached by expand_start's "
+             "JMP. Refuses to run outside MODE 2. Finds the filename "
              "on the command line, opens the file to learn its length, and "
              "loads it so that it ends at &8000, with all sixteen logical "
              "colours black so that neither the packed bytes nor the "
@@ -110,22 +144,24 @@ d.subroutine(0x2E3F, "expand",
 comments([
     (0x2E3F, "Read the screen mode into Y"),
     (0x2E41, "...Y = the current screen mode"),
-    (0x2E44, "MODE 2?"),
+    (0x2E44, "MODE 2, the only mode EXPAND unpacks into?"),
     (0x2E46, "Yes: carry on"),
     (0x2E48, "No: error 25, \"Bad Mode\""),
     (0x2E49, "Error number 25 (BASIC's own \"Bad MODE\" number)"),
     (0x2E4A, "Error message"),
     (0x2E52, "End of the message"),
     (0x2E53, "Save the four zero-page bytes OSARGS will overwrite..."),
-    (0x2E55, "...low byte of command_ptr..."), (0x2E56, "...next byte..."), (0x2E58, "...the caller's, kept..."), (0x2E59, "...third byte..."),
-    (0x2E5B, "...kept..."), (0x2E5C, "...fourth byte..."), (0x2E5E, "...kept, to restore before returning"),
+    (0x2E55, "...low byte of command_ptr..."), (0x2E56, "...then its second byte (&85)..."), (0x2E58, "...the caller's, kept..."),
+    (0x2E59, "...then its third byte (&86)..."),
+    (0x2E5B, "...pushed after the second..."), (0x2E5C, "...then its fourth byte (&87)..."), (0x2E5E, "...kept, to restore before returning"),
     (0x2E5F, "OSARGS 1: command_ptr = the rest of the command line..."),
-    (0x2E61, "...into command_ptr..."), (0x2E63, "...Y = 0 for this call..."), (0x2E65, "...so command_ptr points past \"EXPAND\""),
+    (0x2E61, "...X = command_ptr, to receive the address..."), (0x2E63, "...Y = 0 for this call..."), (0x2E65, "...so command_ptr points past \"EXPAND\""),
     (0x2E68, "Find the filename"),
     (0x2E6B, "Found: open it"),
     (0x2E6D, "None: restore command_ptr..."),
-    (0x2E6E, "...its fourth byte..."), (0x2E70, "...the third..."), (0x2E71, "...back in place..."), (0x2E73, "...the second..."),
-    (0x2E74, "...back in place..."), (0x2E76, "...the first..."), (0x2E77, "...restored, so the caller's zero page is intact"),
+    (0x2E6E, "...its fourth byte..."), (0x2E70, "...then the third, pulled in reverse..."), (0x2E71, "...back in place..."),
+    (0x2E73, "...then the second byte..."),
+    (0x2E74, "...back in place..."), (0x2E76, "...then the first byte..."), (0x2E77, "...restored, so the caller's zero page is intact"),
     (0x2E79, "...and give error 0, \"Filename expected\""),
     (0x2E7A, "Error number 0"),
     (0x2E7B, "Error message"),
@@ -139,8 +175,9 @@ comments([
     (0x2EA0, "Y = the file handle"),
     (0x2EA1, "Opened: go on"),
     (0x2EA3, "Not found: restore command_ptr..."),
-    (0x2EA4, "...its fourth byte..."), (0x2EA6, "...the third..."), (0x2EA7, "...back in place..."), (0x2EA9, "...the second..."),
-    (0x2EAA, "...back in place..."), (0x2EAC, "...the first..."), (0x2EAD, "...restored, so the caller's zero page is intact"),
+    (0x2EA4, "...its fourth byte..."), (0x2EA6, "...then the third, pulled in reverse..."), (0x2EA7, "...back in place..."),
+    (0x2EA9, "...then the second byte..."),
+    (0x2EAA, "...back in place..."), (0x2EAC, "...then the first byte..."), (0x2EAD, "...restored, so the caller's zero page is intact"),
     (0x2EAF, "...and give error 0, \"No such compressed picture\""),
     (0x2EB0, "Error number 0"),
     (0x2EB1, "Error message"),
@@ -151,13 +188,14 @@ comments([
     (0x2ED1, "...on the stack, for restoring afterwards"),
     (0x2ED2, "Replace it with the template's"),
     (0x2ED5, "...in the block at &0C00"),
-    (0x2ED8, "Next byte"),
+    (0x2ED8, "Next byte down, 17 to 0"),
     (0x2ED9, "Until all 18 bytes are set"),
     (0x2EDB, "Point the block at the filename..."),
-    (0x2EDD, "...low byte..."), (0x2EE0, "...high byte..."), (0x2EE2, "...into the block's filename address"),
+    (0x2EDD, "...its low byte at +0..."), (0x2EE0, "...then the filename's page..."), (0x2EE2, "...into the block's filename address"),
     (0x2EE5, "Save the four zero-page bytes OSARGS will overwrite..."),
-    (0x2EE7, "...packed_ptr low byte kept..."), (0x2EE8, "...high byte..."), (0x2EEA, "...kept..."), (0x2EEB, "...screen_ptr low byte..."),
-    (0x2EED, "...kept..."), (0x2EEE, "...high byte..."), (0x2EF0, "...kept, to restore before returning"),
+    (0x2EE7, "...packed_ptr low byte kept..."), (0x2EE8, "...then packed_ptr's high byte..."), (0x2EEA, "...pushed after the low byte..."),
+    (0x2EEB, "...screen_ptr low byte..."),
+    (0x2EED, "...pushed in its turn..."), (0x2EEE, "...then screen_ptr's high byte..."), (0x2EF0, "...kept, to restore before returning"),
     (0x2EF1, "OSARGS 2 (Y = the handle): packed_ptr = the file's length "
               "(EXT#)..."),
     (0x2EF3, "...reason 2: the file's length"), (0x2EF5, "...four bytes into packed_ptr onwards"),
@@ -171,20 +209,21 @@ comments([
     (0x2F10, "VDU 19,colour,0,0,0,0: make it black..."),
     (0x2F12, "...VDU 19: redefine a logical colour..."), (0x2F15, "...logical colour X..."), (0x2F16, "...the colour being redefined"), (0x2F19, "...physical colour 0, black, and three zeros..."),
     (0x2F1B, "...four bytes to send..."), (0x2F1D, "...each a zero..."), (0x2F20, "...one fewer to go..."), (0x2F21, "Not all four: send another"),
-    (0x2F23, "Next colour"),
+    (0x2F23, "Next colour down"),
     (0x2F24, "Until colours 15 to 0 are black"),
     (0x2F26, "Load the file at the block's address (exec byte 0)..."),
-    (0x2F28, "...XY = the block at &0C00..."), (0x2F2A, "...its high byte..."), (0x2F2C, "...so the file lands ending at &8000"),
+    (0x2F28, "...XY = the block at &0C00..."), (0x2F2A, "...and its page, &0C..."), (0x2F2C, "...so the file lands ending at &8000"),
     (0x2F2F, "packed_ptr = the load address, the first packed byte..."),
-    (0x2F30, "...high byte first, as pushed last..."), (0x2F32, "...then the low byte..."), (0x2F33, "...into packed_ptr"),
+    (0x2F30, "...high byte first, as pushed last..."), (0x2F32, "...then the low byte..."),
+    (0x2F33, "...completing packed_ptr: the file's first byte"),
     (0x2F35, "screen_ptr = &3000, the MODE 2 screen's start..."),
     (0x2F37, "...Y = 0 for the (pointer),Y accesses..."), (0x2F38, "...screen_ptr low byte..."), (0x2F3A, "...the screen's page..."), (0x2F3C, "...as screen_ptr's high byte"),
     (0x2F3E, "Read a packed byte"),
-    (0x2F41, "Keep it"),
+    (0x2F41, "Keep it for its screen byte, used after the run"),
     (0x2F42, "Top two bits: the run length code..."),
     (0x2F44, "...moved down to bits 1-0 (through the carry)"),
     (0x2F45, "...bit 7 into the carry..."), (0x2F46, "...bit 6 into the carry, bit 7 into bit 0..."), (0x2F47, "...and bit 6 into bit 0: the code, 0-3"),
-    (0x2F48, "Code 3?"),
+    (0x2F48, "Code 3: the run length is in the next byte?"),
     (0x2F4A, "No: the run is the code + 1 bytes"),
     (0x2F4C, "Yes: the run is the next byte + 1 (0 = 256)"),
     (0x2F4F, "X = the run length..."),
@@ -192,21 +231,23 @@ comments([
     (0x2F51, "A = the screen byte: six pixel bits, colours 0-7"),
     (0x2F52, "...pixel bits only, dropping the run code"),
     (0x2F54, "Write it to the screen"),
-    (0x2F56, "Advance screen_ptr..."),
+    (0x2F56, "Advance screen_ptr to the next screen byte..."),
     (0x2F58, "No carry: same page"), (0x2F5A, "Carry: the next page"),
     (0x2F5C, "Reached &8000: the screen is full"),
     (0x2F5E, "Count down the run"),
     (0x2F5F, "More of the run: write it again"),
     (0x2F61, "Next packed byte"),
     (0x2F64, "Restore the zero-page bytes..."),
-    (0x2F65, "...screen_ptr high byte..."), (0x2F67, "...its low byte..."), (0x2F68, "...back in place..."), (0x2F6A, "...packed_ptr high byte..."),
-    (0x2F6B, "...back in place..."), (0x2F6D, "...its low byte..."), (0x2F6E, "...the caller's values again"),
+    (0x2F65, "...screen_ptr high byte..."), (0x2F67, "...then screen_ptr's low byte..."), (0x2F68, "...back in place..."), (0x2F6A, "...packed_ptr high byte..."),
+    (0x2F6B, "...back in place..."), (0x2F6D, "...then packed_ptr's low byte..."), (0x2F6E, "...the caller's values again"),
     (0x2F70, "Restore the 18 bytes at &0C00..."),
-    (0x2F72, "...each from the stack, byte 0 first..."), (0x2F73, "...back into the block's place"), (0x2F76, "...next byte..."), (0x2F77, "...all 18?"),
+    (0x2F72, "...each from the stack, byte 0 first..."), (0x2F73, "...back into the block's place"),
+    (0x2F76, "...on to the next of the 18..."), (0x2F77, "...all 18 bytes put back?"),
     (0x2F79, "No: restore the next"),
     (0x2F7B, "Restore command_ptr..."),
-    (0x2F7C, "...its fourth byte..."), (0x2F7E, "...the third..."), (0x2F7F, "...back in place..."), (0x2F81, "...the second..."),
-    (0x2F82, "...back in place..."), (0x2F84, "...the first..."), (0x2F85, "...the caller's zero page is intact"),
+    (0x2F7C, "...its fourth byte..."), (0x2F7E, "...then the third, pulled in reverse..."), (0x2F7F, "...back in place..."),
+    (0x2F81, "...then the second byte..."),
+    (0x2F82, "...back in place..."), (0x2F84, "...then the first byte..."), (0x2F85, "...the caller's zero page is intact"),
     (0x2F87, "VDU 20: restore the default colours, revealing the "
               "picture, and return"),
     (0x2F89, "...OSWRCH returns to EXPAND's caller"),
@@ -245,14 +286,16 @@ d.expr(0x2F2B, hi(sym("osfile_block")))
 # read_packed_byte
 
 d.subroutine(0x2F8C, "read_packed_byte", title="Read the next packed byte",
-             description="Read the byte at packed_ptr and step packed_ptr past it.",
+             description="Read the byte at packed_ptr and step packed_ptr past "
+             "it. Called by expand for each packed byte, and again for the "
+             "length byte that follows a code-3 byte.",
              on_entry={"Y": "0"},
              on_exit={"A": "the byte at packed_ptr, which advances past it"})
 comments([
     (0x2F8C, "Read the byte"),
-    (0x2F8E, "Advance packed_ptr..."),
+    (0x2F8E, "Advance packed_ptr past it..."),
     (0x2F90, "No carry: pointer done"), (0x2F92, "Carry into the high byte"),
-    (0x2F94, "Return"),
+    (0x2F94, "Return with the packed byte in A"),
 ])
 d.label(0x2F94, "read_packed_byte_done")
 

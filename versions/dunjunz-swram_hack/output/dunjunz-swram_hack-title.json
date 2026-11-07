@@ -126,7 +126,7 @@
       "addr": 14534,
       "name": "title_start",
       "title": "TITLE: draw the title page and wait for a key",
-      "description": "Entered by */TITLE from the BASIC program DUNJUNZ. Select MODE 5 with colour 2 blue, fill the screen with stripe_pattern, copy title_picture into character rows 1-8, print the credits, title and keys, open an empty black window at the bottom, hide the cursor, flush the keyboard buffer and wait up to 7.67 seconds for a key, then return to BASIC.",
+      "description": "The title page between the intro and the game's loader. Entered by */TITLE from the BASIC program DUNJUNZ, after its \"Please wait....\" screen in MODE 4; it returns to BASIC, which does *FX225 and *TV255 and chains DUNK, the sideways RAM loader. The run is a straight line in four phases, marked by block comments below. Screen: MODE 5 with colour 2 blue, then stripe_pattern copied into every character cell from &5800 to &7FFF. Picture: title_picture, &A00 bytes, copied a byte at a time over character rows 1-8. Text: page_text (the credits, the title in a black window and the keys in a white one), then blank_line_text unless INKEY(-256) reports an Electron, then black_window_vdu. Wait: the cursor is turned off by writing the 6845 directly (register 10 = &20, at &FE00/&FE01, even on an Electron), the input buffer is flushed and OSBYTE &81 waits up to &2FF centiseconds (7.67 s) for a key. It leaves the page on the screen, with the last text window (columns 2-17, rows 26-28) still set, the cursor off, and the key, if one was pressed, read from the buffer.",
       "on_exit": {
         "A": "corrupted",
         "X": "corrupted",
@@ -139,7 +139,7 @@
       "addr": 14336,
       "name": "stripe_pattern",
       "title": "Background stripe pattern",
-      "description": "One MODE 5 character cell, copied over the whole screen: even pixel rows black (&00), odd rows four pixels of colour 2 (&F0), which mode_vdu makes blue.",
+      "description": "TITLE is the title page shown between the intro and the game's loader: the BASIC program DUNJUNZ runs it with */TITLE, and it returns to BASIC, which chains DUNK. Its data comes first and the code, title_start (&38C6), after it; title_start's banner describes the run. This first table is one MODE 5 character cell, copied over the whole screen: even pixel rows black (&00), odd rows four pixels of colour 2 (&F0), which mode_vdu makes blue.",
       "align": "before_label"
     },
     {
@@ -318,22 +318,26 @@
     {
       "addr": 112,
       "name": "copy_from",
-      "group": "zero_page"
+      "group": "zero_page",
+      "description": "Source pointer, low byte: stripe_pattern while striping, then the next byte of title_picture."
     },
     {
       "addr": 113,
       "name": "copy_from_high",
-      "group": "zero_page"
+      "group": "zero_page",
+      "description": "Source pointer, high byte."
     },
     {
       "addr": 128,
       "name": "copy_to",
-      "group": "zero_page"
+      "group": "zero_page",
+      "description": "Screen pointer, low byte: the next character cell while striping, then the next screen byte of the picture."
     },
     {
       "addr": 129,
       "name": "copy_to_high",
-      "group": "zero_page"
+      "group": "zero_page",
+      "description": "Screen pointer, high byte."
     },
     {
       "addr": 22528,
@@ -1050,7 +1054,7 @@
         56
       ],
       "comments_before_label": [
-        "Stripe the whole MODE 5 screen, &5800-&7FFF, one character cell at a time."
+        "Screen, with MODE 5 set: stripe all of it, &5800-&7FFF, one character cell at a time."
       ],
       "comment_inline": "Point copy_from at stripe_pattern and copy_to at mode5_screen",
       "type": "code",
@@ -1259,7 +1263,7 @@
         165,
         128
       ],
-      "comment_inline": "...low byte...",
+      "comment_inline": "...copy_to's low byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "copy_to",
@@ -1296,7 +1300,7 @@
         165,
         129
       ],
-      "comment_inline": "...high byte...",
+      "comment_inline": "...then copy_to's page...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "copy_to_high",
@@ -1393,7 +1397,7 @@
       "comments_before_label": [
         "Copy the logo picture, a byte at a time, over character rows 1-8."
       ],
-      "comment_inline": "copy_from = title_picture",
+      "comment_inline": "copy_from = title_picture, at &3A00...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#>(title_picture)",
@@ -1426,7 +1430,7 @@
         169,
         0
       ],
-      "comment_inline": "...page-aligned...",
+      "comment_inline": "...which is page-aligned...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#0"
@@ -1483,7 +1487,7 @@
         169,
         89
       ],
-      "comment_inline": "...high byte...",
+      "comment_inline": "...then the page of &5940...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "#>(title_picture_screen)",
@@ -1553,7 +1557,7 @@
       "bytes": [
         24
       ],
-      "comment_inline": "copy_from += 1",
+      "comment_inline": "Advance copy_from to the picture's next byte...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -1563,7 +1567,7 @@
         165,
         112
       ],
-      "comment_inline": "...low byte...",
+      "comment_inline": "...copy_from's low byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "copy_from",
@@ -1576,7 +1580,7 @@
         105,
         1
       ],
-      "comment_inline": "...plus one",
+      "comment_inline": "...plus one, carry into the page",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#1"
@@ -1600,7 +1604,7 @@
         165,
         113
       ],
-      "comment_inline": "...high byte...",
+      "comment_inline": "...then copy_from's page...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "copy_from_high",
@@ -1636,7 +1640,7 @@
       "bytes": [
         24
       ],
-      "comment_inline": "copy_to += 1",
+      "comment_inline": "Advance copy_to to the screen's next byte...",
       "type": "code",
       "mnemonic": "clc"
     },
@@ -1646,7 +1650,7 @@
         165,
         128
       ],
-      "comment_inline": "...low byte...",
+      "comment_inline": "...copy_to's low byte...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "copy_to",
@@ -1659,7 +1663,7 @@
         105,
         1
       ],
-      "comment_inline": "...plus one",
+      "comment_inline": "...plus one, carry into the page",
       "type": "code",
       "mnemonic": "adc",
       "operand": "#1"
@@ -1683,7 +1687,7 @@
         165,
         129
       ],
-      "comment_inline": "...high byte...",
+      "comment_inline": "...then copy_to's page...",
       "type": "code",
       "mnemonic": "lda",
       "operand": "copy_to_high",
@@ -1995,7 +1999,7 @@
         238,
         255
       ],
-      "comment_inline": "...printed",
+      "comment_inline": "...printed: a space",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "oswrch",

@@ -5,13 +5,13 @@ osbyte_inkey              = &81
 osbyte_flush_buffer_class = &0f
 
 ; Memory locations
-copy_from             = &70
+copy_from             = &70  ; Source pointer, low byte: stripe_pattern while striping, then the next byte of title_picture.
 ; &70 referenced 6 times by &38da, &38e4, &3909, &3913, &3918, &391c
-copy_from_high        = &71
+copy_from_high        = &71  ; Source pointer, high byte.
 ; &71 referenced 5 times by &38d6, &3905, &391e, &3922, &3931
-copy_to               = &80
+copy_to               = &80  ; Screen pointer, low byte: the next character cell while striping, then the next screen byte of the picture.
 ; &80 referenced 8 times by &38dc, &38e6, &38ef, &38f3, &390d, &3915, &3925, &3929
-copy_to_high          = &81
+copy_to_high          = &81  ; Screen pointer, high byte.
 ; &81 referenced 7 times by &38e0, &38f5, &38f9, &38fd, &3911, &392b, &392f
 mode5_screen          = &5800  ; The start of MODE 5's screen memory (&5800-&7FFF)
 title_picture_screen  = &5940  ; Character row 1 of the MODE 5 screen, where the logo picture is copied (&5940-&633F)
@@ -31,8 +31,12 @@ osbyte                = &fff4
 ; ***************************************************************************************
 ; Background stripe pattern
 ;
-; One MODE 5 character cell, copied over the whole screen: even pixel rows black (&00),
-; odd rows four pixels of colour 2 (&F0), which mode_vdu makes blue.
+; TITLE is the title page shown between the intro and the game's loader: the BASIC
+; program DUNJUNZ runs it with */TITLE, and it returns to BASIC, which chains DUNK. Its
+; data comes first and the code, title_start (&38C6), after it; title_start's banner
+; describes the run. This first table is one MODE 5 character cell, copied over the whole
+; screen: even pixel rows black (&00), odd rows four pixels of colour 2 (&F0), which
+; mode_vdu makes blue.
 .stripe_pattern
     equb &00, &f0, &00, &f0, &00, &f0, &00, &f0  ; Rows 0-7 of the cell, black and colour 2 alternately
 ; ***************************************************************************************
@@ -103,10 +107,19 @@ osbyte                = &fff4
 ; ***************************************************************************************
 ; TITLE: draw the title page and wait for a key
 ;
-; Entered by */TITLE from the BASIC program DUNJUNZ. Select MODE 5 with colour 2 blue,
-; fill the screen with stripe_pattern, copy title_picture into character rows 1-8, print
-; the credits, title and keys, open an empty black window at the bottom, hide the cursor,
-; flush the keyboard buffer and wait up to 7.67 seconds for a key, then return to BASIC.
+; The title page between the intro and the game's loader. Entered by */TITLE from the
+; BASIC program DUNJUNZ, after its "Please wait...." screen in MODE 4; it returns to
+; BASIC, which does *FX225 and *TV255 and chains DUNK, the sideways RAM loader. The run
+; is a straight line in four phases, marked by block comments below. Screen: MODE 5 with
+; colour 2 blue, then stripe_pattern copied into every character cell from &5800 to
+; &7FFF. Picture: title_picture, &A00 bytes, copied a byte at a time over character rows
+; 1-8. Text: page_text (the credits, the title in a black window and the keys in a white
+; one), then blank_line_text unless INKEY(-256) reports an Electron, then
+; black_window_vdu. Wait: the cursor is turned off by writing the 6845 directly (register
+; 10 = &20, at &FE00/&FE01, even on an Electron), the input buffer is flushed and OSBYTE
+; &81 waits up to &2FF centiseconds (7.67 s) for a key. It leaves the page on the screen,
+; with the last text window (columns 2-17, rows 26-28) still set, the cursor off, and the
+; key, if one was pressed, read from the buffer.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -122,7 +135,7 @@ osbyte                = &fff4
     txa                                 ; ...count into A for the test
     cmp #page_text - mode_vdu           ; ...all eight sent?
     bne send_mode_vdu                   ; No: send the next
-; Stripe the whole MODE 5 screen, &5800-&7FFF, one character cell at a time.
+; Screen, with MODE 5 set: stripe all of it, &5800-&7FFF, one character cell at a time.
     lda #>(stripe_pattern)              ; Point copy_from at stripe_pattern and copy_to at mode5_screen
     sta copy_from_high                  ; ...copy_from's high byte
     lda #0                              ; Both low bytes are 0
@@ -140,10 +153,10 @@ osbyte                = &fff4
     cmp #8                              ; ...all eight rows of the cell?
     bne fill_stripes                    ; No: copy the next row
     clc                                 ; copy_to += 8: on to the next cell
-    lda copy_to                         ; ...low byte...
+    lda copy_to                         ; ...copy_to's low byte...
     adc #8                              ; ...plus 8: one character cell
     sta copy_to                         ; ...the cell to the right, or the next row's first
-    lda copy_to_high                    ; ...high byte...
+    lda copy_to_high                    ; ...then copy_to's page...
     adc #0                              ; ...with the carry
     sta copy_to_high                    ; ...completing the next cell's address
     ldy #0                              ; Back to the pattern's first byte
@@ -151,30 +164,30 @@ osbyte                = &fff4
     cmp #>(screen_end)                  ; ...at the top of screen memory?
     bne fill_stripes                    ; No: stripe the next cell
 ; Copy the logo picture, a byte at a time, over character rows 1-8.
-    lda #>(title_picture)               ; copy_from = title_picture
+    lda #>(title_picture)               ; copy_from = title_picture, at &3A00...
     sta copy_from_high                  ; ...as copy_from's high byte
-    lda #0                              ; ...page-aligned...
+    lda #0                              ; ...which is page-aligned...
     sta copy_from                       ; ...so copy_from's low byte is 0
     lda #<(title_picture_screen)        ; copy_to = title_picture_screen (Y stays 0 from here)
     sta copy_to                         ; ...low byte: character row 1, below a striped row
-    lda #>(title_picture_screen)        ; ...high byte...
+    lda #>(title_picture_screen)        ; ...then the page of &5940...
     sta copy_to_high                    ; ...as copy_to's high byte
 ; &3913 referenced 1 time by &3935
 .copy_picture
     lda (copy_from),y                   ; Copy one byte of the picture to the screen
     sta (copy_to),y                     ; ...over the stripes
-    clc                                 ; copy_from += 1
-    lda copy_from                       ; ...low byte...
-    adc #1                              ; ...plus one
+    clc                                 ; Advance copy_from to the picture's next byte...
+    lda copy_from                       ; ...copy_from's low byte...
+    adc #1                              ; ...plus one, carry into the page
     sta copy_from                       ; ...the picture's next byte
-    lda copy_from_high                  ; ...high byte...
+    lda copy_from_high                  ; ...then copy_from's page...
     adc #0                              ; ...with the carry
     sta copy_from_high                  ; ...crossing into its next page
-    clc                                 ; copy_to += 1
-    lda copy_to                         ; ...low byte...
-    adc #1                              ; ...plus one
+    clc                                 ; Advance copy_to to the screen's next byte...
+    lda copy_to                         ; ...copy_to's low byte...
+    adc #1                              ; ...plus one, carry into the page
     sta copy_to                         ; ...the screen's next byte
-    lda copy_to_high                    ; ...high byte...
+    lda copy_to_high                    ; ...then copy_to's page...
     adc #0                              ; ...with the carry
     sta copy_to_high                    ; ...completing the next screen address
     lda copy_from_high                  ; Repeat until copy_from reaches the end of the file, &4400
@@ -200,7 +213,7 @@ osbyte                = &fff4
 ; &3956 referenced 1 time by &3962
 .print_blank_line
     lda blank_line_text,x               ; ...this byte of the line...
-    jsr oswrch                          ; ...printed
+    jsr oswrch                          ; ...printed: a space
     inx                                 ; ...on to the next
     lda blank_line_text,x               ; ...look at it...
     cmp #text_end                       ; ...is it the terminator?

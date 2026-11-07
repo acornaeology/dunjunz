@@ -38,12 +38,19 @@ reset_vector   = &fffc  ; The 6502 reset vector: the MOS's reset entry.
 ; ***************************************************************************************
 ; *DEFAULT: restore a level file
 ;
-; Disable ESCAPE, clear the screen, ask which level to reset and read one or two digits.
-; Accept 1-25, copy that level's original (still encrypted) from the copies at &12B0 to
-; &6B00 and *SAVE it as LevelN. Then offer another level, or quit through the reset
-; vector. Level 25 is accepted and saved as Level25, although the game reads level 25
-; from Stones; and a leading zero (05) is kept in the filename (Level05), which the game
-; does not read either.
+; *DEFAULT is the Master 128 side's level restorer: it puts back a level file that
+; *EDITOR has changed, from the original copies of levels 1-25 it carries. It is run by
+; typing *DEFAULT, which the README says to do with the levels' side of the disc in the
+; drive, and loads and runs at &0E00. It keeps whatever screen mode is in use. For each
+; level, in the phases the block comments below mark: disable ESCAPE, flush the buffers,
+; clear the screen, ask "Which level do you wish to reset ?" and read one or two digits
+; with OSWORD 0, asking again for nothing typed, 0 or anything above 25. Copy that
+; level's original, still encrypted, from &1000 + N x &2B0 to the game's level buffer at
+; &6B00, and *SAVE it as LevelN (&6B00, &2B0 bytes) over the edited file on the current
+; drive. Then ask "Reset another level (A) or quit (Q)": A starts again from the top, Q
+; quits by JMP (&FFFC), which resets the machine. What it leaves behind is the LevelN
+; files it saved. Two of them the game never reads: Level25, since the game takes level
+; 25 from Stones, and a name with a leading zero typed (05 saves Level05).
 ; &0e00 referenced 4 times by &0e44, &0e72, &0e76, &0ef4
 .default_start
     lda #osbyte_escape_break_effect     ; OSBYTE &C8 with X=1, Y=0: disable ESCAPE...
@@ -66,11 +73,11 @@ reset_vector   = &fffc  ; The 6502 reset vector: the MOS's reset entry.
     ldy #>(read_level_block)            ; ...for the OSWORD call below
     lda #<(level_digits)                ; ...and fill it in: the buffer is level_digits...
     sta read_level_block                ; ...buffer address low byte
-    lda #>(level_digits)                ; ...high byte...
+    lda #>(level_digits)                ; ...then level_digits' page...
     sta read_level_block + 1            ; ...buffer address high byte
     lda #2                              ; ...at most two characters: levels 1-25...
     sta read_level_block + 2            ; ...as the maximum length
-    lda #'0'                            ; ...from '0'...
+    lda #'0'                            ; ...accepting characters from '0'...
     sta read_level_block + 3            ; ...as the lowest character accepted
     lda #'9'                            ; ...to '9': digits only
     sta read_level_block + 4            ; ...as the highest character accepted
@@ -79,15 +86,15 @@ reset_vector   = &fffc  ; The 6502 reset vector: the MOS's reset entry.
     cpy #0                              ; Nothing typed (or ESCAPE)?
     beq default_start                   ; Yes: clear the screen and ask again
 ; Turn the digits into the level number, and refuse 0 and anything above 25.
-    cpy #1                              ; One digit?
+    cpy #1                              ; One digit typed: a level from 1 to 9?
     beq one_digit                       ; Yes: levels 1-9
     lda level_digits                    ; Two: tens digit...
     sec                                 ; ...ready to subtract...
     sbc #'0'                            ; ...'0': the tens digit's value
-    asl a                               ; ...x 2...
+    asl a                               ; ...tens x 2...
     sta tens_times_ten                  ; ...kept as tens x 2
-    asl a                               ; ...x 8...
-    asl a                               ; ...x 8 (with the first ASL: x 4, then x 8)
+    asl a                               ; ...tens x 4...
+    asl a                               ; ...tens x 8
     clc                                 ; ...ready to add...
     adc tens_times_ten                  ; ...+ x 2 = x 10...
     sta tens_times_ten                  ; ...tens x 10, kept
@@ -108,13 +115,13 @@ reset_vector   = &fffc  ; The 6502 reset vector: the MOS's reset entry.
 .check_level
     cmp #level_count + 1                ; Beyond level 25, the last it carries?
     bcs default_start                   ; Too high: clear the screen and ask again
-    cmp #0                              ; Level 0?
+    cmp #0                              ; Level 0, which does not exist?
     beq default_start                   ; Yes: no such level, ask again
 ; Copy the level's original from *DEFAULT to the level buffer at &6B00.
     tax                                 ; X = level, the count of copies to step
     lda #<(level_1_original - level_length)  ; read_ptr = &1000, one copy before level 1...
-    sta read_ptr                        ; ...low byte...
-    lda #>(level_1_original - level_length)  ; ...high byte...
+    sta read_ptr                        ; ...its low byte into read_ptr...
+    lda #>(level_1_original - level_length)  ; ...and its page, &10...
     sta read_ptr_hi                     ; ...so adding N x &2B0 reaches level N
 ; &0e81 referenced 1 time by &0e8f
 .find_copy
@@ -122,13 +129,13 @@ reset_vector   = &fffc  ; The 6502 reset vector: the MOS's reset entry.
     clc                                 ; ...ready to add...
     adc #<(level_length)                ; ...one level's length, low byte...
     sta read_ptr                        ; ...one copy further on
-    lda read_ptr_hi                     ; ...high byte...
+    lda read_ptr_hi                     ; ...then read_ptr's page...
     adc #>(level_length)                ; ...one level's length, high byte, with carry
     sta read_ptr_hi                     ; ...completing the step
     dex                                 ; ...one level fewer to step over
     bne find_copy                       ; ...at &1000 + N x &2B0
-    lda #0                              ; put_ptr = &6B00
-    sta put_ptr                         ; ...low byte...
+    lda #0                              ; put_ptr = &6B00, the game's level buffer...
+    sta put_ptr                         ; ...low byte 0 into put_ptr...
     lda #>(level_buffer)                ; ...high byte: the game's level buffer
     sta put_ptr_hi                      ; ...where the level is saved from
     ldy #0                              ; Y = 0: both pointers step instead
@@ -150,7 +157,7 @@ reset_vector   = &fffc  ; The 6502 reset vector: the MOS's reset entry.
     lda put_ptr                         ; Until put_ptr reaches &6DB0
     cmp #<(level_buffer_end)            ; ...end of the level, low byte?
     bne copy_level                      ; No: copy the next byte
-    lda put_ptr_hi                      ; ...and high byte...
+    lda put_ptr_hi                      ; ...then put_ptr's page...
     cmp #>(level_buffer_end)            ; ...end of the level, high byte?
     bne copy_level                      ; No: copy the next byte
 ; Save it as LevelN, then offer another level or quit.
@@ -161,9 +168,9 @@ reset_vector   = &fffc  ; The 6502 reset vector: the MOS's reset entry.
     ldx #<(save_command)                ; *SAVE LevelN 6B00+2B0
     ldy #>(save_command)                ; ...(X, Y) = the command line
     jsr oscli                           ; ...replacing LevelN with the original
-    lda #&0d                            ; New line
-    jsr oswrch                          ; ...carriage return...
-    lda #&0a                            ; ...line feed...
+    lda #&0d                            ; Move down a line before the next question...
+    jsr oswrch                          ; ...sending a carriage return...
+    lda #&0a                            ; ...then a line feed...
     jsr oswrch                          ; ...so the question starts a line of its own
     ldx #0                              ; Print "Reset another level (A) or quit (Q)"
 ; &0ed6 referenced 1 time by &0edf
@@ -188,27 +195,34 @@ reset_vector   = &fffc  ; The 6502 reset vector: the MOS's reset entry.
     jmp default_start                   ; Back to the prompt for the next level
 ; ***************************************************************************************
 ; Prompts, the input block and the SAVE command
+;
+; The two zero-terminated questions default_start prints, the OSWORD 0 block it fills in
+; and the buffer that receives the digits typed, and the OSCLI command line that saves
+; the level.
 ; &0ef7 used as index base 1 time by &0e15
 .level_prompt
-    equs "Which level do you wish to reset ? ", &00
+    equs "Which level do you wish to reset ? ", &00  ; The first question, ended by a zero
+; OSWORD 0 block: buffer address, maximum length, lowest and highest character; default_start fills it in before each call.
 ; &0f1b referenced 1 time by &0e26
 .read_level_block
 ; &0f1c referenced 1 time by &0e2b
 ; &0f1d referenced 1 time by &0e30
 ; &0f1e referenced 1 time by &0e35
 ; &0f1f referenced 1 time by &0e3a
-    equb &2a, &2a, &2a, &2a, &2a
+    equb &2a, &2a, &2a, &2a, &2a        ; Buffer, length, lowest, highest: set at run time
+; The digits typed, and the CR that ends them. A single digit's CR is replaced by a space, so that both bytes can go into save_command's filename.
 ; &0f20 referenced 3 times by &0e4a, &0e6a, &0eb7
 .level_digits
 ; &0f21 referenced 3 times by &0e5a, &0e67, &0ebd
-    equb &2a, &2a, &2a
+    equb &2a, &2a, &2a                  ; Two digits and a CR, written by OSWORD 0
 ; &0f23 used as index base 1 time by &0ed6
 .another_question
-    equs "Reset another level (A) or quit (Q) ", &00
+    equs "Reset another level (A) or quit (Q) ", &00  ; The second question, ended by a zero
+; *SAVE LevelN 6B00+2B0, with the digits put in at +10 and +11.
 .save_command
 ; &0f52 referenced 1 time by &0eba
 ; &0f53 referenced 1 time by &0ec0
-    equs "SAVE Level11 6B00+2B0", &0d
+    equs "SAVE Level11 6B00+2B0", &0d   ; OSCLI: save the level buffer as LevelN
 ; ***************************************************************************************
 ; Leftovers: the end of the assembler source
 ;

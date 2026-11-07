@@ -68,13 +68,25 @@ d.label(0xFFFC, "reset_vector", group="os_entry_points", description=(
 d.entry(LOAD_ADDR)
 d.subroutine(0x1900, "default_start", title="*DEFAULT: restore a level file",
              description=(
-                 "Set *TV255 1, MODE 7 and printer off; then, for each level, "
-                 "disable ESCAPE, clear the screen, ask which level to reset "
-                 "and read one or two digits. Accept 1-24, copy that level's "
-                 "original (still encrypted) from the copies at &1DB0 to "
-                 "&6B00 and *SAVE it as LevelN. Then offer another level, or "
-                 "quit through the reset vector. A leading zero (05) is kept "
-                 "in the filename (Level05), which the game does not read."))
+                 "*DEFAULT is the Model B side's level restorer: it puts "
+                 "back a level file that *EDITOR has changed, from the "
+                 "original copies of levels 1-24 it carries. It is run by "
+                 "typing *DEFAULT, as the README describes, and loads and "
+                 "runs at &1900. "
+                 "Once: *TV255 1, MODE 7 and printer off. Then for each "
+                 "level, in the phases the block comments below mark: "
+                 "disable ESCAPE, flush the buffers, clear the screen, ask "
+                 "\"Which level do you wish to reset ?\" and read one or two "
+                 "digits with OSWORD 0, asking again for nothing typed, 0 "
+                 "or anything above 24. Copy that level's original, still "
+                 "encrypted, from &1B00 + N x &2B0 to the game's level "
+                 "buffer at &6B00, and *SAVE it as LevelN (&6B00, &2B0 "
+                 "bytes) over the edited file on the current drive. Then "
+                 "ask \"Reset another level (A) or quit (Q)\": A asks for "
+                 "another level, Q quits by JMP (&FFFC), which resets the "
+                 "machine. What it leaves behind is the LevelN files it "
+                 "saved. A leading zero typed (05) is kept in the filename "
+                 "(Level05), a file the game does not read."))
 comments([
     (0x1900, "*TV255 1: vertical shift -1 line, interlace off"),
     (0x1902, "...(X, Y) = the command line"), (0x1904, "...taking effect at the MODE change next"),
@@ -94,10 +106,10 @@ comments([
     (0x1936, "Point XY at read_level_block..."),
     (0x1938, "...for the OSWORD call below"),
     (0x193A, "...and fill it in: the buffer is level_digits..."),
-    (0x193C, "...buffer address low byte"), (0x193F, "...high byte..."), (0x1941, "...buffer address high byte"),
+    (0x193C, "...buffer address low byte"), (0x193F, "...then level_digits' page..."), (0x1941, "...buffer address high byte"),
     (0x1944, "...at most two characters: levels 1-24..."),
     (0x1946, "...as the maximum length"),
-    (0x1949, "...from '0'..."),
+    (0x1949, "...accepting characters from '0'..."),
     (0x194B, "...as the lowest character accepted"),
     (0x194E, "...to '9': digits only"),
     (0x1950, "...as the highest character accepted"),
@@ -105,14 +117,14 @@ comments([
     (0x1955, "...Y = the number of characters typed"),
     (0x1958, "Nothing typed (or ESCAPE)?"),
     (0x195A, "Yes: clear the screen and ask again"),
-    (0x195C, "One digit?"),
+    (0x195C, "One digit typed: a level from 1 to 9?"),
     (0x195E, "Yes: levels 1-9"),
     (0x1960, "Two: tens digit..."),
     (0x1963, "...ready to subtract..."), (0x1964, "...'0': the tens digit's value"),
-    (0x1966, "...x 2..."),
+    (0x1966, "...tens x 2..."),
     (0x1967, "...kept as tens x 2"),
-    (0x1969, "...x 8..."),
-    (0x196A, "...x 8 (with the first ASL: x 4, then x 8)"), (0x196B, "...ready to add..."),
+    (0x1969, "...tens x 4..."),
+    (0x196A, "...tens x 8"), (0x196B, "...ready to add..."),
     (0x196C, "...+ x 2 = x 10..."),
     (0x196E, "...tens x 10, kept"),
     (0x1970, "...plus the units digit"),
@@ -124,17 +136,18 @@ comments([
     (0x1983, "...ready to subtract..."), (0x1984, "...'0': the level number"),
     (0x1986, "Beyond level 24, the last it carries?"),
     (0x1988, "Too high: clear the screen and ask again"),
-    (0x198A, "Level 0?"),
+    (0x198A, "Level 0, which does not exist?"),
     (0x198C, "Yes: no such level, ask again"),
     (0x198E, "X = level, the count of copies to step"),
     (0x198F, "read_ptr = &1B00, one copy before level 1..."),
-    (0x1991, "...low byte..."), (0x1993, "...high byte..."), (0x1995, "...so adding N x &2B0 reaches level N"),
+    (0x1991, "...its low byte into read_ptr..."), (0x1993, "...and its page, &1B..."), (0x1995, "...so adding N x &2B0 reaches level N"),
     (0x1997, "...plus &2B0 for each level: level N's copy..."),
-    (0x1999, "...ready to add..."), (0x199A, "...one level's length, low byte..."), (0x199C, "...one copy further on"), (0x199E, "...high byte..."),
+    (0x1999, "...ready to add..."), (0x199A, "...one level's length, low byte..."), (0x199C, "...one copy further on"),
+    (0x199E, "...then read_ptr's page..."),
     (0x19A0, "...one level's length, high byte, with carry"), (0x19A2, "...completing the step"), (0x19A4, "...one level fewer to step over"),
     (0x19A5, "...at &1B00 + N x &2B0"),
-    (0x19A7, "put_ptr = &6B00"),
-    (0x19A9, "...low byte..."), (0x19AB, "...high byte: the game's level buffer"), (0x19AD, "...where the level is saved from"),
+    (0x19A7, "put_ptr = &6B00, the game's level buffer..."),
+    (0x19A9, "...low byte 0 into put_ptr..."), (0x19AB, "...high byte: the game's level buffer"), (0x19AD, "...where the level is saved from"),
     (0x19AF, "Y = 0: both pointers step instead"),
     (0x19B1, "Copy a byte of the level, still encrypted"),
     (0x19B3, "...into the level buffer"),
@@ -143,14 +156,14 @@ comments([
     (0x19BB, "Next byte to write"),
     (0x19BD, "No carry: pointer done"), (0x19BF, "Carry into the high byte"),
     (0x19C1, "Until put_ptr reaches &6DB0"),
-    (0x19C3, "...end of the level, low byte?"), (0x19C5, "No: copy the next byte"), (0x19C7, "...and high byte..."), (0x19C9, "...end of the level, high byte?"),
+    (0x19C3, "...end of the level, low byte?"), (0x19C5, "No: copy the next byte"), (0x19C7, "...then put_ptr's page..."), (0x19C9, "...end of the level, high byte?"),
     (0x19CB, "No: copy the next byte"),
     (0x19CD, "Put the digits typed into the SAVE command"),
     (0x19D0, "...first digit into the filename"), (0x19D3, "...second digit (or a space)..."), (0x19D6, "...into the filename"),
     (0x19D9, "*SAVE LevelN 6B00+2B0"),
     (0x19DB, "...(X, Y) = the command line"), (0x19DD, "...replacing LevelN with the original"),
-    (0x19E0, "New line"),
-    (0x19E2, "...carriage return..."), (0x19E5, "...line feed..."), (0x19E7, "...so the question starts a line of its own"),
+    (0x19E0, "Move down a line before the next question..."),
+    (0x19E2, "...sending a carriage return..."), (0x19E5, "...then a line feed..."), (0x19E7, "...so the question starts a line of its own"),
     (0x19EA, "Print \"Reset another level (A) or quit (Q)\""),
     (0x19EC, "...next character of another_question..."), (0x19EF, "...printed, the zero too (VDU 0 does nothing)..."), (0x19F2, "...on to the next"), (0x19F3, "...was it the zero that ends it?"),
     (0x19F5, "No: print the next"),
@@ -181,28 +194,42 @@ for addr, name in [(0x1916, "ask_level"), (0x192B, "print_prompt"),
                    (0x1A0A, "another_level")]:
     d.label(addr, name)
 
-d.banner(0x1A0D, title="Prompts, the input block and the commands")
+d.banner(0x1A0D, title="Prompts, the input block and the commands",
+         description="The two zero-terminated questions default_start "
+         "prints, the OSWORD 0 block it fills in and the buffer that "
+         "receives the digits typed, and the two OSCLI command lines.")
 d.label(0x1A0D, "level_prompt")
 d.stringz(0x1A0D)
-d.label(0x1A31, "read_level_block", length=5, description=(
-    "OSWORD 0 block: buffer address, maximum length, lowest and highest "
-    "character; *DEFAULT fills it in before each call."))
+d.comment(0x1A0D, "The first question, ended by a zero", align=INLINE)
+d.label(0x1A31, "read_level_block", length=5)
+d.comment(0x1A31, "OSWORD 0 block: buffer address, maximum length, lowest "
+          "and highest character; default_start fills it in before each "
+          "call.")
 d.byte(0x1A31, 5, cols=5)
+d.comment(0x1A31, "Buffer, length, lowest, highest: set at run time",
+          align=INLINE)
 for k in range(1, 5):
     d.expr_label(0x1A31 + k, f"read_level_block+{k}")
-d.label(0x1A36, "level_digits", length=3, description=(
-    "The digits typed, and the CR that ends them."))
+d.label(0x1A36, "level_digits", length=3)
+d.comment(0x1A36, "The digits typed, and the CR that ends them. A single "
+          "digit's CR is replaced by a space, so that both bytes can go "
+          "into save_command's filename.")
 d.byte(0x1A36, 3, cols=3)
+d.comment(0x1A36, "Two digits and a CR, written by OSWORD 0", align=INLINE)
 d.expr_label(0x1A37, "level_digits+1")
 d.label(0x1A39, "another_question")
 d.stringz(0x1A39)
-d.label(0x1A5E, "save_command", description=(
-    "*SAVE LevelN 6B00+2B0, with the digits at +10 and +11."))
+d.comment(0x1A39, "The second question, ended by a zero", align=INLINE)
+d.label(0x1A5E, "save_command")
+d.comment(0x1A5E, "*SAVE LevelN 6B00+2B0, with the digits put in at +10 "
+          "and +11.")
 d.stringcr(0x1A5E)
+d.comment(0x1A5E, "OSCLI: save the level buffer as LevelN", align=INLINE)
 d.expr_label(0x1A68, "save_command+10")
 d.expr_label(0x1A69, "save_command+11")
 d.label(0x1A74, "tv_command")
 d.stringcr(0x1A74)
+d.comment(0x1A74, "OSCLI: vertical shift -1, interlace off", align=INLINE)
 
 for operand_addr, name in [(0x1901, "tv_command"), (0x1937, "read_level_block"),
                            (0x19DA, "save_command")]:

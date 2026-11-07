@@ -181,6 +181,9 @@ feature or defect met along the way, and note the workaround here.
   `basic.wait_for_prompt` returns while a line is still being typed
   (rob-smallshire/beebium#270). With the 1770 preset (DFS 2.26), OSWORD
   &7F read ID returns no IDs.
+- dasmos drops `description=` for labels inside a loaded image
+  (acornaeology/dasmos#61); `Annotator.label` and `Annotator.region`
+  repeat it as a block comment where the address is loaded.
 - `Beebium.launch` needs `variant=` repeated alongside `preset=`
   (rob-smallshire/beebium#269).
 - Shared annotations meet the Master side's differing code through

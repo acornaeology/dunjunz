@@ -107,7 +107,7 @@
       "addr": 8192,
       "name": "coder2_start",
       "title": "Coder2: install the joystick handler and run Coder",
-      "description": "Run by *DUNJUNZ when a joystick is present. *L. Code loads the joystick handler into private RAM at &C500, BYTEV is pointed at it, and *CODER is run, which does not return. From then on every OSBYTE call passes through the handler, which answers the game's INKEY scans of one hero's movement and fire keys from the joystick and passes every other call on to the MOS. BYTEV's old value is not saved: the handler passes calls on through a fixed address.",
+      "description": "Coder2 is the Master side's joystick installer, 38 bytes at &2000. *DUNJUNZ's run_coder runs it as *CODER2, in place of *CODER, when joystick channel 1 reads as a stick at rest; the display is already blanked and VDU output disabled. The run is three steps in a straight line: *L. Code loads the joystick handler into private RAM (HAZEL) at &C500, which MOS 3.20 leaves paged in; BYTEV is pointed at it; and *CODER loads and starts the game, and does not return. There is no RTS: the two command strings follow the last call. It leaves BYTEV pointing at the handler for the whole game. Every OSBYTE call then passes through it: INKEY scans of the Barbarian's (hero 2's) keys N, M, G, B and SPACE are answered from the joystick's two axes and fire buttons, so the joystick plays the Barbarian, and every other call goes straight to the MOS 3.20 OSBYTE routine at &EEB1. BYTEV's old value is not saved, so anything hooked into BYTEV before is bypassed.",
       "fall_through": true
     }
   ],
@@ -439,6 +439,10 @@
       "labels": [
         "load_code_command"
       ],
+      "comments_before_label": [
+        "The OSCLI command lines, each ended by a carriage return."
+      ],
+      "comment_inline": "Load the joystick handler at its own &C500",
       "type": "string",
       "string": "L. Code."
     },
@@ -455,6 +459,7 @@
       "labels": [
         "coder_command"
       ],
+      "comment_inline": "Run Coder, which loads and starts the game",
       "type": "string",
       "string": "CODER."
     }

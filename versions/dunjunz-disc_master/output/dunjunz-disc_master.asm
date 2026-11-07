@@ -1,3 +1,77 @@
+; Dunjunz, official disc (Master 128 side): the game
+;
+; Annotated disassembly of the game's nine files: Coder, Dunj2-Dunj5, and Code, Table,
+; Code2 and Code3 in private RAM.
+;
+; The files
+;
+; | File  | Range       | Contents                                                                                                                      |
+; |-------|-------------|-------------------------------------------------------------------------------------------------------------------------------|
+; | Coder | &0400-&07FE | The game's &0400-&07FF, with coder_start at &0740 (its exec address)                                                          |
+; | Dunj3 | &08C0-&0CFE | Sprite plotting, per-hero tables and scores, room_walls                                                                       |
+; | Dunj4 | &0E00-&1FFF | new_game and level_loop, the status panel, the victory sequence, start_level and load_level, sprites, update_game, play_level |
+; | Dunj5 | &2000-&2FFF | The exit animation, doors and keys, sprites                                                                                   |
+; | Dunj2 | &6E80-&7FFF | Heroes, missiles, objects, monsters, workspace_template, the WRCHV handler                                                    |
+; | Code  | &C500-&C56B | joystick_bytev, the BYTEV handler (HAZEL)                                                                                     |
+; | Table | &C5A0-&C6F7 | load_stones, game_over_music, row_offsets, pause_check (HAZEL)                                                                |
+; | Code2 | &C700-&D759 | The music: start_music, stop_music, music_event and the tune (HAZEL)                                                          |
+; | Code3 | &D800-&D8FE | plot_sprite_hazel, the copy of the sprite plotter (HAZEL)                                                                     |
+;
+; Memory map in play
+;
+; | Range       | Contents                                                                                 |
+; |-------------|------------------------------------------------------------------------------------------|
+; | &0000-&0001 | tune_ptr, the music's place in the tune                                                  |
+; | &0070-&008F | The game's zero page                                                                     |
+; | &0287       | The MOS BREAK intercept, left disabled                                                   |
+; | &0400-&2FFF | Coder, Dunj3, page &0D (the game's per-level workspace, loaded by no file), Dunj4, Dunj5 |
+; | &3000-&6E7F | Screen (25 character rows in play)                                                       |
+; | &6B00-&6DAF | The level file, in the screen's bottom rows                                              |
+; | &6E80-&7FFF | Dunj2                                                                                    |
+; | &C400-&C4FF | saved_page_0d, the MOS's page &0D (HAZEL)                                                |
+; | &C500-&D8FE | Code, Table, Code2, Code3 (HAZEL)                                                        |
+;
+; MOS 3.20 starts *RUN programs with HAZEL, the Master's private RAM at &C000-&DFFF,
+; paged in (ACCCON bit 3 set), and the game never changes ACCCON, so its reads and calls
+; of &C000-&DFFF reach these files rather than the MOS ROM.
+;
+; From power-on to play
+;
+; 1. !BOOT chains BOOT, which on a Master shows README and runs *DUNJUNZ (its own
+;    listing). That loads Code2, Code3 and Table into HAZEL, shows the title screen, and
+;    runs CODER2 (its own listing), which loads Code and points BYTEV at joystick_bytev,
+;    if ADC channel 1 reads as a joystick at rest, or else CODER.
+; 2. coder_start (&0740) calls set_bell, copies the MOS's page &0D to saved_page_0d,
+;    *LOADs Dunj2-Dunj5, shows the display again, selects COLOUR 2 and jumps to new_game
+;    at &0E00.
+; 3. new_game zeroes level_number and level_bcd, gives each hero their starting
+;    attributes (reset_hero) and runs hero_menu. README tells the players to turn the
+;    disc over then: only level 1 is on this side, and the levels are loaded from the
+;    Model B side.
+; 4. level_loop sets monster_start_hit_points and counts the level in level_bcd, then
+;    calls start_level, which runs steps 5 to 9.
+; 5. After the first level, the music's place is kept on the stack, and stop_music
+;    silences it.
+; 6. count_level clears the screen and counts level_number.
+; 7. load_level copies saved_page_0d back to page &0D for the disc filing system, writes
+;    the digits into level_command, shows 15 rows, and *LOADs LEVELnn to &6B00, or for
+;    level 25 Stones through load_stones; decrypt_level decrypts and checks it.
+; 8. unpack_level, reset_workspace (which gives page &0D back to the game) and
+;    reset_monsters set up play; the screen is cleared and set to 25 rows, and
+;    draw_view_frames draws the frames and the four views and points WRCHV at the game's
+;    handler, which passes text to the MOS.
+; 9. start_music starts the tune, which then resumes from its kept place after the first
+;    level.
+; 10. draw_status_panel and remove_absent_heroes finish the screen, and play_level runs
+;     the level until no hero is left in play, with the music playing on the interval
+;     timer event and pause_check last in each frame's update.
+; 11. Every dead hero gets their starting attributes back. If any hero survived,
+;     level_loop starts the next level, with the game resident; if all four died,
+;     game_over_music stops the music, the game-over message is shown for up to 5 seconds
+;     or until a key, and new_game starts again. A hero reaching the Chalice on level 25
+;     is caught by check_for_victory, which plays victory_sequence, prints the ending
+;     message, waits for a key and resets the machine through the RESET vector.
+
 ; Constants
 spr_wall                             = &00  ; Sprite &00
 spr_ranger_up_0                      = &01  ; Sprite &01
@@ -98,7 +172,7 @@ inkey_key_space                      = &9d
 inkey_key_left_square_bracket        = &c7
 
 ; Memory locations
-tune_ptr              = &00  ; The music's place in the tune: the current three-byte step.
+tune_ptr              = &00  ; The music's place in the tune: the address of the three-byte step to play next. Set to the tune's start by start_music, advanced by music_event, and kept on the stack by start_level across a level load.
 ; &00 referenced 11 times by &1413, &146f, &c735, &c774, &c783, &c795, &c7a5, &c7aa, &c7f2, &c80f, &c818
 plot_x                = &70  ; Sprite position: screen byte column, 0-79 (two MODE 2 pixels per byte). Also used as a scratch byte and pointer low byte by other routines.
 ; &70 referenced 47 times by &0422, &0439, &043b, &0452, &045a, &045c, &045e, &0465, &046b, &05a7, &05ab, &0984, &0991, &0f68, &1458, &154d, &1558, &155c, &1da6, &1e1c, &1e77, &20c6, &726d, &7282, &72c6, &72db, &72eb, &72fb, &75b8, &75d9, &75e4, &75fb, &7823, &7846, &784a, &78a1, &78bb, &78d5, &78ef, &7f95, &7fc1, &7fcd, &7fe4, &7ff0, &7ffa, &d884, &d891
@@ -290,15 +364,18 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; ***************************************************************************************
 ; Add 1000 to a hero's score
 ;
-; Advance the thousands digit of hero X's score. It is called from add_ten_points when
-; the hundreds digit carries, and returns to draw_score there, which redraws the four
-; large score digits. The panel has room for only those four, so when the thousands digit
-; passes 9 it goes back to 0 and a separate ten-thousands digit, held as a small digit
-; sprite, goes up, sticking at 9. That digit is then drawn under the score at
-; draw_ten_thousands, followed by four of sprite &71. Sprite &71, the small 8, is a solid
-; bar two pixels wide, the same shape a small 0 would have, so the line reads as a small
-; N0000. remove_absent_heroes enters at draw_ten_thousands to redraw the line at the
-; start of each level.
+; Carry a point into the thousands of hero X's score. add_ten_points calls it whenever
+; the hundreds digit passes 9, and on return its draw_score redraws the four large digits
+; (thousands to units) in the hero's panel section. The panel has room for only those
+; four, so when the thousands digit passes 9 it goes back to 0 and the ten-thousands
+; digit (hero_score_ten_thousands, a small digit sprite) goes up. That digit sticks at 9,
+; so beyond 99,999 the large digits wrap while the small one stays at 9. Each change of
+; the ten-thousands digit is drawn at draw_ten_thousands: the small digit &18 rows below
+; the hero's panel row, under the score, followed by four of sprite &71. Sprite &71, the
+; small 8, is a solid bar two pixels wide, the same shape a small 0 would have, so the
+; line reads as a small N0000. remove_absent_heroes enters at draw_ten_thousands with the
+; digit in A, to redraw the line on the fresh screen of each level. Uses plot_x, plot_y
+; and sprite_number.
 ;
 ; On Entry:
 ;     X: hero number (0-3)
@@ -309,13 +386,13 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 .add_thousand_points
     inc hero_score_thousands,x          ; One more thousand: the hundreds digit carried
     lda hero_score_thousands,x          ; ...and check the new digit
-    cmp #spr_digit_9 + 1                ; Past 9?
+    cmp #spr_digit_9 + 1                ; Past 9: another ten thousand?
     bne add_thousand_points_done        ; No: return; draw_score shows the new digit
     lda #spr_digit_0                    ; Yes: thousands 0...
     sta hero_score_thousands,x          ; ...stored for this hero
     inc hero_score_ten_thousands,x      ; ...and carry into the small ten-thousands digit
     lda hero_score_ten_thousands,x      ; ...and check the new digit
-    cmp #spr_small_digit_9 + 1          ; Past 9?
+    cmp #spr_small_digit_9 + 1          ; Past small 9: a score of 100,000?
     bne draw_ten_thousands              ; No: draw it under the score
     lda #spr_small_digit_9              ; Yes: it sticks at 9
     sta hero_score_ten_thousands,x      ; ...stored for this hero
@@ -339,17 +416,17 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     tya                                 ; Keep the count...
     pha                                 ; ...on the stack while plotting
     inc plot_x                          ; Two byte columns right...
-    inc plot_x                          ; ...(second step)
+    inc plot_x                          ; ...a small digit's width on
     jsr plot_sprite                     ; Plot a 0 there
     pla                                 ; Recover the count...
-    tay                                 ; ...into Y
+    tay                                 ; ...of 0s still to plot, in Y
     dey                                 ; One fewer 0 to plot
     bne draw_ten_thousands_loop         ; More 0s: loop
     pla                                 ; Recover the hero number...
-    tax                                 ; ...into X
+    tax                                 ; ...in X again, as on entry
 ; &0447 referenced 1 time by &0408
 .add_thousand_points_done
-    rts                                 ; Return
+    rts                                 ; Return to draw_score (or remove_absent_heroes)
 ; ***************************************************************************************
 ; Unused
 ;
@@ -360,9 +437,12 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ;
 ; Decrypt the level at &6B00-&6DAF in place, XORing each byte with the low byte of its
 ; own address, and sum the decrypted bytes. If the sum does not match the level's entry
-; in level_checksums, reset the machine, so a damaged or altered level file is never
-; played. It runs once the level file is in memory. The pointer and the sum borrow the
-; plotter's zero-page workspace (plot_x and plot_y, sprite_width).
+; in level_checksums, call &D9CD, the reset entry of MOS 1.20, so a damaged or altered
+; level file is never played. It runs once per level, as soon as the level file is in
+; memory and before unpack_level copies it into the game's tables; it returns only if the
+; level is intact, leaving it decrypted at &6B00. The pointer and the sum borrow the
+; plotter's zero-page workspace (plot_x and plot_y, sprite_width), which nothing is using
+; while a level loads.
 ;
 ; On Entry:
 ;     LEVEL_NUMBER: level loaded (1-25)
@@ -380,8 +460,8 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     sta (plot_x),y                      ; ...and store it back decrypted
     clc                                 ; Add the decrypted byte to the checksum...
     adc sprite_width                    ; ...plus the sum so far
-    sta sprite_width                    ; ...modulo 256
-    inc plot_x                          ; Next byte...
+    sta sprite_width                    ; ...as the new sum, modulo 256
+    inc plot_x                          ; Advance the pointer to the next level byte...
     bne decrypt_level_next              ; No carry: same page
     inc plot_y                          ; ...with carry into the high byte
 ; &046b referenced 1 time by &0467
@@ -399,7 +479,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     jsr mos120_reset_entry              ; No match: call &D9CD, private RAM that no file fills
 ; &0484 referenced 1 time by &047f
 .decrypt_level_done
-    rts                                 ; Return
+    rts                                 ; Return: the level at &6B00 is decrypted and intact
 ; ***************************************************************************************
 ; Unused
 ;
@@ -407,11 +487,13 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00  ; Zeros
 ; &0490 used as index base 1 time by &047c
 .level_checksums
-    equb &00
+    equb &00                            ; Entry 0: there is no level 0, so never read
 ; ***************************************************************************************
 ; Level checksums
 ;
-; One byte per level, 1-25: the sum, modulo 256, of the level's decrypted bytes.
+; One byte per level, 1-25, indexed by level_number from level_checksums (whose entry 0
+; is unused): the sum, modulo 256, of the level's &2B0 decrypted bytes, which
+; decrypt_level checks before the level is played.
     equb &62, &cd, &0c, &44, &4d
     equb &22, &f6, &42, &21, &7d
     equb &5d, &d8, &a0, &f1, &0f
@@ -424,6 +506,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00  ; Zeros
     equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00  ; Zeros
     equb &00, &00, &00, &00, &00        ; Zeros
+; Data of sprite &15, &1A, &77: 4 bytes x 12 rows.
 .sprite_blank
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
@@ -441,12 +524,20 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; ***************************************************************************************
 ; Choose the heroes and the sound
 ;
-; Called by new_game once the heroes are reset. Set a text window the full width of the
-; screen (MODE 2's 20 columns) and clear it, print the menu and read keys. Keys 1-4
-; toggle a hero between YES and NO by flipping hero_absent and rewriting the menu text; 5
-; and 6 switch the sound on and off with OSBYTE &D2. SPACE returns, so the game starts,
-; only if at least one hero is playing. Neither hero_absent nor the menu text is reset
-; here.
+; The screen before each game where the players choose who plays. It is called once per
+; game, when a new game starts, after reset_hero has given every hero their starting
+; attributes and before the first level. Set a text window the full width of the screen
+; (MODE 2's 20 columns) and clear it, print the menu (print_menu) and read keys until
+; SPACE. Keys 1-4 toggle a hero between YES and NO by flipping their hero_absent flag and
+; rewriting the menu entry; 5 and 6 switch the sound on and off with OSBYTE &D2. After
+; each change the whole menu is reprinted. SPACE returns, so the game starts, only if at
+; least one hero is playing. Before each key is read, the keyboard buffer is flushed and
+; CAPS LOCK is forced on with SHIFT LOCK off.
+;
+; Neither hero_absent nor the menu text is set up here: the menu opens with whatever they
+; held, which after a game over in the same load is the last game's choices. The ON/OFF
+; entry shows only what was last chosen on the menu, not the sound suppression actually
+; in force. hero_absent is read by remove_absent_heroes at each level.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -471,7 +562,10 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; ***************************************************************************************
 ; Print the menu text
 ;
-; Print the sixteen positioned strings of menu_text.
+; Print the sixteen positioned strings of menu_text, in their current state, through
+; print_menu_string: fifteen in a loop and the sixteenth by falling into
+; print_menu_string, whose return is this routine's. Called by hero_menu to show the menu
+; and after every change.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -504,53 +598,55 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     lda menu_text,y                     ; ...to the string's column...
     jsr oswrch                          ; Send the column
     iny                                 ; Step to the row byte
-    lda menu_text,y                     ; ...and row
+    lda menu_text,y                     ; ...and the string's row...
     jsr oswrch                          ; Send the row
 ; &0540 referenced 1 time by &0549
 .print_menu_string_loop
     iny                                 ; Print the characters...
     lda menu_text,y                     ; ...the next character...
-    jsr oswrch                          ; ...printed
+    jsr oswrch                          ; ...sent to the screen...
     cmp #&0d                            ; ...up to and including the carriage return
     bne print_menu_string_loop          ; Not the CR yet: next character
     iny                                 ; Point at the next string
-    rts                                 ; Return
+    rts                                 ; Return with Y at the next string's column byte
 ; ***************************************************************************************
 ; Change a menu entry to NO
 ;
-; Write "NO " at menu_text+Y.
+; Write "NO " over a hero's YES/NO entry at menu_text+Y, when hero_menu switches the hero
+; off. print_menu then shows it.
 ;
 ; On Entry:
 ;     Y: offset of the entry
 ; &054d referenced 1 time by &05c0
 .set_menu_no
-    lda #'N'                            ; "NO "
+    lda #'N'                            ; "NO ": N first...
     sta menu_text,y                     ; ...into the entry's first letter
-    lda #'O'                            ; O second...
+    lda #'O'                            ; ...then O...
     sta menu_text + 1,y                 ; ...into the second letter
     lda #' '                            ; A space third, over YES's S...
     sta menu_text + 2,y                 ; ...into the third letter
-    rts                                 ; Return
+    rts                                 ; Return: the entry reads NO
 ; ***************************************************************************************
 ; Change a menu entry to YES
 ;
-; Write "YES" at menu_text+Y.
+; Write "YES" over a hero's YES/NO entry at menu_text+Y, when hero_menu switches the hero
+; on. print_menu then shows it.
 ;
 ; On Entry:
 ;     Y: offset of the entry
 ; &055d referenced 1 time by &05ba
 .set_menu_yes
-    lda #'Y'                            ; "YES"
+    lda #'Y'                            ; "YES": Y first...
     sta menu_text,y                     ; ...into the entry's first letter
-    lda #'E'                            ; E second...
+    lda #'E'                            ; ...then E...
     sta menu_text + 1,y                 ; ...into the second letter
-    lda #'S'                            ; S third...
+    lda #'S'                            ; ...then S...
     sta menu_text + 2,y                 ; ...into the third letter
-    rts                                 ; Return
+    rts                                 ; Return: the entry reads YES
 ; ***************************************************************************************
 ; Change the sound entry to OFF
 ;
-; Write "FF" at menu_text+Y, after its "O".
+; Write "FF" at menu_text+Y, after the sound entry's "O", when key 6 turns the sound off.
 ;
 ; On Entry:
 ;     Y: offset of the entry's second character
@@ -559,11 +655,11 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     lda #'F'                            ; "FF" after the O
     sta menu_text,y                     ; ...over the N of ON...
     sta menu_text + 1,y                 ; ...and the space after it
-    rts                                 ; Return
+    rts                                 ; Return: the entry reads OFF
 ; ***************************************************************************************
 ; Change the sound entry to ON
 ;
-; Write "N " at menu_text+Y, after its "O".
+; Write "N " at menu_text+Y, after the sound entry's "O", when key 5 turns the sound on.
 ;
 ; On Entry:
 ;     Y: offset of the entry's second character
@@ -571,9 +667,9 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 .set_menu_on
     lda #'N'                            ; "N " after the O
     sta menu_text,y                     ; ...over OFF's first F
-    lda #' '                            ; A space...
+    lda #' '                            ; ...then a space...
     sta menu_text + 1,y                 ; ...over OFF's second F
-    rts                                 ; Return
+    rts                                 ; Return: the entry reads ON
 ; Read one key and act on it, then come back for the next, until SPACE starts the game.
 ; &0581 referenced 6 times by &0521, &0598, &059c, &05c6, &05d3, &05f3
 .menu_key_loop
@@ -584,17 +680,18 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     ldy #0                              ; Y = 0: replace the status with X
     jsr osbyte                          ; Set it, whatever the Ranger's lock keys left  osbyte: kbd status
     jsr osrdch                          ; Wait for a key
-    cmp #' '                            ; SPACE?
+    cmp #' '                            ; SPACE, to start the game?
     beq menu_space                      ; Yes: start, if anyone is playing
     cmp #'1'                            ; Ignore anything but 1-6
     bcc menu_key_loop                   ; Below '1': ignore it
-    cmp #'7'                            ; Above '6'?
+    cmp #'7'                            ; ...or above '6' (at or past '7')?
     bcs menu_key_loop                   ; Yes: ignore it
-    sec                                 ; Subtract '1'...
+    sec                                 ; Key number 0-5 = key - '1'...
     sbc #'1'                            ; ...so keys '1'-'6' become 0-5...
     tax                                 ; ...in X: a hero 0-3, or 4-5 for the sound
     cmp #4                              ; Key 5 or 6?
     bcs menu_sound_key                  ; Yes: the sound switch
+; Keys 1-4: switch hero X between playing and absent, and show it as YES or NO.
     asl a                               ; 1-4: Y = offset of the hero's YES/NO, 6 x X + &51...
     sta plot_x                          ; Keep 2 x the hero number
     asl a                               ; 4 x the hero number...
@@ -604,17 +701,18 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     tay                                 ; Y = its offset in menu_text
     lda hero_absent,x                   ; Toggle the hero between playing and absent...
     eor #1                              ; ...by flipping the absent flag
-    sta hero_absent,x                   ; ...stored back
-    bne menu_hero_off                   ; Now absent?
-    jsr set_menu_yes                    ; No: playing, so YES
-    jmp menu_reprint                    ; ...then reprint
+    sta hero_absent,x                   ; ...the hero's new absent flag
+    bne menu_hero_off                   ; Now absent (flag 1)?
+    jsr set_menu_yes                    ; No: playing, so the entry reads YES
+    jmp menu_reprint                    ; ...and reprint the menu
 ; &05c0 referenced 1 time by &05b8
 .menu_hero_off
-    jsr set_menu_no                     ; Absent: NO
+    jsr set_menu_no                     ; Absent: the entry reads NO
 ; &05c3 referenced 1 time by &05bd
 .menu_reprint
     jsr print_menu                      ; Reprint the menu with the change
-    jmp menu_key_loop                   ; Next key
+    jmp menu_key_loop                   ; Wait for the next key
+; SPACE: return, so the game starts, if at least one hero is playing; otherwise ignore it.
 ; &05c9 referenced 1 time by &0594
 .menu_space
     ldx #3                              ; SPACE: is any hero playing?
@@ -627,7 +725,8 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     jmp menu_key_loop                   ; Nobody playing: ignore SPACE
 ; &05d6 referenced 1 time by &05ce
 .menu_done
-    rts                                 ; Return to new_game
+    rts                                 ; Return: the game goes on to its first level
+; Keys 5 and 6: sound on or off, through OSBYTE &D2, and the menu's entry to match.
 ; &05d7 referenced 1 time by &05a4
 .menu_sound_key
     ldy #&99                            ; Sound: Y = offset of the second letter of ON/OFF
@@ -646,13 +745,18 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     ldy #0                              ; Y = 0: replace the setting with X
     jsr osbyte                          ; Turn the sound on or off as chosen  osbyte: sound suppression
     jsr print_menu                      ; Reprint the menu with the change
-    jmp menu_key_loop                   ; Next key
+    jmp menu_key_loop                   ; Wait for the next key
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &4f                       ; Not referenced
+; The hero menu: sixteen strings, each a text column and row followed by the characters and a carriage return. The YES/NO and ON/OFF entries are rewritten as the players toggle them.
 ; ***************************************************************************************
 ; Hero menu text
 ;
-; Sixteen entries of: column, row, text, carriage return; printed by print_menu.
+; Sixteen entries of: column, row, text, carriage return; printed in order by print_menu,
+; each at its own text position. The four heroes' YES/NO entries (text at menu_text + &51
+; + 6 x hero) are rewritten by set_menu_yes and set_menu_no, and the sound entry's ON/OFF
+; (second letter at menu_text + &99) by set_menu_on and set_menu_off, so the table holds
+; the players' choices as well as showing them.
 ; &0600 used as index base 7 times by &0533, &053a, &0541, &054f, &055f, &056f, &0578
 .menu_text
 ; &0601 used as index base 4 times by &0554, &0564, &0572, &057d
@@ -693,14 +797,22 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; ***************************************************************************************
 ; Take the heroes nobody plays out of the level
 ;
-; Called by level_loop after draw_status_panel. First redraw the small ten-thousands line
-; under each score that has one, since start_level cleared the screen and
-; draw_status_panel draws only the four large digits. Then take every hero switched off
-; on the menu out of play: direction 0; step_out_of_play, so move_heroes passes over
-; them; frame 8 and dead health, so that play_level treats them as dead with their death
-; animation over, and level_loop counts them among the dead; and a nobody_returns entry
-; in returning_hero_queue, which a Cross of Resurrection skips. Their panel section keeps
-; the health and score just drawn.
+; The last step of setting up each level, called by level_loop after draw_status_panel
+; and just before play_level. For each hero in turn:
+;
+; First redraw the small ten-thousands line under the score, if it has one (through
+; draw_ten_thousands), since start_level cleared the screen and draw_status_panel draws
+; only the four large digits.
+;
+; Then, if the hero was switched off on the menu (hero_absent), take them out of play,
+; since reset_workspace has just given every hero their starting state: direction 0;
+; step_out_of_play, so move_heroes passes over them; frame 8 and dead health, so that
+; play_level treats them as dead with their death animation over, and level_loop counts
+; them among the dead (and resets them) when the level ends; map x &1F; and a
+; nobody_returns entry in returning_hero_queue, which reset_monsters has just emptied.
+; The absent heroes' entries go at the front of the queue, in hero order; a Cross of
+; Resurrection sends such an entry to the back and takes the next. Their panel section
+; keeps the health and score just drawn.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -722,10 +834,10 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     lda hero_score_ten_thousands,x      ; The digit's sprite...
     jsr draw_ten_thousands              ; ...drawn under the score with its 0000
     pla                                 ; Recover the queue entry...
-    tay                                 ; ...into Y
+    tay                                 ; ...for the next absent hero, in Y
     pla                                 ; Recover the hero number...
-    tax                                 ; ...into X
-; Take the hero out of play if nobody is playing them.
+    tax                                 ; ...in X again
+; Take the hero out of play if nobody is playing them, so that they count as dead, and a Cross of Resurrection passes over their queue entry.
 ; &06c9 referenced 1 time by &06b9
 .remove_absent_heroes_check
     lda hero_absent,x                   ; Switched off on the menu?
@@ -746,21 +858,24 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     iny                                 ; The next absent hero takes the next entry
 ; &06f0 referenced 1 time by &06cc
 .remove_absent_heroes_next
-    inx                                 ; Next hero
+    inx                                 ; Next hero, 0-3
     cpx #4                              ; All four heroes done?
     bne remove_absent_heroes_loop       ; No: next hero
-    rts                                 ; Return
+    rts                                 ; Return to level_loop: the level is ready to play
 ; ***************************************************************************************
 ; Unused
 ;
 ; Zero bytes, which nothing reads.
     equb &00, &00                       ; Zeros
+; Each hero's score ten-thousands digit as a small digit sprite (&69 for none, &6A-&72 for 1-9). reset_hero sets it to &69, and remove_absent_heroes redraws the digit from here under the score at each level.
 ; &06f8 used as index base 6 times by &040f, &0412, &041b, &06b4, &06bf, &0ef3
 .hero_score_ten_thousands
     equs "iiii"
+; One flag per hero: 1 if switched off on the menu, 0 if playing. hero_menu toggles it with keys 1-4; remove_absent_heroes takes the absent heroes out of play at each level.
 ; &06fc used as index base 4 times by &05b0, &05b5, &05cb, &06c9
 .hero_absent
     equb &00, &00, &00, &00
+; Leftover contents of the MOS line-input buffer (&0700) from the machine this file was saved on.
 ; ***************************************************************************************
 ; Leftovers in the line-input buffer
 ;
@@ -776,15 +891,24 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; ***************************************************************************************
 ; Coder: save the MOS's page &0D, load the game and start it
 ;
-; Run with *RUN CODER (or from Coder2), once per game session: the game then stays
-; resident and loads each level itself. Set the bell sound. Copy page &0D, which the MOS
-; and the filing system use for their NMI code and workspace, to &C400 in private RAM:
-; the game's per-level workspace lives in page &0D, so load_level puts the MOS's copy
-; back before each level is loaded. *LOAD the four other game files, restore the display
-; that *DUNJUNZ blanked, select COLOUR 2 and start a new game at &0E00. Page &0D is saved
-; before any file is loaded, while it still holds the filing system's own contents.
+; Load the rest of the game and start a new game. Run once per session, as *RUN CODER by
+; *DUNJUNZ or by Coder2 (which first installs the joystick handler); the game then stays
+; resident and loads each level itself, and never comes back here.
+;
+; Set the bell sound (set_bell). Copy page &0D, which holds the disc filing system's NMI
+; code and workspace, to saved_page_0d at &C400 in private RAM: the game's per-level
+; workspace lives in page &0D, so load_level puts the saved copy back before each level
+; is loaded. The copy is made before any file is loaded, while the page still holds the
+; filing system's own contents. Then *LOAD Dunj2, Dunj3, Dunj4 and Dunj5 at their own
+; load addresses, send coder_display_vdu to show the display that *DUNJUNZ blanked (25
+; rows of 80 characters), and continue at select_colour_2, past the leftovers, to select
+; COLOUR 2 and jump to new_game at &0E00.
+;
+; On Entry:
+;     ACCCON: HAZEL paged in, as MOS 3.20 leaves it
 .coder_start
     jsr set_bell                        ; BEL's sound, used by the game's VDU 7s
+; Keep the filing system's page &0D in private RAM, for load_level to put back before each level's *LOAD.
     ldx #0                              ; Save the MOS's page &0D...
 ; &0745 referenced 1 time by &074c
 .save_page_0d_byte
@@ -792,18 +916,20 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     sta saved_page_0d,x                 ; ...to &C400 in private RAM, for load_level
     dex                                 ; ...next byte (X wraps from 0)
     bne save_page_0d_byte               ; Until all 256 are saved
+; Load the rest of the game, each file at its own load address.
     ldx #<(load_dunj2_command)          ; *L. DUNJ2: heroes, monsters, views (&6E80-&7FFF)
     ldy #>(load_dunj2_command)          ; ...high byte of the command
-    jsr oscli                           ; ...loaded
+    jsr oscli                           ; ...loaded at &6E80
     ldx #<(load_dunj3_command)          ; *L. DUNJ3: hero attributes, room_walls (&08C0-&0CFE)
     ldy #>(load_dunj3_command)          ; ...high byte of the command
-    jsr oscli                           ; ...loaded
+    jsr oscli                           ; ...loaded at &08C0
     ldx #<(load_dunj4_command)          ; *L. DUNJ4: level loop to frame update (&0E00-&1FFF)
     ldy #>(load_dunj4_command)          ; ...high byte of the command
-    jsr oscli                           ; ...loaded
+    jsr oscli                           ; ...loaded at &0E00
     ldx #<(load_dunj5_command)          ; *L. DUNJ5: object_free_map, sprites (&2000-&2FFF)
     ldy #>(load_dunj5_command)          ; ...high byte of the command
-    jsr oscli                           ; ...loaded
+    jsr oscli                           ; ...loaded at &2000
+; Show the display again and go on to start the game.
     ldx #0                              ; Show the display again: coder_display_vdu's 21 bytes
 ; &076c referenced 1 time by &0775
 .send_coder_vdu
@@ -813,14 +939,19 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     cpx #coder_leftovers - coder_display_vdu  ; ...until all of coder_display_vdu is sent
     bne send_coder_vdu                  ; More to send
     jmp select_colour_2                 ; Over the leftovers to colour 2 and a new game
+; "L. DUNJ2", ended by a carriage return.
 .load_dunj2_command
     equs "L. DUNJ2", &0d
+; "L. DUNJ3", ended by a carriage return.
 .load_dunj3_command
     equs "L. DUNJ3", &0d
+; "L. DUNJ4", ended by a carriage return.
 .load_dunj4_command
     equs "L. DUNJ4", &0d
+; "L. DUNJ5", ended by a carriage return.
 .load_dunj5_command
     equs "L. DUNJ5", &0d
+; VDU 6, then VDU 23,0,6,25,0,0,0,0,0,0 (25 character rows displayed) and VDU 23,0,1,80,0,0,0,0,0,0 (80 characters per row, undoing blank_display).
 ; &079e used as index base 1 time by &076c
 .coder_display_vdu
     equb &06                            ; VDU 6: enable VDU output
@@ -832,10 +963,15 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; Leftover bytes, all zero.
 .coder_leftovers
     equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+; ***************************************************************************************
+; Select COLOUR 2 and start a new game
+;
+; The end of coder_start, reached by its JMP over the leftovers: the game's messages
+; print in colour 2.
 ; &07c0 referenced 1 time by &0777
 .select_colour_2
-    lda #&11                            ; COLOUR 2...
-    jsr oswrch                          ; ...VDU 17...
+    lda #&11                            ; COLOUR 2: VDU 17, then the colour...
+    jsr oswrch                          ; ...send VDU 17, set the text colour...
     lda #2                              ; ...text colour 2...
     jsr oswrch                          ; ...for the game's messages
     jmp new_game                        ; ...and start a new game: the hero menu, then level 1
@@ -843,8 +979,9 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; ***************************************************************************************
 ; Set the bell sound
 ;
-; OSBYTEs &D3-&D6: the BEL character's sound on channel &13, envelope 0 (fixed
-; amplitude), pitch &64, duration 1.
+; Called once, first thing in coder_start. OSBYTEs &D3-&D6 set the sound the BEL
+; character (VDU 7) makes: channel &13 (channel 3), envelope 0 (a fixed amplitude), pitch
+; &64 and duration 1, a twentieth of a second.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -853,7 +990,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; &07d0 referenced 1 time by &0740
 .set_bell
     lda #osbyte_bell_channel            ; OSBYTE &D3: bell channel...
-    ldx #&13                            ; ...&13
+    ldx #&13                            ; ...&13: channel 3 in its low bits
     ldy #0                              ; ...Y = 0: X replaces the old setting
     jsr osbyte                          ; ...the bell's sound channel  osbyte: bell channel
     lda #osbyte_bell_envelope           ; OSBYTE &D4: bell envelope...
@@ -861,14 +998,14 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     ldy #0                              ; ...Y = 0: X replaces the old setting
     jsr osbyte                          ; ...the bell's envelope  osbyte: bell envelope
     lda #osbyte_bell_frequency          ; OSBYTE &D5: bell pitch...
-    ldx #&64 ; 'd'                      ; ...&64
+    ldx #&64 ; 'd'                      ; ...&64, the pitch the bell plays at
     ldy #0                              ; ...Y = 0: X replaces the old setting
     jsr osbyte                          ; ...the bell's pitch  osbyte: bell frequency
     lda #osbyte_bell_duration           ; OSBYTE &D6: bell duration...
-    ldx #1                              ; ...1
+    ldx #1                              ; ...1, a twentieth of a second
     ldy #0                              ; ...Y = 0: X replaces the old setting
     jsr osbyte                          ; ...the bell's duration  osbyte: bell duration
-    rts                                 ; Return
+    rts                                 ; Return to coder_start with the bell set
 ; ***************************************************************************************
 ; Leftover filename
 ;
@@ -892,12 +1029,18 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; Plot a sprite
 ;
 ; Copy sprite sprite_number to the screen with its top-left corner at byte column plot_x,
-; pixel row plot_y. The sprite tables give the address of its data and its size; the data
-; is stored row by row, sprite_width bytes to a row, and is written over the screen
-; contents without masking. The screen is laid out like MODE 2 with 640-byte character
-; rows from &3000, so successive bytes of a sprite row are 8 bytes apart, and each pixel
-; row starts one byte below the last, or 640-7 bytes on when it crosses into the next
-; character row.
+; pixel row plot_y.
+;
+; The four sprite tables, indexed by sprite number, give the address of its data and its
+; size: sprite_width bytes across (two MODE 2 pixels to a byte) by sprite_height pixel
+; rows. The data is stored row by row and is written over the screen contents without
+; masking, so a sprite's black pixels erase what was there, and there is no clipping. The
+; screen is laid out like MODE 2 with 640-byte character rows from &3000, so successive
+; bytes of a sprite row are 8 bytes apart, and each pixel row starts one byte below the
+; last, or 640-7 bytes on when it crosses into the next character row. screen_ptr walks
+; across each row, row_start_ptr remembers where the row began, and sprite_data_ptr walks
+; through the data; Y stays 0. sprite_width and sprite_height are left holding the
+; sprite's size.
 ;
 ; On Entry:
 ;     PLOT_X: screen byte column (0-79)
@@ -915,7 +1058,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     ldx sprite_number                   ; X = sprite number, indexing the four sprite tables
 ; &0902 referenced 1 time by &c730
     lda sprite_addr_lo,x                ; Point sprite_data_ptr at the sprite's data...
-    sta sprite_data_ptr                 ; ...low byte
+    sta sprite_data_ptr                 ; ...its low byte from sprite_addr_lo
     lda sprite_addr_hi,x                ; ...high byte from its own table
     sta sprite_data_ptr_hi              ; ...so sprite_data_ptr walks through the data
     lda sprite_widths,x                 ; Bytes in each sprite row...
@@ -928,8 +1071,8 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; &091d referenced 1 time by &0964
 .plot_sprite_row
     lda screen_ptr                      ; Remember where this pixel row starts...
-    sta row_start_ptr                   ; ...low byte
-    lda screen_ptr_hi                   ; ...and high byte...
+    sta row_start_ptr                   ; ...its low byte...
+    lda screen_ptr_hi                   ; ...and its high byte...
     sta row_start_ptr_hi                ; ...in row_start_ptr, to step down from later
     txa                                 ; Save the row count
     pha                                 ; ...on the stack: X now counts bytes
@@ -941,7 +1084,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     clc                                 ; Step screen_ptr right one byte column: 8 bytes on
     lda screen_ptr                      ; ...the screen address's low byte...
     adc #8                              ; ...+ 8, the next byte column...
-    sta screen_ptr                      ; ...stored back
+    sta screen_ptr                      ; ...as screen_ptr's new low byte
     bcc plot_sprite_next_data           ; No carry: the high byte stands
     inc screen_ptr_hi                   ; ...with carry into the high byte
 ; &0938 referenced 1 time by &0934
@@ -955,7 +1098,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     bne plot_sprite_byte                ; More of the row: plot the next byte
     clc                                 ; screen_ptr = row start + 1: the next pixel row down
     lda row_start_ptr                   ; The row start's low byte...
-    adc #1                              ; ...+ 1...
+    adc #1                              ; ...+ 1, one pixel row lower...
     sta screen_ptr                      ; ...is the new low byte
     lda row_start_ptr_hi                ; The row start's high byte...
     adc #0                              ; ...plus the carry...
@@ -966,17 +1109,17 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     clc                                 ; Yes: add &278 more, to the top of the character...
     lda screen_ptr                      ; ...row below (row start + 1 + &278 = + 640 - 7)
     adc #&78 ; 'x'                      ; ...low byte + &78 (640 - 8 = &278)...
-    sta screen_ptr                      ; ...stored
-    lda screen_ptr_hi                   ; ...high byte...
+    sta screen_ptr                      ; ...as screen_ptr's low byte
+    lda screen_ptr_hi                   ; ...then the high byte...
     adc #2                              ; ...+ 2 and the carry...
-    sta screen_ptr_hi                   ; ...stored
+    sta screen_ptr_hi                   ; ...as screen_ptr's high byte: the row below
 ; &0961 referenced 1 time by &0952
 .plot_sprite_next_row
     pla                                 ; Recover the row count
     tax                                 ; ...back into X
     dex                                 ; One pixel row fewer to plot
     bne plot_sprite_row                 ; More rows: plot the next
-    rts                                 ; Return
+    rts                                 ; Return: the sprite is on the screen
 ; ***************************************************************************************
 ; Calculate a screen address
 ;
@@ -996,10 +1139,10 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; &0967 referenced 1 time by &0916
 .screen_address
     lda plot_y                          ; Character row = plot_y DIV 8...
-    lsr a                               ; ...plot_y / 2...
-    lsr a                               ; ...plot_y / 4...
+    lsr a                               ; ...plot_y DIV 2...
+    lsr a                               ; ...plot_y DIV 4: 2 x the character row, + plot_y bit 2...
     and #&fe                            ; ...bit 0 cleared: the row's pair of table bytes
-    tay                                 ; ...as the index into the MOS table
+    tay                                 ; ...as the index into the row table
     lda row_offsets,y                   ; High byte of row x 640, from Table's copy in HAZEL...
     clc                                 ; ...(carry clear for the add)
     adc #>(screen_start)                ; ...plus &30: the screen starts at &3000
@@ -1011,7 +1154,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     adc screen_ptr                      ; ...(carry clear: adding &30 to the high byte cannot carry)
     sta screen_ptr                      ; ...stored in the low byte
     clc                                 ; Add 8 x plot_x: its high byte is plot_x DIV 32...
-    lda plot_x                          ; ...from plot_x...
+    lda plot_x                          ; ...taking the byte column...
     and #&e0                            ; ...bits 7-5 kept...
     rol a                               ; ...four ROLs through the carry: bit 7 out...
     rol a                               ; ...bit 7 in at bit 0, bit 6 out
@@ -1019,19 +1162,19 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     rol a                               ; ...bits 7-5 now in bits 2-0
     clc                                 ; ...(carry clear for the add)
     adc screen_ptr_hi                   ; ...added to the high byte
-    sta screen_ptr_hi                   ; ...stored
-    lda plot_x                          ; ...then plot_x x 8 into the low byte
+    sta screen_ptr_hi                   ; ...as screen_ptr's high byte
+    lda plot_x                          ; Low byte + (plot_x x 8) AND &FF: plot_x...
     asl a                               ; ...x 2...
     asl a                               ; ...x 4...
     asl a                               ; ...x 8, its top bits dropping out
     clc                                 ; ...(carry clear for the add)
     adc screen_ptr                      ; ...added to the low byte
-    sta screen_ptr                      ; ...stored
+    sta screen_ptr                      ; ...as screen_ptr's low byte
     bcc screen_address_done             ; No carry: done
     inc screen_ptr_hi                   ; ...with carry into the high byte
 ; &099f referenced 1 time by &099b
 .screen_address_done
-    rts                                 ; Return
+    rts                                 ; Return with screen_ptr set
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -1042,54 +1185,70 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00  ; Not referenced
+; The exit's map x, kept while a hero goes down it.
 ; &09f0 referenced 4 times by &1f7a, &1fa7, &1fd3, &2026
 .exit_saved_x
     equb &04
+; The exit's map y, kept while a hero goes down it.
 ; &09f1 referenced 4 times by &1f80, &1fad, &1fd9, &202c
 .exit_saved_y
     equb &2c
+; Non-zero while a hero is going down the exit.
 ; &09f2 referenced 5 times by &151a, &1f10, &1f96, &2034, &2078
 .exit_busy
     equb &00
+; Direction (1, 3, 5, 7) of the hero spinning on the exit.
 ; &09f3 referenced 5 times by &1fbe, &1fc3, &1fce, &1ff4, &2086
 .exit_spin
     equb &ff
+; Spins left before the hero has gone (4 to 1).
 ; &09f4 referenced 3 times by &1fdf, &1ff7, &208b
 .exit_shrinks_left
     equb &00
+; The hero going down the exit.
 ; &09f5 referenced 3 times by &1f9e, &1fba, &207e
 .exiting_hero
     equb &03
 ; &09f6 referenced 1 time by &2042; also used as index base 1 time by &1fe2
 .exit_offsets_x
     equb &04
+; exit_offsets_x entry 1.
 ; &09f7 referenced 1 time by &152b
 .exit_offset_x_1
     equb &01
+; exit_offsets_x entry 2.
 ; &09f8 referenced 1 time by &152e
 .exit_offset_x_2
     equb &01
+; exit_offsets_x entry 3.
 ; &09f9 referenced 1 time by &151d
 .exit_offset_x_3
     equb &00
+; Vertical pixel offset of the shrinking hero, entries 1-4 by exit_shrinks_left (at exit_offsets_y+1 to +4). Also entry 4 of exit_offsets_x.
 ; &09fa referenced 1 time by &1520; also used as index base 1 time by &1fe7
 .exit_offsets_y
     equb &00
+; exit_offsets_y entry 1.
 ; &09fb referenced 1 time by &153b
 .exit_offset_y_1
     equb &05
+; exit_offsets_y entry 2.
 ; &09fc referenced 1 time by &1540
 .exit_offset_y_2
     equb &03
+; exit_offsets_y entry 3.
 ; &09fd referenced 1 time by &1531
 .exit_offset_y_3
     equb &01
+; exit_offsets_y entry 4.
 ; &09fe referenced 1 time by &1523
 .exit_offset_y_4
     equb &00
+; The hero whose sprites are shrunk, or &FF.
 ; &09ff referenced 4 times by &1536, &1f2d, &2045, &2081
 .shrunk_hero
     equb &ff
+; Data of sprite &5F: 4 bytes x 12 rows.
 .sprite_boots
     equb &00, &00, &00, &00
     equb &00, &00, &00, &15
@@ -1103,6 +1262,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &03, &03, &33, &00
     equb &03, &03, &33, &00
     equb &00, &00, &00, &00
+; Data of sprite &60: 4 bytes x 12 rows.
 .sprite_helmet
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
@@ -1116,6 +1276,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &14, &3c, &33, &00
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
+; Data of sprite &61: 4 bytes x 12 rows.
 .sprite_potion
     equb &00, &00, &00, &00
     equb &00, &01, &02, &00
@@ -1129,6 +1290,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &05, &0f, &0b, &02
     equb &05, &0f, &03, &02
     equb &00, &0f, &03, &00
+; Data of sprite &63: 4 bytes x 12 rows.
 .sprite_magic_sword
     equb &00, &00, &00, &00
     equb &00, &54, &00, &54
@@ -1142,6 +1304,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &00, &54, &00, &00
     equb &00, &00, &00, &a8
     equb &00, &00, &00, &00
+; Data of sprite &62: 4 bytes x 12 rows.
 .sprite_weapons
     equb &2a, &00, &00, &02
     equb &05, &00, &00, &02
@@ -1155,6 +1318,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &02, &2a, &33, &22
     equb &01, &00, &11, &00
     equb &02, &02, &11, &00
+; Data of sprite &2A: 4 bytes x 12 rows.
 .sprite_cross
     equb &00, &0f, &02, &00
     equb &00, &0f, &02, &00
@@ -1168,32 +1332,40 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &00, &2f, &02, &00
     equb &00, &0f, &02, &00
     equb &00, &0f, &02, &00
+; Number of missiles each hero may have in flight at once, 1-3 (raised by a pile of weapons).
 ; &0b20 used as index base 9 times by &0ed2, &0f2b, &0f30, &6f22, &751a, &751d, &7526, &75c5, &75ca
 .hero_max_missiles
     equb &03, &02, &01, &03
+; INKEY key numbers of the magic keys of heroes 0 and 1, the only heroes with magic.
 ; &0b24 used as index base 1 time by &7624
 .hero_magic_key
     equb inkey_key_ctrl, inkey_key_keypad_enter
+; Frames until heroes 0 and 1 next check their magic key.
 ; &0b26 used as index base 3 times by &7619, &7621, &7644
 .hero_magic_delay
     equb &01, &01
+; Monsters killed by the magic being cast, each worth a point.
 ; &0b28 referenced 3 times by &765e, &768f, &7699
 .magic_kill_count
     equb &00, &10
+; Queue of heroes waiting to come back: each entry is a hero number plus 1, or &64 for a slot that brings nobody back; 0 ends the queue. A Cross of Resurrection takes the first entry.
 ; &0b2a referenced 3 times by &7421, &742b, &7432; also used as index base 6 times by &06ec, &15fd, &16b4, &16bb, &7256, &725f
 .returning_hero_queue
 ; &0b2b referenced 2 times by &742f, &7438
 ; &0b2c referenced 2 times by &7435, &743e
 ; &0b2d referenced 2 times by &743b, &7441
     equb &03, &02, &01, &04, &10
+; Index (0-7) of the trapdoor from which the next monster emerges.
 ; &0b2f referenced 5 times by &1526, &7cb3, &7cb6, &7cbf, &7cc2
 .next_trapdoor
     equb &04
+; Sprites of a hero dying, in order (sparkles &16-&19, then skulls &64-&68, ending as the skull left where the hero fell), or returning, in reverse.
 ; &0b30 used as index base 1 time by &76f2
 .hero_appearance_sprites
     equb &16, &17, &18, &19
     equs "defgh"
     equb &10, &10, &10, &10, &10, &10, &10  ; Not referenced
+; Hit points left for each monster (entries 1-30); a hit subtracts the missile's damage.
 ; &0b40 used as index base 4 times by &15f3, &758d, &759e, &75a6
 .monster_hit_points
     equb &10, &08, &08, &08, &08, &08, &08, &08
@@ -1202,32 +1374,40 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &08, &08, &08, &08, &08, &08, &08, &10
     equb &10, &10, &10, &10, &10, &10, &10, &10
     equb &10, &10, &10, &10, &10, &10, &10, &10
+; Damage each hero's missiles do, 1-9 (raised by a magic sword).
 ; &0b70 used as index base 7 times by &0ed8, &0f50, &6f4a, &756b, &756e, &7577, &75ee
 .hero_missile_damage
     equb &02, &03, &09, &03, &10, &10, &10, &10
     equb &10, &10, &10, &10, &10, &10, &10, &10
+; Damage each missile in flight will do (12 slots, three per hero).
 ; &0b80 used as index base 3 times by &6f4d, &71f0, &7591
 .missile_damage
 ; &0b8f used as index base 1 time by &79cd
     equb &02, &02, &02, &03, &03, &04, &09, &09
     equb &10, &03, &03, &03, &10, &10, &10, &10
+; Map x of the level's eight trapdoors, from the level file.
 ; &0b90 used as index base 2 times by &15b5, &7cc5
 .trapdoor_x
 ; &0b97 used as index base 1 time by &79d3
     equb &0b, &15, &17, &10, &03, &17, &0d, &1a
+; Map y of the level's eight trapdoors, from the level file.
 ; &0b98 used as index base 2 times by &15bb, &7ccb
 .trapdoor_y
     equb &04, &0c, &14, &1d
     equs "% (,"
+; Score hundreds digit, as a digit sprite (&1E-&27 for 0-9).
 ; &0ba0 used as index base 5 times by &0ee6, &72aa, &72ad, &72b6, &72d4
 .hero_score_hundreds
     equb &1e, &1e, &1e, &1e
+; Score tens digit, as a digit sprite.
 ; &0ba4 used as index base 5 times by &0ee9, &729b, &729e, &72a7, &72e4
 .hero_score_tens
     equb &1e, &1e, &1e, &1e
+; Score units digit, as a digit sprite.
 ; &0ba8 used as index base 7 times by &06e2, &0eee, &728c, &728f, &7298, &72f4, &74cf
 .hero_score_units
     equb &1d, &1d, &1d, &1d
+; Score thousands digit, as a digit sprite.
 ; &0bac used as index base 5 times by &0400, &0403, &040c, &0ee3, &72c8
 .hero_score_thousands
     equb &1e, &1e, &1e, &1e, &10, &10, &10, &10
@@ -1239,11 +1419,14 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &10, &10, &10, &10, &10, &10, &10, &10
     equb &10, &10, &10, &10, &10, &10, &10, &10
     equb &10, &10, &10, &10
+; OSWORD 7 (SOUND) parameter block for teleporting.
 .teleport_sound
-    equw &0013, &0004, &0064, &001e     ; SOUND channel 3 (flush), envelope 4, pitch 100, duration 30
+    equw &13, &04, 100, 30              ; SOUND channel 3 (flush), envelope 4, pitch 100, duration 30
+; OSWORD 7 (SOUND) parameter block for eating food, and (with its pitch changed) opening a door.
 .food_sound
 ; &0bfc referenced 2 times by &1d0f, &1d1d
-    equw &0013, &0002, &00c8, &0002     ; SOUND channel 3 (flush), envelope 2, pitch 200, duration 2
+    equw &13, &02, 200, 2               ; SOUND channel 3 (flush), envelope 2, pitch 200, duration 2
+; The level's wall map, from the level file: eight bytes per room, one per row of cells, one bit per cell (bit 7 at the left). Rooms are 8x8 cells and run four to a row of the map. The first eight bytes are also the MOS 1.20 definition of character 128, which the WRCHV handler overwrites with each glyph it prints; the level is unpacked only after the level number has been printed.
 ; &0c00 used as index base 3 times by &15c8, &7fc8, &7feb
 .room_walls
     equb &54, &49, &4b, &50, &24, &55, &54, &48, &4f, &5b, &4b, &46, &2c, &44, &5d, &2f  ; Not read: unpack_level copies each level's wall map here
@@ -1260,47 +1443,77 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &e2, &f8, &fc, &f4, &94, &f0, &e4, &f6, &eb, &f0, &f4, &fc, &9c, &e9, &f6, &f6  ; ...entries 176-191, not read
     equb &93, &e1, &8f, &86, &97, &96, &87, &80, &8d  ; ...entries 192-200, not read
     equb &e7, &9e, &83, &8d, &83, &85, &90  ; Not referenced
+; Health each hero loses when a monster touches it, 3-9 (lowered by a magic helmet). The status panel shows 10 minus this as the armour rating.
 ; &0cd0 used as index base 7 times by &0ede, &0f1e, &74ef, &74f2, &74f9, &75bd, &79a7
 .hero_damage_taken
     equb &89, &9e, &87, &f3, &95, &9b, &92, &f7
     equb &90, &98, &8a, &8b, &85, &fd, &9a, &8a
     equb &ae, &a6, &a7, &ac, &aa, &ac, &a8, &a0
     equb &c9, &00, &00, &00, &00, &00, &00, &00
+; OSWORD 7 (SOUND) parameter block for a monster hit, and (louder) touching an energy drainer.
 .hit_sound
 ; &0cf4 referenced 2 times by &7481, &7491
-    equw &0010, tune_ptr + 1, &0006, &0006  ; SOUND channel 0 (flush), envelope 1, pitch 6, duration 6
+    equw &10, &01, 6, 6                 ; SOUND channel 0 (flush), envelope 1, pitch 6, duration 6
     equb &12, &00, &03, &00, &c8, &00, &0a  ; Not referenced
 .dasmos_dunj3_end
 
     org &0e00
 
 .dasmos_dunj4_start
+; ***************************************************************************************
+; Run the game: the menu, the levels, game over
+;
+; The game's top level, from a new game to its end. The start-up code jumps here once,
+; and every game over comes back here; it never returns. A game has three stages:
+;
+; 1. A new game (new_game). level_number goes back to 0, so that it counts the levels
+;    played, and level_bcd to the level before the first one to be played. reset_hero
+;    gives every hero their starting missiles, damage and armour and a score of 0000, and
+;    hero_menu lets the players choose who plays and whether there is sound.
+; 2. The levels (level_loop), one pass per level. The monsters' starting hit points are
+;    set to 8 + 2 x the levels already played, and the level number, counted in decimal
+;    in level_bcd, is written into the level's filename. Then start_level shows the level
+;    number, loads, decrypts and checks the level, unpacks it and draws the play screen;
+;    draw_status_panel draws each hero's panel section; remove_absent_heroes takes out
+;    the heroes nobody is playing; and play_level runs the level, a frame every three
+;    vertical syncs, until no hero is left in play: each has gone down the exit or died.
+;    Every hero who died (and every hero not playing, who counts as dead) is then given
+;    their starting attributes and score again by reset_hero, so a hero who died comes
+;    back as new on the next level, while those who went down the exit keep their gains
+;    and score. If any hero survived, on to the next level.
+; 3. Game over, when all four died. The game-over message is printed over the views
+;    (game_over_message), and a key, or the end of a time limit, starts a new game at the
+;    menu, which keeps the last game's choices.
+;
+; The game is won only on level 25, by reaching the Chalice: check_for_victory, called by
+; play_level every frame, then plays the ending and resets the machine instead of
+; returning here.
 ; &0e00 referenced 2 times by &07ca, &0ecc
 .new_game
     lda #0                              ; New game: no levels played yet...
-    sta level_number                    ; ...level_number 0, counted up by show_level_number...
+    sta level_number                    ; ...level_number 0, counted up by count_level...
     sta level_bcd                       ; ...and level_bcd 0, counted up by level_loop
     tax                                 ; Give each hero their starting attributes and score
 ; &0e09 referenced 1 time by &0e0f
 .reset_each_hero
-    jsr reset_hero                      ; Reset hero X
-    inx                                 ; Next hero
+    jsr reset_hero                      ; Reset hero X: starting attributes, score 0000
+    inx                                 ; Next hero, 0-3
     cpx #4                              ; All four done?
     bne reset_each_hero                 ; No: reset the next
     jsr hero_menu                       ; Then the players choose heroes and sound
-; Play each level in turn until every hero is dead.
+; Play each level in turn until every hero is dead. First set the level up: the monsters' strength, and the level number in decimal and in the level's filename.
 ; &0e14 referenced 1 time by &0e84
 .level_loop
     lda level_number                    ; Monsters' hit points: 8 + 2 x levels already played...
     asl a                               ; ...x 2...
     clc                                 ; ...(carry clear for the add)
-    adc #8                              ; ...+ 8...
+    adc #8                              ; ...+ 8: 8 on the first level played...
     sta monster_start_hit_points        ; ...for every monster on this level
     sed                                 ; Count the level in decimal, for its filename...
     clc                                 ; ...(carry clear for the add)
     lda level_bcd                       ; ...the BCD count...
-    adc #1                              ; ...+ 1...
-    sta level_bcd                       ; ...stored
+    adc #1                              ; ...+ 1, in decimal...
+    sta level_bcd                       ; ...is this level's number, in level_bcd
     cld                                 ; Back to binary arithmetic
     lda level_number                    ; Filename digits: two once 9 levels are played
     cmp #9                              ; ...(show_level_number counts level_number later)
@@ -1312,25 +1525,26 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     ldx #1                              ; X = 1: two digits
 ; &0e36 referenced 1 time by &0e32
 .store_level_units
-    lda level_bcd                       ; Units digit...
+    lda level_bcd                       ; The level's units digit...
     and #&0f                            ; ...its low nibble...
-    clc                                 ; ...as ASCII...
-    adc #'0'                            ; ...+ '0'...
+    clc                                 ; ...(carry clear for the add)...
+    adc #'0'                            ; ...+ '0': as an ASCII digit
     sta level_filename_digits,x         ; ...as the name's last digit
-    cpx #0                              ; Two digits?
+    cpx #0                              ; A two-digit name (X = 1)?
     beq end_level_filename              ; No: terminate the name
     lda level_bcd                       ; Yes: the tens digit...
     lsr a                               ; ...high nibble: first shift down...
     lsr a                               ; ...shifting the tens digit...
     lsr a                               ; ...down four bits...
     lsr a                               ; ...to the low nibble
-    clc                                 ; ...as ASCII...
-    adc #'0'                            ; ...+ '0'...
+    clc                                 ; ...(carry clear for the add)...
+    adc #'0'                            ; ...+ '0': as an ASCII digit
     sta level_filename_digits           ; ...as the name's first digit
 ; &0e52 referenced 1 time by &0e43
 .end_level_filename
     lda #&0d                            ; Terminate the filename with a carriage return
     sta level_filename_digits + 1,x     ; ...after the last digit
+; Set the level up on the screen and play it: the level itself, the status panel, the absent heroes taken out, then play_level until no hero is left in play.
     jsr start_level                     ; Load and draw the level
     jsr draw_status_panel               ; Draw every hero's panel section
     jsr remove_absent_heroes            ; Take out the heroes nobody plays
@@ -1349,14 +1563,14 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     inc count                           ; ...and count them
 ; &0e7a referenced 1 time by &0e72
 .next_hero_dead
-    inx                                 ; Next hero
+    inx                                 ; Next hero, 0-3
     cpx #4                              ; All four checked?
     bne check_hero_dead                 ; No: next hero
     lda count                           ; Any hero survived?
     cmp #4                              ; ...fewer than four dead?
     bne level_loop                      ; Yes: on to the next level
     jsr game_over_music                 ; All dead: stop the music; VDU 28,0,24,16,0 on the left...
-    nop                                 ; Padding
+    nop                                 ; Padding where the VDU 28 was sent: does nothing
     nop                                 ; ...a second padding byte
     lda #0                              ; Left column 0
     jsr oswrch                          ; Send the left column
@@ -1369,7 +1583,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     lda #&0c                            ; ...VDU 12 to clear it
     jsr oswrch                          ; Send VDU 12: clear the window
     ldx #4                              ; Spaces over &0FF1-&0FF4, two of them the counters
-    lda #&20 ; ' '                      ; ...a space
+    lda #&20 ; ' '                      ; ...the space to write
 ; &0ea8 referenced 1 time by &0eac
 .restore_message_spaces
     sta panel_hero - 1,x                ; ...into each (&0FF1 held YOU ALL's full stop)
@@ -1377,9 +1591,9 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     bne restore_message_spaces          ; Until all four are spaces
 ; &0eae referenced 1 time by &0eb7
 .print_game_over
-    lda game_over_message,x             ; Print game_over_message...
+    lda game_over_message,x             ; Print game_over_message from its start (X = 0)...
     jsr osasci                          ; ...through OSASCI, so each CR starts a new line
-    inx                                 ; Next character
+    inx                                 ; Step to the message's next character
     cmp #0                              ; ...up to its zero byte
     bne print_game_over                 ; Not the end: next
 ; &0eb9 referenced 1 time by &0ebc
@@ -1396,11 +1610,14 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; ***************************************************************************************
 ; Give a hero their starting attributes
 ;
-; Set hero X's missile limit, missile damage and damage taken from the starting tables,
-; and their score to zero with no ten-thousands digit. new_game calls it for every hero,
-; and level_loop for each hero who died (or was not playing) when a level ends, so
-; survivors keep their scores, missile limits, missile damage and armour. The units digit
-; is set one below 0 because draw_status_panel draws the score by adding a point.
+; Undo everything hero X has gained: set their missile limit, missile damage and health
+; lost per hit (hero_max_missiles, hero_missile_damage, hero_damage_taken) from the
+; starting tables at &0F80, and their score to 0000 with no ten-thousands digit. It is
+; called for every hero when a game starts, and by level_loop for each hero who died (or
+; was not playing) when a level ends, so a dead hero comes back on the next level as new,
+; while survivors keep their scores and the gains from objects. Health and position are
+; not set here: reset_workspace restores those for every hero at each level. The units
+; digit is set one below 0 because draw_status_panel draws the score by adding a point.
 ;
 ; On Entry:
 ;     X: hero number (0-3)
@@ -1411,29 +1628,37 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 .reset_hero
     lda hero_start_max_missiles,x       ; Starting missile limit...
     sta hero_max_missiles,x             ; ...as hero X's missile limit
-    lda hero_start_missile_damage,x     ; ...missile damage...
+    lda hero_start_missile_damage,x     ; Starting missile damage...
     sta hero_missile_damage,x           ; ...as their missile damage
-    lda hero_start_damage_taken,x       ; ...and health lost per hit
+    lda hero_start_damage_taken,x       ; Starting health lost per hit (armour)...
     sta hero_damage_taken,x             ; ...as their health lost per hit
-    lda #spr_digit_0                    ; Score 0000...
-    sta hero_score_thousands,x          ; ...thousands...
-    sta hero_score_hundreds,x           ; ...hundreds...
-    sta hero_score_tens,x               ; ...tens...
+    lda #spr_digit_0                    ; Score 0000: digit sprite 0...
+    sta hero_score_thousands,x          ; ...as the thousands digit...
+    sta hero_score_hundreds,x           ; ...the hundreds digit...
+    sta hero_score_tens,x               ; ...and the tens digit
     lda #spr_digit_0 - 1                ; ...units one below 0: draw_status_panel adds a point
     sta hero_score_units,x              ; ...as the units digit
     lda #spr_small_digit_1 - 1          ; No ten-thousands digit (&69, one below small 1)
     sta hero_score_ten_thousands,x      ; ...as the ten-thousands digit
-    rts                                 ; Return
+    rts                                 ; Return, X still the hero
 ; ***************************************************************************************
 ; Draw the status panel
 ;
-; Draw each hero's section of the status panel to the right of the views, after
-; start_level has cleared the screen. The health and score are drawn by taking a health
-; point and adding a score point: the health comes from the workspace template as 99 + 1,
-; so it is 99 at the start of every level, and a hero just reset has a score one below
-; 0000. A hero who survived the last level keeps their score, so gains a point here at
-; every new level. Above the health go the face and the shield with the armour rating on
-; it, and the missile damage; beside the health, one icon per missile allowed in flight.
+; Draw each hero's section of the status panel, the column to the right of the views,
+; Ranger at the top to Fighter at the bottom. level_loop calls it once per level, after
+; start_level has drawn the fresh screen and before remove_absent_heroes.
+;
+; The health and score are drawn by the routines play uses to change them:
+; lose_health_point takes a point from the template's health of 99 + 1, so every hero
+; starts every level on 99, and add_point adds one to the score, which a hero just reset
+; has one below 0000. So a hero who survived the last level, and kept their score, gains
+; a point here at every new level. Then, through plot_panel_sprite, which places each
+; sprite relative to the hero's panel row (hero_panel_y): the face and the shield on the
+; section's top row, with the armour rating (10 - health lost per hit) as a small digit
+; on the shield; the missile damage as a small digit; and one missile icon per missile
+; allowed in flight, three rows apart, beside the health. The keys, the boots icon and
+; the ten-thousands digit are drawn elsewhere. panel_hero is the hero being drawn; count
+; holds the icons' end row.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -1443,28 +1668,31 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 .draw_status_panel
     lda #0                              ; For each hero's section...
     sta panel_hero                      ; ...starting with the Ranger's, at the top
+; Health and score first, drawn by the routines that change them in play.
 ; &0efc referenced 1 time by &0f65
 .draw_panel_hero
     ldx panel_hero                      ; X = this hero
     jsr lose_health_point               ; Take a point from the template's 99 + 1: draws 99
     jsr add_point                       ; Add a point: draws the score (0000 if just reset)
+; The section's top row: the hero's face and the shield, with the armour rating on the shield.
     lda hero_faces,x                    ; The hero's face (their facing-down sprite)...
     ldx #panel_left                     ; ...at column &45, the panel's left...
     ldy #0                              ; ...on the section's top row...
-    jsr plot_panel_sprite               ; ...plotted
+    jsr plot_panel_sprite               ; ...plotted at the section's top left
     ldx #panel_left + 8                 ; Shield at column &4D, the section's top right
     ldy #0                              ; ...on the top row...
     lda #spr_shield                     ; ...the shield sprite...
-    jsr plot_panel_sprite               ; ...plotted
+    jsr plot_panel_sprite               ; ...plotted, for the armour rating to go on
     ldx panel_hero                      ; Armour rating on the shield: 10 - health lost per hit
     sec                                 ; ...(no borrow into the subtract)
     lda #spr_small_digit_1 + 9          ; ...from &73, small digit 1 + 9...
     sbc hero_damage_taken,x             ; ...less the damage per hit
     ldx #panel_left + 9                 ; ...at column &4E...
-    ldy #2                              ; ...row 2...
+    ldy #2                              ; ...2 rows down the section...
     jsr plot_panel_sprite               ; ...plotted on the shield
-    ldx panel_hero                      ; Missile icons, one per missile allowed in flight...
-    lda hero_max_missiles,x             ; ...missile limit...
+; One missile icon per missile the hero may have in flight, three rows apart from row &10.
+    ldx panel_hero                      ; Icon rows run from &10 to &10 + 3 x missile limit...
+    lda hero_max_missiles,x             ; ...the hero's missile limit, 1-3 at the start...
     asl a                               ; ...x 2...
     clc                                 ; ...(carry clear for the add)
     adc hero_max_missiles,x             ; ...+ limit: 3 rows per icon...
@@ -1484,30 +1712,37 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     tay                                 ; ...for the next icon
     cpy count                           ; Past the last icon's row?
     bcc draw_missile_icons              ; No: plot another
+; The damage the hero's missiles do, then on to the next hero's section.
     ldx panel_hero                      ; Missile damage as a small digit, above the icons
     lda hero_missile_damage,x           ; ...the hero's missile damage...
     clc                                 ; ...(carry clear for the add)
     adc #spr_small_digit_1 - 1          ; ...+ &69: small digit 1 for damage 1
     ldx #panel_left + 7                 ; ...at column &4C...
-    ldy #&0a                            ; ...row &0A...
-    jsr plot_panel_sprite               ; ...plotted
+    ldy #&0a                            ; ...&0A rows down, four above the health...
+    jsr plot_panel_sprite               ; ...plotted: the damage each missile does
     inc panel_hero                      ; Next hero's section
     lda panel_hero                      ; All four heroes drawn?
     cmp #4                              ; ...(four of them)
     bne draw_panel_hero                 ; No: the next hero
-    rts                                 ; Return
+    rts                                 ; Return: all four sections drawn
 ; ***************************************************************************************
 ; Plot a sprite in a hero's panel section
 ;
-; Plot sprite A at byte column X and pixel row Y + hero_panel_y - 14 for the hero being
-; drawn (draw_status_panel's loop counter). Row 0 of a section is thus 14 rows above the
-; health digits. The panel row is read from workspace_template, whose copy in page &0D is
-; hero_panel_y.
+; Plot sprite A at byte column X and pixel row Y + hero_panel_y - 14 for the hero
+; panel_hero, the one draw_status_panel is drawing. Row 0 of a section is thus 14 rows
+; above the health digits, which sit at the panel row itself. The panel row is read from
+; workspace_template, whose copy in page &0D, made by reset_workspace, is hero_panel_y.
 ;
 ; On Entry:
 ;     A: sprite number
 ;     X: byte column
 ;     Y: row within the hero's panel section
+;     PANEL_HERO: hero whose section it is (0-3)
+;
+; On Exit:
+;     A: corrupted
+;     X: 0
+;     Y: 0
 ; &0f68 referenced 5 times by &0f0c, &0f15, &0f25, &0f40, &0f5a
 .plot_panel_sprite
     stx plot_x                          ; Byte column from X
@@ -1517,11 +1752,12 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     clc                                 ; ...(carry clear for the add)
     adc workspace_template + 208,x      ; ...(read from workspace_template, which page &0D copies)
     sec                                 ; ...(no borrow into the subtract)
-    sbc #&0e                            ; ...less 14...
+    sbc #&0e                            ; ...less 14: row 0 is 14 above the health
     sta plot_y                          ; ...is the plot row
-    jsr plot_sprite                     ; Plot it
-    rts                                 ; Return
+    jsr plot_sprite                     ; Plot the sprite in the hero's section
+    rts                                 ; Return; plot_sprite leaves X and Y 0
     equb &00, &09, &60                  ; Not referenced
+; Starting hero_max_missiles for each hero: 3, 2, 1, 2.
 ; ***************************************************************************************
 ; Heroes' starting attributes
 ;
@@ -1530,12 +1766,15 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; &0f80 used as index base 1 time by &0ecf
 .hero_start_max_missiles
     equb &03, &02, &01, &02
+; Starting hero_missile_damage for each hero: 2, 3, 9, 5.
 ; &0f84 used as index base 1 time by &0ed5
 .hero_start_missile_damage
     equb &02, &03, &09, &05
+; Starting hero_damage_taken for each hero: 7, 9, 6, 4 (armour ratings 3, 1, 4, 6).
 ; &0f88 used as index base 1 time by &0edb
 .hero_start_damage_taken
     equb &07, &09, &06, &04
+; Sprite shown for each hero at the top left of their status panel section, plotted by draw_status_panel: &05, &31, &39, &41.
 ; &0f8c used as index base 1 time by &0f05
 .hero_faces
     equb &05, &31, &39, &41
@@ -1546,6 +1785,7 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; and a last line ended by a zero byte. Two bytes of it (&0FF1, &0FF2) double as
 ; counters, and are overwritten with spaces before printing, so the full stop after "YOU
 ; ALL" never appears.
+; The message printed when every hero has died, terminated by a zero byte.
 ; &0f90 used as index base 1 time by &0eae
 .game_over_message
     equs "FAREWELL!        ", &0d
@@ -1553,11 +1793,14 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equs "FAILED AND THE   ", &0d
     equs "GODS ARE IN NO   ", &0d
     equs "MOOD TO RESURRECT", &0d
+; The "YOU ALL." line of game_over_message, whose bytes after the text double as panel_hero and count.
 .game_over_you_all
 ; &0ff0 used as index base 1 time by &0ea8
 ; &0ff1 referenced 8 times by &0ef9, &0efc, &0f18, &0f28, &0f4d, &0f5d, &0f60, &0f6d
+; Hero counter for draw_status_panel. It is the full stop of game_over_message's "YOU ALL.", which is overwritten with a space before the message is printed.
 panel_hero = game_over_you_all+7
 ; &0ff2 referenced 5 times by &0e6a, &0e77, &0e7f, &0f35, &0f48
+; Counter, used for the dead heroes at the end of a level and the rows of missile icons. It is a byte of game_over_message.
 count = game_over_you_all+8
     equs "YOU ALL.         ", &0d
     equs "NEW ADVENTURERS  ", &0d
@@ -1575,14 +1818,21 @@ count = game_over_you_all+8
 ; ***************************************************************************************
 ; Check whether the Chalice has been found
 ;
-; Called by play_level at the start of every frame. On level 25, if any hero's
-; hero_door_x, hero_door_y (the cell they last stepped or tried to step into, kept even
-; when a wall stops them) is one of the Chalice's four cells, x &1A-&1B and y 4-5, the
-; game is won: play the victory sequence, print the ending text over the views, wait for
-; a key and reset the machine through the RESET vector, so this never returns. The text
-; is not part of the program: it is the 140 bytes at room_walls + &3A followed by the
-; zero-terminated string at object_free_map + &3A, which on level 25 hold the ending text
-; instead of map data. Otherwise return at once.
+; End the game in victory when a hero reaches the Chalice. Called by play_level first in
+; every frame, before update_game. On levels other than 25 return at once. On level 25,
+; test each hero's hero_door_x, hero_door_y, the cell move_heroes recorded as the one
+; they last stepped or tried to step into (kept even when a wall stops them, so walking
+; into the Chalice is enough). If it is one of the Chalice's four cells, x &1A-&1B and y
+; 4-5, the game is won: play victory_sequence, set a text window over the views (columns
+; 0-16, rows 0-24, leaving the status panel), clear it, print the ending text, flush the
+; keyboard buffer, wait for a key and call the MOS's reset code through the RESET vector,
+; so this never returns.
+;
+; The ending text is not part of the program: it is the 140 bytes at room_walls + &3A
+; followed by the zero-terminated string at object_free_map + &3A, which on level 25 hold
+; text instead of map data. Both lie clear of &0C00-&0C07, the definition of character
+; 128 that wrch_handler rewrites for every letter or digit it prints. The Chalice's cells
+; are fixed here, not read from the level's objects.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -1603,7 +1853,7 @@ count = game_over_you_all+8
     beq check_door_y                    ; Yes: check the row
 ; &1084 referenced 1 time by &1095
 .next_hero_victory
-    inx                                 ; Next hero
+    inx                                 ; Not at the Chalice: on to the next hero
     cpx #4                              ; Past hero 3?
     bne check_door_x                    ; No: check the next hero
 ; &1089 referenced 1 time by &1075
@@ -1633,12 +1883,13 @@ count = game_over_you_all+8
     jsr oswrch                          ; Send the top row
     lda #&0c                            ; ...VDU 12 to clear it
     jsr oswrch                          ; Clear the views for the ending text
+; Print the ending text: 140 bytes of level 25's wall map, then its object-free map up to a zero.
     ldx #0                              ; The ending text: 140 bytes from room_walls + &3A...
 ; &10ba referenced 1 time by &10c3
 .print_victory_text
     lda room_walls + 58,x               ; Next byte of level 25's wall map, which is text
     jsr osasci                          ; Print it in the game's font
-    inx                                 ; Next byte
+    inx                                 ; On through the 140 bytes
     cpx #&8c                            ; All 140 printed?
     bne print_victory_text              ; No: print the next
     ldx #0                              ; ...then the ending message, at object_free_map + &3A
@@ -1646,34 +1897,45 @@ count = game_over_you_all+8
 .print_ending_message
     lda object_free_map + 58,x          ; Next character of the ending message
     jsr osasci                          ; Print it, the zero included
-    inx                                 ; Next character
+    inx                                 ; On along the message (X stays non-zero)
     cmp #0                              ; The zero that ends the message?
     bne print_ending_message            ; No: print the next
+; Wait for a fresh key press, then reset the machine through the RESET vector.
     lda #osbyte_flush_buffer_class      ; OSBYTE &0F, X non-zero: flush the input buffer...
     jsr osbyte                          ; ...so keys pressed in the sequence cannot skip the text  Flush selected class of buffer
     jsr osrdch                          ; Wait for a key once the ending text has been read
-    lda reset_vector                    ; Copy the RESET vector into the JSR below...
-    sta reset_call_address              ; ...low byte
-    lda reset_vector + 1                ; ...high byte...
-    sta reset_call_address + 1          ; ...into the JSR's operand
+    lda reset_vector                    ; Aim the JSR below at the MOS's reset code...
+    sta reset_call_address              ; ...the RESET vector's low byte as its operand's...
+    lda reset_vector + 1                ; ...and the vector's high byte...
+    sta reset_call_address + 1          ; ...as its high: no MOS address built in
 .reset_call
 ; &10e7 referenced 1 time by &10dd
+; Operand of the JSR at reset_call, set from the RESET vector.
 reset_call_address = reset_call+1
 ; &10e8 referenced 1 time by &10e3
     jsr &00                             ; ...and call it: the game ends with a reset
 ; ***************************************************************************************
 ; Play the victory sequence
 ;
-; Called by check_for_victory once a hero reaches the Chalice. Each pass sounds the bell,
-; draws the ring of sparkles round the Chalice, and waits. The bell's pitch climbs by a
-; step each pass and wraps past 255, and each time it wraps the step grows by 1, so the
-; tone repeats as ever faster sweeps. The wait starts at &E6 units of about 1,280 cycles
-; each and shortens by one a pass down to 1; from then on each pass also clears one
-; random byte of the Chalice. After the 50th wrap, erase the ring, blank the Chalice and
-; wait 255 vertical syncs. OSBYTEs &D4 and &D5 set (old AND Y) EOR X, and Y is never set
-; for them: the bell's envelope byte takes Y left over from the frame, and the first
-; pitch takes the Y that OSBYTE &D4 returns; later passes have Y = 0 from the wait loop,
-; so the pitch is exactly victory_pitch.
+; Sparkles circle the Chalice to a rising, quickening bell tone, and the Chalice
+; dissolves into black. Called by check_for_victory once a hero reaches the Chalice; play
+; is frozen meanwhile, as nothing else runs.
+;
+; Each pass sounds the bell, draws the ring of sparkles round the Chalice
+; (draw_victory_ring), and waits. The bell's pitch climbs by a step each pass and wraps
+; past 255, and each time it wraps the step grows by 1, so the tone repeats as ever
+; faster sweeps: about 256 x (1 + 1/2 + ... + 1/50), some 1,150 passes in all. The wait
+; starts at &E6 units of about 1,280 cycles each and shortens by one a pass down to 1,
+; reached on pass 229, near the end of the first sweep; from then on each pass also calls
+; dissolve_chalice, which clears a random byte of the Chalice when its random value is
+; below &C0. After the 50th wrap (erase_victory_ring), erase the ring, clear whatever is
+; left of the Chalice's sprite, replot it black, and wait 255 vertical syncs, about five
+; seconds. The Chalice's sprite data stays cleared, as the game resets next.
+;
+; OSBYTEs &D4 and &D5 set (old AND Y) EOR X, and Y is never set for them: the bell's
+; envelope byte takes Y left over from the frame, and the first pitch takes the Y that
+; OSBYTE &D4 returns; later passes have Y = 0 from the wait loop, so the pitch is exactly
+; victory_pitch.
 ;
 ; On Exit:
 ;     A: 0
@@ -1684,9 +1946,10 @@ reset_call_address = reset_call+1
     lda #osbyte_bell_envelope           ; OSBYTE &D4: the bell's envelope byte...
     ldx #8                              ; ...EOR 8; Y, not set, is the AND mask
     jsr osbyte                          ; Set the bell's envelope for the victory tone  osbyte: bell envelope
-    lda #0                              ; No pixel offsets
-    sta plot_offset_x                   ; ...across...
-    sta plot_offset_y                   ; ...or down, so sprites sit square in their cells
+; Set up the sequence: no pixel offsets, the first sparkle, pitch 0 rising by 1, a wait of &E6, 50 sweeps.
+    lda #0                              ; Plot the ring and Chalice square on their cells:
+    sta plot_offset_x                   ; ...no x offset...
+    sta plot_offset_y                   ; ...and no y offset
     lda #spr_sparkle_0                  ; The ring starts with the first sparkle
     sta victory_sprite                  ; ...as the ring's sprite
     lda #0                              ; Tone starts at pitch 0...
@@ -1700,10 +1963,10 @@ reset_call_address = reset_call+1
 ; One pass of the sequence: raise the pitch, shorten the wait, sound the bell, draw the ring, dissolve a byte of the Chalice once at full speed, and wait.
 ; &110a referenced 1 time by &1146
 .raise_victory_pitch
-    clc                                 ; Start a pass: raise the bell's pitch
-    lda victory_pitch                   ; ...current pitch...
-    adc victory_pitch_step              ; ...plus the step...
-    sta victory_pitch                   ; ...becomes the new pitch, wrapping past 255
+    clc                                 ; Pitch = (pitch + step) mod 256, C set on a wrap...
+    lda victory_pitch                   ; ...the bell's current pitch...
+    adc victory_pitch_step              ; ...plus this sweep's step...
+    sta victory_pitch                   ; ...stored as the pitch for this pass
     bcc shorten_victory_delay           ; No wrap: the sweep goes on
     inc victory_pitch_step              ; Wrapped: the next sweep climbs one step faster...
     dec victory_steps_left              ; ...and one fewer sweep is left
@@ -1739,16 +2002,18 @@ reset_call_address = reset_call+1
     bne victory_delay_inner             ; Until it reaches zero
     dex                                 ; Count down the delay units
     bne victory_delay_outer             ; Until the delay is spent (Y = 0 for the next OSBYTE)
-    jmp raise_victory_pitch             ; Next pass
+    jmp raise_victory_pitch             ; Next pass: raise the pitch again
 ; ***************************************************************************************
 ; Draw the ring of sprites round the Chalice
 ;
-; Plot victory_sprite at the twelve cells round the Chalice's 2 x 2 block, from x &1C, y
-; 3 leftwards along the top, down the left side, along the bottom and up the right side,
-; three cells to a side. The sprite moves on to the next sparkle (next_victory_sprite)
-; after each of the first three sides and is left at the fourth side's, so the next ring
-; starts with it and the sparkles move one side round the ring each pass. With the blank
-; sprite, it erases the ring.
+; Draw one frame of the sparkling ring. Called by victory_sequence once a pass, and once
+; more with the blank sprite to erase the ring. Plot victory_sprite at the twelve cells
+; round the Chalice's 2 x 2 block (x &19-&1C, y 3-6, all in the Chalice's room), from x
+; &1C, y 3 leftwards along the top, down the left side, along the bottom and up the right
+; side, three cells to a side, each corner starting a side. The sprite moves on to the
+; next sparkle (next_victory_sprite) after each of the first three sides and is left at
+; the fourth side's, so the next ring starts with it and the sparkles move one side round
+; the ring each pass. With the blank sprite, it erases the ring.
 ;
 ; On Entry:
 ;     VICTORY_SPRITE: the sprite for the top side
@@ -1765,39 +2030,40 @@ reset_call_address = reset_call+1
     lda #chalice_y - 1                  ; ...one row above the Chalice...
     sta ring_y                          ; ...as the ring's y
     jsr plot_victory_sprite             ; Plot the top-right corner, first of the top side
-    dec ring_x                          ; Left...
-    jsr plot_victory_sprite             ; Plot the next cell along the top
-    dec ring_x                          ; Left...
+    dec ring_x                          ; Left to x &1B, above the Chalice's right column
+    jsr plot_victory_sprite             ; Plot the top side's second cell
+    dec ring_x                          ; Left to x &1A, above its left column
     jsr plot_victory_sprite             ; Plot the last of the top side's three
     lda victory_sprite                  ; Keep the sprite...
     sta victory_sprite_copy             ; ...in victory_sprite_copy, which nothing reads
     jsr next_victory_sprite             ; ...and move to the next sparkle for the left side
-    dec ring_x                          ; Left...
-    jsr plot_victory_sprite             ; Plot the top-left corner
-    inc ring_y                          ; Down...
-    jsr plot_victory_sprite             ; Plot down the left side
-    inc ring_y                          ; Down...
-    jsr plot_victory_sprite             ; Plot down the left side
+    dec ring_x                          ; Left to x &19: the top-left corner
+    jsr plot_victory_sprite             ; Plot it, first of the left side
+    inc ring_y                          ; Down to y 4, beside the Chalice's top row
+    jsr plot_victory_sprite             ; Plot the left side's second cell
+    inc ring_y                          ; Down to y 5, beside its bottom row
+    jsr plot_victory_sprite             ; Plot the left side's third cell
     jsr next_victory_sprite             ; Next sparkle for the bottom side
-    inc ring_y                          ; Down...
-    jsr plot_victory_sprite             ; Plot the bottom-left corner
-    inc ring_x                          ; Right...
-    jsr plot_victory_sprite             ; Plot along the bottom
-    inc ring_x                          ; Right...
-    jsr plot_victory_sprite             ; Plot along the bottom
+    inc ring_y                          ; Down to y 6: the bottom-left corner
+    jsr plot_victory_sprite             ; Plot it, first of the bottom side
+    inc ring_x                          ; Right to x &1A, below the Chalice's left column
+    jsr plot_victory_sprite             ; Plot the bottom side's second cell
+    inc ring_x                          ; Right to x &1B, below its right column
+    jsr plot_victory_sprite             ; Plot the bottom side's third cell
     jsr next_victory_sprite             ; Next sparkle for the right side, kept for the next ring
-    inc ring_x                          ; Right...
-    jsr plot_victory_sprite             ; Plot the bottom-right corner
-    dec ring_y                          ; Up...
-    jsr plot_victory_sprite             ; Plot up the right side
-    dec ring_y                          ; Up...
-    jsr plot_victory_sprite             ; Plot up the right side, closing the ring
-    rts                                 ; Return
+    inc ring_x                          ; Right to x &1C: the bottom-right corner
+    jsr plot_victory_sprite             ; Plot it, first of the right side
+    dec ring_y                          ; Up to y 5, beside the Chalice's bottom row
+    jsr plot_victory_sprite             ; Plot the right side's second cell
+    dec ring_y                          ; Up to y 4, beside its top row
+    jsr plot_victory_sprite             ; Plot the right side's third, closing the ring
+    rts                                 ; Return, victory_sprite at the right side's sparkle
 ; ***************************************************************************************
 ; Plot a victory sprite at a cell
 ;
 ; Plot victory_sprite at the cell ring_x, ring_y in every view showing it, with the pixel
-; offsets victory_sequence cleared.
+; offsets victory_sequence cleared. Called by draw_victory_ring for each of the ring's
+; twelve cells; ring_x and ring_y are left as they were, for the next step.
 ;
 ; On Entry:
 ;     RING_X: cell x
@@ -1817,12 +2083,14 @@ reset_call_address = reset_call+1
     lda victory_sprite                  ; ...with the ring's current sprite...
     sta sprite_number                   ; ...as the sprite to plot
     jsr plot_at_cell                    ; ...in every view that shows the cell
-    rts                                 ; Return
+    rts                                 ; Return to draw_victory_ring for the next cell
 ; ***************************************************************************************
 ; Choose the next victory sprite
 ;
-; Step victory_sprite through the four sparkles, &16-&19, wrapping back to &16. The blank
-; sprite, &15, used to erase the ring, is left alone.
+; Step victory_sprite through the four sparkles, &16-&19, wrapping back to &16. Called by
+; draw_victory_ring between the ring's sides, so each side shows a different sparkle. The
+; blank sprite, &15, used to erase the ring, is left alone, so an erasing ring stays
+; blank all the way round.
 ;
 ; On Entry:
 ;     VICTORY_SPRITE: the current sprite
@@ -1845,14 +2113,17 @@ reset_call_address = reset_call+1
 ; &11bb referenced 2 times by &11b0, &11b7
 .store_victory_sprite
     sta victory_sprite                  ; Make it the ring's sprite
-    rts                                 ; Return
+    rts                                 ; Return with A = victory_sprite
 ; ***************************************************************************************
 ; Clear a random byte of the Chalice
 ;
-; Make a random number from the System VIA's timer 1 low byte mixed with two bytes of MOS
-; workspace. If it is below &C0, the size of the Chalice's 8 x 24-byte sprite, zero that
-; byte of sprite_chalice and replot the Chalice, so it dissolves into black a pixel pair
-; at a time; otherwise do nothing this pass.
+; Eat one more hole in the Chalice. Called by victory_sequence on every pass once its
+; wait is down to 1. Make a random number from the System VIA's timer 1 low byte mixed
+; with two bytes of MOS workspace (&FC and &FA). If it is below &C0, the size of the
+; Chalice's 8 x 24-byte sprite, zero that byte of sprite_chalice and replot the Chalice,
+; so it dissolves into black a pixel pair at a time; otherwise do nothing this pass. A
+; byte already clear may be chosen again, so some survive until erase_victory_ring clears
+; the rest.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -1865,20 +2136,21 @@ reset_call_address = reset_call+1
     eor os_zp_fa                        ; ...and more MOS workspace, for randomness
     cmp #&c0                            ; Within the Chalice's &C0 bytes?
     bcs dissolve_done                   ; No: nothing dissolves this pass
-    tax                                 ; Clear it...
-    lda #0                              ; ...to zero, a black pair of pixels...
+    tax                                 ; X = the chosen byte's offset in the sprite...
+    lda #0                              ; ...cleared to zero, a black pair of pixels...
     sta sprite_chalice,x                ; ...in the Chalice's sprite data
     jsr plot_chalice                    ; ...and replot the Chalice with the hole in it
 ; &11d2 referenced 1 time by &11c7
 .dissolve_done
-    rts                                 ; Return
+    rts                                 ; Return to victory_sequence's wait
+; The 50th sweep is done: erase the ring, clear the rest of the Chalice, and hold the scene for 255 vsyncs.
 ; &11d3 referenced 1 time by &1119
 .erase_victory_ring
     lda #spr_blank                      ; Erase the ring
     sta victory_sprite                  ; ...by making the blank the ring's sprite...
     jsr draw_victory_ring               ; ...and drawing the ring with it
     ldx #&c1                            ; Clear what is left of the Chalice...
-    lda #0                              ; ...to zeros
+    lda #0                              ; ...to zeros, black pixels
 ; &11de referenced 1 time by &11e2
 .clear_chalice_sprite
     sta sprite_chalice - 1,x            ; Clear a byte of the Chalice's sprite data
@@ -1896,8 +2168,10 @@ reset_call_address = reset_call+1
 ; Plot the Chalice
 ;
 ; Plot sprite &73, the Chalice, at its top-left cell (x &1A, y 4) in every view showing
-; it. The sprite is two cells wide and two high, so it covers the four cells
-; check_for_victory tests.
+; it, as its sprite data now stands. Called by dissolve_chalice after each byte it
+; clears, and at the end of victory_sequence to show it gone. The sprite is two cells
+; wide and two high, so it covers the four cells check_for_victory tests. The pixel
+; offsets are those victory_sequence cleared.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -1912,8 +2186,21 @@ reset_call_address = reset_call+1
     lda #spr_chalice                    ; ...sprite &73, 2 x 2 cells...
     sta sprite_number                   ; ...as the sprite to plot...
     jsr plot_at_cell                    ; ...plotted in every view showing it
-    rts                                 ; Return
+    rts                                 ; Return with the Chalice drawn as its data stands
+; ***************************************************************************************
+; Unused
+;
+; Leftover bytes, never read: &52 &78 &60 repeat the end of plot_chalice (JSR
+; plot_at_cell's operand, then RTS), and the rest reads as a fragment of BASIC text,
+; "(&1900+F".
     equs "Rx`(&1900+F%"
+; Data of sprite &73: 8 bytes x 24 rows.
+; ***************************************************************************************
+; The Chalice sprite
+;
+; Sprite &73: 8 bytes by 24 rows, two cells by two, plotted at x &1A, y 4 by
+; plot_chalice. In the victory sequence dissolve_chalice zeros random bytes of it and
+; erase_victory_ring zeros all of it (and the byte after); the game then ends in a reset.
 ; &1210 used as index base 1 time by &11cc
 .sprite_chalice
     equb &00, &00, &05, &0f, &0f, &0a, &00, &00
@@ -1941,8 +2228,10 @@ reset_call_address = reset_call+1
     equb &00, &00, &0f, &07, &0b, &0f, &00, &00
     equb &00, &00, &05, &0f, &0f, &0a, &00, &00
     equb &3d, &26, &00                  ; Not referenced
+; The WRCHV contents found at start-up, restored while the game uses the MOS's own text output.
 .saved_wrchv
-    equb &a4, &e0, &00, &73
+    equb &a4, &e0, &00, &73             ; WRCHV as saved at start-up (&E0A4 as loaded)
+; The game's font for the letters A-Z: eight bytes per letter, one per pixel row, in MOS character-definition format.
 ; ***************************************************************************************
 ; Font: letters A-Z
 ;
@@ -2158,6 +2447,7 @@ reset_call_address = reset_call+1
     equb %01000010
     equb %11111110
     equb %00000000
+; The game's font for the digits 0-9, in the same format as font_letters.
 ; ***************************************************************************************
 ; Font: digits 0-9
 ;
@@ -2245,39 +2535,52 @@ reset_call_address = reset_call+1
     equb %00000100
     equb %00011000
     equb %00000000
+; ***************************************************************************************
+; Unused
+;
+; Leftover bytes, never read: a second copy of the digit 9's eight glyph rows, then &74.
     equs "<BB>"
     equb &02, &04, &18, &00, &74        ; Not referenced
 ; ***************************************************************************************
 ; Set up and draw a new level
 ;
-; Called by level_loop for every level. Stop the music, which plays on the interval timer
-; event, until the level is drawn; after the first level its place (rhythm step,
-; transposition, section and tune_ptr) is kept on the stack. Count the level, put the
-; MOS's page &0D back and load the level, unpack it, reset the workspace and monsters,
-; clear the text area, show 25 rows, and draw the view frames and views. Then restart the
-; music: start_music always plays the tune's first step, after which the saved place, if
-; any, is put back, so that the tune carries on from where the last level left it.
-; first_level_flag tells the two cases apart.
+; Load the next level and draw it, with the music carrying on across levels. Called by
+; level_loop once per level, after it has counted the level in level_bcd; level_loop then
+; draws the status panel and plays the level.
+;
+; The music plays on the interval timer event, and is stopped while the level loads and
+; is drawn. After the first level of the session its place (rhythm step, transposition,
+; section and tune_ptr) is pushed on the stack first, since start_music resets it. Then
+; count the level (count_level), put the MOS's page &0D back and load and check the level
+; (load_level), unpack it, give page &0D back to the game (reset_workspace), reset the
+; monsters, clear the screen, show 25 rows, and draw the view frames and views. Last,
+; restart the music: start_music always plays the tune's first step, after which the
+; saved place, if any, is put back, so that the tune carries on from where the last level
+; left it. first_level_flag tells the two cases apart; it is set after the first level
+; and never cleared, so the first level of a later game resumes the tune where
+; game_over_music stopped it.
 ;
 ; On Exit:
 ;     A: corrupted
 ;     X: corrupted
 ;     Y: corrupted
+; After the first level, keep the music's place on the stack, as start_music will reset it.
 ; &1400 referenced 1 time by &0e57
 .start_level
     lda first_level_flag                ; First level of the session?
     cmp #&7b ; '{'                      ; ...&7B once the first level is done
     bne stop_music_and_load             ; Yes: no music playing to save
     lda music_rhythm_step               ; No: keep the music's place on the stack: its step...
-    pha                                 ; ...pushed
-    lda music_transpose                 ; ...transposition...
-    pha                                 ; ...pushed
-    lda music_section                   ; ...section...
-    pha                                 ; ...pushed
+    pha                                 ; ...pushed first, so it comes off last
+    lda music_transpose                 ; ...then the transposition...
+    pha                                 ; ...pushed second...
+    lda music_section                   ; ...then the section...
+    pha                                 ; ...pushed third...
     lda tune_ptr                        ; ...and tune pointer (zero page &00-&01)
     pha                                 ; ...low byte pushed
-    lda tune_ptr + 1                    ; ...high byte...
-    pha                                 ; ...pushed last
+    lda tune_ptr + 1                    ; ...then its page...
+    pha                                 ; ...pushed last, to come off first
+; Load and set up the level with the music silent.
 ; &1419 referenced 1 time by &1405
 .stop_music_and_load
     jsr stop_music                      ; Silence the music while the level loads
@@ -2287,12 +2590,13 @@ reset_call_address = reset_call+1
     jsr reset_workspace                 ; Page &0D back to the game's workspace
     jsr reset_monsters                  ; Reset the monsters and keys
     jsr clear_text_area                 ; Clear the text area
+; Show all 25 rows and draw the play screen.
     lda #&17                            ; VDU 23,0,6,25,0,0,0,0,0,0: set 6845 register 6...
-    jsr oswrch                          ; ...VDU 23...
+    jsr oswrch                          ; ...send VDU 23, the 6845 command...
     lda #0                              ; ...0: write a 6845 register...
-    jsr oswrch                          ; ...sent
+    jsr oswrch                          ; ...sent: a register setting follows
     lda #6                              ; ...register 6, rows displayed...
-    jsr oswrch                          ; ...sent
+    jsr oswrch                          ; ...sent: the register number
     lda #&19                            ; ...to 25 character rows displayed
     jsr oswrch                          ; ...so play uses all 25 rows
     lda #0                              ; ...then six zeros to finish the command
@@ -2304,42 +2608,51 @@ reset_call_address = reset_call+1
     jsr oswrch                          ; ...zero 6 of 6: the VDU 23 is complete
     lda #<(view_frame_plots)            ; Point at view_frame_plots...
     sta plot_x                          ; ...low byte in plot_x
-    lda #>(view_frame_plots)            ; ...high byte...
+    lda #>(view_frame_plots)            ; ...and its page...
     sta plot_y                          ; ...in plot_y, as draw_view_frames expects
     jsr draw_view_frames                ; ...and draw the frames and the views
+; Restart the music, then put its kept place back.
     jsr start_music                     ; Start the music from the top (plays its first step)
     lda first_level_flag                ; First level of the session?
     cmp #&7b ; '{'                      ; ...&7B once the first level is done
     bne mark_first_level_done           ; Yes: nothing saved; the tune plays from the top
     pla                                 ; No: put the music's place back: tune pointer...
-    sta tune_ptr + 1                    ; ...high byte...
+    sta tune_ptr + 1                    ; ...its page into tune_ptr's high byte...
     pla                                 ; ...then the low byte...
-    sta tune_ptr                        ; ...restored
-    pla                                 ; ...section...
-    sta music_section                   ; ...restored
-    pla                                 ; ...transposition...
-    sta music_transpose                 ; ...restored
+    sta tune_ptr                        ; ...into tune_ptr: the step to play next
+    pla                                 ; ...then the section...
+    sta music_section                   ; ...back in music_section
+    pla                                 ; ...then the transposition...
+    sta music_transpose                 ; ...back in music_transpose
     pla                                 ; ...and rhythm step
     sta music_rhythm_step               ; ...restored: the tune resumes where it was
 ; &147d referenced 1 time by &1469
 .mark_first_level_done
     lda #&7b ; '{'                      ; Mark the first level done...
     sta first_level_flag                ; ...so later levels, and later games, keep the music's place
-    rts                                 ; Return
+    rts                                 ; Return to level_loop to draw the panel and play
 ; ***************************************************************************************
 ; Put the MOS's page &0D back and load the level
 ;
-; Copy the MOS's page &0D back from &C400 (Coder saved it there), over the game's
-; workspace, so that the filing system's NMI code and workspace are intact for the load;
-; reset_workspace gives the page back to the game afterwards. Write level_bcd's digits
-; into level_command, show only 15 character rows, so that the level file arriving at
-; &6B00 (rows 23-24 of the screen) is not seen, and *LOAD LEVELnn 6B00 (level 25 comes
-; from Stones, via load_stones in Table). Then decrypt and check it.
+; Bring the next level's file from disc into &6B00-&6DAF, then decrypt and check it.
+; Called by start_level once per level, after count_level has counted level_number and
+; with the music stopped, and before unpack_level copies the level into play.
+;
+; Copy the MOS's page &0D back from saved_page_0d (coder_start saved it there), over the
+; game's workspace, so that the disc filing system's NMI code and workspace are intact
+; for the load; reset_workspace gives the page back to the game afterwards. Write
+; level_bcd's digits into level_command: one digit and a space for levels 1-9, two digits
+; from 10. Show only 15 character rows, so that the level file arriving at &6B00 (rows
+; 23-24 of the screen) is not seen. Then *LOAD LEVELnn 6B00 and jump to decrypt_level,
+; which returns to start_level; level 25 has no file of its own and comes from Stones,
+; through load_stones in Table. A level that fails its checksum makes decrypt_level call
+; &D9CD, which on a Master is private RAM, not a reset.
 ;
 ; On Exit:
 ;     A: corrupted
 ;     X: corrupted
 ;     Y: corrupted
+; Give page &0D back to the filing system for the load.
 ; &1483 referenced 1 time by &141f
 .load_level
     ldx #0                              ; Copy &C400-&C4FF back to page &0D...
@@ -2349,6 +2662,7 @@ reset_call_address = reset_call+1
     sta scratch,x                       ; ...back where the filing system needs it
     dex                                 ; ...next byte (X wraps from 0)
     bne restore_page_0d_byte            ; Until all 256 are back
+; Write the level's number, from level_bcd, into level_command as one digit and a space, or two digits.
     lda level_bcd                       ; Level 10 or more? (level_bcd &01-&09 or &10-&25)
     cmp #&0a                            ; ...&0A or more means two digits
     bcs level_command_two_digits        ; Yes: two digits
@@ -2356,34 +2670,35 @@ reset_call_address = reset_call+1
     sta level_command_digits + 1        ; ...second digit a space
     lda level_bcd                       ; ...the units digit...
     and #&0f                            ; ...from the low nibble...
-    clc                                 ; ...as ASCII...
+    clc                                 ; ...made ASCII (carry clear for the add)...
     adc #&30 ; '0'                      ; ...'0' plus the digit
     sta level_command_digits            ; ...is the first digit
-    bne shrink_display_for_loading      ; ...(always branches)
+    bne shrink_display_for_loading      ; ...(always branches: the digit is not 0)
 ; &14a7 referenced 1 time by &1493
 .level_command_two_digits
     lda level_bcd                       ; Yes: tens digit...
     lsr a                               ; ...shifting the tens digit...
     lsr a                               ; ...down four bits...
-    lsr a                               ; ...to the...
-    lsr a                               ; ...low nibble
-    clc                                 ; ...as ASCII...
+    lsr a                               ; ...from the high nibble...
+    lsr a                               ; ...into the low nibble: 1 or 2
+    clc                                 ; ...made ASCII (carry clear for the add)...
     adc #&30 ; '0'                      ; ...'0' plus the digit
     sta level_command_digits            ; ...is the first digit
     lda level_bcd                       ; ...then units digit
     and #&0f                            ; ...from the low nibble...
-    clc                                 ; ...as ASCII...
+    clc                                 ; ...made ASCII (carry clear for the add)...
     adc #&30 ; '0'                      ; ...'0' plus the digit
     sta level_command_digits + 1        ; ...is the second digit
+; Show only 15 rows, hiding the screen rows the level file is loaded into.
 ; &14bf referenced 1 time by &14a5
 .shrink_display_for_loading
     lda #&17                            ; VDU 23,0,6,15,0,0,0,0,0,0: show 15 character rows while loading...
-    jsr oswrch                          ; ...VDU 23...
+    jsr oswrch                          ; ...send VDU 23, the 6845 command...
     lda #0                              ; ...0: write a 6845 register...
-    jsr oswrch                          ; ...sent
+    jsr oswrch                          ; ...sent: a register setting follows
     lda #6                              ; ...register 6, rows displayed...
-    jsr oswrch                          ; ...sent
-    lda #&0f                            ; ...15 rows...
+    jsr oswrch                          ; ...sent: the register number
+    lda #&0f                            ; ...15 rows, the new setting...
     jsr oswrch                          ; ...hiding rows 15-24, where &6B00 lies
     lda #0                              ; ...then six zeros to finish the command
     jsr oswrch                          ; ...zero 1 of 6 ending the VDU 23
@@ -2392,6 +2707,7 @@ reset_call_address = reset_call+1
     jsr oswrch                          ; ...zero 4 of 6 ending the VDU 23
     jsr oswrch                          ; ...zero 5 of 6 ending the VDU 23
     jsr oswrch                          ; ...zero 6 of 6: the VDU 23 is complete
+; Load the level: Stones for level 25, LEVELnn for the rest, then decrypt and check it.
     lda level_number                    ; Level 25, the last, with no file of its own?
     cmp #&19                            ; ...level_number &19 (counted by count_level)?
     bne load_level_file                 ; No: load its LEVELnn file
@@ -2402,19 +2718,23 @@ reset_call_address = reset_call+1
     ldy #>(level_command)               ; ...high byte of the command
     jsr oscli                           ; ...the level file to &6B00, for decrypt_level
     jmp decrypt_level                   ; Decrypt and check it, and return from there
+; "LOAD LEVELnn 6B00", passed to OSCLI by load_level for levels 1-24, with the level's digits written at level_command_digits (level_command+10) before each load. It is stored with the digits "11".
 .level_command
 ; &1505 referenced 2 times by &14a2, &14b1
 level_command_digits = level_command+10
 ; &1506 referenced 2 times by &1497, &14bc
-    equs "LOAD LEVEL11 6B00", &0d
+    equs "LOAD LEVEL11 6B00", &0d       ; *LOAD LEVELnn 6B00, the digits at +10
 ; ***************************************************************************************
 ; Reset the game workspace for a new level
 ;
-; Called by start_level. Copy the 256 bytes of workspace_template over page &0D, which
-; puts the heroes, missiles and views back to their starting state, then reset the exit
-; animation's state: no hero going down the exit or shrunk, the shrinking hero's pixel
-; offsets (x 1, 1, 0, 0 and y 5, 3, 1, 0 for exit_shrinks_left 1-4), and trapdoor 0 as
-; the next one a monster comes out of.
+; Put the heroes, missiles and views back where every level starts. Called by start_level
+; once a level, after unpack_level and before reset_monsters. Copy the 256 bytes of
+; workspace_template (&7D00) over page &0D, the per-level workspace, then reset the exit
+; animation's state, which lives in page &09: no hero going down the exit (exit_busy 0)
+; or left shrunk (shrunk_hero &FF), the shrinking hero's pixel offsets (x 1, 1, 0, 0 and
+; y 5, 3, 1, 0 for exit_shrinks_left 1-4), and trapdoor 0 as the next one a monster comes
+; out of (next_trapdoor). Nothing here touches the heroes' health or scores, which carry
+; over from level to level.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -2427,7 +2747,7 @@ level_command_digits = level_command+10
 .copy_workspace_template
     lda workspace_template,x            ; Byte of the starting values...
     sta scratch,x                       ; ...becomes page &0D's byte
-    inx                                 ; Next byte
+    inx                                 ; Next of page &0D's 256 bytes
     bne copy_workspace_template         ; Until all 256 are copied: heroes back at the start
     lda #0                              ; Reset the exit animation and the trapdoor turn
     sta exit_busy                       ; No hero is going down the exit
@@ -2449,8 +2769,11 @@ level_command_digits = level_command+10
 ; ***************************************************************************************
 ; Draw the frames round the four views
 ;
-; Send the twenty PLOT commands of view_frame_plots, draw the four views, then point
-; WRCHV at &7F8F, which passes every character straight to the MOS.
+; Called by start_level once per level, after the screen has been cleared and set to 25
+; rows. Send the twenty PLOT commands of view_frame_plots (five per view: a move and four
+; lines), draw the room in each hero's view with draw_all_views, then point WRCHV at
+; wrch_handler (&7F8F), which passes every character straight to the MOS. Until the first
+; level is drawn, WRCHV is the MOS's own, so the hero menu prints through it directly.
 ;
 ; On Entry:
 ;     PLOT_X: address of view_frame_plots, low byte
@@ -2460,38 +2783,42 @@ level_command_digits = level_command+10
     ldx #&14                            ; Twenty PLOT commands: five for each view's frame
 ; &1546 referenced 1 time by &1561
 .draw_view_frame
-    lda #&19                            ; VDU 25...
+    lda #&19                            ; Start a PLOT command: VDU 25...
     jsr oswrch                          ; Send VDU 25: a PLOT command follows
     ldy #0                              ; ...then the five bytes of the command
 ; &154d referenced 1 time by &1555
 .send_frame_vdu
     lda (plot_x),y                      ; Next byte of this PLOT: K, then X and Y
     jsr oswrch                          ; Send it to the VDU drivers
-    iny                                 ; Next byte
+    iny                                 ; On to the command's next byte
     cpy #5                              ; All five sent?
     bne send_frame_vdu                  ; No: send the next
-    clc                                 ; Next command
-    lda plot_x                          ; ...pointer...
-    adc #5                              ; ...moves on five bytes...
+    clc                                 ; Step (plot_x) on to the next command...
+    lda plot_x                          ; ...its low byte...
+    adc #5                              ; ...plus five...
     sta plot_x                          ; ...to the next PLOT (the table is all in one page)
     ldy #0                              ; Start the next PLOT at its first byte
     dex                                 ; Count the PLOT done
     bne draw_view_frame                 ; Until all twenty are drawn
     jsr draw_all_views                  ; Draw each hero's room inside their frame
     lda #<(wrch_handler)                ; Point WRCHV at &7F8F...
-    sta wrchv                           ; ...low byte...
-    lda #>(wrch_handler)                ; ...high byte...
+    sta wrchv                           ; ...the handler's low byte into WRCHV...
+    lda #>(wrch_handler)                ; ...and its page, &7F...
     sta wrchv + 1                       ; ...the WRCHV entry again, for text
-    rts                                 ; Return
+    rts                                 ; Return to start_level, which starts the music
 ; ***************************************************************************************
 ; Copy the loaded level into the game's tables
 ;
-; Called by start_level once the level file at &6B00 has been decrypted and checked. Copy
-; objects 1-30 (position and type), doors 1-20 (position and sprite), keys 1-20,
-; trapdoors 0-7, &C9 bytes each of the wall map (into room_walls) and object-free map,
-; and the level's 4 x 12 wall block into sprite 0. Entry 0 of the object, door and key
-; tables is not touched. room_walls is also character 128's definition, which the game's
-; text output overwrites, so this must follow the printing of the level number.
+; Bring the level just loaded into play. Called by start_level once the level file at
+; &6B00 has been decrypted and checked, before reset_workspace. Copy objects 1-30
+; (position and type; the type is also the sprite), doors 1-20 (position and sprite),
+; keys 1-20, trapdoors 0-7, &C9 bytes each of the wall map (into room_walls, read by
+; test_wall) and object-free map (into object_free_map, read by test_object_free), and
+; the level's 4 x 12 wall block into wall_sprite, sprite 0, the wall in every room. Entry
+; 0 of the object, door and key tables is not touched. room_walls is also character 128's
+; definition, which the game's text output overwrites, so this must follow the printing
+; of the level number. The file itself lies in screen rows 23-24 and is wiped by
+; start_level's clear_text_area once unpacked.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -2504,7 +2831,7 @@ level_command_digits = level_command+10
 .unpack_objects
     lda level_object_x,x                ; Object's x in the level file...
     sta object_x,x                      ; ...becomes its map x
-    lda level_object_y,x                ; Its y...
+    lda level_object_y,x                ; The object's y in the file...
     sta object_y,x                      ; ...becomes its map y
     lda level_object_type,x             ; Its type, which is also its sprite...
     sta object_type,x                   ; ...becomes its object type
@@ -2515,7 +2842,7 @@ level_command_digits = level_command+10
 .unpack_doors
     lda level_door_x,x                  ; Door's x in the level file...
     sta door_x,x                        ; ...becomes its map x
-    lda level_door_y,x                  ; Its y...
+    lda level_door_y,x                  ; The door's y in the file...
     sta door_y,x                        ; ...becomes its map y
     lda level_door_sprite,x             ; Its sprite, upright or across...
     sta door_sprite,x                   ; ...becomes its sprite
@@ -2526,7 +2853,7 @@ level_command_digits = level_command+10
 .unpack_keys
     lda level_key_x,x                   ; Key's x in the level file...
     sta key_x,x                         ; ...becomes its map x
-    lda level_key_y,x                   ; Its y...
+    lda level_key_y,x                   ; The key's y in the file...
     sta key_y,x                         ; ...becomes its map y
     dex                                 ; Next key down
     bne unpack_keys                     ; Until key 1 is done
@@ -2535,9 +2862,9 @@ level_command_digits = level_command+10
 .unpack_trapdoors
     lda level_trapdoor_x,x              ; Trapdoor's x in the level file...
     sta trapdoor_x,x                    ; ...becomes its map x
-    lda level_trapdoor_y,x              ; Its y...
+    lda level_trapdoor_y,x              ; The trapdoor's y in the file...
     sta trapdoor_y,x                    ; ...becomes its map y
-    inx                                 ; Next trapdoor
+    inx                                 ; Next trapdoor up, 0 to 7
     cpx #8                              ; All eight done?
     bne unpack_trapdoors                ; No: copy the next
     ldx #0                              ; Wall map and object-free map, &C9 bytes each
@@ -2547,7 +2874,7 @@ level_command_digits = level_command+10
     sta room_walls,x                    ; ...into room_walls, which test_wall reads
     lda level_object_free_map,x         ; Byte of the level's object-free map...
     sta object_free_map,x               ; ...into object_free_map, which test_object_free reads
-    inx                                 ; Next byte
+    inx                                 ; Next byte of both maps
     cpx #map_bytes                      ; Both maps copied?
     bne unpack_walls                    ; No: copy the next
     ldx #0                              ; The level's own wall block, &30 bytes
@@ -2555,17 +2882,21 @@ level_command_digits = level_command+10
 .unpack_wall_sprite
     lda level_wall_sprite,x             ; Byte of the level's wall block...
     sta wall_sprite,x                   ; ...becomes sprite 0, the wall in every room
-    inx                                 ; Next byte
+    inx                                 ; Next byte of the wall block
     cpx #&30 ; '0'                      ; All 4 x 12 bytes copied?
     bne unpack_wall_sprite              ; No: copy the next
-    rts                                 ; Return
+    rts                                 ; Return to start_level with the level unpacked
 ; ***************************************************************************************
 ; Clear the monsters for a new level
 ;
-; Called by start_level. Give monsters 1-30 the blank sprite (the first stage of dying)
-; off the map, so each comes out of a trapdoor in turn, with this level's starting hit
-; points. Then, for each of the four heroes, clear their returning_hero_queue entry, the
-; key they carry and swapped, and the cell kept for the door checks.
+; Start every monster dead and every hero empty-handed. Called by start_level after
+; reset_workspace. Give monsters 1-30 the blank sprite (the first stage of dying) and an
+; x off the map, so update_monsters brings each out of a trapdoor in turn, with
+; monster_start_hit_points, the hit points level_loop set for this level. Then, for each
+; of the four heroes, clear their returning_hero_queue entry, the key they carry
+; (hero_key) and the swap flag (hero_key_dropped), and the cell kept for the door and
+; Chalice checks (hero_door_x, hero_door_y), so nothing from the last level opens a door
+; or wins the game. remove_absent_heroes refills the queue later for heroes nobody plays.
 ;
 ; On Exit:
 ;     A: 0
@@ -2593,16 +2924,16 @@ level_command_digits = level_command+10
     sta hero_key_dropped,x              ; ...and has swapped none
     sta hero_door_x,x                   ; No door-check cell...
     sta hero_door_y,x                   ; ...in x or y
-    inx                                 ; Next hero
+    inx                                 ; Next hero, 0 to 3
     cpx #4                              ; All four done?
     bne clear_hero_carrying             ; No: clear the next
-    rts                                 ; Return to start_level
+    rts                                 ; Return to start_level, monsters and heroes reset
 ; ***************************************************************************************
 ; Clear the text area and count the level
 ;
-; start_level's first call after the music stops. Count the level in level_number (1-25),
-; which picks the level's checksum, Stones for level 25 and the Chalice. No level number
-; is shown.
+; start_level's first call after the music stops. Clear the screen and count the level in
+; level_number (1-25), which picks the level's checksum, Stones for level 25 and the
+; Chalice. No level number is shown.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -2612,12 +2943,16 @@ level_command_digits = level_command+10
 .count_level
     jsr clear_text_area                 ; Clear the text area
     inc level_number                    ; level_number + 1: the level about to load
-    rts                                 ; Return
+    rts                                 ; Return to start_level to load that level
 ; ***************************************************************************************
 ; Clear the screen
 ;
-; Set a text window the full 20 columns wide, from row 0 to the bottom row, and clear it
-; with VDU 12. The window is left set.
+; Clear the screen above the game code. Called twice for each level: by the routine
+; start_level calls first, before the level is loaded, and by start_level itself before
+; the play screen is drawn. Set a text window the full 20 columns wide from row 0 to the
+; bottom row (24 in play), and clear it with VDU 12. The window never reaches below row
+; 24 because MODE 2's rows 25-31, &6E80-&7FFF, hold game code. The window is left set, so
+; later text and clears stay inside it.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -2635,16 +2970,19 @@ level_command_digits = level_command+10
     jsr oswrch                          ; Send the right column
 .set_text_window_top
 ; &162e referenced 1 time by &c60a
+; The top-row operand of clear_text_area's VDU 28.
 clear_text_area_top = set_text_window_top+1
     lda #0                              ; Top row 0
     jsr oswrch                          ; Send the top row
     lda #&0c                            ; ...VDU 12 to clear it
     jsr oswrch                          ; Send it: the window clears to the background
-    rts                                 ; Return
+    rts                                 ; Return with the window left set
+; Whether start_level has run this session: &EA as loaded, &7B once the first level is drawn. start_level reads it twice per level, to decide whether the music's place is to be kept and put back, and writes &7B at its end; nothing clears it.
 ; &1638 referenced 3 times by &1400, &1464, &147f
 .first_level_flag
     equb &ea
     equb &60                            ; Not referenced
+; Twenty VDU 25 (PLOT) commands, five bytes each (plot code, then x and y as 16-bit words), that draw the frames round the four views; read by draw_view_frames through (plot_x).
 ; ***************************************************************************************
 ; View frame PLOT commands
 ;
@@ -2675,16 +3013,21 @@ clear_text_area_top = set_text_window_top+1
     equb &01, &00, &00, &84, &01
     equb &05, &28, &02, &66, &02
     equb &08                            ; Not referenced
+; The current level, 1-25, in binary. Set to 0 for a new game and counted up as each level starts. Read for the monsters' hit points (8 + 2 per level already played), for the level file's checksum entry (decrypt_level), and by check_for_victory, which looks for the Chalice only on level 25.
 ; &169f referenced 7 times by &0477, &0e02, &0e14, &0e29, &1070, &14e7, &1615
 .level_number
     equb &01
 ; ***************************************************************************************
 ; Sound the exit and add a queue marker
 ;
-; Called by hero_enters_exit. Define exit_envelope and play exit_sound, then put a &64
-; (nobody_returns) entry in the first empty (zero) entry of returning_hero_queue, as
-; remove_absent_heroes does for each hero nobody plays. At most four entries are ever in
-; use, so an empty one is always found.
+; Play the exit's falling tone and queue a marker for the hero leaving. Called first by
+; hero_enters_exit, when a hero steps onto the exit. Define envelope 3 from exit_envelope
+; and play exit_sound with it (channel 2, pitch 250). Then put a &64 (nobody_returns)
+; entry in the first empty (zero) entry of returning_hero_queue, behind any dead heroes
+; waiting, as remove_absent_heroes does for each hero nobody plays. A Cross of
+; Resurrection passes such markers to the back of the queue, so a hero who took the exit
+; is never brought back by one. At most four of the queue's five entries are ever in use,
+; so an empty one is always found; X is not bounded.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -2692,14 +3035,14 @@ clear_text_area_top = set_text_window_top+1
 ;     Y: corrupted
 ; &16a0 referenced 1 time by &203d
 .queue_exit_marker
-    ldx #<(exit_envelope)               ; Define the exit envelope...
-    ldy #>(exit_envelope)               ; ...high byte
+    ldx #<(exit_envelope)               ; Envelope 3 for the exit: X = exit_envelope low...
+    ldy #>(exit_envelope)               ; ...Y = its high byte...
     lda #osword_envelope                ; ...OSWORD 8: ENVELOPE...
-    jsr osword                          ; ENVELOPE command
-    ldx #<(exit_sound)                  ; ...and play the exit sound
-    ldy #>(exit_sound)                  ; ...high byte
+    jsr osword                          ; Define envelope 3: a falling pitch  ENVELOPE command
+    ldx #<(exit_sound)                  ; Play the exit sound: X = exit_sound low...
+    ldy #>(exit_sound)                  ; ...Y = its high byte...
     lda #osword_sound                   ; ...OSWORD 7: SOUND...
-    jsr osword                          ; SOUND command
+    jsr osword                          ; Sound channel 2 with envelope 3  SOUND command
     ldx #0                              ; Append a marker to returning_hero_queue...
 ; &16b4 referenced 1 time by &16c0
 .find_queue_end
@@ -2710,11 +3053,13 @@ clear_text_area_top = set_text_window_top+1
     rts                                 ; Return to hero_enters_exit
 ; &16bf referenced 1 time by &16b7
 .next_queue_entry
-    inx                                 ; Next entry
+    inx                                 ; Next entry along the queue
     bne find_queue_end                  ; Keep looking (at most four entries are in use)
     equb &02, &02, &00, &00, &83, &00, &00, &00
     equb &00, &00, &00, &31, &00, &8d   ; Not referenced
     equs "LEVEL"
+; Where the level number's digits are written into the level's filename.
+; Where level_loop writes the level number's digits. load_level builds level_command instead, so they are not used.
 ; &16d5 referenced 1 time by &0e4f; also used as index base 1 time by &0e3e
 .level_filename_digits
 ; &16d6 used as index base 1 time by &0e54
@@ -2725,9 +3070,16 @@ clear_text_area_top = set_text_window_top+1
     equb &50, &00, &00, &00, &fa, &16, &78, &00
     equb &8c, &50, &20, &00, &00, &02, &00, &79
     equb &00, &8c                       ; Not referenced
+; The current level in binary-coded decimal (&01-&25), counted up with decimal arithmetic as each level starts, for printing the level number and for the digits of the level's filename.
 ; &16ff referenced 9 times by &0e05, &0e20, &0e25, &0e36, &0e45, &148e, &149a, &14a7, &14b4
 .level_bcd
     equb &01
+; Data of sprite &49: 4 bytes x 12 rows.
+; ***************************************************************************************
+; Sword sprites
+;
+; Sprites &49-&4C, the Fighter's missile flying up, right, down and left: 4 bytes by 12
+; rows each.
 .sprite_sword_up
     equb &00, &00, &00, &00
     equb &00, &15, &00, &00
@@ -2741,6 +3093,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &01, &00, &00
     equb &00, &01, &00, &00
     equb &00, &00, &00, &00
+; Data of sprite &4A: 4 bytes x 12 rows.
 .sprite_sword_right
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
@@ -2754,6 +3107,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
+; Data of sprite &4B: 4 bytes x 12 rows.
 .sprite_sword_down
     equb &00, &00, &00, &00
     equb &00, &00, &02, &00
@@ -2767,6 +3121,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &00, &2a, &00
     equb &00, &00, &2a, &00
     equb &00, &00, &00, &00
+; Data of sprite &4C: 4 bytes x 12 rows.
 .sprite_sword_left
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
@@ -2780,6 +3135,11 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
+; ***************************************************************************************
+; Unused
+;
+; Leftover bytes, never read, including fragments of BASIC text ("?&A66=(rx%-lx%)",
+; "sprite%?&A99=by%-ty%+1").
     equb &80, &00, &00, &32, &00        ; Not referenced
     equs "eco"
     equb &00, &8e, &0b, &94, &00, &00   ; Not referenced
@@ -2787,6 +3147,13 @@ clear_text_area_top = set_text_window_top+1
     equb &81                            ; Not referenced
     equs "2+1:sprite%?&A99=by%-ty%+1"
     equb &0d, &03, &d4, &1d, &20, &d4, &31, &2c  ; Not referenced
+; Data of sprite &69: 3 bytes x 12 rows.
+; ***************************************************************************************
+; Panel sprites: the shield and the small digits
+;
+; Sprite &69, the shield beside each hero's face in the status panel (3 bytes by 12
+; rows), then sprites &6A-&72, the small digits 1-9 (1 byte by 5 rows), which show the
+; armour rating on the shield and the missile damage.
 .sprite_shield
     equb &3f, &3f, &3e
     equb &2a, &00, &14
@@ -2800,54 +3167,63 @@ clear_text_area_top = set_text_window_top+1
     equb &15, &00, &28
     equb &00, &3e, &00
     equb &00, &3e, &00
+; Data of sprite &6A: 1 bytes x 5 rows.
 .sprite_small_digit_1
     equb &01
     equb &01
     equb &01
     equb &01
     equb &01
+; Data of sprite &6B: 1 bytes x 5 rows.
 .sprite_small_digit_2
     equb &03
     equb &01
     equb &03
     equb &02
     equb &03
+; Data of sprite &6C: 1 bytes x 5 rows.
 .sprite_small_digit_3
     equb &03
     equb &01
     equb &03
     equb &01
     equb &03
+; Data of sprite &6D: 1 bytes x 5 rows.
 .sprite_small_digit_4
     equb &02
     equb &02
     equb &03
     equb &03
     equb &01
+; Data of sprite &6E: 1 bytes x 5 rows.
 .sprite_small_digit_5
     equb &03
     equb &02
     equb &03
     equb &01
     equb &03
+; Data of sprite &6F: 1 bytes x 5 rows.
 .sprite_small_digit_6
     equb &02
     equb &02
     equb &03
     equb &03
     equb &03
+; Data of sprite &70: 1 bytes x 5 rows.
 .sprite_small_digit_7
     equb &03
     equb &01
     equb &01
     equb &01
     equb &01
+; Data of sprite &71: 1 bytes x 5 rows.
 .sprite_small_digit_8
     equb &03
     equb &03
     equb &03
     equb &03
     equb &03
+; Data of sprite &72: 1 bytes x 5 rows.
 .sprite_small_digit_9
     equb &03
     equb &03
@@ -2856,10 +3232,18 @@ clear_text_area_top = set_text_window_top+1
     equb &01
     equb &0a, &00, &05, &00, &00, &00, &0a, &00
     equb &05, &00, &00, &00, &0a, &00, &05  ; Not referenced
+; Data of sprite &74: 4 bytes x 3 rows.
+; ***************************************************************************************
+; Panel sprites: the missile and boots icons
+;
+; Sprite &74, the missile icon, one per missile a hero may have in flight (4 bytes by 3
+; rows), and sprite &75, the boots icon shown while a hero wears the Boots of Speed (2
+; bytes by 6 rows).
 .sprite_missile_icon
     equb &00, &00, &01, &00
     equb &3f, &3f, &2b, &03
     equb &00, &00, &01, &00
+; Data of sprite &75: 2 bytes x 6 rows.
 .sprite_boots_icon
     equb &00, &05
     equb &00, &0a
@@ -2867,6 +3251,11 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &0a
     equb &05, &00
     equb &0a, &00
+; Data of sprite &76: 12 bytes x 8 rows.
+; ***************************************************************************************
+; The word LEVEL
+;
+; Sprite &76, the word LEVEL for the level-number display: 12 bytes by 8 rows.
 .sprite_level_word
     equb &3c, &00, &14, &3c, &28, &28, &14, &14, &3c, &28, &3c, &00
     equb &3c, &00, &14, &00, &00, &28, &14, &14, &00, &00, &3c, &00
@@ -2881,6 +3270,7 @@ clear_text_area_top = set_text_window_top+1
     equb &08, &00, &08, &04, &0c, &08, &0c, &0c
     equb &1a, &35, &03, &8f, &7d, &9a, &82, &03
     equb &00, &00, &00, &6d, &19, &00, &00, &00  ; Not referenced
+; OSWORD 8 (ENVELOPE) parameter block for casting magic.
 .magic_envelope
     equb &03                            ; Envelope 3
     equb &01                            ; Step length 1 centisecond
@@ -2888,8 +3278,10 @@ clear_text_area_top = set_text_window_top+1
     equb &03, &03, &03                  ; Steps in pitch sections 1-3: 3, 3, 3
     equb &80, &00, &00, &ff             ; Amplitude change per step in attack, decay, sustain, release: -128, 0, 0, -1
     equb &80, &80                       ; Target levels at the end of attack and decay: 128, 128
+; OSWORD 7 (SOUND) parameter block for casting magic.
 .magic_sound
-    equw &0012, &0003, tune_ptr, &0002  ; SOUND channel 2 (flush), envelope 3, pitch 0, duration 2
+    equw &12, &03, 0, 2                 ; SOUND channel 2 (flush), envelope 3, pitch 0, duration 2
+; OSWORD 8 (ENVELOPE) parameter block for collecting treasure.
 .treasure_envelope
     equb &03                            ; Envelope 3
     equb &02                            ; Step length 2 centiseconds
@@ -2897,8 +3289,10 @@ clear_text_area_top = set_text_window_top+1
     equb &01, &01, &01                  ; Steps in pitch sections 1-3: 1, 1, 1
     equb &80, &00, &00, &f8             ; Amplitude change per step in attack, decay, sustain, release: -128, 0, 0, -8
     equb &80, &80                       ; Target levels at the end of attack and decay: 128, 128
+; OSWORD 7 (SOUND) parameter block for collecting treasure.
 .treasure_sound
-    equw &0012, &0003, &00c8, &0005     ; SOUND channel 2 (flush), envelope 3, pitch 200, duration 5
+    equw &12, &03, 200, 5               ; SOUND channel 2 (flush), envelope 3, pitch 200, duration 5
+; OSWORD 8 (ENVELOPE) parameter block for collecting an item.
 .pickup_envelope
     equb &03                            ; Envelope 3
     equb &80                            ; Step length 0 centiseconds, no auto-repeat
@@ -2906,8 +3300,10 @@ clear_text_area_top = set_text_window_top+1
     equb &0a, &0a, &0a                  ; Steps in pitch sections 1-3: 10, 10, 10
     equb &0a, &00, &00, &fd             ; Amplitude change per step in attack, decay, sustain, release: 10, 0, 0, -3
     equb &80, &80                       ; Target levels at the end of attack and decay: 128, 128
+; OSWORD 7 (SOUND) parameter block for collecting an item.
 .pickup_sound
-    equw &0010, &0003, &000a, &0005     ; SOUND channel 0 (flush), envelope 3, pitch 10, duration 5
+    equw &10, &03, 10, 5                ; SOUND channel 0 (flush), envelope 3, pitch 10, duration 5
+; OSWORD 8 (ENVELOPE) parameter block for picking up a key.
 .key_envelope
     equb &03                            ; Envelope 3
     equb &80                            ; Step length 0 centiseconds, no auto-repeat
@@ -2915,8 +3311,10 @@ clear_text_area_top = set_text_window_top+1
     equb &01, &1e, &1e                  ; Steps in pitch sections 1-3: 1, 30, 30
     equb &80, &00, &00, &fe             ; Amplitude change per step in attack, decay, sustain, release: -128, 0, 0, -2
     equb &80, &80                       ; Target levels at the end of attack and decay: 128, 128
+; OSWORD 7 (SOUND) parameter block for picking up a key.
 .key_sound
-    equw &0012, &0003, &00f0, tune_ptr + 1  ; SOUND channel 2 (flush), envelope 3, pitch 240, duration 1
+    equw &12, &03, 240, 1               ; SOUND channel 2 (flush), envelope 3, pitch 240, duration 1
+; OSWORD 8 (ENVELOPE) parameter block for a hero going down the exit.
 .exit_envelope
     equb &03                            ; Envelope 3
     equb &82                            ; Step length 2 centiseconds, no auto-repeat
@@ -2924,8 +3322,9 @@ clear_text_area_top = set_text_window_top+1
     equb &01, &01, &80                  ; Steps in pitch sections 1-3: 1, 1, 128
     equb &80, &00, &00, &ff             ; Amplitude change per step in attack, decay, sustain, release: -128, 0, 0, -1
     equb &80, &80                       ; Target levels at the end of attack and decay: 128, 128
+; OSWORD 7 (SOUND) parameter block for a hero going down the exit.
 .exit_sound
-    equw &0012, &0003, os_zp_fa, tune_ptr + 1  ; SOUND channel 2 (flush), envelope 3, pitch 250, duration 1
+    equw &12, &03, 250, 1               ; SOUND channel 2 (flush), envelope 3, pitch 250, duration 1
     equb &00, &00, &00, &00, &04        ; Not referenced
     equs "50:50:$"
     equb &0c, &0c, &08, &00, &00, &00, &00, &00
@@ -2940,6 +3339,13 @@ clear_text_area_top = set_text_window_top+1
     equb &18, &3f, &3a, &0c, &0c, &08, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &35, &00                       ; Not referenced
+; Data of sprite &08: 4 bytes x 12 rows.
+; ***************************************************************************************
+; Hero and death sprites
+;
+; Sprite &08, the Ranger facing left (second frame), then sprites &64-&68, the skulls of
+; a hero's death animation, the last of which is left where the hero fell; 4 bytes by 12
+; rows each.
 .sprite_ranger_left_1
     equb &00, &01, &03, &00
     equb &01, &0b, &08, &00
@@ -2953,6 +3359,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &0a, &0c, &09
     equb &00, &0e, &0c, &00
     equb &00, &04, &00, &00
+; Data of sprite &64: 4 bytes x 12 rows.
 .sprite_skull_0
     equb &00, &00, &00, &00
     equb &00, &3f, &00, &00
@@ -2966,6 +3373,7 @@ clear_text_area_top = set_text_window_top+1
     equb &2a, &00, &3f, &2a
     equb &15, &00, &00, &2a
     equb &15, &00, &00, &00
+; Data of sprite &65: 4 bytes x 12 rows.
 .sprite_skull_1
     equb &15, &2a, &00, &00
     equb &00, &00, &00, &00
@@ -2979,6 +3387,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &00, &00, &2a
     equb &2a, &00, &00, &2a
     equb &15, &15, &2a, &2a
+; Data of sprite &66: 4 bytes x 12 rows.
 .sprite_skull_2
     equb &00, &00, &00, &00
     equb &00, &2a, &00, &00
@@ -2992,6 +3401,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &2a, &00, &3f
     equb &2a, &15, &15, &15
     equb &15, &00, &2a, &00
+; Data of sprite &67: 4 bytes x 12 rows.
 .sprite_skull_3
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
@@ -3005,6 +3415,7 @@ clear_text_area_top = set_text_window_top+1
     equb &15, &2a, &15, &00
     equb &15, &3f, &2a, &00
     equb &2a, &15, &3f, &2a
+; Data of sprite &68: 4 bytes x 12 rows.
 .sprite_skull_4
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
@@ -3018,6 +3429,7 @@ clear_text_area_top = set_text_window_top+1
     equb &15, &2a, &2a, &00
     equb &00, &3f, &3f, &2a
     equb &3f, &15, &2a, &15
+; Low bytes of the sprite data addresses, indexed by sprite number (120 entries).
 ; ***************************************************************************************
 ; Sprite tables
 ;
@@ -3040,6 +3452,7 @@ clear_text_area_top = set_text_window_top+1
     equb &30, &60, &c0, &90, &f0, &20, &50, &80
     equb &b0, &00, &24, &29, &2e, &33, &38, &3d
     equb &42, &47, &4c, &10, &60, &6c, &78, &cf
+; High bytes of the sprite data addresses, indexed by sprite number.
 ; &1b58 used as index base 2 times by &0907, &d807
 .sprite_addr_hi
     equb &2d, &2d, &2d, &2d, &2d, &2d, &2e, &2e
@@ -3057,6 +3470,7 @@ clear_text_area_top = set_text_window_top+1
     equb &0a, &0a, &0a, &0a, &19, &1a, &1a, &1a
     equb &1a, &18, &18, &18, &18, &18, &18, &18
     equb &18, &18, &18, &12, &18, &18, &18, &04
+; Sprite widths in screen bytes, indexed by sprite number.
 ; &1bd0 used as index base 4 times by &090c, &2009, &205f, &d80c
 .sprite_widths
     equb &04, &04, &04, &04, &04, &04, &04, &04
@@ -3074,6 +3488,7 @@ clear_text_area_top = set_text_window_top+1
     equb &04, &04, &04, &04, &04, &04, &04, &04
     equb &04, &03, &01, &01, &01, &01, &01, &01
     equb &01, &01, &01, &08, &04, &02, &0c, &02
+; Sprite heights in pixel rows, indexed by sprite number.
 ; &1c48 used as index base 5 times by &0911, &2015, &201a, &206c, &d811
 .sprite_heights
     equb &0c, &0c, &0c, &0c, &0c, &0c, &0c, &0c
@@ -3094,11 +3509,32 @@ clear_text_area_top = set_text_window_top+1
 ; ***************************************************************************************
 ; Run one frame of play
 ;
-; Called by play_level each frame, after check_for_victory. Move the heroes; then, for
-; each hero, look for a door at the cell they last stepped or tried to step into
-; (hero_door_x, hero_door_y): if they carry that door's key, the door opens, the hero
-; scores 7 and the key is used up. Then draw the keys, pick up and swap keys, draw the
-; objects, move the missiles and the monsters, and handle the pause key.
+; Do all of a frame's play apart from the exit. Called by play_level once a frame, after
+; check_for_victory; play_level deals with the exit when this returns. The work, in
+; order:
+;
+; 1. move_heroes: each hero in play walks, fires or casts magic, is redrawn, and picks up
+;    any object in their cell. It records in hero_door_x/y the cell each hero stepped or
+;    tried to step into.
+; 2. Doors (check_doors): for each hero in turn, doors 20 to 1 are compared with that
+;    cell. If one is there and the hero carries its key (key n opens door n; hero_key 0
+;    means none, and there is no door 0), the door opens: the hero scores 7 points, the
+;    door sound plays (food_sound at a lower pitch), the door is erased from every view,
+;    its wall bit in room_walls is cleared, its entry in door_x/door_y is moved off the
+;    map, and the key is used up and its panel icon erased. At most one door opens per
+;    hero per frame. Every hero is tested, in play or not.
+; 3. Keys (draw_keys): every key on the floor is redrawn, then each hero is checked. A
+;    dead hero whose death animation has finished drops their key where they fell. A hero
+;    in play, or still dying, who stands on a key picks it up and leaves the key they
+;    carried, if any, in its place; hero_key_dropped makes them skip the next frame, so
+;    one who stays on the cell swaps back on the frame after.
+; 4. draw_objects: the objects are replotted, repairing any cell a moving sprite has
+;    crossed.
+; 5. move_missiles: each missile in flight moves one cell and hits what it meets.
+; 6. update_monsters: the trapdoors are redrawn and the monsters move.
+; 7. The pause key: if it is held, the game freezes here until it is pressed again.
+;    OSBYTE &7A reports only the lowest-numbered key held, so a held movement key can
+;    hide it.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -3107,6 +3543,7 @@ clear_text_area_top = set_text_window_top+1
 ; &1cc0 referenced 1 time by &1f0d
 .update_game
     jsr move_heroes                     ; Move the heroes: steps, shots, magic, pick-ups
+; Doors: for each hero, find a door at the cell they last stepped or tried to step into, and open it if they carry its key.
     ldx #0                              ; For each hero, 0-3...
 ; &1cc5 referenced 1 time by &1dbf
 .check_doors
@@ -3126,7 +3563,7 @@ clear_text_area_top = set_text_window_top+1
     jmp next_door                       ; No: next door
 ; &1ce3 referenced 1 time by &1cde
 .check_door_cell_y
-    lda door_y,x                        ; ...and y?
+    lda door_y,x                        ; This door's y (&FF once opened)...
     cmp cell_y                          ; ...the cell being tested?
     beq check_door_key                  ; Yes: the hero has walked into this door
     jmp next_door                       ; No: next door
@@ -3139,6 +3576,7 @@ clear_text_area_top = set_text_window_top+1
     cmp hero_key,y                      ; Is it the number of the key the hero carries?
     beq open_door                       ; Yes: open door
     jmp next_door                       ; No key, or the wrong one: the door stays shut
+; The hero has the key: score 7, sound the door, erase it, clear its wall bit, and use up the key.
 ; &1cfa referenced 1 time by &1cf5
 .open_door
     txa                                 ; Open the door: 7 points...
@@ -3156,46 +3594,49 @@ clear_text_area_top = set_text_window_top+1
     tay                                 ; ...back into Y
     dey                                 ; One fewer to give
     bne door_points_loop                ; More to give: add the next point
+; The door sound: food_sound played at a lower pitch.
     lda #&96                            ; The door sound is the food sound, lower...
     sta food_sound + 4                  ; ...pitch 150 instead of food's 200
     ldx #<(food_sound)                  ; SOUND food_sound: block address low...
-    ldy #>(food_sound)                  ; ...and high
+    ldy #>(food_sound)                  ; ...and high: the door sound's block
     lda #osword_sound                   ; OSWORD 7: SOUND
     jsr osword                          ; Sound the door opening  SOUND command
     lda #&c8                            ; ...then put food's pitch back...
     sta food_sound + 4                  ; ...to 200, for the next food eaten
+; Erase the door from every view showing it, keeping its cell in monster_x + 35 and monster_y + 35 across plot_at_cell, which overwrites cell_x and cell_y.
     lda cell_y                          ; Save the door's cell; plot_at_cell changes cell_x/y...
     sta monster_y + 35                  ; ...y into the spare byte at monster_y + 35...
     lda cell_x                          ; ...then the door's x...
     sta monster_x + 35                  ; ...into the spare byte at monster_x + 35
     lda #spr_blank                      ; Erase the door from the screen...
     sta sprite_number                   ; ...the blank as the sprite to plot
-    lda #0                              ; ...on the cell itself: no pixel offset...
-    sta plot_offset_x                   ; ...horizontally...
-    sta plot_offset_y                   ; ...or vertically
+    lda #0                              ; ...squarely on the door's cell...
+    sta plot_offset_x                   ; ...no shift across (plot_offset_x 0)...
+    sta plot_offset_y                   ; ...or down (plot_offset_y 0)
     jsr plot_at_cell                    ; Blank the door in every view showing its room
     lda monster_x + 35                  ; ...and recover its cell
     sta cell_x                          ; ...back into cell_x...
     lda monster_y + 35                  ; ...then the door's y...
     sta cell_y                          ; ...back into cell_y
     pla                                 ; Recover the hero number pushed at open_door...
-    tay                                 ; ...into Y
+    tay                                 ; ...into Y, unused: Y is the wall row index below
     pla                                 ; Recover the door number...
-    tax                                 ; ...into X
-    lda cell_y                          ; Clear the door's wall bit: room offset...
-    and #&f8                            ; ...room row: y AND &F8, 8 cell rows per room...
-    sta scratch                         ; ...kept to add in again
-    clc                                 ; ...clear carry for the three adds
-    adc scratch                         ; ...twice...
-    adc scratch                         ; ...three times...
-    adc scratch                         ; ...four: 32 bytes per row of four rooms
-    sta map_ptr                         ; ...as the low byte of map_ptr
+    tax                                 ; ...into X, to remove its entry once the wall is gone
+; Clear the door's bit in room_walls, so test_wall no longer stops heroes, monsters or missiles there.
+    lda cell_y                          ; Door's room: (y AND &F8) x 4 + (x AND &F8)...
+    and #&f8                            ; ...y AND &F8: the room's top row, 8 rows a room...
+    sta scratch                         ; ...kept in scratch to add three more times
+    clc                                 ; ...clear carry for the adds
+    adc scratch                         ; ...x 2...
+    adc scratch                         ; ...x 3...
+    adc scratch                         ; ...x 4: 32 bytes per row of four rooms
+    sta map_ptr                         ; ...kept in map_ptr
     lda cell_x                          ; ...plus the room column...
     and #&f8                            ; ...x AND &F8: 8 bytes per room...
-    adc map_ptr                         ; ...added on...
+    adc map_ptr                         ; ...added to the row of rooms' offset...
     sta map_ptr                         ; ...giving the room's offset in room_walls
-    lda #>(room_walls)                  ; ...in room_walls...
-    sta map_ptr_hi                      ; ...as map_ptr's high byte
+    lda #>(room_walls)                  ; ...plus room_walls' page...
+    sta map_ptr_hi                      ; ...in map_ptr_hi: map_ptr points at the room
     txa                                 ; Keep the door number...
     pha                                 ; ...on the stack while X is used for the bit
     lda cell_x                          ; ...mask for the column...
@@ -3211,12 +3652,13 @@ clear_text_area_top = set_text_window_top+1
     and scratch                         ; ...knock out the door's bit...
     sta (map_ptr),y                     ; ...so the doorway no longer blocks anyone
     pla                                 ; Recover the door number...
-    tax                                 ; ...into X
+    tax                                 ; ...into X, to index door_x and door_y
+; Remove the door from door_x/door_y and use up the key, erasing its icon from the hero's panel.
     lda #off_map                        ; Take the door out of the level...
     sta door_x,x                        ; ...x off the map: no hero matches it again...
     sta door_y,x                        ; ...and y off the map
-    pla                                 ; Recover the hero number...
-    tax                                 ; ...into X
+    pla                                 ; Recover the hero number pushed at check_doors...
+    tax                                 ; ...into X, for their key slot and panel
     lda #0                              ; The key is used up: the hero carries none
     sta hero_key,x                      ; ...in the hero's key slot
     lda #spr_blank_key_icon             ; Erase the key icon from the hero's panel
@@ -3224,27 +3666,27 @@ clear_text_area_top = set_text_window_top+1
     lda hero_panel_y,x                  ; ...from the hero's panel row...
     sec                                 ; ...set carry to subtract
     sbc #&0d                            ; ...less 13: the key icon's row...
-    sta plot_y                          ; ...as plot_y
+    sta plot_y                          ; ...as plot_y, the icon's screen row
     lda #panel_left + 5                 ; ...in panel column panel_left + 5...
-    sta plot_x                          ; ...as plot_x
+    sta plot_x                          ; ...as plot_x, the icon's column
     txa                                 ; Keep the hero number...
     pha                                 ; ...on the stack across plot_sprite
     jsr plot_sprite                     ; Plot the blank icon over the key icon
     pla                                 ; Recover the hero number...
-    tax                                 ; ...into X
+    tax                                 ; ...into X, for next_hero_doors
     jmp next_hero_doors                 ; One door a frame per hero: on to the next hero
 ; &1db2 referenced 3 times by &1ce0, &1ceb, &1cf7
 .next_door
-    dex                                 ; Next door
+    dex                                 ; Next door down, 20 to 1
     beq doors_done                      ; Doors all checked: this hero is done
     jmp check_door                      ; Otherwise check the next door
 ; &1db8 referenced 1 time by &1db3
 .doors_done
     pla                                 ; Recover the hero number pushed at check_doors...
-    tax                                 ; ...into X
+    tax                                 ; ...into X, to move on from this hero
 ; &1dba referenced 1 time by &1daf
 .next_hero_doors
-    inx                                 ; Next hero
+    inx                                 ; Next hero, 0 to 3
     cpx #4                              ; All four heroes done?
     beq draw_keys                       ; Yes: on to the keys
     jmp check_doors                     ; No: check this hero against the doors
@@ -3253,21 +3695,21 @@ clear_text_area_top = set_text_window_top+1
 .draw_keys
     lda #0                              ; Redraw every key lying on the floor, 20 to 1
     sta plot_offset_x                   ; ...on their cells: no pixel offset...
-    sta plot_offset_y                   ; ...either way
+    sta plot_offset_y                   ; ...across or down: keys sit squarely in cells
     lda #spr_key                        ; ...in the key sprite...
     sta sprite_number                   ; ...as the sprite to plot
     ldx #max_key                        ; ...counting keys down from 20; entry 0 is never drawn
 ; &1dce referenced 1 time by &1de2
 .draw_each_key
     lda key_x,x                         ; The key's x...
-    sta cell_x                          ; ...as cell_x...
+    sta cell_x                          ; ...is the column to plot at...
     lda key_y,x                         ; ...and y (off the map if it is carried)...
-    sta cell_y                          ; ...as cell_y
+    sta cell_y                          ; ...the row: plot_at_cell needs both each time
     txa                                 ; Keep the key number...
     pha                                 ; ...on the stack across plot_at_cell
     jsr plot_at_cell                    ; Plot it in every view showing its cell
     pla                                 ; Recover the key number...
-    tax                                 ; ...into X
+    tax                                 ; ...into X, counting down the keys
     dex                                 ; Next key down
     bne draw_each_key                   ; More keys: draw the next
     ldx #0                              ; For each hero, from hero 0...
@@ -3283,6 +3725,7 @@ clear_text_area_top = set_text_window_top+1
     lda hero_frame,x                    ; Has the death animation reached its end?
     cmp #8                              ; ...frame 8 is the last of the death
     bne check_key_swap                  ; Still dying: key checks go on as if in play
+; A dead hero's death animation has ended: leave their key on the cell where they fell and erase its icon.
     ldy hero_key,x                      ; Yes: drop the key where the hero fell
     lda hero_x,x                        ; ...at the hero's x...
     sta key_x,y                         ; ...as the key's x...
@@ -3295,15 +3738,15 @@ clear_text_area_top = set_text_window_top+1
     lda hero_panel_y,x                  ; ...using the hero's panel row...
     sec                                 ; ...set carry to subtract
     sbc #&0d                            ; ...less 13: the key icon's row...
-    sta plot_y                          ; ...as plot_y
+    sta plot_y                          ; ...as plot_y, the icon's screen row
     lda #panel_left + 5                 ; ...in panel column panel_left + 5...
-    sta plot_x                          ; ...as plot_x
+    sta plot_x                          ; ...as plot_x, the icon's column
     txa                                 ; Keep the hero number...
     pha                                 ; ...on the stack across plot_sprite
     jsr plot_sprite                     ; Plot the blank icon over the key icon
     pla                                 ; Recover the hero number...
-    tax                                 ; ...into X
-    jmp next_hero_keys                  ; Next hero
+    tax                                 ; ...into X, for next_hero_keys
+    jmp next_hero_keys                  ; Key dropped: on to the next hero
 ; &1e28 referenced 2 times by &1de9, &1df8
 .check_key_swap
     lda hero_key_dropped,x              ; Swapped keys on the last frame?
@@ -3311,12 +3754,13 @@ clear_text_area_top = set_text_window_top+1
     lda #0                              ; Yes: skip this frame, clearing the flag
     sta hero_key_dropped,x              ; ...so next frame's check may swap again
     jmp next_hero_keys                  ; ...and move on to the next hero
+; Look for a key at the hero's cell, keys 20 to 1; the first found is picked up.
 ; &1e35 referenced 1 time by &1e2b
 .check_key_cell
     lda hero_x,x                        ; Is there a key at the hero's cell? Its x...
-    sta cell_x                          ; ...as cell_x...
+    sta cell_x                          ; ...in cell_x, for each key's x to match...
     lda hero_y,x                        ; ...and the hero's y...
-    sta cell_y                          ; ...as cell_y
+    sta cell_y                          ; ...in cell_y, for each key's y
     txa                                 ; Keep the hero number...
     pha                                 ; ...on the stack while X counts the keys
     ldx #max_key                        ; ...keys 20 to 1; entry 0 is never picked up
@@ -3330,34 +3774,35 @@ clear_text_area_top = set_text_window_top+1
     bne next_key                        ; No: try the next key
     lda #spr_blank                      ; Yes: pick it up, erasing it from the floor
     sta sprite_number                   ; ...as the sprite to plot...
-    lda #0                              ; ...on the cell itself: no pixel offset...
-    sta plot_offset_x                   ; ...horizontally...
-    sta plot_offset_y                   ; ...or vertically
+    lda #0                              ; ...squarely on the key's cell...
+    sta plot_offset_x                   ; ...no shift across (plot_offset_x 0)...
+    sta plot_offset_y                   ; ...or down (plot_offset_y 0)
     txa                                 ; Keep the key number...
     pha                                 ; ...on the stack across plot_at_cell
     jsr plot_at_cell                    ; Blank the key in every view showing it
     pla                                 ; Recover the key number...
-    tax                                 ; ...into X
+    tax                                 ; ...into X: the key being picked up
     pla                                 ; Show the key icon in the hero's panel: hero...
-    tay                                 ; ...into Y...
+    tay                                 ; ...into Y, to index hero_panel_y...
     pha                                 ; ...and back on the stack for later
     lda #spr_key_icon                   ; ...in the key icon sprite...
     sta sprite_number                   ; ...as the sprite to plot
     lda hero_panel_y,y                  ; ...from the hero's panel row...
     sec                                 ; ...set carry to subtract
     sbc #&0d                            ; ...less 13: the key icon's row...
-    sta plot_y                          ; ...as plot_y
+    sta plot_y                          ; ...as plot_y, the icon's screen row
     lda #panel_left + 5                 ; ...in panel column panel_left + 5...
-    sta plot_x                          ; ...as plot_x
+    sta plot_x                          ; ...as plot_x, the icon's column
     tya                                 ; Keep the hero number...
     pha                                 ; ...on the stack...
     txa                                 ; ...and the key number...
-    pha                                 ; ...across plot_sprite
+    pha                                 ; ...both kept across plot_sprite
     jsr plot_sprite                     ; Plot the key icon
     pla                                 ; Recover the key number...
-    tax                                 ; ...into X...
+    tax                                 ; ...into X: the key to carry...
     pla                                 ; ...and the hero number...
-    tay                                 ; ...into Y
+    tay                                 ; ...into Y: the hero picking it up
+; The swap: the key carried (or unused entry 0) goes on the floor here, the new one is carried and taken off the map, and hero_key_dropped makes the next frame pass this hero by.
     txa                                 ; Drop the key carried (if any) in this cell...
     pha                                 ; ...keeping the new key's number on the stack...
     ldx hero_key,y                      ; ...the old key, or unseen entry 0 if none...
@@ -3374,31 +3819,32 @@ clear_text_area_top = set_text_window_top+1
     sta key_x,x                         ; ...x off the map, so draw_keys skips it...
     sta key_y,x                         ; ...and y off the map
     ldx #<(key_envelope)                ; Sound the pickup: ENVELOPE key_envelope low...
-    ldy #>(key_envelope)                ; ...and high
+    ldy #>(key_envelope)                ; ...and high: the pickup's envelope block
     lda #osword_envelope                ; OSWORD 8: ENVELOPE
     jsr osword                          ; Define the key pickup envelope  ENVELOPE command
     ldx #<(key_sound)                   ; SOUND key_sound: block address low...
-    ldy #>(key_sound)                   ; ...and high
+    ldy #>(key_sound)                   ; ...and high: the pickup's sound block
     lda #osword_sound                   ; OSWORD 7: SOUND
     jsr osword                          ; Play the key pickup sound  SOUND command
     pla                                 ; Recover the hero number...
-    tax                                 ; ...into X
+    tax                                 ; ...into X, for next_hero_keys
     jmp next_hero_keys                  ; One key a frame per hero: next hero
 ; &1ebe referenced 2 times by &1e4b, &1e53
 .next_key
-    dex                                 ; Next key
+    dex                                 ; Next key down, 20 to 1
     beq keys_done                       ; Keys all checked: this hero is done
     jmp check_key                       ; Otherwise check the next key
 ; &1ec4 referenced 1 time by &1ebf
 .keys_done
     pla                                 ; Recover the hero number pushed at check_key_cell...
-    tax                                 ; ...into X
+    tax                                 ; ...into X, to move on from this hero
 ; &1ec6 referenced 4 times by &1df0, &1e25, &1e32, &1ebb
 .next_hero_keys
-    inx                                 ; Next hero
+    inx                                 ; Next hero, 0 to 3
     cpx #4                              ; All four heroes done?
     beq update_rest                     ; Yes: on with the rest of the frame
     jmp check_hero_keys                 ; No: check this hero's keys
+; The rest of the frame: objects, missiles, monsters, then the pause key.
 ; &1ece referenced 1 time by &1ec9
 .update_rest
     jsr draw_objects                    ; Draw the objects over the floor
@@ -3416,31 +3862,67 @@ clear_text_area_top = set_text_window_top+1
     equb &e0, &71, &d0, &f9, &20, &f4, &ff, &e0
     equb &71, &f0, &f9, &60, &00        ; Not used
     equb &00, &00, &00, &00, &00        ; Not referenced
-    equs "<<<<"
+; ***************************************************************************************
+; Unused
+;
+; Four &3C bytes, "<<<<", which nothing reads.
+    equs "<<<<"                         ; Not referenced
 ; ***************************************************************************************
 ; Play a level until it ends
 ;
-; Run one frame every three vertical syncs: check for victory and update the game, take
-; any hero standing on the exit down it, and animate one going down. Return when no hero
-; is in play and every death animation has finished. Each hero_enters_exit leaves its
-; return address on the stack (it ends with a jump back here), so the first RTS at the
-; end of a level returns into this loop, once for each hero who left by the exit, and
-; each of those runs one more frame before the next RTS; the last returns to the caller.
-; Only one hero goes down the exit at a time: the exit is taken off the map until the
-; animation ends.
+; The game's frame loop: play the current level until it is over. Called once per level
+; by new_game's level loop, after the level is drawn, the status panel set up and absent
+; heroes removed; when it returns, new_game gives each dead hero their starting
+; attributes back, ending the game if all four died.
+;
+; A frame, in order:
+;
+; 1. Wait for os_vsync_counter, which the MOS counts down at every vertical sync, to go
+;    negative, then set it to 2. Frames start three vsyncs apart (about 17 a second), or
+;    at once if a frame's work took longer.
+; 2. check_for_victory: on level 25, a hero at the Chalice wins the game, and it never
+;    returns.
+; 3. update_game: heroes, doors, keys, objects, missiles, monsters and the pause key, in
+;    that order (see its banner).
+; 4. The level-end test, skipped while a hero is going down the exit (exit_busy). The
+;    level is over when every hero is out of play (direction 0) and no dead hero's death
+;    animation is still short of frame 8; heroes who went down the exit, or whom nobody
+;    plays, count as out of play. shrunk_hero's sprites are then restored and the loop
+;    returns.
+; 5. check_exit: the first hero found standing on the exit drops their key beside it
+;    (drop_key), is taken out of play, erased and moved off the map (hero_x &FF), and the
+;    exit itself is moved off the map, its cell kept in exit_saved_x/y, so no other hero
+;    can enter it meanwhile. hero_enters_exit then starts the descent and jumps back to
+;    the top of the loop.
+; 6. While exit_busy is set, redraw_exit draws one step of the descent: the exit sprite
+;    on its cell, then the hero on it turned a quarter, through up, right, down and left.
+;    On the fifth frame of each turn only the exit is drawn and the hero's sprites shrink
+;    by a byte and three rows (shrink_hero_width/height), drawn from then on with
+;    exit_offsets_x/y to keep them near the cell's centre. After four turns, 20 frames in
+;    all, restore_exit puts the exit back and clears exit_busy, so another hero can use
+;    it.
+;
+; How the level ends: hero_enters_exit is entered with JSR but leaves with a JMP to
+; play_level, so each descent leaves a return address (into check_exit at &1F8E) on the
+; stack. The RTS at the level's end therefore returns into check_exit once for each hero
+; who left by the exit; each such return runs one more full frame before the next RTS,
+; and only the last returns to new_game.
 ;
 ; On Exit:
 ;     A: corrupted
 ;     X: corrupted
 ;     Y: corrupted
+; Pace the game: start a frame every three vsyncs.
 ; &1f00 referenced 7 times by &0e65, &1f03, &1f9b, &1fef, &2023, &2037, &208e
 .play_level
     lda os_vsync_counter                ; Wait for the vertical sync counter to pass zero...
     bpl play_level                      ; Not yet negative: keep waiting
     lda #2                              ; ...and set it for three syncs from now
     sta os_vsync_counter                ; ...in the MOS's vertical sync counter
+; This frame's play: the Chalice on level 25, then all but the exit (update_game).
     jsr check_for_victory               ; On level 25: has a hero reached the Chalice?
     jsr update_game                     ; Run a frame: heroes, keys, objects, monsters
+; Is the level over? Never while a hero is going down the exit; otherwise when every hero is out of play and no death animation is still running.
     lda exit_busy                       ; A hero going down the exit?
     bne check_exit                      ; Yes: the level goes on
     ldx #4                              ; Is any hero in play, or still dying? Heroes 3 to 0
@@ -3456,7 +3938,7 @@ clear_text_area_top = set_text_window_top+1
     bcc check_exit                      ; Yes: the level goes on
 ; &1f2a referenced 1 time by &1f21
 .next_hero_in_play
-    dex                                 ; Next hero
+    dex                                 ; Next hero down (X is the hero + 1)
     bne count_heroes_in_play            ; More heroes: check the next
     ldx shrunk_hero                     ; The level is over: restore the last exiting hero's sprites
     bmi play_level_done                 ; None (&FF): nothing to restore
@@ -3464,6 +3946,7 @@ clear_text_area_top = set_text_window_top+1
 ; &1f35 referenced 1 time by &1f30
 .play_level_done
     rts                                 ; Return, perhaps into this loop at &1F8E
+; Look for a hero on the exit. The first found leaves their key beside it, leaves play and the map, and starts down; the exit is hidden off the map until they have gone.
 ; &1f36 referenced 3 times by &1f13, &1f1a, &1f28
 .check_exit
     ldx #0                              ; Is a hero on the exit? From hero 0
@@ -3472,7 +3955,7 @@ clear_text_area_top = set_text_window_top+1
     lda hero_x,x                        ; The hero's x...
     cmp exit_x                          ; ...at the exit's x?
     bne next_hero_exit                  ; No: next hero
-    lda hero_y,x                        ; ...and y...
+    lda hero_y,x                        ; ...and the hero's y...
     cmp exit_y                          ; ...at the exit's y?
     bne next_hero_exit                  ; No: next hero
     jsr drop_key                        ; Yes: drop their key beside it
@@ -3481,35 +3964,36 @@ clear_text_area_top = set_text_window_top+1
     lda #0                              ; ...and no direction...
     sta hero_direction,x                ; ...so move_heroes skips them
     lda hero_x,x                        ; Erase them from the exit's cell
-    sta cell_x                          ; ...as cell_x...
+    sta cell_x                          ; ...is the cell to blank: x...
     lda hero_y,x                        ; ...and the hero's y...
-    sta cell_y                          ; ...in cell_y...
-    lda #0                              ; ...on the cell itself: no pixel offset...
-    sta plot_offset_x                   ; ...horizontally...
-    sta plot_offset_y                   ; ...or vertically...
+    sta cell_y                          ; ...and y...
+    lda #0                              ; ...squarely on the cell...
+    sta plot_offset_x                   ; ...no shift across (plot_offset_x 0)...
+    sta plot_offset_y                   ; ...or down (plot_offset_y 0)...
     lda #spr_blank                      ; ...with the blank sprite
     sta sprite_number                   ; ...as the sprite to plot
     txa                                 ; Keep the hero number...
     pha                                 ; ...on the stack across plot_at_cell
     jsr plot_at_cell                    ; Plot the blank in every view showing them
     pla                                 ; Recover the hero number...
-    tax                                 ; ...into X
+    tax                                 ; ...into X, to move them off the map
     lda #off_map                        ; Move them off the map
     sta hero_x,x                        ; ...x off the map, so nothing meets them
     lda exit_x                          ; Hide the exit while they go down it, keeping its position
-    sta exit_saved_x                    ; ...x saved...
+    sta exit_saved_x                    ; ...x in exit_saved_x, for redraw_exit...
     lda exit_y                          ; ...and its y...
-    sta exit_saved_y                    ; ...saved too
+    sta exit_saved_y                    ; ...in exit_saved_y, for restore_exit too
     lda #off_map                        ; ...then put the exit off the map...
-    sta exit_x                          ; ...x...
-    sta exit_y                          ; ...and y, so no other hero can enter it
+    sta exit_x                          ; ...x &FF...
+    sta exit_y                          ; ...and y &FF, so no other hero can enter it
     jsr hero_enters_exit                ; Start the exit animation (which jumps back to play_level)
     jmp check_exit_busy                 ; Reached by the RTS at the end of the level: one more frame
 ; &1f91 referenced 2 times by &1f3e, &1f46
 .next_hero_exit
-    inx                                 ; Next hero
+    inx                                 ; Next hero, 0 to 3
     cpx #4                              ; All four heroes checked?
     bne check_hero_on_exit              ; No: check the next
+; The descent, one step a frame while exit_busy is set: redraw the exit, then the hero on it a quarter turn on, at the size and offsets for this turn.
 ; &1f96 referenced 1 time by &1f8e
 .check_exit_busy
     lda exit_busy                       ; A hero going down the exit?
@@ -3518,13 +4002,13 @@ clear_text_area_top = set_text_window_top+1
 ; &1f9e referenced 1 time by &1f99
 .redraw_exit
     ldx exiting_hero                    ; Redraw the exit under the spinning hero
-    lda #0                              ; ...on its cell: no pixel offset...
-    sta plot_offset_x                   ; ...horizontally...
-    sta plot_offset_y                   ; ...or vertically...
-    lda exit_saved_x                    ; ...at its saved x...
-    sta cell_x                          ; ...as cell_x...
-    lda exit_saved_y                    ; ...and saved y...
-    sta cell_y                          ; ...as cell_y...
+    lda #0                              ; ...squarely on its cell...
+    sta plot_offset_x                   ; ...no shift across (plot_offset_x 0)...
+    sta plot_offset_y                   ; ...or down (plot_offset_y 0)...
+    lda exit_saved_x                    ; ...at exit_saved_x...
+    sta cell_x                          ; ...(exit_x itself is off the map)...
+    lda exit_saved_y                    ; ...and exit_saved_y...
+    sta cell_y                          ; ...as the cell to plot...
     lda #spr_exit                       ; ...with the exit sprite...
     sta sprite_number                   ; ...as the sprite to plot
     jsr plot_at_cell                    ; Plot it in every view showing it
@@ -3540,16 +4024,17 @@ clear_text_area_top = set_text_window_top+1
     adc exit_spin                       ; ...plus the direction's frame...
     sta sprite_number                   ; ...as the sprite to plot
     lda exit_saved_x                    ; ...on the exit's cell: its x...
-    sta cell_x                          ; ...as cell_x...
+    sta cell_x                          ; ...set again, as plot_at_cell changed cell_x...
     lda exit_saved_y                    ; ...and its y...
-    sta cell_y                          ; ...as cell_y
+    sta cell_y                          ; ...and cell_y
     ldx exit_shrinks_left               ; ...with offsets for its size, by turns left...
-    lda exit_offsets_x,x                ; ...horizontal offset...
-    sta plot_offset_x                   ; ...as plot_offset_x...
-    lda exit_offsets_y,x                ; ...vertical offset...
-    sta plot_offset_y                   ; ...as plot_offset_y
+    lda exit_offsets_x,x                ; ...byte columns right, from exit_offsets_x...
+    sta plot_offset_x                   ; ...as plot_offset_x, centring the narrower sprite...
+    lda exit_offsets_y,x                ; ...pixel rows down, from exit_offsets_y...
+    sta plot_offset_y                   ; ...as plot_offset_y, centring the shorter one
     jsr plot_at_cell                    ; Plot the hero in every view showing the exit
-    jmp play_level                      ; Next frame
+    jmp play_level                      ; Next frame: the next quarter turn
+; A full turn is done. After the fourth the hero has gone; after each of the first three, sprites base + 1 to base + 7 shrink by a byte and three rows.
 ; &1ff2 referenced 1 time by &1fc8
 .next_turn
     lda #&ff                            ; Start the next turn from facing up
@@ -3571,7 +4056,7 @@ clear_text_area_top = set_text_window_top+1
 ; &2009 referenced 1 time by &2010
 .shrink_hero_width
     dec sprite_widths,x                 ; One byte (two pixels) narrower
-    inx                                 ; Next sprite
+    inx                                 ; Next of the hero's seven sprites
     cpx scratch                         ; Reached the end?
     bne shrink_hero_width               ; No: narrow the next
     tya                                 ; Three rows shorter...
@@ -3581,28 +4066,38 @@ clear_text_area_top = set_text_window_top+1
     sec                                 ; ...set carry to subtract
     lda sprite_heights,x                ; This sprite's height...
     sbc #3                              ; ...less three rows...
-    sta sprite_heights,x                ; ...stored back
-    inx                                 ; Next sprite
+    sta sprite_heights,x                ; ...stored back in sprite_heights
+    inx                                 ; Next of the hero's seven sprites
     cpx scratch                         ; Reached the end?
     bne shrink_hero_height              ; No: shorten the next
     jmp play_level                      ; ...three rows shorter. Next frame
+; The hero has gone: put the exit back.
 ; &2026 referenced 1 time by &1ffa
 .restore_exit
     lda exit_saved_x                    ; Put the exit back where it was...
-    sta exit_x                          ; ...x...
+    sta exit_x                          ; ...exit_saved_x back as its x...
     lda exit_saved_y                    ; ...and its saved y...
     sta exit_y                          ; ...as its y, so the next hero can use it
     lda #0                              ; ...and end the animation
     sta exit_busy                       ; ...exit no longer busy
-    jmp play_level                      ; Next frame
+    jmp play_level                      ; Next frame: the descent is over
 ; ***************************************************************************************
 ; Start a hero going down the exit
 ;
-; Called by play_level for hero X, who has just stepped onto the exit. Play the exit
-; sound and put a marker in returning_hero_queue, give any hero shrunk on an earlier exit
-; back their full-size sprites, then mark the exit busy and set up four turns of the spin
-; for hero X. Ends by jumping to play_level rather than returning, so its return address
-; stays on the stack until the level ends.
+; Start hero X's descent: the hero spins on the exit for four turns, shrinking after each
+; of the first three. Called by play_level's check_exit for a hero who has just stepped
+; onto the exit, after drop_key, and after the hero has been taken out of play and the
+; exit hidden off the map.
+;
+; queue_exit_marker plays the exit sound and puts a nobody_returns marker in
+; returning_hero_queue, as remove_absent_heroes does for a hero nobody plays. Any hero
+; shrunk on an earlier descent (shrunk_hero) gets their full-size sprites back, as the
+; sprites are shared with no copy. Then exit_busy is set, exiting_hero and shrunk_hero
+; become X, exit_spin starts at -1 (the first frame's +2 gives the up-facing sprite) and
+; exit_shrinks_left at 4; play_level's redraw_exit runs the spin from the next frame.
+;
+; It ends by jumping to play_level rather than returning, so its return address (into
+; check_exit at &1F8E) stays on the stack until the level ends; see play_level.
 ;
 ; On Entry:
 ;     X: hero number (0-3)
@@ -3619,9 +4114,13 @@ clear_text_area_top = set_text_window_top+1
 ; ***************************************************************************************
 ; Restore a hero's sprite sizes
 ;
-; Set the seven sprites base + 1 to base + 7 of hero X (base from hero_sprites), which
-; the exit animation shrinks, back to the full cell: 4 bytes wide and 12 rows high. Used
-; when the next hero takes the exit and when the level ends.
+; Give hero X back their full-size sprites after the exit animation has shrunk them. The
+; descent narrows sprites base + 1 to base + 7 (base from hero_sprites) by a byte and
+; shortens them by three rows after each of three turns, in sprite_widths and
+; sprite_heights themselves. This sets the seven back to a whole cell, 4 bytes wide and
+; 12 rows high, which is what every hero's walking sprites measure. Called by
+; hero_enters_exit, before the next hero's descent shrinks their own sprites, and by
+; play_level when the level ends, each time for shrunk_hero.
 ;
 ; On Entry:
 ;     X: hero number (0-3)
@@ -3635,27 +4134,28 @@ clear_text_area_top = set_text_window_top+1
     clc                                 ; The hero's sprites base + 1 to base + 7
     lda hero_sprites,x                  ; ...the hero's sprite base...
     adc #1                              ; ...+1: their first sprite...
-    tax                                 ; ...in X, for the height loop...
-    tay                                 ; ...and in Y, for the width loop
+    tax                                 ; ...in X, kept to restart Y for the heights...
+    tay                                 ; ...and in Y, to walk the widths
     adc #7                              ; ...+7: stop before base + 8, left frame 1
     sta scratch                         ; ...kept as the end
     lda #4                              ; Widths back to 4 bytes, a whole cell...
 ; &205f referenced 1 time by &2066
 .restore_sprite_widths
-    sta sprite_widths,y                 ; Full width
-    iny                                 ; Next sprite
+    sta sprite_widths,y                 ; Sprite Y back to 4 bytes wide
+    iny                                 ; Next of the seven, base + 1 to base + 7
     cpy scratch                         ; Reached the end?
     bne restore_sprite_widths           ; No: widen the next
-    txa                                 ; ...from the first sprite again
-    tay                                 ; ...into Y
+    txa                                 ; ...from the first sprite again...
+    tay                                 ; ...in Y, to walk the heights
     lda #&0c                            ; ...heights back to 12 rows, a whole cell
 ; &206c referenced 1 time by &2073
 .restore_sprite_heights
-    sta sprite_heights,y                ; Full height
-    iny                                 ; Next sprite
+    sta sprite_heights,y                ; Sprite Y back to 12 rows high
+    iny                                 ; Next of the seven
     cpy scratch                         ; Reached the end?
     bne restore_sprite_heights          ; No: restore the next
-    rts                                 ; Return
+    rts                                 ; Return with the hero's sprites full size again
+; Set up the descent for the hero kept in scratch2.
 ; &2076 referenced 2 times by &2048, &204d
 .start_hero_animation
     lda #1                              ; Start the animation for this hero...
@@ -3666,15 +4166,21 @@ clear_text_area_top = set_text_window_top+1
     lda #&ff                            ; ...turning from the start...
     sta exit_spin                       ; ...-1, so the first frame's +2 gives 1
     lda #4                              ; ...for four turns, shrinking after the first three
-    sta exit_shrinks_left               ; ...as exit_shrinks_left
+    sta exit_shrinks_left               ; ...in exit_shrinks_left, counting turns 4 to 1
     jmp play_level                      ; Back to play_level, leaving the JSR's return address
 ; ***************************************************************************************
 ; Drop the key a hero carries
 ;
-; Called when hero X steps onto the exit. Put their key in a cell next to them with no
-; wall (see find_open_neighbour; another key or an object may already lie there), and
-; erase the key icon from their panel section. A hero with no key moves key entry 0,
-; which is never drawn or picked up.
+; Leave hero X's key behind beside the exit, so the heroes still playing can use it.
+; Called by play_level's check_exit as the hero steps onto the exit, before they are
+; taken out of play.
+;
+; find_open_neighbour picks the first wall-free cell of those above, right of and below
+; the hero, or else the cell to the left whatever it holds; another key or an object may
+; already lie there. The key's key_x/key_y are set to that cell, so update_game's
+; draw_keys shows it from the next frame; hero_key is cleared and the key icon erased
+; from the hero's panel section. A hero with no key moves key entry 0, which is never
+; drawn or picked up.
 ;
 ; On Entry:
 ;     X: hero number (0-3)
@@ -3684,14 +4190,14 @@ clear_text_area_top = set_text_window_top+1
 ; &2091 referenced 1 time by &1f48
 .drop_key
     lda hero_x,x                        ; From the hero's cell (the exit)...
-    sta cell_x                          ; ...as cell_x...
+    sta cell_x                          ; ...is where the search starts: x...
     lda hero_y,x                        ; ...and the hero's y...
-    sta cell_y                          ; ...as cell_y
+    sta cell_y                          ; ...and y
     txa                                 ; ...find a wall-free cell next to it
     pha                                 ; Keep the hero number...
     jsr find_open_neighbour             ; ...on the stack across the search
     pla                                 ; Recover the hero number...
-    tax                                 ; ...into X
+    tax                                 ; ...into X, to find the key they carry
     ldy hero_key,x                      ; Put the hero's key there (entry 0 if none)
     lda cell_x                          ; ...the free cell's x...
     sta key_x,y                         ; ...as the key's x...
@@ -3704,21 +4210,24 @@ clear_text_area_top = set_text_window_top+1
     lda hero_panel_y,x                  ; ...from the hero's panel row...
     sec                                 ; ...set carry to subtract
     sbc #&0d                            ; ...less 13: the key icon's row...
-    sta plot_y                          ; ...as plot_y
+    sta plot_y                          ; ...as plot_y, the icon's screen row
     lda #panel_left + 5                 ; ...in panel column panel_left + 5...
-    sta plot_x                          ; ...as plot_x
+    sta plot_x                          ; ...as plot_x, the icon's column
     txa                                 ; Keep the hero number...
     pha                                 ; ...on the stack across plot_sprite
     jsr plot_sprite                     ; Plot the blank icon over the key icon
     pla                                 ; Recover the hero number...
-    tax                                 ; ...into X
-    rts                                 ; Return
+    tax                                 ; ...into X, preserved for check_exit
+    rts                                 ; Return with the key on the floor beside the exit
 ; ***************************************************************************************
 ; Find a free cell next to a cell
 ;
-; Starting with cell_x, cell_y, try the cells above, to the right and below, and leave
-; cell_x, cell_y at the first without a wall; failing those, leave them at the cell to
-; the left without testing it. Only walls are tested, not keys, objects or creatures.
+; Find where drop_key, its only caller, can put down a key next to the exit. Starting
+; from cell_x, cell_y, try the cells above, to the right and below, in that order,
+; through test_wall, and leave cell_x, cell_y on the first without a wall; failing all
+; three, leave them on the cell to the left without testing it, so a key can land in a
+; wall there. Only walls are tested, not keys, objects or creatures. map_ptr is left
+; pointing at the room of the last cell tested.
 ;
 ; On Entry:
 ;     CELL_X: cell x
@@ -3759,6 +4268,7 @@ clear_text_area_top = set_text_window_top+1
     dec cell_x                          ; ...x - 1: unchecked, the last resort
     rts                                 ; Return, Y non-zero
     equb &01, &3f                       ; Not referenced
+; Map of the cells that cannot hold an object, in the same layout as room_walls, from the level file: a bit is clear where an object lies (and on a few other cells), so the object list need only be searched when a hero steps onto a clear bit.
 ; &2100 used as index base 1 time by &15ce
 .object_free_map
     equb &00, &02, &07, &07, &1f, &3f, &7d, &7f, &00, &30, &78, &fd, &7f, &ff, &80, &00  ; Not read: unpack_level copies each level's object-free map here
@@ -3775,6 +4285,7 @@ clear_text_area_top = set_text_window_top+1
     equb &01, &01, &0f, &df, &07, &03, &01, &00, &08, &08, &5a, &fe, &fe, &fc, &b8, &00  ; ...entries 176-191, not read
     equb &00, &00, &00, &00, &00, &00, &00, &00, &00  ; ...entries 192-200, not read
     equb &08, &2a, &00, &00, &00, &00, &00  ; Not referenced
+; Data of sprite &53, &54, &55, &56, &57, &58, &59, &5A, &5B, &5C, &5D, &5E: 4 bytes x 12 rows.
 .sprite_drainer
     equb &11, &33, &33, &22
     equb &33, &33, &33, &33
@@ -3788,36 +4299,42 @@ clear_text_area_top = set_text_window_top+1
     equb &33, &ff, &c0, &33
     equb &33, &33, &33, &33
     equb &11, &33, &33, &22
+; Map x of each door (entries 1-20).
 ; &2200 used as index base 4 times by &158d, &1cd8, &1d8b, &77fe
 .door_x
     equb &ff, &ff, &ff, &04, &ff, &ff, &06, &ff, &11, &ff, &ff, &ff, &1a, &03, &03, &0b  ; Not read: unpack_level copies each level's doors here
     equb &ff, &03, &09, &12, &ff        ; ...entries 16-20, not read
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
     equb &ff, &ff, &ff                  ; Not referenced
+; Map y of each door.
 ; &2220 used as index base 4 times by &1593, &1ce3, &1d8e, &7804
 .door_y
     equb &ff, &ff, &ff, &0d, &ff, &ff, &11, &ff, &16, &ff, &ff, &ff, &1a, &23, &27, &25  ; Not read: unpack_level copies each level's doors here
     equb &ff, &2b, &2e, &2b, &ff        ; ...entries 16-20, not read
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
     equb &ff, &ff, &ff                  ; Not referenced
+; Sprite of each door.
 ; &2240 used as index base 2 times by &1599, &7810
 .door_sprite
     equb &ff, &1c, &1c, &1d, &1c, &1c, &1d, &1d, &1d, &1d, &1d, &1c, &1c, &1d, &1d, &1c  ; Not read: unpack_level copies each level's door sprites here
     equb &1d, &1d, &1c, &1c, &ff        ; ...entries 16-20, not read
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
     equb &ff, &ff, &ff                  ; Not referenced
+; Map x of each key lying on the floor (entries 1-20); key n opens door n.
 ; &2260 used as index base 7 times by &15a4, &1dce, &1e00, &1e45, &1e8c, &1ea1, &20aa
 .key_x
     equb &13, &ff, &ff, &1b, &ff, &ff, &17, &ff, &1c, &ff, &ff, &ff, &02, &15, &04, &09  ; Not read: unpack_level copies each level's keys here
     equb &ff, &04, &19, &17, &ff        ; ...entries 16-20, not read
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
     equb &ff, &ff, &ff                  ; Not referenced
+; Map y of each key on the floor.
 ; &2280 used as index base 7 times by &15aa, &1dd4, &1e06, &1e4d, &1e92, &1ea4, &20b0
 .key_y
     equb &25, &ff, &ff, &06, &ff, &ff, &09, &ff, &18, &ff, &ff, &ff, &29, &04, &0c, &14  ; Not read: unpack_level copies each level's keys here
     equb &ff, &0f, &03, &04, &ff        ; ...entries 16-20, not read
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
     equb &ff, &ff, &ff                  ; Not referenced
+; Data of sprite &51: 4 bytes x 12 rows.
 .sprite_exit
     equb &03, &03, &03, &03
     equb &02, &00, &00, &01
@@ -3831,6 +4348,7 @@ clear_text_area_top = set_text_window_top+1
     equb &02, &00, &00, &01
     equb &02, &00, &00, &01
     equb &03, &03, &03, &03
+; Data of sprite &52: 2 bytes x 3 rows.
 .sprite_key_icon
     equb &00, &05
     equb &0f, &0f
@@ -3840,20 +4358,25 @@ clear_text_area_top = set_text_window_top+1
 ;
 ; Zero bytes, which nothing reads.
     equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00  ; Zeros
+; Number of the key each hero carries, or 0.
 ; &22e0 used as index base 10 times by &1600, &1cf2, &1d95, &1deb, &1dfa, &1e0b, &1e86, &1e97, &20a4, &20b5
 .hero_key
     equb &00, &00, &00, &00, &00
+; Set when the hero has just swapped keys, so the key dropped is not picked straight back up.
 ; &22e5 used as index base 4 times by &1603, &1e28, &1e2f, &1e9c
 .hero_key_dropped
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00
+; Hero map x, kept for the door and key checks.
 ; &22f0 used as index base 4 times by &1079, &1606, &1cc8, &6f9b
 .hero_door_x
     equb &1a, &09, &00, &16, &00
+; Hero map y, kept for the door and key checks.
 ; &22f5 used as index base 4 times by &108a, &1609, &1cce, &6fa1
 .hero_door_y
     equb &06, &1d, &00, &09, &00, &00, &00, &00
     equb &00, &00, &00
+; Data of sprite &2D: 4 bytes x 12 rows.
 .sprite_magic_user_up_0
     equb &01, &0a, &00, &00
     equb &03, &0a, &0b, &00
@@ -3867,6 +4390,7 @@ clear_text_area_top = set_text_window_top+1
     equb &03, &13, &33, &00
     equb &03, &03, &22, &00
     equb &03, &03, &00, &00
+; Data of sprite &2E: 4 bytes x 12 rows.
 .sprite_magic_user_up_1
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
@@ -3880,6 +4404,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &13, &33, &03
     equb &00, &03, &23, &03
     equb &00, &01, &01, &03
+; Data of sprite &2F: 4 bytes x 12 rows.
 .sprite_magic_user_right_0
     equb &03, &00, &03, &00
     equb &03, &03, &03, &02
@@ -3893,6 +4418,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &13, &01, &0a
     equb &00, &03, &03, &0a
     equb &00, &01, &03, &00
+; Data of sprite &30: 4 bytes x 12 rows.
 .sprite_magic_user_right_1
     equb &00, &00, &00, &00
     equb &00, &01, &03, &0a
@@ -3906,6 +4432,7 @@ clear_text_area_top = set_text_window_top+1
     equb &03, &13, &07, &00
     equb &03, &03, &07, &00
     equb &03, &01, &02, &00
+; Data of sprite &31: 4 bytes x 12 rows.
 .sprite_magic_user_down_0
     equb &00, &00, &03, &03
     equb &00, &11, &03, &03
@@ -3919,6 +4446,7 @@ clear_text_area_top = set_text_window_top+1
     equb &01, &07, &00, &03
     equb &00, &07, &05, &03
     equb &00, &00, &05, &02
+; Data of sprite &32: 4 bytes x 12 rows.
 .sprite_magic_user_down_1
     equb &03, &02, &02, &00
     equb &03, &13, &03, &00
@@ -3932,6 +4460,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
+; Data of sprite &33: 4 bytes x 12 rows.
 .sprite_magic_user_left_0
     equb &00, &03, &02, &00
     equb &05, &03, &03, &00
@@ -3945,6 +4474,7 @@ clear_text_area_top = set_text_window_top+1
     equb &0f, &00, &23, &03
     equb &01, &03, &03, &03
     equb &00, &03, &00, &03
+; Data of sprite &34: 4 bytes x 12 rows.
 .sprite_magic_user_left_1
     equb &00, &01, &02, &03
     equb &00, &0b, &03, &03
@@ -3958,6 +4488,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &0b, &23, &00
     equb &05, &03, &02, &00
     equb &00, &00, &00, &00
+; Data of sprite &35: 4 bytes x 12 rows.
 .sprite_barbarian_up_0
     equb &00, &00, &3f, &3f
     equb &00, &0f, &05, &0a
@@ -3971,6 +4502,7 @@ clear_text_area_top = set_text_window_top+1
     equb &0b, &1a, &25, &07
     equb &05, &03, &0b, &0a
     equb &00, &0b, &07, &00
+; Data of sprite &36: 4 bytes x 12 rows.
 .sprite_barbarian_up_1
     equb &00, &15, &3f, &2a
     equb &05, &0a, &0f, &00
@@ -3984,6 +4516,7 @@ clear_text_area_top = set_text_window_top+1
     equb &0f, &12, &21, &0f
     equb &01, &0b, &07, &02
     equb &00, &07, &03, &00
+; Data of sprite &37: 4 bytes x 12 rows.
 .sprite_barbarian_right_0
     equb &00, &0f, &02, &00
     equb &05, &0b, &0f, &0a
@@ -3997,6 +4530,7 @@ clear_text_area_top = set_text_window_top+1
     equb &01, &0f, &07, &1f
     equb &05, &0f, &07, &1f
     equb &00, &0f, &03, &3d
+; Data of sprite &38: 4 bytes x 12 rows.
 .sprite_barbarian_right_1
     equb &00, &0f, &02, &28
     equb &05, &0b, &0f, &0a
@@ -4010,6 +4544,7 @@ clear_text_area_top = set_text_window_top+1
     equb &05, &0f, &07, &15
     equb &05, &0f, &03, &00
     equb &00, &0f, &00, &00
+; Data of sprite &39: 4 bytes x 12 rows.
 .sprite_barbarian_down_0
     equb &00, &0b, &07, &00
     equb &05, &07, &03, &0a
@@ -4023,6 +4558,7 @@ clear_text_area_top = set_text_window_top+1
     equb &2d, &1e, &0f, &02
     equb &05, &0a, &0f, &00
     equb &3f, &3f, &00, &00
+; Data of sprite &3A: 4 bytes x 12 rows.
 .sprite_barbarian_down_1
     equb &00, &03, &0b, &00
     equb &01, &0b, &07, &02
@@ -4036,6 +4572,7 @@ clear_text_area_top = set_text_window_top+1
     equb &14, &0f, &2d, &0b
     equb &00, &0f, &05, &0a
     equb &15, &3f, &2a, &00
+; Data of sprite &3B: 4 bytes x 12 rows.
 .sprite_barbarian_left_0
     equb &3e, &03, &0f, &00
     equb &2f, &0b, &0f, &0a
@@ -4049,6 +4586,7 @@ clear_text_area_top = set_text_window_top+1
     equb &05, &0f, &07, &0a
     equb &05, &0f, &07, &0a
     equb &00, &01, &0f, &00
+; Data of sprite &3C: 4 bytes x 12 rows.
 .sprite_barbarian_left_1
     equb &00, &00, &0f, &00
     equb &00, &03, &0f, &0a
@@ -4062,6 +4600,7 @@ clear_text_area_top = set_text_window_top+1
     equb &05, &0f, &07, &0a
     equb &05, &0f, &07, &0a
     equb &14, &01, &0f, &00
+; Data of sprite &3D: 4 bytes x 12 rows.
 .sprite_fighter_up_0
     equb &00, &15, &00, &00
     equb &00, &00, &2a, &00
@@ -4075,6 +4614,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &3e, &3c, &2a
     equb &15, &00, &0c, &15
     equb &00, &00, &0c, &00
+; Data of sprite &3E: 4 bytes x 12 rows.
 .sprite_fighter_up_1
     equb &00, &28, &00, &15
     equb &00, &28, &00, &15
@@ -4088,6 +4628,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &3e, &3c, &2a
     equb &15, &04, &08, &15
     equb &00, &04, &08, &00
+; Data of sprite &3F: 4 bytes x 12 rows.
 .sprite_fighter_right_0
     equb &00, &3c, &3c, &28
     equb &00, &11, &22, &00
@@ -4101,6 +4642,7 @@ clear_text_area_top = set_text_window_top+1
     equb &3b, &33, &17, &00
     equb &00, &33, &0a, &00
     equb &00, &01, &0a, &00
+; Data of sprite &40: 4 bytes x 12 rows.
 .sprite_fighter_right_1
     equb &00, &00, &28, &00
     equb &2a, &33, &36, &00
@@ -4114,6 +4656,7 @@ clear_text_area_top = set_text_window_top+1
     equb &11, &23, &00, &00
     equb &11, &23, &3f, &3f
     equb &00, &00, &00, &00
+; Data of sprite &41: 4 bytes x 12 rows.
 .sprite_fighter_down_0
     equb &00, &0c, &00, &00
     equb &2a, &0c, &00, &2a
@@ -4127,6 +4670,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &2a, &05, &14
     equb &00, &15, &00, &00
     equb &00, &00, &2a, &00
+; Data of sprite &42: 4 bytes x 12 rows.
 .sprite_fighter_down_1
     equb &00, &04, &08, &00
     equb &2a, &04, &08, &2a
@@ -4140,6 +4684,7 @@ clear_text_area_top = set_text_window_top+1
     equb &2a, &00, &00, &28
     equb &2a, &00, &14, &00
     equb &2a, &00, &14, &00
+; Data of sprite &43: 4 bytes x 12 rows.
 .sprite_fighter_left_0
     equb &00, &05, &02, &00
     equb &00, &05, &33, &00
@@ -4153,6 +4698,7 @@ clear_text_area_top = set_text_window_top+1
     equb &05, &1b, &33, &15
     equb &00, &11, &22, &00
     equb &14, &3c, &3c, &00
+; Data of sprite &44: 4 bytes x 12 rows.
 .sprite_fighter_left_1
     equb &3f, &3f, &13, &22
     equb &00, &00, &13, &22
@@ -4166,6 +4712,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &39, &33, &15
     equb &00, &14, &00, &00
     equb &00, &00, &00, &00
+; Data of sprite &45: 4 bytes x 12 rows.
 .sprite_fireball_up
     equb &00, &00, &0a, &00
     equb &00, &01, &03, &00
@@ -4179,6 +4726,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &00, &0a, &00
     equb &00, &00, &0a, &00
     equb &00, &00, &0a, &00
+; Data of sprite &46: 4 bytes x 12 rows.
 .sprite_fireball_right
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
@@ -4192,6 +4740,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
+; Data of sprite &47: 4 bytes x 12 rows.
 .sprite_fireball_down
     equb &00, &00, &0a, &00
     equb &00, &00, &0a, &00
@@ -4205,6 +4754,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &05, &07, &00
     equb &00, &01, &03, &00
     equb &00, &00, &0a, &00
+; Data of sprite &48: 4 bytes x 12 rows.
 .sprite_fireball_left
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
@@ -4218,6 +4768,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
+; Data of sprite &4D: 4 bytes x 12 rows.
 .sprite_axe_up
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
@@ -4231,6 +4782,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
+; Data of sprite &4E: 4 bytes x 12 rows.
 .sprite_axe_right
     equb &00, &00, &00, &00
     equb &00, &14, &00, &00
@@ -4244,6 +4796,7 @@ clear_text_area_top = set_text_window_top+1
     equb &15, &14, &15, &00
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
+; Data of sprite &4F: 4 bytes x 12 rows.
 .sprite_axe_down
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
@@ -4257,6 +4810,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
+; Data of sprite &50: 4 bytes x 12 rows.
 .sprite_axe_left
     equb &00, &00, &00, &00
     equb &00, &2a, &28, &2a
@@ -4270,6 +4824,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &00, &28, &00
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
+; Data of sprite &1B: 4 bytes x 12 rows.
 .sprite_key
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
@@ -4283,6 +4838,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
+; Data of sprite &28: 4 bytes x 12 rows.
 .sprite_treasure
     equb &03, &03, &02, &02
     equb &13, &50, &02, &02
@@ -4296,6 +4852,7 @@ clear_text_area_top = set_text_window_top+1
     equb &07, &08, &17, &03
     equb &06, &b0, &02, &02
     equb &03, &03, &02, &02
+; Data of sprite &29: 4 bytes x 12 rows.
 .sprite_food
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
@@ -4315,6 +4872,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &0a, &00, &05, &0f, &1a, &30, &25
     equb &0f, &00, &00, &0a, &0a, &30, &30, &0a
     equb &05, &00, &00, &0a, &00, &0f, &0f, &00  ; Not referenced
+; Data of sprite &2B: 4 bytes x 12 rows.
 .sprite_teleporter
     equb &3f, &3f, &3f, &3f
     equb &3e, &3c, &3c, &38
@@ -4330,6 +4888,7 @@ clear_text_area_top = set_text_window_top+1
     equb &30, &30, &30, &30
     equb &00, &2c, &00, &00, &00, &2c, &08, &00
     equb &00, &0c, &08, &00, &04, &0f, &0e, &00  ; Not referenced
+; Data of sprite &1E: 2 bytes x 10 rows.
 .sprite_digit_0
     equb &04, &08
     equb &08, &0c
@@ -4341,6 +4900,7 @@ clear_text_area_top = set_text_window_top+1
     equb &0c, &04
     equb &0c, &04
     equb &04, &08
+; Data of sprite &1F: 2 bytes x 10 rows.
 .sprite_digit_1
     equb &04, &00
     equb &0c, &00
@@ -4352,6 +4912,7 @@ clear_text_area_top = set_text_window_top+1
     equb &04, &00
     equb &04, &00
     equb &0c, &00
+; Data of sprite &20: 2 bytes x 10 rows.
 .sprite_digit_2
     equb &04, &08
     equb &08, &04
@@ -4363,6 +4924,7 @@ clear_text_area_top = set_text_window_top+1
     equb &08, &04
     equb &08, &08
     equb &0c, &0c
+; Data of sprite &21: 2 bytes x 10 rows.
 .sprite_digit_3
     equb &04, &08
     equb &08, &04
@@ -4374,6 +4936,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &04
     equb &0c, &04
     equb &04, &08
+; Data of sprite &22: 2 bytes x 10 rows.
 .sprite_digit_4
     equb &00, &08
     equb &04, &08
@@ -4385,6 +4948,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &08
     equb &00, &08
     equb &04, &08
+; Data of sprite &23: 2 bytes x 10 rows.
 .sprite_digit_5
     equb &0c, &0c
     equb &08, &04
@@ -4396,6 +4960,7 @@ clear_text_area_top = set_text_window_top+1
     equb &04, &04
     equb &08, &04
     equb &04, &08
+; Data of sprite &24: 2 bytes x 10 rows.
 .sprite_digit_6
     equb &00, &04
     equb &00, &08
@@ -4407,6 +4972,7 @@ clear_text_area_top = set_text_window_top+1
     equb &08, &04
     equb &08, &04
     equb &04, &08
+; Data of sprite &25: 2 bytes x 10 rows.
 .sprite_digit_7
     equb &0c, &0c
     equb &00, &04
@@ -4418,6 +4984,7 @@ clear_text_area_top = set_text_window_top+1
     equb &04, &00
     equb &04, &00
     equb &0c, &08
+; Data of sprite &26: 2 bytes x 10 rows.
 .sprite_digit_8
     equb &04, &08
     equb &08, &04
@@ -4429,6 +4996,7 @@ clear_text_area_top = set_text_window_top+1
     equb &08, &04
     equb &08, &04
     equb &04, &08
+; Data of sprite &27: 2 bytes x 10 rows.
 .sprite_digit_9
     equb &04, &08
     equb &08, &04
@@ -4440,6 +5008,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &08
     equb &04, &00
     equb &08, &00
+; Data of sprite &1D: 4 bytes x 12 rows.
 .sprite_door_horizontal
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
@@ -4454,6 +5023,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
     equb &0f, &1a, &30, &20, &00, &00, &00, &25  ; Not referenced
+; Data of sprite &16: 4 bytes x 12 rows.
 .sprite_sparkle_0
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
@@ -4467,6 +5037,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
+; Data of sprite &17: 4 bytes x 12 rows.
 .sprite_sparkle_1
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
@@ -4480,6 +5051,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &3f, &3f, &00
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
+; Data of sprite &18: 4 bytes x 12 rows.
 .sprite_sparkle_2
     equb &00, &00, &00, &00
     equb &15, &3f, &3f, &2a
@@ -4493,6 +5065,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &3f, &3f, &00
     equb &15, &3f, &3f, &2a
     equb &00, &00, &00, &00
+; Data of sprite &19: 4 bytes x 12 rows.
 .sprite_sparkle_3
     equb &3f, &00, &00, &3f
     equb &3f, &2a, &15, &3f
@@ -4506,6 +5079,7 @@ clear_text_area_top = set_text_window_top+1
     equb &2a, &2a, &15, &15
     equb &3f, &2a, &15, &3f
     equb &3f, &00, &00, &3f
+; Data of sprite &2C: 4 bytes x 12 rows.
 .sprite_trapdoor
     equb &3c, &3c, &3c, &3c
     equb &29, &03, &03, &16
@@ -4521,6 +5095,7 @@ clear_text_area_top = set_text_window_top+1
     equb &3c, &3c, &3c, &3c
     equb &00, &00, &00, &00, &04, &00, &00, &00
     equb &20, &00, &00, &00, &fd, &14, &93, &00  ; Not referenced
+; Data of sprite &11: 4 bytes x 12 rows.
 .sprite_arrow_up
     equb &00, &00, &00, &00
     equb &00, &15, &00, &00
@@ -4534,6 +5109,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &0c, &08, &00
     equb &00, &08, &08, &00
     equb &00, &00, &00, &00
+; Data of sprite &12: 4 bytes x 12 rows.
 .sprite_arrow_right
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
@@ -4547,6 +5123,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
+; Data of sprite &13: 4 bytes x 12 rows.
 .sprite_arrow_down
     equb &00, &00, &00, &00
     equb &00, &04, &04, &00
@@ -4560,6 +5137,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &00, &2a, &00
     equb &00, &00, &2a, &00
     equb &00, &00, &00, &00
+; Data of sprite &14: 4 bytes x 12 rows.
 .sprite_arrow_left
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
@@ -4573,6 +5151,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
     equb &00, &00, &00, &00
+; Data of sprite &1C: 4 bytes x 12 rows.
 .sprite_door_vertical
     equb &00, &3f, &3a, &00
     equb &00, &3e, &38, &00
@@ -4588,6 +5167,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &30, &30, &00
     equb &01, &00, &00, &00, &17, &00, &00, &90
     equb &17, &00, &00, &00, &00, &00, &00, &00  ; Not referenced
+; Data of sprite 0, the wall block (4 bytes x 12 rows), replaced by each level's own from the level file.
 ; &2d00 used as index base 1 time by &15db
 .wall_sprite
     equb &0f, &0b, &0f, &07
@@ -4602,6 +5182,7 @@ clear_text_area_top = set_text_window_top+1
     equb &07, &0b, &07, &0f
     equb &0f, &0f, &0f, &03
     equb &0b, &0f, &0f, &0f
+; Data of sprite &01: 4 bytes x 12 rows.
 .sprite_ranger_up_0
     equb &00, &03, &0b, &00
     equb &01, &00, &0a, &02
@@ -4615,6 +5196,7 @@ clear_text_area_top = set_text_window_top+1
     equb &04, &3c, &0c, &00
     equb &00, &0c, &09, &00
     equb &00, &00, &03, &00
+; Data of sprite &02: 4 bytes x 12 rows.
 .sprite_ranger_up_1
     equb &00, &03, &02, &00
     equb &00, &00, &01, &00
@@ -4628,6 +5210,7 @@ clear_text_area_top = set_text_window_top+1
     equb &04, &3c, &0c, &00
     equb &01, &0c, &08, &00
     equb &01, &02, &00, &00
+; Data of sprite &03: 4 bytes x 12 rows.
 .sprite_ranger_right_0
     equb &00, &04, &0b, &00
     equb &00, &0c, &0b, &00
@@ -4641,6 +5224,7 @@ clear_text_area_top = set_text_window_top+1
     equb &03, &06, &08, &02
     equb &00, &00, &01, &00
     equb &00, &00, &01, &00
+; Data of sprite &04: 4 bytes x 12 rows.
 .sprite_ranger_right_1
     equb &00, &00, &08, &00
     equb &00, &0c, &0d, &00
@@ -4654,6 +5238,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &0c, &0d, &02
     equb &00, &04, &07, &02
     equb &00, &03, &02, &00
+; Data of sprite &05: 4 bytes x 12 rows.
 .sprite_ranger_down_0
     equb &00, &03, &00, &00
     equb &00, &06, &0c, &00
@@ -4667,6 +5252,7 @@ clear_text_area_top = set_text_window_top+1
     equb &02, &08, &00, &01
     equb &01, &05, &00, &02
     equb &00, &07, &03, &00
+; Data of sprite &06: 4 bytes x 12 rows.
 .sprite_ranger_down_1
     equb &00, &00, &01, &02
     equb &00, &04, &0c, &02
@@ -4680,6 +5266,7 @@ clear_text_area_top = set_text_window_top+1
     equb &05, &00, &00, &00
     equb &00, &02, &00, &00
     equb &00, &01, &03, &00
+; Data of sprite &07: 4 bytes x 12 rows.
 .sprite_ranger_left_0
     equb &00, &02, &00, &00
     equb &00, &02, &00, &00
@@ -4693,6 +5280,7 @@ clear_text_area_top = set_text_window_top+1
     equb &01, &01, &06, &08
     equb &00, &07, &0c, &00
     equb &00, &07, &08, &00
+; Data of sprite &09: 4 bytes x 12 rows.
 .sprite_monster_up_0
     equb &00, &00, &00, &02
     equb &00, &00, &01, &13
@@ -4706,6 +5294,7 @@ clear_text_area_top = set_text_window_top+1
     equb &14, &3c, &2c, &00
     equb &00, &00, &0c, &00
     equb &00, &00, &0c, &00
+; Data of sprite &0A: 4 bytes x 12 rows.
 .sprite_monster_up_1
     equb &00, &04, &08, &00
     equb &00, &04, &08, &02
@@ -4719,6 +5308,7 @@ clear_text_area_top = set_text_window_top+1
     equb &14, &3c, &2d, &0a
     equb &04, &08, &00, &00
     equb &04, &08, &00, &00
+; Data of sprite &0B: 4 bytes x 12 rows.
 .sprite_monster_right_0
     equb &00, &2d, &0a, &00
     equb &14, &2d, &00, &00
@@ -4732,6 +5322,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &3c, &01, &02
     equb &00, &0f, &03, &03
     equb &00, &0f, &11, &22
+; Data of sprite &0C: 4 bytes x 12 rows.
 .sprite_monster_right_1
     equb &00, &2d, &0a, &00
     equb &14, &2d, &00, &00
@@ -4745,6 +5336,7 @@ clear_text_area_top = set_text_window_top+1
     equb &0f, &01, &02, &00
     equb &0b, &03, &03, &00
     equb &00, &11, &22, &00
+; Data of sprite &0D: 4 bytes x 12 rows.
 .sprite_monster_down_0
     equb &00, &0c, &00, &00
     equb &00, &0c, &00, &00
@@ -4758,6 +5350,7 @@ clear_text_area_top = set_text_window_top+1
     equb &23, &02, &04, &08
     equb &23, &02, &00, &00
     equb &01, &00, &00, &00
+; Data of sprite &0E: 4 bytes x 12 rows.
 .sprite_monster_down_1
     equb &00, &00, &04, &08
     equb &00, &00, &04, &08
@@ -4771,6 +5364,7 @@ clear_text_area_top = set_text_window_top+1
     equb &23, &47, &30, &8a
     equb &01, &04, &08, &00
     equb &00, &04, &08, &00
+; Data of sprite &0F: 4 bytes x 12 rows.
 .sprite_monster_left_0
     equb &11, &22, &0f, &00
     equb &03, &03, &0f, &00
@@ -4784,6 +5378,7 @@ clear_text_area_top = set_text_window_top+1
     equb &04, &4d, &34, &28
     equb &00, &00, &1e, &28
     equb &00, &05, &1e, &00
+; Data of sprite &10: 4 bytes x 12 rows.
 .sprite_monster_left_1
     equb &00, &11, &22, &00
     equb &00, &03, &03, &07
@@ -4805,19 +5400,35 @@ clear_text_area_top = set_text_window_top+1
 ; ***************************************************************************************
 ; Move the heroes
 ;
-; Called by update_game at the start of each frame. A hero out of play is skipped if
-; nobody plays them (step &63), or animated by animate_absent_hero if dying or returning
-; through a Cross. A hero part way through a step finishes it. Otherwise heroes 0 and 1
-; first try their magic key (check_magic, whose delay can return from move_heroes before
-; the later heroes move), then the keys are tried in the order up, down, right, left,
-; fire, and the first held one wins. A move records the cell tried in hero_door_x/y, for
-; update_game's door test, before a wall, a monster (which costs a health point) or
-; another hero in play can refuse it. A move into another room is made at once and
-; switches the hero's view; within a room the Boots of Speed also make it at once, and
-; without them the hero is drawn half a cell along and arrives on the next frame through
-; continue_hero_step. Fire puts a missile in the hero's first free slot. A hero who moved
-; is erased at their old position; every hero in play is then drawn and picks up any
-; object in their cell.
+; Let each of the four heroes, in turn from the Ranger, walk, fire or cast magic for this
+; frame, redraw them, and let them pick up what lies in their cell. update_game calls
+; this first in every frame, before the door and key tests (which use the cells it
+; records in hero_door_x/y), draw_objects, move_missiles and update_monsters.
+;
+; A hero out of play is passed over if nobody plays them (step &63), or handed to
+; animate_absent_hero if dying or returning through a Cross. A hero half way through a
+; step (step 1) finishes it through continue_hero_step and reads no keys. Otherwise
+; heroes 0 and 1 first go through check_magic, which comes back to read_hero_keys, or
+; after a cast to draw_moved_hero with no move; then the first held of up, down, right,
+; left and fire decides. A direction turns the hero that way (directions 1, 3, 5, 7) and
+; tries the next cell, which is recorded in hero_door_x/y whatever is there, so a hero
+; pushing on a door opens it. A wall or closed door, a monster (alive or dying, found by
+; find_creature) or another hero in play refuses the move; walking into a monster also
+; costs one health point, whatever the hero's armour. A move into another room is made at
+; once and switches the hero's view (show_hero_room); within a room the Boots of Speed
+; make it at once too, and without them the hero stays in the old cell, drawn half a cell
+; along, and arrives on the next frame. Fire puts a missile in the first of the hero's
+; free slots (3 x hero up to hero_max_missiles of them), in the hero's own cell, with bit
+; 7 of its direction set so move_missiles does not erase it off the hero; the bell (VDU
+; 7) sounds and the hero's frame flips. With no slot free, or no key held, the hero
+; stands still.
+;
+; A hero who moved or was refused is erased from where they were drawn, using
+; previous_x/y and previous_offset_x/y; every hero still in play is then drawn, and
+; collect_objects runs whenever object_free_map lets their cell hold an object, every
+; frame they are there and not only on arrival. check_magic's delay returns from
+; move_heroes itself, so after a cast the later heroes are not moved for three frames.
+; The bytes at &6F6D are never executed.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -4826,6 +5437,7 @@ clear_text_area_top = set_text_window_top+1
 ; &6e80 referenced 1 time by &1cc0
 .move_heroes
     ldx #0                              ; Hero 0, the Ranger, first
+; For hero X: one out of play is not moved or drawn here, only animated if dying or returning.
 ; &6e82 referenced 1 time by &70c6
 .move_hero
     lda hero_direction,x                ; A direction (1, 3, 5, 7) means the hero is in play
@@ -4849,6 +5461,7 @@ clear_text_area_top = set_text_window_top+1
     sta previous_offset_x               ; ...so erase_hero blanks the image where it is
     lda hero_offset_y,x                 ; And the vertical pixel offset...
     sta previous_offset_y               ; ...for the same erase
+; A hero half way through a step arrives this frame and reads no keys; only a standing hero acts.
     lda hero_step,x                     ; Half way between cells (step 1)?
     beq check_magic_key                 ; No: standing in a cell, so read the keys
     jsr continue_hero_step              ; Yes: arrive in the next cell; no keys this frame
@@ -4906,7 +5519,7 @@ clear_text_area_top = set_text_window_top+1
 .fire_missile
     txa                                 ; Slots 3 x hero to 3 x hero + hero_max_missiles - 1
     sta scratch                         ; Hero number kept to add...
-    asl a                               ; ...x 2...
+    asl a                               ; ...doubled: 2 x hero...
     clc                                 ; ...(no carry in)...
     adc scratch                         ; ...+ hero: 3 x hero, the hero's first slot
     tay                                 ; Y walks the hero's slots
@@ -4918,7 +5531,7 @@ clear_text_area_top = set_text_window_top+1
     bne next_missile_slot               ; Yes: look at the hero's next slot
     lda hero_direction,x                ; Free: missile direction = (hero direction + 1) / 2
     clc                                 ; Hero direction 1, 3, 5 or 7...
-    adc #1                              ; ...+ 1...
+    adc #1                              ; ...+ 1: 2, 4, 6 or 8...
     lsr a                               ; ...halved: 1-4, up, right, down, left
     ora #&80                            ; Bit 7: just fired, so not erased off the hero
     sta missile_direction,y             ; The slot is now in flight
@@ -4938,39 +5551,40 @@ clear_text_area_top = set_text_window_top+1
     lda previous_x                      ; Put back the cell remembered at the start...
     sta hero_x,x                        ; ...the same cell: nothing has moved the hero here
     lda previous_y                      ; And the y...
-    sta hero_y,x                        ; ...likewise
+    sta hero_y,x                        ; ...is put back the same way
     lda hero_frame,x                    ; Next animation frame...
     eor #1                              ; ...0 and 1 alternate...
     sta hero_frame,x                    ; ...so the hero is seen to throw
     jmp draw_moved_hero                 ; Draw the hero where they stand; no erase needed
 ; Unreachable after the JMP: DEY and BNE find_missile_slot.
     equb &88, &d0, &b8                  ; Not referenced
+; Slot taken: try the hero's next one, up to the limit worked out above.
 ; &6f70 referenced 1 time by &6f2b
 .next_missile_slot
     iny                                 ; The hero's next slot
     cpy scratch                         ; Past the hero's last slot?
     bne find_missile_slot               ; No: is that one free?
     jmp draw_moved_hero                 ; All the hero's missiles in flight: no shot
-; Move: try the next cell the way the hero faces. A wall or closed door, a monster, or another hero in play refuses it.
+; Move: try the next cell the way the hero faces. A wall or closed door, a monster, or another hero in play refuses it. The hero has already turned, so a refused move still changes the way they face.
 ; &6f79 referenced 4 times by &6ed1, &6ee4, &6ef7, &6f0a
 .step_hero
     lda hero_direction,x                ; Move the hero's cell in the direction faced: up...
-    cmp #1                              ; Facing up?
+    cmp #1                              ; Direction 1, facing up?
     bne step_right                      ; No: try right
     dec hero_y,x                        ; Up: one row up the map
 ; &6f83 referenced 1 time by &6f7e
 .step_right
-    cmp #3                              ; ...right...
+    cmp #3                              ; Direction 3, facing right? (A still holds it)
     bne step_down                       ; No: try down
     inc hero_x,x                        ; Right: one column along
 ; &6f8a referenced 1 time by &6f85
 .step_down
-    cmp #5                              ; ...down...
+    cmp #5                              ; Direction 5, facing down?
     bne step_left                       ; No: try left
     inc hero_y,x                        ; Down: one row down the map
 ; &6f91 referenced 1 time by &6f8c
 .step_left
-    cmp #7                              ; ...left
+    cmp #7                              ; Direction 7, facing left?
     bne note_new_cell                   ; No: the cell is moved
     dec hero_x,x                        ; Left: one column back
 ; &6f98 referenced 1 time by &6f93
@@ -4978,20 +5592,21 @@ clear_text_area_top = set_text_window_top+1
     lda hero_x,x                        ; Record the cell tried, wall or not...
     sta hero_door_x,x                   ; ...so update_game finds a door the hero walks into
     lda hero_y,x                        ; And the y tried...
-    sta hero_door_y,x                   ; ...in hero_door_y
+    sta hero_door_y,x                   ; ...in hero_door_y, for the same door test
     lda hero_x,x                        ; Is the cell tried a wall (or a closed door)?
     sta cell_x                          ; cell_x: the cell for test_wall
     lda hero_y,x                        ; And the y tried...
-    sta cell_y                          ; ...in cell_y
+    sta cell_y                          ; ...in cell_y, also used by the hero test
     txa                                 ; Keep the hero number...
     pha                                 ; ...on the stack across test_wall
     jsr test_wall                       ; Y = the cell's wall bit; map_ptr = its room
     pla                                 ; Recover the hero number...
-    tax                                 ; ...into X
+    tax                                 ; ...into X, which test_wall used for the bit
     cpy #0                              ; Wall bit clear?
     beq check_monster_in_cell           ; Clear: is a monster in the way?
+; Refused by a wall or closed door: back to the old cell, standing whole. The door test in update_game may still open it.
     lda previous_x                      ; A wall: the hero stays in the old cell...
-    sta hero_x,x                        ; ...x back...
+    sta hero_x,x                        ; ...hero_x put back from previous_x...
     lda previous_y                      ; ...and y back...
     sta hero_y,x                        ; ...so the hero does not enter the wall
 ; &6fc7 referenced 1 time by &7050
@@ -5001,6 +5616,7 @@ clear_text_area_top = set_text_window_top+1
     sta hero_offset_x,x                 ; ...no horizontal offset...
     sta hero_offset_y,x                 ; ...and no vertical offset
     jmp erase_hero                      ; Erase the old image, draw the hero in their cell
+; No wall. A monster in the cell, alive or dying, refuses the move and costs the hero one health point.
 ; &6fd5 referenced 1 time by &6fb9
 .check_monster_in_cell
     lda #0                              ; Is a monster in the cell tried?
@@ -5009,11 +5625,11 @@ clear_text_area_top = set_text_window_top+1
     pha                                 ; ...on the stack across find_creature
     jsr find_creature                   ; Y non-zero if a monster is in the cell
     pla                                 ; Recover the hero number...
-    tax                                 ; ...into X
+    tax                                 ; ...into X, which find_creature used for monsters
     cpy #0                              ; A monster there?
     beq check_hero_in_cell              ; No: is another hero in the way?
     lda previous_x                      ; Yes: the hero stays in the old cell...
-    sta hero_x,x                        ; ...x back...
+    sta hero_x,x                        ; ...hero_x put back from previous_x...
     lda previous_y                      ; ...and y back...
     sta hero_y,x                        ; ...so the hero stays out of the monster's cell
     lda #0                              ; The move is over: the hero stands in a whole cell...
@@ -5022,6 +5638,7 @@ clear_text_area_top = set_text_window_top+1
     sta hero_offset_y,x                 ; ...and no vertical offset
     jsr lose_health_point               ; ...and pays a health point for walking into it
     jmp erase_hero                      ; Erase the old image, draw the hero in their cell
+; Nor a monster. Another hero in play there refuses the move at no cost; a hero out of play (a skull) does not.
 ; &7002 referenced 1 time by &6fe3
 .check_hero_in_cell
     stx scratch                         ; Is another hero in play in the cell tried?
@@ -5039,7 +5656,7 @@ clear_text_area_top = set_text_window_top+1
     lda hero_direction,y                ; There, but in play?
     beq next_other_hero                 ; No (a skull, say): not in the way
     lda previous_x                      ; In play there: the hero stays in the old cell...
-    sta hero_x,x                        ; ...x back...
+    sta hero_x,x                        ; ...hero_x put back from previous_x...
     lda previous_y                      ; ...and y back...
     sta hero_y,x                        ; ...so heroes in play never share a cell
     lda #0                              ; The move is over: the hero stands in a whole cell...
@@ -5049,7 +5666,7 @@ clear_text_area_top = set_text_window_top+1
     jmp erase_hero                      ; Erase the old image, draw the hero in their cell
 ; &703b referenced 4 times by &700a, &7012, &701a, &701f
 .next_other_hero
-    iny                                 ; Next hero
+    iny                                 ; Next hero to compare with the cell tried
     cpy #4                              ; Checked all four?
     bne check_other_hero                ; No: check that one
 ; The cell is free. A move into another room is made at once, as is one with the Boots of Speed; otherwise the hero is drawn half way and arrives on the next frame.
@@ -5090,17 +5707,17 @@ clear_text_area_top = set_text_window_top+1
     lda previous_x                      ; ...at the hero's old cell...
     sta cell_x                          ; ...as the cell to plot at
     lda previous_y                      ; And the old y...
-    sta cell_y                          ; ...in cell_y
+    sta cell_y                          ; ...in cell_y: where the hero was last drawn
     lda previous_offset_x               ; With the old pixel offsets too...
-    sta plot_offset_x                   ; ...across...
-    lda previous_offset_y               ; ...and down...
+    sta plot_offset_x                   ; ...the old horizontal offset...
+    lda previous_offset_y               ; ...and the old vertical offset...
     sta plot_offset_y                   ; ...so a half-way image is blanked where it was
     txa                                 ; Keep the hero number...
     pha                                 ; ...on the stack across plot_at_cell
     jsr plot_at_cell                    ; Blank the hero in every view showing that cell
     pla                                 ; Recover the hero number...
-    tax                                 ; ...into X
-; Draw the hero, then pick up any object in their cell.
+    tax                                 ; ...into X, to draw the same hero
+; Draw the hero, then pick up any object in their cell. A hero comes here on every frame they are moved, standing still or not, so a hero standing on an energy drainer loses 10 health a frame.
 ; &7096 referenced 4 times by &6f15, &6f6a, &6f76, &76ae
 .draw_moved_hero
     clc                                 ; Clear carry for the sprite sum
@@ -5113,40 +5730,50 @@ clear_text_area_top = set_text_window_top+1
     lda hero_x,x                        ; Can the hero's cell hold an object?
     sta cell_x                          ; The hero's cell, to test for an object...
     lda hero_y,x                        ; And the hero's y...
-    sta cell_y                          ; ...in cell_y
+    sta cell_y                          ; ...in cell_y, where they now stand
     txa                                 ; Keep the hero number...
     pha                                 ; ...on the stack across test_object_free
     jsr test_object_free                ; Y zero if an object may lie in the cell
     pla                                 ; Recover the hero number...
-    tax                                 ; ...into X
+    tax                                 ; ...into X, for collect_objects
     cpy #0                              ; Can an object lie there?
     bne next_hero                       ; No: nothing to pick up; next hero
     jsr collect_objects                 ; Yes: pick up whatever is there
+; On to the next hero, until all four have had their turn.
 ; &70c1 referenced 4 times by &6e8e, &6e94, &709a, &70bc
 .next_hero
-    inx                                 ; Next hero
+    inx                                 ; Next hero, in the order Ranger to Fighter
     cpx #4                              ; All four heroes moved?
-    beq move_heroes_done                ; Yes: done
+    beq move_heroes_done                ; Yes: every hero has had this frame's turn
     jmp move_hero                       ; No: move the next hero
 ; &70c9 referenced 1 time by &70c4
 .move_heroes_done
-    rts                                 ; Return to update_game
+    rts                                 ; Return to update_game, all four heroes moved and drawn
 ; ***************************************************************************************
 ; Move the missiles
 ;
-; Called by update_game each frame, after move_heroes and draw_objects and before
-; update_monsters. Each of the twelve slots (three per hero, from 3 x hero) whose missile
-; is in flight is erased from its cell, unless fired this frame and so still on its hero,
-; and moved one cell in its direction (1-4: up, right, down, left). The new cell is then
-; tried in turn. A wall spends the missile. A live monster takes its damage through
+; Fly every missile in flight one cell and settle what it hits. update_game calls this
+; each frame, after move_heroes (which fires them) and draw_objects, and before
+; update_monsters, which plays out the deaths it causes.
+;
+; Each of the twelve slots (three per hero, from 3 x hero) with a non-zero
+; missile_direction is in flight. It is erased from its cell, unless fired this frame
+; (bit 7 set) and so still on its hero, whose frame flip_firer_frame then flips back. It
+; moves one cell in its direction (1-4: up, right, down, left), a cell a frame with no
+; pixel offset, and the new cell is tried in turn, with the slot kept on the stack
+; throughout. A wall spends the missile. A live monster takes its damage through
 ; monster_hit, which spends the missile and, for a kill, gives the firer a point; a
 ; monster already sparkling lets it through. The test for live is a sprite below the
 ; first sparkle, so a monster killed earlier in the frame (sprite blank until
 ; update_monsters runs) can be hit again. An energy drainer is worn down a stage, and
 ; removed after its last; the firer scores a point and the missile is turned round in the
-; drainer's cell. Any hero in the cell, the firer included and whether in play or not,
-; spends the missile, and lose_health_point takes its damage from a hero in play.
-; Otherwise the missile is drawn in its new cell, pointing the way it flies.
+; drainer's cell, so it can fly back into its firer. Any hero in the cell, the firer
+; included and whether in play or not (a skull stops it), spends the missile, and
+; lose_health_point takes missile_damage points, one at a time, from a hero in play.
+; Otherwise the missile is drawn in its new cell as missile_sprite_base + direction, the
+; weapon pointing the way it flies. A spent missile is not drawn, and its direction 0
+; frees the slot for its hero's next shot. Missiles pass through one another and through
+; objects other than drainers.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -5158,6 +5785,7 @@ clear_text_area_top = set_text_window_top+1
     sta plot_offset_x                   ; ...so they are plotted with no horizontal offset...
     sta plot_offset_y                   ; ...and no vertical offset
     ldx #0                              ; Slot 0 first: the Ranger's first missile
+; For missile slot X: an empty slot (direction 0) is passed over. One fired this frame shares its hero's cell and is moved without being erased.
 ; &70d2 referenced 1 time by &721d
 .move_missile
     lda missile_direction,x             ; A direction means this slot's missile is flying
@@ -5169,7 +5797,7 @@ clear_text_area_top = set_text_window_top+1
     and #&7f                            ; Fired this frame: drop the just-fired bit...
     sta missile_direction,x             ; ...leaving direction 1-4
     jsr flip_firer_frame                ; ...flip the firer's animation frame again...
-    jmp missile_up                      ; ...and move it unerased: its cell is the hero's
+    jmp step_missile                    ; ...and move it unerased: its cell is the hero's
 ; Erase the missile and move it one cell.
 ; &70e7 referenced 1 time by &70da
 .erase_missile
@@ -5178,31 +5806,31 @@ clear_text_area_top = set_text_window_top+1
     lda missile_x,x                     ; The missile's x...
     sta cell_x                          ; ...as the cell to plot at
     lda missile_y,x                     ; And its y...
-    sta cell_y                          ; ...in cell_y
+    sta cell_y                          ; ...in cell_y: where it was drawn last frame
     txa                                 ; Keep the missile slot...
     pha                                 ; ...on the stack across plot_at_cell
     jsr plot_at_cell                    ; Blank it in every view showing that cell
     pla                                 ; Recover the missile slot...
-    tax                                 ; ...into X
+    tax                                 ; ...into X, to move the same missile
 ; &70fe referenced 1 time by &70e4
-.missile_up
+.step_missile
     lda missile_direction,x             ; Move it one cell the way it flies: up...
     cmp #1                              ; Direction 1: up
     bne missile_right                   ; No: try right
     dec missile_y,x                     ; Up: one row up the map
 ; &7108 referenced 1 time by &7103
 .missile_right
-    cmp #2                              ; ...right...
+    cmp #2                              ; Direction 2: right? (A still holds it)
     bne missile_down                    ; No: try down
     inc missile_x,x                     ; Right: one column along
 ; &710f referenced 1 time by &710a
 .missile_down
-    cmp #3                              ; ...down...
+    cmp #3                              ; Direction 3: down?
     bne missile_left                    ; No: try left
     inc missile_y,x                     ; Down: one row down the map
 ; &7116 referenced 1 time by &7111
 .missile_left
-    cmp #4                              ; ...left
+    cmp #4                              ; Direction 4: left?
     bne check_missile_wall              ; No: the cell is moved
     dec missile_x,x                     ; Left: one column back
 ; Try the new cell: wall, monster, energy drainer, then hero. The slot stays on the stack through the tests.
@@ -5211,11 +5839,12 @@ clear_text_area_top = set_text_window_top+1
     lda missile_x,x                     ; Does the missile's new cell hold a wall or door?
     sta cell_x                          ; ...as the cell to test
     lda missile_y,x                     ; And its y...
-    sta cell_y                          ; ...in cell_y
+    sta cell_y                          ; ...in cell_y, kept for every test below
     txa                                 ; Keep the missile slot...
     pha                                 ; ...on the stack across the tests
     jsr test_wall                       ; Z set if the cell is clear of walls
     beq check_missile_monster           ; Clear: is a monster there?
+; Spent: the missile stops where it is, undrawn, and its slot is free for its hero's next shot.
 ; &7130 referenced 2 times by &71fe, &75ab
 .missile_spent_pop
     pla                                 ; A wall: the missile stops, never drawn there
@@ -5225,6 +5854,7 @@ clear_text_area_top = set_text_window_top+1
     lda #0                              ; The missile is spent: free its slot...
     sta missile_direction,x             ; ...direction 0, so the hero may fire again
     jmp next_missile                    ; On to the next slot
+; No wall. A live monster takes the hit; a sparkling (dying) one lets the missile through.
 ; &713a referenced 1 time by &712e
 .check_missile_monster
     lda #0                              ; Is a monster in the new cell?
@@ -5237,10 +5867,12 @@ clear_text_area_top = set_text_window_top+1
     pla                                 ; Alive: hit it, with the slot off the stack...
     tay                                 ; ...in Y, for monster_hit
     jmp monster_hit                     ; Hit sound, damage; it spends the missile
+; monster_hit jumps back here, slot in X, when its hit kills the monster.
 ; &7150 referenced 1 time by &75a3
 .monster_killed
     jsr credit_missile_owner            ; monster_hit's kill: a point to the firer...
     jmp missile_spent                   ; ...and the missile is spent
+; No live monster there. If the cell can hold an object, look for an energy drainer there.
 ; &7156 referenced 2 times by &7142, &7149
 .check_missile_object
     pla                                 ; Could the new cell hold an object (a drainer)?
@@ -5248,12 +5880,12 @@ clear_text_area_top = set_text_window_top+1
     lda missile_x,x                     ; The missile's x...
     sta cell_x                          ; ...as the cell to test
     lda missile_y,x                     ; And its y...
-    sta cell_y                          ; ...in cell_y
+    sta cell_y                          ; ...in cell_y (find_creature left it intact)
     txa                                 ; Keep the missile slot...
     pha                                 ; ...on the stack across test_object_free
     jsr test_object_free                ; Y zero if an object may lie in the cell
     pla                                 ; Recover the missile slot...
-    tax                                 ; ...into X
+    tax                                 ; ...into X, which test_object_free used for the bit
     cpy #0                              ; Can an object lie there?
     bne check_missile_hero              ; No: no drainer; is a hero there?
 ; A missile hitting an energy drainer wears it down, scores for the firer and turns round in its cell.
@@ -5286,21 +5918,21 @@ clear_text_area_top = set_text_window_top+1
     tax                                 ; Recover the missile slot
     jsr credit_missile_owner            ; The missile's sprites say whose it is
     lda missile_direction,x             ; Turn the missile round, still in the drainer's cell
-    cmp #1                              ; Flying up?
+    cmp #1                              ; Direction 1, flying up?
     bne reverse_right                   ; No: try right
     lda #3                              ; Up turns to down...
     sta missile_direction,x             ; ...back the way it came
     jmp check_missile_hero              ; Is a hero in the drainer's cell?
 ; &71b4 referenced 1 time by &71aa
 .reverse_right
-    cmp #2                              ; ...right...
+    cmp #2                              ; Direction 2, flying right?
     bne reverse_down                    ; No: try down
     lda #4                              ; Right turns to left...
     sta missile_direction,x             ; ...back the way it came
     jmp check_missile_hero              ; Is a hero in the drainer's cell?
 ; &71c0 referenced 1 time by &71b6
 .reverse_down
-    cmp #3                              ; ...down...
+    cmp #3                              ; Direction 3, flying down?
     bne reverse_left                    ; No: it was flying left
     lda #1                              ; Down turns to up...
     sta missile_direction,x             ; ...back the way it came
@@ -5312,7 +5944,7 @@ clear_text_area_top = set_text_window_top+1
     jmp check_missile_hero              ; Is a hero in the drainer's cell?
 ; &71d4 referenced 2 times by &7179, &7181
 .next_object_drainer
-    dex                                 ; Next object
+    dex                                 ; Next object down, looking for one in the cell
     bne check_object_drainer            ; Until all 30 are checked
 ; &71d7 referenced 2 times by &7188, &718c
 .no_drainer
@@ -5327,7 +5959,7 @@ clear_text_area_top = set_text_window_top+1
 ; &71dd referenced 1 time by &7204
 .check_hero_hit
     pla                                 ; Fetch the missile slot...
-    tay                                 ; ...into Y...
+    tay                                 ; ...into Y, to read its damage if this hero is hit...
     pha                                 ; ...leaving it on the stack
     lda hero_x,x                        ; This hero's x...
     cmp cell_x                          ; ...the missile's cell?
@@ -5343,15 +5975,16 @@ clear_text_area_top = set_text_window_top+1
     pha                                 ; ...on the stack across the call
     jsr lose_health_point               ; One point (none if out of play, as a skull)
     pla                                 ; Recover the count...
-    tay                                 ; ...into Y
+    tay                                 ; ...of damage points still to take, into Y
     dey                                 ; One fewer to take
     bne take_missile_damage             ; More to take: take the next
     jmp missile_spent_pop               ; The missile is spent, slot still on the stack
 ; &7201 referenced 2 times by &71e6, &71ee
 .next_hero_hit
-    inx                                 ; Next hero
+    inx                                 ; Next hero to test against the missile's cell
     cpx #4                              ; All four heroes checked?
     bne check_hero_hit                  ; No: check the next hero against the missile's cell
+; No wall, live monster or hero in the new cell: draw the missile there, pointing the way it flies (a drainer will have turned it round), then go on to the next slot.
     pla                                 ; Nothing hit: the missile flies on, drawn in its new cell
     tax                                 ; Missile slot back in X
     clc                                 ; Sprite = the missile's base...
@@ -5362,29 +5995,38 @@ clear_text_area_top = set_text_window_top+1
     pha                                 ; ...across the plot
     jsr plot_at_cell                    ; Plot the missile in every view showing its cell
     pla                                 ; Recover the missile slot...
-    tax                                 ; ...into X
+    tax                                 ; ...into X, for the slot loop
 ; &7218 referenced 2 times by &70d7, &7137
 .next_missile
-    inx                                 ; Next slot
+    inx                                 ; Next missile slot
     cpx #&0c                            ; Past the twelfth slot (three per hero)?
     beq move_missiles_done              ; Yes: every missile moved this frame
     jmp move_missile                    ; No: move this slot's missile
 ; &7220 referenced 1 time by &721b
 .move_missiles_done
-    rts                                 ; Return
+    rts                                 ; Return to update_game: all twelve slots done
 ; ***************************************************************************************
 ; Take one health point from a hero
 ;
-; If hero X is in play, take one from their health and redraw it in the status panel.
-; Every kind of harm comes through here one point at a time: a monster's touch or bump, a
-; missile, an energy drainer, the cost of magic. draw_status_panel, the potion and a
-; returning hero also call it, to draw a health set one point high. Health is two digit
-; sprites, so the units digit wraps from 0 to 9 with a borrow from the tens. Health 00 is
-; still alive; the hero dies when a point is taken from 00. Then their sprite is erased,
-; they leave play (direction 0), the death animation is started (frame step +1, counter
-; 1) and their number + 1 is added at the end of returning_hero_queue, for a Cross of
-; Resurrection to bring back. A hero out of play, dying or returning, loses nothing. The
-; health is not redrawn on death.
+; If hero X is in play, take one point from their health and redraw it in the status
+; panel; if that point was their last, kill them.
+;
+; Every kind of harm is paid through here, one call per point: a hero walking into a
+; monster (move_heroes, 1 point), a monster stepping onto a hero (hero_damage_taken
+; points), a missile (its damage), an energy drainer (10, from collect_objects) and the
+; cost of magic (6 for the Ranger, 3 for the Magic-User). Three callers use it only to
+; draw a health they have set one point high: draw_status_panel (99 + 1 at each level),
+; the potion, and a returning hero (33, drawn as 32).
+;
+; Health is two digit sprites, hero_health_tens and hero_health_units (&1E-&27 for 0-9),
+; so the units digit wraps from 0 to 9 with a borrow from the tens. Health 00 is still
+; alive; the hero dies when a point is taken from 00, which leaves the tens at &1D, one
+; below the 0 sprite: the play loop tests that to count the dead. On death the hero's
+; sprite is erased from every view, they leave play (direction 0), the death animation is
+; started (frame step +1, counter 1, run by move_heroes) and their number + 1 is put in
+; the first free entry of returning_hero_queue, for a Cross of Resurrection to bring
+; back. The health is not redrawn on death. A hero out of play (dying, returning, or not
+; playing) loses nothing, so a skull is safe to touch.
 ;
 ; On Entry:
 ;     X: hero number (0-3)
@@ -5408,6 +6050,7 @@ clear_text_area_top = set_text_window_top+1
     lda hero_health_tens,x              ; ...and look at the new tens digit
     cmp #spr_digit_0 - 1                ; Below 0? The point was taken from 00
     bne draw_health                     ; No: still alive, redraw the health
+; The point was taken from health 00: the hero dies. The tens digit is left at &1D, below the 0 sprite, which marks the hero as dead to the play loop.
     lda #spr_blank                      ; The hero has died: erase them...
     sta sprite_number                   ; ...with the blank sprite...
     jsr draw_hero                       ; ...at their cell in every view showing it
@@ -5416,13 +6059,14 @@ clear_text_area_top = set_text_window_top+1
     lda #1                              ; ...and start the death animation:
     sta hero_offset_x,x                 ; ...frame step +1: forwards to the skull...
     sta hero_offset_y,x                 ; ...frame counter 1: the first step comes next frame
+; Put the hero in the first free (zero) entry of returning_hero_queue, as hero + 1, to wait for a Cross. The search has no limit; a free entry is always there, as the queue holds at most one entry per hero.
     ldy #0                              ; Queue them for a Cross: from the queue's front...
 ; &7256 referenced 1 time by &7264
 .find_queue_slot
     lda returning_hero_queue,y          ; ...look at this queue entry
     bne next_queue_slot                 ; Taken: try the next entry
-    txa                                 ; Free: hero number...
-    clc                                 ; ...plus one...
+    txa                                 ; Free: entry = hero number + 1...
+    clc                                 ; ...(carry clear for the add)...
     adc #1                              ; ...(entries are hero + 1, so 0 can mean free)...
     sta returning_hero_queue,y          ; ...queued behind those already waiting
     rts                                 ; Return, health not redrawn
@@ -5430,7 +6074,7 @@ clear_text_area_top = set_text_window_top+1
 .next_queue_slot
     iny                                 ; Next queue entry
     bne find_queue_slot                 ; Keep looking (an empty entry is always found)
-; Draw hero X's health, two digit sprites on the top row of their panel section. lose_health_point and the food reach it.
+; Draw hero X's health, two digit sprites on the top row of their panel section, tens at panel_left and units three byte columns right. lose_health_point falls through to here and food calls it; plot_sprite corrupts X, so the hero is kept on the stack.
 ; &7266 referenced 3 times by &722f, &723e, &73a2
 .draw_health
     lda hero_panel_y,x                  ; Health on the top row of the hero's panel section...
@@ -5443,7 +6087,7 @@ clear_text_area_top = set_text_window_top+1
     pha                                 ; ...across the plot
     jsr plot_sprite                     ; Plot the health's tens digit
     pla                                 ; Recover the hero number...
-    tax                                 ; ...into X
+    tax                                 ; ...into X, for the units digit
     lda hero_health_units,x             ; The units digit sprite...
     sta sprite_number                   ; ...as the sprite to plot
     lda #panel_left + 3                 ; ...three byte columns right of the tens...
@@ -5452,14 +6096,21 @@ clear_text_area_top = set_text_window_top+1
     pha                                 ; ...across the plot
     jsr plot_sprite                     ; Plot the health's units digit
     pla                                 ; Recover the hero number...
-    tax                                 ; ...into X
-    rts                                 ; Return
+    tax                                 ; ...into X, as the caller had it
+    rts                                 ; Return with the health drawn and X the hero
 ; ***************************************************************************************
 ; Add one point to a hero's score
 ;
-; Add one to hero X's score, carrying into the tens and above, and redraw the score in
-; the status panel. The score is four digit sprites (thousands to units), with
-; add_thousand_points handling the ten-thousands.
+; Add one to hero X's score and redraw it in the status panel. Points come one at a time
+; from here: a monster killed by a missile or by magic, a hit on an energy drainer, food
+; (five calls) and a door opened (seven); draw_status_panel calls it at each level just
+; to draw the score, which adds a point. Bigger rewards go through add_ten_points.
+;
+; The score is kept as digit sprites, one table per digit (hero_score_thousands,
+; _hundreds, _tens, _units; &1E-&27 for 0-9), so it can be plotted as it stands. A units
+; digit past 9 is set back to 0 and the carry made by falling into add_ten_points, which
+; goes on into the hundreds and, through add_thousand_points, the thousands and the small
+; ten-thousands digit. draw_score then plots all four main digits.
 ;
 ; On Entry:
 ;     X: hero number (0-3)
@@ -5478,8 +6129,10 @@ clear_text_area_top = set_text_window_top+1
 ; Add ten points to a hero's score
 ;
 ; Add ten to hero X's score, carrying into the hundreds and through add_thousand_points,
-; and redraw the score. add_point falls into this entry to carry from the units. The
-; units digit is left as it is.
+; and redraw the score. collect_objects calls it for treasure (twice: 20 points), the
+; Cross of Resurrection and every magic item; add_point falls into it to carry from the
+; units. The units digit is not touched, which the potion relies on: it reads the units
+; digit before calling this.
 ;
 ; On Entry:
 ;     X: hero number (0-3)
@@ -5501,7 +6154,7 @@ clear_text_area_top = set_text_window_top+1
     lda #spr_digit_0                    ; Yes: hundreds back to 0...
     sta hero_score_hundreds,x           ; ...stored for this hero
     jsr add_thousand_points             ; ...and carry into the thousands and beyond
-; Draw hero X's score, four digit sprites twelve rows below the health.
+; Draw hero X's score, four digit sprites (thousands, hundreds, tens, units, three byte columns apart from panel_left) twelve rows below the health. The ten-thousands digit is drawn by add_thousand_points when it changes.
 ; &72bc referenced 3 times by &7294, &72a3, &72b2
 .draw_score
     clc                                 ; Score: all four digits, twelve rows below the health
@@ -5516,7 +6169,7 @@ clear_text_area_top = set_text_window_top+1
     pha                                 ; ...across the plot
     jsr plot_sprite                     ; Plot the thousands digit
     pla                                 ; Recover the hero number...
-    tax                                 ; ...into X
+    tax                                 ; ...into X, for the hundreds digit
     lda hero_score_hundreds,x           ; The hundreds digit sprite...
     sta sprite_number                   ; ...as the sprite to plot
     lda #panel_left + 3                 ; ...three byte columns right (&48)...
@@ -5525,7 +6178,7 @@ clear_text_area_top = set_text_window_top+1
     pha                                 ; ...across the plot
     jsr plot_sprite                     ; Plot the hundreds digit
     pla                                 ; Recover the hero number...
-    tax                                 ; ...into X
+    tax                                 ; ...into X, for the tens digit
     lda hero_score_tens,x               ; The tens digit sprite...
     sta sprite_number                   ; ...as the sprite to plot
     lda #panel_left + 6                 ; ...six byte columns right (&4B)...
@@ -5534,7 +6187,7 @@ clear_text_area_top = set_text_window_top+1
     pha                                 ; ...across the plot
     jsr plot_sprite                     ; Plot the tens digit
     pla                                 ; Recover the hero number...
-    tax                                 ; ...into X
+    tax                                 ; ...into X, for the units digit
     lda hero_score_units,x              ; The units digit sprite...
     sta sprite_number                   ; ...as the sprite to plot
     lda #panel_left + 9                 ; ...nine byte columns right (&4E)...
@@ -5543,16 +6196,21 @@ clear_text_area_top = set_text_window_top+1
     pha                                 ; ...across the plot
     jsr plot_sprite                     ; Plot the units digit
     pla                                 ; Recover the hero number...
-    tax                                 ; ...into X
-    rts                                 ; Return
+    tax                                 ; ...into X, as the caller had it
+    rts                                 ; Return with the score drawn and X the hero
 ; ***************************************************************************************
 ; Draw the level's objects
 ;
-; Plot each of objects 30 to 1, using its type as the sprite, at its cell in every view
-; that shows it, with no pixel offset. update_game calls this every frame, before the
-; missiles and monsters move, so objects are put back wherever a moving sprite has
-; crossed them. An object that has been collected or worn away has map x and y &FF
-; (off_map).
+; Draw every object still on the level (treasure, food, teleporters, drainers, magic
+; items, the exit) in whichever views show it. update_game calls this every frame, after
+; move_heroes and the door and key checks and before move_missiles and update_monsters,
+; so an object that a hero has just walked off or a monster has crossed is put back
+; before the next sprites are drawn over it.
+;
+; Objects 30 (the exit) down to 1 are plotted with plot_at_cell, their type being their
+; sprite, squarely in their cells (no pixel offset). Object 0 is not drawn. A collected
+; or worn-away object has map x and y &FF (off_map), which plot_at_cell works out to a
+; room offset (&DB) that no view shows, so it is not drawn.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -5576,28 +6234,58 @@ clear_text_area_top = set_text_window_top+1
     pha                                 ; ...across the plot
     jsr plot_at_cell                    ; Plot it in every view showing its cell
     pla                                 ; Recover the object number...
-    tax                                 ; ...into X
+    tax                                 ; ...into X, to count down
     dex                                 ; Next object down
     bne draw_each_object                ; Until object 1 is drawn (object 0 is not drawn)
-    rts                                 ; Return
+    rts                                 ; Return to update_game, X = 0
 ; ***************************************************************************************
 ; Pick up the object in a hero's cell
 ;
-; Search objects 30 down to 1 for one at hero X's cell and act on the first found.
-; move_heroes calls this after drawing a hero who has moved, when object_free_map says
-; the cell can hold an object.
+; Give hero X whatever lies in the cell they have just stepped into: pick up treasure,
+; food, the Cross or a magic item, ride a teleporter, or suffer an energy drainer.
+; move_heroes calls this every frame for each hero in play, after drawing them
+; (draw_moved_hero), whether they moved, stood still or fired, and only when
+; object_free_map says the hero's cell can hold an object. A pickup is removed at once,
+; so it acts once; a drainer stays and acts on every frame the hero's cell is its cell:
+; the frame of arrival, each frame standing on it, and the half-step frame of leaving it
+; (the hero's cell changes only on arrival), so walking across one within a room costs at
+; least 20 health.
 ;
+; Objects 30 down to 1 are compared with the hero's cell and the first match is acted on.
 ; Finding any object at all takes off the hero's Boots of Speed and erases the bolt from
 ; the panel, before the type is looked at, so the boots are lost to a teleporter, a
-; drainer or the exit as well as to a pickup. Then, by type: treasure gives 20 points;
-; food 10 health (to at most 99) and 5 points; a teleporter moves the hero to the cell
-; above the previous teleporter in the list (wrapping from object 1 to 29), with no test
-; of that cell, and shows the room; the Cross of Resurrection gives 10 points and starts
-; the first hero in returning_hero_queue materialising; the exit is passed over and the
-; search goes on; every type from &5F up is a magic item (10 points, then boots, helmet,
-; potion, weapons, or otherwise the sword); any other type is taken as an energy drainer,
-; which costs 10 health and stays. Treasure, food, the Cross and magic items are removed
-; from the level.
+; drainer or the exit as well as to a pickup. Then, by type (object_type, which is also
+; the sprite):
+;
+; &28 treasure: 20 points and the treasure sound; removed.
+;
+; &29 food: 10 health (to at most 99), 5 points and the food sound; removed.
+;
+; &2B teleporter: the hero is moved to the cell above the previous teleporter in the
+; object list, searching back and wrapping from object 0 to 29, so each leads to the one
+; before it and the first to the last; the cell is not tested for walls or creatures, and
+; a lone teleporter leads to itself. The teleport sound plays and show_hero_room redraws
+; the view. The teleporter stays.
+;
+; &2A Cross of Resurrection: 10 points and the pickup sound; removed, and the first hero
+; in returning_hero_queue starts to materialise where they fell. With nobody waiting it
+; is wasted.
+;
+; &51 the exit: passed over (update_game's check_hero_on_exit deals with it) and the
+; search goes on.
+;
+; &5F and up, magic items: removed, the pickup sound and 10 points, then &5F Boots of
+; Speed (bolt icon, a whole cell per step), &60 helmet (one less health lost per monster
+; blow, to at least 3, and the armour rating redrawn), &61 potion (health set to the
+; score's units digit twice over, e.g. 77), &62 pile of weapons (one more missile in
+; flight, to at most 3, and its icon) and anything else, &63, the magic sword (one more
+; missile damage, to at most 9, redrawn).
+;
+; Anything else (&53-&5E, an energy drainer at one of its stages): hit_sound at pitch &32
+; and 10 health lost, one point at a time, which can kill. The drainer stays.
+;
+; Treasure, food, the Cross and magic items are removed by setting their map x and y to
+; &FF (off_map), so they are neither drawn nor found again.
 ;
 ; On Entry:
 ;     X: hero number (0-3)
@@ -5606,7 +6294,7 @@ clear_text_area_top = set_text_window_top+1
     lda hero_x,x                        ; The hero's cell: map x...
     sta cell_x                          ; ...as the cell to search
     lda hero_y,x                        ; ...and map y...
-    sta cell_y                          ; ...likewise
+    sta cell_y                          ; ...as cell_y, for the comparisons
     ldy #max_object                     ; Search from object 30, the exit, down to 1
 ; &7337 referenced 1 time by &7473
 .check_object
@@ -5620,6 +6308,7 @@ clear_text_area_top = set_text_window_top+1
     cmp cell_y                          ; ...the hero's row?
     beq object_found                    ; Yes: the hero is on object Y
     jmp next_object                     ; No: try the next object
+; Object Y is in the hero's cell. Whatever it is, the hero loses the Boots of Speed and their bolt icon first.
 ; &734d referenced 1 time by &7348
 .object_found
     tya                                 ; Found: any object at all costs the Boots of Speed
@@ -5629,44 +6318,46 @@ clear_text_area_top = set_text_window_top+1
     jsr point_at_boots_icon             ; Point at the hero's bolt in the panel...
     jsr erase_boots_icon                ; ...and erase it
     pla                                 ; Recover the object number...
-    tay                                 ; ...into Y
+    tay                                 ; ...into Y, to read its type
     lda object_type,y                   ; The object's type, which is its sprite
-    cmp #spr_treasure                   ; Treasure?
+    cmp #spr_treasure                   ; Treasure (20 points)?
     bne check_food                      ; No: try food
+; Treasure: define envelope 3 and play the treasure sound with it, score 20 and remove it.
     txa                                 ; Treasure: its sound, keeping hero and object
     pha                                 ; Keep the hero...
     tya                                 ; ...and the object...
     pha                                 ; ...across the OSWORD calls
-    ldx #<(treasure_envelope)           ; Envelope 3 as the treasure envelope...
-    ldy #>(treasure_envelope)           ; ...high byte...
+    ldx #<(treasure_envelope)           ; XY = treasure_envelope, defining envelope 3...
+    ldy #>(treasure_envelope)           ; ...the block in page &19...
     lda #osword_envelope                ; ...OSWORD 8, ENVELOPE
-    jsr osword                          ; ENVELOPE command
-    ldx #<(treasure_sound)              ; ...then the treasure sound with it
-    ldy #>(treasure_sound)              ; ...high byte...
+    jsr osword                          ; Define the treasure envelope:  ENVELOPE command
+    ldx #<(treasure_sound)              ; ...then XY = treasure_sound, with envelope 3...
+    ldy #>(treasure_sound)              ; ...the next block in page &19...
     lda #osword_sound                   ; ...OSWORD 7, SOUND
-    jsr osword                          ; SOUND command
+    jsr osword                          ; Play the treasure sound:  SOUND command
     pla                                 ; Recover the object...
-    tay                                 ; ...into Y...
+    tay                                 ; ...into Y, to be removed...
     pla                                 ; ...and the hero...
-    tax                                 ; ...into X
+    tax                                 ; ...into X, to be scored
     tya                                 ; Treasure is worth 20 points:
     pha                                 ; ...keeping the object number
-    jsr add_ten_points                  ; Ten points...
+    jsr add_ten_points                  ; Ten points, the score redrawn...
     jsr add_ten_points                  ; ...and ten more
     pla                                 ; Recover the object number...
-    tay                                 ; ...into Y
+    tay                                 ; ...into Y, for remove_object
     jmp remove_object                   ; Take the treasure off the level
 ; &738a referenced 1 time by &7361
 .check_food
-    cmp #spr_food                       ; Food?
+    cmp #spr_food                       ; Food (10 health, 5 points)?
     bne check_teleporter                ; No: try a teleporter
+; Food: add 10 health (to at most 99), redraw it, score 5, play the food sound and remove it.
     inc hero_health_tens,x              ; Food: +10 health, one on the tens digit...
     lda hero_health_tens,x              ; ...and look at the new tens digit
     cmp #spr_digit_9 + 1                ; Past the 9 sprite?
     bne redraw_health                   ; No: health is up by 10
     lda #spr_digit_9                    ; Yes: health is capped at 99...
-    sta hero_health_tens,x              ; ...tens 9...
-    sta hero_health_units,x             ; ...units 9
+    sta hero_health_tens,x              ; ...tens digit 9...
+    sta hero_health_units,x             ; ...units digit 9, whatever it was
 ; &73a0 referenced 1 time by &7396
 .redraw_health
     tya                                 ; Show the new health and score 5 points:
@@ -5676,27 +6367,28 @@ clear_text_area_top = set_text_window_top+1
 ; &73a7 referenced 1 time by &73af
 .add_food_points
     tya                                 ; Keep the count of points to add...
-    pha                                 ; ...across add_point
-    jsr add_point                       ; One point
+    pha                                 ; ...on the stack across add_point and its plots
+    jsr add_point                       ; One point, the score redrawn
     pla                                 ; Recover the count...
-    tay                                 ; ...into Y
+    tay                                 ; ...into Y, to count down
     dey                                 ; One fewer to add
     bne add_food_points                 ; Until all five are added
     txa                                 ; The food sound, keeping the hero
     pha                                 ; Keep the hero across the OSWORD call
-    ldx #<(food_sound)                  ; SOUND food_sound...
-    ldy #>(food_sound)                  ; ...high byte...
+    ldx #<(food_sound)                  ; XY = food_sound...
+    ldy #>(food_sound)                  ; ...the block in page &0B...
     lda #osword_sound                   ; ...OSWORD 7, SOUND
-    jsr osword                          ; SOUND command
+    jsr osword                          ; Play the food sound:  SOUND command
     pla                                 ; Recover the hero...
-    tax                                 ; ...into X
+    tax                                 ; ...into X, as move_heroes had it
     pla                                 ; Recover the object number...
-    tay                                 ; ...into Y
+    tay                                 ; ...into Y, for remove_object
     jmp remove_object                   ; Take the food off the level
 ; &73c3 referenced 1 time by &738c
 .check_teleporter
-    cmp #spr_teleporter                 ; Teleporter?
+    cmp #spr_teleporter                 ; Teleporter (moves the hero)?
     bne check_cross                     ; No: try the Cross
+; Teleporter: find its partner, the nearest teleporter before it in the object list, wrapping round to 29 after object 0 (whose type, never set by unpack_level, is 0 and never matches). A lone teleporter finds itself.
 ; &73c7 referenced 2 times by &73d1, &73d6
 .find_previous_teleporter
     dey                                 ; Teleporter: search back from it for the previous...
@@ -5707,26 +6399,26 @@ clear_text_area_top = set_text_window_top+1
     bne find_previous_teleporter        ; No: keep looking backwards
     ldy teleport_last                   ; Yes: wrap round to 30, so the search goes on at 29
     jmp find_previous_teleporter        ; ...(the one found may be this teleporter itself)
-; Y is the destination teleporter. The hero arrives on the cell above it, whatever is there.
+; Y is the destination teleporter. The hero arrives standing on the cell above it, whatever is there, and their view is moved to that cell's room.
 ; &73d9 referenced 1 time by &73cd
 .teleport
     txa                                 ; The teleport sound, keeping hero and destination
     pha                                 ; Keep the hero...
     tya                                 ; ...and the destination teleporter...
     pha                                 ; ...across the OSWORD call
-    ldx #<(teleport_sound)              ; SOUND teleport_sound...
-    ldy #>(teleport_sound)              ; ...high byte...
+    ldx #<(teleport_sound)              ; XY = teleport_sound...
+    ldy #>(teleport_sound)              ; ...the block in page &0B...
     lda #osword_sound                   ; ...OSWORD 7, SOUND
-    jsr osword                          ; SOUND command
+    jsr osword                          ; Play the teleport sound:  SOUND command
     pla                                 ; Recover the destination...
-    tay                                 ; ...into Y...
+    tay                                 ; ...into Y, to read its cell...
     pla                                 ; ...and the hero...
-    tax                                 ; ...into X
+    tax                                 ; ...into X, the hero to move
     lda object_x,y                      ; Move the hero to the cell above the destination...
     sta hero_x,x                        ; ...the destination's column...
     sta cell_x                          ; ...and cell_x (show_hero_room sets it again)
     lda object_y,y                      ; ...and its row...
-    sec                                 ; ...less one...
+    sec                                 ; ...less one: the row above it...
     sbc #1                              ; ...so the hero does not stand on it and teleport back
     sta hero_y,x                        ; ...as the hero's row (wall or not: it is not tested)
     sta cell_y                          ; ...and cell_y, likewise
@@ -5739,6 +6431,7 @@ clear_text_area_top = set_text_window_top+1
 .check_cross
     cmp #spr_cross                      ; Cross of Resurrection?
     bne check_magic_item                ; No: try the exit, drainers and magic items
+; Cross of Resurrection: remove it and score 10 whether or not anyone is waiting to return, play the pickup sound, then look at the front of returning_hero_queue.
     lda #off_map                        ; Cross: take it off the level...
     sta object_x,y                      ; ...off the map in x...
     sta object_y,y                      ; ...and y, even if nobody comes back
@@ -5750,8 +6443,8 @@ clear_text_area_top = set_text_window_top+1
     bne take_returning_hero             ; Yes: bring back the first hero waiting
     pla                                 ; No: wasted. Recover the hero...
     tax                                 ; ...into X...
-    rts                                 ; ...and return
-; Bring back the first hero waiting in returning_hero_queue. &64 markers, which stand for heroes left out on the menu, are passed to the back of the queue.
+    rts                                 ; ...and return, the Cross spent on nobody
+; Bring back the first hero waiting in returning_hero_queue. Each pass takes the front entry and shifts the four entries up one; &64 markers, which stand for heroes left out on the menu, are put back at the end and the next entry taken. A hero found is started materialising (the death animation run backwards, by animate_absent_hero) in the cell where they fell.
 ; &7429 referenced 1 time by &7424
 .take_returning_hero
     ldy #0                              ; Take the first entry off the queue, appending 0...
@@ -5761,38 +6454,40 @@ clear_text_area_top = set_text_window_top+1
     dex                                 ; ...minus 1: the hero, &63 for the marker, &FF for none
     lda returning_hero_queue + 1        ; Shift the queue up one: the second entry...
     sta returning_hero_queue            ; ...becomes the first...
-    lda returning_hero_queue + 2        ; ...the third...
+    lda returning_hero_queue + 2        ; ...the third entry...
     sta returning_hero_queue + 1        ; ...becomes the second...
-    lda returning_hero_queue + 3        ; ...the fourth...
+    lda returning_hero_queue + 3        ; ...the fourth entry...
     sta returning_hero_queue + 2        ; ...becomes the third...
     sty returning_hero_queue + 3        ; ...and Y fills the last (0, or the marker sent back)
     cpx #nobody_returns - 1             ; A &64 marker (a hero absent from the menu)?
     bne check_queue_empty               ; No: a hero, or nobody
     ldy #nobody_returns                 ; Yes: send it to the back and take the next entry
-    bne shift_returning_queue           ; ...(always taken)
+    bne shift_returning_queue           ; ...(always taken: Y is &64)
 ; &744c referenced 1 time by &7446
 .check_queue_empty
-    cpx #&ff                            ; Queue empty?
+    cpx #&ff                            ; &FF: the front entry was 0, nobody left waiting?
     beq cross_done                      ; Yes: nobody returns
     lda #0                              ; Start hero X materialising: out of play...
     sta hero_direction,x                ; ...direction 0: not in play while the sprites run
     lda #8                              ; ...from the skull back...
     sta hero_frame,x                    ; ...frame 8, the last of hero_appearance_sprites
-    lda #&ff                            ; ...stepping backwards...
+    lda #&ff                            ; ...stepping backwards through the sprites...
     sta hero_offset_x,x                 ; ...frame step -1
     lda #1                              ; ...the first step next frame
     sta hero_offset_y,x                 ; ...the frame counter
 ; &7464 referenced 1 time by &744e
 .cross_done
     pla                                 ; Recover the hero who picked up the Cross...
-    tax                                 ; ...into X
-    rts                                 ; Return
+    tax                                 ; ...into X, for move_heroes
+    rts                                 ; Return to move_heroes
+; Shared tail for treasure and food: take object Y off the map.
 ; &7467 referenced 2 times by &7387, &73c0
 .remove_object
     lda #off_map                        ; Take object Y off the level:
     sta object_x,y                      ; ...off the map in x...
     sta object_y,y                      ; ...and y, so it is neither drawn nor found again
-    rts                                 ; Return
+    rts                                 ; Return to move_heroes: the object is gone
+; The object is not in the hero's cell, or is the exit: try the next one down.
 ; &7470 referenced 3 times by &733f, &734a, &747d
 .next_object
     dey                                 ; Next object down
@@ -5800,7 +6495,7 @@ clear_text_area_top = set_text_window_top+1
     jmp check_object                    ; Check this object
 ; &7476 referenced 1 time by &7471
 .collect_objects_done
-    rts                                 ; Return
+    rts                                 ; Return: nothing to act on in the hero's cell
 ; Not treasure, food, a teleporter or the Cross: the exit, an energy drainer or a magic item, told apart by type ranges alone.
 ; &7477 referenced 1 time by &740f
 .check_magic_item
@@ -5808,36 +6503,38 @@ clear_text_area_top = set_text_window_top+1
     bcs magic_item                      ; Yes: collect the magic item
     cmp #spr_exit                       ; The exit? The main loop deals with it...
     beq next_object                     ; ...so search on for another object in the cell
+; An energy drainer (&53-&5E): sound it by playing hit_sound with its pitch changed to &32 for the call, then take 10 health one point at a time. The drainer stays, and acts again on every frame the hero's cell is its cell.
     lda #&32 ; '2'                      ; Any other type is an energy drainer: pitch &32...
     sta hit_sound + 4                   ; ...instead of 6 in hit_sound, the drainer's noise
     txa                                 ; Keep the hero...
     pha                                 ; ...across the OSWORD call
-    ldx #<(hit_sound)                   ; SOUND hit_sound...
-    ldy #>(hit_sound)                   ; ...high byte...
+    ldx #<(hit_sound)                   ; XY = hit_sound, now at the drainer's pitch...
+    ldy #>(hit_sound)                   ; ...the block in page &0C...
     lda #osword_sound                   ; ...OSWORD 7, SOUND
     jsr osword                          ; The drainer's noise:  SOUND command
     lda #6                              ; ...then pitch 6 again...
     sta hit_sound + 4                   ; ...for monster_hit's blow
     pla                                 ; Recover the hero...
-    tax                                 ; ...into X
+    tax                                 ; ...into X, for lose_health_point
     ldy #&0a                            ; The drainer takes 10 health and stays
 ; &7498 referenced 1 time by &74a0
 .take_ten_health
     tya                                 ; Keep the count...
-    pha                                 ; ...across lose_health_point
+    pha                                 ; ...on the stack: lose_health_point corrupts Y
     jsr lose_health_point               ; One point of the hero's health
     pla                                 ; Recover the count...
-    tay                                 ; ...into Y
+    tay                                 ; ...into Y, to count down
     dey                                 ; One fewer to take
     bne take_ten_health                 ; Until all ten are taken
-    rts                                 ; Return
+    rts                                 ; Return: the drainer stays, to act again next frame
 ; ***************************************************************************************
 ; Play the pickup sound
 ;
-; Define envelope 3 as the pickup envelope and play the pickup sound on the noise
-; channel, from the OSWORD parameter blocks at &192C and &193A. Envelope 3 is shared with
-; the treasure, key and exit sounds, which define their own, so it is defined again each
-; time.
+; Play the sound of a Cross or magic item being picked up. collect_objects calls it for
+; both. Envelope 3 is defined as the pickup envelope and the pickup sound played with it
+; on the noise channel, from the OSWORD parameter blocks pickup_envelope and
+; pickup_sound. Envelope 3 is shared with the treasure, key and exit sounds, which define
+; their own, so it is defined again each time.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -5845,46 +6542,48 @@ clear_text_area_top = set_text_window_top+1
 ;     Y: corrupted
 ; &74a3 referenced 2 times by &741e, &74ca
 .play_pickup_sound
-    ldx #<(pickup_envelope)             ; Envelope 3 as the pickup envelope...
-    ldy #>(pickup_envelope)             ; ...high byte...
+    ldx #<(pickup_envelope)             ; XY = pickup_envelope, defining envelope 3...
+    ldy #>(pickup_envelope)             ; ...the block in page &19...
     lda #osword_envelope                ; ...OSWORD 8, ENVELOPE
     jsr osword                          ; Define it:  ENVELOPE command
-    ldx #<(pickup_sound)                ; ...then the pickup sound...
-    ldy #>(pickup_sound)                ; ...high byte...
+    ldx #<(pickup_sound)                ; ...then XY = pickup_sound, with envelope 3...
+    ldy #>(pickup_sound)                ; ...the next block in page &19...
     lda #osword_sound                   ; ...OSWORD 7, SOUND
     jsr osword                          ; Play it:  SOUND command
-    rts                                 ; Return
-; A magic item, type &5F or above. Each gives 10 points; the type then picks boots, helmet, potion or weapons, and any other type counts as a magic sword.
+    rts                                 ; Return, A, X and Y corrupted by the OSWORDs
+; A magic item, type &5F or above: removed, the pickup sound, and 10 points for every kind. The type then picks boots, helmet, potion or weapons, and any other type counts as a magic sword.
 ; &74b6 referenced 1 time by &7479
 .magic_item
     sta scratch                         ; A magic item: keep its type for the tests below
     lda #off_map                        ; Take it off the level...
     sta object_x,y                      ; ...off the map in x...
-    sta object_y,y                      ; ...and y
+    sta object_y,y                      ; ...and y, so it is neither drawn nor found again
     txa                                 ; The pickup sound, keeping the hero
     pha                                 ; Keep the hero across the sound
     lda scratch                         ; A = (type AND 7) x 4: unused, as play_pickup_sound...
     and #7                              ; ...sets its own registers...
     asl a                               ; ...x 2...
-    asl a                               ; ...x 4
+    asl a                               ; ...x 4, then lost to the OSWORD calls
     jsr play_pickup_sound               ; Play the pickup sound
     pla                                 ; Recover the hero...
-    tax                                 ; ...into X
+    tax                                 ; ...into X, to be scored
     lda hero_score_units,x              ; The score's units digit sprite...
     sta scratch2                        ; ...kept for a potion (add_ten_points leaves it)
     jsr add_ten_points                  ; Every magic item is worth 10 points
     lda scratch                         ; The item's type...
     cmp #spr_boots                      ; ...Boots of Speed?
     bne check_helmet                    ; No: try the helmet
+; Boots of Speed: show the bolt and let the hero step a whole cell a frame, until they next find an object.
     jsr point_at_boots_icon             ; Boots: point at the hero's bolt in the panel...
     jsr plot_boots_icon                 ; ...and show it
     lda #1                              ; ...and wear them...
     sta hero_has_boots,x                ; ...so the hero moves a whole cell per step
-    rts                                 ; Return
+    rts                                 ; Return to move_heroes, the boots on
 ; &74eb referenced 1 time by &74dd
 .check_helmet
-    cmp #spr_helmet                     ; Magic helmet?
+    cmp #spr_helmet                     ; Magic helmet (better armour)?
     bne check_potion                    ; No: try the potion
+; Magic helmet: lower hero_damage_taken, the health a monster's blow takes, by one to at least 3, and redraw the armour rating (10 - hero_damage_taken, so at most 7).
     dec hero_damage_taken,x             ; Helmet: one less health lost per hit...
     lda hero_damage_taken,x             ; ...and look at it
     cmp #3                              ; ...below 3 (armour 7, the best)?
@@ -5897,17 +6596,19 @@ clear_text_area_top = set_text_window_top+1
 .check_potion
     cmp #spr_potion                     ; Potion of healing?
     bne check_weapons                   ; No: try the weapons
+; Potion of healing: health is set from the score's units digit d, read before the 10 points were added, as tens d and units d + 1, then lose_health_point takes a point and draws it: health dd, from 00 to 99.
     lda scratch2                        ; Potion: health = the score's last digit twice...
     sta hero_health_tens,x              ; ...as the tens (so a score ending in 0 gives 00)
     inc scratch2                        ; ...and the units one higher...
     lda scratch2                        ; ...the sprite after it...
     sta hero_health_units,x             ; ...as the health's units
     jsr lose_health_point               ; ...less a point, which also draws the health
-    rts                                 ; Return
+    rts                                 ; Return to move_heroes with the new health drawn
 ; &7516 referenced 1 time by &7501
 .check_weapons
     cmp #spr_weapons                    ; Pile of weapons?
     bne magic_sword                     ; No: anything else is taken as a magic sword
+; Pile of weapons: one more missile allowed in flight, to at most 3 (the hero's three missile slots), and its icon added.
     inc hero_max_missiles,x             ; Weapons: one more missile in flight at once...
     lda hero_max_missiles,x             ; ...and look at it
     cmp #4                              ; ...past 3, the hero's missile slots?
@@ -5920,11 +6621,16 @@ clear_text_area_top = set_text_window_top+1
 ; ***************************************************************************************
 ; Show the room a hero has moved into
 ;
-; Point hero X's view at the room containing their cell and redraw that view. Each hero
-; has a fixed view (0 top left to 3 bottom right); view_room holds a pointer per view
-; into room_walls, and only its low byte changes, to the room offset that test_wall
-; leaves in map_ptr. move_heroes calls this when a hero steps into another room, and a
-; teleporter jumps here after moving the hero.
+; Make hero X's view show the room they are now in, and redraw that view's walls and
+; doors. move_heroes calls this when a hero steps into another room, and a teleporter
+; jumps here after moving the hero.
+;
+; Each hero has a fixed view (0 top left to 3 bottom right). test_wall is called on the
+; hero's cell only for the room offset it leaves in map_ptr; that becomes the low byte of
+; the view's view_room entry (view_room + 2 x hero), the pointer into room_walls that
+; draw_view_0 to draw_view_3 and plot_at_cell read; the high byte never changes. The
+; matching draw_view_n then draws the room's walls and doors. Creatures and objects
+; appear in the new view as they are next plotted.
 ;
 ; On Entry:
 ;     X: hero number (0-3)
@@ -5934,81 +6640,84 @@ clear_text_area_top = set_text_window_top+1
 ; &752c referenced 2 times by &704d, &740a
 .show_hero_room
     lda hero_x,x                        ; The hero's cell, for test_wall to find its room
-    sta cell_x                          ; ...as cell_x...
+    sta cell_x                          ; ...as cell_x for test_wall...
     lda hero_y,x                        ; ...and its map y...
-    sta cell_y                          ; ...as cell_y
+    sta cell_y                          ; ...as cell_y for test_wall
     txa                                 ; Keep the hero...
-    pha                                 ; ...across test_wall
+    pha                                 ; ...on the stack: test_wall corrupts X
     jsr test_wall                       ; Only for map_ptr: the offset of the cell's room
     pla                                 ; Recover the hero...
-    tax                                 ; ...into X
+    tax                                 ; ...into X, to pick their view
     pha                                 ; Keep the hero number across the view draw
     asl a                               ; Hero x 2: their view's entry in view_room...
     tay                                 ; ...two bytes, a pointer into room_walls
     lda map_ptr                         ; The room's offset that test_wall left...
     sta view_room,y                     ; ...becomes the view's room
+; Redraw the hero's own view, which is fixed by hero number.
     cpx #0                              ; Redraw this hero's own view: hero 0's?
     bne check_view_1                    ; No: try hero 1
     jsr draw_view_0                     ; Hero 0: redraw the top-left view
     pla                                 ; Recover the hero...
-    tax                                 ; ...into X
-    rts                                 ; Return
+    tax                                 ; ...into X, as the caller had it
+    rts                                 ; Return with the Ranger's view redrawn
 ; &7551 referenced 1 time by &7549
 .check_view_1
     cpx #1                              ; Hero 1, the top-right view?
     bne check_view_2                    ; No: try hero 2
     jsr draw_view_1                     ; Yes: redraw it
     pla                                 ; Recover the hero...
-    tax                                 ; ...into X
-    rts                                 ; Return
+    tax                                 ; ...into X, as the caller had it
+    rts                                 ; Return with the Magic-User's view redrawn
 ; &755b referenced 1 time by &7553
 .check_view_2
     cpx #2                              ; Hero 2, the bottom-left view?
     bne show_view_3                     ; No: hero 3
     jsr draw_view_2                     ; Yes: redraw it
     pla                                 ; Recover the hero...
-    tax                                 ; ...into X
-    rts                                 ; Return
+    tax                                 ; ...into X, as the caller had it
+    rts                                 ; Return with the Barbarian's view redrawn
 ; &7565 referenced 1 time by &755d
 .show_view_3
     jsr draw_view_3                     ; Hero 3: redraw the bottom-right view
     pla                                 ; Recover the hero...
-    tax                                 ; ...into X
-    rts                                 ; Return
+    tax                                 ; ...into X, as the caller had it
+    rts                                 ; Return with the Fighter's view redrawn
+; Magic sword: one more damage for each missile the hero fires from now on, to at most 9, and the panel's damage digit redrawn. Missiles already in flight keep their damage.
 ; &756b referenced 1 time by &7518
 .magic_sword
     inc hero_missile_damage,x           ; Magic sword: one more damage per missile...
     lda hero_missile_damage,x           ; ...and look at it
-    cmp #&0a                            ; ...past 9?
+    cmp #&0a                            ; ...past 9, the most?
     bne draw_missile_damage             ; No: draw the new damage in the panel
     lda #9                              ; Yes: back to 9...
     sta hero_missile_damage,x           ; ...as the missile damage
     bne draw_missile_damage             ; ...and draw it (always taken)
-; A missile has hit a live monster: X is the monster, Y the missile slot. Reached by JMP from move_missiles, and leaves by jumping back into it.
+; A missile has hit a live monster: X is the monster, Y the missile slot. Reached by JMP from move_missiles, and leaves by jumping back into it. Every hit makes the hit sound. The missile's damage is taken from the monster's hit points; below 0 kills it (0 survives), and the kill is scored by monster_killed. Either way the missile is spent.
 ; &757c referenced 1 time by &714d
 .monster_hit
     txa                                 ; Hit: sound the blow
     pha                                 ; Keep the monster...
     tya                                 ; ...and the missile slot...
     pha                                 ; ...across the OSWORD call
-    ldx #<(hit_sound)                   ; SOUND hit_sound...
-    ldy #>(hit_sound)                   ; ...high byte...
+    ldx #<(hit_sound)                   ; XY = hit_sound, at pitch 6...
+    ldy #>(hit_sound)                   ; ...the block in page &0C...
     lda #osword_sound                   ; ...OSWORD 7, SOUND
-    jsr osword                          ; SOUND command
+    jsr osword                          ; Sound the blow:  SOUND command
     pla                                 ; Recover the missile slot...
-    tay                                 ; ...into Y...
+    tay                                 ; ...into Y, for its damage...
     pla                                 ; ...and the monster...
-    tax                                 ; ...into X
+    tax                                 ; ...into X, for its hit points
     lda monster_hit_points,x            ; The monster's hit points...
     sec                                 ; ...set the carry for the subtraction...
     sbc missile_damage,y                ; ...less this missile's damage
     bpl store_monster_health            ; 0 or more: alive (0 hit points survives a hit)
+; Killed: the monster's sprite becomes the blank, from which update_monsters runs the sparkles, and its slot is given this level's starting hit points for when it comes back at a trapdoor.
     lda #spr_blank                      ; Below 0: killed. Start it dying...
     sta monster_sprite,x                ; ...from the blank sprite through the sparkles
     lda monster_start_hit_points        ; ...and give the slot this level's hit points...
     sta monster_hit_points,x            ; ...ready for when it comes back at a trapdoor
     tya                                 ; Missile slot back in X...
-    tax                                 ; ...for monster_killed
+    tax                                 ; ...as monster_killed expects
     jmp monster_killed                  ; ...a point to its hero, and the missile is spent
 ; &75a6 referenced 1 time by &7594
 .store_monster_health
@@ -6016,7 +6725,7 @@ clear_text_area_top = set_text_window_top+1
     tya                                 ; Push the missile slot, as missile_spent_pop...
     pha                                 ; ...expects to find it on the stack
     jmp missile_spent_pop               ; The missile is spent: one hit per missile
-; Redraw hero X's armour rating after a magic helmet: the small digit 10 - hero_damage_taken on the shield in their panel section.
+; Redraw hero X's armour rating after a magic helmet: the small digit 10 - hero_damage_taken (at most 7) on the shield in their panel section, twelve rows above the health. Jumped to from collect_objects; returns to its caller with X kept.
 ; &75ae referenced 1 time by &74fc
 .draw_armour_rating
     sec                                 ; Armour rating = 10 - health lost per hit, drawn...
@@ -6030,11 +6739,11 @@ clear_text_area_top = set_text_window_top+1
     sbc hero_damage_taken,x             ; ...less the health lost per hit: 1 to 7
     sta sprite_number                   ; ...as the sprite to plot
     jmp plot_keeping_x                  ; Plot it, keeping X, and return
-; Add the icon for hero X's newest missile after a pile of weapons, at the row draw_status_panel would give it (icon n at its row &0D + 3n, which plot_panel_sprite offsets by the panel row - &0E).
+; Add the icon for hero X's newest missile after a pile of weapons, at the row draw_status_panel would give it (icon n at its row &0D + 3n, which plot_panel_sprite offsets by the panel row - &0E). Icons are only added: with 3 already allowed the third is drawn again. Jumped to from collect_objects; returns with X kept.
 ; &75c5 referenced 1 time by &7529
 .draw_new_missile_icon
     lda hero_max_missiles,x             ; Icon for the newest missile allowed: missiles x 2...
-    asl a                               ; ...(the shift)...
+    asl a                               ; ...(x 2)...
     clc                                 ; ...clear the carry for the addition...
     adc hero_max_missiles,x             ; ...+ missiles again: 3 rows per icon...
     adc #&0d                            ; ...+ &0D, as in draw_status_panel's icon rows...
@@ -6047,7 +6756,7 @@ clear_text_area_top = set_text_window_top+1
     lda #spr_missile_icon               ; The missile icon...
     sta sprite_number                   ; ...as the sprite to plot
     jmp plot_keeping_x                  ; Plot it, keeping X, and return
-; Redraw hero X's missile damage after a magic sword, as a small digit four rows above their panel row.
+; Redraw hero X's missile damage after a magic sword, as a small digit (1-9) four rows above their panel row. Jumped to from collect_objects; returns with X kept.
 ; &75e2 referenced 2 times by &7573, &757a
 .draw_missile_damage
     lda #panel_left + 7                 ; Missile damage: byte column &4C...
@@ -6066,7 +6775,8 @@ clear_text_area_top = set_text_window_top+1
 ;
 ; Set plot_x to the panel's column &4A and plot_y to eight pixel rows above hero X's
 ; panel row (hero_panel_y), where the lightning bolt shows that the hero wears Boots of
-; Speed. plot_boots_icon or erase_boots_icon then plots there.
+; Speed. collect_objects calls it before plot_boots_icon, when boots are picked up, and
+; before erase_boots_icon, when any object is found under the hero.
 ;
 ; On Entry:
 ;     X: hero number (0-3)
@@ -6083,11 +6793,19 @@ clear_text_area_top = set_text_window_top+1
     lda hero_panel_y,x                  ; ...the hero's panel row...
     sbc #8                              ; ...8 rows above the hero's panel section
     sta plot_y                          ; ...as the icon's pixel row
-    rts                                 ; Return
+    rts                                 ; Return with plot_x, plot_y at the hero's boots icon
 ; ***************************************************************************************
 ; Show a hero's boots icon
 ;
-; Plot the lightning bolt at plot_x, plot_y.
+; Plot the lightning bolt at plot_x, plot_y, where point_at_boots_icon has just pointed,
+; to show that hero X now wears Boots of Speed. Called when the boots are picked up. The
+; plot goes through plot_keeping_x, which keeps the hero number across plot_sprite (which
+; leaves X = 0).
+;
+; On Entry:
+;     X: hero number (0-3)
+;     PLOT_X: the icon's byte column
+;     PLOT_Y: the icon's pixel row
 ;
 ; On Exit:
 ;     X: preserved
@@ -6099,7 +6817,14 @@ clear_text_area_top = set_text_window_top+1
 ; ***************************************************************************************
 ; Remove a hero's boots icon
 ;
-; Plot the blank sprite over the lightning bolt at plot_x, plot_y.
+; Plot the blank boots sprite over the lightning bolt at plot_x, plot_y, where
+; point_at_boots_icon has just pointed. collect_objects calls this whenever a hero finds
+; any object, since every find takes the boots off. Falls into plot_keeping_x.
+;
+; On Entry:
+;     X: hero number (0-3)
+;     PLOT_X: the icon's byte column
+;     PLOT_Y: the icon's pixel row
 ;
 ; On Exit:
 ;     X: preserved
@@ -6114,14 +6839,37 @@ clear_text_area_top = set_text_window_top+1
     jsr plot_sprite                     ; Plot the icon in the hero's panel section
     pla                                 ; Recover the hero number...
     tax                                 ; ...in X again for the caller
-    rts                                 ; Return
+    rts                                 ; Return with X = the hero again
+; ***************************************************************************************
+; Cast a hero's magic if their key is held
+;
+; Let the Ranger or the Magic-User cast magic, which kills every live monster in the room
+; they are in. move_heroes jumps here (JMP, not JSR) for heroes 0 and 1 when they stand
+; in a cell, before reading their other keys.
+;
+; hero_magic_delay is counted down first. It normally stands at 1, so the magic key
+; (hero_magic_key) is scanned every frame; while it is not yet zero the RTS here returns
+; from move_heroes itself, so neither this hero nor those after it move that frame.
+; Without the key held, play goes on to read_hero_keys. With it held, the magic sound
+; plays, the delay is set to 4 (three frozen frames follow) and the cost is taken one
+; health point at a time: 6 for the Ranger, 3 for the Magic-User, which can kill the
+; caster. Then every monster whose cell lies in the room the caster's view shows, and
+; whose sprite is below the blank (alive), is given the blank sprite, the first frame of
+; a death that update_monsters plays out, and the caster scores a point for each, through
+; add_point, even if the cost has just killed them. Unlike a missile's kill, the magic
+; does not reset the monster's hit points, so a monster wounded before comes back from
+; its trapdoor still wounded. The caster does not move that frame: play goes on at
+; draw_moved_hero, which draws them if still in play.
+;
+; On Entry:
+;     X: hero number (0 or 1)
 ; &7619 referenced 1 time by &6ebe
 .check_magic
     dec hero_magic_delay,x              ; Count down this hero's magic key delay
-    beq check_magic_every_frame         ; Zero: time to look at the magic key
+    beq read_magic_key                  ; Zero: time to look at the magic key
     rts                                 ; Not yet: RTS ends move_heroes; later heroes wait too
 ; &761f referenced 1 time by &761c
-.check_magic_every_frame
+.read_magic_key
     lda #1                              ; Delay 1: the key is read every frame from now on
     sta hero_magic_delay,x              ; ...so the next press is seen at once
     lda hero_magic_key,x                ; This hero's magic key, an INKEY number...
@@ -6130,16 +6878,17 @@ clear_text_area_top = set_text_window_top+1
 ; Cast the magic: play its sound, take the caster's health, then kill every live monster in the room the caster's view shows, a point each.
     txa                                 ; Held: cast. Keep the hero number...
     pha                                 ; ...on the stack: X carries the OSWORD blocks
-    ldx #<(magic_envelope)              ; XY = magic_envelope...
-    ldy #>(magic_envelope)              ; ...its high byte
+    ldx #<(magic_envelope)              ; XY = magic_envelope, an OSWORD 8 block...
+    ldy #>(magic_envelope)              ; ...and its page
     lda #osword_envelope                ; OSWORD 8: define the magic envelope
     jsr osword                          ; ENVELOPE command
-    ldx #<(magic_sound)                 ; XY = magic_sound...
-    ldy #>(magic_sound)                 ; ...its high byte
+    ldx #<(magic_sound)                 ; XY = magic_sound, an OSWORD 7 block...
+    ldy #>(magic_sound)                 ; ...and its page
     lda #osword_sound                   ; OSWORD 7: make the magic sound
     jsr osword                          ; SOUND command
     pla                                 ; Recover the hero number...
     tax                                 ; ...the caster, in X again
+; Hold off the key for three frames, then take the cost, 6 health for the Ranger and 3 for the Magic-User, a point at a time through lose_health_point. The caster may die of it; the spell still goes on.
     lda #4                              ; Ignore the key for the next three frames
     sta hero_magic_delay,x              ; ...so one press casts only once
     cpx #1                              ; Health cost: 3 for the Magic-User...
@@ -6155,27 +6904,27 @@ clear_text_area_top = set_text_window_top+1
     pha                                 ; ...the points left on the stack
     jsr lose_health_point               ; One point off the caster, redrawn (it can kill them)
     pla                                 ; Recover the points left...
-    tay                                 ; ...into Y
+    tay                                 ; ...back in Y
     dey                                 ; One point fewer to take
     bne take_magic_cost                 ; Until the whole cost is paid
-    lda #0                              ; No monsters killed yet
-    sta magic_kill_count                ; ...in magic_kill_count
+    lda #0                              ; No monsters killed yet:
+    sta magic_kill_count                ; ...magic_kill_count counts this cast's kills
     txa                                 ; The caster's view_room index, 2 x hero...
     asl a                               ; ...x 2: view_room holds two bytes per hero
     sta sprite_number                   ; ...kept in sprite_number, free as scratch here
-; Kill every live monster in the caster's room. A monster parked off the map (&FF) is in no room and survives.
+; Kill every live monster in the caster's room. A monster parked off the map (&FF) is in no room and survives. The kill only sets the first death frame; hit points are left as they are.
     ldx #max_monster                    ; For each monster, 30 to 1...
 ; &7667 referenced 1 time by &7693
-.find_monster_room
+.check_magic_monster
     lda monster_x,x                     ; ...find its room from its cell: map x...
-    sta cell_x                          ; ...as cell_x...
+    sta cell_x                          ; ...as cell_x for test_wall...
     lda monster_y,x                     ; ...and map y...
-    sta cell_y                          ; ...as cell_y
+    sta cell_y                          ; ...as cell_y; the wall bit is not wanted
     txa                                 ; Keep the monster number...
     pha                                 ; ...on the stack across test_wall
     jsr test_wall                       ; test_wall leaves the monster's room in map_ptr
     pla                                 ; Recover the monster number...
-    tax                                 ; ...into X
+    tax                                 ; ...back in X
     ldy sprite_number                   ; Y = the caster's view_room index
     lda view_room,y                     ; The room the caster's view shows...
     cmp map_ptr                         ; ...is it the monster's room?
@@ -6188,8 +6937,9 @@ clear_text_area_top = set_text_window_top+1
     inc magic_kill_count                ; ...a kill to score
 ; &7692 referenced 2 times by &7681, &7688
 .next_monster_magic
-    dex                                 ; Next monster
-    bne find_monster_room               ; Until monster 1 is done
+    dex                                 ; Next monster down
+    bne check_magic_monster             ; Until monster 1 is done
+; Score a point for each kill, to the caster, through add_point.
     lda sprite_number                   ; One point for each monster killed
     lsr a                               ; ...halve the view_room index back to the hero
     tax                                 ; ...X = the caster, who scores the points
@@ -6202,7 +6952,7 @@ clear_text_area_top = set_text_window_top+1
     pha                                 ; ...on the stack across add_point
     jsr add_point                       ; One point to the caster
     pla                                 ; Recover the kills left...
-    tay                                 ; ...into Y
+    tay                                 ; ...back in Y
     dey                                 ; One kill fewer to score
     jmp score_magic_kills               ; Score the next
 ; &76ab referenced 1 time by &762a
@@ -6214,34 +6964,39 @@ clear_text_area_top = set_text_window_top+1
 ; ***************************************************************************************
 ; Give a point to the hero who fired a missile
 ;
-; move_missiles calls this when a missile kills a monster and when it hits an energy
-; drainer. The firer is told by the missile's sprite base, as in flip_firer_frame, and
-; add_point gives them one point.
+; Score one point for the hero whose missile is in slot X. move_missiles calls this when
+; a missile kills a monster (through monster_killed) and when it wears down an energy
+; drainer. The firer is told by the missile's sprite base, as in flip_firer_frame: arrows
+; the Ranger, fireballs the Magic-User, axes the Barbarian, and anything else the
+; Fighter. add_point adds the point and redraws the score, whether or not the firer is
+; still in play.
 ;
 ; On Entry:
-;     X: missile slot
+;     X: missile slot (0-11)
 ;
 ; On Exit:
+;     A: corrupted
 ;     X: preserved
+;     Y: corrupted
 ; &76b1 referenced 2 times by &7150, &71a2
 .credit_missile_owner
     ldy missile_sprite_base,x           ; Which hero fired it? Its sprite base says
     txa                                 ; Keep the missile slot...
     pha                                 ; ...on the stack: X becomes the hero
     tya                                 ; The sprite base, to compare
-    cmp #spr_arrow_up - 1               ; ...arrows?
+    cmp #spr_arrow_up - 1               ; ...the arrows' base, one below the up arrow?
     bne owner_fireball                  ; Not arrows: try fireballs
     ldx #0                              ; Arrows: the Ranger, hero 0
     jmp credit_owner                    ; Credit the Ranger
 ; &76c0 referenced 1 time by &76b9
 .owner_fireball
-    cmp #spr_fireball_up - 1            ; ...fireballs?
+    cmp #spr_fireball_up - 1            ; ...the fireballs' base?
     bne owner_axe                       ; Not fireballs: try axes
     ldx #1                              ; Fireballs: the Magic-User, hero 1
     jmp credit_owner                    ; Credit the Magic-User
 ; &76c9 referenced 1 time by &76c2
 .owner_axe
-    cmp #spr_axe_up - 1                 ; ...axes?
+    cmp #spr_axe_up - 1                 ; ...the axes' base?
     bne owner_sword                     ; Not axes: so it must be swords
     ldx #2                              ; Axes: the Barbarian, hero 2
     jmp credit_owner                    ; Credit the Barbarian
@@ -6253,57 +7008,70 @@ clear_text_area_top = set_text_window_top+1
     jsr add_point                       ; One point to the firer's score
     pla                                 ; Recover the missile slot...
     tax                                 ; ...in X again for move_missiles
-    rts                                 ; Return
+    rts                                 ; Return with X = the missile slot again
 ; ***************************************************************************************
 ; Animate a hero who is out of play
 ;
-; move_heroes calls this for a hero out of play (direction 0) unless nobody plays them
-; (step &63). While out of play, hero_offset_y is a two-frame timer and hero_offset_x the
-; step through the sequence.
+; Play a dying hero's sparkles and skull, or a returning hero's skull and sparkles in
+; reverse, at the cell where they fell. move_heroes calls this each frame, in the hero's
+; turn, for a hero out of play (direction 0) unless nobody plays them (step &63). While
+; out of play the hero's offset bytes are reused: hero_offset_y is a two-frame timer and
+; hero_offset_x the step through the sequence (+1 or -1), both set by lose_health_point
+; for a death and by collect_objects for a Cross of Resurrection.
 ;
 ; Every other frame, plot hero_appearance_sprites entry hero_frame at the hero's cell,
-; then step hero_frame by hero_offset_x: forwards (+1) for a hero dying, stopping at the
-; skull (entry 8), which then stays on the map; backwards (-1) for a hero returning
-; through a Cross of Resurrection, from entry 8. A dying hero starts from their walking
-; frame (0 or 1), which lose_health_point does not reset, so the first sparkle may be
-; skipped. A returning hero is put in play as hero_frame reaches 0, so entry 0 is never
-; shown on the way back. They come back facing down with health 32 (set to 33 and drawn
-; by taking a point).
+; with no pixel offset, then step hero_frame by hero_offset_x: forwards (+1) for a hero
+; dying, stopping at the skull (entry 8), which is then redrawn every other frame until a
+; Cross brings the hero back; backwards (-1) for a hero returning through a Cross of
+; Resurrection, from entry 8. A dying hero starts from their walking frame (0 or 1),
+; which lose_health_point does not reset, so the first sparkle may be skipped. A
+; returning hero is put back in play as hero_frame reaches 0, so entry 0 is never shown
+; on the way back: they come back in the cell where they fell, facing down, standing
+; squarely in it, with health 32 (set to 33 and drawn by taking a point). move_heroes
+; draws them on their next turn.
 ;
 ; On Entry:
 ;     X: hero number (0-3)
+;
+; On Exit:
+;     A: corrupted
+;     X: preserved
+;     Y: corrupted
 ; &76da referenced 1 time by &6e91
 .animate_absent_hero
     dec hero_offset_y,x                 ; Every other frame: count down the timer...
     beq absent_frame_due                ; Timer run out: show the next sprite
     rts                                 ; Not yet: nothing to draw this frame
+; Due: plot the sprite for the hero's place in the sequence at their cell.
 ; &76e0 referenced 1 time by &76dd
 .absent_frame_due
     lda #2                              ; Restart the two-frame timer...
     sta hero_offset_y,x                 ; ...which an absent hero keeps in hero_offset_y
     jsr get_hero_cell                   ; Plot the current appearance sprite at the hero's cell
     lda #0                              ; No pixel offsets (those bytes hold timer and step)...
-    sta plot_offset_x                   ; ...across...
-    sta plot_offset_y                   ; ...or down
+    sta plot_offset_x                   ; ...none across...
+    sta plot_offset_y                   ; ...and none down
     lda hero_frame,x                    ; The hero's place in the appearance sequence...
     tay                                 ; ...as an index...
     lda hero_appearance_sprites,y       ; ...picks the sparkle or skull to show
-    sta sprite_number                   ; ...to plot
+    sta sprite_number                   ; ...as the sprite to plot
     txa                                 ; Keep the hero number...
-    pha                                 ; ...on the stack
+    pha                                 ; ...on the stack: plot_at_cell changes X
     jsr plot_at_cell                    ; Plot it in every view that shows the hero
     pla                                 ; Recover the hero number...
-    tax                                 ; ...into X
+    tax                                 ; ...back in X
+; Step to the next place, holding a dying hero at the skull (place 8).
     clc                                 ; Step to the next (+1 dying, -1 returning), stopping at 8
     lda hero_frame,x                    ; Current place in the sequence...
     adc hero_offset_x,x                 ; ...plus the step kept in hero_offset_x
     cmp #9                              ; Past the skull (place 8)?
-    bcc check_first_sprite              ; No: keep the new place
+    bcc check_hero_returned             ; No: keep the new place
     lda #8                              ; Yes: a dead hero stays on the skull
 ; &770b referenced 1 time by &7707
-.check_first_sprite
+.check_hero_returned
     cmp #0                              ; Place 0? Only a returning hero gets there
     bne store_hero_frame                ; No: store the new place for the next plot
+; A returning hero has reached place 0: put them back in play, facing down, squarely in their cell, with 32 health.
     lda #5                              ; Yes: back in play before place 0 is shown...
     sta hero_direction,x                ; ...facing down (direction 5)
     lda #0                              ; ...with no step or offsets...
@@ -6315,48 +7083,55 @@ clear_text_area_top = set_text_window_top+1
     sta hero_health_tens,x              ; ...tens digit 3...
     sta hero_health_units,x             ; ...units digit 3...
     jsr lose_health_point               ; ...less a point, which also draws it: 32
-    rts                                 ; Return
+    rts                                 ; Return with the hero back in play
 ; &772e referenced 1 time by &770d
 .store_hero_frame
-    sta hero_frame,x                    ; Store the frame
-    rts                                 ; Return
+    sta hero_frame,x                    ; Store the new place, to show in two frames
+    rts                                 ; Return; the hero stays out of play
 ; ***************************************************************************************
 ; Draw a hero
 ;
-; Plot sprite_number at hero X's cell, shifted by their pixel offsets, in every view that
-; shows it. move_heroes calls it with the hero's own sprite; lose_health_point calls it
-; with the blank to erase a hero who has just died. cell_x and cell_y are left as
-; plot_at_cell leaves them.
+; Plot sprite_number at hero X's cell, shifted by their pixel offsets (half a cell along
+; while a step is under way), in every view that shows it. move_heroes calls it each
+; frame for every hero in play, at draw_moved_hero, with the hero's sprite for their
+; direction and frame; lose_health_point calls it with the blank to erase a hero who has
+; just died. cell_x and cell_y are left as plot_at_cell leaves them, as positions within
+; the view, so callers needing the map cell load it again.
 ;
 ; On Entry:
 ;     X: hero number (0-3)
+;     SPRITE_NUMBER: sprite to plot
 ;
 ; On Exit:
+;     A: corrupted
 ;     X: preserved
+;     Y: corrupted
 ; &7732 referenced 2 times by &70a4, &7244
 .draw_hero
     jsr get_hero_cell                   ; The hero's map cell...
     lda hero_offset_x,x                 ; ...and the pixel offsets of a step in progress
-    sta plot_offset_x                   ; ...across...
-    lda hero_offset_y,x                 ; ...and down...
+    sta plot_offset_x                   ; ...the column offset (0 or +-2) as plot_offset_x...
+    lda hero_offset_y,x                 ; ...and the row offset (0 or +-6)...
     sta plot_offset_y                   ; ...as plot_offset_y
     txa                                 ; Keep the hero number...
     pha                                 ; ...on the stack: each plot leaves X = 0
     jsr plot_at_cell                    ; Plot the hero in every view showing it
     pla                                 ; Recover the hero number...
     tax                                 ; ...in X again for the caller
-    rts                                 ; Return
+    rts                                 ; Return with X = the hero again
 ; ***************************************************************************************
 ; Animate the hero who fired a missile
 ;
-; Toggle the animation frame of the hero whose missile is in slot X, so the hero's sprite
-; changes as they throw. move_missiles calls this on a missile's first move, while bit 7
-; of its direction still marks it as just fired. The firer is told by the missile's
-; sprite base: arrows the Ranger, fireballs the Magic-User, axes the Barbarian, and
-; anything else the Fighter.
+; Toggle the animation frame (0 or 1) of the hero whose missile is in slot X, so the
+; hero's sprite changes as they throw. move_missiles calls this on a missile's first
+; move, while bit 7 of its direction still marks it as just fired; move_heroes flipped
+; the frame when it fired, so this flips it back, and the throw shows for one frame. The
+; firer is told by the missile's sprite base (one less than its up sprite): arrows the
+; Ranger, fireballs the Magic-User, axes the Barbarian, and anything else the Fighter.
+; The hero is not redrawn here; the new frame shows when move_heroes next draws them.
 ;
 ; On Entry:
-;     X: missile slot
+;     X: missile slot (0-11)
 ;
 ; On Exit:
 ;     A: corrupted
@@ -6364,60 +7139,70 @@ clear_text_area_top = set_text_window_top+1
 ; &7747 referenced 1 time by &70e1
 .flip_firer_frame
     lda missile_sprite_base,x           ; Which hero fired it? Its sprite base says
-    cmp #spr_arrow_up - 1               ; ...arrows?
+    cmp #spr_arrow_up - 1               ; ...the arrows' base, one below the up arrow?
     bne firer_fireball                  ; Not arrows: try fireballs
     lda hero_frame                      ; The Ranger's animation frame...
     eor #1                              ; ...flipped between 0 and 1...
     sta hero_frame                      ; ...so the Ranger's sprite changes as they fire
-    rts                                 ; Return
+    rts                                 ; Return; X is still the missile slot
 ; &7757 referenced 1 time by &774c
 .firer_fireball
-    cmp #spr_fireball_up - 1            ; ...fireballs?
+    cmp #spr_fireball_up - 1            ; ...the fireballs' base?
     bne firer_axe                       ; Not fireballs: try axes
     lda hero_frame + 1                  ; The Magic-User's animation frame...
     eor #1                              ; ...flipped between 0 and 1...
     sta hero_frame + 1                  ; ...so the Magic-User's sprite changes as they cast
-    rts                                 ; Return
+    rts                                 ; Return; X is still the missile slot
 ; &7764 referenced 1 time by &7759
 .firer_axe
-    cmp #spr_axe_up - 1                 ; ...axes?
+    cmp #spr_axe_up - 1                 ; ...the axes' base?
     bne firer_sword                     ; Not axes: so it must be swords
     lda hero_frame + 2                  ; The Barbarian's animation frame...
     eor #1                              ; ...flipped between 0 and 1...
     sta hero_frame + 2                  ; ...so the Barbarian's sprite changes as they throw
-    rts                                 ; Return
+    rts                                 ; Return; X is still the missile slot
 ; &7771 referenced 1 time by &7766
 .firer_sword
     lda hero_frame + 3                  ; Otherwise swords: the Fighter's frame...
     eor #1                              ; ...flipped between 0 and 1...
     sta hero_frame + 3                  ; ...so the Fighter's sprite changes as they throw
-    rts                                 ; Return
+    rts                                 ; Return; X is still the missile slot
 ; ***************************************************************************************
 ; Copy a hero's position to cell_x, cell_y
+;
+; Load hero X's map cell into cell_x and cell_y, ready for plot_at_cell. Used by
+; draw_hero and animate_absent_hero.
 ;
 ; On Entry:
 ;     X: hero number (0-3)
 ;
 ; On Exit:
+;     CELL_X: hero_x
+;     CELL_Y: hero_y
+;     A: hero_y
 ;     X: preserved
 ; &777a referenced 2 times by &76e5, &7732
 .get_hero_cell
-    lda hero_x,x                        ; cell_x = hero_x
-    sta cell_x                          ; ...for the plotting and testing routines
-    lda hero_y,x                        ; cell_y = hero_y
-    sta cell_y                          ; ...likewise
-    rts                                 ; Return
+    lda hero_x,x                        ; The hero's map x...
+    sta cell_x                          ; ...as cell_x, for plot_at_cell
+    lda hero_y,x                        ; ...and map y...
+    sta cell_y                          ; ...as cell_y
+    rts                                 ; Return with the hero's cell in cell_x, cell_y
     equb &73                            ; Not referenced
 ; ***************************************************************************************
 ; Draw all four views
 ;
-; Draw the walls and doors of the room each hero's view shows, top left, top right,
-; bottom left, bottom right. Called once as a level starts, after the view frames are
-; drawn.
+; Draw the walls and doors of the room in each hero's view: the Ranger's top left, the
+; Magic-User's top right, the Barbarian's bottom left and the Fighter's bottom right.
+; draw_view_frames calls it once as each level starts, after drawing the frames round the
+; views, when every view_room entry holds the heroes' starting room. A view is drawn even
+; for a hero nobody plays. Since each draw_room plots every door in every view showing
+; its room, the doors of a room shared by several views are drawn several times over.
+; Heroes, monsters and objects appear as the first frame of play plots them.
 ;
 ; On Exit:
 ;     A: corrupted
-;     X: corrupted
+;     X: 0
 ;     Y: corrupted
 ; &7788 referenced 1 time by &1563
 .draw_all_views
@@ -6425,13 +7210,16 @@ clear_text_area_top = set_text_window_top+1
     jsr draw_view_1                     ; The Magic-User's view, top right
     jsr draw_view_2                     ; The Barbarian's view, bottom left
     jsr draw_view_3                     ; The Fighter's view, bottom right
-    rts                                 ; Return
+    rts                                 ; Return with all four rooms drawn
 ; ***************************************************************************************
 ; Draw the top-left view
 ;
-; Draw the room in hero 0's view, the Ranger's, whose top-left is byte column 1, pixel
-; row 1. draw_all_views calls this as a level starts, and show_hero_room when hero 0
-; enters another room.
+; Draw the walls and doors of the room in hero 0's view, the Ranger's, whose top-left
+; cell starts at byte column 1, pixel row 1 (see plot_at_cell for the view coordinates).
+; draw_all_views calls this as a level starts, and show_hero_room when hero 0 enters
+; another room. The view's corner is passed to draw_room in plot_y and, for want of a
+; spare variable, in cell_x; only the low byte of view_room is passed, in map_ptr, as
+; draw_room supplies page &0C.
 ;
 ; On Entry:
 ;     VIEW_ROOM: the room hero 0 is in
@@ -6449,7 +7237,7 @@ clear_text_area_top = set_text_window_top+1
     lda view_room                       ; ...the room the Ranger's view shows
     sta map_ptr                         ; ...whose walls draw_room reads
     jsr draw_room                       ; Draw its walls and doors
-    rts                                 ; Return
+    rts                                 ; Return with the top-left view redrawn
 ; ***************************************************************************************
 ; Draw the top-right view
 ;
@@ -6472,7 +7260,7 @@ clear_text_area_top = set_text_window_top+1
     lda view_room + 2                   ; ...the room the Magic-User's view shows
     sta map_ptr                         ; ...whose walls draw_room reads
     jsr draw_room                       ; Draw its walls and doors
-    rts                                 ; Return
+    rts                                 ; Return with the top-right view redrawn
 ; ***************************************************************************************
 ; Draw the bottom-left view
 ;
@@ -6495,7 +7283,7 @@ clear_text_area_top = set_text_window_top+1
     lda view_room + 4                   ; ...the room the Barbarian's view shows
     sta map_ptr                         ; ...whose walls draw_room reads
     jsr draw_room                       ; Draw its walls and doors
-    rts                                 ; Return
+    rts                                 ; Return with the bottom-left view redrawn
 ; ***************************************************************************************
 ; Draw the bottom-right view
 ;
@@ -6518,30 +7306,42 @@ clear_text_area_top = set_text_window_top+1
     lda view_room + 6                   ; ...the room the Fighter's view shows
     sta map_ptr                         ; ...whose walls draw_room reads
     jsr draw_room                       ; Draw its walls and doors
-    rts                                 ; Return
+    rts                                 ; Return with the bottom-right view redrawn
     equb &60                            ; Not referenced
 ; ***************************************************************************************
 ; Draw a room
 ;
-; Draw the eight rows of walls of the room at &7B, &7C (a pointer into room_walls) with
-; its top-left at plot_y and the column in cell_x, a wall block or a blank in every cell,
-; then draw the doors. Nothing else in the room is drawn here. The doors go through
-; plot_at_cell, so every door is drawn again in every view that shows its room, not just
-; in this one.
+; Repaint one view with the walls of its room and the level's doors, wiping whatever the
+; view showed before. Called by draw_view_0 to draw_view_3, so as a level starts and
+; whenever a hero changes room.
+;
+; The room's eight wall bytes (see test_wall for the map layout) are read through
+; map_ptr, whose high byte is set here to page &0C (room_walls). Each byte is one row of
+; cells: draw_room_row plots a wall block or a blank in each of its eight cells, and
+; plot_y moves down twelve pixel rows for the next. Every cell is painted, so this also
+; wipes the previous room's creatures and objects; they reappear as they are next
+; plotted. Then each of doors 20 to 1 is plotted at its map cell through plot_at_cell,
+; which draws it only in views whose room holds it, and in every such view, not just this
+; one. A closed door's cell is also a wall in room_walls, so it is first drawn as a wall
+; block and then covered by the door; an opened door has its wall bit cleared and its
+; position set to off_map, so it is drawn nowhere.
 ;
 ; On Entry:
 ;     MAP_PTR: the room's offset in room_walls (the low byte)
-;     CELL_X: the view's left column
+;     CELL_X: the view's left byte column
 ;     PLOT_Y: the view's top pixel row
 ;
 ; On Exit:
 ;     A: corrupted
 ;     X: 0
 ;     Y: corrupted
+;     CELL_X: corrupted
+;     CELL_Y: corrupted
 ; &77de referenced 4 times by &77a3, &77b5, &77c7, &77d9
 .draw_room
     lda #>(room_walls)                  ; The room's walls are in page &0C
     sta map_ptr_hi                      ; ...so map_ptr points at the room's wall bytes
+; Walls: paint each of the room's eight rows of cells, wall or blank, from its wall byte, twelve pixel rows apart.
     ldy #0                              ; For each of the room's eight rows of cells...
 ; &77e4 referenced 1 time by &77fa
 .draw_room_walls
@@ -6555,45 +7355,49 @@ clear_text_area_top = set_text_window_top+1
     adc #&0c                            ; ...each 12 pixel rows tall
     sta plot_y                          ; ...ready for the next row
     pla                                 ; Recover the row number...
-    tay                                 ; ...into Y
-    iny                                 ; Next row
+    tay                                 ; ...back in Y
+    iny                                 ; Next row of the room down
     cpy #8                              ; All eight rows done?
     bne draw_room_walls                 ; No: draw the next row
+; Doors: plot every door on the level through plot_at_cell, which shows only those in rooms on view, in every such view.
     ldx #max_door                       ; Then doors 20 to 1, wherever they are on the map
 ; &77fe referenced 1 time by &781d
 .draw_room_doors
     lda door_x,x                        ; This door's map x...
     sta cell_x                          ; ...as the cell to plot
-    lda door_y,x                        ; ...and its map y
-    sta cell_y                          ; ...likewise
+    lda door_y,x                        ; ...and its map y (off_map once opened)...
+    sta cell_y                          ; ...as cell_y
     lda #0                              ; Doors sit squarely in their cells:
     sta plot_offset_x                   ; ...no horizontal offset...
     sta plot_offset_y                   ; ...and no vertical offset
     lda door_sprite,x                   ; Its sprite, vertical or horizontal...
-    sta sprite_number                   ; ...to plot
+    sta sprite_number                   ; ...as the sprite to plot
     txa                                 ; Keep the door number...
-    pha                                 ; ...on the stack
+    pha                                 ; ...on the stack: plot_at_cell changes X
     jsr plot_at_cell                    ; Plot it in every view showing its cell
     pla                                 ; Recover the door number...
-    tax                                 ; ...into X
-    dex                                 ; Next door
+    tax                                 ; ...in X for the count
+    dex                                 ; Next door down
     bne draw_room_doors                 ; Until door 1 is drawn
-    rts                                 ; Return
+    rts                                 ; Return with the room and its doors drawn
 ; ***************************************************************************************
 ; Draw one row of a room
 ;
-; Plot a wall or a blank for each of the eight bits of scratch, four byte columns apart,
-; starting at byte column cell_x.
+; Plot a wall block or a blank in each of the eight cells of one row of a view, from bit
+; 7 of scratch (the leftmost cell) to bit 0, four byte columns apart, starting at byte
+; column cell_x. Called by draw_room for each row. The cells are plotted with plot_sprite
+; directly, in this view only.
 ;
 ; On Entry:
 ;     SCRATCH: the row's eight wall bits, the leftmost cell in bit 7
-;     CELL_X: the view's left column
+;     CELL_X: the view's left byte column
 ;     PLOT_Y: the row's top pixel row
 ;
 ; On Exit:
-;     A: corrupted
-;     X: corrupted
+;     A: 0
+;     X: 0
 ;     Y: corrupted
+;     PLOT_X: cell_x + 32, just right of the view
 ; &7820 referenced 1 time by &77eb
 .draw_room_row
     lda cell_x                          ; Start at the view's left edge
@@ -6602,19 +7406,19 @@ clear_text_area_top = set_text_window_top+1
 ; &7827 referenced 1 time by &784f
 .draw_room_cell
     txa                                 ; Keep this cell's bit mask...
-    pha                                 ; ...on the stack...
+    pha                                 ; ...on the stack: plot_sprite leaves X = 0...
     sta scratch2                        ; ...and in scratch2 for the test
     lda scratch                         ; Wall in this cell?
     and scratch2                        ; ...against the row's wall bits
     beq plot_blank                      ; No: an open cell, blanked
     lda #spr_wall                       ; Yes: plot the wall block (sprite 0)
-    sta sprite_number                   ; ...to plot
+    sta sprite_number                   ; ...as the sprite to plot
     jsr plot_sprite                     ; Draw the wall block in this cell
     jmp next_room_cell                  ; On to the next cell
 ; &783e referenced 1 time by &7832
 .plot_blank
     lda #spr_blank                      ; Plot the blank (sprite &15)
-    sta sprite_number                   ; ...to plot
+    sta sprite_number                   ; ...as the sprite to plot
     jsr plot_sprite                     ; Clear whatever the view showed there
 ; &7845 referenced 1 time by &783b
 .next_room_cell
@@ -6622,23 +7426,47 @@ clear_text_area_top = set_text_window_top+1
     lda plot_x                          ; Next cell's screen column...
     adc #4                              ; ...four bytes, one cell's width, along
     sta plot_x                          ; ...stored for the next plot
-    pla                                 ; Next bit...
-    lsr a                               ; ...the mask moves to the next cell right
+    pla                                 ; This cell's mask back from the stack...
+    lsr a                               ; ...shifted to the next cell right
     tax                                 ; ...into X; zero once the eighth cell is done
     bne draw_room_cell                  ; ...until all eight are done
-    rts                                 ; Return
+    rts                                 ; Return with the row drawn, X = 0
 ; ***************************************************************************************
 ; Plot a sprite at a map cell in every view
 ;
-; Plot sprite_number at map cell cell_x, cell_y, shifted by the pixel offsets in &7D,
-; &7E, in each view that shows the cell's room. Cells are four byte columns wide and
-; twelve pixel rows high. Heroes, monsters, missiles, objects, doors and trapdoors are
-; all drawn and erased through here (the walls are not), so a cell in a room that two
-; heroes share is drawn in both views, and one in a room that no view shows is not drawn
-; at all. Only the low byte of each view_room entry is compared.
+; Draw (or, with the blank sprite, erase) sprite_number at a map cell, in every view that
+; is showing the cell's room. Heroes, skulls, monsters, sparkles, missiles, objects,
+; keys, doors, trapdoors and the Chalice are all drawn and erased through here; only the
+; walls (draw_room_row) and the status panel are plotted directly. So a cell in a room
+; that two heroes share is drawn in both views, and one in a room that no view shows is
+; not drawn at all.
+;
+; Map coordinates. The dungeon is a grid of cells, x across from 0 at the left, y down
+; from 0 at the top, divided into rooms of 8x8 cells, four rooms across (x 0-31) and six
+; down (y 0-47). A room is named by its offset in room_walls, 32 x its row of rooms + 8 x
+; its column of rooms, which is (y AND &F8) x 4 + (x AND &F8): always a multiple of 8,
+; from 0 to &B8 (test_wall describes the map's bytes). The cell's place within its room
+; is x AND 7, y AND 7.
+;
+; View coordinates. plot_sprite takes a byte column (plot_x, 0-79 across the screen, two
+; MODE 2 pixels each) and a pixel row (plot_y, from 0 at the top). Each view shows one
+; room, 8 cells of 4 byte columns by 8 cells of 12 pixel rows (32 x 96), with its
+; top-left at column 1 or view_right_column (&23) and row 1 or view_bottom_row (&67):
+; hero 0's view top left, 1 top right, 2 bottom left, 3 bottom right. view_room + 2 x
+; hero holds the offset of the room each view shows. A cell's sprite goes at the view's
+; corner + ((x AND 7) x 4 + plot_offset_x, (y AND 7) x 12 + plot_offset_y). The offsets
+; are signed (&FA is 6 rows up) and place a sprite part way between cells while it steps.
+;
+; The room offset is worked out once and compared with the low byte of each view_room
+; entry, views 0 to 3 in turn. A cell at off_map (&FF, &FF), where collected objects,
+; opened doors and parked monsters are put, comes out as &DB, through the carries of the
+; sum: not a multiple of 8, so no view shows it and it is never drawn. There is no
+; clipping, but no hero's or monster's step crosses a room edge, so a stepping sprite
+; stays inside its view.
 ;
 ; cell_x and cell_y are overwritten with the position within the room, so a caller that
-; needs the map cell again sets them again.
+; needs the map cell again sets them again; code that reads them afterwards without doing
+; so sees these view positions.
 ;
 ; On Entry:
 ;     CELL_X: map x
@@ -6651,97 +7479,116 @@ clear_text_area_top = set_text_window_top+1
 ;     CELL_X: byte column within the room
 ;     CELL_Y: pixel row within the room
 ;     CELL_ROOM: the cell's room, as an offset into room_walls
+; Which room is the cell in? Its offset in room_walls, the same number view_room holds for each view.
 ; &7852 referenced 19 times by &11a8, &1200, &1d36, &1ddc, &1e61, &1f6d, &1fb7, &1fec, &7091, &70f9, &7213, &7320, &76f9, &7741, &7817, &79db, &7a07, &7b25, &7b5c
 .plot_at_cell
     lda cell_y                          ; Room = (cell_y AND &F8) x 4 + (cell_x AND &F8)...
-    and #&f8                            ; ...the room's top row of cells (y AND &F8)
-    sta scratch                         ; ...kept to multiply...
-    clc                                 ; ...(no carry into the sum)
-    adc scratch                         ; ...x 2...
-    adc scratch                         ; ...x 3...
-    adc scratch                         ; ...x 4: a room row is 32 bytes of room_walls
-    sta cell_room                       ; ...where its row of rooms starts, so far
-    lda cell_x                          ; Add the room's left column of cells...
-    and #&f8                            ; ...cell_x AND &F8: 8 bytes per room across
-    adc cell_room                       ; ...giving the room's offset in room_walls
-    sta cell_room                       ; ...in cell_room, to match against the views
-    lda cell_x                          ; Column within the view = (cell_x AND 7) x 4 + offset_x
-    and #7                              ; ...the cell's column within its room...
+    and #&f8                            ; ...y AND &F8 = 8 x the cell's row of rooms...
+    sta scratch                         ; ...kept in scratch, to add up four times...
+    clc                                 ; ...(y < 64 on the map: no carry, so clear it once)
+    adc scratch                         ; ...doubled: 16 bytes per row of rooms so far...
+    adc scratch                         ; ...tripled: 24...
+    adc scratch                         ; ...x 4: 32 bytes, four rooms, per row of rooms
+    sta cell_room                       ; ...the offset of the cell's row of rooms
+    lda cell_x                          ; Add the room's column in that row...
+    and #&f8                            ; ...x AND &F8 = 8 x the column: 8 bytes per room
+    adc cell_room                       ; ...giving the room's offset in room_walls (0-&B8)
+    sta cell_room                       ; ...in cell_room, to compare with each view_room
+; Where in a view does the cell go? Its column and row within the room, scaled to bytes and pixel rows, plus the sprite's offsets.
+    lda cell_x                          ; Byte column in a view = (x AND 7) x 4 + offset_x
+    and #7                              ; ...the cell's column within its room, 0-7...
     asl a                               ; ...x 2...
-    asl a                               ; ...x 4: each cell is 4 screen bytes wide
-    clc                                 ; ...(no carry)
-    adc plot_offset_x                   ; ...plus the sprite's offset in byte columns
-    sta cell_x                          ; ...replacing cell_x: the map x is lost
-    lda cell_y                          ; Row within the view = (cell_y AND 7) x 12 + offset_y
-    and #7                              ; ...the cell's row within its room...
+    asl a                               ; ...x 4: each cell is 4 byte columns wide
+    clc                                 ; ...clear the carry for the offset
+    adc plot_offset_x                   ; ...plus the sprite's signed offset in byte columns
+    sta cell_x                          ; ...cell_x is now the column within the view
+    lda cell_y                          ; Pixel row in a view = (y AND 7) x 12 + offset_y
+    and #7                              ; ...the cell's row within its room, 0-7...
     asl a                               ; ...x 2...
     asl a                               ; ...x 4...
-    sta scratch                         ; ...kept...
+    sta scratch                         ; ...row x 4 kept in scratch, for the sum...
     asl a                               ; ...x 8...
-    clc                                 ; ...(no carry)
-    adc scratch                         ; ...+ x 4 = x 12: each cell is 12 rows tall
-    adc plot_offset_y                   ; ...plus the sprite's offset in pixel rows
-    sta cell_y                          ; ...replacing cell_y: the map y is lost
+    clc                                 ; ...clear the carry (at most 56 + 28)
+    adc scratch                         ; ...x 8 + x 4 = x 12: each cell is 12 rows tall
+    adc plot_offset_y                   ; ...plus the sprite's signed offset in pixel rows
+    sta cell_y                          ; ...cell_y is now the row within the view
+; Plot it in each view showing that room, at the view's top-left corner plus the position within the room.
     lda view_room                       ; The Ranger's view (top left): this room?
-    cmp cell_room                       ; ...is it the room of the cell?
+    cmp cell_room                       ; ...the room the cell is in?
     bne check_view_1_room               ; Not shown there: try the top-right view
-    clc                                 ; Shown: plot at the view's corner (column 1, row 1)...
-    lda #1                              ; ...view's left column, 1...
-    adc cell_x                          ; ...plus the column within the room
-    sta plot_x                          ; ...as the screen column
-    lda #1                              ; ...view's top row, 1...
-    adc cell_y                          ; ...plus the row within the room
-    sta plot_y                          ; ...as the screen row
+    clc                                 ; Shown: screen position = view corner (1, 1) + cell's
+    lda #1                              ; ...the view's left byte column, 1...
+    adc cell_x                          ; ...plus the column within the view
+    sta plot_x                          ; ...as plot_x
+    lda #1                              ; ...the view's top pixel row, 1...
+    adc cell_y                          ; ...plus the row within the view
+    sta plot_y                          ; ...as plot_y
     jsr plot_sprite                     ; Draw it in the top-left view
 ; &78ad referenced 1 time by &7899
 .check_view_1_room
     lda view_room + 2                   ; The Magic-User's view (top right): this room?
-    cmp cell_room                       ; ...is it the room of the cell?
+    cmp cell_room                       ; ...the room the cell is in?
     bne check_view_2_room               ; Not shown there: try the bottom-left view
-    clc                                 ; Shown: plot from column &23, row 1
-    lda #view_right_column              ; ...view's left column...
-    adc cell_x                          ; ...plus the column within the room
-    sta plot_x                          ; ...as the screen column
-    lda #1                              ; ...view's top row, 1...
-    adc cell_y                          ; ...plus the row within the room
-    sta plot_y                          ; ...as the screen row
+    clc                                 ; Shown: view corner (&23, 1) + cell's position
+    lda #view_right_column              ; ...the view's left byte column...
+    adc cell_x                          ; ...plus the column within the view
+    sta plot_x                          ; ...as plot_x
+    lda #1                              ; ...the view's top pixel row, 1...
+    adc cell_y                          ; ...plus the row within the view
+    sta plot_y                          ; ...as plot_y
     jsr plot_sprite                     ; Draw it in the top-right view
 ; &78c7 referenced 1 time by &78b3
 .check_view_2_room
     lda view_room + 4                   ; The Barbarian's view (bottom left): this room?
-    cmp cell_room                       ; ...is it the room of the cell?
+    cmp cell_room                       ; ...the room the cell is in?
     bne check_view_3_room               ; Not shown there: try the bottom-right view
-    clc                                 ; Shown: plot from column 1, row &67
-    lda #1                              ; ...view's left column, 1...
-    adc cell_x                          ; ...plus the column within the room
-    sta plot_x                          ; ...as the screen column
-    lda #view_bottom_row                ; ...view's top row...
-    adc cell_y                          ; ...plus the row within the room
-    sta plot_y                          ; ...as the screen row
+    clc                                 ; Shown: view corner (1, &67) + cell's position
+    lda #1                              ; ...the view's left byte column, 1...
+    adc cell_x                          ; ...plus the column within the view
+    sta plot_x                          ; ...as plot_x
+    lda #view_bottom_row                ; ...the view's top pixel row...
+    adc cell_y                          ; ...plus the row within the view
+    sta plot_y                          ; ...as plot_y
     jsr plot_sprite                     ; Draw it in the bottom-left view
 ; &78e1 referenced 1 time by &78cd
 .check_view_3_room
     lda view_room + 6                   ; The Fighter's view (bottom right): this room?
-    cmp cell_room                       ; ...is it the room of the cell?
+    cmp cell_room                       ; ...the room the cell is in?
     bne plot_at_cell_done               ; Not shown there: done
-    clc                                 ; Shown: plot from column &23, row &67
-    lda #view_right_column              ; ...view's left column...
-    adc cell_x                          ; ...plus the column within the room
-    sta plot_x                          ; ...as the screen column
-    lda #view_bottom_row                ; ...view's top row...
-    adc cell_y                          ; ...plus the row within the room
-    sta plot_y                          ; ...as the screen row
+    clc                                 ; Shown: view corner (&23, &67) + cell's position
+    lda #view_right_column              ; ...the view's left byte column...
+    adc cell_x                          ; ...plus the column within the view
+    sta plot_x                          ; ...as plot_x
+    lda #view_bottom_row                ; ...the view's top pixel row...
+    adc cell_y                          ; ...plus the row within the view
+    sta plot_y                          ; ...as plot_y
     jsr plot_sprite                     ; Draw it in the bottom-right view
 ; &78fb referenced 1 time by &78e7
 .plot_at_cell_done
-    rts                                 ; Return
+    rts                                 ; Return; cell_x, cell_y now hold the view position
 ; ***************************************************************************************
 ; Test for a wall at a map cell
 ;
-; Return the room_walls bit for cell cell_x, cell_y: non-zero if there is a wall. Also
-; leaves &7B, &7C pointing at the cell's room. Heroes, missiles and monsters test the
-; cell they are about to enter here; the magic and show_hero_room call it only for the
-; room pointer. The bit is also stored in &8F, which no caller reads.
+; Say whether a map cell is solid: a wall, or a door not yet opened. Heroes
+; (move_heroes), missiles (move_missiles) and monsters (update_monsters) test here the
+; cell they are about to enter, and find_open_neighbour the cells next to the exit where
+; drop_key can put a key down. check_magic and show_hero_room call it only for the room
+; pointer it leaves in map_ptr.
+;
+; The wall map. room_walls (&0C00) holds eight bytes per room, one per row of cells from
+; the top, and one bit per cell, bit 7 for the leftmost (x AND 7 = 0) to bit 0 for the
+; rightmost; a set bit is solid. Rooms are stored in rows of four, left to right, so a
+; room's eight bytes start at (y AND &F8) x 4 + (x AND &F8) (see plot_at_cell for the
+; coordinates), and the cell is bit bit_masks[x AND 7] of byte y AND 7 there.
+; object_free_map at &2100 has the same layout (test_object_free). The level file
+; supplies both; opening a door clears its bit.
+;
+; The bit is returned in A and Y, with Z set for an open cell; callers that have pulled X
+; from the stack test Y. map_ptr is left pointing at the room's bytes, its low byte being
+; the room offset that view_room uses. Coordinates off the map are not checked: off_map
+; (&FF, &FF) reads a byte beyond the wall map. The bit is also stored in &8F
+; (victory_pitch), which the victory sequence sets before it reads it, so the copy is
+; never used.
 ;
 ; On Entry:
 ;     CELL_X: map x
@@ -6753,42 +7600,50 @@ clear_text_area_top = set_text_window_top+1
 ;     Z: set if no wall
 ;     X: corrupted (the column within the room)
 ;     MAP_PTR: the cell's room in room_walls
+; Point map_ptr at the cell's room in room_walls.
 ; &78fc referenced 8 times by &20d3, &20e1, &20ef, &6fb2, &712b, &753a, &7675, &7a51
 .test_wall
     lda cell_y                          ; Room offset = (cell_y AND &F8) x 4 + (cell_x AND &F8)...
-    and #&f8                            ; ...the room's top row of cells (y AND &F8)
-    sta scratch                         ; ...kept to multiply...
-    clc                                 ; ...(no carry into the sum)
-    adc scratch                         ; ...x 2...
-    adc scratch                         ; ...x 3...
-    adc scratch                         ; ...x 4: a room row is 32 bytes of room_walls
-    sta map_ptr                         ; ...low byte of the pointer
-    lda cell_x                          ; Add the room's left column of cells...
-    and #&f8                            ; ...cell_x AND &F8: 8 bytes per room across
-    adc map_ptr                         ; ...to the pointer's low byte...
-    sta map_ptr                         ; ...map_ptr: the room's eight wall bytes
-    lda #>(room_walls)                  ; ...into room_walls at &0C00
-    sta map_ptr_hi                      ; ...as the pointer's high byte
-    lda cell_x                          ; Bit for the column within the room
-    and #7                              ; ...cell_x AND 7...
-    tax                                 ; ...indexes bit_masks...
-    lda bit_masks,x                     ; ...for the cell's bit, leftmost bit 7
-    sta scratch                         ; ...kept in scratch
-    lda cell_y                          ; Byte for the row within the room
-    and #7                              ; ...cell_y AND 7...
-    tay                                 ; ...indexes the room's bytes
-    lda (map_ptr),y                     ; Isolate the cell's bit...
-    and scratch                         ; ...with the column's mask: non-zero if a wall
-    sta victory_pitch                   ; ...a copy in &8F, which no caller reads...
-    tay                                 ; ...and in Y, so callers can pull X and test Y
-    rts                                 ; Return
+    and #&f8                            ; ...y AND &F8 = 8 x the cell's row of rooms...
+    sta scratch                         ; ...kept in scratch, to add up four times...
+    clc                                 ; ...(y < 64 on the map: no carry, so clear it once)
+    adc scratch                         ; ...doubled: 16 bytes per row of rooms so far...
+    adc scratch                         ; ...tripled: 24...
+    adc scratch                         ; ...x 4: 32 bytes, four rooms, per row of rooms
+    sta map_ptr                         ; ...the start of its row of rooms, in map_ptr
+    lda cell_x                          ; Add the room's column in that row...
+    and #&f8                            ; ...x AND &F8 = 8 x the column: 8 bytes per room
+    adc map_ptr                         ; ...to the row's offset...
+    sta map_ptr                         ; ...map_ptr low = the room's offset (0-&B8)...
+    lda #>(room_walls)                  ; ...in page &0C, room_walls...
+    sta map_ptr_hi                      ; ...as map_ptr's high byte: map_ptr = the room's bytes
+; Pick out the cell's bit: bit_masks for the column, the room's byte for the row.
+    lda cell_x                          ; Mask for the cell's column within the room...
+    and #7                              ; ...x AND 7, 0 at the left...
+    tax                                 ; ...in X, to look up its bit...
+    lda bit_masks,x                     ; ...&80 for column 0 down to &01 for column 7
+    sta scratch                         ; ...kept in scratch to test the row byte with
+    lda cell_y                          ; The row byte: y AND 7...
+    and #7                              ; ...the cell's row within the room, 0-7...
+    tay                                 ; ...in Y, indexing the room's eight bytes
+    lda (map_ptr),y                     ; The row's walls, one bit per cell...
+    and scratch                         ; ...masked to this cell: non-zero if solid
+    sta victory_pitch                   ; ...copied to &8F, which is never read for it...
+    tay                                 ; ...and to Y: callers pull X, then test Y
+    rts                                 ; Return with Z set if the cell is open
 ; ***************************************************************************************
 ; Test whether a map cell can hold an object
 ;
-; Return the object_free_map bit for cell cell_x, cell_y: zero if an object may lie
-; there. The same calculation as test_wall, on object_free_map at &2100 instead of
-; room_walls. A hero who has moved, and a missile, look up the object list only when this
-; returns zero. The bit is also stored in &8F, which no caller reads.
+; Say whether an object might lie in a map cell, so that the object list need be searched
+; only there. move_heroes calls it for a hero who has moved, before collect_objects, and
+; move_missiles for a missile's new cell, before looking for an energy drainer.
+;
+; The same calculation as test_wall, on object_free_map at &2100 instead of room_walls:
+; eight bytes per room, a bit per cell, bit 7 at the left. A clear bit means an object
+; may lie there; the map comes from the level file and is not changed when an object is
+; collected, so a cleared cell goes on costing a search that finds nothing. The bit is
+; returned in A and Y, with Z set if an object may lie there, and also stored in &8F
+; (victory_pitch), where nothing reads it. map_ptr is left pointing into object_free_map.
 ;
 ; On Entry:
 ;     CELL_X: map x
@@ -6799,47 +7654,59 @@ clear_text_area_top = set_text_window_top+1
 ;     Y: map bit
 ;     Z: set if an object may lie there
 ;     X: corrupted (the column within the room)
+; Point map_ptr at the cell's room in object_free_map.
 ; &7938 referenced 2 times by &70b5, &7166
 .test_object_free
     lda cell_y                          ; Room offset = (cell_y AND &F8) x 4 + (cell_x AND &F8)...
-    and #&f8                            ; ...the room's top row of cells (y AND &F8)
-    sta scratch                         ; ...kept to multiply...
-    clc                                 ; ...(no carry into the sum)
-    adc scratch                         ; ...x 2...
-    adc scratch                         ; ...x 3...
-    adc scratch                         ; ...x 4: the map has room_walls' layout
-    sta map_ptr                         ; ...low byte of the pointer
-    lda cell_x                          ; Add the room's left column of cells...
-    and #&f8                            ; ...cell_x AND &F8: 8 bytes per room across
-    adc map_ptr                         ; ...to the pointer's low byte...
-    sta map_ptr                         ; ...map_ptr: the room's eight map bytes
-    lda #>(object_free_map)             ; ...into object_free_map at &2100
-    sta map_ptr_hi                      ; ...as the pointer's high byte
-    lda cell_x                          ; Bit for the column within the room
-    and #7                              ; ...cell_x AND 7...
-    tax                                 ; ...indexes bit_masks...
-    lda bit_masks,x                     ; ...for the cell's bit, leftmost bit 7
-    sta scratch                         ; ...kept in scratch
-    lda cell_y                          ; Byte for the row within the room
-    and #7                              ; ...cell_y AND 7...
-    tay                                 ; ...indexes the room's bytes
-    lda (map_ptr),y                     ; Isolate the cell's bit...
-    and scratch                         ; ...with the mask: zero if an object may lie here
-    sta victory_pitch                   ; ...a copy in &8F, which no caller reads...
-    tay                                 ; ...and in Y, which callers test after pulling X
-    rts                                 ; Return
+    and #&f8                            ; ...y AND &F8 = 8 x the cell's row of rooms...
+    sta scratch                         ; ...kept in scratch, to add up four times...
+    clc                                 ; ...(y < 64 on the map: no carry, so clear it once)
+    adc scratch                         ; ...doubled: 16 bytes per row of rooms so far...
+    adc scratch                         ; ...tripled: 24...
+    adc scratch                         ; ...x 4: 32 bytes, laid out as room_walls
+    sta map_ptr                         ; ...the start of its row of rooms, in map_ptr
+    lda cell_x                          ; Add the room's column in that row...
+    and #&f8                            ; ...x AND &F8 = 8 x the column: 8 bytes per room
+    adc map_ptr                         ; ...to the row's offset...
+    sta map_ptr                         ; ...map_ptr low = the room's offset (0-&B8)...
+    lda #>(object_free_map)             ; ...in page &21, object_free_map...
+    sta map_ptr_hi                      ; ...as map_ptr's high byte: map_ptr = the room's bytes
+; Pick out the cell's bit, as test_wall does.
+    lda cell_x                          ; Mask for the cell's column within the room...
+    and #7                              ; ...x AND 7, 0 at the left...
+    tax                                 ; ...in X, to look up its bit...
+    lda bit_masks,x                     ; ...&80 for column 0 down to &01 for column 7
+    sta scratch                         ; ...kept in scratch to test the row byte with
+    lda cell_y                          ; The row byte: y AND 7...
+    and #7                              ; ...the cell's row within the room, 0-7...
+    tay                                 ; ...in Y, indexing the room's eight bytes
+    lda (map_ptr),y                     ; The row's bits, one per cell...
+    and scratch                         ; ...masked to this cell: zero if an object may lie
+    sta victory_pitch                   ; ...copied to &8F, which is never read for it...
+    tay                                 ; ...and to Y: callers pull X, then test Y
+    rts                                 ; Return with Z set if an object may lie here
 ; ***************************************************************************************
 ; Look for a monster or hero at a cell
 ;
-; Look for a monster, other than monster number scratch, at cell_x, cell_y. If scratch is
-; non-zero, also look for a hero there, and if one is found take hero_damage_taken points
-; of their health.
+; Say whether a creature stands in a map cell, and if a monster has walked into a hero,
+; hurt the hero. Called by move_heroes and move_missiles for the cell a hero or missile
+; is entering, and by update_monsters for the cell a monster steps into and for the
+; trapdoor a dead monster comes back at (monster_reappears).
 ;
-; A moving hero or missile passes scratch = 0, so only monsters are looked for. A moving
-; or reappearing monster passes its own number, so it skips itself and also finds heroes:
-; a monster that walks onto a hero hurts them and is blocked. Neither search looks at
-; state: a dying monster still fills its cell, and a hero out of play (a skull) blocks a
-; monster too, though lose_health_point takes nothing from them.
+; Monsters 30 to 1 are compared first, skipping monster number scratch; the first whose
+; cell matches is returned. If none matches and scratch is non-zero (a monster is
+; asking), heroes 0 to 3 are compared too, and the first one found loses
+; hero_damage_taken points of health, one at a time through lose_health_point. A hero or
+; missile passes scratch = 0, so only monsters are looked for (they test heroes their own
+; way); a monster passes its own number, so it skips itself and is blocked by, and hurts,
+; a hero in its way, every frame it tries.
+;
+; Neither search looks at state: a dying monster still fills its cell, and a hero out of
+; play (a skull) blocks a monster too, though lose_health_point takes nothing from them.
+; A found monster is reported with A = Y = cell_y, so one in map row 0 would read as
+; nothing found. monster_reappears calls this without loading the trapdoor's cell, so it
+; tests the view position plot_at_cell left in cell_x, cell_y; a hero who happens to
+; stand at that cell is hurt.
 ;
 ; On Entry:
 ;     SCRATCH: the monster moving (1-30), or 0
@@ -6849,66 +7716,100 @@ clear_text_area_top = set_text_window_top+1
 ; On Exit:
 ;     A: cell_y if a monster was found, 1 if a hero, else 0
 ;     Y: cell_y if a monster was found, else 0
-;     X: the monster or hero found
+;     Z: clear if a creature was found (cell_y non-zero)
+;     X: the monster or hero found; else 0, or 4 after the hero search
+; Monsters first: any but the asker, alive or dying, in the cell?
 ; &7974 referenced 4 times by &6fdc, &713f, &7a8c, &7ce6
 .find_creature
     ldx #max_monster                    ; Monsters 30 to 1, alive or dying...
 ; &7976 referenced 1 time by &798e
 .check_monster
-    cpx scratch                         ; ...except the one being moved (scratch)
-    beq next_monster_find               ; The mover itself: skip it
-    lda cell_x                          ; The cell's map x...
-    cmp monster_x,x                     ; ...this monster's x?
-    bne next_monster_find               ; No: not this monster
-    lda cell_y                          ; ...and its map y...
-    cmp monster_y,x                     ; ...this monster's y?
-    bne next_monster_find               ; No: not this monster
-    tay                                 ; Found: Y = A = cell_y, X = the monster
-    rts                                 ; ...so the caller sees the cell taken
+    cpx scratch                         ; ...except monster number scratch, the one asking
+    beq next_monster_find               ; The asker itself: skip it
+    lda cell_x                          ; Is this monster in the cell? cell_x...
+    cmp monster_x,x                     ; ...against the monster's x
+    bne next_monster_find               ; Another column: not this monster
+    lda cell_y                          ; ...and cell_y...
+    cmp monster_y,x                     ; ...against the monster's y
+    bne next_monster_find               ; Another row: not this monster
+    tay                                 ; Found: A = Y = cell_y, X = the monster
+    rts                                 ; Return, Z clear unless the cell is in row 0
 ; &798d referenced 3 times by &7979, &7981, &7989
 .next_monster_find
-    dex                                 ; Next monster
+    dex                                 ; Next monster down
     bne check_monster                   ; Until monster 1 is done
-    lda scratch                         ; No monster. A monster moving (scratch > 0)?
-    beq nothing_found                   ; No, a hero or missile: heroes don't count
-    ldx #0                              ; Yes: look at heroes 0 to 3 too...
+; Then, only for a monster asking, heroes: the first in the cell, in play or not, is hurt and blocks the move.
+    lda scratch                         ; No monster there. Is a monster asking (scratch > 0)?
+    beq nothing_found                   ; No (a hero or missile): heroes are not looked for
+    ldx #0                              ; Yes: a hero blocks it too. Heroes 0 to 3...
 ; &7997 referenced 1 time by &79ba
 .check_hero
-    lda cell_x                          ; ...the cell's map x...
-    cmp hero_x,x                        ; ...this hero's x?
-    bne next_hero_find                  ; No: not this hero
-    lda cell_y                          ; ...and its map y...
-    cmp hero_y,x                        ; ...this hero's y?
-    bne next_hero_find                  ; No: not this hero
-    ldy hero_damage_taken,x             ; Yes, in play or not: their armour sets the damage
+    lda cell_x                          ; ...is this hero in the cell? cell_x...
+    cmp hero_x,x                        ; ...against the hero's x
+    bne next_hero_find                  ; Another column: not this hero
+    lda cell_y                          ; ...and cell_y...
+    cmp hero_y,x                        ; ...against the hero's y
+    bne next_hero_find                  ; Another row: not this hero
+    ldy hero_damage_taken,x             ; Found, in play or not: health a blow costs them
 ; &79aa referenced 1 time by &79b2
 .take_hero_damage
-    tya                                 ; Keep the points still to take...
-    pha                                 ; ...on the stack
+    tya                                 ; Take it a point at a time: keep the points left...
+    pha                                 ; ...on the stack across lose_health_point
     jsr lose_health_point               ; One point off the hero (none if out of play)
     pla                                 ; Recover the points still to take...
-    tay                                 ; ...into Y
+    tay                                 ; ...back in Y
     dey                                 ; One point fewer to take
     bne take_hero_damage                ; Until the hero has taken them all
-    lda #1                              ; Return A = 1 (Y = 0): a hero was there
-    rts                                 ; ...so the monster is blocked or parked
+    lda #1                              ; Return A = 1, Z clear (Y = 0): a hero was there
+    rts                                 ; ...so the monster is blocked (or parked)
 ; &79b7 referenced 2 times by &799d, &79a5
 .next_hero_find
-    inx                                 ; Next hero
+    inx                                 ; Next hero up
     cpx #4                              ; All four heroes checked?
     bne check_hero                      ; No: check the next
 ; &79bc referenced 1 time by &7993
 .nothing_found
-    lda #0                              ; Nothing there: return A = Y = 0
+    lda #0                              ; Nothing there: return A = Y = 0...
     ldy #0                              ; ...the cell is free of creatures
-    rts                                 ; Return
+    rts                                 ; Return with Z set: nothing in the cell
 ; ***************************************************************************************
 ; Draw the trapdoors and move the monsters
 ;
-; Draw the eight trapdoors, then for each monster continue its step or start a new one,
-; turning a random way when it is blocked, and advance dying monsters until they reappear
-; at a trapdoor. The trapdoors are redrawn every frame, because erasing a creature or
-; missile that has crossed one blanks its cell.
+; Move every monster on by one frame of its life, and redraw the trapdoors they come out
+; of. update_game calls it once a frame, after draw_objects and move_missiles, so a
+; monster killed by a missile or magic this frame starts its death here.
+;
+; The eight trapdoors are drawn first, because erasing a creature or missile that crossed
+; one has blanked its cell. Then each monster, 30 down to 1, is erased where it was drawn
+; last frame and moved on according to its state.
+;
+; Moving: a monster mid-step slides a quarter cell further (continue_monster_step). One
+; that is not stepping tries the next cell the way it faces. If that cell is open and
+; holds no creature, it starts a step: monster_x and monster_y keep the old cell while
+; the offsets carry the sprite across, so an interior cell takes four frames (a quarter,
+; a half, three quarters, then square in the new cell). A cell in a room's edge row or
+; column, in the direction of travel, is entered at once, so no sprite is drawn between
+; two rooms and a monster crosses from one room into the next in two frames.
+;
+; Blocked: a wall, a closed door or a creature in the cell keeps the monster where it is.
+; It turns a random way, each of the four equally likely, from the System VIA's timer 1,
+; and tries that way next frame. A monster does not chase anyone: it walks straight on
+; until blocked. find_creature takes hero_damage_taken points from a hero it finds in the
+; cell, so a monster hurts a hero each time it tries to step into them.
+;
+; Dying: a monster killed by a missile or by magic is given sprite &15 (the blank) there.
+; Each frame here advances it through the sparkles &16-&19, drawn where it died.
+;
+; Reappearing: after the last sparkle monster_reappears puts it on the next trapdoor in
+; turn, facing up, to be drawn next frame.
+;
+; reset_monsters starts every monster at the blank with x &FF, so at the start of a level
+; all 30 sparkle off the map together and emerge on the same frame, shared out round the
+; eight trapdoors in turn. Only the target cell is ever tested for a creature: during a
+; slide the monster is still recorded in the cell it is leaving, and the arrival is not
+; checked again, so two monsters, or a monster and a hero, can end a step in the same
+; cell. The creature test made as a monster reappears looks at the wrong cell (see
+; monster_reappears).
 ;
 ; On Exit:
 ;     A: corrupted
@@ -6927,15 +7828,16 @@ clear_text_area_top = set_text_window_top+1
     lda trapdoor_x - 1,x                ; This trapdoor's map x...
     sta cell_x                          ; ...as the cell to plot
     lda trapdoor_y - 1,x                ; ...and its map y
-    sta cell_y                          ; ...likewise
+    sta cell_y                          ; ...as cell_y
     txa                                 ; Keep the trapdoor number...
-    pha                                 ; ...on the stack
+    pha                                 ; ...on the stack: plot_at_cell changes X
     jsr plot_at_cell                    ; Draw it in every view showing its cell
     pla                                 ; Recover the trapdoor number...
-    tax                                 ; ...into X
-    dex                                 ; Next trapdoor
+    tax                                 ; ...back in X
+    dex                                 ; Next trapdoor down
     bne draw_trapdoor                   ; Until trapdoor 1 is drawn
     ldx #max_monster                    ; Then each monster, 30 to 1...
+; Each monster in turn, 30 down to 1. It is first rubbed out where it was drawn last frame, its cell and offsets plotted with the blank sprite, and its cell is kept in previous_x and previous_y. Then its state decides what happens: a dying monster (sprite &15 and up) shows its next sparkle, one part way through a step slides on, and any other tries a new step. The monster number stays on the stack until monster_done.
 ; &79e5 referenced 1 time by &7b2d
 .next_monster_update
     txa                                 ; Keep the monster number...
@@ -6967,26 +7869,26 @@ clear_text_area_top = set_text_window_top+1
     jsr continue_monster_step           ; Yes: slide it a quarter cell further
     pla                                 ; Drop the stacked number (X still has it)...
     jmp draw_monster                    ; ...as draw_monster pushes it again
-; A monster that is not stepping tries the next cell the way it faces. A wall or a creature there (a hero there is hurt) keeps it where it is and turns it a random way to try next frame. Otherwise the step goes ahead: monster_x and monster_y keep the old cell and the offsets carry the sprite across over four frames.
+; A monster that is not stepping tries the next cell the way it faces. Its cell is moved there provisionally and the step's first offsets are set, then the cell is tested: first for a wall or closed door, then for a creature.
 ; &7a23 referenced 1 time by &7a1a
 .start_monster_move
     lda monster_sprite,x                ; Step into the next cell in the way it faces: up...
-    cmp #spr_monster_up_0               ; Facing up?
+    cmp #spr_monster_up_0               ; Sprite 9, facing up?
     bne monster_right                   ; No: try right
     dec monster_y,x                     ; Yes: one row up
 ; &7a2d referenced 1 time by &7a28
 .monster_right
-    cmp #spr_monster_right_0            ; ...right...
+    cmp #spr_monster_right_0            ; Sprite &0B, facing right?
     bne monster_down                    ; No: try down
     inc monster_x,x                     ; Yes: one column right
 ; &7a34 referenced 1 time by &7a2f
 .monster_down
-    cmp #spr_monster_down_0             ; ...down...
+    cmp #spr_monster_down_0             ; Sprite &0D, facing down?
     bne monster_left                    ; No: try left
     inc monster_y,x                     ; Yes: one row down
 ; &7a3b referenced 1 time by &7a36
 .monster_left
-    cmp #spr_monster_left_0             ; ...left
+    cmp #spr_monster_left_0             ; Sprite &0F, facing left?
     bne set_monster_step                ; No: it does not move
     dec monster_x,x                     ; Yes: one column left
 ; &7a42 referenced 1 time by &7a3d
@@ -6995,9 +7897,10 @@ clear_text_area_top = set_text_window_top+1
     lda monster_x,x                     ; Is the new cell a wall (or a closed door)?
     sta cell_x                          ; ...the new x as cell_x
     lda monster_y,x                     ; The new y...
-    sta cell_y                          ; ...as cell_y
+    sta cell_y                          ; ...as cell_y: the cell to test
     jsr test_wall                       ; Z set if the cell is open
     beq check_monster_blocked           ; Open: is a creature in the way?
+; Blocked by a wall: the monster goes back to the cell it was in, with no step under way, and faces a random way. A random 0-7 + 8 gives a sprite &08-&0F; an even one is rounded up to the facing above it, so up, right, down and left are each chosen 2 times in 8. It tries that way on the next frame.
     pla                                 ; Wall: the monster stays where it is...
     tax                                 ; ...its number back in X, which test_wall changed
     lda previous_x                      ; The cell it was in...
@@ -7010,7 +7913,7 @@ clear_text_area_top = set_text_window_top+1
     sta monster_offset_y,x              ; ...no vertical offset
     lda system_via_t1c_l                ; Turn a random way, from the System VIA's timer
     and #7                              ; A random 0-7...
-    clc                                 ; ...plus 8...
+    clc                                 ; ...+ 8, the first monster sprite...
     adc #8                              ; ...a sprite &08-&0F
     sta monster_sprite,x                ; Face the monster that way
     and #1                              ; Odd sprites (9, &0B, &0D, &0F) are the facings
@@ -7020,14 +7923,16 @@ clear_text_area_top = set_text_window_top+1
 .turn_monster
     inc monster_sprite,x                ; Round up: each way is equally likely, 2 in 8
     jmp draw_monster                    ; Draw it; it tries the new way next frame
+; The cell is open: is a monster or hero standing in it? find_creature skips this monster and, because scratch is non-zero, takes hero_damage_taken points from a hero it finds there. A monster mid-slide is still recorded in the cell it is leaving, so it does not block the cell it is entering.
 ; &7a87 referenced 1 time by &7a54
 .check_monster_blocked
     pla                                 ; Monster or hero in the new cell? (a hero there is hurt)
     pha                                 ; ...left stacked for later
     sta scratch                         ; Non-zero scratch: skip this monster, check heroes
     jsr find_creature                   ; A = 0 if no creature is at cell_x, cell_y
-    cmp #0                              ; Anything there?
+    cmp #0                              ; Non-zero: a monster or hero is in the cell
     beq monster_vertical                ; No: the cell is free, so the step goes ahead
+; Blocked by a creature: as for a wall, the monster stays where it was, with no step, and turns a random way.
     pla                                 ; Yes: stay put, with no step, and turn a random way
     tax                                 ; ...its number back in X, which find_creature changed
     lda previous_x                      ; The cell it was in...
@@ -7040,22 +7945,22 @@ clear_text_area_top = set_text_window_top+1
     sta monster_offset_y,x              ; ...no vertical offset
     lda system_via_t1c_l                ; Turn a random way, from the System VIA's timer
     and #7                              ; A random 0-7...
-    clc                                 ; ...plus 8...
+    clc                                 ; ...+ 8, the first monster sprite...
     adc #8                              ; ...a sprite &08-&0F
     sta monster_sprite,x                ; Face the monster that way
     and #1                              ; Odd sprites (9, &0B, &0D, &0F) are the facings
     bne draw_monster                    ; Odd: draw it; it tries the new way next frame
     inc monster_sprite,x                ; Even: round it up to the next facing
     jmp draw_monster                    ; Draw it; it tries the new way next frame
-; A step into a cell on a room's edge row (moving up or down) or edge column (moving across) is made at once, with no slide, so the sprite is never drawn part way between two rooms.
+; The step goes ahead. A step into a cell on a room's edge row (moving up or down) or edge column (moving across) is made at once, with no slide, so the sprite is never drawn part way between two rooms. Any other step keeps the old cell in monster_x and monster_y and lets the offsets carry the sprite across over four frames.
 ; &7ac1 referenced 1 time by &7a91
 .monster_vertical
     pla                                 ; The step goes ahead...
     tax                                 ; ...its number back in X, which find_creature changed
     lda monster_sprite,x                ; Which way is it going?
-    cmp #spr_monster_up_0               ; Facing up?
+    cmp #spr_monster_up_0               ; Moving up, so the new row decides?
     beq check_room_edge                 ; Yes: check the new row
-    cmp #spr_monster_down_0             ; Facing down?
+    cmp #spr_monster_down_0             ; Moving down, likewise?
     beq check_room_edge                 ; Yes: check the new row
     lda monster_x,x                     ; Across: is the new cell in a room's edge column?
     and #7                              ; Column within its eight-cell room
@@ -7084,12 +7989,13 @@ clear_text_area_top = set_text_window_top+1
     sta monster_x,x                     ; ...back in monster_x
     lda previous_y                      ; ...and its row...
     sta monster_y,x                     ; ...back in monster_y: drawn offset from there
+; Draw the monster at its recorded cell, displaced by its offsets, as its facing sprite plus its walking frame, in every view that shows the room. The dying and reappearing paths join at monster_done, which pulls the monster number and moves on to the next.
 ; &7b04 referenced 6 times by &7a20, &7a7e, &7a84, &7ab9, &7abe, &7af5
 .draw_monster
     lda monster_x,x                     ; Draw it: its cell, facing + frame, offsets
-    sta cell_x                          ; ...as cell_x
-    lda monster_y,x                     ; Its row...
-    sta cell_y                          ; ...as cell_y
+    sta cell_x                          ; ...as cell_x for plot_at_cell
+    lda monster_y,x                     ; Its map y...
+    sta cell_y                          ; ...as cell_y for plot_at_cell
     clc                                 ; Ready to add the frame
     lda monster_sprite,x                ; Its facing sprite...
     adc monster_frame,x                 ; ...plus walking frame 0 or 1...
@@ -7104,14 +8010,14 @@ clear_text_area_top = set_text_window_top+1
 ; &7b28 referenced 3 times by &7b5f, &7cf8, &7cfb
 .monster_done
     pla                                 ; The monster number back from the stack...
-    tax                                 ; ...in X
+    tax                                 ; ...in X, to count on down
     dex                                 ; Next monster down
     beq update_monsters_done            ; Past monster 1: all 30 updated
     jmp next_monster_update             ; Otherwise update the next one
 ; &7b30 referenced 1 time by &7b2b
 .update_monsters_done
-    rts                                 ; Return
-; A killed monster is set to sprite &15 (the blank). Each frame the sprite advances, showing the sparkles &16-&19 at the cell and offsets it died at; after the last the monster reappears.
+    rts                                 ; Return: every monster moved and drawn
+; A killed monster is set to sprite &15 (the blank). Each frame the sprite advances, showing the sparkles &16-&19 at the cell and offsets it died at; after the last the monster reappears. Its step counter is left as it was, since a dying monster is dispatched before the step is looked at.
 ; &7b31 referenced 1 time by &7a14
 .advance_dying_monster
     pla                                 ; Drop the stacked number (X still has it)
@@ -7124,81 +8030,86 @@ clear_text_area_top = set_text_window_top+1
 .draw_monster_death
     txa                                 ; Draw the sparkle where the monster died...
     pha                                 ; ...keeping the monster number across the plot
-    lda monster_x,x                     ; Its cell...
-    sta cell_x                          ; ...as cell_x
-    lda monster_y,x                     ; ...and row...
-    sta cell_y                          ; ...as cell_y
+    lda monster_x,x                     ; Its map x, where it died...
+    sta cell_x                          ; ...as cell_x for plot_at_cell
+    lda monster_y,x                     ; ...and its map y...
+    sta cell_y                          ; ...as cell_y for plot_at_cell
     lda monster_sprite,x                ; The sparkle sprite, with no walking frame...
     sta sprite_number                   ; ...is the sprite to plot
     lda monster_offset_x,x              ; Offsets frozen at the moment it died...
-    sta plot_offset_x                   ; ...across
-    lda monster_offset_y,x              ; ...and down
+    sta plot_offset_x                   ; ...across, as plot_offset_x
+    lda monster_offset_y,x              ; ...and how far down it had slid...
     sta plot_offset_y                   ; ...so it sparkles exactly where it died
     jsr plot_at_cell                    ; Draw the sparkle in every view showing it
     jmp monster_done                    ; Pull the monster number and on to the next
 ; ***************************************************************************************
 ; Start a hero's step between cells
 ;
-; Called by move_heroes when a direction key starts a move. Set hero X's step counter to
-; 1 and their pixel offsets to half a cell in the direction they face: 6 rows up or down,
-; or 2 byte columns left or right. move_heroes then draws the hero there, half way to the
-; next cell, for one frame.
+; Called by move_heroes when a direction key starts a move within a room and the hero has
+; no Boots of Speed. Set hero X's step counter to 1 and their pixel offsets to half a
+; cell in the direction they face (hero_direction 1, 3, 5 or 7: up, right, down, left): 6
+; rows up or down, or 2 byte columns left or right. move_heroes then draws the hero
+; there, half way to the next cell, for one frame, still recorded in the old cell;
+; continue_hero_step completes the move on the next frame.
 ;
 ; On Entry:
 ;     X: hero number (0-3)
 ;
 ; On Exit:
+;     A: corrupted
 ;     X: preserved
 ; &7b62 referenced 4 times by &6ece, &6ee1, &6ef4, &6f07
 .start_hero_step
     lda #1                              ; One frame to go before the hero is in the new cell
     sta hero_step,x                     ; ...as hero_step: continue_hero_step ends it
     lda hero_direction,x                ; Draw the hero half a cell along the way they face
-    cmp #1                              ; Facing up?
+    cmp #1                              ; Direction 1, facing up?
     bne hero_step_right                 ; No: try right
     lda #0                              ; Up: not across...
     sta hero_offset_x,x                 ; ...no horizontal offset
     lda #&fa                            ; -6: half a 12-row cell up...
     sta hero_offset_y,x                 ; ...as the vertical offset
-    rts                                 ; Return
+    rts                                 ; Return: drawn half a cell up
 ; &7b79 referenced 1 time by &7b6c
 .hero_step_right
-    cmp #3                              ; Facing right?
+    cmp #3                              ; Direction 3, facing right?
     bne hero_step_down                  ; No: try down
     lda #0                              ; Right: not up or down...
     sta hero_offset_y,x                 ; ...no vertical offset
     lda #2                              ; +2: half a 4-byte cell right...
     sta hero_offset_x,x                 ; ...as the horizontal offset
-    rts                                 ; Return
+    rts                                 ; Return: drawn half a cell right
 ; &7b88 referenced 1 time by &7b7b
 .hero_step_down
-    cmp #5                              ; Facing down?
+    cmp #5                              ; Direction 5, facing down?
     bne hero_step_left                  ; No: they face left
     lda #0                              ; Down: not across...
     sta hero_offset_x,x                 ; ...no horizontal offset
     lda #6                              ; +6: half a cell down...
     sta hero_offset_y,x                 ; ...as the vertical offset
-    rts                                 ; Return
+    rts                                 ; Return: drawn half a cell down
 ; &7b97 referenced 1 time by &7b8a
 .hero_step_left
     lda #0                              ; Left: not up or down...
     sta hero_offset_y,x                 ; ...no vertical offset
     lda #&fe                            ; -2: half a cell left...
     sta hero_offset_x,x                 ; ...as the horizontal offset
-    rts                                 ; Return
+    rts                                 ; Return: drawn half a cell left
 ; ***************************************************************************************
 ; Continue a hero's step between cells
 ;
-; Called by move_heroes on the frame after a step starts. Toggle hero X's animation frame
-; and count down their step. When it ends, move the hero one cell in the direction they
-; face and clear the pixel offsets. The offsets are then doubled. Since start_hero_step
-; sets the counter to 1 and nothing else gives an in-play hero a non-zero step, the step
-; always ends here, so the doubling only ever doubles zero offsets.
+; Called by move_heroes, in place of reading the hero's keys, on the frame after a step
+; starts. Toggle hero X's walking frame and count down their step. When it ends, move the
+; hero one cell in the direction they face and clear the pixel offsets, so a step takes
+; two frames. The offsets are then doubled. Since start_hero_step sets the counter to 1
+; and nothing else gives an in-play hero a non-zero step, the step always ends here, so
+; the doubling only ever doubles zero offsets.
 ;
 ; On Entry:
 ;     X: hero number (0-3)
 ;
 ; On Exit:
+;     A: corrupted
 ;     X: preserved
 ; &7ba2 referenced 1 time by &6eb4
 .continue_hero_step
@@ -7208,22 +8119,22 @@ clear_text_area_top = set_text_window_top+1
     dec hero_step,x                     ; One frame fewer to the new cell
     bne double_offsets                  ; Not there yet (never taken: the step is 1)
     lda hero_direction,x                ; Arrived: move their cell on the way they face: up...
-    cmp #1                              ; Facing up?
+    cmp #1                              ; Direction 1, facing up?
     bne continue_right                  ; No: try right
     dec hero_y,x                        ; Yes: one row up
 ; &7bb9 referenced 1 time by &7bb4
 .continue_right
-    cmp #3                              ; ...right...
+    cmp #3                              ; Direction 3, facing right?
     bne continue_down                   ; No: try down
     inc hero_x,x                        ; Yes: one column right
 ; &7bc0 referenced 1 time by &7bbb
 .continue_down
-    cmp #5                              ; ...down...
+    cmp #5                              ; Direction 5, facing down?
     bne continue_left                   ; No: try left
     inc hero_y,x                        ; Yes: one row down
 ; &7bc7 referenced 1 time by &7bc2
 .continue_left
-    cmp #7                              ; ...left
+    cmp #7                              ; Direction 7, facing left?
     bne hero_no_offsets                 ; No: no move
     dec hero_x,x                        ; Yes: one column left
 ; &7bce referenced 1 time by &7bc9
@@ -7234,76 +8145,83 @@ clear_text_area_top = set_text_window_top+1
 ; &7bd6 referenced 1 time by &7bad
 .double_offsets
     clc                                 ; Double the offsets, which are always zero by now
-    lda hero_offset_x,x                 ; Horizontal offset...
-    adc hero_offset_x,x                 ; ...plus itself...
-    sta hero_offset_x,x                 ; ...doubled
+    lda hero_offset_x,x                 ; Horizontal offset x 2: the offset...
+    adc hero_offset_x,x                 ; ...added to itself...
+    sta hero_offset_x,x                 ; ...stored back, still 0
     clc                                 ; Ready for the vertical offset
-    lda hero_offset_y,x                 ; Vertical offset...
-    adc hero_offset_y,x                 ; ...plus itself...
-    sta hero_offset_y,x                 ; ...doubled
-    rts                                 ; Return
+    lda hero_offset_y,x                 ; Vertical offset x 2: the offset...
+    adc hero_offset_y,x                 ; ...added to itself...
+    sta hero_offset_y,x                 ; ...stored back, still 0
+    rts                                 ; Return: the hero is squarely in the new cell
 ; ***************************************************************************************
 ; Start a monster's step between cells
 ;
-; Called by update_monsters as a monster starts a move. Set monster X's step counter to 3
-; and its offsets to the first quarter of a cell in the direction it faces: 3 rows up or
-; down, or one byte column left or right.
+; Called by update_monsters when a monster that is not stepping tries the next cell,
+; before that cell is tested. Set monster X's step counter to 3 and its offsets to the
+; first quarter of a cell in the direction it faces: 3 rows up or down, or one byte
+; column left or right. If the cell turns out to be blocked, or on a room's edge,
+; update_monsters clears all three again; otherwise the monster is drawn this frame a
+; quarter of the way there, and continue_monster_step takes over on the next.
 ;
 ; On Entry:
-;     X: monster number
+;     X: monster number (1-30)
 ;
 ; On Exit:
+;     A: corrupted
 ;     X: preserved
 ; &7beb referenced 1 time by &7a42
 .start_monster_step
     lda #3                              ; Three more frames to reach the new cell...
     sta monster_step,x                  ; ...as the step count
     lda monster_sprite,x                ; Draw it a quarter cell along the way it faces: up...
-    cmp #spr_monster_up_0               ; Facing up?
+    cmp #spr_monster_up_0               ; Sprite 9, facing up?
     bne monster_step_right              ; No: try right
     lda #0                              ; Up: not across...
     sta monster_offset_x,x              ; ...no horizontal offset
     lda #&fd                            ; -3: a quarter of a 12-row cell up...
     sta monster_offset_y,x              ; ...as the vertical offset
-    rts                                 ; Return
+    rts                                 ; Return: drawn a quarter cell up
 ; &7c02 referenced 1 time by &7bf5
 .monster_step_right
-    cmp #spr_monster_right_0            ; Facing right?
+    cmp #spr_monster_right_0            ; Sprite &0B, facing right?
     bne monster_step_down               ; No: try down
     lda #0                              ; Right: not up or down...
     sta monster_offset_y,x              ; ...no vertical offset
     lda #1                              ; +1: a quarter of a 4-byte cell right...
     sta monster_offset_x,x              ; ...as the horizontal offset
-    rts                                 ; Return
+    rts                                 ; Return: drawn a quarter cell right
 ; &7c11 referenced 1 time by &7c04
 .monster_step_down
-    cmp #spr_monster_down_0             ; Facing down?
+    cmp #spr_monster_down_0             ; Sprite &0D, facing down?
     bne monster_step_left               ; No: it faces left
     lda #0                              ; Down: not across...
     sta monster_offset_x,x              ; ...no horizontal offset
     lda #3                              ; +3: a quarter of a cell down...
     sta monster_offset_y,x              ; ...as the vertical offset
-    rts                                 ; Return
+    rts                                 ; Return: drawn a quarter cell down
 ; &7c20 referenced 1 time by &7c13
 .monster_step_left
     lda #0                              ; Left: not up or down...
     sta monster_offset_y,x              ; ...no vertical offset
     lda #&ff                            ; -1: a quarter of a cell left...
     sta monster_offset_x,x              ; ...as the horizontal offset
-    rts                                 ; Return
+    rts                                 ; Return: drawn a quarter cell left
 ; ***************************************************************************************
 ; Continue a monster's step between cells
 ;
-; Called by update_monsters each frame while monster X's step is under way. Toggle its
-; frame and count down its step. On the first two calls, grow the offsets by another
-; quarter of a cell (a byte column or three rows), to a half and three quarters. On the
-; third the step ends: the monster moves one cell on and its offsets are cleared. A
-; monster so crosses a cell in four frames.
+; Called by update_monsters each frame while monster X's step is under way (monster_step
+; non-zero). Toggle its walking frame, so its legs move, and count down its step. On the
+; first two calls the offsets grow by another quarter of a cell (a byte column or three
+; rows), to a half and then three quarters. On the third the step ends: monster_x or
+; monster_y moves one cell on the way it faces and the offsets are cleared, so it is
+; drawn squarely in the new cell. With the frame start_monster_step began, a monster
+; crosses an interior cell in four frames. Nothing tests the new cell again on arrival.
 ;
 ; On Entry:
-;     X: monster number
+;     X: monster number (1-30)
 ;
 ; On Exit:
+;     A: corrupted
 ;     X: preserved
 ; &7c2b referenced 1 time by &7a1c
 .continue_monster_step
@@ -7313,22 +8231,22 @@ clear_text_area_top = set_text_window_top+1
     dec monster_step,x                  ; One frame fewer to the new cell
     bne grow_offset_x                   ; Not there yet: slide a quarter cell further
     lda monster_sprite,x                ; Arrived: move its cell on the way it faces: up...
-    cmp #spr_monster_up_0               ; Facing up?
+    cmp #spr_monster_up_0               ; Sprite 9, facing up?
     bne monster_continue_right          ; No: try right
     dec monster_y,x                     ; Yes: one row up
 ; &7c42 referenced 1 time by &7c3d
 .monster_continue_right
-    cmp #spr_monster_right_0            ; ...right...
+    cmp #spr_monster_right_0            ; Sprite &0B, facing right?
     bne monster_continue_down           ; No: try down
     inc monster_x,x                     ; Yes: one column right
 ; &7c49 referenced 1 time by &7c44
 .monster_continue_down
-    cmp #spr_monster_down_0             ; ...down...
+    cmp #spr_monster_down_0             ; Sprite &0D, facing down?
     bne monster_continue_left           ; No: try left
     inc monster_y,x                     ; Yes: one row down
 ; &7c50 referenced 1 time by &7c4b
 .monster_continue_left
-    cmp #spr_monster_left_0             ; ...left
+    cmp #spr_monster_left_0             ; Sprite &0F, facing left?
     bne monster_no_offsets              ; No: no move
     dec monster_x,x                     ; Yes: one column left
 ; &7c57 referenced 1 time by &7c52
@@ -7353,26 +8271,28 @@ clear_text_area_top = set_text_window_top+1
     bpl grow_offset_y_down              ; Positive: moving down
     sec                                 ; Moving up: three more rows up...
     lda monster_offset_y,x              ; ...from the vertical offset...
-    sbc #3                              ; ...less three...
+    sbc #3                              ; ...three rows further up...
     sta monster_offset_y,x              ; ...to -6 or -9
-    jmp monster_step_done               ; Done
+    jmp monster_step_done               ; Offsets grown: return
 ; &7c82 referenced 1 time by &7c74
 .grow_offset_y_down
     clc                                 ; Moving down: three more rows down...
     lda monster_offset_y,x              ; ...from the vertical offset...
-    adc #3                              ; ...plus three...
+    adc #3                              ; ...three rows further down...
     sta monster_offset_y,x              ; ...to 6 or 9
 ; &7c8b referenced 2 times by &7c72, &7c7f
 .monster_step_done
-    rts                                 ; Return
+    rts                                 ; Return: offsets grown, or the step ended
     equb &de, &35, &0d, &bd, &35, &0d, &d0, &00
     equb &60                            ; Not referenced
 ; ***************************************************************************************
 ; Test whether a key is pressed
 ;
-; Scan the key whose negative INKEY number is in A with OSBYTE &81 (Y = &FF), which
-; returns X = Y = &FF if it is held. move_heroes uses it for each hero's direction and
-; fire keys, and check_magic for the magic keys.
+; Report whether one key is held down at this moment. read_hero_keys calls it for each
+; hero's direction and fire keys, from the hero_key tables, and check_magic for the
+; Ranger's and Magic-User's magic keys. The key is scanned with OSBYTE &81 and a negative
+; INKEY number (Y = &FF), which returns X = Y = &FF if it is held; the caller's X, the
+; hero number, is kept on the stack across the call.
 ;
 ; On Entry:
 ;     A: INKEY key number (negative, as a byte)
@@ -7381,6 +8301,7 @@ clear_text_area_top = set_text_window_top+1
 ;     A: 0 if the key is pressed, 1 if not
 ;     Z: set if the key is pressed
 ;     X: preserved
+;     Y: corrupted
 ; &7c95 referenced 6 times by &6ec4, &6ed7, &6eea, &6efd, &6f10, &7627
 .test_key
     tay                                 ; Park the INKEY number in Y for a moment
@@ -7390,7 +8311,7 @@ clear_text_area_top = set_text_window_top+1
     tax                                 ; ...in X, as OSBYTE &81 wants it
     lda #osbyte_inkey                   ; OSBYTE &81 with Y = &FF: scan the key
     ldy #&ff                            ; Y = &FF: scan the one key, not wait
-    jsr osbyte                          ; Scan it: X = Y = &FF if the hero's key is held  Test whether the key with negative INKEY number X is pressed
+    jsr osbyte                          ; Scan it: X = Y = &FF if the key is held.  Test whether the key with negative INKEY number X is pressed
     cpy #&ff                            ; Held only if both Y and X come back &FF
     bne key_not_pressed                 ; Y not &FF: the key is up
     cpx #&ff                            ; X = &FF too?
@@ -7398,14 +8319,14 @@ clear_text_area_top = set_text_window_top+1
     pla                                 ; Held: the caller's X back from the stack...
     tax                                 ; ...the hero number again
     lda #0                              ; A = 0, Z set: the key is held
-    rts                                 ; Return
+    rts                                 ; Return with Z set: the key is held
 ; &7cae referenced 2 times by &7ca3, &7ca7
 .key_not_pressed
     pla                                 ; Up: the caller's X back from the stack...
     tax                                 ; ...the hero number again
     lda #1                              ; A = 1, Z clear: the key is up
-    rts                                 ; Return
-; The monster comes back facing up on the next trapdoor in turn. It is not drawn until next frame. The creature test that follows reads cell_x and cell_y, which still hold the dying monster's position within its view, as the erase's plot_at_cell left them, not the trapdoor's cell. So a creature already on the trapdoor does not stop the monster emerging; one that happens to stand at the unrelated cell the leftovers name parks the monster at &FF,&FF, still alive, where nothing returns it to a trapdoor (and a hero there is hurt).
+    rts                                 ; Return with Z clear: the key is up
+; The monster comes back facing up on the next trapdoor in turn, with the hit points the kill gave it back. It is not drawn until next frame. The creature test that follows reads cell_x and cell_y, which still hold the dying monster's position within its view, as the erase's plot_at_cell left them, not the trapdoor's cell. So a creature already on the trapdoor does not stop the monster emerging; one that happens to stand at the unrelated cell the leftovers name parks the monster at &FF,&FF, still alive, where nothing returns it to a trapdoor (and a hero there is hurt).
 ; &7cb3 referenced 1 time by &7b3c
 .monster_reappears
     inc next_trapdoor                   ; Each reappearance uses the next trapdoor in turn
@@ -7444,16 +8365,23 @@ clear_text_area_top = set_text_window_top+1
 .emerge_done
     jmp monster_done                    ; Pull the monster number and on to the next
     equb &00                            ; Not referenced
+; Hit points a monster starts with on this level: 6 + 2 x the level number (8 on level 1).
 ; &7cff referenced 3 times by &0e1b, &15f0, &759b
 .monster_start_hit_points
     equb &08
+; Initial contents of page &0D, copied there at the start of every level.
 ; ***************************************************************************************
 ; Workspace template
 ;
-; The starting contents of page &0D for each level, copied there by reset_workspace: the
-; heroes' starting positions, directions, keys (hero_key_up etc. at +&70), health of 99 +
-; 1 (at +&90, +&95), the views' rooms (+&A0), sprite bases (+&B0, +&B5), bit masks (+&C0)
-; and panel rows (+&D0).
+; The starting contents of page &0D, the heroes' and missiles' workspace, which
+; reset_workspace copies there whole at the start of every level. Byte +n becomes &0D00 +
+; n. It sets the heroes in the four cells of the start, facing four ways and not
+; stepping; every missile slot empty; each hero's direction and fire keys (hero_key_up
+; etc. at +&70, as negative INKEY numbers for test_key); health digits 9 and 9 + 1 (+&90,
+; +&95), which read 99 once draw_status_panel has taken a point; every view on the start
+; room (+&A0); the heroes' and missiles' sprite bases (+&B0, +&B5); the bit masks
+; test_wall and test_object_free use (+&C0); and the panel rows (+&D0). The bytes between
+; variables are copied with the rest.
 ; &7d00 used as index base 1 time by &150f
 .workspace_template
     equb &00                            ; scratch: working byte
@@ -7473,7 +8401,7 @@ clear_text_area_top = set_text_window_top+1
     equb &26                            ; Copied to &0D19: no variable starts here
     equb &01, &03, &05, &07             ; hero_direction: facing up, right, down and left
     equb &2d, &2f                       ; Copied to &0D1E: no variable starts here
-    equb &01, &01, &01, &01             ; hero_frame: frame 1
+    equb &01, &01, &01, &01             ; hero_frame: walking frame 1 for every hero
     equb &5d                            ; Copied to &0D24: no variable starts here
     equb &00, &00, &00, &00             ; hero_step: not stepping
     equb &16                            ; Copied to &0D29: no variable starts here
@@ -7490,14 +8418,14 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &00, &00, &00             ; missile_direction: every slot empty
     equb &15, &85, &7a, &8a, &48, &20, &00, &09
     equb &68, &aa, &bd, &08             ; missile_sprite_base: set when a missile is fired
-    equb inkey_key_caps_lock, inkey_key_keypad_hash, inkey_key_g, inkey_key_underscore  ; hero_key_up: each hero's up key
-    equb inkey_key_shift_lock, inkey_key_keypad_del, inkey_key_b, inkey_key_return  ; hero_key_down
-    equb inkey_key_z, inkey_key_keypad_comma, inkey_key_m, inkey_key_copy  ; hero_key_right
-    equb inkey_key_shift, inkey_key_keypad_3, inkey_key_n, inkey_key_delete  ; hero_key_left
-    equb inkey_key_tab, inkey_key_keypad_asterisk, inkey_key_space, inkey_key_left_square_bracket  ; hero_key_fire
+    equb inkey_key_caps_lock, inkey_key_keypad_hash, inkey_key_g, inkey_key_underscore  ; hero_key_up: heroes 0-3, read through test_key
+    equb inkey_key_shift_lock, inkey_key_keypad_del, inkey_key_b, inkey_key_return  ; hero_key_down: likewise, one per hero
+    equb inkey_key_z, inkey_key_keypad_comma, inkey_key_m, inkey_key_copy  ; hero_key_right: likewise
+    equb inkey_key_shift, inkey_key_keypad_3, inkey_key_n, inkey_key_delete  ; hero_key_left: likewise
+    equb inkey_key_tab, inkey_key_keypad_asterisk, inkey_key_space, inkey_key_left_square_bracket  ; hero_key_fire: likewise
     equb &0d, &c9, &05, &d0, &09, &18, &bd, &04
     equb &0d, &69, &03, &9d             ; Copied to &0D84: no variable starts here
-    equb spr_digit_9, spr_digit_9, spr_digit_9, spr_digit_9  ; hero_health_tens: 9...
+    equb spr_digit_9, spr_digit_9, spr_digit_9, spr_digit_9  ; hero_health_tens: the 9 digit sprite...
     equb &d0                            ; Copied to &0D94: no variable starts here
     equb spr_digit_9 + 1, spr_digit_9 + 1, spr_digit_9 + 1, spr_digit_9 + 1  ; hero_health_units: ...9 + 1: health 99 once a point is taken
     equb &18, &bd, &08, &0d, &6d, &40, &0d  ; Copied to &0D99: no variable starts here
@@ -7521,16 +8449,19 @@ clear_text_area_top = set_text_window_top+1
     equb &1e                            ; teleport_last: object &1E, the last
     equb &fd                            ; Copied to &0DFE: no variable starts here
     equb &00                            ; victory_sprite_copy: set before use
+; Map x of each monster (entries 1-30; entry 0 unused). During a step it stays the cell the monster is leaving until the step ends, so find_creature, the missiles and the magic all meet the monster there. &FF (off_map) after reset_monsters, and for a monster monster_reappears has parked. Written by update_monsters, continue_monster_step and monster_reappears.
 ; &7e00 used as index base 17 times by &15ed, &7667, &797e, &79e7, &7a31, &7a3f, &7a45, &7a5b, &7a98, &7ace, &7afb, &7b04, &7b41, &7c46, &7c54, &7cc8, &7cf2
 .monster_x
     equb &00, &04, &0b, &09, &1d, &08, &01, &06, &07, &0a, &01, &0b, &1a, &06, &0b, &16  ; Not read: reset_monsters and the trapdoors set the monsters
     equb &15, &0d, &1b, &14, &1a, &09, &1c, &0f, &1e, &02, &1a, &0b, &1c, &0e, &16, &00  ; ...entries 16-31, not read
     equb &00, &00, &00, &1a, &00, &00, &00, &00, &00  ; ...entries 32-40, not read
+; Map y of each monster, kept like monster_x.
 ; &7e29 used as index base 16 times by &766d, &7986, &79f0, &7a2a, &7a38, &7a4b, &7a61, &7a9e, &7adc, &7b01, &7b0a, &7b47, &7c3f, &7c4d, &7cce, &7cf5
 .monster_y
     equb &00, &24, &17, &25, &20, &24, &22, &14, &27, &0d, &20, &01, &26, &0a, &01, &12  ; Not read: reset_monsters and the trapdoors set the monsters
     equb &05, &20, &29, &0d, &26, &27, &08, &06, &1a, &14, &03, &1d, &07, &0d, &17, &00  ; ...entries 16-31, not read
     equb &00, &00, &00, &1b, &00, &00, &00, &00, &00  ; ...entries 32-40, not read
+; Each monster's state as a sprite number: 9, &0B, &0D or &0F facing up, right, down or left; &15 (the blank) when just killed, then &16-&19, the sparkles of its death, one a frame. It reaches &1A only for the moment before monster_reappears resets it to 9.
 ; &7e52 used as index base 19 times by &15e8, &7144, &7598, &7683, &768c, &7a0d, &7a23, &7a77, &7a81, &7ab4, &7abb, &7ac3, &7b11, &7b32, &7b35, &7b4d, &7bf0, &7c38, &7cd3
 .monster_sprite
     equb &00, &09, &0d, &0b, &0b, &0b, &09, &0f
@@ -7539,6 +8470,7 @@ clear_text_area_top = set_text_window_top+1
     equb &0d, &0f, &0b, &09, &0d, &0b, &09, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00
+; Each monster's animation frame (0 or 1), added to its facing sprite; toggled on each frame of a step.
 ; &7e7b used as index base 3 times by &7b14, &7c2b, &7c30
 .monster_frame
     equb &00, &00, &01, &00, &00, &01, &01, &00
@@ -7547,6 +8479,7 @@ clear_text_area_top = set_text_window_top+1
     equb &01, &00, &00, &00, &01, &01, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00
+; How far each monster is drawn across from its cell during a step, in byte columns: 0, or +/-1 to 3.
 ; &7ea4 used as index base 15 times by &79fd, &7a69, &7aa6, &7aef, &7b19, &7b52, &7bf9, &7c0d, &7c17, &7c27, &7c59, &7c5f, &7c66, &7c6c, &7cdb
 .monster_offset_x
     equb &00, &00, &00, &02, &02, &02, &00, &fd
@@ -7555,6 +8488,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &00, &03, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00
+; How far each monster is drawn down from its cell during a step, in pixel rows: 0, or +/-3, 6 or 9.
 ; &7ecd used as index base 17 times by &7a02, &7a6c, &7aa9, &7af2, &7b1e, &7b57, &7bfe, &7c08, &7c1c, &7c22, &7c5c, &7c6f, &7c77, &7c7c, &7c83, &7c88, &7cde
 .monster_offset_y
     equb &00, &fd, &00, &00, &00, &00, &fa, &00
@@ -7563,6 +8497,7 @@ clear_text_area_top = set_text_window_top+1
     equb &06, &00, &00, &f7, &00, &00, &f7, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00
+; Frames left in each monster's step between cells: 3 when the step starts, counted down by continue_monster_step, 0 when the monster is not stepping. Not looked at while a monster is dying; monster_reappears clears it.
 ; &7ef6 used as index base 7 times by &7a17, &7a66, &7aa3, &7aec, &7bed, &7c33, &7cd8
 .monster_step
     equb &00, &03, &00, &02, &02, &02, &02, &01
@@ -7571,20 +8506,25 @@ clear_text_area_top = set_text_window_top+1
     equb &02, &00, &01, &01, &00, &00, &01, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00
+; Map x of each object on the level (entries 1-30), from the level file; &FF once collected. Entry 30 is the exit.
 ; &7f20 used as index base 9 times by &1576, &7173, &719a, &730d, &7337, &73ea, &7413, &7469, &74bb
 .object_x
     equb &00, &ff, &ff, &ff, &ff, &ff, &18, &04, &04, &05, &ff, &ff, &ff, &ff, &ff, &ff  ; Not read: unpack_level copies each level's objects here
     equb &ff, &ff, &ff, &ff, &ff, &01, &07, &04, &04, &ff, &ff, &ff, &ff, &ff  ; ...entries 16-29, not read
+; Map x of the exit (object 30).
 ; &7f3e referenced 4 times by &1f3b, &1f77, &1f85, &2029
 .exit_x
     equb &04                            ; ...the exit's entry
+; Map y of each object.
 ; &7f3f used as index base 9 times by &157c, &717b, &719d, &7313, &7342, &73f3, &7416, &746c, &74be
 .object_y
     equb &00, &ff, &ff, &ff, &ff, &ff, &15, &18, &19, &19, &ff, &ff, &ff, &ff, &ff, &ff  ; Not read: unpack_level copies each level's objects here
     equb &ff, &ff, &ff, &ff, &ff, &2a, &2a, &2b, &2e, &ff, &ff, &ff, &ff, &ff  ; ...entries 16-29, not read
+; Map y of the exit (object 30).
 ; &7f5d referenced 4 times by &1f43, &1f7d, &1f88, &202f
 .exit_y
     equb &2c                            ; ...the exit's entry
+; Each object's type, which is also its sprite: &28 treasure, &29 food, &2A Cross of Resurrection, &2B teleporter, &51 exit, &53-&5E energy drainer (advancing with each hit), &5F Boots of Speed, &60 magic helmet, &61 potion of healing, &62 pile of weapons, &63 magic sword.
 ; &7f5e used as index base 7 times by &1582, &7183, &718e, &7191, &7319, &735c, &73c8
 .object_type
     equb &00, &5f, &5f, &5f, &29, &63, &5f, &53, &2b, &53, &28, &28, &60, &60, &28, &2a  ; Not read: unpack_level copies each level's objects here
@@ -7617,17 +8557,17 @@ clear_text_area_top = set_text_window_top+1
     tya                                 ; ...and the caller's Y
     pha                                 ; ...on the stack: OSWRCH must preserve both
     lda plot_x                          ; Classify the character by range
-    cmp #'0'                            ; Below '0'?
+    cmp #'0'                            ; Below '0': a control code, space or punctuation?
     bcc pass_character                  ; Controls, space, punctuation: the MOS font
-    cmp #':'                            ; '0'-'9'?
+    cmp #':'                            ; Below ':', so a digit '0'-'9'?
     bcc digit_glyph                     ; A digit: use the game's digit glyph
-    cmp #'A'                            ; ':'-'@'?
+    cmp #'A'                            ; Below 'A', so ':' to '@'?
     bcc pass_character                  ; Punctuation: the MOS font
-    cmp #'['                            ; 'A'-'Z'?
+    cmp #'['                            ; Below '[', so a capital 'A'-'Z'?
     bcc capital_letter                  ; A capital: use the game's letter glyph
-    cmp #'a'                            ; '['-'`'?
+    cmp #'a'                            ; Below 'a', so '[' to '`'?
     bcc pass_character                  ; Punctuation: the MOS font
-    cmp #'{'                            ; Beyond 'z'?
+    cmp #'{'                            ; '{' or above, past the lower-case letters?
     bcs pass_character                  ; '{' and above: the MOS font
     sec                                 ; Lower case: letter number 0-25...
     sbc #'a'                            ; ...so it is drawn with the capital's glyph
@@ -7638,8 +8578,8 @@ clear_text_area_top = set_text_window_top+1
     sbc #'A'                            ; ...0 for 'A'
 ; &7fb8 referenced 1 time by &7fb2
 .glyph_offset
-    asl a                               ; x 2: eight bytes a glyph in font_letters...
-    asl a                               ; ...x 4...
+    asl a                               ; Glyph offset = letter x 8 in font_letters: x 2...
+    asl a                               ; ...x 4 (8 bytes a glyph)...
     asl a                               ; ...x 8: the glyph's offset (at most 200)
     bne copy_glyph                      ; Branch to the next instruction either way
 ; &7fbd referenced 1 time by &7fbb
@@ -7669,8 +8609,8 @@ clear_text_area_top = set_text_window_top+1
 .digit_glyph
     sec                                 ; Digit: digit number 0-9...
     sbc #'0'                            ; ...0 for '0'
-    asl a                               ; x 2: eight bytes a glyph in font_digits...
-    asl a                               ; ...x 4...
+    asl a                               ; Glyph offset = digit x 8 in font_digits: x 2...
+    asl a                               ; ...x 4 (8 bytes a glyph)...
     asl a                               ; ...x 8: the glyph's offset
     tax                                 ; X indexes the glyph in font_digits
     clc                                 ; End offset = start + 8...
@@ -7708,7 +8648,12 @@ clear_text_area_top = set_text_window_top+1
 ; &AA) and right (M &9A) from channel 1, up (G &AC) and down (B &9B) from channel 2, and
 ; fire (SPACE &9D) from either fire button. A direction counts only at the stick's
 ; extreme, when the channel's high byte is &FF or 0. Every other call goes to the MOS
-; 3.20 OSBYTE routine at &EEB1 directly.
+; 3.20 OSBYTE routine at &EEB1 directly, skipping any other BYTEV claimant; the handler's
+; own OSBYTE &80 reads come back through BYTEV into it and are passed on the same way.
+; The Barbarian's five keys are never scanned while it is installed, so that hero can be
+; played only with the joystick. test_key counts a key as held only when X and Y both
+; come back &FF, so a not-pressed answer needs only X = 0. It lives in private RAM and so
+; works only while HAZEL is paged in.
 ;
 ; On Entry:
 ;     A: OSBYTE number
@@ -7739,7 +8684,7 @@ clear_text_area_top = set_text_window_top+1
     cpy #&ff                            ; ...high byte &FF: pushed fully left?
     bne joystick_not_pressed            ; No: not pressed
     ldx #&ff                            ; Yes: pressed (Y is already &FF)
-    rts                                 ; Return
+    rts                                 ; Return X = Y = &FF: left is pressed
 ; &c529 referenced 1 time by &c512
 .joystick_right
     ldx #1                              ; M: channel 1 high byte 0?
@@ -7749,7 +8694,7 @@ clear_text_area_top = set_text_window_top+1
     bne joystick_not_pressed            ; No: not pressed
     dey                                 ; Yes: pressed (Y = &FF)
     ldx #&ff                            ; ...X = Y = &FF, as INKEY reports a key held
-    rts                                 ; Return
+    rts                                 ; Return X = Y = &FF: right is pressed
 ; &c538 referenced 1 time by &c50e
 .joystick_up
     ldx #2                              ; G: channel 2 high byte &FF?
@@ -7758,7 +8703,7 @@ clear_text_area_top = set_text_window_top+1
     cpy #&ff                            ; ...high byte &FF: pushed fully up?
     bne joystick_not_pressed            ; No: not pressed
     ldx #&ff                            ; Yes: pressed (Y is already &FF)
-    rts                                 ; Return
+    rts                                 ; Return X = Y = &FF: up is pressed
 ; &c546 referenced 1 time by &c50a
 .joystick_down
     ldx #2                              ; B: channel 2 high byte 0?
@@ -7768,7 +8713,7 @@ clear_text_area_top = set_text_window_top+1
     bne joystick_not_pressed            ; No: not pressed
     dey                                 ; Yes: pressed (Y = &FF)
     ldx #&ff                            ; ...X = Y = &FF, as INKEY reports a key held
-    rts                                 ; Return
+    rts                                 ; Return X = Y = &FF: down is pressed
 ; &c555 referenced 1 time by &c516
 .joystick_fire
     ldx #0                              ; Fire: either fire button?
@@ -7777,13 +8722,13 @@ clear_text_area_top = set_text_window_top+1
     txa                                 ; ...the button bits...
     and #3                              ; ...bits 0-1: either button held?
     beq joystick_not_pressed            ; No: not pressed
-    ldx #&ff                            ; Yes: pressed
+    ldx #&ff                            ; Yes: X = &FF, fire pressed...
     ldy #&ff                            ; ...X = Y = &FF, as INKEY reports a key held
-    rts                                 ; Return
+    rts                                 ; Return X = Y = &FF: fire is pressed
 ; &c566 referenced 5 times by &c524, &c532, &c541, &c54f, &c55f
 .joystick_not_pressed
     ldx #0                              ; Not pressed: X = 0, which test_key reads as not held
-    rts                                 ; Return
+    rts                                 ; Return X = 0: the key is not pressed
 ; &c569 referenced 1 time by &c502
 .joystick_pass_on
     jmp mos320_osbyte_default           ; Not INKEY: on to the MOS 3.20 OSBYTE routine
@@ -7795,8 +8740,12 @@ clear_text_area_top = set_text_window_top+1
 ; ***************************************************************************************
 ; Load level 25 from Stones
 ;
-; Level 25 has no file of its own: Stones ends with its data, so *LOAD STONES 6680 puts
-; it at &6B00. Then decrypt and check it.
+; load_level's way to level 25, reached by its JMP when level_number is 25, with page &0D
+; already given back to the filing system. Level 25 has no file of its own: Stones (&730
+; bytes) ends with its data, so *LOAD STONES 6680 puts it at &6B00-&6DAF. Then jump to
+; decrypt_level, which returns to start_level. stones_command is ended by a zero byte,
+; not a carriage return; the first CR after it is at &C623, the end of the leftover
+; DUNJUNZ.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -7807,9 +8756,9 @@ clear_text_area_top = set_text_window_top+1
     ldx #<(stones_command)              ; *LOAD STONES 6680
     ldy #>(stones_command)              ; ...high byte of the command
     jsr oscli                           ; ...level 25 is at the end of Stones
-    jmp decrypt_level                   ; Decrypt and check it, and return from there
+    jmp decrypt_level                   ; Decrypt and check it; it returns to start_level
 .stones_command
-    equs "LOAD STONES 6680"
+    equs "LOAD STONES 6680"             ; *LOAD STONES 6680, with no CR after it
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -7818,7 +8767,7 @@ clear_text_area_top = set_text_window_top+1
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00   ; Not referenced
+    equb &00, &00, &00, &00, &00, &00   ; 0, where a CR would end stones_command; unused zeros
 ; ***************************************************************************************
 ; Stop the music for the game-over message
 ;
@@ -7838,7 +8787,7 @@ clear_text_area_top = set_text_window_top+1
     jsr oswrch                          ; ...whose four edges the caller sends next
     lda #0                              ; Top row 0 in clear_text_area's window...
     sta clear_text_area_top             ; ...where it is already 0
-    rts                                 ; Return
+    rts                                 ; Return to send the window's edges
 ; ***************************************************************************************
 ; Unused
 ;
@@ -7887,10 +8836,10 @@ row_offsets_lo = row_offsets+1
 ;     X: corrupted
 ;     Y: corrupted
 .show_free_space
-    ldx #<(free_command)                ; *FREE...
+    ldx #<(free_command)                ; *FREE: X, Y = free_command...
     ldy #>(free_command)                ; ...high byte of the command
     jsr oscli                           ; ...print the disc's free space
-    rts                                 ; Return
+    rts                                 ; Return to the editor
 .free_command
     equs "FREE", &0d
     equb &00, &00, &00                  ; Not referenced
@@ -7898,8 +8847,10 @@ row_offsets_lo = row_offsets+1
 ; Pause while P is pressed
 ;
 ; Reached by check_pause's JMP, last in each frame's update, so its RTS returns from
-; update_game. If P (internal key &37) is held, wait for it to be released, pressed again
-; and released, then give the next frame its usual three vertical syncs. OSBYTE &7A
+; update_game to play_level. If P (internal key &37) is held, wait for it to be released,
+; pressed again and released, then give the next frame its usual three vertical syncs.
+; Waiting for the second release means a P still held cannot pause the game again at the
+; next frame. The music plays on through the pause, on its timer event. OSBYTE &7A
 ; reports a single key, so P is seen only when the scan finds it rather than another key
 ; held with it.
 ;
@@ -7911,26 +8862,26 @@ row_offsets_lo = row_offsets+1
 .pause_check
     lda #osbyte_scan_keyboard_from_16   ; OSBYTE &7A: which key is pressed?
     jsr osbyte                          ; ...X = the key held, if any  Scan keyboard from key 16
-    cpx #&37 ; '7'                      ; P?
+    cpx #&37 ; '7'                      ; Is it P (internal key &37)?
     bne not_paused                      ; No: on with play
     jsr wait_p_released                 ; Paused: wait for P to be released...
 ; &c6dc referenced 1 time by &c6e3
 .wait_p_pressed
-    lda #osbyte_scan_keyboard_from_16   ; ...pressed again...
+    lda #osbyte_scan_keyboard_from_16   ; ...then scan again until P is pressed again...
     jsr osbyte                          ; ...X = the key held  Scan keyboard from key 16
-    cpx #&37 ; '7'                      ; ...P?
+    cpx #&37 ; '7'                      ; ...is it P yet?
     bne wait_p_pressed                  ; No: stay paused
     jsr wait_p_released                 ; ...and released, so the next frame cannot re-pause
     lda #2                              ; Restart the frame timing: 2...
     sta os_vsync_counter                ; ...gives the next frame the usual three vsyncs
 ; &c6ed referenced 1 time by &c6d7
 .not_paused
-    rts                                 ; Return
+    rts                                 ; Return to play_level: this frame's update is done
 ; ***************************************************************************************
 ; Wait until P is not pressed
 ;
-; Scan the keyboard with OSBYTE &7A until the key found is no longer P (internal key
-; &37).
+; Called twice by pause_check, once for each release of P. Scan the keyboard with OSBYTE
+; &7A until the key found is no longer P (internal key &37).
 ;
 ; On Exit:
 ;     A: corrupted
@@ -7940,9 +8891,9 @@ row_offsets_lo = row_offsets+1
 .wait_p_released
     lda #osbyte_scan_keyboard_from_16   ; OSBYTE &7A: which key is pressed?
     jsr osbyte                          ; ...X = the key held  Scan keyboard from key 16
-    cpx #&37 ; '7'                      ; Still P?
+    cpx #&37 ; '7'                      ; Is it still P?
     beq wait_p_released                 ; Yes: keep waiting
-    rts                                 ; Return
+    rts                                 ; Return to pause_check: P is released
 .dasmos_table_end
 
     org &c700
@@ -7951,63 +8902,77 @@ row_offsets_lo = row_offsets+1
 ; ***************************************************************************************
 ; Start the music
 ;
-; Called by start_level once each level is drawn. Define envelopes 6-9, redirect the
-; game's plot_sprite to the copy in Code3 (from the first level on, so the hero menu
-; before it uses the original), point the tune at its first section, and play it on the
-; interval timer: EVNTV is pointed at music_event and the interval timer event enabled.
-; Then play the first step, which also sets the timer for the next.
+; Start the in-game music from the top of the tune. Called by start_level once each level
+; is drawn; start_level then puts back the music's place from the last level, if there
+; was one.
+;
+; Define envelopes 6-9 for the tune's sounds. Redirect the game's plot_sprite to
+; plot_sprite_hazel, the copy in Code3, by writing a JMP over its first three bytes: this
+; happens from the first level on, so the hero menu before it uses the original. Point
+; tune_ptr at the tune's first section (section 0, which plays only once), set the rhythm
+; step to -1 and the transposition to 0. Then hand the music to the interval timer: EVNTV
+; is pointed at music_event and the interval timer event enabled. Last, jump to
+; music_event to play the first step, which also sets the timer for the next and returns
+; to start_level.
 ;
 ; On Exit:
 ;     A: corrupted
 ;     X: corrupted
 ;     Y: corrupted
+; Define the four envelopes the tune uses.
 ; &c700 referenced 1 time by &1461
 .start_music
-    ldx #<(envelope_6)                  ; ENVELOPE 6...
-    ldy #>(envelope_6)                  ; ...high byte
+    ldx #<(envelope_6)                  ; ENVELOPE 6: X, Y = envelope_6's block...
+    ldy #>(envelope_6)                  ; ...Y = the block's page
     lda #osword_envelope                ; ...OSWORD 8 defines it
     jsr osword                          ; ...for the tune's notes  ENVELOPE command
-    ldx #<(envelope_7)                  ; ENVELOPE 7...
-    ldy #>(envelope_7)                  ; ...high byte
+    ldx #<(envelope_7)                  ; ENVELOPE 7: X, Y = envelope_7's block...
+    ldy #>(envelope_7)                  ; ...Y = the block's page
     lda #osword_envelope                ; ...OSWORD 8 defines it
     jsr osword                          ; ...for the tune's notes  ENVELOPE command
-    ldx #<(envelope_8)                  ; ENVELOPE 8...
-    ldy #>(envelope_8)                  ; ...high byte
+    ldx #<(envelope_8)                  ; ENVELOPE 8: X, Y = envelope_8's block...
+    ldy #>(envelope_8)                  ; ...Y = the block's page
     lda #osword_envelope                ; ...OSWORD 8 defines it
     jsr osword                          ; ...for the tune's notes  ENVELOPE command
-    ldx #<(envelope_9)                  ; ENVELOPE 9
-    ldy #>(envelope_9)                  ; ...high byte
+    ldx #<(envelope_9)                  ; ENVELOPE 9: X, Y = envelope_9's block...
+    ldy #>(envelope_9)                  ; ...Y = the block's page
     lda #osword_envelope                ; ...OSWORD 8 defines it
     jsr osword                          ; ...for the tune's notes  ENVELOPE command
+; Send every sprite plot to the copy in private RAM.
     lda #&4c ; 'L'                      ; Make plot_sprite JMP &D800, the copy in Code3...
     sta plot_sprite                     ; ...over plot_sprite's first byte
     lda #<(plot_sprite_hazel)           ; ...JMP to the copy: address low byte...
-    sta plot_sprite + 1                 ; ...stored
-    lda #>(plot_sprite_hazel)           ; ...high byte...
+    sta plot_sprite + 1                 ; ...as the JMP's operand low byte
+    lda #>(plot_sprite_hazel)           ; ...then the copy's page, &D8...
     sta plot_sprite + 2                 ; ...stored: sprites now plot from HAZEL
+; Start the tune from its first section.
     lda #<(tune)                        ; Tune pointer (zero page &00-&01) = the first section...
     sta tune_ptr                        ; ...low byte stored
-    lda #>(tune)                        ; ...high byte...
-    sta tune_ptr + 1                    ; ...stored
-    lda #0                              ; Section 0
-    sta music_section                   ; ...stored
+    lda #>(tune)                        ; ...then the tune's page...
+    sta tune_ptr + 1                    ; ...into tune_ptr's high byte
+    lda #0                              ; Section 0, the opening, played only once
+    sta music_section                   ; ...in music_section: the opening plays first
     lda #&ff                            ; Rhythm step -1, so the first step plays step 0
-    sta music_rhythm_step               ; ...stored
-    lda #0                              ; No transposition
-    sta music_transpose                 ; ...stored
-    lda #<(music_event)                 ; EVNTV = music_event...
-    sta evntv                           ; ...low byte
-    lda #>(music_event)                 ; ...high byte
+    sta music_rhythm_step               ; ...in music_rhythm_step, the pattern's index
+    lda #0                              ; Transposition 0: the rhythm at its written pitch
+    sta music_transpose                 ; ...in music_transpose, for channel 1's notes
+; Play a step at each interval timer event, starting with one now.
+    lda #<(music_event)                 ; Point EVNTV at music_event...
+    sta evntv                           ; ...the handler's low byte into EVNTV...
+    lda #>(music_event)                 ; ...and its page, &C7...
     sta evntv + 1                       ; ...so each timer event plays a step
     lda #osbyte_enable_event            ; OSBYTE 14, 5: enable the interval timer event
     ldx #event_interval_timer_crossing_zero  ; ...event 5, the interval timer...
-    ldy #0                              ; ...Y = 0
+    ldy #0                              ; ...Y = 0, as OSBYTE 14 expects
     jsr osbyte                          ; ...enabled  Enable event
     jmp music_event                     ; Play the first step, and return from there
 ; ***************************************************************************************
 ; Stop the music
 ;
-; OSBYTE 13, 5: disable the interval timer event.
+; Silence the tune by disabling the interval timer event (OSBYTE 13, 5), so music_event
+; is no longer called. Called by start_level before each level loads and by
+; game_over_music. The sound queues are not flushed, and the music's place (tune_ptr,
+; music_section and so on) is left as it was.
 ;
 ; On Exit:
 ;     A: corrupted
@@ -8017,7 +8982,7 @@ row_offsets_lo = row_offsets+1
 .stop_music
     lda #osbyte_disable_event           ; OSBYTE 13, 5: disable the interval timer event
     ldx #event_interval_timer_crossing_zero  ; ...event 5, the interval timer...
-    ldy #0                              ; ...Y = 0
+    ldy #0                              ; ...Y = 0, as OSBYTE 13 expects
     jmp osbyte                          ; ...disabled, returning from there  Disable event
 ; &c769 referenced 6 times by &1407, &147a, &c742, &c7b2, &c7be, &c803
 .music_rhythm_step
@@ -8039,24 +9004,27 @@ row_offsets_lo = row_offsets+1
 ; for channel 3 (0 for silence). Each step also plays the next of the 32 steps of
 ; rhythm_pattern on channel 1 and the noise channel. At the end of a section the next
 ; byte sets channel 3's envelope and the next section starts; after section 24 the tune
-; goes back to section 1. The interval timer is then reset.
+; goes back to section 1. The interval timer is then reset. It runs in private RAM, so it
+; relies on HAZEL being paged in when the event is raised.
 ;
 ; On Exit:
 ;     A: preserved
 ;     X: preserved
 ;     Y: preserved
+; Save the interrupted code's registers, then read the step's first byte: &FF ends the section.
 ; &c76c referenced 1 time by &c75d
 .music_event
     php                                 ; Save the flags and registers
-    pha                                 ; ...A...
+    pha                                 ; ...A, pushed first...
     tya                                 ; ...Y, via A...
-    pha                                 ; ...pushed
+    pha                                 ; ...Y's copy pushed second
     txa                                 ; ...X, via A...
     pha                                 ; ...pushed: the interrupted code keeps them
     ldy #0                              ; First byte of the step...
     lda (tune_ptr),y                    ; ...the step's transposition byte
-    cmp #&ff                            ; ...&FF?
+    cmp #&ff                            ; ...&FF, the end of the section?
     beq end_of_section                  ; Yes: end of the section
+; Play the step: take a new transposition, and sound channels 2 and 3.
 ; &c77a referenced 1 time by &c81a
 .play_step
     cmp #0                              ; Non-zero: a new transposition
@@ -8065,36 +9033,37 @@ row_offsets_lo = row_offsets+1
 ; &c781 referenced 1 time by &c77c
 .play_channel_2
     ldy #1                              ; Second byte: channel 2's pitch...
-    lda (tune_ptr),y                    ; ...read
+    lda (tune_ptr),y                    ; ...read from the step
     beq play_channel_3                  ; ...0 for none
     sta channel_2_sound + 4             ; ...into its SOUND block's pitch
-    ldx #<(channel_2_sound)             ; SOUND channel_2_sound...
-    ldy #>(channel_2_sound)             ; ...high byte
+    ldx #<(channel_2_sound)             ; SOUND channel_2_sound: X, Y = its block...
+    ldy #>(channel_2_sound)             ; ...Y = the block's page
     lda #osword_sound                   ; ...OSWORD 7: SOUND
     jsr osword                          ; ...play the note  SOUND command
 ; &c793 referenced 1 time by &c785
 .play_channel_3
     ldy #2                              ; Third byte: channel 3's pitch...
-    lda (tune_ptr),y                    ; ...read
+    lda (tune_ptr),y                    ; ...read from the step
     beq next_step                       ; ...0 for none
     sta channel_3_sound + 4             ; ...into its SOUND block's pitch
-    ldx #<(channel_3_sound)             ; SOUND channel_3_sound...
-    ldy #>(channel_3_sound)             ; ...high byte
+    ldx #<(channel_3_sound)             ; SOUND channel_3_sound: X, Y = its block...
+    ldy #>(channel_3_sound)             ; ...Y = the block's page
     lda #osword_sound                   ; ...OSWORD 7: SOUND
     jsr osword                          ; ...play the note  SOUND command
+; Move on to the next step, and play the next step of the rhythm, transposed, with a beat on the noise channel.
 ; &c7a5 referenced 1 time by &c797
 .next_step
     lda tune_ptr                        ; Next step: tune_ptr += 3...
-    clc                                 ; ...three bytes...
+    clc                                 ; ...(carry clear for the add)...
     adc #3                              ; ...past this step
-    sta tune_ptr                        ; ...low byte
-    lda tune_ptr + 1                    ; ...high byte...
+    sta tune_ptr                        ; ...into tune_ptr's low byte
+    lda tune_ptr + 1                    ; ...and the page...
     adc #0                              ; ...with the carry
-    sta tune_ptr + 1                    ; ...stored
+    sta tune_ptr + 1                    ; ...into tune_ptr's high byte
     lda music_rhythm_step               ; Next rhythm step, 0-31...
-    clc                                 ; ...one...
-    adc #1                              ; ...on
-    cmp #&20 ; ' '                      ; ...past 31?
+    clc                                 ; ...(carry clear for the add)...
+    adc #1                              ; ...plus 1, the next step
+    cmp #&20 ; ' '                      ; ...32, past the pattern's last step?
     bmi store_rhythm_step               ; No: keep it
     lda #0                              ; Yes: back to step 0
 ; &c7be referenced 1 time by &c7ba
@@ -8103,61 +9072,67 @@ row_offsets_lo = row_offsets+1
     tay                                 ; Its pitch, 0 for a rest...
     lda rhythm_pattern,y                ; ...the bass pitch for this step
     beq set_step_timer                  ; Zero: a rest, no note
-    clc                                 ; ...transposed...
+    clc                                 ; ...transposed (carry clear for the add)...
     adc music_transpose                 ; ...plus the transposition
     sta channel_1_sound + 4             ; ...into channel 1's SOUND block
     ldx #<(channel_1_sound)             ; ...on channel 1...
-    ldy #>(channel_1_sound)             ; ...high byte
+    ldy #>(channel_1_sound)             ; ...Y = the block's page
     lda #osword_sound                   ; ...OSWORD 7: SOUND
     jsr osword                          ; ...play the bass note  SOUND command
     ldx #<(noise_sound)                 ; ...with the noise channel
-    ldy #>(noise_sound)                 ; ...high byte
+    ldy #>(noise_sound)                 ; ...Y = the block's page
     lda #osword_sound                   ; ...OSWORD 7: SOUND
     jsr osword                          ; ...play the beat  SOUND command
+; Set the timer for the next step and return.
 ; &c7e0 referenced 1 time by &c7c5
 .set_step_timer
     ldx #<(music_interval)              ; OSWORD 4: interval timer = -12 centiseconds, for the next step
-    ldy #>(music_interval)              ; ...high byte
+    ldy #>(music_interval)              ; ...Y = the block's page
     lda #osword_write_interval_timer    ; ...OSWORD 4: write the interval timer
     jsr osword                          ; ...so the next event comes 12 cs on  Write interval timer
     pla                                 ; Restore the registers and flags
-    tax                                 ; ...X...
+    tax                                 ; ...X from the last push...
     pla                                 ; ...then Y's byte...
-    tay                                 ; ...Y...
-    pla                                 ; ...A...
+    tay                                 ; ...back into Y...
+    pla                                 ; ...then A, pushed first...
     plp                                 ; ...and the flags
-    rts                                 ; Return
+    rts                                 ; Return to the MOS's event code (or start_level)
+; End of a section: set channel 3's envelope, move to the next section (looping 24 back to 1), and play its first step.
 ; &c7f0 referenced 1 time by &c778
 .end_of_section
     ldy #1                              ; End of section: the next byte is channel 3's envelope
-    lda (tune_ptr),y                    ; ...read
+    lda (tune_ptr),y                    ; ...read from after the &FF
     sta channel_3_sound + 2             ; ...into its SOUND block
-    inc music_section                   ; Next section...
+    inc music_section                   ; Count on to the next section...
     lda music_section                   ; ...the new section...
     cmp #&19                            ; ...25, past the last?
     bne start_section                   ; No: start it
     lda #&ff                            ; Yes: loop to section 1 (0 plays only once), rhythm too
     sta music_rhythm_step               ; ...rhythm step -1 again...
-    lda #1                              ; ...section 1...
-    sta music_section                   ; ...stored
+    lda #1                              ; ...section 1, where the loop starts...
+    sta music_section                   ; ...in music_section
 ; &c80b referenced 1 time by &c7ff
 .start_section
     tay                                 ; Point tune_ptr at the section...
     lda section_ptrs_lo,y               ; ...address low byte...
-    sta tune_ptr                        ; ...into tune_ptr
-    lda section_ptrs_hi,y               ; ...high byte...
-    sta tune_ptr + 1                    ; ...complete
+    sta tune_ptr                        ; ...into tune_ptr's low byte
+    lda section_ptrs_hi,y               ; ...then its page...
+    sta tune_ptr + 1                    ; ...into tune_ptr's high byte
     ldy #0                              ; ...and play its first step
     lda (tune_ptr),y                    ; ...its first byte, the transposition
     jmp play_step                       ; ...played as any other step
+; OSWORD 7 block: SOUND &11, 9 (envelope 9), pitch, 1: the rhythm.
 .channel_1_sound
 ; &c821 referenced 1 time by &c7cb
     equb &11, &00, &09, &00, &00, &00, &01, &00
+; OSWORD 7 block: SOUND &10, envelope 7, 3, 3: noise with the rhythm.
 .noise_sound
     equb &10, &00, &07, &00, &03, &00, &03, &00
+; OSWORD 7 block: SOUND &12, envelope 8, pitch, 10.
 .channel_2_sound
 ; &c831 referenced 1 time by &c787
     equb &12, &00, &08, &00, &00, &00, &0a, &00
+; OSWORD 7 block: SOUND &13, envelope (set per section), pitch, 8.
 .channel_3_sound
 ; &c837 referenced 1 time by &c7f4
 ; &c839 referenced 1 time by &c799
@@ -8511,12 +9486,18 @@ row_offsets_lo = row_offsets+1
 ; Plot a sprite
 ;
 ; Copy sprite sprite_number to the screen with its top-left corner at byte column plot_x,
-; pixel row plot_y. The sprite tables give the address of its data and its size; the data
-; is stored row by row, sprite_width bytes to a row, and is written over the screen
-; contents without masking. The screen is laid out like MODE 2 with 640-byte character
-; rows from &3000, so successive bytes of a sprite row are 8 bytes apart, and each pixel
-; row starts one byte below the last, or 640-7 bytes on when it crosses into the next
-; character row.
+; pixel row plot_y.
+;
+; The four sprite tables, indexed by sprite number, give the address of its data and its
+; size: sprite_width bytes across (two MODE 2 pixels to a byte) by sprite_height pixel
+; rows. The data is stored row by row and is written over the screen contents without
+; masking, so a sprite's black pixels erase what was there, and there is no clipping. The
+; screen is laid out like MODE 2 with 640-byte character rows from &3000, so successive
+; bytes of a sprite row are 8 bytes apart, and each pixel row starts one byte below the
+; last, or 640-7 bytes on when it crosses into the next character row. screen_ptr walks
+; across each row, row_start_ptr remembers where the row began, and sprite_data_ptr walks
+; through the data; Y stays 0. sprite_width and sprite_height are left holding the
+; sprite's size.
 ;
 ; On Entry:
 ;     PLOT_X: screen byte column (0-79)
@@ -8531,7 +9512,7 @@ row_offsets_lo = row_offsets+1
 .plot_sprite_hazel
     ldx sprite_number                   ; X = sprite number, indexing the four sprite tables
     lda sprite_addr_lo,x                ; Point sprite_data_ptr at the sprite's data...
-    sta sprite_data_ptr                 ; ...low byte
+    sta sprite_data_ptr                 ; ...its low byte from sprite_addr_lo
     lda sprite_addr_hi,x                ; ...high byte from its own table
     sta sprite_data_ptr_hi              ; ...so sprite_data_ptr walks through the data
     lda sprite_widths,x                 ; Bytes in each sprite row...
@@ -8544,8 +9525,8 @@ row_offsets_lo = row_offsets+1
 ; &d81d referenced 1 time by &d864
 .plot_sprite_row_hazel
     lda screen_ptr                      ; Remember where this pixel row starts...
-    sta row_start_ptr                   ; ...low byte
-    lda screen_ptr_hi                   ; ...and high byte...
+    sta row_start_ptr                   ; ...its low byte...
+    lda screen_ptr_hi                   ; ...and its high byte...
     sta row_start_ptr_hi                ; ...in row_start_ptr, to step down from later
     txa                                 ; Save the row count
     pha                                 ; ...on the stack: X now counts bytes
@@ -8557,7 +9538,7 @@ row_offsets_lo = row_offsets+1
     clc                                 ; Step screen_ptr right one byte column: 8 bytes on
     lda screen_ptr                      ; ...the screen address's low byte...
     adc #8                              ; ...+ 8, the next byte column...
-    sta screen_ptr                      ; ...stored back
+    sta screen_ptr                      ; ...as screen_ptr's new low byte
     bcc plot_sprite_next_data_hazel     ; No carry: the high byte stands
     inc screen_ptr_hi                   ; ...with carry into the high byte
 ; &d838 referenced 1 time by &d834
@@ -8571,7 +9552,7 @@ row_offsets_lo = row_offsets+1
     bne plot_sprite_byte_hazel          ; More of the row: plot the next byte
     clc                                 ; screen_ptr = row start + 1: the next pixel row down
     lda row_start_ptr                   ; The row start's low byte...
-    adc #1                              ; ...+ 1...
+    adc #1                              ; ...+ 1, one pixel row lower...
     sta screen_ptr                      ; ...is the new low byte
     lda row_start_ptr_hi                ; The row start's high byte...
     adc #0                              ; ...plus the carry...
@@ -8582,17 +9563,17 @@ row_offsets_lo = row_offsets+1
     clc                                 ; Yes: add &278 more, to the top of the character...
     lda screen_ptr                      ; ...row below (row start + 1 + &278 = + 640 - 7)
     adc #&78 ; 'x'                      ; ...low byte + &78 (640 - 8 = &278)...
-    sta screen_ptr                      ; ...stored
-    lda screen_ptr_hi                   ; ...high byte...
+    sta screen_ptr                      ; ...as screen_ptr's low byte
+    lda screen_ptr_hi                   ; ...then the high byte...
     adc #2                              ; ...+ 2 and the carry...
-    sta screen_ptr_hi                   ; ...stored
+    sta screen_ptr_hi                   ; ...as screen_ptr's high byte: the row below
 ; &d861 referenced 1 time by &d852
 .plot_sprite_next_row_hazel
     pla                                 ; Recover the row count
     tax                                 ; ...back into X
     dex                                 ; One pixel row fewer to plot
     bne plot_sprite_row_hazel           ; More rows: plot the next
-    rts                                 ; Return
+    rts                                 ; Return: the sprite is on the screen
 ; ***************************************************************************************
 ; Calculate a screen address
 ;
@@ -8612,10 +9593,10 @@ row_offsets_lo = row_offsets+1
 ; &d867 referenced 1 time by &d816
 .screen_address_hazel
     lda plot_y                          ; Character row = plot_y DIV 8...
-    lsr a                               ; ...plot_y / 2...
-    lsr a                               ; ...plot_y / 4...
+    lsr a                               ; ...plot_y DIV 2...
+    lsr a                               ; ...plot_y DIV 4: 2 x the character row, + plot_y bit 2...
     and #&fe                            ; ...bit 0 cleared: the row's pair of table bytes
-    tay                                 ; ...as the index into the MOS table
+    tay                                 ; ...as the index into the row table
     lda row_offsets,y                   ; High byte of row x 640, from Table's copy...
     clc                                 ; ...(carry clear for the add)
     adc #>(screen_start)                ; ...plus &30: the screen starts at &3000
@@ -8627,7 +9608,7 @@ row_offsets_lo = row_offsets+1
     adc screen_ptr                      ; ...(carry clear: adding &30 to the high byte cannot carry)
     sta screen_ptr                      ; ...stored in the low byte
     clc                                 ; Add 8 x plot_x: its high byte is plot_x DIV 32...
-    lda plot_x                          ; ...from plot_x...
+    lda plot_x                          ; ...taking the byte column...
     and #&e0                            ; ...bits 7-5 kept...
     rol a                               ; ...four ROLs through the carry: bit 7 out...
     rol a                               ; ...bit 7 in at bit 0, bit 6 out
@@ -8635,19 +9616,19 @@ row_offsets_lo = row_offsets+1
     rol a                               ; ...bits 7-5 now in bits 2-0
     clc                                 ; ...(carry clear for the add)
     adc screen_ptr_hi                   ; ...added to the high byte
-    sta screen_ptr_hi                   ; ...stored
-    lda plot_x                          ; ...then plot_x x 8 into the low byte
+    sta screen_ptr_hi                   ; ...as screen_ptr's high byte
+    lda plot_x                          ; Low byte + (plot_x x 8) AND &FF: plot_x...
     asl a                               ; ...x 2...
     asl a                               ; ...x 4...
     asl a                               ; ...x 8, its top bits dropping out
     clc                                 ; ...(carry clear for the add)
     adc screen_ptr                      ; ...added to the low byte
-    sta screen_ptr                      ; ...stored
+    sta screen_ptr                      ; ...as screen_ptr's low byte
     bcc screen_address_done_hazel       ; No carry: done
     inc screen_ptr_hi                   ; ...with carry into the high byte
 ; &d89f referenced 1 time by &d89b
 .screen_address_done_hazel
-    rts                                 ; Return
+    rts                                 ; Return with screen_ptr set
 ; ***************************************************************************************
 ; Copied data
 ;
@@ -8929,7 +9910,6 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     check_door_x:                   1
 ;     check_doors:                    1
 ;     check_exit_busy:                1
-;     check_first_sprite:             1
 ;     check_food:                     1
 ;     check_for_victory:              1
 ;     check_helmet:                   1
@@ -8939,6 +9919,7 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     check_hero_in_cell:             1
 ;     check_hero_keys:                1
 ;     check_hero_on_exit:             1
+;     check_hero_returned:            1
 ;     check_just_fired:               1
 ;     check_key:                      1
 ;     check_key_cell:                 1
@@ -8947,9 +9928,9 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     check_key_left:                 1
 ;     check_key_right:                1
 ;     check_magic:                    1
-;     check_magic_every_frame:        1
 ;     check_magic_item:               1
 ;     check_magic_key:                1
+;     check_magic_monster:            1
 ;     check_missile_monster:          1
 ;     check_missile_wall:             1
 ;     check_monster:                  1
@@ -9035,7 +10016,6 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     exit_offset_y_3:                1
 ;     exit_offset_y_4:                1
 ;     find_missile_slot:              1
-;     find_monster_room:              1
 ;     find_open_neighbour:            1
 ;     find_queue_end:                 1
 ;     find_queue_slot:                1
@@ -9117,7 +10097,6 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     missile_left:                   1
 ;     missile_right:                  1
 ;     missile_spent:                  1
-;     missile_up:                     1
 ;     monster_continue_down:          1
 ;     monster_continue_left:          1
 ;     monster_continue_right:         1
@@ -9195,6 +10174,7 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     print_victory_text:             1
 ;     queue_exit_marker:              1
 ;     raise_victory_pitch:            1
+;     read_magic_key:                 1
 ;     redraw_armour:                  1
 ;     redraw_exit:                    1
 ;     redraw_health:                  1
@@ -9256,6 +10236,7 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     stay_in_old_cell:               1
 ;     step_down:                      1
 ;     step_left:                      1
+;     step_missile:                   1
 ;     step_right:                     1
 ;     stop_music_and_load:            1
 ;     store_hero_frame:               1
