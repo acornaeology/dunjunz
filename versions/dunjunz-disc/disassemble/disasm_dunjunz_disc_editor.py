@@ -40,6 +40,9 @@ main.banner(0x23E8, "Unused",
             "(new line, choose disc or tape, new line, *CAT, new line, ask "
             "for the level number again) assembled at other addresses.")
 main.byte(0x23E8, 0x2400 - 0x23E8, cols=8)
+main.c(0x23E8, "Not used")
+main.byte(0x25FF, 1)
+main.c(0x25FF, "Not referenced on this side (the Master's table_loaded_flag)")
 
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)

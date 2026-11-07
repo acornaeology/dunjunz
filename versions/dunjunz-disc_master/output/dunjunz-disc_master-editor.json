@@ -1006,6 +1006,13 @@
       "align": "before_label"
     },
     {
+      "addr": 7640,
+      "name": "edit_screen_vdu_end",
+      "title": "Unused",
+      "description": "Four asterisks, not sent.",
+      "align": "before_label"
+    },
+    {
       "addr": 8790,
       "name": "break_to_save",
       "title": "BREAK intercept: back to saving",
@@ -3244,6 +3251,7 @@
         0,
         0
       ],
+      "comment_inline": "Not used",
       "type": "byte",
       "values": [
         0,
@@ -4331,6 +4339,7 @@
         0,
         0
       ],
+      "comment_inline": "Not used",
       "type": "byte",
       "values": [
         0,
@@ -6674,6 +6683,7 @@
       "bytes": [
         0
       ],
+      "comment_inline": "Zero: the end",
       "type": "byte",
       "values": [
         0
@@ -6725,6 +6735,7 @@
       "labels": [
         "drive_digit"
       ],
+      "comment_inline": "The drive digit",
       "xref_summaries": [
         "&1d61 referenced 1 time by &2140"
       ],
@@ -6744,6 +6755,7 @@
       "bytes": [
         13
       ],
+      "comment_inline": "CR",
       "type": "byte",
       "values": [
         13
@@ -6863,7 +6875,8 @@
         50,
         55,
         48,
-        48
+        48,
+        13
       ],
       "labels": [
         "load_command"
@@ -6880,17 +6893,7 @@
         }
       ],
       "type": "string",
-      "string": "LOAD LEVEL11 2700"
-    },
-    {
-      "addr": 7553,
-      "bytes": [
-        13
-      ],
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "LOAD LEVEL11 2700."
     },
     {
       "addr": 7554,
@@ -6898,46 +6901,28 @@
         68,
         82,
         46,
-        48
+        48,
+        13
       ],
       "labels": [
         "drive_0_command"
       ],
       "type": "string",
-      "string": "DR.0"
-    },
-    {
-      "addr": 7558,
-      "bytes": [
-        13
-      ],
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "DR.0."
     },
     {
       "addr": 7559,
       "bytes": [
         68,
         73,
-        46
+        46,
+        13
       ],
       "labels": [
         "disc_command"
       ],
       "type": "string",
-      "string": "DI."
-    },
-    {
-      "addr": 7562,
-      "bytes": [
-        13
-      ],
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "DI.."
     },
     {
       "addr": 7563,
@@ -6948,23 +6933,14 @@
         53,
         53,
         32,
-        49
+        49,
+        13
       ],
       "labels": [
         "tv_command"
       ],
       "type": "string",
-      "string": "TV255 1"
-    },
-    {
-      "addr": 7570,
-      "bytes": [
-        13
-      ],
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "TV255 1."
     },
     {
       "addr": 7571,
@@ -6976,66 +6952,39 @@
         65,
         66,
         76,
-        69
+        69,
+        13
       ],
       "labels": [
         "load_table_command"
       ],
       "type": "string",
-      "string": "L. TABLE"
-    },
-    {
-      "addr": 7579,
-      "bytes": [
-        13
-      ],
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "L. TABLE."
     },
     {
       "addr": 7580,
       "bytes": [
         84,
-        46
+        46,
+        13
       ],
       "labels": [
         "tape_command"
       ],
       "type": "string",
-      "string": "T."
-    },
-    {
-      "addr": 7582,
-      "bytes": [
-        13
-      ],
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "T.."
     },
     {
       "addr": 7583,
       "bytes": [
-        46
+        46,
+        13
       ],
       "labels": [
         "cat_command"
       ],
       "type": "string",
-      "string": "."
-    },
-    {
-      "addr": 7584,
-      "bytes": [
-        13
-      ],
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": ".."
     },
     {
       "addr": 7585,
@@ -7047,6 +6996,7 @@
       "labels": [
         "count_labels"
       ],
+      "comment_inline": "VDU 31,16,0: TAB(16,0)",
       "xref_summaries": [
         "&1da1 used as index base 1 time by &21af"
       ],
@@ -7081,6 +7031,7 @@
         16,
         4
       ],
+      "comment_inline": "VDU 31,16,4: TAB(16,4)",
       "type": "byte",
       "values": [
         31,
@@ -7106,6 +7057,7 @@
         16,
         8
       ],
+      "comment_inline": "VDU 31,16,8: TAB(16,8)",
       "type": "byte",
       "values": [
         31,
@@ -7129,6 +7081,7 @@
       "bytes": [
         13
       ],
+      "comment_inline": "CR: the end",
       "type": "byte",
       "values": [
         13
@@ -7151,6 +7104,7 @@
       "labels": [
         "edit_screen_vdu"
       ],
+      "comment_inline": "VDU 23,0,10,32: 6845 register 10 = &20, no cursor",
       "xref_summaries": [
         "&1db7 used as index base 1 time by &2155"
       ],
@@ -7177,7 +7131,17 @@
     {
       "addr": 7617,
       "bytes": [
-        0,
+        0
+      ],
+      "comment_inline": "VDU 0: does nothing",
+      "type": "byte",
+      "values": [
+        0
+      ]
+    },
+    {
+      "addr": 7618,
+      "bytes": [
         23,
         0,
         6,
@@ -7186,11 +7150,12 @@
         0,
         0,
         0,
+        0,
         0
       ],
+      "comment_inline": "VDU 23,0,6,30: 6845 register 6 = 30 character rows displayed",
       "type": "byte",
       "values": [
-        0,
         23,
         0,
         6,
@@ -7199,56 +7164,49 @@
         0,
         0,
         0,
+        0,
         0
       ]
     },
     {
-      "addr": 7627,
+      "addr": 7628,
       "bytes": [
-        0,
         19,
         10,
         1,
         0,
+        0,
         0
       ],
+      "comment_inline": "VDU 19,10,1: logical colour 10 shows red",
       "type": "byte",
       "values": [
-        0,
         19,
         10,
         1,
         0,
-        0
-      ]
-    },
-    {
-      "addr": 7633,
-      "bytes": [
-        0,
-        19,
-        9,
-        3,
-        0,
-        0
-      ],
-      "type": "byte",
-      "values": [
-        0,
-        19,
-        9,
-        3,
         0,
         0
       ]
     },
     {
-      "addr": 7639,
+      "addr": 7634,
       "bytes": [
+        19,
+        9,
+        3,
+        0,
+        0,
         0
       ],
+      "comment_inline": "VDU 19,9,3: logical colour 9 shows yellow",
       "type": "byte",
       "values": [
+        19,
+        9,
+        3,
+        0,
+        0,
         0
       ]
     },
@@ -7260,6 +7218,10 @@
         42,
         42
       ],
+      "labels": [
+        "edit_screen_vdu_end"
+      ],
+      "comment_inline": "Not used",
       "type": "byte",
       "values": [
         42,
@@ -7299,7 +7261,8 @@
         108,
         101,
         120,
-        32
+        32,
+        0
       ],
       "labels": [
         "level_number_prompt"
@@ -7314,17 +7277,7 @@
         }
       ],
       "type": "string",
-      "string": "Level in the Dunjunz complex "
-    },
-    {
-      "addr": 7673,
-      "bytes": [
-        0
-      ],
-      "type": "byte",
-      "values": [
-        0
-      ]
+      "string": "Level in the Dunjunz complex ."
     },
     {
       "addr": 7674,
@@ -7349,7 +7302,8 @@
         43,
         50,
         66,
-        48
+        48,
+        13
       ],
       "labels": [
         "save_command"
@@ -7365,17 +7319,7 @@
         }
       ],
       "type": "string",
-      "string": "SAVE LEVEL22 2700+2B0"
-    },
-    {
-      "addr": 7695,
-      "bytes": [
-        13
-      ],
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "SAVE LEVEL22 2700+2B0."
     },
     {
       "addr": 7696,
@@ -13083,7 +13027,19 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "cpx",
-      "operand": "#&21"
+      "operand": "#edit_screen_vdu_end - edit_screen_vdu",
+      "expr": {
+        "text": "edit_screen_vdu_end - edit_screen_vdu",
+        "tree": {
+          "op": "sub",
+          "left": {
+            "sym": "edit_screen_vdu_end"
+          },
+          "right": {
+            "sym": "edit_screen_vdu"
+          }
+        }
+      }
     },
     {
       "addr": 8542,
@@ -20008,23 +19964,14 @@
         79,
         78,
         69,
-        83
+        83,
+        13
       ],
       "labels": [
         "load_stones_command"
       ],
       "type": "string",
-      "string": "LOAD STONES"
-    },
-    {
-      "addr": 9562,
-      "bytes": [
-        13
-      ],
-      "type": "byte",
-      "values": [
-        13
-      ]
+      "string": "LOAD STONES."
     },
     {
       "addr": 9563,
@@ -20426,6 +20373,7 @@
         216,
         46
       ],
+      "comment_inline": "Not used",
       "type": "byte",
       "values": [
         13,
@@ -20632,6 +20580,7 @@
         0,
         0
       ],
+      "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
         0,
@@ -22070,6 +22019,7 @@
         0,
         0
       ],
+      "comment_inline": "Not used",
       "type": "byte",
       "values": [
         0,
@@ -22249,6 +22199,7 @@
         0,
         0
       ],
+      "comment_inline": "Not used",
       "type": "byte",
       "values": [
         0,
@@ -23680,6 +23631,7 @@
       ],
       "binary_addr": 10144,
       "move": "plotter",
+      "comment_inline": "Not used",
       "type": "byte",
       "values": [
         32,
@@ -23819,6 +23771,7 @@
       ],
       "binary_addr": 10163,
       "move": "plotter",
+      "comment_inline": "Not used: leftover spaces and Ds",
       "type": "byte",
       "values": [
         32,
@@ -23993,6 +23946,7 @@
       ],
       "binary_addr": 10217,
       "move": "plotter",
+      "comment_inline": "Not used",
       "type": "byte",
       "values": [
         0,
@@ -24586,6 +24540,7 @@
       ],
       "binary_addr": 10444,
       "move": "plotter",
+      "comment_inline": "Not used",
       "type": "byte",
       "values": [
         104,
@@ -24774,6 +24729,7 @@
         0,
         0
       ],
+      "comment_inline": "Not used: the level file's &2900-&29AF when one is loaded",
       "type": "byte",
       "values": [
         255,
@@ -24961,6 +24917,7 @@
       "labels": [
         "level_wall_block"
       ],
+      "comment_inline": "...",
       "xref_summaries": [
         "&2980 used as index base 2 times by &1ea7, &2464"
       ],
@@ -25100,6 +25057,7 @@
         0,
         0
       ],
+      "comment_inline": "Not used",
       "type": "byte",
       "values": [
         0,
@@ -25222,6 +25180,7 @@
       "labels": [
         "item_sprites"
       ],
+      "comment_inline": "Sprite &00: wall",
       "type": "byte",
       "values": [
         204,
@@ -25250,6 +25209,7 @@
         3,
         3
       ],
+      "comment_inline": "Sprite &01: exit",
       "type": "byte",
       "values": [
         3,
@@ -25278,6 +25238,7 @@
         51,
         51
       ],
+      "comment_inline": "Sprite &02: drainer",
       "type": "byte",
       "values": [
         51,
@@ -25306,6 +25267,7 @@
         60,
         60
       ],
+      "comment_inline": "Sprite &03: trapdoor",
       "type": "byte",
       "values": [
         60,
@@ -25334,6 +25296,7 @@
         3,
         1
       ],
+      "comment_inline": "Sprite &04: treasure",
       "type": "byte",
       "values": [
         3,
@@ -25362,6 +25325,7 @@
         0,
         2
       ],
+      "comment_inline": "Sprite &05: food",
       "type": "byte",
       "values": [
         42,
@@ -25390,6 +25354,7 @@
         48,
         48
       ],
+      "comment_inline": "Sprite &06: teleporter",
       "type": "byte",
       "values": [
         63,
@@ -25418,6 +25383,7 @@
         130,
         84
       ],
+      "comment_inline": "Sprite &07: magic sword",
       "type": "byte",
       "values": [
         168,
@@ -25446,6 +25412,7 @@
         20,
         60
       ],
+      "comment_inline": "Sprite &08: helmet",
       "type": "byte",
       "values": [
         0,
@@ -25474,6 +25441,7 @@
         0,
         2
       ],
+      "comment_inline": "Sprite &09: potion",
       "type": "byte",
       "values": [
         0,
@@ -25502,6 +25470,7 @@
         8,
         42
       ],
+      "comment_inline": "Sprite &0A: weapons",
       "type": "byte",
       "values": [
         5,
@@ -25530,6 +25499,7 @@
         0,
         0
       ],
+      "comment_inline": "Sprite &0B: cross",
       "type": "byte",
       "values": [
         0,
@@ -25558,6 +25528,7 @@
         0,
         0
       ],
+      "comment_inline": "Sprite &0C: boots",
       "type": "byte",
       "values": [
         0,
@@ -25586,6 +25557,7 @@
         20,
         42
       ],
+      "comment_inline": "Sprite &0D: door vertical",
       "type": "byte",
       "values": [
         20,
@@ -25614,6 +25586,7 @@
         0,
         0
       ],
+      "comment_inline": "Sprite &0E: door horizontal",
       "type": "byte",
       "values": [
         0,
@@ -25642,6 +25615,7 @@
         0,
         0
       ],
+      "comment_inline": "Sprite &0F: key",
       "type": "byte",
       "values": [
         0,
@@ -25777,6 +25751,7 @@
         0,
         0
       ],
+      "comment_inline": "Not used",
       "type": "byte",
       "values": [
         0,
@@ -32180,6 +32155,7 @@
         46,
         133
       ],
+      "comment_inline": "Not used",
       "type": "byte",
       "values": [
         248,

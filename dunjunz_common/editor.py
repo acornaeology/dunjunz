@@ -47,6 +47,7 @@ class Remapped:
         "entry", "banner", "subroutine", "comment", "expr", "label",
         "index_region", "expr_label", "optional_label", "index_base",
         "byte", "string", "hook_subroutine", "inkey_number",
+        "stringcr", "stringz", "word", "format_hint",
     }
 
     def __init__(self, disassembler, remap):
@@ -227,6 +228,7 @@ def annotate(d, model_b=False):
     # The rest of the plotter page: the editor's tables.
     in_plotter.banner(0x09A0, "Unused", "Leftover bytes.")
     in_plotter.byte(0x09A0, 0x10, cols=8)
+    in_plotter.c(0x09A0, "Not used")
     for addr, name, text in [
         (0x09B0, "packed_objects", "save_level's count of objects packed so far."),
         (0x09B1, "packed_trapdoors", "save_level's count of trapdoors packed so far."),
@@ -235,6 +237,7 @@ def annotate(d, model_b=False):
         in_plotter.label(addr, name, description=text)
         in_plotter.byte(addr)
     in_plotter.byte(0x09B3, 0x0D, cols=8)
+    in_plotter.c(0x09B3, "Not used: leftover spaces and Ds")
     in_plotter.label(0x09C0, "item_types", length=16, description=(
         "The level type of each editor item (its sprite number, 0-&0F): 1 "
         "exit &51; 2 energy drainer &53; 4-&0C treasure &28, food &29, "
@@ -254,6 +257,7 @@ def annotate(d, model_b=False):
     d.expr_label(0x09CF, "level_checksums-1", move=plotter)
     in_plotter.banner(0x09E9, "Unused", "Leftover bytes.")
     in_plotter.byte(0x09E9, 0x17, cols=8)
+    in_plotter.c(0x09E9, "Not used")
     in_plotter.banner(0x0A00, "Sprite tables",
                       "Each of the editor's 51 sprites' data address (low and "
                       "high bytes), width in bytes and height in pixel rows. "
@@ -273,6 +277,7 @@ def annotate(d, model_b=False):
         in_plotter.byte(addr, 51, cols=17)
     in_plotter.banner(0x0ACC, "Unused", "Leftover bytes.")
     in_plotter.byte(0x0ACC, 0x34, cols=8)
+    in_plotter.c(0x0ACC, "Not used")
 
     # -----------------------------------------------------------------------
     # Workspace.
@@ -524,12 +529,15 @@ def annotate(d, model_b=False):
     main.label(0x1D45, "filename_prompt")
     main.string(0x1D45, 9)
     main.byte(0x1D4E)
+    main.c(0x1D4E, "Zero: the end")
     main.label(0x1D4F, "drive_prompt")
     main.string(0x1D4F, 13)
     main.label(0x1D5C, "drive_command", description="*DRIVE n, with the digit at +5.")
     main.string(0x1D5C, 5)
     main.byte(0x1D61)
+    main.c(0x1D61, "The drive digit")
     main.byte(0x1D62)
+    main.c(0x1D62, "CR")
     main.label(0x1D61, "drive_digit")
     main.label(0x1D63, "filename_buffer", length=8, description=(
         "OSWORD 0's buffer: a filename (up to 7 characters) or a level "
@@ -543,8 +551,7 @@ def annotate(d, model_b=False):
     for k in range(1, 5):
         d.expr_label(0x1D6B + k, f"read_line_block+{k}")
     main.label(0x1D70, "load_command", description="*LOAD name 2700, the name at +5.")
-    main.string(0x1D70, 0x11)
-    main.byte(0x1D81)
+    main.stringcr(0x1D70)
     d.expr_label(0x1D75, "load_command+5")
     d.expr_label(0x1D7B, "load_command+11")
     # The commands differ between the sides; they are declared at the
@@ -560,30 +567,37 @@ def annotate(d, model_b=False):
     raw_main = Annotator(raw_d, version, lambda addr: [(None, "")])
     for addr, name, length in commands:
         raw_main.label(addr, name)
-        raw_main.string(addr, length)
-        raw_main.byte(addr + length)
+        raw_main.stringcr(addr)
     main.label(0x1DA1, "count_labels", description=(
         "VDU 31 and the labels of the three counts: Objs, Mons (the "
         "trapdoors, where monsters appear) and Dors."))
-    for addr in (0x1DA1, 0x1DA8, 0x1DAF):
+    for addr, row in ((0x1DA1, 0), (0x1DA8, 4), (0x1DAF, 8)):
         main.byte(addr, 3, cols=3)
+        main.c(addr, f"VDU 31,16,{row}: TAB(16,{row})")
         main.string(addr + 3, 4)
     main.byte(0x1DB6)
+    main.c(0x1DB6, "CR: the end")
     main.label(0x1DB7, "edit_screen_vdu", length=0x21, description=(
         "VDU 23,0,10,32 (no cursor), VDU 23,0,6,30 (30 rows), VDU 19,10,1 and "
         "VDU 19,9,3."))
-    main.byte(0x1DB7, 10, cols=10)
-    main.byte(0x1DC1, 10, cols=10)
-    main.byte(0x1DCB, 6, cols=6)
-    main.byte(0x1DD1, 6, cols=6)
-    main.byte(0x1DD7, 1)
+    for addr, length, text in [
+        (0x1DB7, 10, "VDU 23,0,10,32: 6845 register 10 = &20, no cursor"),
+        (0x1DC1, 1, "VDU 0: does nothing"),
+        (0x1DC2, 10, "VDU 23,0,6,30: 6845 register 6 = 30 character rows displayed"),
+        (0x1DCC, 6, "VDU 19,10,1: logical colour 10 shows red"),
+        (0x1DD2, 6, "VDU 19,9,3: logical colour 9 shows yellow"),
+    ]:
+        main.byte(addr, length, cols=length)
+        main.c(addr, text)
+    main.label(0x1DD8, "edit_screen_vdu_end")
+    main.banner(0x1DD8, "Unused", "Four asterisks, not sent.")
     main.byte(0x1DD8, 4, cols=4)
+    main.c(0x1DD8, "Not used")
+    d.expr(0x215D, sym("edit_screen_vdu_end") - sym("edit_screen_vdu"))
     main.label(0x1DDC, "level_number_prompt")
-    main.string(0x1DDC, 0x1D)
-    main.byte(0x1DF9)
+    main.stringz(0x1DDC)
     main.label(0x1DFA, "save_command", description="*SAVE name 2700+2B0, the name at +5.")
-    main.string(0x1DFA, 0x15)
-    main.byte(0x1E0F)
+    main.stringcr(0x1DFA)
     d.expr_label(0x1DFF, "save_command+5")
     main.label(0x1E10, "another_prompt")
     main.string(0x1E10, 0x1F)
@@ -1350,8 +1364,7 @@ def annotate(d, model_b=False):
         (0x254E, "Return"),
     ])
     main.label(0x254F, "load_stones_command")
-    main.string(0x254F, 11)
-    main.byte(0x255A)
+    main.stringcr(0x254F)
 
     main.sub(0x255B, "show_25_rows", "Show 25 rows",
              "Send VDU 23,0,6,25,0,0,0,0,0,0.",
@@ -1373,6 +1386,7 @@ def annotate(d, model_b=False):
     main.byte(0x2580, 0x6C, cols=6)
     main.banner(0x25EC, "Unused", "Leftover bytes.")
     main.byte(0x25EC, 4, cols=4)
+    main.c(0x25EC, "Not used")
 
     main.banner(0x25F0, "Variables")
     for addr, name, text in [
@@ -1393,6 +1407,7 @@ def annotate(d, model_b=False):
                  0x25F9, 0x25FA) + (() if model_b else (0x25FF,)):
         main.byte(addr)
     main.byte(0x25F6, 2, cols=2)
+    main.c(0x25F6, "Not referenced")
     main.label(0x25FB, "drive_keys", length=4, description=(
         "Internal key numbers of 0, 1, 2 and 3, the drive digits."))
     main.byte(0x25FB, 4, cols=4)
@@ -1471,6 +1486,7 @@ def annotate(d, model_b=False):
     main.label(0x26AE, "copy_maps")
     main.banner(0x26C0, "Unused", "Zeros.")
     main.byte(0x26C0, 0x10, cols=8)
+    main.c(0x26C0, "Not used")
 
     main.sub(0x26D0, "load_stones", "Load the wall blocks",
              "*LOAD STONES (at its own address, &6E80) with VDU output off.",
@@ -1486,6 +1502,7 @@ def annotate(d, model_b=False):
     ])
     main.banner(0x26E2, "Unused", "Zeros.")
     main.byte(0x26E2, 0x1E, cols=8)
+    main.c(0x26E2, "Not used")
 
     # -----------------------------------------------------------------------
     # The level buffer's tail and the item sprites (not moved).
@@ -1493,8 +1510,11 @@ def annotate(d, model_b=False):
     main.banner(0x2900, "Unused", "Leftover bytes, covered by the level file "
                 "(&2700-&29AF) when one is loaded.")
     main.byte(0x2900, 0x80, cols=8)
+    main.c(0x2900, "Not used: the level file's &2900-&29AF when one is loaded")
     main.byte(0x2980, 0x30, cols=8)
+    main.c(0x2980, "...")
     main.byte(0x29B0, 0x46, cols=8)
+    main.c(0x29B0, "Not used")
     main.label(0x29F6, "cursor_sprite", length=10, description="Sprite &2C: the cursor.")
     main.banner(0x29F6, "Sprites", "The cursor (sprite &2C), then the 16 "
                 "items (sprites 0-&0F) and the door waiting for its key (&11), "
@@ -1505,11 +1525,13 @@ def annotate(d, model_b=False):
         "trapdoor, treasure, food, teleporter, magic sword, magic helmet, "
         "potion, weapons, Cross, boots, the two doors and the key."))
     for n in range(16):
-        main.byte(0x2A00 + 10 * n, 10, cols=10)
+        main.byte(0x2A00 + 10 * n, 10, cols=2)
+        main.c(0x2A00 + 10 * n, f"Sprite &{n:02X}: {EDITOR_SPRITES[n][1].replace('_', ' ')}")
     main.label(0x2AA0, "waiting_door_sprite", length=10, description="Sprite &11: a door waiting for its key.")
     main.byte(0x2AA0, 10, cols=10)
     main.banner(0x2AAA, "Unused", "Leftover bytes.")
     main.byte(0x2AAA, 0x56, cols=8)
+    main.c(0x2AAA, "Not used")
 
     # -----------------------------------------------------------------------
     # The cursor and items.
@@ -1947,6 +1969,7 @@ def annotate(d, model_b=False):
     main.label(0x2E69, "next_drawn_link")
     main.banner(0x2E6F, "Unused", "Leftover bytes.")
     main.byte(0x2E6F, 0x21, cols=8)
+    main.c(0x2E6F, "Not used")
 
     main.sub(0x2E90, "cursor_key_pressed", "Test a key",
              "OSBYTE &81 with the INKEY number in X, as key_pressed.",
@@ -2067,8 +2090,11 @@ def annotate(d, model_b=False):
 
     main.banner(0x19DE, "Unused", "Leftover bytes after unpack_level's image.")
     main.byte(0x19DE, 0x22, cols=8)
+
+    main.c(0x19DE, "Not used")
     main.banner(0x1A43, "Unused", "Leftover bytes, among them the text PAGE.")
     main.byte(0x1A43, 0x1C10 - 0x1A43, cols=16)
+    main.c(0x1A43, "Not used")
 
     # The editor's sprite numbers, limits, characters and keys.
     for number, name in EDITOR_SPRITES:

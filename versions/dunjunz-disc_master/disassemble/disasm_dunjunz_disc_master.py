@@ -133,7 +133,8 @@ class Shifted:
     ADDRESSED = {
         "entry", "banner", "subroutine", "comment", "expr", "label",
         "index_region", "expr_label", "optional_label", "index_base",
-        "byte", "string",
+        "byte", "string", "stringcr", "stringz", "word", "format_hint",
+        "inkey_number",
     }
 
     def __init__(self, disassembler, offset):

@@ -579,7 +579,7 @@ reset_vector          = &fffc
 ;
 ; Leftover bytes.
     equb &20, &20, &20, &20, &44, &20, &20, &20
-    equb &20, &20, &20, &20, &44, &20, &20, &20
+    equb &20, &20, &20, &20, &44, &20, &20, &20  ; Not used
 ; &09b0 referenced 3 times by &2602, &261e, &2625
 .packed_objects
     equb &20
@@ -590,7 +590,7 @@ reset_vector          = &fffc
 .packed_doors
     equb &20
     equb &20, &44, &20, &20, &20, &20, &20, &20
-    equb &20, &44, &20, &20, &20
+    equb &20, &44, &20, &20, &20        ; Not used: leftover spaces and Ds
 ; ***************************************************************************************
 ; Item types and checksums
 ;
@@ -609,7 +609,7 @@ reset_vector          = &fffc
 ; Leftover bytes.
     equb &00, &3a, &20, &20, &20, &3a, &20, &20
     equb &20, &3a, &20, &20, &20, &3a, &20, &20
-    equb &20, &3a, &20, &20, &20, &3a, &20
+    equb &20, &3a, &20, &20, &20, &3a, &20  ; Not used
 ; ***************************************************************************************
 ; Sprite tables
 ;
@@ -648,7 +648,7 @@ reset_vector          = &fffc
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &ff
+    equb &00, &00, &00, &ff             ; Not used
 
 
     ; Copy the newly assembled block of code back to it's proper place in the binary
@@ -677,7 +677,7 @@ reset_vector          = &fffc
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00
+    equb &00, &00                       ; Not used
 
     org &1a43
 ; ***************************************************************************************
@@ -712,7 +712,7 @@ reset_vector          = &fffc
     equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &ff, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00, &00  ; Not used
 ; ***************************************************************************************
 ; BREAK intercept: start again
 ;
@@ -899,15 +899,15 @@ reset_vector          = &fffc
 ; &1d45 used as index base 1 time by &1e52
 .filename_prompt
     equs "Filename "
-    equb &00
+    equb &00                            ; Zero: the end
 .drive_prompt
     equs "Which drive *"
 .drive_command
     equs "DRIVE"
 ; &1d61 referenced 1 time by &2140
 .drive_digit
-    equb &20
-    equb &0d
+    equb &20                            ; The drive digit
+    equb &0d                            ; CR
 ; &1d63 referenced 4 times by &1e99, &2298, &22ca, &22d2; also used as index base 2 times by &1cb1, &237d
 .filename_buffer
 ; &1d64 referenced 3 times by &229b, &22c3, &22e4
@@ -923,52 +923,48 @@ reset_vector          = &fffc
 .load_command
 ; &1d75 used as index base 1 time by &1cb4
 ; &1d7b referenced 1 time by &1cac
-    equs "LOAD LEVEL11 2700"
-    equb &0d
+    equs "LOAD LEVEL11 2700", &0d
 .drive_0_command
-    equs "DR.0"
-    equb &0d
+    equs "DR.0", &0d
 .disc_command
-    equs "DI."
-    equb &0d
+    equs "DI.", &0d
 .tv_command
-    equs "TV255 1"
-    equb &0d
+    equs "TV255 1", &0d
 .load_table_command
-    equs "L. TABLE"
-    equb &0d
+    equs "L. TABLE", &0d
 .tape_command
-    equs "T."
-    equb &0d
+    equs "T.", &0d
 .cat_command
-    equs "."
-    equb &0d
+    equs ".", &0d
 ; &1da1 used as index base 1 time by &21af
 .count_labels
-    equb &1f, &10, &00
+    equb &1f, &10, &00                  ; VDU 31,16,0: TAB(16,0)
     equs "Objs"
-    equb &1f, &10, &04
+    equb &1f, &10, &04                  ; VDU 31,16,4: TAB(16,4)
     equs "Mons"
-    equb &1f, &10, &08
+    equb &1f, &10, &08                  ; VDU 31,16,8: TAB(16,8)
     equs "Dors"
-    equb &0d
+    equb &0d                            ; CR: the end
 ; &1db7 used as index base 1 time by &2155
 .edit_screen_vdu
-    equb &17, &00, &0a, &20, &00, &00, &00, &00, &00, &00
-    equb &00, &17, &00, &06, &1e, &00, &00, &00, &00, &00
-    equb &00, &13, &0a, &01, &00, &00
-    equb &00, &13, &09, &03, &00, &00
-    equb &00
-    equb &2a, &2a, &2a, &2a
+    equb &17, &00, &0a, &20, &00, &00, &00, &00, &00, &00  ; VDU 23,0,10,32: 6845 register 10 = &20, no cursor
+    equb &00                            ; VDU 0: does nothing
+    equb &17, &00, &06, &1e, &00, &00, &00, &00, &00, &00  ; VDU 23,0,6,30: 6845 register 6 = 30 character rows displayed
+    equb &13, &0a, &01, &00, &00, &00   ; VDU 19,10,1: logical colour 10 shows red
+    equb &13, &09, &03, &00, &00, &00   ; VDU 19,9,3: logical colour 9 shows yellow
+; ***************************************************************************************
+; Unused
+;
+; Four asterisks, not sent.
+.edit_screen_vdu_end
+    equb &2a, &2a, &2a, &2a             ; Not used
 ; &1ddc used as index base 1 time by &2287
 .level_number_prompt
-    equs "Level in the Dunjunz complex "
-    equb &00
+    equs "Level in the Dunjunz complex ", &00
 ; &1dfa used as index base 1 time by &236b
 .save_command
 ; &1dff used as index base 1 time by &2380
-    equs "SAVE LEVEL22 2700+2B0"
-    equb &0d
+    equs "SAVE LEVEL22 2700+2B0", &0d
 .another_prompt
     equs "Another level (A) or quit (Q) *"
 ; ***************************************************************************************
@@ -1525,7 +1521,7 @@ reset_vector          = &fffc
     lda edit_screen_vdu,x               ; ...
     jsr oswrch                          ; ...
     inx                                 ; ...
-    cpx #&21 ; '!'                      ; ...
+    cpx #edit_screen_vdu_end - edit_screen_vdu  ; ...
     bne send_edit_screen                ; ...
     rts                                 ; Return
 ; ***************************************************************************************
@@ -2258,8 +2254,7 @@ reset_vector          = &fffc
     jsr plot_sprite                     ; ...
     rts                                 ; Return
 .load_stones_command
-    equs "LOAD STONES"
-    equb &0d
+    equs "LOAD STONES", &0d
 ; ***************************************************************************************
 ; Show 25 rows
 ;
@@ -2315,7 +2310,7 @@ reset_vector          = &fffc
 ; Unused
 ;
 ; Leftover bytes.
-    equb &0d, &09, &d8, &2e
+    equb &0d, &09, &d8, &2e             ; Not used
 ; ***************************************************************************************
 ; Variables
 ; &25f0 referenced 2 times by &1c88, &1f28
@@ -2336,7 +2331,7 @@ reset_vector          = &fffc
 ; &25f5 referenced 3 times by &1ebe, &202b, &2030
 .cursor_flash
     equb &01
-    equb &00, &00
+    equb &00, &00                       ; Not referenced
 ; &25f8 referenced 18 times by &2411, &2434, &246e, &2478, &247f, &2488, &24a9, &24b6, &24b9, &24c9, &24d8, &24dd, &24ee, &24f3, &24fe, &252c, &253d, &2543
 .chosen_block
     equb &00
@@ -2479,7 +2474,7 @@ reset_vector          = &fffc
 ;
 ; Zeros.
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00, &00, &00  ; Not used
 ; ***************************************************************************************
 ; Load the wall blocks
 ;
@@ -2506,7 +2501,7 @@ reset_vector          = &fffc
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00   ; Not used
 
     org &2900
 ; ***************************************************************************************
@@ -2528,7 +2523,7 @@ reset_vector          = &fffc
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &00
     equb &fe, &fe, &fe, &fe, &fe, &fe, &fe, &00
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff
-    equb &ff, &00, &00, &00, &00, &00, &00, &00
+    equb &ff, &00, &00, &00, &00, &00, &00, &00  ; Not used: the level file's &2900-&29AF when one is loaded
 ; &2980 used as index base 2 times by &1ea7, &2464
 .level_wall_block
     equb &14, &3c, &3c, &28, &29, &03, &03, &16
@@ -2536,7 +2531,7 @@ reset_vector          = &fffc
     equb &29, &03, &03, &16, &14, &3c, &3c, &28
     equb &3c, &28, &14, &3c, &03, &16, &29, &03
     equb &03, &16, &29, &03, &03, &16, &29, &03
-    equb &03, &16, &29, &03, &3c, &28, &14, &3c
+    equb &03, &16, &29, &03, &3c, &28, &14, &3c  ; ...
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
@@ -2545,7 +2540,7 @@ reset_vector          = &fffc
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00   ; Not used
 ; ***************************************************************************************
 ; Sprites
 ;
@@ -2554,22 +2549,86 @@ reset_vector          = &fffc
 .cursor_sprite
     equb &cc, &cc, &88, &44, &88, &44, &88, &44, &cc, &cc
 .item_sprites
-    equb &cc, &cc, &cc, &cc, &cc, &cc, &cc, &cc, &cc, &cc
-    equb &03, &03, &02, &01, &02, &01, &02, &01, &03, &03
-    equb &33, &33, &62, &bb, &62, &bb, &62, &bb, &33, &33
-    equb &3c, &3c, &29, &16, &29, &16, &29, &16, &3c, &3c
-    equb &03, &01, &43, &a9, &53, &a1, &47, &83, &03, &01
-    equb &2a, &00, &3f, &0a, &01, &0b, &05, &0b, &00, &02
-    equb &3f, &3f, &3e, &38, &3e, &38, &3e, &38, &30, &30
-    equb &a8, &41, &00, &02, &3f, &03, &00, &02, &82, &54
-    equb &00, &28, &14, &3c, &10, &30, &14, &34, &14, &3c
-    equb &00, &2a, &00, &0a, &05, &0b, &05, &03, &00, &02
-    equb &05, &01, &0a, &2b, &00, &2b, &18, &2b, &08, &2a
-    equb &00, &0a, &05, &0f, &00, &0a, &00, &0a, &00, &00
-    equb &00, &05, &00, &07, &01, &22, &13, &22, &00, &00
-    equb &14, &2a, &14, &2a, &14, &2a, &14, &2a, &14, &2a
-    equb &00, &00, &3c, &3c, &3f, &3f, &00, &00, &00, &00
-    equb &00, &00, &00, &05, &0f, &0f, &0f, &05, &00, &00
+    equb &cc, &cc
+    equb &cc, &cc
+    equb &cc, &cc
+    equb &cc, &cc
+    equb &cc, &cc                       ; Sprite &00: wall
+    equb &03, &03
+    equb &02, &01
+    equb &02, &01
+    equb &02, &01
+    equb &03, &03                       ; Sprite &01: exit
+    equb &33, &33
+    equb &62, &bb
+    equb &62, &bb
+    equb &62, &bb
+    equb &33, &33                       ; Sprite &02: drainer
+    equb &3c, &3c
+    equb &29, &16
+    equb &29, &16
+    equb &29, &16
+    equb &3c, &3c                       ; Sprite &03: trapdoor
+    equb &03, &01
+    equb &43, &a9
+    equb &53, &a1
+    equb &47, &83
+    equb &03, &01                       ; Sprite &04: treasure
+    equb &2a, &00
+    equb &3f, &0a
+    equb &01, &0b
+    equb &05, &0b
+    equb &00, &02                       ; Sprite &05: food
+    equb &3f, &3f
+    equb &3e, &38
+    equb &3e, &38
+    equb &3e, &38
+    equb &30, &30                       ; Sprite &06: teleporter
+    equb &a8, &41
+    equb &00, &02
+    equb &3f, &03
+    equb &00, &02
+    equb &82, &54                       ; Sprite &07: magic sword
+    equb &00, &28
+    equb &14, &3c
+    equb &10, &30
+    equb &14, &34
+    equb &14, &3c                       ; Sprite &08: helmet
+    equb &00, &2a
+    equb &00, &0a
+    equb &05, &0b
+    equb &05, &03
+    equb &00, &02                       ; Sprite &09: potion
+    equb &05, &01
+    equb &0a, &2b
+    equb &00, &2b
+    equb &18, &2b
+    equb &08, &2a                       ; Sprite &0A: weapons
+    equb &00, &0a
+    equb &05, &0f
+    equb &00, &0a
+    equb &00, &0a
+    equb &00, &00                       ; Sprite &0B: cross
+    equb &00, &05
+    equb &00, &07
+    equb &01, &22
+    equb &13, &22
+    equb &00, &00                       ; Sprite &0C: boots
+    equb &14, &2a
+    equb &14, &2a
+    equb &14, &2a
+    equb &14, &2a
+    equb &14, &2a                       ; Sprite &0D: door vertical
+    equb &00, &00
+    equb &3c, &3c
+    equb &3f, &3f
+    equb &00, &00
+    equb &00, &00                       ; Sprite &0E: door horizontal
+    equb &00, &00
+    equb &00, &05
+    equb &0f, &0f
+    equb &0f, &05
+    equb &00, &00                       ; Sprite &0F: key
 .waiting_door_sprite
     equb &45, &8a, &cf, &cf, &cf, &cf, &cf, &cf, &45, &8a
 ; ***************************************************************************************
@@ -2586,7 +2645,7 @@ reset_vector          = &fffc
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00, &00, &00, &00, &00, &00, &00, &00
-    equb &00, &00, &00, &00, &00, &00
+    equb &00, &00, &00, &00, &00, &00   ; Not used
 ; ***************************************************************************************
 ; Move the cursor
 ;
@@ -3322,7 +3381,7 @@ reset_vector          = &fffc
     equb &0b, &a0, &18, &a9, &94, &85, &0a, &a9
     equb &2e, &85, &0b, &20, &a6, &11, &a2, &08
     equb &a0, &1a, &a9, &a8, &85, &0a, &a9, &2e
-    equb &85
+    equb &85                            ; Not used
 ; ***************************************************************************************
 ; Test a key
 ;
@@ -3695,7 +3754,7 @@ save "Editor", dasmos_start, dasmos_end, &23b2, &1910
 ;     Data                     = 1890 bytes (34%)
 ;
 ;     Number of instructions   = 1696
-;     Number of data bytes     = 1649 bytes
+;     Number of data bytes     = 1639 bytes
 ;     Number of data words     = 0 bytes
-;     Number of string bytes   = 241 bytes
+;     Number of string bytes   = 251 bytes
 ;     Number of strings        = 20
