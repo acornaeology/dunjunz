@@ -126,7 +126,12 @@
       "addr": 14534,
       "name": "title_start",
       "title": "TITLE: draw the title page and wait for a key",
-      "description": "Entered by */TITLE from the BASIC program DUNJUNZ. Select MODE 5 with colour 2 blue, fill the screen with stripe_pattern, copy title_picture into character rows 1-8, print the credits, title and keys, open an empty black window at the bottom, hide the cursor, flush the keyboard buffer and wait up to 7.67 seconds for a key, then return to BASIC."
+      "description": "Entered by */TITLE from the BASIC program DUNJUNZ. Select MODE 5 with colour 2 blue, fill the screen with stripe_pattern, copy title_picture into character rows 1-8, print the credits, title and keys, open an empty black window at the bottom, hide the cursor, flush the keyboard buffer and wait up to 7.67 seconds for a key, then return to BASIC.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     }
   ],
   "banners": [

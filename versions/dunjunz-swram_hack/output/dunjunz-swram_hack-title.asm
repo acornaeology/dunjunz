@@ -107,6 +107,11 @@ osbyte                = &fff4
 ; fill the screen with stripe_pattern, copy title_picture into character rows 1-8, print
 ; the credits, title and keys, open an empty black window at the bottom, hide the cursor,
 ; flush the keyboard buffer and wait up to 7.67 seconds for a key, then return to BASIC.
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 .title_start
     ldx #0                              ; Send the eight bytes of mode_vdu
 ; &38c8 referenced 1 time by &38d2

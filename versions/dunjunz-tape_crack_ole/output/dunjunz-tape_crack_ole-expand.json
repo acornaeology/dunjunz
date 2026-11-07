@@ -139,7 +139,15 @@
       "addr": 11776,
       "name": "expand_start",
       "title": "EXPAND: unpack a compressed MODE 2 picture",
-      "description": "*EXPAND <filename>. Entered at the load address, which jumps over the copyright notice."
+      "description": "*EXPAND <filename>. Entered at the load address, which jumps over the copyright notice.",
+      "on_entry": {
+        "command line": "the filename, after *EXPAND"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 11803,
@@ -154,7 +162,15 @@
       "addr": 11839,
       "name": "expand",
       "title": "Load the named picture and unpack it onto the screen",
-      "description": "Refuses to run outside MODE 2. Finds the filename on the command line, opens the file to learn its length, and loads it so that it ends at &8000, with all sixteen logical colours black so that neither the packed bytes nor the unpacking show. Unpacks it from &3000 until the screen is full, restores the zero page and page &0C bytes it used, and resets the palette (VDU 20) to reveal the picture."
+      "description": "Refuses to run outside MODE 2. Finds the filename on the command line, opens the file to learn its length, and loads it so that it ends at &8000, with all sixteen logical colours black so that neither the packed bytes nor the unpacking show. Unpacks it from &3000 until the screen is full, restores the zero page and page &0C bytes it used, and resets the palette (VDU 20) to reveal the picture.",
+      "on_entry": {
+        "command line": "the filename, after *EXPAND"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
     },
     {
       "addr": 12172,

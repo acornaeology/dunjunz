@@ -35,6 +35,14 @@ osbyte       = &fff4
 ; EXPAND: unpack a compressed MODE 2 picture
 ;
 ; *EXPAND <filename>. Entered at the load address, which jumps over the copyright notice.
+;
+; On Entry:
+;     COMMAND LINE: the filename, after *EXPAND
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 .expand_start
     jmp expand                          ; Skip the copyright notice
 ; ***************************************************************************************
@@ -87,6 +95,14 @@ osbyte       = &fff4
 ; colours black so that neither the packed bytes nor the unpacking show. Unpacks it from
 ; &3000 until the screen is full, restores the zero page and page &0C bytes it used, and
 ; resets the palette (VDU 20) to reveal the picture.
+;
+; On Entry:
+;     COMMAND LINE: the filename, after *EXPAND
+;
+; On Exit:
+;     A: corrupted
+;     X: corrupted
+;     Y: corrupted
 ; &2e3f referenced 1 time by &2e00
 .expand
     lda #osbyte_read_char_at_cursor     ; Read the screen mode into Y

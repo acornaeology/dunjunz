@@ -164,7 +164,8 @@ d.subroutine(0x38C6, "title_start", title="TITLE: draw the title page and wait f
                          "character rows 1-8, print the credits, title and "
                          "keys, open an empty black window at the bottom, hide "
                          "the cursor, flush the keyboard buffer and wait up to "
-                         "7.67 seconds for a key, then return to BASIC.")
+                         "7.67 seconds for a key, then return to BASIC.",
+             on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 d.label(0x38C8, "send_mode_vdu")
 d.label(0x38E4, "fill_stripes")
 d.label(0x3913, "copy_picture")

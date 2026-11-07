@@ -45,7 +45,9 @@ d.index_region(0x0C00, "osfile_block", window=(0, 0x11), group="expand_workspace
 
 d.subroutine(0x2E00, "expand_start", title="EXPAND: unpack a compressed MODE 2 picture",
              description="*EXPAND <filename>. Entered at the load address, "
-             "which jumps over the copyright notice.")
+             "which jumps over the copyright notice.",
+             on_entry={"command line": "the filename, after *EXPAND"},
+             on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 comments([(0x2E00, "Skip the copyright notice"),
           (0x2E03, "The author's copyright")])
 d.label(0x2E03, "copyright_notice")
@@ -95,7 +97,9 @@ d.subroutine(0x2E3F, "expand",
              "colours black so that neither the packed bytes nor the "
              "unpacking show. Unpacks it from &3000 until the screen is full, "
              "restores the zero page and page &0C bytes it used, and resets "
-             "the palette (VDU 20) to reveal the picture.")
+             "the palette (VDU 20) to reveal the picture.",
+             on_entry={"command line": "the filename, after *EXPAND"},
+             on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
 comments([
     (0x2E3F, "Read the screen mode into Y"),
     (0x2E41, "..."),
