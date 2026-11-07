@@ -215,118 +215,90 @@ reset_vector   = &fffc  ; The 6502 reset vector: the MOS's reset entry.
 ; variables: store is level_digits, read and put are read_ptr and put_ptr, save is
 ; save_command and again is another_question. Each line is shown below as it reads when
 ; listed.
-; ...3:LDA#57:STAbuffer+4 (the end of a line)
 .source_leftovers
     equb &33, &3a, &4c, &44, &41, &23, &35, &37, &3a, &53, &54, &41, &62, &75, &66, &66
-    equb &65, &72, &2b, &34
+    equb &65, &72, &2b, &34             ; ...3:LDA#57:STAbuffer+4 (the end of a line)
     equb &0d, &04, &7e, &13             ; Line 1150: CR, line number, length
-; 1150 LDA#0:JSR&FFF1
-    equb &20, &4c, &44, &41, &23, &30, &3a, &4a, &53, &52, &26, &46, &46, &46, &31
+    equb &20, &4c, &44, &41, &23, &30, &3a, &4a, &53, &52, &26, &46, &46, &46, &31  ; 1150 LDA#0:JSR&FFF1
     equb &0d, &04, &88, &13             ; Line 1160: CR, line number, length
-; 1160 CPY#0:BEQinput
-    equb &20, &43, &50, &59, &23, &30, &3a, &42, &45, &51, &69, &6e, &70, &75, &74
+    equb &20, &43, &50, &59, &23, &30, &3a, &42, &45, &51, &69, &6e, &70, &75, &74  ; 1160 CPY#0:BEQinput
     equb &0d, &04, &92, &13             ; Line 1170: CR, line number, length
-; 1170 CPY#1:BEQsmall
-    equb &20, &43, &50, &59, &23, &31, &3a, &42, &45, &51, &73, &6d, &61, &6c, &6c
+    equb &20, &43, &50, &59, &23, &31, &3a, &42, &45, &51, &73, &6d, &61, &6c, &6c  ; 1170 CPY#1:BEQsmall
     equb &0d, &04, &9c, &43             ; Line 1180: CR, line number, length
-; 1180 LDAstore:SEC:SBC#48:ASLA:STAtemp:ASLA:ASLA:CLC:ADCtemp:STAtemp
     equb &20, &4c, &44, &41, &73, &74, &6f, &72, &65, &3a, &53, &45, &43, &3a, &53, &42
     equb &43, &23, &34, &38, &3a, &41, &53, &4c, &41, &3a, &53, &54, &41, &74, &65, &6d
     equb &70, &3a, &41, &53, &4c, &41, &3a, &41, &53, &4c, &41, &3a, &43, &4c, &43, &3a
-    equb &41, &44, &43, &74, &65, &6d, &70, &3a, &53, &54, &41, &74, &65, &6d, &70
+    equb &41, &44, &43, &74, &65, &6d, &70, &3a, &53, &54, &41, &74, &65, &6d, &70  ; 1180 LDAstore:SEC:SBC#48:ASLA:STAtemp:ASLA:ASLA:CLC:ADCtemp:STAtemp
     equb &0d, &04, &a6, &26             ; Line 1190: CR, line number, length
-; 1190 LDAstore+1:SEC:SBC#48:CLC:ADCtemp
     equb &20, &4c, &44, &41, &73, &74, &6f, &72, &65, &2b, &31, &3a, &53, &45, &43, &3a
     equb &53, &42, &43, &23, &34, &38, &3a, &43, &4c, &43, &3a, &41, &44, &43, &74, &65
-    equb &6d, &70
+    equb &6d, &70                       ; 1190 LDAstore+1:SEC:SBC#48:CLC:ADCtemp
     equb &0d, &04, &b0, &0d             ; Line 1200: CR, line number, length
-; 1200 BNEvalue
-    equb &20, &42, &4e, &45, &76, &61, &6c, &75, &65
+    equb &20, &42, &4e, &45, &76, &61, &6c, &75, &65  ; 1200 BNEvalue
     equb &0d, &04, &ba, &31             ; Line 1210: CR, line number, length
-; 1210 .small LDA#32:STAstore+1:LDAstore:SEC:SBC#48
     equb &20, &2e, &73, &6d, &61, &6c, &6c, &20, &4c, &44, &41, &23, &33, &32, &3a, &53
     equb &54, &41, &73, &74, &6f, &72, &65, &2b, &31, &3a, &4c, &44, &41, &73, &74, &6f
-    equb &72, &65, &3a, &53, &45, &43, &3a, &53, &42, &43, &23, &34, &38
+    equb &72, &65, &3a, &53, &45, &43, &3a, &53, &42, &43, &23, &34, &38  ; 1210 .small LDA#32:STAstore+1:LDAstore:SEC:SBC#48
     equb &0d, &04, &c4, &0b             ; Line 1220: CR, line number, length
-; 1220 .value
-    equb &20, &2e, &76, &61, &6c, &75, &65
+    equb &20, &2e, &76, &61, &6c, &75, &65  ; 1220 .value
     equb &0d, &04, &c9, &08             ; Line 1225: CR, line number, length
-; 1225 TAX
-    equb &20, &54, &41, &58
+    equb &20, &54, &41, &58             ; 1225 TAX
     equb &0d, &04, &ce, &24             ; Line 1230: CR, line number, length
-; 1230 LDA#0:STAread:LDA#&10:STAread+1
     equb &20, &4c, &44, &41, &23, &30, &3a, &53, &54, &41, &72, &65, &61, &64, &3a, &4c
-    equb &44, &41, &23, &26, &31, &30, &3a, &53, &54, &41, &72, &65, &61, &64, &2b, &31
+    equb &44, &41, &23, &26, &31, &30, &3a, &53, &54, &41, &72, &65, &61, &64, &2b, &31  ; 1230 LDA#0:STAread:LDA#&10:STAread+1
     equb &0d, &04, &d8, &40             ; Line 1240: CR, line number, length
-; 1240 .loop LDAread:CLC:ADC#176:STAread:LDAread+1:ADC#2:STAread+1
     equb &20, &2e, &6c, &6f, &6f, &70, &20, &4c, &44, &41, &72, &65, &61, &64, &3a, &43
     equb &4c, &43, &3a, &41, &44, &43, &23, &31, &37, &36, &3a, &53, &54, &41, &72, &65
     equb &61, &64, &3a, &4c, &44, &41, &72, &65, &61, &64, &2b, &31, &3a, &41, &44, &43
-    equb &23, &32, &3a, &53, &54, &41, &72, &65, &61, &64, &2b, &31
+    equb &23, &32, &3a, &53, &54, &41, &72, &65, &61, &64, &2b, &31  ; 1240 .loop LDAread:CLC:ADC#176:STAread:LDAread+1:ADC#2:STAread+1
     equb &0d, &04, &e2, &22             ; Line 1250: CR, line number, length
-; 1250 LDA#0:STAput:LDA#&6B:STAput+1
     equb &20, &4c, &44, &41, &23, &30, &3a, &53, &54, &41, &70, &75, &74, &3a, &4c, &44
-    equb &41, &23, &26, &36, &42, &3a, &53, &54, &41, &70, &75, &74, &2b, &31
+    equb &41, &23, &26, &36, &42, &3a, &53, &54, &41, &70, &75, &74, &2b, &31  ; 1250 LDA#0:STAput:LDA#&6B:STAput+1
     equb &0d, &04, &ec, &28             ; Line 1260: CR, line number, length
-; 1260 LDY#0:.loop2 LDA(read),Y:STA(put),Y
     equb &20, &4c, &44, &59, &23, &30, &3a, &2e, &6c, &6f, &6f, &70, &32, &20, &4c, &44
     equb &41, &28, &72, &65, &61, &64, &29, &2c, &59, &3a, &53, &54, &41, &28, &70, &75
-    equb &74, &29, &2c, &59
+    equb &74, &29, &2c, &59             ; 1260 LDY#0:.loop2 LDA(read),Y:STA(put),Y
     equb &0d, &04, &f6, &20             ; Line 1270: CR, line number, length
-; 1270 INCread:BNEc1:INCread+1:.c1
     equb &20, &49, &4e, &43, &72, &65, &61, &64, &3a, &42, &4e, &45, &63, &31, &3a, &49
-    equb &4e, &43, &72, &65, &61, &64, &2b, &31, &3a, &2e, &63, &31
+    equb &4e, &43, &72, &65, &61, &64, &2b, &31, &3a, &2e, &63, &31  ; 1270 INCread:BNEc1:INCread+1:.c1
     equb &0d, &04, &fb, &1e             ; Line 1275: CR, line number, length
-; 1275 INCput:BNEc2:INCput+1:.c2
     equb &20, &49, &4e, &43, &70, &75, &74, &3a, &42, &4e, &45, &63, &32, &3a, &49, &4e
-    equb &43, &70, &75, &74, &2b, &31, &3a, &2e, &63, &32
+    equb &43, &70, &75, &74, &2b, &31, &3a, &2e, &63, &32  ; 1275 INCput:BNEc2:INCput+1:.c2
     equb &0d, &05, &00, &1c             ; Line 1280: CR, line number, length
-; 1280 LDAput:CMP#&B0:BNEloop2
     equb &20, &4c, &44, &41, &70, &75, &74, &3a, &43, &4d, &50, &23, &26, &42, &30, &3a
-    equb &42, &4e, &45, &6c, &6f, &6f, &70, &32
+    equb &42, &4e, &45, &6c, &6f, &6f, &70, &32  ; 1280 LDAput:CMP#&B0:BNEloop2
     equb &0d, &05, &0a, &1e             ; Line 1290: CR, line number, length
-; 1290 LDAput+1:CMP#&6D:BNEloop2
     equb &20, &4c, &44, &41, &70, &75, &74, &2b, &31, &3a, &43, &4d, &50, &23, &26, &36
-    equb &44, &3a, &42, &4e, &45, &6c, &6f, &6f, &70, &32
+    equb &44, &3a, &42, &4e, &45, &6c, &6f, &6f, &70, &32  ; 1290 LDAput+1:CMP#&6D:BNEloop2
     equb &0d, &05, &0f, &2e             ; Line 1295: CR, line number, length
-; 1295 LDAstore:STAsave+10:LDAstore+1:STAsave+11
     equb &20, &4c, &44, &41, &73, &74, &6f, &72, &65, &3a, &53, &54, &41, &73, &61, &76
     equb &65, &2b, &31, &30, &3a, &4c, &44, &41, &73, &74, &6f, &72, &65, &2b, &31, &3a
-    equb &53, &54, &41, &73, &61, &76, &65, &2b, &31, &31
+    equb &53, &54, &41, &73, &61, &76, &65, &2b, &31, &31  ; 1295 LDAstore:STAsave+10:LDAstore+1:STAsave+11
     equb &0d, &05, &14, &20             ; Line 1300: CR, line number, length
-; 1300 LDX#save MOD256:LDY#save DIV256
     equb &20, &4c, &44, &58, &23, &73, &61, &76, &65, &20, &83, &32, &35, &36, &3a, &4c
-    equb &44, &59, &23, &73, &61, &76, &65, &20, &81, &32, &35, &36
+    equb &44, &59, &23, &73, &61, &76, &65, &20, &81, &32, &35, &36  ; 1300 LDX#save MOD256:LDY#save DIV256
     equb &0d, &05, &1e, &0d             ; Line 1310: CR, line number, length
-; 1310 JSR&FFF7
-    equb &20, &4a, &53, &52, &26, &46, &46, &46, &37
+    equb &20, &4a, &53, &52, &26, &46, &46, &46, &37  ; 1310 JSR&FFF7
     equb &0d, &05, &28, &24             ; Line 1320: CR, line number, length
-; 1320 LDA#13:JSR&FFEE:LDA#10:JSR&FFEE
     equb &20, &4c, &44, &41, &23, &31, &33, &3a, &4a, &53, &52, &26, &46, &46, &45, &45
-    equb &3a, &4c, &44, &41, &23, &31, &30, &3a, &4a, &53, &52, &26, &46, &46, &45, &45
+    equb &3a, &4c, &44, &41, &23, &31, &30, &3a, &4a, &53, &52, &26, &46, &46, &45, &45  ; 1320 LDA#13:JSR&FFEE:LDA#10:JSR&FFEE
     equb &0d, &05, &32, &38             ; Line 1330: CR, line number, length
-; 1330 LDX#0:.loop3 LDAagain,X:JSR&FFEE:INX:CMP#0:BNEloop3
     equb &20, &4c, &44, &58, &23, &30, &3a, &2e, &6c, &6f, &6f, &70, &33, &20, &4c, &44
     equb &41, &61, &67, &61, &69, &6e, &2c, &58, &3a, &4a, &53, &52, &26, &46, &46, &45
     equb &45, &3a, &49, &4e, &58, &3a, &43, &4d, &50, &23, &30, &3a, &42, &4e, &45, &6c
-    equb &6f, &6f, &70, &33
+    equb &6f, &6f, &70, &33             ; 1330 LDX#0:.loop3 LDAagain,X:JSR&FFEE:INX:CMP#0:BNEloop3
     equb &0d, &05, &37, &14             ; Line 1335: CR, line number, length
-; 1335 LDA#15:JSR&FFF4
-    equb &20, &4c, &44, &41, &23, &31, &35, &3a, &4a, &53, &52, &26, &46, &46, &46, &34
+    equb &20, &4c, &44, &41, &23, &31, &35, &3a, &4a, &53, &52, &26, &46, &46, &46, &34  ; 1335 LDA#15:JSR&FFF4
     equb &0d, &05, &3c, &22             ; Line 1340: CR, line number, length
-; 1340 .il2 JSR&FFE0:CMP#ASC"A":BEQrun
     equb &20, &2e, &69, &6c, &32, &20, &4a, &53, &52, &26, &46, &46, &45, &30, &3a, &43
-    equb &4d, &50, &23, &97, &22, &41, &22, &3a, &42, &45, &51, &72, &75, &6e
+    equb &4d, &50, &23, &97, &22, &41, &22, &3a, &42, &45, &51, &72, &75, &6e  ; 1340 .il2 JSR&FFE0:CMP#ASC"A":BEQrun
     equb &0d, &05, &46, &14             ; Line 1350: CR, line number, length
-; 1350 CMP#ASC"Q":BNEil2
-    equb &20, &43, &4d, &50, &23, &97, &22, &51, &22, &3a, &42, &4e, &45, &69, &6c, &32
+    equb &20, &43, &4d, &50, &23, &97, &22, &51, &22, &3a, &42, &4e, &45, &69, &6c, &32  ; 1350 CMP#ASC"Q":BNEil2
     equb &0d, &05, &50, &15             ; Line 1360: CR, line number, length
-; 1360 .quit JMP(&FFFC)
     equb &20, &2e, &71, &75, &69, &74, &20, &4a, &4d, &50, &28, &26, &46, &46, &46, &43
-    equb &29
+    equb &29                            ; 1360 .quit JMP(&FFFC)
     equb &0d, &05, &5a, &12             ; Line 1370: CR, line number, length
-; 1370 .run JMPin (cut off by level 1's copy)
-    equb &20, &2e, &72, &75, &6e, &20, &4a, &4d, &50, &69, &6e
+    equb &20, &2e, &72, &75, &6e, &20, &4a, &4d, &50, &69, &6e  ; 1370 .run JMPin (cut off by level 1's copy)
 ; ***************************************************************************************
 ; The original levels
 ;

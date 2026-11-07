@@ -2293,9 +2293,7 @@
       "labels": [
         "source_leftovers"
       ],
-      "comments_before_label": [
-        "...3:LDA#57:STAbuffer+4 (the end of a line)"
-      ],
+      "comment_inline": "...3:LDA#57:STAbuffer+4 (the end of a line)",
       "type": "byte",
       "values": [
         51,
@@ -2356,9 +2354,7 @@
         70,
         49
       ],
-      "comments_before_label": [
-        "1150 LDA#0:JSR&FFF1"
-      ],
+      "comment_inline": "1150 LDA#0:JSR&FFF1",
       "type": "byte",
       "values": [
         32,
@@ -2414,9 +2410,7 @@
         117,
         116
       ],
-      "comments_before_label": [
-        "1160 CPY#0:BEQinput"
-      ],
+      "comment_inline": "1160 CPY#0:BEQinput",
       "type": "byte",
       "values": [
         32,
@@ -2472,9 +2466,7 @@
         108,
         108
       ],
-      "comments_before_label": [
-        "1170 CPY#1:BEQsmall"
-      ],
+      "comment_inline": "1170 CPY#1:BEQsmall",
       "type": "byte",
       "values": [
         32,
@@ -2578,9 +2570,7 @@
         109,
         112
       ],
-      "comments_before_label": [
-        "1180 LDAstore:SEC:SBC#48:ASLA:STAtemp:ASLA:ASLA:CLC:ADCtemp:STAtemp"
-      ],
+      "comment_inline": "1180 LDAstore:SEC:SBC#48:ASLA:STAtemp:ASLA:ASLA:CLC:ADCtemp:STAtemp",
       "type": "byte",
       "values": [
         32,
@@ -2703,9 +2693,7 @@
         109,
         112
       ],
-      "comments_before_label": [
-        "1190 LDAstore+1:SEC:SBC#48:CLC:ADCtemp"
-      ],
+      "comment_inline": "1190 LDAstore+1:SEC:SBC#48:CLC:ADCtemp",
       "type": "byte",
       "values": [
         32,
@@ -2774,9 +2762,7 @@
         117,
         101
       ],
-      "comments_before_label": [
-        "1200 BNEvalue"
-      ],
+      "comment_inline": "1200 BNEvalue",
       "type": "byte",
       "values": [
         32,
@@ -2856,9 +2842,7 @@
         52,
         56
       ],
-      "comments_before_label": [
-        "1210 .small LDA#32:STAstore+1:LDAstore:SEC:SBC#48"
-      ],
+      "comment_inline": "1210 .small LDA#32:STAstore+1:LDAstore:SEC:SBC#48",
       "type": "byte",
       "values": [
         32,
@@ -2936,9 +2920,7 @@
         117,
         101
       ],
-      "comments_before_label": [
-        "1220 .value"
-      ],
+      "comment_inline": "1220 .value",
       "type": "byte",
       "values": [
         32,
@@ -2975,9 +2957,7 @@
         65,
         88
       ],
-      "comments_before_label": [
-        "1225 TAX"
-      ],
+      "comment_inline": "1225 TAX",
       "type": "byte",
       "values": [
         32,
@@ -3039,9 +3019,7 @@
         43,
         49
       ],
-      "comments_before_label": [
-        "1230 LDA#0:STAread:LDA#&10:STAread+1"
-      ],
+      "comment_inline": "1230 LDA#0:STAread:LDA#&10:STAread+1",
       "type": "byte",
       "values": [
         32,
@@ -3159,9 +3137,7 @@
         43,
         49
       ],
-      "comments_before_label": [
-        "1240 .loop LDAread:CLC:ADC#176:STAread:LDAread+1:ADC#2:STAread+1"
-      ],
+      "comment_inline": "1240 .loop LDAread:CLC:ADC#176:STAread:LDAread+1:ADC#2:STAread+1",
       "type": "byte",
       "values": [
         32,
@@ -3277,9 +3253,7 @@
         43,
         49
       ],
-      "comments_before_label": [
-        "1250 LDA#0:STAput:LDA#&6B:STAput+1"
-      ],
+      "comment_inline": "1250 LDA#0:STAput:LDA#&6B:STAput+1",
       "type": "byte",
       "values": [
         32,
@@ -3371,9 +3345,7 @@
         44,
         89
       ],
-      "comments_before_label": [
-        "1260 LDY#0:.loop2 LDA(read),Y:STA(put),Y"
-      ],
+      "comment_inline": "1260 LDY#0:.loop2 LDA(read),Y:STA(put),Y",
       "type": "byte",
       "values": [
         32,
@@ -3463,9 +3435,7 @@
         99,
         49
       ],
-      "comments_before_label": [
-        "1270 INCread:BNEc1:INCread+1:.c1"
-      ],
+      "comment_inline": "1270 INCread:BNEc1:INCread+1:.c1",
       "type": "byte",
       "values": [
         32,
@@ -3545,9 +3515,7 @@
         99,
         50
       ],
-      "comments_before_label": [
-        "1275 INCput:BNEc2:INCput+1:.c2"
-      ],
+      "comment_inline": "1275 INCput:BNEc2:INCput+1:.c2",
       "type": "byte",
       "values": [
         32,
@@ -3623,9 +3591,7 @@
         112,
         50
       ],
-      "comments_before_label": [
-        "1280 LDAput:CMP#&B0:BNEloop2"
-      ],
+      "comment_inline": "1280 LDAput:CMP#&B0:BNEloop2",
       "type": "byte",
       "values": [
         32,
@@ -3701,9 +3667,7 @@
         112,
         50
       ],
-      "comments_before_label": [
-        "1290 LDAput+1:CMP#&6D:BNEloop2"
-      ],
+      "comment_inline": "1290 LDAput+1:CMP#&6D:BNEloop2",
       "type": "byte",
       "values": [
         32,
@@ -3797,9 +3761,7 @@
         49,
         49
       ],
-      "comments_before_label": [
-        "1295 LDAstore:STAsave+10:LDAstore+1:STAsave+11"
-      ],
+      "comment_inline": "1295 LDAstore:STAsave+10:LDAstore+1:STAsave+11",
       "type": "byte",
       "values": [
         32,
@@ -3895,9 +3857,7 @@
         53,
         54
       ],
-      "comments_before_label": [
-        "1300 LDX#save MOD256:LDY#save DIV256"
-      ],
+      "comment_inline": "1300 LDX#save MOD256:LDY#save DIV256",
       "type": "byte",
       "values": [
         32,
@@ -3960,9 +3920,7 @@
         70,
         55
       ],
-      "comments_before_label": [
-        "1310 JSR&FFF7"
-      ],
+      "comment_inline": "1310 JSR&FFF7",
       "type": "byte",
       "values": [
         32,
@@ -4029,9 +3987,7 @@
         69,
         69
       ],
-      "comments_before_label": [
-        "1320 LDA#13:JSR&FFEE:LDA#10:JSR&FFEE"
-      ],
+      "comment_inline": "1320 LDA#13:JSR&FFEE:LDA#10:JSR&FFEE",
       "type": "byte",
       "values": [
         32,
@@ -4141,9 +4097,7 @@
         112,
         51
       ],
-      "comments_before_label": [
-        "1330 LDX#0:.loop3 LDAagain,X:JSR&FFEE:INX:CMP#0:BNEloop3"
-      ],
+      "comment_inline": "1330 LDX#0:.loop3 LDAagain,X:JSR&FFEE:INX:CMP#0:BNEloop3",
       "type": "byte",
       "values": [
         32,
@@ -4237,9 +4191,7 @@
         70,
         52
       ],
-      "comments_before_label": [
-        "1335 LDA#15:JSR&FFF4"
-      ],
+      "comment_inline": "1335 LDA#15:JSR&FFF4",
       "type": "byte",
       "values": [
         32,
@@ -4311,9 +4263,7 @@
         117,
         110
       ],
-      "comments_before_label": [
-        "1340 .il2 JSR&FFE0:CMP#ASC\"A\":BEQrun"
-      ],
+      "comment_inline": "1340 .il2 JSR&FFE0:CMP#ASC\"A\":BEQrun",
       "type": "byte",
       "values": [
         32,
@@ -4385,9 +4335,7 @@
         108,
         50
       ],
-      "comments_before_label": [
-        "1350 CMP#ASC\"Q\":BNEil2"
-      ],
+      "comment_inline": "1350 CMP#ASC\"Q\":BNEil2",
       "type": "byte",
       "values": [
         32,
@@ -4446,9 +4394,7 @@
         67,
         41
       ],
-      "comments_before_label": [
-        "1360 .quit JMP(&FFFC)"
-      ],
+      "comment_inline": "1360 .quit JMP(&FFFC)",
       "type": "byte",
       "values": [
         32,
@@ -4502,9 +4448,7 @@
         105,
         110
       ],
-      "comments_before_label": [
-        "1370 .run JMPin (cut off by level 1's copy)"
-      ],
+      "comment_inline": "1370 .run JMPin (cut off by level 1's copy)",
       "type": "byte",
       "values": [
         32,

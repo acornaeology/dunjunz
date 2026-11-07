@@ -218,7 +218,7 @@ d.label(LEFTOVER_ADDR, "source_leftovers")
 first_cr = image.index(b"\r", LEFTOVER_ADDR - LOAD_ADDR) + LOAD_ADDR
 d.byte(LEFTOVER_ADDR, first_cr - LEFTOVER_ADDR, cols=16)
 fragment = detokenise(image[LEFTOVER_ADDR - LOAD_ADDR:first_cr - LOAD_ADDR])
-d.comment(LEFTOVER_ADDR, f"...{fragment} (the end of a line)")
+d.comment(LEFTOVER_ADDR, f"...{fragment} (the end of a line)", align=INLINE)
 cr = first_cr
 while cr + 4 <= LEVELS_ADDR:
     hi_byte, lo_byte, length = image[cr + 1 - LOAD_ADDR:cr + 4 - LOAD_ADDR]
@@ -229,7 +229,7 @@ while cr + 4 <= LEVELS_ADDR:
     d.comment(cr, f"Line {number}: CR, line number, length", align=INLINE)
     text = detokenise(image[text_addr - LOAD_ADDR:text_end - LOAD_ADDR])
     cut = " (cut off by level 1's copy)" if cr + length > LEVELS_ADDR else ""
-    d.comment(text_addr, f"{number}{text}{cut}")
+    d.comment(text_addr, f"{number}{text}{cut}", align=INLINE)
     d.byte(text_addr, text_end - text_addr, cols=16)
     cr = cr + length
 
