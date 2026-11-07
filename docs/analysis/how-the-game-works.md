@@ -127,9 +127,9 @@ down a stage per hit, and the firer gets a point for each hit.
 
 ## Monsters
 
-Up to 30 monsters (`monster_x`, `monster_y`, `monster_sprite`) move one
-cell every three frames in a straight line, sliding there pixel by
-pixel. When blocked by a wall or another creature they turn a random way,
+Up to 30 monsters (`monster_x`, `monster_y`, `monster_sprite`) move in a
+straight line, sliding a quarter of a cell a frame, so one cell every
+four frames; a cell on the edge of a room is entered at once. When blocked by a wall or another creature they turn a random way,
 using the System VIA timer. A monster that walks into a hero hurts it
 (`hero_damage_taken` points). A monster killed by a missile or by magic
 plays a short death animation and then reappears at the next of the

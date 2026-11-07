@@ -99,12 +99,19 @@ the first hero waiting in `returning_hero_queue`, a hero who died on this
 level. The hero materialises and returns with health 32. Only the helmet
 (&60) lowers `hero_damage_taken`.
 
-### Energy drainers take 10 health per contact, not 20
+### Energy drainers take 10 health a frame, so 20 for a crossing
 
 Line 310 says an Energy Drainer makes you "Lose 20 health points".
-`collect_objects` calls `lose_health_point` ten times when a hero touches
-one (types &53–&5E). Whether a hero can touch one twice in a single move
-has not been checked in play.
+`collect_objects` calls `lose_health_point` ten times when it finds a
+drainer (types &53–&5E) in the hero's cell, and leaves the drainer there.
+It is called through `draw_moved_hero` (&70BE) on every frame a hero in
+play is handled: standing still (&6F15), firing (&6F6C, &6F76), the
+half-step frame and arrival. On the half-step frame of leaving,
+`stay_in_old_cell` keeps the hero in the drainer's cell. So walking
+across a drainer within a room costs 20, as the instructions say; leaving
+it into another room, which is instant, costs 10; and every frame spent
+standing on it, or bumping into something from it, costs 10 more
+**[confirmed from the code; not measured in play]**.
 
 ## Level data
 
@@ -581,8 +588,15 @@ is on the trapdoor. One that dies in the top four rows leaves a real
 cell (rows 0, 12, 24 or 36, in the top-left part of the dungeon), and if
 a hero or monster happens to stand there the branch at &7CED is taken.
 That branch parks the monster at &FF,&FF but leaves its sprite alive, so
-nothing brings it back to a trapdoor and it is lost for the rest of the
-level **[inference from the code]**.
+nothing brings it back to a trapdoor **[inference from the code]**. A
+parked monster is still moved every frame; its coordinates can wrap to 0
+and `test_wall` then reads bytes beyond `room_walls`, so whether it can
+walk back onto the map's top row or left column is not known.
+
+`find_creature` is called with `scratch` non-zero, and in that mode it
+takes `hero_damage_taken` health from any hero it finds (&79A7-&79B2). So
+a hero who happens to stand at the leftover cell is hurt by a monster
+emerging elsewhere **[confirmed from the code]**.
 
 ### A missile stops at a dead hero's skull
 
@@ -673,7 +687,10 @@ The object is removed (&7411) before the returning queue is tested
 
 Magic's cost is taken through `lose_health_point`, which can end the
 caster's life; `draw_moved_hero` (&7096) checks that the caster is still
-in play before drawing **[confirmed from the code]**.
+in play before drawing **[confirmed from the code]**. Nothing after the
+cost loop (&7652-&765A) checks, so a caster killed by the cost still
+kills the room's monsters and scores for them **[confirmed from the
+code]**.
 
 ### A hero standing on a key swaps keys every other frame
 
@@ -710,3 +727,123 @@ code left **[confirmed from the code]**.
 
 The bytes at &6F6D, `88 D0 B8` (`DEY: BNE find_missile_slot`), follow a
 `JMP` and are never reached **[confirmed from the code]**.
+
+### A monster killed by magic comes back still wounded
+
+The magic kill (&768A) only sets the sprite to the blank. Hit points are
+written only by `reset_monsters`, the missile kill (&759E, which resets
+them) and a surviving hit (&75A6), and `monster_reappears` does not touch
+them. So a monster wounded by missiles and then killed by magic returns
+from its trapdoor with the hit points it had left **[confirmed from the
+code]**.
+
+### Walking into a monster costs one point, whatever the armour
+
+A hero's move into a monster's cell calls `lose_health_point` once
+(&6FFC); a monster moving into a hero takes `hero_damage_taken` points
+(&79A7). `find_creature` ignores the sprite, so a dying monster still
+blocks heroes and costs the point, though missiles pass through it
+(&7147) **[confirmed from the code]**.
+
+### Monsters move faster across room boundaries
+
+A step into a cell inside a room takes four frames (`start_monster_step`
+draws a quarter of the way, `continue_monster_step` a half, three
+quarters, then the cell). A cell on a room's edge, in the direction of
+travel, is entered at once **[confirmed from the code]**.
+
+### All the monsters emerge together at the start of a level
+
+`reset_monsters` gives all 30 the blank sprite at x &FF, so they sparkle
+together and emerge on the same frame, round-robin over the eight
+trapdoors, three or four to a trapdoor **[confirmed from the code]**.
+While a monster slides between cells its `monster_x`/`monster_y` hold the
+cell it is leaving and arrival is not tested, so creatures can end up
+sharing a cell; stacked monsters can slide out together **[inference
+from the code]**.
+
+### Each hero who leaves by the exit adds a frame to the level's end
+
+Each hero who goes down the exit leaves a return address on the stack,
+so the `RTS` at the level's end comes back into `check_exit` once per
+such hero, each time running a full frame **[confirmed from the code]**.
+
+### A key dropped at the exit can land in a wall
+
+`find_open_neighbour` tests the cells above, right of and below the exit
+for walls, and falls back on the cell to the left without testing it
+(&20F7) **[confirmed from the code]**. It does not test for keys or
+objects either.
+
+### The game can stall after a pause in the crack and the hack
+
+The pause loop (&1ED7-&1EF5) does not set `os_vsync_counter` (&0240)
+again. The MOS counts it down at every vsync throughout the pause, so it
+can be positive when play resumes and `play_level` then waits up to 128
+vsyncs, about 2.6 seconds, for the next frame. Both disc sides reset the
+counter after a pause **[inference from the code and the MOS; not
+tested]**.
+
+### Game over waits for the vsync counter to reach exactly 0
+
+At &0EB9 the game waits for &0240 to be 0. `play_level` last set it to 2
+and the MOS goes on counting it down, so if the window clear and message
+take more than two vsyncs the wait lasts until it wraps, up to 256
+vsyncs (about 5 s), before the keys are flushed and the timed wait starts
+**[inference from the code; not tested]**.
+
+### The hero menu keeps the last game's choices
+
+Neither `hero_absent` nor `menu_text` is reset after a game over, so the
+menu opens with the previous game's YES/NO and sound choices, and its
+ON/OFF entry shows the last choice made rather than the sound
+suppression in force **[confirmed from the code]**.
+
+## Official disc release: further notes
+
+### `*DUNJUNZ` (Model B) arms the BREAK intercept only while Coder loads
+
+`title_start` stores the JMP at &0287 just before `*CODER`, and Coder
+stores 0 there within its first few instructions **[confirmed from the
+code]**. On the first run after power-on, &15B5 does not yet hold
+`next_level_intercept`, so a BREAK during that load would jump into
+whatever is there **[inference]**. Each level's reset arms the intercept
+again itself (&1460).
+
+### Coder reads the joystick's ADC channel twice
+
+Once at &50A3 to choose which &0400 image to copy, and again at &50D0 to
+decide whether to point BYTEV at &0780. If the readings disagreed, the
+joystick image would run with the MOS's BYTEV, or BYTEV would point at
+the keyboard image's &0780, which is zeros (BRK) **[confirmed from the
+code; whether readings can disagree is untested]**.
+
+### The Master's `stones_command` ends with a zero byte
+
+`stones_command` (&C5AA) is `LOAD STONES 6680` followed by &00, not a CR;
+the first CR after it is at &C623, ending a leftover "DUNJUNZ"
+**[confirmed from the bytes]**. Whether MOS 3.20 and DFS 2.24 accept the
+command, so that level 25 loads, is untested.
+
+## Level editor: further notes
+
+### The level number typed when saving only chooses the checksum
+
+`level_number` (&25F1, Master side) is written at &22F8 and never read;
+the filename is asked for separately (&2373). A level saved under another
+level's filename carries the wrong checksum and fails the game's test
+when it is loaded **[confirmed from the code; the failure inferred]**.
+
+### Loading a level trusts the file
+
+For a loaded level `start_editing` sets `exit_placed` to 1 and
+`unpack_level` sets `trapdoor_count` to 8 without checking, and each
+door's key is taken whether or not it is on the map. Only a malformed
+file is affected **[confirmed from the code]**.
+
+### Errors during the Editor's questions may restart it
+
+`editor_init` arms the BREAK intercept and points BRKV at the reset
+entry, so an error such as File not found should come back to
+`editor_init` through `break_to_start` **[inference; depends on the MOS
+reset path, untested]**.
