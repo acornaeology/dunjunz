@@ -232,9 +232,15 @@ release:
   match the crack's `DUNJ4` except at:
   - &0450–&0484, which holds the routine that decrypts a level and checks
     its checksum, byte-identical to the official disc release's;
-  - &1447–&149F, the level loader, rewritten to load `LEVELn` by calling
-    the filing system's FILEV handler directly, with an OSFILE block at
-    &6E60;
+  - &1447–&149F, the level loader, replaced by one that loads `LEVELn`
+    by calling the filing system's FILEV handler directly, with an OSFILE
+    block at &6E60. Its last ten bytes, at &1496–&149F (`STA &149C: LDA
+    #&FF: JSR &3000: JMP &0450`), are byte-identical, at the same
+    addresses, to leftover bytes after the official disc's own loader in
+    `Dun1`, and the crack has neither **[confirmed]**. So the FILEV
+    loader looks older than the disc release, part of its development
+    that the disc's loader was written over, rather than new work for the
+    hack **[inference]**;
   - &0E00–&0E06, identical to the official disc release's, and the
     filename at &16D0;
   - bytes in &0800–&08BF, &0D2F–&0D30 and &0D80–&0D85. These look like

@@ -2187,7 +2187,7 @@
         "r",
         "w"
       ],
-      "description": "Horizontal pixel offset added by plot_at_cell (in byte columns)."
+      "description": "Horizontal offset added by plot_at_cell, in byte columns."
     },
     {
       "addr": 126,
@@ -2197,7 +2197,7 @@
         "r",
         "w"
       ],
-      "description": "Vertical pixel offset added by plot_at_cell (in pixel rows)."
+      "description": "Vertical offset added by plot_at_cell, in pixel rows."
     },
     {
       "addr": 128,
@@ -11136,7 +11136,7 @@
         "exit_offsets_y"
       ],
       "comments_before_label": [
-        "Vertical pixel offset of the shrinking hero, entries 1-4 by exit_shrinks_left (at exit_offsets_y+1 to +4). Also entry 4 of exit_offsets_x."
+        "Vertical offset of the shrinking hero, in pixel rows, entries 1-4 by exit_shrinks_left (at exit_offsets_y+1 to +4). Also entry 4 of exit_offsets_x."
       ],
       "xref_summaries": [
         "&29fa referenced 1 time by &14b3[1]; also used as index base 1 time by &1fe7[1]"

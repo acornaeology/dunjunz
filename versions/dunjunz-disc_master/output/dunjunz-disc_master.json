@@ -2268,7 +2268,7 @@
         "r",
         "w"
       ],
-      "description": "Horizontal pixel offset added by plot_at_cell (in byte columns)."
+      "description": "Horizontal offset added by plot_at_cell, in byte columns."
     },
     {
       "addr": 126,
@@ -2278,7 +2278,7 @@
         "r",
         "w"
       ],
-      "description": "Vertical pixel offset added by plot_at_cell (in pixel rows)."
+      "description": "Vertical offset added by plot_at_cell, in pixel rows."
     },
     {
       "addr": 128,
@@ -4235,6 +4235,9 @@
       "image": 0,
       "labels": [
         "level_checksums"
+      ],
+      "comments_before_label": [
+        "The expected sum of each decrypted level, for levels 1-25 at level_checksums+1 to level_checksums+25."
       ],
       "comment_inline": "Entry 0: there is no level 0, so never read",
       "xref_summaries": [
@@ -10600,6 +10603,9 @@
       "labels": [
         "exit_offsets_x"
       ],
+      "comments_before_label": [
+        "Horizontal offset of the shrinking hero, in byte columns, entries 1-4 by exit_shrinks_left. Entry 0 is written at &2040 and never read."
+      ],
       "xref_summaries": [
         "&09f6 referenced 1 time by &2042; also used as index base 1 time by &1fe2"
       ],
@@ -10706,7 +10712,7 @@
         "exit_offsets_y"
       ],
       "comments_before_label": [
-        "Vertical pixel offset of the shrinking hero, entries 1-4 by exit_shrinks_left (at exit_offsets_y+1 to +4). Also entry 4 of exit_offsets_x."
+        "Vertical offset of the shrinking hero, in pixel rows, entries 1-4 by exit_shrinks_left (at exit_offsets_y+1 to +4). Also entry 4 of exit_offsets_x."
       ],
       "xref_summaries": [
         "&09fa referenced 1 time by &1520; also used as index base 1 time by &1fe7"

@@ -152,6 +152,7 @@ class Annotator:
     def index_base(self, addr, name, **kwargs):
         if self.skip is None or not self.skip(addr):
             self.d.index_base(addr, name, **kwargs)
+            self._describe_in_image(addr, kwargs.get("description"), None)
 
     def banner(self, addr, title, description=""):
         for move, _ in self._each(addr):

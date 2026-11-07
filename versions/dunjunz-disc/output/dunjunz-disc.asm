@@ -200,9 +200,9 @@ map_ptr                  = &7b  ; Pointer into room_walls or object_free_map at 
 ; &7b referenced 21 times by &449b, &44a2, &44a4, &44c0, &44c5, &7046, &7542, &767f, &77a1, &77b3, &77c5, &77d7, &77e4, &790e, &7915, &7917, &792f, &794a, &7951, &7953, &796b
 map_ptr_hi               = &7c  ; Pointer into a map, high byte.
 ; &7c referenced 4 times by &44a8, &77e0, &791b, &7957
-plot_offset_x            = &7d  ; Horizontal pixel offset added by plot_at_cell (in byte columns).
+plot_offset_x            = &7d  ; Horizontal offset added by plot_at_cell, in byte columns.
 ; &7d referenced 18 times by &3832, &4472, &4504, &459b, &46a3, &46e3, &4725, &7088, &70cc, &7307, &76ea, &7738, &780c, &787a, &79c5, &7a00, &7b1c, &7b55
-plot_offset_y            = &7e  ; Vertical pixel offset added by plot_at_cell (in pixel rows).
+plot_offset_y            = &7e  ; Vertical offset added by plot_at_cell, in pixel rows.
 ; &7e referenced 18 times by &3834, &4474, &4506, &459d, &46a5, &46e5, &472a, &708d, &70ce, &7309, &76ec, &773d, &780e, &788e, &79c7, &7a05, &7b21, &7b5a
 ring_x                   = &80  ; Map x of the cell being drawn in the victory ring.
 ; &80 referenced 8 times by &388b, &3894, &3899, &38a6, &38bd, &38c2, &38ca, &38da
@@ -481,7 +481,7 @@ reset_vector             = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; &09f9 referenced 1 time by &3bf0
 .exit_offset_x_3
     equb &00
-; Vertical pixel offset of the shrinking hero, entries 1-4 by exit_shrinks_left (at exit_offsets_y+1 to +4). Also entry 4 of exit_offsets_x.
+; Vertical offset of the shrinking hero, in pixel rows, entries 1-4 by exit_shrinks_left (at exit_offsets_y+1 to +4). Also entry 4 of exit_offsets_x.
 ; &09fa referenced 1 time by &3bf3; also used as index base 1 time by &4727
 .exit_offsets_y
     equb &00

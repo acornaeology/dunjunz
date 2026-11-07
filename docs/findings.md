@@ -879,3 +879,170 @@ file is affected **[confirmed from the code]**.
 entry, so an error such as File not found should come back to
 `editor_init` through `break_to_start` **[inference; depends on the MOS
 reset path, untested]**.
+
+## Space a revised version could recover
+
+Redundant code and unused bytes matter here as space that a revised
+version, with a more general joystick driver and filing-system handling,
+could reuse on a Model B. `tools/unused_space.py LISTING_JSON --in-play`
+lists every run the listings mark as unused; check each before reusing
+it, since a byte the listing calls unused can still be code that doubles
+as data, or be reached by an indexed access past a table's end.
+
+### Memory nothing uses during play
+
+Counting what is resident in play (not the screen at &3000-&6E7F, where
+the stored copies lie, and on the disc one of the two page &04-&07
+images) **[from the listings' annotations]**:
+
+| Version | Unused in play | Runs |
+|---|---|---|
+| Official disc, Model B side | 1,046 bytes | 66 |
+| Official disc, Master side | 903 bytes | 57 |
+| Ole's crack | 1,129 bytes | 63 |
+| Sideways RAM hack | 1,082 bytes | 56 |
+
+The larger runs on the disc's Model B side:
+
+| Runtime | Bytes | What |
+|---|---|---|
+| &0772-&07EF | 126 | Leftovers in page &07 of the keyboard image (see "Leftovers from development in page &07"); the joystick image keeps `joystick_bytev` at &0780 |
+| &09A0-&09EF | 80 | Not referenced, in the game core |
+| &15D0-&1619 | 74 | Stale code before `next_level_intercept` |
+| &08C0-&08FF | 64 | Not referenced, start of the game core |
+| &17C0-&17FF | 64 | Leftover fragments of BASIC text |
+| &2990-&29BF | 48 | A sprite-sized gap between `sprite_food` and `sprite_teleporter` |
+| &18D8-&18FF | 40 | After the word LEVEL |
+| &04AA-&04CE | 37 | Zeros in page &04 |
+| &0E21-&0E44 | 36 | Not referenced, before the disc's `to_next_level` (and 11 more at &0E4C) |
+| &16C2-&16FE | 51 | Three runs among the view frame PLOT commands |
+| &196E-&19BF | 65 | Five runs in the 82 bytes after `exit_sound` |
+| &2215-&229F | 55 | Eleven bytes after each of the five 21-byte door and key tables |
+| &29F0-&2CFF | 56 | 8- and 16-byte gaps after sprite blocks |
+
+The rest are runs of 1-18 bytes. On the disc the &4740-&4FFF and
+&59B0-&6AFF gaps in `Dun1` are only file space, as that memory is the
+screen in play.
+
+Initial contents that the game overwrites before reading (the object,
+door, key and monster tables, the wall map, page &0D refreshed from
+`workspace_template`) are file space only: at least 194 bytes on the
+disc, since the memory is workspace.
+
+### Redundant code
+
+All **[confirmed from the code]**, at runtime addresses shared by all
+four versions unless stated:
+
+| Address | Bytes | What |
+|---|---|---|
+| &7BAD, &7BD6-&7BE9 | 22 | `continue_hero_step`'s `BNE double_offsets` is never taken (the step is 1), and `double_offsets` only doubles offsets that are already zero; the `RTS` at &7BEA stays |
+| &6F6D-&6F6F | 3 | `DEY: BNE find_missile_slot`, unreachable after a `JMP` |
+| &7934, &7970 | 4 | `STA &8F` in `test_wall` and `test_object_free`; nothing reads &8F for it |
+| &2040-&2044 | 5 | `exit_offsets_x` entry 0 set to 4; never read |
+| &1160 | 3 | `STA victory_sprite_copy`; never read |
+| &1F9E | 3 | `LDX exiting_hero`; X is loaded again at &1FBA before use |
+| &1D46 | 1 | `TAY` of the hero number; Y is overwritten at &1D7F |
+| &C60A (Master) | 3 | `game_over_music` stores 0 into `clear_text_area`'s top-row operand, already 0 |
+
+Not removable, though they look it: on the disc, `game_entry`'s `LDA
+&8F: STA level_bcd` (&0D6E-&0D72) stores into a byte nothing reads, but
+the code lies in page &0D and runs once before the first level; from
+then on page &0D is workspace refreshed from `workspace_template`, and
+&0D70 onwards are the `hero_key_up` and `hero_key_down` tables.
+
+Time rather than space:
+
+- Each extra frame run at &1F8E for a hero who went down the exit repeats
+  `restore_hero_sprites` (&1F2D).
+- `draw_room` sends all 20 doors through `plot_at_cell`, so drawing one
+  view redraws every door in every view that shows it.
+- `object_free_map` is never updated as objects are collected, so a
+  collected object's cell goes on triggering a search of the object list.
+- The final clear of the Chalice (&11DA-&11E2) clears &C1 bytes, one more
+  than the sprite.
+
+In the separate programs (Master addresses for the Editor):
+
+| Program | Address | Bytes | What |
+|---|---|---|---|
+| Editor | &1CAA | 5 | A space stored at `load_command`+11, already blank |
+| Editor | &1F2D | 5 | `link_index` zeroed again (also at &1EC1) |
+| Editor | &1F9A | 6 | `show_labels` and `show_counts` called again for a loaded level (also at &1F50) |
+| Editor | &1FB2 | 7 | OSBYTE 4,1 repeated (also at &1F21) |
+| Editor | `new_level` | 10 | Fills `level_wall_block` with &03, which `choose_wall_block` always replaces before saving |
+| Editor | &2340 | - | `save_level`'s two checksum branches compute the same value, so the comparison changes nothing |
+| `*DUNJUNZ` (Model B) | `title_start` | 10 | Arms the BREAK intercept at &0287, which Coder clears straight away (see above) |
+
+## Minor observations
+
+None of these matters in normal play; all are **[confirmed from the
+code]** unless marked.
+
+Game:
+
+- A refused move still turns the hero: the direction is stored (&6ECB and
+  the like) before the cell is tested.
+- A hero who dies on walking frame 1 skips the first sparkle of the death
+  animation, because `lose_health_point` (&7240-&7251) sets the step and
+  timer but not `hero_frame`. A returning hero goes from place 8 down to
+  1 and is back in play when the frame reaches 0, so place 0 is never
+  shown.
+- `find_creature` returns A = Y = `cell_y` as its found flag (&798B), so a
+  monster in map row 0 would read as nothing there; when it finds a hero
+  it returns Y = 0. The border walls keep creatures out of row 0
+  **[inference]**.
+- The teleporter search (&73C7) also compares object 0, which is never
+  written and holds 0, so it never matches. Each teleporter leads to the
+  one before it in the object list, and the first to the last.
+- A collected object is moved to &FF,&FF, which works out to room offset
+  &DB, so no view ever draws it.
+- Object types are told apart by ranges (&7477-&747F): any type below &5F
+  that is not treasure, food, the Cross, a teleporter or the exit counts
+  as an energy drainer, and any type from &5F up other than &5F-&62 as a
+  magic sword, the Chalice (&73) included if it were ever found in the
+  object list.
+- `queue_exit_marker`'s search for a free queue entry has no bound; it
+  relies on at most four of the five entries being in use. A Cross of
+  Resurrection sends the markers of heroes who left by the exit to the
+  back of the queue, so only heroes who died come back.
+- The disc's `clear_text_area` window starts with its bottom row at 22,
+  so the first clear keeps the level file Coder loaded into rows 23-24;
+  `check_level` then widens it to 24. Rows 25-31 (&6E80-&7FFF) are game
+  code, so no text window ever reaches them.
+- The Master's `start_music` plays the tune's first step at every level
+  before `start_level` puts back the saved place, so the music restarts
+  briefly.
+- The crack's `saved_pages` (&4E00-&58FF) are in screen rows 12-16, so the
+  moved game code should show under the level number while a level loads
+  **[inference; not watched]**. Its `load_level` resets the restore
+  loop's operands because restoring page &14 copies back the running
+  copy's stepped values.
+
+Loaders and utilities:
+
+- In `*DUNJUNZ`, erasing the stars when a key ends the title has no
+  visible effect, as *TV and MODE 2 follow at once; and OSBYTE &7A scans
+  from key 16, so SHIFT or CTRL alone does not end the title.
+- `*DEFAULT` matches the A and Q answers in capitals only, rejects "00" as
+  level 0 through its one-digit path, and quits with `JMP (&FFFC)` into
+  the MOS reset code.
+
+Level editor (both sides):
+
+- `move_cursor` gives right priority over left and up over down (&2B1B,
+  &2B35, &2B3B), and the cursor keys repeat on every pass while held.
+- The colour keys only redefine logical colour 10 on screen; nothing is
+  written to the level.
+- The edge walls `wall_edges` adds when saving go through `put_item`, which
+  clears their cells' object-free bits; walls cannot be entered, so this
+  is harmless in play **[inference]**.
+- `ask_key` reads keys by scanning, so the answer stays in the input
+  buffer; `ask_filename` waits and flushes before reading the name. Its
+  OSBYTE &0F runs with X still holding the prompt's low byte, non-zero
+  for all four prompts, so only the input buffer is flushed.
+- `item_for_type` has no bound: with no match, Y wraps and execution runs
+  into &7BCE, a zero byte (BRK) after the MODE 2 clear. Only the Chalice
+  type has no item, and `start_editing` removes it first.
+- `ask_filename` and `copy_load_name` rely on OSWORD 0 returning the
+  length without the CR, as documented **[from the MOS documentation]**.

@@ -111,6 +111,10 @@ on the official release.
   and follows the end-of-level reset to the next: a pattern for testing
   the disc release at run time.
 
+- `uv run python tools/unused_space.py LISTING_JSON --in-play` lists the
+  bytes a listing marks unused (and initial contents overwritten), the
+  space a revised version could recover; record redundant code in
+  findings.md's "Space a revised version could recover".
 - `uv run python tools/timing_probe.py TEST` measures the timing findings
   in vsyncs (`hack_pause`, `game_over`, `monster_step`, `disc_repause`),
   stopping with `debugger.run_to(addr, skip_current=True)`; the polling

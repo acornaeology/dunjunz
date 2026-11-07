@@ -71,9 +71,9 @@ def _zero_page(a: Annotator) -> None:
         "byte; set by test_wall and test_object_free."), **zp)
     a.label(0x7C, "map_ptr_hi", description="Pointer into a map, high byte.", **zp)
     a.label(0x7D, "plot_offset_x", description=(
-        "Horizontal pixel offset added by plot_at_cell (in byte columns)."), **zp)
+        "Horizontal offset added by plot_at_cell, in byte columns."), **zp)
     a.label(0x7E, "plot_offset_y", description=(
-        "Vertical pixel offset added by plot_at_cell (in pixel rows)."), **zp)
+        "Vertical offset added by plot_at_cell, in pixel rows."), **zp)
     a.label(0x7A, "sprite_number", description=(
         "Sprite to plot: an index into the sprite tables at "
         "sprite_addr_lo, sprite_addr_hi, sprite_widths and sprite_heights."),
@@ -3125,10 +3125,11 @@ def annotate_play_loop(a: Annotator) -> None:
     ]:
         a.label(addr, name, description=description)
     a.index_base(0x09F6, "exit_offsets_x", group="game_state", description=(
-        "Horizontal pixel offset of the shrinking hero, entries 1-4 by "
-        "exit_shrinks_left."))
+        "Horizontal offset of the shrinking hero, in byte columns, "
+        "entries 1-4 by exit_shrinks_left. Entry 0 is written at &2040 and "
+        "never read."))
     a.label(0x09FA, "exit_offsets_y", description=(
-        "Vertical pixel offset of the shrinking hero, entries 1-4 by "
+        "Vertical offset of the shrinking hero, in pixel rows, entries 1-4 by "
         "exit_shrinks_left (at exit_offsets_y+1 to +4). Also entry 4 of "
         "exit_offsets_x."))
 
