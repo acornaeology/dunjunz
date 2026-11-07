@@ -888,6 +888,12 @@
       "description": "Stop the music, send the VDU 28 that the game-over code's text window begins with, and set the top row in clear_text_area's window to 0."
     },
     {
+      "addr": 50880,
+      "name": "show_free_space",
+      "title": "*FREE",
+      "description": "Show the disc's free space. The game never calls it: [*EDITOR](address:23F7@/editor) does, after cataloguing the disc, relying on Table being in private RAM."
+    },
+    {
       "addr": 50896,
       "name": "pause_check",
       "title": "Pause while P is pressed",
@@ -1021,12 +1027,6 @@
       "name": "row_offsets",
       "title": "Screen row offsets",
       "description": "Row x 640 for character rows 0-24, high byte first: the table screen_address and the title's star plotter read here instead of in MOS 1.20.",
-      "align": "before_label"
-    },
-    {
-      "addr": 50880,
-      "title": "Unused",
-      "description": "A leftover routine, never called: *FREE.",
       "align": "before_label"
     },
     {
@@ -72905,26 +72905,71 @@
       "addr": 50880,
       "bytes": [
         162,
-        200,
+        200
+      ],
+      "image": 6,
+      "labels": [
+        "show_free_space"
+      ],
+      "comment_inline": "*FREE...",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#<(free_command)",
+      "expr": {
+        "text": "<(free_command)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "free_command"
+          }
+        }
+      }
+    },
+    {
+      "addr": 50882,
+      "bytes": [
         160,
-        198,
+        198
+      ],
+      "image": 6,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#>(free_command)",
+      "expr": {
+        "text": ">(free_command)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "free_command"
+          }
+        }
+      }
+    },
+    {
+      "addr": 50884,
+      "bytes": [
         32,
         247,
-        255,
+        255
+      ],
+      "image": 6,
+      "comment_inline": "...",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oscli",
+      "target": 65527,
+      "target_label": "oscli"
+    },
+    {
+      "addr": 50887,
+      "bytes": [
         96
       ],
       "image": 6,
-      "type": "byte",
-      "values": [
-        162,
-        200,
-        160,
-        198,
-        32,
-        247,
-        255,
-        96
-      ]
+      "comment_inline": "Return",
+      "type": "code",
+      "mnemonic": "rts"
     },
     {
       "addr": 50888,
@@ -72935,13 +72980,26 @@
         69
       ],
       "image": 6,
+      "labels": [
+        "free_command"
+      ],
       "type": "string",
       "string": "FREE"
     },
     {
       "addr": 50892,
       "bytes": [
-        13,
+        13
+      ],
+      "image": 6,
+      "type": "byte",
+      "values": [
+        13
+      ]
+    },
+    {
+      "addr": 50893,
+      "bytes": [
         0,
         0,
         0
@@ -72949,7 +73007,6 @@
       "image": 6,
       "type": "byte",
       "values": [
-        13,
         0,
         0,
         0

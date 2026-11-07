@@ -114,7 +114,7 @@ level_trapdoor_y      = &27d8  ; The level file: trapdoors' y.
 ; &27d8 used as index base 2 times by &19a9, &265c
 level_walls           = &27e0  ; The level file: the wall map.
 ; &27e0 referenced 2 times by &230f, &2314; also used as index base 2 times by &19bc, &26b1
-data_2800             = &2800
+plotter_image_page_2  = &2800  ; The second page of the stored plotter page, copied to &0A00.
 ; &2800 used as index base 1 time by &23bd
 level_object_free     = &28b0  ; The level file: the object-free map.
 ; &28b0 used as index base 2 times by &19c2, &26b7
@@ -1841,7 +1841,7 @@ reset_vector          = &fffc
     bne copy_plotter_lo                 ; ...
 ; &23bd referenced 1 time by &23c4
 .copy_plotter_hi
-    lda data_2800,x                     ; ...and &2800-&28FF to &0A00
+    lda plotter_image_page_2,x          ; ...and &2800-&28FF to &0A00
     sta sprite_addr_lo,x                ; ...
     dex                                 ; ...
     bne copy_plotter_hi                 ; ...
@@ -3313,7 +3313,6 @@ save "Editor", dasmos_start, dasmos_end, &23b2, &1910
 ;     crypt_check_end:            1
 ;     cursor_key_done:            1
 ;     dasmos_start:               1
-;     data_2800:                  1
 ;     delete_exit:                1
 ;     delete_item:                1
 ;     delete_item_slot:           1
@@ -3402,6 +3401,7 @@ save "Editor", dasmos_start, dasmos_end, &23b2, &1910
 ;     plot_next_row:              1
 ;     plot_row:                   1
 ;     plotter_image:              1
+;     plotter_image_page_2:       1
 ;     print_filename_prompt:      1
 ;     print_labels:               1
 ;     print_level_prompt:         1
@@ -3458,9 +3458,6 @@ save "Editor", dasmos_start, dasmos_end, &23b2, &1910
 ;     wall_edges:                 1
 ;     wall_left_right:            1
 ;     wall_top_bottom:            1
-
-; Automatically generated labels:
-;     data_2800
 
 ; Stats:
 ;     Total size (Code + Data) = 5518 bytes

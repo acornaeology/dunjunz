@@ -188,6 +188,40 @@ The details:
   Master therefore "restores" level 6 to a version the disc never
   shipped.
 
+### The level editor reverses the tables and balances the checksum in entry 0
+
+`*EDITOR` (on both sides) unpacks a level's tables from the last entry
+back into item slots counting down from &4F. It packs them again from
+slot &4F up to slot 0. So each load and save reverses the order of the
+objects (except the exit, always entry 30), the doors with their keys,
+and the trapdoors. On saving, it sets the level's first byte (entry 0 of
+the objects' x, which the game never reads) to whatever makes the
+level's sum equal its entry in the checksum table **[confirmed from the
+code]**. That accounts exactly for the disc's eight revised levels. Each
+has reversed tables and keeps its checksum, and level 6 changed only by
+being loaded and saved **[confirmed]**.
+
+Other things worth knowing about `*EDITOR` **[confirmed from the code]**:
+- It cannot save level 25 (it accepts 1–24), and on loading it drops the
+  Chalice (type &73), which only level 25 has.
+- Saving needs exactly eight trapdoors, the exit, and a key for every
+  door. It walls in the map's edges first.
+- BRKV points at the MOS reset entry (&D9CD on the Model B side, &E364
+  on the Master side), so any filing system error, such as a missing
+  file, restarts the machine.
+- The wall block comes from `Stones`. Its first &480 bytes are 24 wall
+  blocks, and the game's `*LOAD STONES 6680` puts the level 25 data that
+  follows them at &6B00.
+
+### `*DEFAULT` writes level files the game never reads
+
+`*DEFAULT` accepts levels 1–25. Level 25 is saved as `Level25`, but the
+game reads level 25 from `Stones`, so restoring it has no effect. A
+leading zero typed is also kept in the filename, so `05` is saved as
+`Level05` rather than `Level5` **[confirmed from the code]**. The Master
+side's copy restores level 6 to the cassette's version, which the disc
+never shipped (see above).
+
 ## Provenance of this disc
 
 The sideways RAM version is described on stardot as an unofficial hack

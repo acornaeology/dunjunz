@@ -72,7 +72,17 @@ captures' **[confirmed]**. The contents of the two sides are:
 - The README says to turn the disc over after choosing the heroes "in
   order to access the levels of play". It describes `*EDITOR` (a level
   editor) and `*DEFAULT` (restores an edited level to its original form),
-  "for the BBC model B ONLY" **[confirmed]**.
+  "for the BBC model B ONLY" **[confirmed]**. Each side in fact has its own
+  `Editor` and `Default`. The Master side's are conversions of the Model B
+  side's, and are disassembled with it.
+- **The disc's levels were edited with `*EDITOR`.** Eight of the disc's
+  levels (1, 2, 4, 5, 6, 12, 22, 24) differ from the cassette's, with
+  their tables reversed as `*EDITOR` saves them and their checksums kept
+  **[confirmed]**. Seven have real changes to walls, objects, doors or
+  keys, and level 6 was only loaded and saved. The Master `Default`
+  carries the disc's versions of the other seven but the cassette's
+  level 6. So level 6 was re-saved after that file was built **[inference]**.
+  See [findings.md](findings.md).
 - The disc's levels use the same encryption and checksum scheme as the
   sideways RAM hack (see below), and its game, `Coder` and `Editor` all
   carry the same checksum table. That table holds &4D for level 5

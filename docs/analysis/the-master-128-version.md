@@ -7,9 +7,10 @@ Master features it uses, and how it copes with the Master's WD1770 disc
 controller and DFS 2.24 (the DFS that beebjit's Master 128 runs, sideways ROM
 bank 9 reading "DFS 2.24 (C)1985 Acorn" **[confirmed]**).
 
-The full listing is `versions/dunjunz-disc_master/`. Its driver,
-`disasm_dunjunz_disc_master.py`, applies the shared game annotations and
-adds the Master's own. Statements are tagged **[confirmed]** (by the bytes,
+The listings are in `versions/dunjunz-disc_master/`, one for each program
+on the side: the game (`disasm_dunjunz_disc_master.py`, which applies the
+shared game annotations and adds the Master's own), `*DUNJUNZ`, `Coder2`,
+`*EDITOR` and `*DEFAULT`. `BOOT` is detokenised in `basic/boot.bas`. Statements are tagged **[confirmed]** (by the bytes,
 or by running the side in beebjit's Master 128 with MOS 3.20), or
 **[inference]**.
 
@@ -57,7 +58,8 @@ or by running the side in beebjit's Master 128 with MOS 3.20), or
 | `Screen` | &3280 | &3280 | — | — | the title picture (identical to the Model B side's) |
 | `Stones` | &6E80 | &6E80 | &730 | — | ends with level 25 (identical to the Model B side's) |
 | `Level1` | &6B00 | &6B00 | &2B0 | — | level 1 (identical to the Model B side's) |
-| `Editor`, `Default` | &1910, &0E00 | &23B2, &0E00 | — | — | the level editor and level restorer, Master builds (not yet disassembled) |
+| `Editor` | &1910 | &23B2 | &158E | &1910 | `*EDITOR`, the level editor (see below) |
+| `Default` | &0E00 | &0E00 | &47E0 | &0E00 | `*DEFAULT`, which restores a level file from the copies it carries |
 
 Only level 1 is on this side. The README tells the players to turn the
 disc over once they have chosen their heroes, "in order to access the
@@ -255,20 +257,93 @@ In short, the conversion accommodates the WD1770 and DFS 2.24 by not
 competing with them. It lets the DFS do all the loading and keeps the
 DFS's NMI page intact whenever the DFS runs.
 
+## The level editor and the level restorer
+
+The README offers two more programs: `*EDITOR` to edit levels and
+`*DEFAULT` to restore a level "back to its original format". Both work on
+the level files of the side in the drive, so the disc is turned over for
+them too. The Model B side has its own copies, which the README says are
+"for the BBC model B ONLY".
+
+**`*EDITOR`** (&1910, run at &23B2) **[confirmed from its code]**:
+- **Start-up.** It copies its plotter page (&2700–&28FF) to &0900, the
+  game's sprite plotter's home. That page holds the game's `plot_sprite`
+  and `screen_address`, unchanged except that they read the editor's own
+  sprite tables, together with those tables and a copy of the game's
+  level checksum table. It also copies two routines to &7B00 and &7D80.
+- **Choosing a level.** It asks whether to edit a level or start a new
+  one, then whether to use disc or tape (and, for disc, which drive), and
+  `*LOAD`s the file at &2700, over the plotter page's old copy.
+- **Unpacking.** It decrypts the level and unpacks it into 80 item slots,
+  a wall map and an object-free map. It drops any object of type &73, the
+  Chalice, which only level 25 has and the editor has no sprite for. It
+  draws the 32 × 48 map in MODE 2, each cell two bytes wide and five pixel
+  rows high.
+- **Editing.** The cursor moves with `,` `.` `A` `Z`; f0 slows it down.
+  `1` and `2` choose the item: a wall, the exit, a trapdoor (labelled
+  "Mons"), a door, a key, or one of eleven objects. SPACE places the item
+  and TAB deletes. To give a door its key, choose the key, press SPACE on
+  the door, then place the key. Holding CTRL draws each door–key link as
+  a line. The limits are one exit, eight trapdoors, 20 doors and 29
+  objects.
+- **Saving.** SHIFT+S saves, once the exit, all eight trapdoors and every
+  door's key are placed:
+  - It walls in the map's edges and packs the slots into the level file.
+  - It loads `Stones` and lets the player choose one of its 24 wall
+    blocks.
+  - It asks for the level's number (1–24). It sets the level's unused
+    first byte so that the bytes sum to that level's entry in the
+    checksum table, encrypts the level and saves it under the filename
+    typed.
+  - Pressing nothing at the level-number prompt catalogues the disc and
+    calls `Table`'s `*FREE` routine at &C6C0, which the game itself never
+    uses.
+- **Errors and BREAK.** BRKV points at MOS 3.20's reset entry (&E364), so
+  any filing system error restarts the machine. BREAK returns to the
+  start, or to the save prompt while saving, through the BREAK intercept.
+
+The packing walks the slots from the last to the first, while unpacking
+fills them from the last down. So every load and save reverses the order
+of each table (the exit stays in entry 30). That is the signature of the
+eight revised levels on the disc (see [findings](../findings.md)).
+
+The Master conversion of the editor changes only a handful of things from
+the Model B side's **[confirmed by comparing the two]**:
+- BRKV &D9CD (MOS 1.20's reset entry) → &E364 (MOS 3.20's), and the final
+  `JMP &D9CD` → `JMP (&FFFC)`;
+- the screen row table &C375 → &C675, with `*L. TABLE` on the first run;
+- the catalogue's free-space display, now `Table`'s routine.
+
+The rest is the same code, moved 19–21 bytes by those changes.
+
+**`*DEFAULT`** (&0E00) asks for a level number and saves that level's
+original file. It carries all 25 levels, encrypted, at &12B0 **[confirmed]**:
+- **Its copies.** They match the Model B side's files, except level 6,
+  which is the cassette's version (see [findings](../findings.md)).
+- **Level 25 is accepted.** It is saved as `Level25`, a file the game
+  never reads, since the game takes level 25 from `Stones`. A typed
+  leading zero is kept too, so `05` is saved as `Level05`.
+- **Its leftovers.** Between the code and the levels lies the end of
+  `*DEFAULT`'s own tokenised BBC BASIC assembler source, lines 1150–1370.
+  The listing shows it line by line.
+
+The Model B side's `Default` carries only levels 1–24.
+
 ## Hazards and oddities
 
 - **A failed checksum on a Master runs `BRK`.** The checksum routine
   still ends with `JSR &D9CD`, the MOS 1.20 reset entry. With HAZEL paged
   in, &D9CD is private RAM, which holds zeros in beebjit, so a tampered
   level executes BRK rather than resetting **[confirmed that &D9CD holds
-  0; the effect is an inference]**.
+  0; the effect is an inference]**. The conversion of `*EDITOR` did
+  replace its uses of &D9CD with MOS 3.20's reset entry, &E364, so this
+  one was missed rather than unknown **[inference]**.
 - **The Model B side's title animation also uses MOS 1.20.** Its star
   plotter reads the row table at &C375 (`Dunjunz` &287D and &2885 on the
   Model B side) **[confirmed]**.
 - **Leftovers:**
   - the Model B loader's page &08 set-up;
   - the BREAK intercept address &15B5;
-  - a `*FREE` routine at &C6C0;
   - part of a `*DUNJUNZ` restart routine at &C60E;
   - the rest of the cassette pause routine at &1EDA;
   - the unused body of the game-font WRCHV handler at &7F92;
@@ -279,12 +354,11 @@ DFS's NMI page intact whenever the DFS runs.
 
 ## Not yet examined
 
-- **What happens if the disc is not turned over.** The Master side has
-  only `Level1`, so asking for level 2 there should give a DFS error,
-  which the game does not trap. In beebjit, with the level digit changed
-  to 2 just before the first load, the emulation reached none of the
-  probe's later breakpoints, so the outcome is not yet known.
-- **The Master `Editor` and `Default`.** The README says the other
-  side's are "for the BBC model B ONLY".
+- **What happens if the disc is not turned over**, against the README's
+  instructions. The Master side has only `Level1`, so asking for level 2
+  there should give a DFS error, which the game does not trap. In beebjit,
+  with the level digit changed to 2 just before the first load, the
+  emulation reached none of the probe's later breakpoints, so the outcome
+  is not yet known.
 - **The remainder of `Code2`**, its tune data, has not been transcribed
   into notes.

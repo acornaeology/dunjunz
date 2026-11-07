@@ -78,6 +78,7 @@ sprite number.
 | &61 | Potion of healing | Health becomes the score's last digit, doubled (e.g. 77); 10 points |
 | &62 | Pile of weapons | One more missile in flight (at most 3); 10 points |
 | &63 | Magic sword | Missile damage +1 (at most 9); 10 points |
+| &73 | The Chalice | Level 25 only (object 29, at x &1A, y 4); `check_for_victory` ends the game when a hero reaches it |
 
 ## Doors, keys and trapdoors
 
@@ -112,8 +113,16 @@ level's wall sprite from its last bytes, and carry a checksum table with
 &4D for level 5 (the official disc's). Its `add_checksum` makes an edited
 level pass the check by adjusting the level's last byte.
 
+The official disc's own level editor, `*EDITOR`, balances the sum
+instead by setting the unused first byte (entry 0 of the objects' x).
+It also writes every table in the reverse of the order it read them (see
+[findings.md](findings.md)).
+
 ## Open questions
 
-- How the win check's cells (x &1A–&1B, y 4–5 on level 25) relate to the
-  objects placed there.
+- Whether the Chalice object (type &73, at x &1A, y 4) is what draws the
+  Chalice in the four cells the win check tests (x &1A–&1B, y 4–5). Its
+  position is the top-left of those cells **[confirmed in the bytes]**,
+  and the Chalice sprite is 8 bytes by 24 rows **[confirmed]**, but the
+  link is an inference.
 - Whether the map rows below the ending message on level 25 are reachable.

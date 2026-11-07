@@ -16487,9 +16487,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "data_2800,x",
+      "operand": "plotter_image_page_2,x",
       "target": 10240,
-      "target_label": "data_2800"
+      "target_label": "plotter_image_page_2"
     },
     {
       "addr": 9152,

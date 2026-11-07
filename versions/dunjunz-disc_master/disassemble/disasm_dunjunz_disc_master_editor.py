@@ -107,6 +107,8 @@ main.label(0x2700, "plotter_image", description=(
 for operand_addr in (0x1F48, 0x1F81, 0x231B, 0x235A, 0x262F, 0x2646):
     d.expr(operand_addr, sym("level_object_x"))
 d.expr(0x7B19, sym("level_object_x"), move=unpack)
+main.label(0x2800, "plotter_image_page_2", description=(
+    "The second page of the stored plotter page, copied to &0A00."))
 main.label(0x23B4, "copy_plotter_lo")
 main.label(0x23BD, "copy_plotter_hi")
 

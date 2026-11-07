@@ -195,7 +195,7 @@ osword                          = &fff1
 osbyte                          = &fff4
 ; &fff4 referenced 23 times by &0583, &058c, &05ed, &07d6, &07df, &07e8, &07f1, &0ec0, &0ec9, &10d4, &10ed, &1128, &7c9e, &c51f, &c52d, &c53c, &c54a, &c559, &c6d2, &c6de, &c6f0, &c75a, &c766
 oscli                           = &fff7
-; &fff7 referenced 6 times by &0752, &0759, &0760, &0767, &14f5, &c5a4
+; &fff7 referenced 7 times by &0752, &0759, &0760, &0767, &14f5, &c5a4, &c6c4
 reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
 ; &fffc referenced 1 time by &10da
 
@@ -7003,12 +7003,19 @@ row_offsets_lo = row_offsets+1
     equb &00, &00, &00, &00, &00, &00, &00, &00
     equb &00
 ; ***************************************************************************************
-; Unused
+; *FREE
 ;
-; A leftover routine, never called: *FREE.
-    equb &a2, &c8, &a0, &c6, &20, &f7, &ff, &60
+; Show the disc's free space. The game never calls it: *EDITOR does, after cataloguing
+; the disc, relying on Table being in private RAM.
+.show_free_space
+    ldx #<(free_command)                ; *FREE...
+    ldy #>(free_command)                ; ...
+    jsr oscli                           ; ...
+    rts                                 ; Return
+.free_command
     equs "FREE"
-    equb &0d, &00, &00, &00
+    equb &0d
+    equb &00, &00, &00
 ; ***************************************************************************************
 ; Pause while P is pressed
 ;
@@ -7823,6 +7830,7 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     monster_step:                 7
 ;     object_type:                  7
 ;     os_vsync_counter:             7
+;     oscli:                        7
 ;     play_level:                   7
 ;     ring_y:                       7
 ;     draw_monster:                 6
@@ -7832,7 +7840,6 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     missile_y:                    6
 ;     music_rhythm_step:            6
 ;     music_section:                6
-;     oscli:                        6
 ;     sprite_data_ptr:              6
 ;     test_key:                     6
 ;     tune_ptr + 1:                 6
@@ -8650,11 +8657,11 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 
 ; Stats:
 ;     Total size (Code + Data) = 20187 bytes
-;     Code                     = 7436 bytes (37%)
-;     Data                     = 12751 bytes (63%)
+;     Code                     = 7444 bytes (37%)
+;     Data                     = 12743 bytes (63%)
 ;
-;     Number of instructions   = 3430
-;     Number of data bytes     = 11933 bytes
+;     Number of instructions   = 3434
+;     Number of data bytes     = 11925 bytes
 ;     Number of data words     = 0 bytes
 ;     Number of string bytes   = 818 bytes
 ;     Number of strings        = 102

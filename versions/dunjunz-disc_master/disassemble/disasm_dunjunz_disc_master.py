@@ -29,7 +29,7 @@ import sys
 from pathlib import Path
 
 import dasmos
-from dasmos.expr import hexlit, sym
+from dasmos.expr import hexlit, hi, lo, sym
 
 VERSION_DIRPATH = Path(__file__).resolve().parent.parent
 REPO_DIRPATH = VERSION_DIRPATH.parent.parent
@@ -562,11 +562,21 @@ master.banner(0xC675, "Screen row offsets",
               "of in MOS 1.20.")
 master.byte(0xC675, 50, cols=10)
 master.byte(0xC6A7, 0x19, cols=8)
-master.banner(0xC6C0, "Unused",
-              "A leftover routine, never called: *FREE.")
-master.byte(0xC6C0, 8, cols=8)
+master.sub(0xC6C0, "show_free_space", "*FREE",
+           "Show the disc's free space. The game never calls it: [*EDITOR](address:23F7@/editor) "
+           "does, after cataloguing the disc, relying on Table being in "
+           "private RAM.")
+comments(master, [
+    (0xC6C0, "*FREE..."),
+    (0xC6C2, "..."), (0xC6C4, "..."),
+    (0xC6C7, "Return"),
+])
+master.label(0xC6C8, "free_command")
 master.string(0xC6C8, 4)
-master.byte(0xC6CC, 4, cols=4)
+master.byte(0xC6CC)
+master.byte(0xC6CD, 3, cols=3)
+d.expr(0xC6C1, lo(sym("free_command")))
+d.expr(0xC6C3, hi(sym("free_command")))
 
 master.label(0x1ED7, "check_pause")
 master.sub(0xC6D0, "pause_check", "Pause while P is pressed",
