@@ -135,10 +135,11 @@ feature or defect met along the way, and note the workaround here.
   `d.load(..., name=, exec_addr=)` and dasmos saves each (dasmos 4.3.0).
   The disc's `Coder` is a part of `Dun1`, so it cannot be a second loaded
   image; `dunjunz_common.rendering.ExtraSavesBeebasmRenderer` adds its
-  `save` through the public `disassembly_end` hook. `fantasm.toml`
-  declares one target per file sharing one driver and listing
-  (acornaeology/fantasm#25). fantasm's version graph (annotation porting)
-  also assumes one binary per version, so annotations shared between
+  `save` through the public `disassembly_end` hook. `fantasm.toml` has one
+  target per listing, listing a multi-file game's files under `images`
+  (fantasm 1.4.0); the disc target lists `Coder` too, which verify checks
+  against the extra save. fantasm's version graph (annotation porting)
+  assumes one binary per version, so annotations shared between
   releases live in `dunjunz_common/`, keyed by runtime address.
 - Index regions cannot be declared inside a dasmos move, so
   `Annotator.region` gives each offset in a moved table an `expr_label`
@@ -147,11 +148,6 @@ feature or defect met along the way, and note the workaround here.
   address. Each image's labels are its own (the joystick image's carry a
   `_joystick` suffix), and every branch target in the page is named in
   `dunjunz_common/game.py`.
-- fantasm adds a target for every `versions/dunjunz-<id>` directory even
-  when `[[targets]]` is configured, and `verify --all` counts those as
-  failures (acornaeology/fantasm#26). Each version's main target
-  therefore carries the version id (`swram_hack`, `tape_crack_ole`,
-  `disc`) so the two coincide.
 - No execution coverage in beebium: `tools/coverage.py` uses range
   breakpoints over data plus single-stepping (rob-smallshire/beebium#268).
 - oaknut cannot open HFE captures (rob-smallshire/oaknut#93).

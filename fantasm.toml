@@ -1,4 +1,10 @@
 # fantasm project configuration. See https://acornaeology.github.io/fantasm/
+#
+# One target per listing. Each separate program of a version has its own
+# driver and listing; a game made of several DFS files is one target
+# listing all of them under `images`, and verify compares each with the
+# file of that name that the listing saves. beebasm runs in fantasm's
+# temporary directory, so the saved files never land in the repository.
 
 [project]
 name = "dunjunz"
@@ -7,46 +13,24 @@ default_target = "swram_hack"
 [binary]
 cpu = "6502"
 
-# The resident game is four DFS files disassembled together by one driver
-# into one listing, which saves each file under its DFS name. Each file is a
-# target so that `fantasm verify --all` checks every one; the targets share
-# the driver, listing and JSON, and beebasm runs in fantasm's temporary
-# directory so the saved files never land in the repository.
+[verify]
+command = ["beebasm", "-i", "{asm}"]
+cwd = "{output_dirpath}"
+output = "{image}"
 
-[[targets]]
-id = "dunjun4"
-binary = "versions/dunjunz-swram_hack/binary/Dunjun4"
-driver = "versions/dunjunz-swram_hack/disassemble/disasm_dunjunz_swram_hack.py"
-asm = "versions/dunjunz-swram_hack/output/dunjunz-swram_hack.asm"
-json = "versions/dunjunz-swram_hack/output/dunjunz-swram_hack.json"
-verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunjun4" }
-
+# The sideways RAM hack: the resident game (four files), and TITLE, its
+# title page.
 [[targets]]
 id = "swram_hack"
-binary = "versions/dunjunz-swram_hack/binary/Dunjun7"
+images = [
+  "versions/dunjunz-swram_hack/binary/Dunjun4",
+  "versions/dunjunz-swram_hack/binary/Dunjun7",
+  "versions/dunjunz-swram_hack/binary/Dunjun5",
+  "versions/dunjunz-swram_hack/binary/Dunjun6",
+]
 driver = "versions/dunjunz-swram_hack/disassemble/disasm_dunjunz_swram_hack.py"
 asm = "versions/dunjunz-swram_hack/output/dunjunz-swram_hack.asm"
 json = "versions/dunjunz-swram_hack/output/dunjunz-swram_hack.json"
-verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunjun7" }
-
-[[targets]]
-id = "dunjun5"
-binary = "versions/dunjunz-swram_hack/binary/Dunjun5"
-driver = "versions/dunjunz-swram_hack/disassemble/disasm_dunjunz_swram_hack.py"
-asm = "versions/dunjunz-swram_hack/output/dunjunz-swram_hack.asm"
-json = "versions/dunjunz-swram_hack/output/dunjunz-swram_hack.json"
-verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunjun5" }
-
-[[targets]]
-id = "dunjun6"
-binary = "versions/dunjunz-swram_hack/binary/Dunjun6"
-driver = "versions/dunjunz-swram_hack/disassemble/disasm_dunjunz_swram_hack.py"
-asm = "versions/dunjunz-swram_hack/output/dunjunz-swram_hack.asm"
-json = "versions/dunjunz-swram_hack/output/dunjunz-swram_hack.json"
-verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunjun6" }
-
-# TITLE, the hack's title page, is a separate program with its own driver
-# and listing.
 
 [[targets]]
 id = "swram_hack-title"
@@ -54,29 +38,19 @@ binary = "versions/dunjunz-swram_hack/binary/TITLE"
 driver = "versions/dunjunz-swram_hack/disassemble/disasm_dunjunz_swram_hack_title.py"
 asm = "versions/dunjunz-swram_hack/output/dunjunz-swram_hack-title.asm"
 json = "versions/dunjunz-swram_hack/output/dunjunz-swram_hack-title.json"
-verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "TITLE" }
 
-# Ole's crack of the cassette: DUNJ4 (the &0400-&2FFF image stored at &2400,
-# plus start-up code at &5000) and DUNJ3 (&6E80 onwards).
-
+# Ole's crack of the cassette: DUNJ4 (the &0400-&2FFF image stored at
+# &2400, plus start-up code at &5000) and DUNJ3 (&6E80 onwards); and
+# EXPAND, the picture unpacker that PLOAD runs.
 [[targets]]
 id = "tape_crack_ole"
-binary = "versions/dunjunz-tape_crack_ole/binary/DUNJ4"
+images = [
+  "versions/dunjunz-tape_crack_ole/binary/DUNJ4",
+  "versions/dunjunz-tape_crack_ole/binary/DUNJ3",
+]
 driver = "versions/dunjunz-tape_crack_ole/disassemble/disasm_dunjunz_tape_crack_ole.py"
 asm = "versions/dunjunz-tape_crack_ole/output/dunjunz-tape_crack_ole.asm"
 json = "versions/dunjunz-tape_crack_ole/output/dunjunz-tape_crack_ole.json"
-verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "DUNJ4" }
-
-[[targets]]
-id = "tape-dunj3"
-binary = "versions/dunjunz-tape_crack_ole/binary/DUNJ3"
-driver = "versions/dunjunz-tape_crack_ole/disassemble/disasm_dunjunz_tape_crack_ole.py"
-asm = "versions/dunjunz-tape_crack_ole/output/dunjunz-tape_crack_ole.asm"
-json = "versions/dunjunz-tape_crack_ole/output/dunjunz-tape_crack_ole.json"
-verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "DUNJ3" }
-
-# EXPAND, the picture unpacker that PLOAD runs, is a separate program with
-# its own driver and listing.
 
 [[targets]]
 id = "tape_crack_ole-expand"
@@ -84,30 +58,20 @@ binary = "versions/dunjunz-tape_crack_ole/binary/EXPAND"
 driver = "versions/dunjunz-tape_crack_ole/disassemble/disasm_dunjunz_tape_crack_ole_expand.py"
 asm = "versions/dunjunz-tape_crack_ole/output/dunjunz-tape_crack_ole-expand.asm"
 json = "versions/dunjunz-tape_crack_ole/output/dunjunz-tape_crack_ole-expand.json"
-verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "EXPAND" }
 
 # The official disc release, Model B side: Dun1 (the game, reloaded every
-# level) and Coder (its per-level loader, also stored inside Dun1).
-
+# level) and Coder (its per-level loader, also stored inside Dun1, so the
+# driver loads only Dun1 and saves Coder from it); then Dunjunz (the
+# loader and title screen), *EDITOR (Editor) and *DEFAULT (Default).
 [[targets]]
 id = "disc"
-binary = "versions/dunjunz-disc/binary/Dun1"
+images = [
+  "versions/dunjunz-disc/binary/Dun1",
+  "versions/dunjunz-disc/binary/Coder",
+]
 driver = "versions/dunjunz-disc/disassemble/disasm_dunjunz_disc.py"
 asm = "versions/dunjunz-disc/output/dunjunz-disc.asm"
 json = "versions/dunjunz-disc/output/dunjunz-disc.json"
-verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dun1" }
-
-[[targets]]
-id = "disc-coder"
-binary = "versions/dunjunz-disc/binary/Coder"
-driver = "versions/dunjunz-disc/disassemble/disasm_dunjunz_disc.py"
-asm = "versions/dunjunz-disc/output/dunjunz-disc.asm"
-json = "versions/dunjunz-disc/output/dunjunz-disc.json"
-verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Coder" }
-
-# The Model B side's other programs, each with its own driver and listing:
-# Dunjunz (the loader and title screen), *EDITOR (Editor) and *DEFAULT
-# (Default).
 
 [[targets]]
 id = "disc-dunjunz"
@@ -115,7 +79,6 @@ binary = "versions/dunjunz-disc/binary/Dunjunz"
 driver = "versions/dunjunz-disc/disassemble/disasm_dunjunz_disc_dunjunz.py"
 asm = "versions/dunjunz-disc/output/dunjunz-disc-dunjunz.asm"
 json = "versions/dunjunz-disc/output/dunjunz-disc-dunjunz.json"
-verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunjunz" }
 
 [[targets]]
 id = "disc-editor"
@@ -123,7 +86,6 @@ binary = "versions/dunjunz-disc/binary/Editor"
 driver = "versions/dunjunz-disc/disassemble/disasm_dunjunz_disc_editor.py"
 asm = "versions/dunjunz-disc/output/dunjunz-disc-editor.asm"
 json = "versions/dunjunz-disc/output/dunjunz-disc-editor.json"
-verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Editor" }
 
 [[targets]]
 id = "disc-default"
@@ -131,20 +93,17 @@ binary = "versions/dunjunz-disc/binary/Default"
 driver = "versions/dunjunz-disc/disassemble/disasm_dunjunz_disc_default.py"
 asm = "versions/dunjunz-disc/output/dunjunz-disc-default.asm"
 json = "versions/dunjunz-disc/output/dunjunz-disc-default.json"
-verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Default" }
 
-# The official disc release, Master 128 side. Each program has its own
-# driver and listing: *DUNJUNZ (Dunjunz), Coder2, *EDITOR (Editor),
-# *DEFAULT (Default), and the game, whose nine files (five at their run
-# addresses, four in the Master's private RAM, HAZEL) make one listing.
-
+# The official disc release, Master 128 side: *DUNJUNZ (Dunjunz), Coder2,
+# *DEFAULT (Default), *EDITOR (Editor), and the game, whose nine files
+# (five at their run addresses, four in the Master's private RAM, HAZEL)
+# make one listing.
 [[targets]]
 id = "disc_master-dunjunz"
 binary = "versions/dunjunz-disc_master/binary/Dunjunz"
 driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master_dunjunz.py"
 asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master-dunjunz.asm"
 json = "versions/dunjunz-disc_master/output/dunjunz-disc_master-dunjunz.json"
-verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunjunz" }
 
 [[targets]]
 id = "disc_master-coder2"
@@ -152,7 +111,6 @@ binary = "versions/dunjunz-disc_master/binary/Coder2"
 driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master_coder2.py"
 asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master-coder2.asm"
 json = "versions/dunjunz-disc_master/output/dunjunz-disc_master-coder2.json"
-verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Coder2" }
 
 [[targets]]
 id = "disc_master-default"
@@ -160,7 +118,6 @@ binary = "versions/dunjunz-disc_master/binary/Default"
 driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master_default.py"
 asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master-default.asm"
 json = "versions/dunjunz-disc_master/output/dunjunz-disc_master-default.json"
-verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Default" }
 
 [[targets]]
 id = "disc_master-editor"
@@ -168,76 +125,20 @@ binary = "versions/dunjunz-disc_master/binary/Editor"
 driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master_editor.py"
 asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master-editor.asm"
 json = "versions/dunjunz-disc_master/output/dunjunz-disc_master-editor.json"
-verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Editor" }
-
-[[targets]]
-id = "disc_master-coder"
-binary = "versions/dunjunz-disc_master/binary/Coder"
-driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master.py"
-asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master.asm"
-json = "versions/dunjunz-disc_master/output/dunjunz-disc_master.json"
-verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Coder" }
-
-[[targets]]
-id = "disc_master-dunj3"
-binary = "versions/dunjunz-disc_master/binary/Dunj3"
-driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master.py"
-asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master.asm"
-json = "versions/dunjunz-disc_master/output/dunjunz-disc_master.json"
-verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunj3" }
 
 [[targets]]
 id = "disc_master"
-binary = "versions/dunjunz-disc_master/binary/Dunj4"
+images = [
+  "versions/dunjunz-disc_master/binary/Coder",
+  "versions/dunjunz-disc_master/binary/Dunj3",
+  "versions/dunjunz-disc_master/binary/Dunj4",
+  "versions/dunjunz-disc_master/binary/Dunj5",
+  "versions/dunjunz-disc_master/binary/Dunj2",
+  "versions/dunjunz-disc_master/binary/Code",
+  "versions/dunjunz-disc_master/binary/Table",
+  "versions/dunjunz-disc_master/binary/Code2",
+  "versions/dunjunz-disc_master/binary/Code3",
+]
 driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master.py"
 asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master.asm"
 json = "versions/dunjunz-disc_master/output/dunjunz-disc_master.json"
-verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunj4" }
-
-[[targets]]
-id = "disc_master-dunj5"
-binary = "versions/dunjunz-disc_master/binary/Dunj5"
-driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master.py"
-asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master.asm"
-json = "versions/dunjunz-disc_master/output/dunjunz-disc_master.json"
-verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunj5" }
-
-[[targets]]
-id = "disc_master-dunj2"
-binary = "versions/dunjunz-disc_master/binary/Dunj2"
-driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master.py"
-asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master.asm"
-json = "versions/dunjunz-disc_master/output/dunjunz-disc_master.json"
-verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Dunj2" }
-
-[[targets]]
-id = "disc_master-code"
-binary = "versions/dunjunz-disc_master/binary/Code"
-driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master.py"
-asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master.asm"
-json = "versions/dunjunz-disc_master/output/dunjunz-disc_master.json"
-verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Code" }
-
-[[targets]]
-id = "disc_master-table"
-binary = "versions/dunjunz-disc_master/binary/Table"
-driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master.py"
-asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master.asm"
-json = "versions/dunjunz-disc_master/output/dunjunz-disc_master.json"
-verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Table" }
-
-[[targets]]
-id = "disc_master-code2"
-binary = "versions/dunjunz-disc_master/binary/Code2"
-driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master.py"
-asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master.asm"
-json = "versions/dunjunz-disc_master/output/dunjunz-disc_master.json"
-verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Code2" }
-
-[[targets]]
-id = "disc_master-code3"
-binary = "versions/dunjunz-disc_master/binary/Code3"
-driver = "versions/dunjunz-disc_master/disassemble/disasm_dunjunz_disc_master.py"
-asm = "versions/dunjunz-disc_master/output/dunjunz-disc_master.asm"
-json = "versions/dunjunz-disc_master/output/dunjunz-disc_master.json"
-verify = { command = ["beebasm", "-i", "{asm}"], cwd = "{output_dirpath}", output = "Code3" }
