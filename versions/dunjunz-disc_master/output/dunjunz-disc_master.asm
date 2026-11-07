@@ -40,7 +40,7 @@ inkey_key_left_square_bracket        = &c7
 
 ; Memory locations
 tune_ptr                        = &00  ; The music's place in the tune: the current three-byte step.
-; &00 referenced 12 times by &10e6, &1413, &146f, &c735, &c774, &c783, &c795, &c7a5, &c7aa, &c7f2, &c80f, &c818
+; &00 referenced 11 times by &1413, &146f, &c735, &c774, &c783, &c795, &c7a5, &c7aa, &c7f2, &c80f, &c818
 plot_x                          = &70  ; Sprite position: screen byte column, 0-79 (two MODE 2 pixels per byte). Also used as a scratch byte and pointer low byte by other routines.
 ; &70 referenced 41 times by &0422, &0439, &043b, &0452, &045a, &045c, &045e, &0465, &046b, &05a7, &05ab, &0984, &0991, &0f68, &1458, &154d, &1558, &155c, &1da6, &1e1c, &1e77, &20c6, &726d, &7282, &72c6, &72db, &72eb, &72fb, &75b8, &75d9, &75e4, &75fb, &7823, &7846, &784a, &78a1, &78bb, &78d5, &78ef, &d884, &d891
 plot_y                          = &71  ; Sprite position: pixel row from the top of the screen. Also used as a pointer high byte by other routines.
@@ -138,6 +138,7 @@ missile_y                       = &0d4c  ; Map y of each missile.
 ; &0d4c used as index base 6 times by &6f42, &70f1, &7105, &7113, &7123, &715e
 missile_direction               = &0d58  ; Direction of each missile: 1 up, 2 right, 3 down, 4 left; bit 7 set for a missile just fired; 0 for an empty slot.
 ; &0d58 used as index base 12 times by &6f28, &6f36, &70d2, &70de, &70fe, &7134, &71a5, &71ae, &71ba, &71c6, &71ce, &720c
+set_wrchv_low                   = &0d63
 missile_sprite_base             = &0d64  ; Sprite base of each missile, to which its direction is added; also identifies the hero who fired it.
 ; &0d64 used as index base 4 times by &6f53, &7209, &76b1, &7747
 hero_key_up                     = &0d70  ; INKEY key number of each hero's up key.
@@ -739,7 +740,7 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
     jsr oswrch                          ; ...
     lda #2                              ; ...
     jsr oswrch                          ; ...
-    jmp code_0e00                       ; ...and start a new game
+    jmp new_game                        ; ...and start a new game
     equb &00, &00, &00
 ; ***************************************************************************************
 ; Set the bell sound
@@ -824,7 +825,7 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
     ldy #0                              ; Index stays 0: the pointers themselves advance
     ldx sprite_height                   ; X counts the pixel rows still to plot
 ; &091d referenced 1 time by &0964
-.loop_091d
+.plot_sprite_row
     lda screen_ptr                      ; Remember where this pixel row starts...
     sta row_start_ptr                   ; ...
     lda screen_ptr_hi                   ; ...
@@ -833,24 +834,24 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
     pha                                 ; ...
     ldx sprite_width                    ; X counts the bytes across this row
 ; &0929 referenced 1 time by &093f
-.loop_0929
+.plot_sprite_byte
     lda (sprite_data_ptr),y             ; Copy one sprite byte...
     sta (screen_ptr),y                  ; ...to the screen
     clc                                 ; Step screen_ptr right one byte column: 8 bytes on
     lda screen_ptr                      ; ...
     adc #8                              ; ...
     sta screen_ptr                      ; ...
-    bcc code_0938                       ; ...
+    bcc plot_sprite_next_data           ; ...
     inc screen_ptr_hi                   ; ...with carry into the high byte
 ; &0938 referenced 1 time by &0934
-.code_0938
+.plot_sprite_next_data
     inc sprite_data_ptr                 ; Next sprite data byte
-    bne code_093e                       ; ...
+    bne plot_sprite_count_byte          ; ...
     inc sprite_data_ptr_hi              ; ...with carry into the high byte
 ; &093e referenced 1 time by &093a
-.code_093e
+.plot_sprite_count_byte
     dex                                 ; Count the bytes across
-    bne loop_0929                       ; Loop until the row is done
+    bne plot_sprite_byte                ; Loop until the row is done
     clc                                 ; screen_ptr = row start + 1: the next pixel row down
     lda row_start_ptr                   ; ...
     adc #1                              ; ...
@@ -860,7 +861,7 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
     sta screen_ptr_hi                   ; ...
     lda screen_ptr                      ; Has it crossed into the next character row?
     and #7                              ; ...(pixel row within the character now 0)
-    bne code_0961                       ; No: carry on
+    bne plot_sprite_next_row            ; No: carry on
     clc                                 ; Yes: add 640-8 to reach the top pixel row of the...
     lda screen_ptr                      ; ...character row below
     adc #&78 ; 'x'                      ; ...
@@ -869,11 +870,11 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
     adc #2                              ; ...
     sta screen_ptr_hi                   ; ...
 ; &0961 referenced 1 time by &0952
-.code_0961
+.plot_sprite_next_row
     pla                                 ; Recover the row count
     tax                                 ; ...
     dex                                 ; Count the pixel rows
-    bne loop_091d                       ; Loop until the sprite is done
+    bne plot_sprite_row                 ; Loop until the sprite is done
     rts                                 ; Return
 ; ***************************************************************************************
 ; Calculate a screen address
@@ -1194,17 +1195,17 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
 
 .dasmos_dunj4_start
 ; &0e00 referenced 2 times by &07ca, &0ecc
-.code_0e00
+.new_game
     lda #0                              ; New game: level 0...
     sta level_number                    ; ...
     sta level_bcd                       ; ...
     tax                                 ; Give each hero their starting attributes
 ; &0e09 referenced 1 time by &0e0f
-.loop_0e09
+.reset_each_hero
     jsr reset_hero                      ; ...
     inx                                 ; ...
     cpx #4                              ; ...
-    bne loop_0e09                       ; ...
+    bne reset_each_hero                 ; ...
     jsr hero_menu                       ; ...
 ; Play each level in turn until every hero is dead.
 ; &0e14 referenced 1 time by &0e84
@@ -1222,21 +1223,21 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
     cld                                 ; ...
     lda level_number                    ; One digit for levels 1-9, two from 10 (the count is incremented later, in show_level_number)
     cmp #9                              ; ...
-    bcs code_0e34                       ; ...
+    bcs two_level_digits                ; ...
     ldx #0                              ; X = 0: one digit
-    beq code_0e36                       ; ...(always branches)
+    beq store_level_units               ; ...(always branches)
 ; &0e34 referenced 1 time by &0e2e
-.code_0e34
+.two_level_digits
     ldx #1                              ; X = 1: two digits
 ; &0e36 referenced 1 time by &0e32
-.code_0e36
+.store_level_units
     lda level_bcd                       ; Units digit...
     and #&0f                            ; ...
     clc                                 ; ...as ASCII...
     adc #&30 ; '0'                      ; ...
     sta level_filename_digits,x         ; ...into the filename
     cpx #0                              ; Two digits?
-    beq code_0e52                       ; No
+    beq end_level_filename              ; No
     lda level_bcd                       ; Yes: the tens digit...
     lsr a                               ; ...
     lsr a                               ; ...
@@ -1246,7 +1247,7 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
     adc #&30 ; '0'                      ; ...
     sta level_filename_digits           ; ...goes first
 ; &0e52 referenced 1 time by &0e43
-.code_0e52
+.end_level_filename
     lda #&0d                            ; Terminate the filename with a carriage return
     sta level_filename_digits + 1,x     ; ...
     jsr start_level                     ; Load and draw the level
@@ -1258,17 +1259,17 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
     ldx #0                              ; Count the heroes who died, giving each back their starting attributes
     stx count                           ; ...
 ; &0e6d referenced 1 time by &0e7d
-.loop_0e6d
+.check_hero_dead
     lda hero_health_tens,x              ; Dead?
     cmp #&1d                            ; ...
-    bne code_0e7a                       ; ...
+    bne next_hero_dead                  ; ...
     jsr reset_hero                      ; Yes: reset them
     inc count                           ; ...and count them
 ; &0e7a referenced 1 time by &0e72
-.code_0e7a
+.next_hero_dead
     inx                                 ; Next hero
     cpx #4                              ; ...
-    bne loop_0e6d                       ; ...
+    bne check_hero_dead                 ; ...
     lda count                           ; Any hero alive?
     cmp #4                              ; ...
     bne level_loop                      ; Yes: on to the next level
@@ -1288,28 +1289,28 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
     ldx #4                              ; Put spaces back over the four message bytes used as counters
     lda #&20 ; ' '                      ; ...
 ; &0ea8 referenced 1 time by &0eac
-.loop_0ea8
+.restore_message_spaces
     sta panel_hero - 1,x                ; ...
     dex                                 ; ...
-    bne loop_0ea8                       ; ...
+    bne restore_message_spaces          ; ...
 ; &0eae referenced 1 time by &0eb7
-.loop_0eae
+.print_game_over
     lda game_over_message,x             ; Print game_over_message...
     jsr osasci                          ; ...
     inx                                 ; ...
     cmp #0                              ; ...up to its zero byte
-    bne loop_0eae                       ; ...
+    bne print_game_over                 ; ...
 ; &0eb9 referenced 1 time by &0ebc
-.loop_0eb9
+.wait_vsync_game_over
     lda os_vsync_counter                ; Wait for the vertical sync counter to run out
-    bne loop_0eb9                       ; ...
+    bne wait_vsync_game_over            ; ...
     lda #osbyte_flush_buffer_class      ; Flush the input buffers
     jsr osbyte                          ; ...  Flush selected class of buffer
     ldx #&f4                            ; Wait up to &1F4 centiseconds (5 s) for a key...
     ldy #1                              ; ...
     lda #osbyte_inkey                   ; ...
     jsr osbyte                          ; ...  Read a key, waiting up to 500 centiseconds
-    jmp code_0e00                       ; ...then start a new game
+    jmp new_game                        ; ...then start a new game
 ; ***************************************************************************************
 ; Give a hero their starting attributes
 ;
@@ -1351,7 +1352,7 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
     lda #0                              ; For each hero...
     sta panel_hero                      ; ...
 ; &0efc referenced 1 time by &0f65
-.loop_0efc
+.draw_panel_hero
     ldx panel_hero                      ; ...
     jsr lose_health_point               ; Draw the health (from the template's 99+1)
     jsr add_point                       ; Draw the score (from its starting 000 and one below 0)
@@ -1379,7 +1380,7 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
     sta count                           ; ...(end row in count)
     ldy #&10                            ; ...
 ; &0f3a referenced 1 time by &0f4b
-.loop_0f3a
+.draw_missile_icons
     tya                                 ; ...
     pha                                 ; ...
     ldx #&4b ; 'K'                      ; ...at column &4B
@@ -1390,7 +1391,7 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
     adc #3                              ; ...
     tay                                 ; ...
     cpy count                           ; ...
-    bcc loop_0f3a                       ; ...
+    bcc draw_missile_icons              ; ...
     ldx panel_hero                      ; Missile damage, as a small digit at column &4C, row &0A
     lda hero_missile_damage,x           ; ...
     clc                                 ; ...
@@ -1401,7 +1402,7 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
     inc panel_hero                      ; Next hero
     lda panel_hero                      ; ...
     cmp #4                              ; ...
-    bne loop_0efc                       ; ...
+    bne draw_panel_hero                 ; ...
     rts                                 ; Return
 ; ***************************************************************************************
 ; Plot a sprite in a hero's panel section
@@ -1463,12 +1464,12 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
     equb &0d
     equs "MOOD TO RESURRECT"
     equb &0d
-.data_0fea
+.game_over_you_all
 ; &0ff0 used as index base 1 time by &0ea8
 ; &0ff1 referenced 8 times by &0ef9, &0efc, &0f18, &0f28, &0f4d, &0f5d, &0f60, &0f6d
-panel_hero = data_0fea+7
+panel_hero = game_over_you_all+7
 ; &0ff2 referenced 5 times by &0e6a, &0e77, &0e7f, &0f35, &0f48
-count = data_0fea+8
+count = game_over_you_all+8
     equs "YOU ALL.         "
     equb &0d
     equs "NEW ADVENTURERS  "
@@ -1502,30 +1503,30 @@ count = data_0fea+8
     bne return_2                        ; ...
     ldx #0                              ; Is a hero on one of the Chalice's cells, x &1A or &1B...
 ; &1079 referenced 1 time by &1087
-.loop_1079
+.check_door_x
     lda hero_door_x,x                   ; ...
     cmp #&1a                            ; ...
-    beq code_108a                       ; ...
+    beq check_door_y                    ; ...
     cmp #&1b                            ; ...
-    beq code_108a                       ; ...
+    beq check_door_y                    ; ...
 ; &1084 referenced 1 time by &1095
-.loop_1084
+.next_hero_victory
     inx                                 ; Next hero
     cpx #4                              ; ...
-    bne loop_1079                       ; ...
+    bne check_door_x                    ; ...
 ; &1089 referenced 1 time by &1075
 .return_2
     rts                                 ; Return
 ; &108a referenced 2 times by &107e, &1082
-.code_108a
+.check_door_y
     lda hero_door_y,x                   ; ...and y 4 or 5?
     cmp #4                              ; ...
-    beq code_1097                       ; ...
+    beq start_victory                   ; ...
     cmp #5                              ; ...
-    beq code_1097                       ; ...
-    bne loop_1084                       ; No: next hero
+    beq start_victory                   ; ...
+    bne next_hero_victory               ; No: next hero
 ; &1097 referenced 2 times by &108f, &1093
-.code_1097
+.start_victory
     jsr victory_sequence                ; Yes: play the victory sequence
     lda #&1c                            ; VDU 28,0,24,16,0: a text window on the left...
     jsr oswrch                          ; ...
@@ -1541,20 +1542,20 @@ count = data_0fea+8
     jsr oswrch                          ; ...
     ldx #0                              ; Print 140 bytes from room_walls + &3A...
 ; &10ba referenced 1 time by &10c3
-.loop_10ba
+.print_victory_text
     lda room_walls + 58,x               ; ...
     jsr osasci                          ; ...
     inx                                 ; ...
     cpx #&8c                            ; ...
-    bne loop_10ba                       ; ...
+    bne print_victory_text              ; ...
     ldx #0                              ; ...then the string at object_free_map + &3A: on level 25, the ending message
 ; &10c7 referenced 1 time by &10d0
-.loop_10c7
+.print_ending_message
     lda object_free_map + 58,x          ; ...
     jsr osasci                          ; ...
     inx                                 ; ...
     cmp #0                              ; ...
-    bne loop_10c7                       ; ...
+    bne print_ending_message            ; ...
     lda #osbyte_flush_buffer_class      ; Flush the input buffers
     jsr osbyte                          ; ...  Flush selected class of buffer
     jsr osrdch                          ; Wait for a key
@@ -1566,7 +1567,7 @@ count = data_0fea+8
 ; &10e7 referenced 1 time by &10dd
 reset_call_address = reset_call+1
 ; &10e8 referenced 1 time by &10e3
-    jsr tune_ptr                        ; ...and call it: reset the machine
+    jsr &00                             ; ...and call it: reset the machine
 ; ***************************************************************************************
 ; Play the victory sequence
 ;
@@ -1590,24 +1591,24 @@ reset_call_address = reset_call+1
     lda #1                              ; ...each by 1 to begin with
     sta victory_pitch_step              ; ...
 ; &110a referenced 1 time by &1146
-.code_110a
+.raise_victory_pitch
     clc                                 ; Raise the pitch
     lda victory_pitch                   ; ...
     adc victory_pitch_step              ; ...
     sta victory_pitch                   ; ...
-    bcc code_111c                       ; No carry: carry on
+    bcc shorten_victory_delay           ; No carry: carry on
     inc victory_pitch_step              ; Carry: rise faster...
     dec victory_steps_left              ; ...and count a rise
-    bne code_111c                       ; More to come
-    jmp code_11d3                       ; Done: finish
+    bne shorten_victory_delay           ; More to come
+    jmp erase_victory_ring              ; Done: finish
 ; &111c referenced 2 times by &1111, &1117
-.code_111c
+.shorten_victory_delay
     dec victory_delay                   ; Shorten the delay...
-    bne code_1124                       ; ...
+    bne sound_victory_bell              ; ...
     lda #1                              ; ...to at least 1
     sta victory_delay                   ; ...
 ; &1124 referenced 1 time by &111e
-.code_1124
+.sound_victory_bell
     ldx victory_pitch                   ; OSBYTE &D5: the bell's pitch...
     lda #osbyte_bell_frequency          ; ...
     jsr osbyte                          ; ...  osbyte: bell frequency
@@ -1616,21 +1617,21 @@ reset_call_address = reset_call+1
     jsr draw_victory_ring               ; Draw the ring
     lda victory_delay                   ; At full speed, dissolve the Chalice a byte at a time
     cmp #1                              ; ...
-    bne code_113c                       ; ...
+    bne victory_delay_loop              ; ...
     jsr dissolve_chalice                ; ...
 ; &113c referenced 1 time by &1137
-.code_113c
+.victory_delay_loop
     ldx victory_delay                   ; Wait for the delay
 ; &113e referenced 1 time by &1144
-.loop_113e
+.victory_delay_outer
     ldy #&ff                            ; ...
 ; &1140 referenced 1 time by &1141
-.loop_1140
+.victory_delay_inner
     dey                                 ; ...
-    bne loop_1140                       ; ...
+    bne victory_delay_inner             ; ...
     dex                                 ; ...
-    bne loop_113e                       ; ...
-    jmp code_110a                       ; Next frame
+    bne victory_delay_outer             ; ...
+    jmp raise_victory_pitch             ; Next frame
 ; ***************************************************************************************
 ; Draw the ring of sprites round the Chalice
 ;
@@ -1693,14 +1694,14 @@ reset_call_address = reset_call+1
 .next_victory_sprite
     lda victory_sprite                  ; Erasing (sprite &15)? Keep it
     cmp #&15                            ; ...
-    beq code_11bb                       ; ...
+    beq store_victory_sprite            ; ...
     clc                                 ; Next sparkle, &16-&19 in turn
     adc #1                              ; ...
     cmp #&1a                            ; ...
-    bne code_11bb                       ; ...
+    bne store_victory_sprite            ; ...
     lda #&16                            ; ...
 ; &11bb referenced 2 times by &11b0, &11b7
-.code_11bb
+.store_victory_sprite
     sta victory_sprite                  ; ...
     rts                                 ; Return
 ; ***************************************************************************************
@@ -1723,24 +1724,24 @@ reset_call_address = reset_call+1
 .return_3
     rts                                 ; Return
 ; &11d3 referenced 1 time by &1119
-.code_11d3
+.erase_victory_ring
     lda #&15                            ; Erase the ring
     sta victory_sprite                  ; ...
     jsr draw_victory_ring               ; ...
     ldx #&c1                            ; Clear the whole Chalice sprite...
     lda #0                              ; ...
 ; &11de referenced 1 time by &11e2
-.loop_11de
+.clear_chalice_sprite
     sta sprite_chalice - 1,x            ; ...
     dex                                 ; ...
-    bne loop_11de                       ; ...
+    bne clear_chalice_sprite            ; ...
     jsr plot_chalice                    ; ...and redraw it, now blank
     lda #&ff                            ; Wait 255 vertical syncs (about five seconds)
     sta os_vsync_counter                ; ...
 ; &11ec referenced 1 time by &11ef
-.loop_11ec
+.wait_vsync_chalice
     lda os_vsync_counter                ; ...
-    bne loop_11ec                       ; ...
+    bne wait_vsync_chalice              ; ...
     rts                                 ; Return
 ; ***************************************************************************************
 ; Plot the Chalice
@@ -2010,11 +2011,11 @@ level_command_digits = level_command+10
 .reset_workspace
     ldx #0                              ; Copy workspace_template to page &0D
 ; &150f referenced 1 time by &1516
-.loop_150f
+.copy_workspace_template
     lda workspace_template,x            ; ...
     sta scratch,x                       ; ...
     inx                                 ; ...
-    bne loop_150f                       ; ...
+    bne copy_workspace_template         ; ...
     lda #0                              ; Reset the exit and other per-level state
     sta exit_busy                       ; ...
     sta exit_offset_x_3                 ; ...
@@ -2045,24 +2046,24 @@ level_command_digits = level_command+10
 .draw_view_frames
     ldx #&14                            ; Twenty PLOT commands
 ; &1546 referenced 1 time by &1561
-.loop_1546
+.draw_view_frame
     lda #&19                            ; VDU 25...
     jsr oswrch                          ; ...
     ldy #0                              ; ...then the five bytes of the command
 ; &154d referenced 1 time by &1555
-.loop_154d
+.send_frame_vdu
     lda (plot_x),y                      ; ...
     jsr oswrch                          ; ...
     iny                                 ; ...
     cpy #5                              ; ...
-    bne loop_154d                       ; ...
+    bne send_frame_vdu                  ; ...
     clc                                 ; Next command
     lda plot_x                          ; ...
     adc #5                              ; ...
     sta plot_x                          ; ...
     ldy #0                              ; ...
     dex                                 ; ...
-    bne loop_1546                       ; ...
+    bne draw_view_frame                 ; ...
     jsr draw_all_views                  ; Draw the four views
     lda #&8f                            ; Point WRCHV at &7F8F...
     sta wrchv                           ; ...
@@ -2078,7 +2079,7 @@ level_command_digits = level_command+10
 .unpack_level
     ldx #&1e                            ; Objects 30 to 1: position and type
 ; &1573 referenced 1 time by &1586
-.loop_1573
+.unpack_objects
     lda level_object_x,x                ; ...
     sta object_x,x                      ; ...
     lda level_object_y,x                ; ...
@@ -2086,10 +2087,10 @@ level_command_digits = level_command+10
     lda level_object_type,x             ; ...
     sta object_type,x                   ; ...
     dex                                 ; ...
-    bne loop_1573                       ; ...
+    bne unpack_objects                  ; ...
     ldx #&14                            ; Doors 20 to 1: position and sprite
 ; &158a referenced 1 time by &159d
-.loop_158a
+.unpack_doors
     lda level_door_x,x                  ; ...
     sta door_x,x                        ; ...
     lda level_door_y,x                  ; ...
@@ -2097,44 +2098,44 @@ level_command_digits = level_command+10
     lda level_door_sprite,x             ; ...
     sta door_sprite,x                   ; ...
     dex                                 ; ...
-    bne loop_158a                       ; ...
+    bne unpack_doors                    ; ...
     ldx #&14                            ; Keys 20 to 1: position
 ; &15a1 referenced 1 time by &15ae
-.loop_15a1
+.unpack_keys
     lda level_key_x,x                   ; ...
     sta key_x,x                         ; ...
     lda level_key_y,x                   ; ...
     sta key_y,x                         ; ...
     dex                                 ; ...
-    bne loop_15a1                       ; ...
+    bne unpack_keys                     ; ...
     ldx #0                              ; Trapdoors 0 to 7: position
 ; &15b2 referenced 1 time by &15c1
-.loop_15b2
+.unpack_trapdoors
     lda level_trapdoor_x,x              ; ...
     sta trapdoor_x,x                    ; ...
     lda level_trapdoor_y,x              ; ...
     sta trapdoor_y,x                    ; ...
     inx                                 ; ...
     cpx #8                              ; ...
-    bne loop_15b2                       ; ...
+    bne unpack_trapdoors                ; ...
     ldx #0                              ; Wall map and object-free map, &C9 bytes each
 ; &15c5 referenced 1 time by &15d4
-.loop_15c5
+.unpack_walls
     lda level_walls,x                   ; ...
     sta room_walls,x                    ; ...
     lda level_object_free_map,x         ; ...
     sta object_free_map,x               ; ...
     inx                                 ; ...
     cpx #&c9                            ; ...
-    bne loop_15c5                       ; ...
+    bne unpack_walls                    ; ...
     ldx #0                              ; The level's wall sprite, &30 bytes
 ; &15d8 referenced 1 time by &15e1
-.loop_15d8
+.unpack_wall_sprite
     lda level_wall_sprite,x             ; ...
     sta wall_sprite,x                   ; ...
     inx                                 ; ...
     cpx #&30 ; '0'                      ; ...
-    bne loop_15d8                       ; ...
+    bne unpack_wall_sprite              ; ...
     rts                                 ; Return
 ; ***************************************************************************************
 ; Clear the monsters for a new level
@@ -2145,7 +2146,7 @@ level_command_digits = level_command+10
 .reset_monsters
     ldx #&1e                            ; Monsters 30 to 1...
 ; &15e6 referenced 1 time by &15f7
-.loop_15e6
+.reset_each_monster
     lda #&15                            ; ...dying, so that they emerge from the trapdoors...
     sta monster_sprite,x                ; ...
     lda #&ff                            ; ...off the map...
@@ -2153,11 +2154,11 @@ level_command_digits = level_command+10
     lda monster_start_hit_points        ; ...with this level's hit points
     sta monster_hit_points,x            ; ...
     dex                                 ; ...
-    bne loop_15e6                       ; ...
+    bne reset_each_monster              ; ...
     ldx #0                              ; For each hero: clear the returning queue, the key carried and the door-check position
     lda #0                              ; ...
 ; &15fd referenced 1 time by &160f
-.loop_15fd
+.clear_hero_carrying
     sta returning_hero_queue,x          ; ...
     sta hero_key,x                      ; ...
     sta hero_key_dropped,x              ; ...
@@ -2165,7 +2166,7 @@ level_command_digits = level_command+10
     sta hero_door_y,x                   ; ...
     inx                                 ; ...
     cpx #4                              ; ...
-    bne loop_15fd                       ; ...
+    bne clear_hero_carrying             ; ...
     rts                                 ; Return
 ; ***************************************************************************************
 ; Clear the text area and count the level
@@ -2248,16 +2249,16 @@ clear_text_area_top = code_162d+1
     jsr osword                          ; SOUND command
     ldx #0                              ; Find the end of returning_hero_queue...
 ; &16b4 referenced 1 time by &16c0
-.loop_16b4
+.find_queue_end
     lda returning_hero_queue,x          ; ...
-    bne code_16bf                       ; ...
+    bne next_queue_entry                ; ...
     lda #&64 ; 'd'                      ; ...and add a &64 marker there
     sta returning_hero_queue,x          ; ...
     rts                                 ; Return
 ; &16bf referenced 1 time by &16b7
-.code_16bf
+.next_queue_entry
     inx                                 ; Next entry
-    bne loop_16b4                       ; ...
+    bne find_queue_end                  ; ...
     equb &02, &02, &00, &00, &83, &00, &00, &00
     equb &00, &00, &00, &31, &00, &8d
     equs "LEVEL"
@@ -2637,7 +2638,7 @@ clear_text_area_top = code_162d+1
     jsr move_heroes                     ; Move the heroes
     ldx #0                              ; For each hero...
 ; &1cc5 referenced 1 time by &1dbf
-.code_1cc5
+.check_doors
     stx scratch                         ; ...look for a door at the cell the hero is moving into
     lda hero_door_x,x                   ; ...
     sta cell_x                          ; ...
@@ -2647,28 +2648,28 @@ clear_text_area_top = code_162d+1
     pha                                 ; ...
     ldx #&14                            ; Doors 20 to 1
 ; &1cd8 referenced 1 time by &1db5
-.code_1cd8
+.check_door
     lda door_x,x                        ; This door's x?
     cmp cell_x                          ; ...
-    beq code_1ce3                       ; ...
-    jmp code_1db2                       ; No: next door
+    beq check_door_cell_y               ; ...
+    jmp next_door                       ; No: next door
 ; &1ce3 referenced 1 time by &1cde
-.code_1ce3
+.check_door_cell_y
     lda door_y,x                        ; ...and y?
     cmp cell_y                          ; ...
-    beq code_1cee                       ; ...
-    jmp code_1db2                       ; No: next door
+    beq check_door_key                  ; ...
+    jmp next_door                       ; No: next door
 ; &1cee referenced 1 time by &1ce9
-.code_1cee
+.check_door_key
     pla                                 ; Does the hero carry this door's key?
     tay                                 ; ...
     pha                                 ; ...
     txa                                 ; ...
     cmp hero_key,y                      ; ...
-    beq code_1cfa                       ; Yes
-    jmp code_1db2                       ; No: next door
+    beq open_door                       ; Yes
+    jmp next_door                       ; No: next door
 ; &1cfa referenced 1 time by &1cf5
-.code_1cfa
+.open_door
     txa                                 ; Open the door: 7 points...
     pha                                 ; ...
     tya                                 ; ...
@@ -2676,14 +2677,14 @@ clear_text_area_top = code_162d+1
     ldy #7                              ; ...
     ldx scratch                         ; ...
 ; &1d03 referenced 1 time by &1d0b
-.loop_1d03
+.erase_door_loop
     tya                                 ; ...
     pha                                 ; ...
     jsr add_point                       ; ...
     pla                                 ; ...
     tay                                 ; ...
     dey                                 ; ...
-    bne loop_1d03                       ; ...
+    bne erase_door_loop                 ; ...
     lda #&96                            ; ...play the food sound at a lower pitch...
     sta food_sound + 4                  ; ...
     ldx #<(food_sound)                  ; ...
@@ -2760,22 +2761,22 @@ clear_text_area_top = code_162d+1
     jsr plot_sprite                     ; ...
     pla                                 ; ...
     tax                                 ; ...
-    jmp code_1dba                       ; Next hero
+    jmp next_hero_doors                 ; Next hero
 ; &1db2 referenced 3 times by &1ce0, &1ceb, &1cf7
-.code_1db2
+.next_door
     dex                                 ; Next door
-    beq code_1db8                       ; ...
-    jmp code_1cd8                       ; ...
+    beq doors_done                      ; ...
+    jmp check_door                      ; ...
 ; &1db8 referenced 1 time by &1db3
-.code_1db8
+.doors_done
     pla                                 ; ...
     tax                                 ; ...
 ; &1dba referenced 1 time by &1daf
-.code_1dba
+.next_hero_doors
     inx                                 ; Next hero
     cpx #4                              ; ...
     beq draw_keys                       ; ...
-    jmp code_1cc5                       ; ...
+    jmp check_doors                     ; ...
 ; &1dc2 referenced 1 time by &1dbd
 .draw_keys
     lda #0                              ; Draw the keys on the floor, 20 to 1
@@ -2785,7 +2786,7 @@ clear_text_area_top = code_162d+1
     sta sprite_number                   ; ...
     ldx #&14                            ; ...
 ; &1dce referenced 1 time by &1de2
-.loop_1dce
+.draw_each_key
     lda key_x,x                         ; ...
     sta cell_x                          ; ...
     lda key_y,x                         ; ...
@@ -2796,20 +2797,20 @@ clear_text_area_top = code_162d+1
     pla                                 ; ...
     tax                                 ; ...
     dex                                 ; ...
-    bne loop_1dce                       ; ...
+    bne draw_each_key                   ; ...
     ldx #0                              ; For each hero...
 ; &1de6 referenced 1 time by &1ecb
 .check_hero_keys
     lda hero_direction,x                ; In play?
-    bne code_1e28                       ; Yes
+    bne check_key_swap                  ; Yes
     lda hero_key,x                      ; Out of play: carrying a key?
-    bne code_1df3                       ; Yes
-    jmp code_1ec6                       ; No: next hero
+    bne check_death_finished            ; Yes
+    jmp next_hero_keys                  ; No: next hero
 ; &1df3 referenced 1 time by &1dee
-.code_1df3
+.check_death_finished
     lda hero_frame,x                    ; Death animation finished?
     cmp #8                              ; ...
-    bne code_1e28                       ; Not yet
+    bne check_key_swap                  ; Not yet
     ldy hero_key,x                      ; Yes: drop the key where the hero fell
     lda hero_x,x                        ; ...
     sta key_x,y                         ; ...
@@ -2830,16 +2831,16 @@ clear_text_area_top = code_162d+1
     jsr plot_sprite                     ; ...
     pla                                 ; ...
     tax                                 ; ...
-    jmp code_1ec6                       ; Next hero
+    jmp next_hero_keys                  ; Next hero
 ; &1e28 referenced 2 times by &1de9, &1df8
-.code_1e28
+.check_key_swap
     lda hero_key_dropped,x              ; Just swapped keys?
-    beq code_1e35                       ; No
+    beq check_key_cell                  ; No
     lda #0                              ; Yes: not again until the hero moves on
     sta hero_key_dropped,x              ; ...
-    jmp code_1ec6                       ; ...
+    jmp next_hero_keys                  ; ...
 ; &1e35 referenced 1 time by &1e2b
-.code_1e35
+.check_key_cell
     lda hero_x,x                        ; Is there a key at the hero's cell?
     sta cell_x                          ; ...
     lda hero_y,x                        ; ...
@@ -2848,13 +2849,13 @@ clear_text_area_top = code_162d+1
     pha                                 ; ...
     ldx #&14                            ; ...keys 20 to 1
 ; &1e45 referenced 1 time by &1ec1
-.code_1e45
+.check_key
     lda key_x,x                         ; ...
     cmp cell_x                          ; ...
-    bne code_1ebe                       ; ...
+    bne next_key                        ; ...
     lda key_y,x                         ; ...
     cmp cell_y                          ; ...
-    bne code_1ebe                       ; ...
+    bne next_key                        ; ...
     lda #&15                            ; Yes: erase it from the floor
     sta sprite_number                   ; ...
     lda #0                              ; ...
@@ -2910,25 +2911,25 @@ clear_text_area_top = code_162d+1
     jsr osword                          ; ...  SOUND command
     pla                                 ; ...
     tax                                 ; ...
-    jmp code_1ec6                       ; Next hero
+    jmp next_hero_keys                  ; Next hero
 ; &1ebe referenced 2 times by &1e4b, &1e53
-.code_1ebe
+.next_key
     dex                                 ; Next key
-    beq code_1ec4                       ; ...
-    jmp code_1e45                       ; ...
+    beq keys_done                       ; ...
+    jmp check_key                       ; ...
 ; &1ec4 referenced 1 time by &1ebf
-.code_1ec4
+.keys_done
     pla                                 ; ...
     tax                                 ; ...
 ; &1ec6 referenced 4 times by &1df0, &1e25, &1e32, &1ebb
-.code_1ec6
+.next_hero_keys
     inx                                 ; Next hero
     cpx #4                              ; ...
     beq update_rest                     ; ...
     jmp check_hero_keys                 ; ...
 ; &1ece referenced 1 time by &1ec9
 .update_rest
-    jsr sub_7305                        ; Draw the objects
+    jsr draw_objects                    ; Draw the objects
     jsr move_missiles                   ; Move the missiles
     jsr update_monsters                 ; Move the monsters
 .check_pause
@@ -2962,22 +2963,22 @@ clear_text_area_top = code_162d+1
     jsr check_for_victory               ; Has the Chalice been found?
     jsr update_game                     ; Run a frame
     lda exit_busy                       ; A hero going down the exit?
-    bne code_1f36                       ; Yes: carry on
+    bne check_exit                      ; Yes: carry on
     ldx #4                              ; Is any hero in play, or still dying?
 ; &1f17 referenced 1 time by &1f2b
-.loop_1f17
+.count_heroes_in_play
     lda hero_direction - 1,x            ; In play?
-    bne code_1f36                       ; Yes: carry on
+    bne check_exit                      ; Yes: carry on
     lda hero_health_tens - 1,x          ; Dead...
     cmp #&1d                            ; ...
-    bne code_1f2a                       ; ...
+    bne next_hero_in_play               ; ...
     lda hero_frame - 1,x                ; ...with the death animation unfinished?
     cmp #8                              ; ...
-    bcc code_1f36                       ; Yes: carry on
+    bcc check_exit                      ; Yes: carry on
 ; &1f2a referenced 1 time by &1f21
-.code_1f2a
+.next_hero_in_play
     dex                                 ; Next hero
-    bne loop_1f17                       ; ...
+    bne count_heroes_in_play            ; ...
     ldx shrunk_hero                     ; The level is over: restore the last exiting hero's sprites
     bmi return_4                        ; ...
     jsr restore_hero_sprites            ; ...
@@ -2985,16 +2986,16 @@ clear_text_area_top = code_162d+1
 .return_4
     rts                                 ; Return
 ; &1f36 referenced 3 times by &1f13, &1f1a, &1f28
-.code_1f36
+.check_exit
     ldx #0                              ; Is a hero on the exit?
 ; &1f38 referenced 1 time by &1f94
-.loop_1f38
+.check_hero_on_exit
     lda hero_x,x                        ; ...
     cmp exit_x                          ; ...
-    bne code_1f91                       ; ...
+    bne next_hero_exit                  ; ...
     lda hero_y,x                        ; ...
     cmp exit_y                          ; ...
-    bne code_1f91                       ; ...
+    bne next_hero_exit                  ; ...
     jsr drop_key                        ; Yes: drop their key beside it
     lda #&63 ; 'c'                      ; Take them out of play for the rest of the level
     sta hero_step,x                     ; ...
@@ -3024,19 +3025,19 @@ clear_text_area_top = code_162d+1
     sta exit_x                          ; ...
     sta exit_y                          ; ...
     jsr hero_enters_exit                ; Start the exit animation (which jumps back to play_level)
-    jmp code_1f96                       ; Reached by the RTS at the end of the level
+    jmp check_exit_busy                 ; Reached by the RTS at the end of the level
 ; &1f91 referenced 2 times by &1f3e, &1f46
-.code_1f91
+.next_hero_exit
     inx                                 ; Next hero
     cpx #4                              ; ...
-    bne loop_1f38                       ; ...
+    bne check_hero_on_exit              ; ...
 ; &1f96 referenced 1 time by &1f8e
-.code_1f96
+.check_exit_busy
     lda exit_busy                       ; A hero going down the exit?
-    bne code_1f9e                       ; Yes
+    bne redraw_exit                     ; Yes
     jmp play_level                      ; No: next frame
 ; &1f9e referenced 1 time by &1f99
-.code_1f9e
+.redraw_exit
     ldx exiting_hero                    ; Redraw the exit
     lda #0                              ; ...
     sta plot_offset_x                   ; ...
@@ -3054,7 +3055,7 @@ clear_text_area_top = code_162d+1
     adc #2                              ; ...
     sta exit_spin                       ; ...
     cmp #9                              ; A full turn?
-    beq code_1ff2                       ; Yes: shrink the hero
+    beq next_turn                       ; Yes: shrink the hero
     clc                                 ; Plot the hero on the exit, centred for its current size
     lda hero_sprites,x                  ; ...
     adc exit_spin                       ; ...
@@ -3071,11 +3072,11 @@ clear_text_area_top = code_162d+1
     jsr plot_at_cell                    ; ...
     jmp play_level                      ; Next frame
 ; &1ff2 referenced 1 time by &1fc8
-.code_1ff2
+.next_turn
     lda #&ff                            ; Start the next turn
     sta exit_spin                       ; ...
     dec exit_shrinks_left               ; Last turn done?
-    beq code_2026                       ; Yes: the hero has gone
+    beq restore_exit                    ; Yes: the hero has gone
     clc                                 ; Shrink the hero's eight sprites: one byte narrower...
     lda hero_sprites,x                  ; ...
 .dasmos_dunj4_end
@@ -3089,25 +3090,25 @@ clear_text_area_top = code_162d+1
     adc #7                              ; ...
     sta scratch                         ; ...
 ; &2009 referenced 1 time by &2010
-.loop_2009
+.shrink_hero_width
     dec sprite_widths,x                 ; ...
     inx                                 ; ...
     cpx scratch                         ; ...
-    bne loop_2009                       ; ...
+    bne shrink_hero_width               ; ...
     tya                                 ; Three rows shorter...
     tax                                 ; ...
 ; &2014 referenced 1 time by &2021
-.loop_2014
+.shrink_hero_height
     sec                                 ; ...
     lda sprite_heights,x                ; ...
     sbc #3                              ; ...
     sta sprite_heights,x                ; ...
     inx                                 ; ...
     cpx scratch                         ; ...
-    bne loop_2014                       ; ...
+    bne shrink_hero_height              ; ...
     jmp play_level                      ; ...three rows shorter. Next frame
 ; &2026 referenced 1 time by &1ffa
-.code_2026
+.restore_exit
     lda exit_saved_x                    ; Put the exit back...
     sta exit_x                          ; ...
     lda exit_saved_y                    ; ...
@@ -3131,9 +3132,9 @@ clear_text_area_top = code_162d+1
     lda #4                              ; ...
     sta exit_offsets_x                  ; ...
     ldx shrunk_hero                     ; Restore the sprites of any hero shrunk before
-    bmi code_2076                       ; ...
+    bmi start_hero_animation            ; ...
     jsr restore_hero_sprites            ; ...
-    jmp code_2076                       ; ...
+    jmp start_hero_animation            ; ...
 ; ***************************************************************************************
 ; Restore a hero's sprite sizes
 ;
@@ -3153,23 +3154,23 @@ clear_text_area_top = code_162d+1
     sta scratch                         ; ...
     lda #4                              ; Widths back to 4...
 ; &205f referenced 1 time by &2066
-.loop_205f
+.restore_sprite_widths
     sta sprite_widths,y                 ; ...
     iny                                 ; ...
     cpy scratch                         ; ...
-    bne loop_205f                       ; ...
+    bne restore_sprite_widths           ; ...
     txa                                 ; ...
     tay                                 ; ...
     lda #&0c                            ; ...heights back to 12
 ; &206c referenced 1 time by &2073
-.loop_206c
+.restore_sprite_heights
     sta sprite_heights,y                ; ...
     iny                                 ; ...
     cpy scratch                         ; ...
-    bne loop_206c                       ; ...
+    bne restore_sprite_heights          ; ...
     rts                                 ; Return
 ; &2076 referenced 2 times by &2048, &204d
-.code_2076
+.start_hero_animation
     lda #1                              ; Start the animation for this hero...
     sta exit_busy                       ; ...
     lda scratch2                        ; ...
@@ -3232,26 +3233,26 @@ clear_text_area_top = code_162d+1
     dec cell_y                          ; The cell above
     jsr test_wall                       ; ...free?
     cpy #0                              ; ...
-    bne code_20db                       ; No
+    bne try_cell_right                  ; No
     rts                                 ; Yes: return
 ; &20db referenced 1 time by &20d8
-.code_20db
+.try_cell_right
     inc cell_y                          ; The cell to the right
     inc cell_x                          ; ...
     jsr test_wall                       ; ...free?
     cpy #0                              ; ...
-    bne code_20e9                       ; No
+    bne try_cell_below                  ; No
     rts                                 ; Yes: return
 ; &20e9 referenced 1 time by &20e6
-.code_20e9
+.try_cell_below
     dec cell_x                          ; The cell below
     inc cell_y                          ; ...
     jsr test_wall                       ; ...free?
     cpy #0                              ; ...
-    bne code_20f7                       ; No
+    bne try_cell_left                   ; No
     rts                                 ; Yes: return
 ; &20f7 referenced 1 time by &20f4
-.code_20f7
+.try_cell_left
     dec cell_y                          ; Otherwise the cell to the left
     dec cell_x                          ; ...
     rts                                 ; Return
@@ -4330,19 +4331,19 @@ clear_text_area_top = code_162d+1
 .move_heroes
     ldx #0                              ; For each hero...
 ; &6e82 referenced 1 time by &70c6
-.code_6e82
+.move_hero
     lda hero_direction,x                ; In play?
-    bne code_6e97                       ; Yes
+    bne remember_hero_position          ; Yes
     lda hero_step,x                     ; Out of play: never playing (step &63)?
     cmp #&63 ; 'c'                      ; ...
-    bne code_6e91                       ; ...
+    bne animate_absent                  ; ...
     jmp next_hero                       ; Yes: nothing to do
 ; &6e91 referenced 1 time by &6e8c
-.code_6e91
+.animate_absent
     jsr animate_absent_hero             ; No: dying or returning, so animate them
     jmp next_hero                       ; ...
 ; &6e97 referenced 1 time by &6e85
-.code_6e97
+.remember_hero_position
     lda hero_x,x                        ; Remember the hero's position and offsets before moving
     sta previous_x                      ; ...
     lda hero_y,x                        ; ...
@@ -4352,11 +4353,11 @@ clear_text_area_top = code_162d+1
     lda hero_offset_y,x                 ; ...
     sta previous_offset_y               ; ...
     lda hero_step,x                     ; Part way through a step?
-    beq code_6eba                       ; No: read the keys
+    beq check_magic_key                 ; No: read the keys
     jsr continue_hero_step              ; Yes: continue it...
     jmp erase_hero                      ; ...and redraw
 ; &6eba referenced 1 time by &6eb2
-.code_6eba
+.check_magic_key
     cpx #2                              ; Heroes 0 and 1 check their magic key first
     bcs read_hero_keys                  ; ...
     jmp check_magic                     ; ...
@@ -4364,40 +4365,40 @@ clear_text_area_top = code_162d+1
 .read_hero_keys
     lda hero_key_up,x                   ; Up key?
     jsr test_key                        ; ...
-    bne code_6ed4                       ; No
+    bne check_key_down                  ; No
     lda #1                              ; Yes: face up...
     sta hero_direction,x                ; ...
     jsr start_hero_step                 ; ...start the step...
     jmp step_hero                       ; ...and move
 ; &6ed4 referenced 1 time by &6ec7
-.code_6ed4
+.check_key_down
     lda hero_key_down,x                 ; Down key?
     jsr test_key                        ; ...
-    bne code_6ee7                       ; No
+    bne check_key_right                 ; No
     lda #5                              ; Yes: face down...
     sta hero_direction,x                ; ...
     jsr start_hero_step                 ; ...start the step...
     jmp step_hero                       ; ...and move
 ; &6ee7 referenced 1 time by &6eda
-.code_6ee7
+.check_key_right
     lda hero_key_right,x                ; Right key?
     jsr test_key                        ; ...
-    bne code_6efa                       ; No
+    bne check_key_left                  ; No
     lda #3                              ; Yes: face right...
     sta hero_direction,x                ; ...
     jsr start_hero_step                 ; ...start the step...
     jmp step_hero                       ; ...and move
 ; &6efa referenced 1 time by &6eed
-.code_6efa
+.check_key_left
     lda hero_key_left,x                 ; Left key?
     jsr test_key                        ; ...
-    bne code_6f0d                       ; No
+    bne check_key_fire                  ; No
     lda #7                              ; Yes: face left...
     sta hero_direction,x                ; ...
     jsr start_hero_step                 ; ...start the step...
     jmp step_hero                       ; ...and move
 ; &6f0d referenced 1 time by &6f00
-.code_6f0d
+.check_key_fire
     lda hero_key_fire,x                 ; Fire key?
     jsr test_key                        ; ...
     beq fire_missile                    ; Yes
@@ -4413,9 +4414,9 @@ clear_text_area_top = code_162d+1
     adc hero_max_missiles,x             ; ...
     sta scratch                         ; ...end of the range
 ; &6f28 referenced 1 time by &6f74
-.loop_6f28
+.find_missile_slot
     lda missile_direction,y             ; Slot free?
-    bne code_6f70                       ; No: try the next
+    bne next_missile_slot               ; No: try the next
     lda hero_direction,x                ; Missile direction = (hero direction + 1) / 2, so 1-4, with bit 7 marking it just fired
     clc                                 ; ...
     adc #1                              ; ...
@@ -4445,34 +4446,34 @@ clear_text_area_top = code_162d+1
     jmp draw_moved_hero                 ; Redraw the hero
     equb &88, &d0, &b8
 ; &6f70 referenced 1 time by &6f2b
-.code_6f70
+.next_missile_slot
     iny                                 ; Next slot
     cpy scratch                         ; ...
-    bne loop_6f28                       ; ...
+    bne find_missile_slot               ; ...
     jmp draw_moved_hero                 ; All in flight: just redraw the hero
 ; &6f79 referenced 4 times by &6ed1, &6ee4, &6ef7, &6f0a
 .step_hero
     lda hero_direction,x                ; Move the hero's cell in the direction faced: up...
     cmp #1                              ; ...
-    bne code_6f83                       ; ...
+    bne step_right                      ; ...
     dec hero_y,x                        ; ...
 ; &6f83 referenced 1 time by &6f7e
-.code_6f83
+.step_right
     cmp #3                              ; ...right...
-    bne code_6f8a                       ; ...
+    bne step_down                       ; ...
     inc hero_x,x                        ; ...
 ; &6f8a referenced 1 time by &6f85
-.code_6f8a
+.step_down
     cmp #5                              ; ...down...
-    bne code_6f91                       ; ...
+    bne step_left                       ; ...
     inc hero_y,x                        ; ...
 ; &6f91 referenced 1 time by &6f8c
-.code_6f91
+.step_left
     cmp #7                              ; ...left
-    bne code_6f98                       ; ...
+    bne note_new_cell                   ; ...
     dec hero_x,x                        ; ...
 ; &6f98 referenced 1 time by &6f93
-.code_6f98
+.note_new_cell
     lda hero_x,x                        ; Note the new cell for the door and key checks
     sta hero_door_x,x                   ; ...
     lda hero_y,x                        ; ...
@@ -4487,20 +4488,20 @@ clear_text_area_top = code_162d+1
     pla                                 ; ...
     tax                                 ; ...
     cpy #0                              ; ...
-    beq code_6fd5                       ; No
+    beq check_monster_in_cell           ; No
     lda previous_x                      ; Yes: stay put...
     sta hero_x,x                        ; ...
     lda previous_y                      ; ...
     sta hero_y,x                        ; ...
 ; &6fc7 referenced 1 time by &7050
-.code_6fc7
+.cancel_hero_step
     lda #0                              ; Cancel the step
     sta hero_step,x                     ; ...
     sta hero_offset_x,x                 ; ...
     sta hero_offset_y,x                 ; ...
     jmp erase_hero                      ; ...and redraw
 ; &6fd5 referenced 1 time by &6fb9
-.code_6fd5
+.check_monster_in_cell
     lda #0                              ; Is there a monster in the new cell?
     sta scratch                         ; ...
     txa                                 ; ...
@@ -4509,7 +4510,7 @@ clear_text_area_top = code_162d+1
     pla                                 ; ...
     tax                                 ; ...
     cpy #0                              ; ...
-    beq code_7002                       ; No
+    beq check_hero_in_cell              ; No
     lda previous_x                      ; Yes: stay put, cancel the step...
     sta hero_x,x                        ; ...
     lda previous_y                      ; ...
@@ -4521,21 +4522,21 @@ clear_text_area_top = code_162d+1
     jsr lose_health_point               ; ...and lose a health point for bumping into it
     jmp erase_hero                      ; Redraw
 ; &7002 referenced 1 time by &6fe3
-.code_7002
+.check_hero_in_cell
     stx scratch                         ; Is another hero in play in the new cell?
     ldy #0                              ; ...
 ; &7007 referenced 1 time by &703e
-.loop_7007
+.check_other_hero
     cpy scratch                         ; Not this hero
-    beq code_703b                       ; ...
+    beq next_other_hero                 ; ...
     lda hero_x,y                        ; ...
     cmp cell_x                          ; ...
-    bne code_703b                       ; ...
+    bne next_other_hero                 ; ...
     lda hero_y,y                        ; ...
     cmp cell_y                          ; ...
-    bne code_703b                       ; ...
+    bne next_other_hero                 ; ...
     lda hero_direction,y                ; ...
-    beq code_703b                       ; ...
+    beq next_other_hero                 ; ...
     lda previous_x                      ; Yes: stay put, cancel the step and redraw
     sta hero_x,x                        ; ...
     lda previous_y                      ; ...
@@ -4546,35 +4547,35 @@ clear_text_area_top = code_162d+1
     sta hero_offset_y,x                 ; ...
     jmp erase_hero                      ; ...
 ; &703b referenced 4 times by &700a, &7012, &701a, &701f
-.code_703b
+.next_other_hero
     iny                                 ; Next hero
     cpy #4                              ; ...
-    bne loop_7007                       ; ...
+    bne check_other_hero                ; ...
     txa                                 ; Has the hero moved into another room?
     asl a                               ; ...
     tax                                 ; ...
     lda view_room,x                     ; ...
     cmp map_ptr                         ; ...
-    beq code_7053                       ; No
+    beq check_boots                     ; No
     txa                                 ; Yes: change this hero's view to the new room...
     lsr a                               ; ...
     tax                                 ; ...
     jsr show_hero_room                  ; ...
-    jmp code_6fc7                       ; ...and cancel the step
+    jmp cancel_hero_step                ; ...and cancel the step
 ; &7053 referenced 1 time by &7048
-.code_7053
+.check_boots
     txa                                 ; Same room. Wearing Boots of Speed?
     lsr a                               ; ...
     tax                                 ; ...
     lda hero_has_boots,x                ; ...
-    beq code_7069                       ; No
+    beq stay_in_old_cell                ; No
     lda #0                              ; Yes: arrive in the cell at once, with no step
     sta hero_offset_x,x                 ; ...
     sta hero_offset_y,x                 ; ...
     sta hero_step,x                     ; ...
     jmp erase_hero                      ; ...
 ; &7069 referenced 1 time by &7059
-.code_7069
+.stay_in_old_cell
     lda previous_x                      ; No boots: stay in the old cell for now; continue_hero_step moves on at the end of the step
     sta hero_x,x                        ; ...
     lda previous_y                      ; ...
@@ -4622,7 +4623,7 @@ clear_text_area_top = code_162d+1
     inx                                 ; Next hero
     cpx #4                              ; ...
     beq return_5                        ; ...
-    jmp code_6e82                       ; ...
+    jmp move_hero                       ; ...
 ; &70c9 referenced 1 time by &70c4
 .return_5
     rts                                 ; Return
@@ -4638,19 +4639,19 @@ clear_text_area_top = code_162d+1
     sta plot_offset_y                   ; ...
     ldx #0                              ; For each of the twelve missile slots...
 ; &70d2 referenced 1 time by &721d
-.code_70d2
+.move_missile
     lda missile_direction,x             ; In flight?
-    bne code_70da                       ; Yes
+    bne check_just_fired                ; Yes
     jmp next_missile                    ; No: next slot
 ; &70da referenced 1 time by &70d5
-.code_70da
-    bpl code_70e7                       ; Just fired (bit 7 set)?
+.check_just_fired
+    bpl erase_missile                   ; Just fired (bit 7 set)?
     and #&7f                            ; Yes: clear the flag...
     sta missile_direction,x             ; ...
     jsr flip_firer_frame                ; ...animate the hero who fired it...
-    jmp code_70fe                       ; ...and move it without erasing (it is on the hero)
+    jmp missile_up                      ; ...and move it without erasing (it is on the hero)
 ; &70e7 referenced 1 time by &70da
-.code_70e7
+.erase_missile
     lda #&15                            ; Erase the missile at its old cell
     sta sprite_number                   ; ...
     lda missile_x,x                     ; ...
@@ -4663,28 +4664,28 @@ clear_text_area_top = code_162d+1
     pla                                 ; ...
     tax                                 ; ...
 ; &70fe referenced 1 time by &70e4
-.code_70fe
+.missile_up
     lda missile_direction,x             ; Move it one cell: up...
     cmp #1                              ; ...
-    bne code_7108                       ; ...
+    bne missile_right                   ; ...
     dec missile_y,x                     ; ...
 ; &7108 referenced 1 time by &7103
-.code_7108
+.missile_right
     cmp #2                              ; ...right...
-    bne code_710f                       ; ...
+    bne missile_down                    ; ...
     inc missile_x,x                     ; ...
 ; &710f referenced 1 time by &710a
-.code_710f
+.missile_down
     cmp #3                              ; ...down...
-    bne code_7116                       ; ...
+    bne missile_left                    ; ...
     inc missile_y,x                     ; ...
 ; &7116 referenced 1 time by &7111
-.code_7116
+.missile_left
     cmp #4                              ; ...left
-    bne code_711d                       ; ...
+    bne check_missile_wall              ; ...
     dec missile_x,x                     ; ...
 ; &711d referenced 1 time by &7118
-.code_711d
+.check_missile_wall
     lda missile_x,x                     ; Wall in the new cell?
     sta cell_x                          ; ...
     lda missile_y,x                     ; ...
@@ -4692,7 +4693,7 @@ clear_text_area_top = code_162d+1
     txa                                 ; ...
     pha                                 ; ...
     jsr test_wall                       ; ...
-    beq code_713a                       ; No
+    beq check_missile_monster           ; No
 ; &7130 referenced 2 times by &71fe, &75ab
 .missile_spent_pop
     pla                                 ; Yes: the missile is spent
@@ -4703,23 +4704,23 @@ clear_text_area_top = code_162d+1
     sta missile_direction,x             ; ...
     jmp next_missile                    ; Next slot
 ; &713a referenced 1 time by &712e
-.code_713a
+.check_missile_monster
     lda #0                              ; Monster in the new cell (not checking heroes)?
     sta scratch                         ; ...
     jsr find_creature                   ; ...
-    beq code_7156                       ; No
+    beq check_missile_object            ; No
     lda monster_sprite,x                ; Yes, but is it alive?
     cmp #&16                            ; ...
-    bcs code_7156                       ; No: fly on
+    bcs check_missile_object            ; No: fly on
     pla                                 ; Alive: hit it
     tay                                 ; ...
-    jmp code_757c                       ; ...
+    jmp monster_hit                     ; ...
 ; &7150 referenced 1 time by &75a3
-.code_7150
+.monster_killed
     jsr credit_missile_owner            ; Monster killed: a point to the hero who fired...
     jmp missile_spent                   ; ...and the missile is spent
 ; &7156 referenced 2 times by &7142, &7149
-.code_7156
+.check_missile_object
     pla                                 ; Can the new cell hold an object?
     tax                                 ; ...
     lda missile_x,x                     ; ...
@@ -4732,101 +4733,101 @@ clear_text_area_top = code_162d+1
     pla                                 ; ...
     tax                                 ; ...
     cpy #0                              ; ...
-    bne code_71d9                       ; No: check for heroes
+    bne check_missile_hero              ; No: check for heroes
     txa                                 ; Look for an energy drainer at the cell...
     pha                                 ; ...
     ldx #&1e                            ; ...objects 30 to 1
 ; &7173 referenced 1 time by &71d5
-.loop_7173
+.check_object_drainer
     lda object_x,x                      ; ...
     cmp cell_x                          ; ...
-    bne code_71d4                       ; ...
+    bne next_object_drainer             ; ...
     lda object_y,x                      ; ...
     cmp cell_y                          ; ...
-    bne code_71d4                       ; ...
+    bne next_object_drainer             ; ...
     lda object_type,x                   ; Is it a drainer (&53-&5E)?
     cmp #&53 ; 'S'                      ; ...
-    bcc code_71d7                       ; No
+    bcc no_drainer                      ; No
     cmp #&5f ; '_'                      ; ...
-    bcs code_71d7                       ; No
+    bcs no_drainer                      ; No
     inc object_type,x                   ; Yes: wear it down a stage
     lda object_type,x                   ; ...
     cmp #&5f ; '_'                      ; Worn away?
-    bne code_71a0                       ; No
+    bne credit_drainer_hit              ; No
     lda #&ff                            ; Yes: remove it from the level
     sta object_x,x                      ; ...
     sta object_y,x                      ; ...
 ; &71a0 referenced 1 time by &7196
-.code_71a0
+.credit_drainer_hit
     pla                                 ; A point to the hero who fired
     tax                                 ; ...
     jsr credit_missile_owner            ; ...
     lda missile_direction,x             ; Bounce the missile back: up becomes down...
     cmp #1                              ; ...
-    bne code_71b4                       ; ...
+    bne reverse_right                   ; ...
     lda #3                              ; ...
     sta missile_direction,x             ; ...
-    jmp code_71d9                       ; ...
+    jmp check_missile_hero              ; ...
 ; &71b4 referenced 1 time by &71aa
-.code_71b4
+.reverse_right
     cmp #2                              ; ...right becomes left...
-    bne code_71c0                       ; ...
+    bne reverse_down                    ; ...
     lda #4                              ; ...
     sta missile_direction,x             ; ...
-    jmp code_71d9                       ; ...
+    jmp check_missile_hero              ; ...
 ; &71c0 referenced 1 time by &71b6
-.code_71c0
+.reverse_down
     cmp #3                              ; ...down becomes up...
-    bne code_71cc                       ; ...
+    bne reverse_left                    ; ...
     lda #1                              ; ...
     sta missile_direction,x             ; ...
-    jmp code_71d9                       ; ...
+    jmp check_missile_hero              ; ...
 ; &71cc referenced 1 time by &71c2
-.code_71cc
+.reverse_left
     lda #2                              ; ...and left becomes right
     sta missile_direction,x             ; ...
-    jmp code_71d9                       ; ...
+    jmp check_missile_hero              ; ...
 ; &71d4 referenced 2 times by &7179, &7181
-.code_71d4
+.next_object_drainer
     dex                                 ; Next object
-    bne loop_7173                       ; ...
+    bne check_object_drainer            ; ...
 ; &71d7 referenced 2 times by &7188, &718c
-.code_71d7
+.no_drainer
     pla                                 ; No drainer here
     tax                                 ; ...
 ; &71d9 referenced 5 times by &716d, &71b1, &71bd, &71c9, &71d1
-.code_71d9
+.check_missile_hero
     txa                                 ; Is a hero in the new cell?
     pha                                 ; ...
     ldx #0                              ; ...
 ; &71dd referenced 1 time by &7204
-.loop_71dd
+.check_hero_hit
     pla                                 ; ...
     tay                                 ; ...
     pha                                 ; ...
     lda hero_x,x                        ; ...
     cmp cell_x                          ; ...
-    bne code_7201                       ; ...
+    bne next_hero_hit                   ; ...
     lda hero_y,x                        ; ...
     cmp cell_y                          ; ...
-    bne code_7201                       ; ...
+    bne next_hero_hit                   ; ...
     lda missile_damage,y                ; Yes: they lose the missile's damage in health...
     tay                                 ; ...
 ; &71f4 referenced 1 time by &71fc
-.loop_71f4
+.take_missile_damage
     tya                                 ; ...
     pha                                 ; ...
     jsr lose_health_point               ; ...
     pla                                 ; ...
     tay                                 ; ...
     dey                                 ; ...
-    bne loop_71f4                       ; ...
+    bne take_missile_damage             ; ...
     jmp missile_spent_pop               ; ...and the missile is spent
 ; &7201 referenced 2 times by &71e6, &71ee
-.code_7201
+.next_hero_hit
     inx                                 ; Next hero
     cpx #4                              ; ...
-    bne loop_71dd                       ; ...
+    bne check_hero_hit                  ; ...
     pla                                 ; Nothing hit: draw the missile in its new cell
     tax                                 ; ...
     clc                                 ; ...
@@ -4843,7 +4844,7 @@ clear_text_area_top = code_162d+1
     inx                                 ; Next slot
     cpx #&0c                            ; ...
     beq return_6                        ; ...
-    jmp code_70d2                       ; ...
+    jmp move_missile                    ; ...
 ; &7220 referenced 1 time by &721b
 .return_6
     rts                                 ; Return
@@ -4862,20 +4863,20 @@ clear_text_area_top = code_162d+1
 ; &7221 referenced 8 times by &0eff, &6ffc, &71f6, &749a, &7512, &7654, &772a, &79ac
 .lose_health_point
     lda hero_direction,x                ; Is the hero in play?
-    bne code_7227                       ; Yes
+    bne take_health_unit                ; Yes
     rts                                 ; No: return
 ; &7227 referenced 1 time by &7224
-.code_7227
+.take_health_unit
     dec hero_health_units,x             ; Take one from the units digit
     lda hero_health_units,x             ; ...
     cmp #&1d                            ; Below 0?
-    bne code_7266                       ; No: redraw
+    bne draw_health                     ; No: redraw
     lda #&27                            ; Yes: units 9...
     sta hero_health_units,x             ; ...
     dec hero_health_tens,x              ; ...and take one from the tens
     lda hero_health_tens,x              ; ...
     cmp #&1d                            ; Below 0: the hero has died
-    bne code_7266                       ; No: redraw
+    bne draw_health                     ; No: redraw
     lda #&15                            ; Erase the hero...
     sta sprite_number                   ; ...
     jsr draw_hero                       ; ...
@@ -4886,20 +4887,20 @@ clear_text_area_top = code_162d+1
     sta hero_offset_y,x                 ; ...
     ldy #0                              ; Add hero number + 1 at the end of returning_hero_queue
 ; &7256 referenced 1 time by &7264
-.loop_7256
+.find_queue_slot
     lda returning_hero_queue,y          ; ...
-    bne code_7263                       ; ...
+    bne next_queue_slot                 ; ...
     txa                                 ; ...
     clc                                 ; ...
     adc #1                              ; ...
     sta returning_hero_queue,y          ; ...
     rts                                 ; Return
 ; &7263 referenced 1 time by &7259
-.code_7263
+.next_queue_slot
     iny                                 ; ...
-    bne loop_7256                       ; ...
+    bne find_queue_slot                 ; ...
 ; &7266 referenced 3 times by &722f, &723e, &73a2
-.code_7266
+.draw_health
     lda hero_panel_y,x                  ; Draw the health: tens digit at column &45...
     sta plot_y                          ; ...
     lda #&45 ; 'E'                      ; ...
@@ -4936,7 +4937,7 @@ clear_text_area_top = code_162d+1
     inc hero_score_units,x              ; Add one to the units digit
     lda hero_score_units,x              ; ...
     cmp #&28 ; '('                      ; Past 9?
-    bne code_72bc                       ; No: redraw
+    bne draw_score                      ; No: redraw
     lda #&1e                            ; Yes: units 0, and carry into the tens
     sta hero_score_units,x              ; ...
 ; ***************************************************************************************
@@ -4954,18 +4955,18 @@ clear_text_area_top = code_162d+1
     inc hero_score_tens,x               ; Add one to the tens digit
     lda hero_score_tens,x               ; ...
     cmp #&28 ; '('                      ; Past 9?
-    bne code_72bc                       ; No: redraw
+    bne draw_score                      ; No: redraw
     lda #&1e                            ; Yes: tens 0...
     sta hero_score_tens,x               ; ...
     inc hero_score_hundreds,x           ; ...and add one to the hundreds
     lda hero_score_hundreds,x           ; ...
     cmp #&28 ; '('                      ; Past 9?
-    bne code_72bc                       ; No: redraw
+    bne draw_score                      ; No: redraw
     lda #&1e                            ; Yes: hundreds 0...
     sta hero_score_hundreds,x           ; ...
     jsr add_thousand_points             ; ...and add a thousand
 ; &72bc referenced 3 times by &7294, &72a3, &72b2
-.code_72bc
+.draw_score
     clc                                 ; Draw the score twelve rows below the health: thousands at column &45...
     lda hero_panel_y,x                  ; ...
     adc #&0c                            ; ...
@@ -5007,14 +5008,24 @@ clear_text_area_top = code_162d+1
     pla                                 ; ...
     tax                                 ; ...
     rts                                 ; Return
+; ***************************************************************************************
+; Draw the level's objects
+;
+; Plot each of objects 30 to 1 at its cell in every view that shows it, with no pixel
+; offset.
+;
+; On Exit:
+;     A: corrupted
+;     X: 0
+;     Y: corrupted
 ; &7305 referenced 1 time by &1ece
-.sub_7305
+.draw_objects
     lda #0                              ; No pixel offsets
     sta plot_offset_x                   ; ...
     sta plot_offset_y                   ; ...
     ldx #&1e                            ; Objects 30 to 1: plot each at its cell
 ; &730d referenced 1 time by &7326
-.loop_730d
+.draw_each_object
     lda object_x,x                      ; ...
     sta cell_x                          ; ...
     lda object_y,x                      ; ...
@@ -5027,7 +5038,7 @@ clear_text_area_top = code_162d+1
     pla                                 ; ...
     tax                                 ; ...
     dex                                 ; ...
-    bne loop_730d                       ; ...
+    bne draw_each_object                ; ...
     rts                                 ; Return
 ; ***************************************************************************************
 ; Pick up the object in a hero's cell
@@ -5045,19 +5056,19 @@ clear_text_area_top = code_162d+1
     sta cell_y                          ; ...
     ldy #&1e                            ; ...objects 30 to 1
 ; &7337 referenced 1 time by &7473
-.code_7337
+.check_object
     lda object_x,y                      ; ...
     cmp cell_x                          ; ...
-    beq code_7342                       ; ...
-    jmp code_7470                       ; ...
+    beq check_object_y                  ; ...
+    jmp next_object                     ; ...
 ; &7342 referenced 1 time by &733d
-.code_7342
+.check_object_y
     lda object_y,y                      ; ...
     cmp cell_y                          ; ...
-    beq code_734d                       ; ...
-    jmp code_7470                       ; ...
+    beq object_found                    ; ...
+    jmp next_object                     ; ...
 ; &734d referenced 1 time by &7348
-.code_734d
+.object_found
     tya                                 ; Found: picking up anything loses Boots of Speed
     pha                                 ; ...
     lda #0                              ; ...
@@ -5068,7 +5079,7 @@ clear_text_area_top = code_162d+1
     tay                                 ; ...
     lda object_type,y                   ; Treasure?
     cmp #&28 ; '('                      ; ...
-    bne code_738a                       ; No
+    bne check_food                      ; No
     txa                                 ; Yes: play the treasure sound
     pha                                 ; ...
     tya                                 ; ...
@@ -5091,33 +5102,33 @@ clear_text_area_top = code_162d+1
     jsr add_ten_points                  ; ...
     pla                                 ; ...
     tay                                 ; ...
-    jmp code_7467                       ; Remove it
+    jmp remove_object                   ; Remove it
 ; &738a referenced 1 time by &7361
-.code_738a
+.check_food
     cmp #&29 ; ')'                      ; Food?
-    bne code_73c3                       ; No
+    bne check_teleporter                ; No
     inc hero_health_tens,x              ; Yes: 10 health...
     lda hero_health_tens,x              ; ...
     cmp #&28 ; '('                      ; ...to at most 99
-    bne code_73a0                       ; ...
+    bne redraw_health                   ; ...
     lda #&27                            ; ...
     sta hero_health_tens,x              ; ...
     sta hero_health_units,x             ; ...
 ; &73a0 referenced 1 time by &7396
-.code_73a0
+.redraw_health
     tya                                 ; Redraw the health
     pha                                 ; ...
-    jsr code_7266                       ; ...
+    jsr draw_health                     ; ...
     ldy #5                              ; 5 points
 ; &73a7 referenced 1 time by &73af
-.loop_73a7
+.redraw_health_loop
     tya                                 ; ...
     pha                                 ; ...
     jsr add_point                       ; ...
     pla                                 ; ...
     tay                                 ; ...
     dey                                 ; ...
-    bne loop_73a7                       ; ...
+    bne redraw_health_loop              ; ...
     txa                                 ; Play the food sound
     pha                                 ; ...
     ldx #<(food_sound)                  ; ...
@@ -5128,23 +5139,23 @@ clear_text_area_top = code_162d+1
     tax                                 ; ...
     pla                                 ; ...
     tay                                 ; ...
-    jmp code_7467                       ; Remove it
+    jmp remove_object                   ; Remove it
 ; &73c3 referenced 1 time by &738c
-.code_73c3
+.check_teleporter
     cmp #&2b ; '+'                      ; Teleporter?
-    bne code_740d                       ; No
+    bne check_cross                     ; No
 ; &73c7 referenced 2 times by &73d1, &73d6
-.code_73c7
+.find_previous_teleporter
     dey                                 ; Yes: find the previous teleporter in the list...
     lda object_type,y                   ; ...
     cmp #&2b ; '+'                      ; ...
-    beq code_73d9                       ; ...
+    beq teleport                        ; ...
     cpy #0                              ; ...
-    bne code_73c7                       ; ...
+    bne find_previous_teleporter        ; ...
     ldy teleport_last                   ; ...wrapping round to the end
-    jmp code_73c7                       ; ...
+    jmp find_previous_teleporter        ; ...
 ; &73d9 referenced 1 time by &73cd
-.code_73d9
+.teleport
     txa                                 ; Play the teleport sound
     pha                                 ; ...
     tya                                 ; ...
@@ -5171,9 +5182,9 @@ clear_text_area_top = code_162d+1
     sta hero_offset_y,x                 ; ...
     jmp show_hero_room                  ; Show the room they arrive in
 ; &740d referenced 1 time by &73c5
-.code_740d
+.check_cross
     cmp #&2a ; '*'                      ; Cross of Resurrection?
-    bne code_7477                       ; No
+    bne check_magic_item                ; No
     lda #&ff                            ; Yes: remove it
     sta object_x,y                      ; ...
     sta object_y,y                      ; ...
@@ -5182,15 +5193,15 @@ clear_text_area_top = code_162d+1
     pha                                 ; ...
     jsr play_pickup_sound               ; Play the pickup sound
     lda returning_hero_queue            ; Anyone waiting to return?
-    bne code_7429                       ; Yes
+    bne take_returning_hero             ; Yes
     pla                                 ; No: return
     tax                                 ; ...
     rts                                 ; ...
 ; &7429 referenced 1 time by &7424
-.code_7429
+.take_returning_hero
     ldy #0                              ; Take the first entry off the queue, appending 0...
 ; &742b referenced 1 time by &744a
-.loop_742b
+.shift_returning_queue
     ldx returning_hero_queue            ; ...
     dex                                 ; ...
     lda returning_hero_queue + 1        ; ...
@@ -5201,13 +5212,13 @@ clear_text_area_top = code_162d+1
     sta returning_hero_queue + 2        ; ...
     sty returning_hero_queue + 3        ; ...
     cpx #&63 ; 'c'                      ; A &64 marker?
-    bne code_744c                       ; No
+    bne check_queue_empty               ; No
     ldy #&64 ; 'd'                      ; Yes: move it to the back and take the next entry
-    bne loop_742b                       ; ...
+    bne shift_returning_queue           ; ...
 ; &744c referenced 1 time by &7446
-.code_744c
+.check_queue_empty
     cpx #&ff                            ; Queue empty?
-    beq code_7464                       ; Yes: nobody returns
+    beq cross_done                      ; Yes: nobody returns
     lda #0                              ; Start hero X returning: out of play...
     sta hero_direction,x                ; ...
     lda #8                              ; ...from the last appearance sprite...
@@ -5217,30 +5228,30 @@ clear_text_area_top = code_162d+1
     lda #1                              ; ...every other frame
     sta hero_offset_y,x                 ; ...
 ; &7464 referenced 1 time by &744e
-.code_7464
+.cross_done
     pla                                 ; Return
     tax                                 ; ...
     rts                                 ; ...
 ; &7467 referenced 2 times by &7387, &73c0
-.code_7467
+.remove_object
     lda #&ff                            ; Remove object Y from the level
     sta object_x,y                      ; ...
     sta object_y,y                      ; ...
     rts                                 ; Return
 ; &7470 referenced 3 times by &733f, &734a, &747d
-.code_7470
+.next_object
     dey                                 ; Next object
     beq return_7                        ; ...
-    jmp code_7337                       ; ...
+    jmp check_object                    ; ...
 ; &7476 referenced 1 time by &7471
 .return_7
     rts                                 ; Return
 ; &7477 referenced 1 time by &740f
-.code_7477
+.check_magic_item
     cmp #&5f ; '_'                      ; One of the magic items (&5F and up)?
-    bcs code_74b6                       ; Yes
+    bcs magic_item                      ; Yes
     cmp #&51 ; 'Q'                      ; The exit? Nothing to do here
-    beq code_7470                       ; ...
+    beq next_object                     ; ...
     lda #&32 ; '2'                      ; An energy drainer: play the hit sound louder...
     sta hit_sound + 4                   ; ...
     txa                                 ; ...
@@ -5255,14 +5266,14 @@ clear_text_area_top = code_162d+1
     tax                                 ; ...
     ldy #&0a                            ; ...and take 10 health
 ; &7498 referenced 1 time by &74a0
-.loop_7498
+.take_ten_health
     tya                                 ; ...
     pha                                 ; ...
     jsr lose_health_point               ; ...
     pla                                 ; ...
     tay                                 ; ...
     dey                                 ; ...
-    bne loop_7498                       ; ...
+    bne take_ten_health                 ; ...
     rts                                 ; Return
 ; ***************************************************************************************
 ; Play the pickup sound
@@ -5281,7 +5292,7 @@ clear_text_area_top = code_162d+1
     jsr osword                          ; ...  SOUND command
     rts                                 ; Return
 ; &74b6 referenced 1 time by &7479
-.code_74b6
+.magic_item
     sta scratch                         ; A magic item: keep its type
     lda #&ff                            ; Remove it from the level
     sta object_x,y                      ; ...
@@ -5300,28 +5311,28 @@ clear_text_area_top = code_162d+1
     jsr add_ten_points                  ; 10 points
     lda scratch                         ; Boots of Speed?
     cmp #&5f ; '_'                      ; ...
-    bne code_74eb                       ; No
+    bne check_helmet                    ; No
     jsr point_at_boots_icon             ; Yes: show the bolt in the panel...
     jsr plot_boots_icon                 ; ...
     lda #1                              ; ...and wear them
     sta hero_has_boots,x                ; ...
     rts                                 ; Return
 ; &74eb referenced 1 time by &74dd
-.code_74eb
+.check_helmet
     cmp #&60 ; '`'                      ; Magic helmet?
-    bne code_74ff                       ; No
+    bne check_potion                    ; No
     dec hero_damage_taken,x             ; Yes: lose one less health per hit...
     lda hero_damage_taken,x             ; ...
     cmp #3                              ; ...but never fewer than 3
-    bcs code_74fc                       ; ...
+    bcs redraw_armour                   ; ...
     inc hero_damage_taken,x             ; ...
 ; &74fc referenced 1 time by &74f7
-.code_74fc
+.redraw_armour
     jmp draw_armour_rating              ; Redraw the armour rating
 ; &74ff referenced 1 time by &74ed
-.code_74ff
+.check_potion
     cmp #&61 ; 'a'                      ; Potion of healing?
-    bne code_7516                       ; No
+    bne check_weapons                   ; No
     lda scratch2                        ; Yes: health tens = the score's units digit...
     sta hero_health_tens,x              ; ...
     inc scratch2                        ; ...units one more, then take a point to draw it
@@ -5330,17 +5341,17 @@ clear_text_area_top = code_162d+1
     jsr lose_health_point               ; ...
     rts                                 ; Return
 ; &7516 referenced 1 time by &7501
-.code_7516
+.check_weapons
     cmp #&62 ; 'b'                      ; Pile of weapons?
-    bne code_756b                       ; No: a magic sword
+    bne magic_sword                     ; No: a magic sword
     inc hero_max_missiles,x             ; Yes: one more missile in flight...
     lda hero_max_missiles,x             ; ...
     cmp #4                              ; ...to at most 3
-    bne code_7529                       ; ...
+    bne draw_missile_icon               ; ...
     lda #3                              ; ...
     sta hero_max_missiles,x             ; ...
 ; &7529 referenced 1 time by &7522
-.code_7529
+.draw_missile_icon
     jmp draw_new_missile_icon           ; Draw the new missile icon
 ; ***************************************************************************************
 ; Show the room a hero has moved into
@@ -5369,35 +5380,35 @@ clear_text_area_top = code_162d+1
     lda map_ptr                         ; ...
     sta view_room,y                     ; ...now this room
     cpx #0                              ; Redraw this hero's view
-    bne code_7551                       ; Top-left view?
+    bne check_view_1                    ; Top-left view?
     jsr draw_view_0                     ; Yes: draw it
     pla                                 ; ...
     tax                                 ; ...
     rts                                 ; Return
 ; &7551 referenced 1 time by &7549
-.code_7551
+.check_view_1
     cpx #1                              ; Top-right view?
-    bne code_755b                       ; ...
+    bne check_view_2                    ; ...
     jsr draw_view_1                     ; Yes: draw it
     pla                                 ; ...
     tax                                 ; ...
     rts                                 ; Return
 ; &755b referenced 1 time by &7553
-.code_755b
+.check_view_2
     cpx #2                              ; Bottom-left view?
-    bne code_7565                       ; ...
+    bne show_view_3                     ; ...
     jsr draw_view_2                     ; Yes: draw it
     pla                                 ; ...
     tax                                 ; ...
     rts                                 ; Return
 ; &7565 referenced 1 time by &755d
-.code_7565
+.show_view_3
     jsr draw_view_3                     ; Otherwise the bottom-right view
     pla                                 ; ...
     tax                                 ; ...
     rts                                 ; Return
 ; &756b referenced 1 time by &7518
-.code_756b
+.magic_sword
     inc hero_missile_damage,x           ; A magic sword: more missile damage...
     lda hero_missile_damage,x           ; ...
     cmp #&0a                            ; ...to at most 9
@@ -5406,7 +5417,7 @@ clear_text_area_top = code_162d+1
     sta hero_missile_damage,x           ; ...
     bne draw_missile_damage             ; ...
 ; &757c referenced 1 time by &714d
-.code_757c
+.monster_hit
     txa                                 ; Play the hit sound
     pha                                 ; ...
     tya                                 ; ...
@@ -5422,16 +5433,16 @@ clear_text_area_top = code_162d+1
     lda monster_hit_points,x            ; Take the missile's damage from the monster's hit points
     sec                                 ; ...
     sbc missile_damage,y                ; ...
-    bpl code_75a6                       ; Still alive?
+    bpl store_monster_health            ; Still alive?
     lda #&15                            ; No: start it dying...
     sta monster_sprite,x                ; ...
     lda monster_start_hit_points        ; ...and give the slot fresh hit points for its next appearance
     sta monster_hit_points,x            ; ...
     tya                                 ; Missile slot back in X...
     tax                                 ; ...
-    jmp code_7150                       ; ...a point to its hero, and the missile is spent
+    jmp monster_killed                  ; ...a point to its hero, and the missile is spent
 ; &75a6 referenced 1 time by &7594
-.code_75a6
+.store_monster_health
     sta monster_hit_points,x            ; Alive: store the hit points left
     tya                                 ; ...
     pha                                 ; ...
@@ -5529,15 +5540,15 @@ clear_text_area_top = code_162d+1
 ; &7619 referenced 1 time by &6ebe
 .check_magic
     dec hero_magic_delay,x              ; Count down the magic key delay
-    beq code_761f                       ; ...
+    beq check_magic_every_frame         ; ...
     rts                                 ; Not yet: return, which leaves move_heroes for this frame
 ; &761f referenced 1 time by &761c
-.code_761f
+.check_magic_every_frame
     lda #1                              ; Check the key every frame from now on
     sta hero_magic_delay,x              ; ...
     lda hero_magic_key,x                ; Magic key pressed?
     jsr test_key                        ; ...
-    bne code_76ab                       ; No: carry on reading the keys
+    bne no_magic                        ; No: carry on reading the keys
     txa                                 ; Yes: play the magic sound
     pha                                 ; ...
     ldx #<(magic_envelope)              ; ...
@@ -5553,21 +5564,21 @@ clear_text_area_top = code_162d+1
     lda #4                              ; Ignore the key for the next three frames
     sta hero_magic_delay,x              ; ...
     cpx #1                              ; Health cost: 3 for the Magic-User...
-    beq code_7650                       ; ...
+    beq magic_user_cost                 ; ...
     ldy #6                              ; ...6 for the Ranger
-    jmp code_7652                       ; ...
+    jmp take_magic_cost                 ; ...
 ; &7650 referenced 1 time by &7649
-.code_7650
+.magic_user_cost
     ldy #3                              ; ...
 ; &7652 referenced 2 times by &764d, &765a
-.code_7652
+.take_magic_cost
     tya                                 ; Take the cost
     pha                                 ; ...
     jsr lose_health_point               ; ...
     pla                                 ; ...
     tay                                 ; ...
     dey                                 ; ...
-    bne code_7652                       ; ...
+    bne take_magic_cost                 ; ...
     lda #0                              ; No monsters killed yet
     sta magic_kill_count                ; ...
     txa                                 ; sprite_number = 2 x hero, an index into view_room
@@ -5575,7 +5586,7 @@ clear_text_area_top = code_162d+1
     sta sprite_number                   ; ...
     ldx #&1e                            ; For each monster...
 ; &7667 referenced 1 time by &7693
-.loop_7667
+.find_monster_room
     lda monster_x,x                     ; ...find its room
     sta cell_x                          ; ...
     lda monster_y,x                     ; ...
@@ -5588,37 +5599,37 @@ clear_text_area_top = code_162d+1
     ldy sprite_number                   ; In the room this hero's view shows?
     lda view_room,y                     ; ...
     cmp map_ptr                         ; ...
-    bne code_7692                       ; No
+    bne next_monster_magic              ; No
     lda monster_sprite,x                ; Alive?
     cmp #&15                            ; ...
-    bcs code_7692                       ; No
+    bcs next_monster_magic              ; No
     lda #&15                            ; Yes: start it dying...
     sta monster_sprite,x                ; ...
     inc magic_kill_count                ; ...and count it
 ; &7692 referenced 2 times by &7681, &7688
-.code_7692
+.next_monster_magic
     dex                                 ; Next monster
-    bne loop_7667                       ; ...
+    bne find_monster_room               ; ...
     lda sprite_number                   ; One point for each monster killed
     lsr a                               ; ...
     tax                                 ; ...
     ldy magic_kill_count                ; ...
 ; &769c referenced 1 time by &76a8
-.code_769c
+.check_kills
     cpy #0                              ; ...
-    beq code_76ae                       ; ...
+    beq magic_cast                      ; ...
     tya                                 ; ...
     pha                                 ; ...
     jsr add_point                       ; ...
     pla                                 ; ...
     tay                                 ; ...
     dey                                 ; ...
-    jmp code_769c                       ; ...
+    jmp check_kills                     ; ...
 ; &76ab referenced 1 time by &762a
-.code_76ab
+.no_magic
     jmp read_hero_keys                  ; No magic: carry on with the keys
 ; &76ae referenced 1 time by &769e
-.code_76ae
+.magic_cast
     jmp draw_moved_hero                 ; Magic cast: redraw the hero
 ; ***************************************************************************************
 ; Give a point to the hero who fired a missile
@@ -5635,26 +5646,26 @@ clear_text_area_top = code_162d+1
     pha                                 ; ...
     tya                                 ; ...
     cmp #&10                            ; Arrows: the Ranger
-    bne code_76c0                       ; ...
+    bne owner_fireball                  ; ...
     ldx #0                              ; ...
-    jmp code_76d4                       ; ...
+    jmp credit_owner                    ; ...
 ; &76c0 referenced 1 time by &76b9
-.code_76c0
+.owner_fireball
     cmp #&44 ; 'D'                      ; Fireballs: the Magic-User
-    bne code_76c9                       ; ...
+    bne owner_axe                       ; ...
     ldx #1                              ; ...
-    jmp code_76d4                       ; ...
+    jmp credit_owner                    ; ...
 ; &76c9 referenced 1 time by &76c2
-.code_76c9
+.owner_axe
     cmp #&4c ; 'L'                      ; Axes: the Barbarian
-    bne code_76d2                       ; ...
+    bne owner_sword                     ; ...
     ldx #2                              ; ...
-    jmp code_76d4                       ; ...
+    jmp credit_owner                    ; ...
 ; &76d2 referenced 1 time by &76cb
-.code_76d2
+.owner_sword
     ldx #3                              ; Otherwise swords: the Fighter
 ; &76d4 referenced 3 times by &76bd, &76c6, &76cf
-.code_76d4
+.credit_owner
     jsr add_point                       ; One point to that hero
     pla                                 ; ...
     tax                                 ; ...
@@ -5673,10 +5684,10 @@ clear_text_area_top = code_162d+1
 ; &76da referenced 1 time by &6e91
 .animate_absent_hero
     dec hero_offset_y,x                 ; Every other frame...
-    beq code_76e0                       ; ...
+    beq absent_frame_due                ; ...
     rts                                 ; ...
 ; &76e0 referenced 1 time by &76dd
-.code_76e0
+.absent_frame_due
     lda #2                              ; ...
     sta hero_offset_y,x                 ; ...
     jsr get_hero_cell                   ; Plot the current appearance sprite at the hero's cell
@@ -5696,12 +5707,12 @@ clear_text_area_top = code_162d+1
     lda hero_frame,x                    ; ...
     adc hero_offset_x,x                 ; ...
     cmp #9                              ; ...
-    bcc code_770b                       ; ...
+    bcc check_first_sprite              ; ...
     lda #8                              ; ...
 ; &770b referenced 1 time by &7707
-.code_770b
+.check_first_sprite
     cmp #0                              ; Reached the first sprite (returning)?
-    bne code_772e                       ; No
+    bne store_hero_frame                ; No
     lda #5                              ; Yes: in play, facing down...
     sta hero_direction,x                ; ...
     lda #0                              ; ...with no step or offsets...
@@ -5715,7 +5726,7 @@ clear_text_area_top = code_162d+1
     jsr lose_health_point               ; ...
     rts                                 ; Return
 ; &772e referenced 1 time by &770d
-.code_772e
+.store_hero_frame
     sta hero_frame,x                    ; Store the frame
     rts                                 ; Return
 ; ***************************************************************************************
@@ -5752,29 +5763,29 @@ clear_text_area_top = code_162d+1
 .flip_firer_frame
     lda missile_sprite_base,x           ; Which hero fired it? Arrows: toggle the Ranger's frame
     cmp #&10                            ; ...
-    bne code_7757                       ; ...
+    bne firer_fireball                  ; ...
     lda hero_frame                      ; ...
     eor #1                              ; ...
     sta hero_frame                      ; ...
     rts                                 ; Return
 ; &7757 referenced 1 time by &774c
-.code_7757
+.firer_fireball
     cmp #&44 ; 'D'                      ; Fireballs: the Magic-User's
-    bne code_7764                       ; ...
+    bne firer_axe                       ; ...
     lda hero_frame + 1                  ; ...
     eor #1                              ; ...
     sta hero_frame + 1                  ; ...
     rts                                 ; Return
 ; &7764 referenced 1 time by &7759
-.code_7764
+.firer_axe
     cmp #&4c ; 'L'                      ; Axes: the Barbarian's
-    bne code_7771                       ; ...
+    bne firer_sword                     ; ...
     lda hero_frame + 2                  ; ...
     eor #1                              ; ...
     sta hero_frame + 2                  ; ...
     rts                                 ; Return
 ; &7771 referenced 1 time by &7766
-.code_7771
+.firer_sword
     lda hero_frame + 3                  ; Otherwise swords: the Fighter's
     eor #1                              ; ...
     sta hero_frame + 3                  ; ...
@@ -5874,7 +5885,7 @@ clear_text_area_top = code_162d+1
     sta map_ptr_hi                      ; ...
     ldy #0                              ; For each of the eight rows...
 ; &77e4 referenced 1 time by &77fa
-.loop_77e4
+.draw_room_walls
     lda (map_ptr),y                     ; ...take its eight wall bits...
     sta scratch                         ; ...
     tya                                 ; ...
@@ -5888,10 +5899,10 @@ clear_text_area_top = code_162d+1
     tay                                 ; ...
     iny                                 ; ...
     cpy #8                              ; ...
-    bne loop_77e4                       ; ...
+    bne draw_room_walls                 ; ...
     ldx #&14                            ; Then the doors 20 to 1, in every view showing them
 ; &77fe referenced 1 time by &781d
-.loop_77fe
+.draw_room_doors
     lda door_x,x                        ; ...
     sta cell_x                          ; ...
     lda door_y,x                        ; ...
@@ -5907,7 +5918,7 @@ clear_text_area_top = code_162d+1
     pla                                 ; ...
     tax                                 ; ...
     dex                                 ; ...
-    bne loop_77fe                       ; ...
+    bne draw_room_doors                 ; ...
     rts                                 ; Return
 ; ***************************************************************************************
 ; Draw one row of a room
@@ -5920,24 +5931,24 @@ clear_text_area_top = code_162d+1
     sta plot_x                          ; ...
     ldx #&80                            ; Bit mask, starting with the leftmost cell
 ; &7827 referenced 1 time by &784f
-.loop_7827
+.draw_room_cell
     txa                                 ; ...
     pha                                 ; ...
     sta scratch2                        ; ...
     lda scratch                         ; Wall here?
     and scratch2                        ; ...
-    beq code_783e                       ; No: plot the blank
+    beq plot_blank                      ; No: plot the blank
     lda #0                              ; Yes: plot the wall block (sprite 0)
     sta sprite_number                   ; ...
     jsr plot_sprite                     ; ...
-    jmp code_7845                       ; ...
+    jmp next_room_cell                  ; ...
 ; &783e referenced 1 time by &7832
-.code_783e
+.plot_blank
     lda #&15                            ; Plot the blank (sprite &15)
     sta sprite_number                   ; ...
     jsr plot_sprite                     ; ...
 ; &7845 referenced 1 time by &783b
-.code_7845
+.next_room_cell
     clc                                 ; Four byte columns right
     lda plot_x                          ; ...
     adc #4                              ; ...
@@ -5945,7 +5956,7 @@ clear_text_area_top = code_162d+1
     pla                                 ; Next bit...
     lsr a                               ; ...
     tax                                 ; ...
-    bne loop_7827                       ; ...until all eight are done
+    bne draw_room_cell                  ; ...until all eight are done
     rts                                 ; Return
 ; ***************************************************************************************
 ; Plot a sprite at a map cell in every view
@@ -5991,7 +6002,7 @@ clear_text_area_top = code_162d+1
     sta cell_y                          ; ...
     lda view_room                       ; Does the top-left view show this room?
     cmp cell_room                       ; ...
-    bne code_78ad                       ; No
+    bne check_view_1_room               ; No
     clc                                 ; Yes: plot at column 1, row 1 of the screen, plus the position in the room
     lda #1                              ; ...
     adc cell_x                          ; ...
@@ -6001,10 +6012,10 @@ clear_text_area_top = code_162d+1
     sta plot_y                          ; ...
     jsr plot_sprite                     ; ...
 ; &78ad referenced 1 time by &7899
-.code_78ad
+.check_view_1_room
     lda view_room + 2                   ; Does the top-right view show it?
     cmp cell_room                       ; ...
-    bne code_78c7                       ; No
+    bne check_view_2_room               ; No
     clc                                 ; Yes: plot at column &23, row 1
     lda #&23 ; '#'                      ; ...
     adc cell_x                          ; ...
@@ -6014,10 +6025,10 @@ clear_text_area_top = code_162d+1
     sta plot_y                          ; ...
     jsr plot_sprite                     ; ...
 ; &78c7 referenced 1 time by &78b3
-.code_78c7
+.check_view_2_room
     lda view_room + 4                   ; Does the bottom-left view show it?
     cmp cell_room                       ; ...
-    bne code_78e1                       ; No
+    bne check_view_3_room               ; No
     clc                                 ; Yes: plot at column 1, row &67
     lda #1                              ; ...
     adc cell_x                          ; ...
@@ -6027,7 +6038,7 @@ clear_text_area_top = code_162d+1
     sta plot_y                          ; ...
     jsr plot_sprite                     ; ...
 ; &78e1 referenced 1 time by &78cd
-.code_78e1
+.check_view_3_room
     lda view_room + 6                   ; Does the bottom-right view show it?
     cmp cell_room                       ; ...
     bne return_8                        ; No
@@ -6134,51 +6145,51 @@ clear_text_area_top = code_162d+1
 .find_creature
     ldx #&1e                            ; Monsters 30 to 1...
 ; &7976 referenced 1 time by &798e
-.loop_7976
+.check_monster
     cpx scratch                         ; ...except the one being moved
-    beq code_798d                       ; ...
+    beq next_monster_find               ; ...
     lda cell_x                          ; At cell_x...
     cmp monster_x,x                     ; ...
-    bne code_798d                       ; ...
+    bne next_monster_find               ; ...
     lda cell_y                          ; ...and cell_y?
     cmp monster_y,x                     ; ...
-    bne code_798d                       ; ...
+    bne next_monster_find               ; ...
     tay                                 ; Yes: return with Y and A non-zero
     rts                                 ; ...
 ; &798d referenced 3 times by &7979, &7981, &7989
-.code_798d
+.next_monster_find
     dex                                 ; Next monster
-    bne loop_7976                       ; ...
+    bne check_monster                   ; ...
     lda scratch                         ; No monster. Check for heroes too?
-    beq code_79bc                       ; No: return 0
+    beq nothing_found                   ; No: return 0
     ldx #0                              ; For each hero...
 ; &7997 referenced 1 time by &79ba
-.loop_7997
+.check_hero
     lda cell_x                          ; ...at cell_x...
     cmp hero_x,x                        ; ...
-    bne code_79b7                       ; ...
+    bne next_hero_find                  ; ...
     lda cell_y                          ; ...and cell_y?
     cmp hero_y,x                        ; ...
-    bne code_79b7                       ; ...
+    bne next_hero_find                  ; ...
     ldy hero_damage_taken,x             ; Yes: take hero_damage_taken health points
 ; &79aa referenced 1 time by &79b2
-.loop_79aa
+.check_hero_loop
     tya                                 ; ...
     pha                                 ; ...
     jsr lose_health_point               ; ...
     pla                                 ; ...
     tay                                 ; ...
     dey                                 ; ...
-    bne loop_79aa                       ; ...
+    bne check_hero_loop                 ; ...
     lda #1                              ; Return A = 1: a hero was there
     rts                                 ; ...
 ; &79b7 referenced 2 times by &799d, &79a5
-.code_79b7
+.next_hero_find
     inx                                 ; Next hero
     cpx #4                              ; ...
-    bne loop_7997                       ; ...
+    bne check_hero                      ; ...
 ; &79bc referenced 1 time by &7993
-.code_79bc
+.nothing_found
     lda #0                              ; Nothing there: return A = Y = 0
     ldy #0                              ; ...
     rts                                 ; ...
@@ -6197,7 +6208,7 @@ clear_text_area_top = code_162d+1
     lda #&2c ; ','                      ; ...
     sta sprite_number                   ; ...
 ; &79cd referenced 1 time by &79e1
-.loop_79cd
+.check_trapdoor
     lda trapdoor_x - 1,x                ; ...
     sta cell_x                          ; ...
     lda trapdoor_y - 1,x                ; ...
@@ -6208,7 +6219,7 @@ clear_text_area_top = code_162d+1
     pla                                 ; ...
     tax                                 ; ...
     dex                                 ; ...
-    bne loop_79cd                       ; ...
+    bne check_trapdoor                  ; ...
     ldx #&1e                            ; For each monster, 30 to 1...
 ; &79e5 referenced 1 time by &7b2d
 .next_monster_update
@@ -6232,45 +6243,45 @@ clear_text_area_top = code_162d+1
     tax                                 ; ...
     lda monster_sprite,x                ; Dying?
     cmp #&15                            ; ...
-    bcc code_7a17                       ; No
+    bcc check_monster_step              ; No
     jmp advance_dying_monster           ; Yes: advance the death animation
 ; &7a17 referenced 1 time by &7a12
-.code_7a17
+.check_monster_step
     lda monster_step,x                  ; Part way through a step?
-    beq code_7a23                       ; No
+    beq start_monster_move              ; No
     jsr continue_monster_step           ; Yes: continue it and draw
     pla                                 ; ...
     jmp draw_monster                    ; ...
 ; &7a23 referenced 1 time by &7a1a
-.code_7a23
+.start_monster_move
     lda monster_sprite,x                ; Start a step: move the cell in the direction it faces, up...
     cmp #9                              ; ...
-    bne code_7a2d                       ; ...
+    bne monster_right                   ; ...
     dec monster_y,x                     ; ...
 ; &7a2d referenced 1 time by &7a28
-.code_7a2d
+.monster_right
     cmp #&0b                            ; ...right...
-    bne code_7a34                       ; ...
+    bne monster_down                    ; ...
     inc monster_x,x                     ; ...
 ; &7a34 referenced 1 time by &7a2f
-.code_7a34
+.monster_down
     cmp #&0d                            ; ...down...
-    bne code_7a3b                       ; ...
+    bne monster_left                    ; ...
     inc monster_y,x                     ; ...
 ; &7a3b referenced 1 time by &7a36
-.code_7a3b
+.monster_left
     cmp #&0f                            ; ...left
-    bne code_7a42                       ; ...
+    bne set_monster_step                ; ...
     dec monster_x,x                     ; ...
 ; &7a42 referenced 1 time by &7a3d
-.code_7a42
+.set_monster_step
     jsr start_monster_step              ; Set the step's offsets
     lda monster_x,x                     ; Wall in the new cell?
     sta cell_x                          ; ...
     lda monster_y,x                     ; ...
     sta cell_y                          ; ...
     jsr test_wall                       ; ...
-    beq code_7a87                       ; No
+    beq check_monster_blocked           ; No
     pla                                 ; Yes: stay put, with no step...
     tax                                 ; ...
     lda previous_x                      ; ...
@@ -6287,20 +6298,20 @@ clear_text_area_top = code_162d+1
     adc #8                              ; ...
     sta monster_sprite,x                ; ...
     and #1                              ; ...made odd (9, &0B, &0D or &0F)
-    beq code_7a81                       ; ...
+    beq turn_monster                    ; ...
     jmp draw_monster                    ; ...
 ; &7a81 referenced 1 time by &7a7c
-.code_7a81
+.turn_monster
     inc monster_sprite,x                ; ...
     jmp draw_monster                    ; ...
 ; &7a87 referenced 1 time by &7a54
-.code_7a87
+.check_monster_blocked
     pla                                 ; Is another monster, or a hero, in the new cell? (A hero there is hurt)
     pha                                 ; ...
     sta scratch                         ; ...
     jsr find_creature                   ; ...
     cmp #0                              ; ...
-    beq code_7ac1                       ; No
+    beq monster_vertical                ; No
     pla                                 ; Yes: stay put, with no step, and turn a random way
     tax                                 ; Stay in the old cell...
     lda previous_x                      ; ...
@@ -6321,37 +6332,37 @@ clear_text_area_top = code_162d+1
     inc monster_sprite,x                ; ...
     jmp draw_monster                    ; ...
 ; &7ac1 referenced 1 time by &7a91
-.code_7ac1
+.monster_vertical
     pla                                 ; Moving vertically...
     tax                                 ; ...
     lda monster_sprite,x                ; ...
     cmp #9                              ; ...
-    beq code_7adc                       ; ...
+    beq check_room_edge                 ; ...
     cmp #&0d                            ; ...
-    beq code_7adc                       ; ...
+    beq check_room_edge                 ; ...
     lda monster_x,x                     ; No: at the left or right edge of a room?
     and #7                              ; ...
-    beq code_7aea                       ; ...
+    beq monster_at_edge                 ; ...
     cmp #7                              ; ...
-    beq code_7aea                       ; ...
-    jmp code_7af8                       ; No: move on
+    beq monster_at_edge                 ; ...
+    jmp monster_move_on                 ; No: move on
 ; &7adc referenced 2 times by &7ac8, &7acc
-.code_7adc
+.check_room_edge
     lda monster_y,x                     ; Yes: at the top or bottom edge of a room?
     and #7                              ; ...
-    beq code_7aea                       ; ...
+    beq monster_at_edge                 ; ...
     cmp #7                              ; ...
-    beq code_7aea                       ; ...
-    jmp code_7af8                       ; No: move on
+    beq monster_at_edge                 ; ...
+    jmp monster_move_on                 ; No: move on
 ; &7aea referenced 4 times by &7ad3, &7ad7, &7ae1, &7ae5
-.code_7aea
+.monster_at_edge
     lda #0                              ; At a room edge: cancel the step, so it arrives at once
     sta monster_step,x                  ; ...
     sta monster_offset_x,x              ; ...
     sta monster_offset_y,x              ; ...
     jmp draw_monster                    ; ...
 ; &7af8 referenced 2 times by &7ad9, &7ae7
-.code_7af8
+.monster_move_on
     lda previous_x                      ; Move on: stay in the old cell until the step ends
     sta monster_x,x                     ; ...
     lda previous_y                      ; ...
@@ -6389,10 +6400,10 @@ clear_text_area_top = code_162d+1
     inc monster_sprite,x                ; Next death frame
     lda monster_sprite,x                ; ...
     cmp #&1a                            ; Animation over?
-    bne code_7b3f                       ; No
+    bne draw_monster_death              ; No
     jmp monster_reappears               ; Yes: bring it back at a trapdoor
 ; &7b3f referenced 1 time by &7b3a
-.code_7b3f
+.draw_monster_death
     txa                                 ; Draw the death frame
     pha                                 ; ...
     lda monster_x,x                     ; ...
@@ -6424,32 +6435,32 @@ clear_text_area_top = code_162d+1
     sta hero_step,x                     ; ...
     lda hero_direction,x                ; Facing up: drawn 6 rows up
     cmp #1                              ; ...
-    bne code_7b79                       ; ...
+    bne hero_step_right                 ; ...
     lda #0                              ; ...
     sta hero_offset_x,x                 ; ...
     lda #&fa                            ; ...
     sta hero_offset_y,x                 ; ...
     rts                                 ; Return
 ; &7b79 referenced 1 time by &7b6c
-.code_7b79
+.hero_step_right
     cmp #3                              ; Facing right: 2 columns right
-    bne code_7b88                       ; ...
+    bne hero_step_down                  ; ...
     lda #0                              ; ...
     sta hero_offset_y,x                 ; ...
     lda #2                              ; ...
     sta hero_offset_x,x                 ; ...
     rts                                 ; Return
 ; &7b88 referenced 1 time by &7b7b
-.code_7b88
+.hero_step_down
     cmp #5                              ; Facing down: 6 rows down
-    bne code_7b97                       ; ...
+    bne hero_step_left                  ; ...
     lda #0                              ; ...
     sta hero_offset_x,x                 ; ...
     lda #6                              ; ...
     sta hero_offset_y,x                 ; ...
     rts                                 ; Return
 ; &7b97 referenced 1 time by &7b8a
-.code_7b97
+.hero_step_left
     lda #0                              ; Facing left: 2 columns left
     sta hero_offset_y,x                 ; ...
     lda #&fe                            ; ...
@@ -6473,33 +6484,33 @@ clear_text_area_top = code_162d+1
     eor #1                              ; ...
     sta hero_frame,x                    ; ...
     dec hero_step,x                     ; Count down the step
-    bne code_7bd6                       ; Not over
+    bne double_offsets                  ; Not over
     lda hero_direction,x                ; Over: move the cell on in the direction faced, up...
     cmp #1                              ; ...
-    bne code_7bb9                       ; ...
+    bne continue_right                  ; ...
     dec hero_y,x                        ; ...
 ; &7bb9 referenced 1 time by &7bb4
-.code_7bb9
+.continue_right
     cmp #3                              ; ...right...
-    bne code_7bc0                       ; ...
+    bne continue_down                   ; ...
     inc hero_x,x                        ; ...
 ; &7bc0 referenced 1 time by &7bbb
-.code_7bc0
+.continue_down
     cmp #5                              ; ...down...
-    bne code_7bc7                       ; ...
+    bne continue_left                   ; ...
     inc hero_y,x                        ; ...
 ; &7bc7 referenced 1 time by &7bc2
-.code_7bc7
+.continue_left
     cmp #7                              ; ...left
-    bne code_7bce                       ; ...
+    bne hero_no_offsets                 ; ...
     dec hero_x,x                        ; ...
 ; &7bce referenced 1 time by &7bc9
-.code_7bce
+.hero_no_offsets
     lda #0                              ; ...with no offsets
     sta hero_offset_x,x                 ; ...
     sta hero_offset_y,x                 ; ...
 ; &7bd6 referenced 1 time by &7bad
-.code_7bd6
+.double_offsets
     clc                                 ; Double the offsets
     lda hero_offset_x,x                 ; ...
     adc hero_offset_x,x                 ; ...
@@ -6523,32 +6534,32 @@ clear_text_area_top = code_162d+1
     sta monster_step,x                  ; ...
     lda monster_sprite,x                ; First frame's offsets, in the direction of travel: up...
     cmp #9                              ; ...
-    bne code_7c02                       ; ...
+    bne monster_step_right              ; ...
     lda #0                              ; ...
     sta monster_offset_x,x              ; ...
     lda #&fd                            ; ...3 rows up
     sta monster_offset_y,x              ; ...
     rts                                 ; Return
 ; &7c02 referenced 1 time by &7bf5
-.code_7c02
+.monster_step_right
     cmp #&0b                            ; Moving right...
-    bne code_7c11                       ; ...
+    bne monster_step_down               ; ...
     lda #0                              ; ...
     sta monster_offset_y,x              ; ...
     lda #1                              ; ...1 column right
     sta monster_offset_x,x              ; ...
     rts                                 ; Return
 ; &7c11 referenced 1 time by &7c04
-.code_7c11
+.monster_step_down
     cmp #&0d                            ; Moving down...
-    bne code_7c20                       ; ...
+    bne monster_step_left               ; ...
     lda #0                              ; ...
     sta monster_offset_x,x              ; ...
     lda #3                              ; ...3 rows down
     sta monster_offset_y,x              ; ...
     rts                                 ; Return
 ; &7c20 referenced 1 time by &7c13
-.code_7c20
+.monster_step_left
     lda #0                              ; Left: 1 column left
     sta monster_offset_y,x              ; ...
     lda #&ff                            ; ...
@@ -6569,53 +6580,53 @@ clear_text_area_top = code_162d+1
     eor #1                              ; ...
     sta monster_frame,x                 ; ...
     dec monster_step,x                  ; Count down the step
-    bne code_7c5f                       ; Not over: grow the offsets
+    bne grow_offset_x                   ; Not over: grow the offsets
     lda monster_sprite,x                ; Over: move the cell on in its direction, up...
     cmp #9                              ; ...
-    bne code_7c42                       ; ...
+    bne monster_continue_right          ; ...
     dec monster_y,x                     ; ...
 ; &7c42 referenced 1 time by &7c3d
-.code_7c42
+.monster_continue_right
     cmp #&0b                            ; ...right...
-    bne code_7c49                       ; ...
+    bne monster_continue_down           ; ...
     inc monster_x,x                     ; ...
 ; &7c49 referenced 1 time by &7c44
-.code_7c49
+.monster_continue_down
     cmp #&0d                            ; ...down...
-    bne code_7c50                       ; ...
+    bne monster_continue_left           ; ...
     inc monster_y,x                     ; ...
 ; &7c50 referenced 1 time by &7c4b
-.code_7c50
+.monster_continue_left
     cmp #&0f                            ; ...left
-    bne code_7c57                       ; ...
+    bne monster_no_offsets              ; ...
     dec monster_x,x                     ; ...
 ; &7c57 referenced 1 time by &7c52
-.code_7c57
+.monster_no_offsets
     lda #0                              ; ...with no offsets
     sta monster_offset_x,x              ; ...
     sta monster_offset_y,x              ; ...
 ; &7c5f referenced 1 time by &7c36
-.code_7c5f
+.grow_offset_x
     lda monster_offset_x,x              ; Grow the horizontal offset by a column, away from zero
-    beq code_7c6f                       ; ...
-    bpl code_7c6c                       ; ...
+    beq grow_offset_y                   ; ...
+    bpl grow_offset_x_right             ; ...
     dec monster_offset_x,x              ; ...
-    jmp code_7c6f                       ; ...
+    jmp grow_offset_y                   ; ...
 ; &7c6c referenced 1 time by &7c64
-.code_7c6c
+.grow_offset_x_right
     inc monster_offset_x,x              ; ...
 ; &7c6f referenced 2 times by &7c62, &7c69
-.code_7c6f
+.grow_offset_y
     lda monster_offset_y,x              ; Grow the vertical offset by three rows, away from zero
     beq return_10                       ; ...
-    bpl code_7c82                       ; ...
+    bpl grow_offset_y_down              ; ...
     sec                                 ; ...
     lda monster_offset_y,x              ; ...
     sbc #3                              ; ...
     sta monster_offset_y,x              ; ...
     jmp return_10                       ; ...
 ; &7c82 referenced 1 time by &7c74
-.code_7c82
+.grow_offset_y_down
     clc                                 ; ...
     lda monster_offset_y,x              ; ...
     adc #3                              ; ...
@@ -6648,15 +6659,15 @@ clear_text_area_top = code_162d+1
     ldy #&ff                            ; ...
     jsr osbyte                          ; ...  Test whether the key with negative INKEY number X is pressed
     cpy #&ff                            ; X = Y = &FF if it is pressed
-    bne code_7cae                       ; ...
+    bne key_not_pressed                 ; ...
     cpx #&ff                            ; ...
-    bne code_7cae                       ; ...
+    bne key_not_pressed                 ; ...
     pla                                 ; Pressed: restore X and return A = 0, Z set
     tax                                 ; ...
     lda #0                              ; ...
     rts                                 ; ...
 ; &7cae referenced 2 times by &7ca3, &7ca7
-.code_7cae
+.key_not_pressed
     pla                                 ; Not pressed: restore X and return A = 1
     tax                                 ; ...
     lda #1                              ; ...
@@ -6666,11 +6677,11 @@ clear_text_area_top = code_162d+1
     inc next_trapdoor                   ; Next trapdoor, 0-7 in turn
     lda next_trapdoor                   ; ...
     cmp #8                              ; ...
-    bne code_7cc2                       ; ...
+    bne emerge_at_trapdoor              ; ...
     lda #0                              ; ...
     sta next_trapdoor                   ; ...
 ; &7cc2 referenced 1 time by &7cbb
-.code_7cc2
+.emerge_at_trapdoor
     ldy next_trapdoor                   ; ...
     lda trapdoor_x,y                    ; Put the monster on it, facing up, with no step
     sta monster_x,x                     ; ...
@@ -6687,7 +6698,7 @@ clear_text_area_top = code_162d+1
     stx scratch                         ; ...
     jsr find_creature                   ; ...
     cmp #0                              ; ...
-    beq code_7cfb                       ; No: done
+    beq emerge_done                     ; No: done
     pla                                 ; Yes: wait off the map, to try again next frame
     pha                                 ; ...
     tax                                 ; ...
@@ -6696,7 +6707,7 @@ clear_text_area_top = code_162d+1
     sta monster_y,x                     ; ...
     jmp monster_done                    ; ...
 ; &7cfb referenced 1 time by &7ceb
-.code_7cfb
+.emerge_done
     jmp monster_done                    ; Done
     equb &00
 ; &7cff referenced 3 times by &0e1b, &15f0, &759b
@@ -6845,6 +6856,15 @@ clear_text_area_top = code_162d+1
 ; The rest of the cassette game's wrch_handler, which prints letters and digits in the
 ; game's own font. On this side WRCHV's entry at &7F8F jumps straight to the MOS, so none
 ; of this runs and text appears in the MOS font.
+.data_7f92
+capital_letter = data_7f92+35
+glyph_offset = data_7f92+38
+copy_glyph = data_7f92+43
+copy_letter_glyph = data_7f92+51
+restore_registers = data_7f92+63
+digit_glyph = data_7f92+72
+copy_digit_glyph = data_7f92+86
+pass_character = data_7f92+100
     equb &48, &98, &48, &a5, &70, &c9, &30, &90
     equb &5b, &c9, &3a, &90, &3b, &c9, &41, &90
     equb &53, &c9, &5b, &90, &0e, &c9, &61, &90
@@ -7659,7 +7679,7 @@ row_offsets_lo = row_offsets+1
     ldy #0                              ; Index stays 0: the pointers themselves advance
     ldx sprite_height                   ; X counts the pixel rows still to plot
 ; &d81d referenced 1 time by &d864
-.loop_d81d
+.plot_sprite_row_hazel
     lda screen_ptr                      ; Remember where this pixel row starts...
     sta row_start_ptr                   ; ...
     lda screen_ptr_hi                   ; ...
@@ -7668,24 +7688,24 @@ row_offsets_lo = row_offsets+1
     pha                                 ; ...
     ldx sprite_width                    ; X counts the bytes across this row
 ; &d829 referenced 1 time by &d83f
-.loop_d829
+.plot_sprite_byte_hazel
     lda (sprite_data_ptr),y             ; Copy one sprite byte...
     sta (screen_ptr),y                  ; ...to the screen
     clc                                 ; Step screen_ptr right one byte column: 8 bytes on
     lda screen_ptr                      ; ...
     adc #8                              ; ...
     sta screen_ptr                      ; ...
-    bcc code_d838                       ; ...
+    bcc plot_sprite_next_data_hazel     ; ...
     inc screen_ptr_hi                   ; ...with carry into the high byte
 ; &d838 referenced 1 time by &d834
-.code_d838
+.plot_sprite_next_data_hazel
     inc sprite_data_ptr                 ; Next sprite data byte
-    bne code_d83e                       ; ...
+    bne plot_sprite_count_byte_hazel    ; ...
     inc sprite_data_ptr_hi              ; ...with carry into the high byte
 ; &d83e referenced 1 time by &d83a
-.code_d83e
+.plot_sprite_count_byte_hazel
     dex                                 ; Count the bytes across
-    bne loop_d829                       ; Loop until the row is done
+    bne plot_sprite_byte_hazel          ; Loop until the row is done
     clc                                 ; screen_ptr = row start + 1: the next pixel row down
     lda row_start_ptr                   ; ...
     adc #1                              ; ...
@@ -7695,7 +7715,7 @@ row_offsets_lo = row_offsets+1
     sta screen_ptr_hi                   ; ...
     lda screen_ptr                      ; Has it crossed into the next character row?
     and #7                              ; ...(pixel row within the character now 0)
-    bne code_d861                       ; No: carry on
+    bne plot_sprite_next_row_hazel      ; No: carry on
     clc                                 ; Yes: add 640-8 to reach the top pixel row of the...
     lda screen_ptr                      ; ...character row below
     adc #&78 ; 'x'                      ; ...
@@ -7704,11 +7724,11 @@ row_offsets_lo = row_offsets+1
     adc #2                              ; ...
     sta screen_ptr_hi                   ; ...
 ; &d861 referenced 1 time by &d852
-.code_d861
+.plot_sprite_next_row_hazel
     pla                                 ; Recover the row count
     tax                                 ; ...
     dex                                 ; Count the pixel rows
-    bne loop_d81d                       ; Loop until the sprite is done
+    bne plot_sprite_row_hazel           ; Loop until the sprite is done
     rts                                 ; Return
 ; ***************************************************************************************
 ; Calculate a screen address
@@ -7795,796 +7815,624 @@ save "Code2", dasmos_code2_start, dasmos_code2_end, &c700, &c700
 save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 
 ; Label references by decreasing frequency:
-;     cell_x:                      59
-;     cell_y:                      55
-;     oswrch:                      54
-;     scratch:                     52
-;     sprite_number:               45
-;     plot_x:                      41
-;     plot_y:                      30
-;     hero_x:                      29
-;     hero_y:                      27
-;     screen_ptr:                  26
-;     osword:                      24
-;     osbyte:                      23
-;     map_ptr:                     21
-;     plot_sprite:                 21
-;     hero_offset_y:               20
-;     hero_offset_x:               19
-;     monster_sprite:              19
-;     plot_at_cell:                19
-;     hero_direction:              18
-;     plot_offset_x:               18
-;     plot_offset_y:               18
-;     screen_ptr_hi:               18
-;     monster_offset_y:            17
-;     monster_x:                   17
-;     monster_y:                   16
-;     monster_offset_x:            15
-;     hero_frame:                  14
-;     hero_step:                   12
-;     missile_direction:           12
-;     plot_victory_sprite:         12
-;     tune_ptr:                    12
-;     previous_x:                  11
-;     previous_y:                  11
-;     hero_health_tens:            10
-;     hero_key:                    10
-;     hero_panel_y:                10
-;     hero_max_missiles:            9
-;     level_bcd:                    9
-;     object_x:                     9
-;     object_y:                     9
-;     returning_hero_queue:         9
-;     lose_health_point:            8
-;     panel_hero:                   8
-;     ring_x:                       8
-;     scratch2:                     8
-;     sprite_width:                 8
-;     test_wall:                    8
-;     cell_room:                    7
-;     hero_damage_taken:            7
-;     hero_health_units:            7
-;     hero_missile_damage:          7
-;     hero_score_units:             7
-;     key_x:                        7
-;     key_y:                        7
-;     level_number:                 7
-;     menu_text:                    7
-;     monster_step:                 7
-;     object_type:                  7
-;     os_vsync_counter:             7
-;     oscli:                        7
-;     play_level:                   7
-;     ring_y:                       7
-;     draw_monster:                 6
-;     hero_score_ten_thousands:     6
-;     menu_key_loop:                6
-;     missile_x:                    6
-;     missile_y:                    6
-;     music_rhythm_step:            6
-;     music_section:                6
-;     sprite_data_ptr:              6
-;     test_key:                     6
-;     tune_ptr + 1:                 6
-;     victory_pitch:                6
-;     victory_sprite:               6
-;     add_point:                    5
-;     code_71d9:                    5
-;     code_c566:                    5
-;     count:                        5
-;     erase_hero:                   5
-;     exit_busy:                    5
-;     exit_spin:                    5
-;     hero_score_hundreds:          5
-;     hero_score_tens:              5
-;     hero_score_thousands:         5
-;     music_transpose:              5
-;     next_trapdoor:                5
-;     plot_panel_sprite:            5
-;     sprite_heights:               5
-;     victory_delay:                5
-;     view_room:                    5
-;     add_ten_points:               4
-;     code_1ec6:                    4
-;     code_703b:                    4
-;     code_7aea:                    4
-;     door_x:                       4
-;     door_y:                       4
-;     draw_moved_hero:              4
-;     draw_room:                    4
-;     exit_saved_x:                 4
-;     exit_saved_y:                 4
-;     exit_x:                       4
-;     exit_y:                       4
-;     find_creature:                4
-;     hero_absent:                  4
-;     hero_door_x:                  4
-;     hero_door_y:                  4
-;     hero_key_dropped:             4
-;     hero_sprites:                 4
-;     map_ptr_hi:                   4
-;     menu_text + 1:                4
-;     missile_sprite_base:          4
-;     monster_hit_points:           4
-;     next_hero:                    4
-;     plot_keeping_x:               4
-;     row_start_ptr:                4
-;     row_start_ptr_hi:             4
-;     shrunk_hero:                  4
-;     sprite_data_ptr_hi:           4
-;     sprite_height:                4
-;     sprite_widths:                4
-;     start_hero_step:              4
-;     step_hero:                    4
-;     bit_masks:                    3
-;     code_1db2:                    3
-;     code_1f36:                    3
-;     code_7266:                    3
-;     code_72bc:                    3
-;     code_7470:                    3
-;     code_76d4:                    3
-;     code_798d:                    3
-;     exit_shrinks_left:            3
-;     exiting_hero:                 3
-;     first_level_flag:             3
-;     hero_has_boots:               3
-;     hero_magic_delay:             3
-;     magic_kill_count:             3
-;     missile_damage:               3
-;     monster_done:                 3
-;     monster_frame:                3
-;     monster_start_hit_points:     3
-;     next_victory_sprite:          3
-;     osasci:                       3
-;     print_menu:                   3
-;     system_via_t1c_l:             3
-;     victory_pitch_step:           3
-;     wait_p_released:              3
-;     clear_text_area:              2
-;     code_0e00:                    2
-;     code_108a:                    2
-;     code_1097:                    2
-;     code_111c:                    2
-;     code_11bb:                    2
-;     code_1e28:                    2
-;     code_1ebe:                    2
-;     code_1f91:                    2
-;     code_2076:                    2
-;     code_7156:                    2
-;     code_71d4:                    2
-;     code_71d7:                    2
-;     code_7201:                    2
-;     code_73c7:                    2
-;     code_7467:                    2
-;     code_7652:                    2
-;     code_7692:                    2
-;     code_79b7:                    2
-;     code_7adc:                    2
-;     code_7af8:                    2
-;     code_7c6f:                    2
-;     code_7cae:                    2
-;     credit_missile_owner:         2
-;     decrypt_level:                2
-;     decrypt_level_loop:           2
-;     door_sprite:                  2
-;     draw_hero:                    2
-;     draw_missile_damage:          2
-;     draw_ten_thousands:           2
-;     draw_victory_ring:            2
-;     draw_view_0:                  2
-;     draw_view_1:                  2
-;     draw_view_2:                  2
-;     draw_view_3:                  2
-;     exit_offsets_x:               2
-;     exit_offsets_y:               2
-;     food_sound + 4:               2
-;     get_hero_cell:                2
-;     hero_frame + 1:               2
-;     hero_frame + 2:               2
-;     hero_frame + 3:               2
-;     hit_sound + 4:                2
-;     level_command_digits:         2
-;     level_command_digits + 1:     2
-;     level_filename_digits:        2
-;     menu_text + 2:                2
-;     missile_spent_pop:            2
-;     monster_x + 35:               2
-;     monster_y + 35:               2
-;     mos320_osbyte_default:        2
-;     next_missile:                 2
-;     osrdch:                       2
-;     play_pickup_sound:            2
-;     plot_chalice:                 2
-;     point_at_boots_icon:          2
-;     previous_offset_x:            2
-;     previous_offset_y:            2
-;     read_hero_keys:               2
-;     reset_hero:                   2
-;     restore_hero_sprites:         2
-;     return_10:                    2
-;     returning_hero_queue + 1:     2
-;     returning_hero_queue + 2:     2
-;     returning_hero_queue + 3:     2
-;     row_offsets:                  2
-;     row_offsets_lo:               2
-;     saved_page_0d:                2
-;     show_hero_room:               2
-;     sprite_addr_hi:               2
-;     sprite_addr_lo:               2
-;     stop_music:                   2
-;     test_object_free:             2
-;     trapdoor_x:                   2
-;     trapdoor_y:                   2
-;     victory_steps_left:           2
-;     view_room + 2:                2
-;     view_room + 4:                2
-;     view_room + 6:                2
-;     workspace_template + 208:     2
-;     add_thousand_points:          1
-;     add_thousand_points_done:     1
-;     advance_dying_monster:        1
-;     animate_absent_hero:          1
-;     channel_1_sound + 4:          1
-;     channel_2_sound + 4:          1
-;     channel_3_sound + 2:          1
-;     channel_3_sound + 4:          1
-;     check_for_victory:            1
-;     check_hero_keys:              1
-;     check_magic:                  1
-;     clear_text_area_top:          1
-;     code_07c0:                    1
-;     code_0938:                    1
-;     code_093e:                    1
-;     code_0961:                    1
-;     code_0e34:                    1
-;     code_0e36:                    1
-;     code_0e52:                    1
-;     code_0e7a:                    1
-;     code_110a:                    1
-;     code_1124:                    1
-;     code_113c:                    1
-;     code_11d3:                    1
-;     code_1419:                    1
-;     code_147d:                    1
-;     code_14a7:                    1
-;     code_14bf:                    1
-;     code_14f1:                    1
-;     code_16bf:                    1
-;     code_1cc5:                    1
-;     code_1cd8:                    1
-;     code_1ce3:                    1
-;     code_1cee:                    1
-;     code_1cfa:                    1
-;     code_1db8:                    1
-;     code_1dba:                    1
-;     code_1df3:                    1
-;     code_1e35:                    1
-;     code_1e45:                    1
-;     code_1ec4:                    1
-;     code_1f2a:                    1
-;     code_1f96:                    1
-;     code_1f9e:                    1
-;     code_1ff2:                    1
-;     code_2026:                    1
-;     code_20db:                    1
-;     code_20e9:                    1
-;     code_20f7:                    1
-;     code_6e82:                    1
-;     code_6e91:                    1
-;     code_6e97:                    1
-;     code_6eba:                    1
-;     code_6ed4:                    1
-;     code_6ee7:                    1
-;     code_6efa:                    1
-;     code_6f0d:                    1
-;     code_6f70:                    1
-;     code_6f83:                    1
-;     code_6f8a:                    1
-;     code_6f91:                    1
-;     code_6f98:                    1
-;     code_6fc7:                    1
-;     code_6fd5:                    1
-;     code_7002:                    1
-;     code_7053:                    1
-;     code_7069:                    1
-;     code_70d2:                    1
-;     code_70da:                    1
-;     code_70e7:                    1
-;     code_70fe:                    1
-;     code_7108:                    1
-;     code_710f:                    1
-;     code_7116:                    1
-;     code_711d:                    1
-;     code_713a:                    1
-;     code_7150:                    1
-;     code_71a0:                    1
-;     code_71b4:                    1
-;     code_71c0:                    1
-;     code_71cc:                    1
-;     code_7227:                    1
-;     code_7263:                    1
-;     code_7337:                    1
-;     code_7342:                    1
-;     code_734d:                    1
-;     code_738a:                    1
-;     code_73a0:                    1
-;     code_73c3:                    1
-;     code_73d9:                    1
-;     code_740d:                    1
-;     code_7429:                    1
-;     code_744c:                    1
-;     code_7464:                    1
-;     code_7477:                    1
-;     code_74b6:                    1
-;     code_74eb:                    1
-;     code_74fc:                    1
-;     code_74ff:                    1
-;     code_7516:                    1
-;     code_7529:                    1
-;     code_7551:                    1
-;     code_755b:                    1
-;     code_7565:                    1
-;     code_756b:                    1
-;     code_757c:                    1
-;     code_75a6:                    1
-;     code_761f:                    1
-;     code_7650:                    1
-;     code_769c:                    1
-;     code_76ab:                    1
-;     code_76ae:                    1
-;     code_76c0:                    1
-;     code_76c9:                    1
-;     code_76d2:                    1
-;     code_76e0:                    1
-;     code_770b:                    1
-;     code_772e:                    1
-;     code_7757:                    1
-;     code_7764:                    1
-;     code_7771:                    1
-;     code_783e:                    1
-;     code_7845:                    1
-;     code_78ad:                    1
-;     code_78c7:                    1
-;     code_78e1:                    1
-;     code_79bc:                    1
-;     code_7a17:                    1
-;     code_7a23:                    1
-;     code_7a2d:                    1
-;     code_7a34:                    1
-;     code_7a3b:                    1
-;     code_7a42:                    1
-;     code_7a81:                    1
-;     code_7a87:                    1
-;     code_7ac1:                    1
-;     code_7b3f:                    1
-;     code_7b79:                    1
-;     code_7b88:                    1
-;     code_7b97:                    1
-;     code_7bb9:                    1
-;     code_7bc0:                    1
-;     code_7bc7:                    1
-;     code_7bce:                    1
-;     code_7bd6:                    1
-;     code_7c02:                    1
-;     code_7c11:                    1
-;     code_7c20:                    1
-;     code_7c42:                    1
-;     code_7c49:                    1
-;     code_7c50:                    1
-;     code_7c57:                    1
-;     code_7c5f:                    1
-;     code_7c6c:                    1
-;     code_7c82:                    1
-;     code_7cc2:                    1
-;     code_7cfb:                    1
-;     code_c51b:                    1
-;     code_c529:                    1
-;     code_c538:                    1
-;     code_c546:                    1
-;     code_c555:                    1
-;     code_c569:                    1
-;     code_c77a:                    1
-;     code_c781:                    1
-;     code_c793:                    1
-;     code_c7a5:                    1
-;     code_c7be:                    1
-;     code_c7e0:                    1
-;     code_c7f0:                    1
-;     code_c80b:                    1
-;     code_d838:                    1
-;     code_d83e:                    1
-;     code_d861:                    1
-;     coder_display_vdu:            1
-;     collect_objects:              1
-;     continue_hero_step:           1
-;     continue_monster_step:        1
-;     count_level:                  1
-;     dasmos_start:                 1
-;     decrypt_level_done:           1
-;     decrypt_level_next:           1
-;     dissolve_chalice:             1
-;     draw_all_views:               1
-;     draw_armour_rating:           1
-;     draw_keys:                    1
-;     draw_new_missile_icon:        1
-;     draw_room_row:                1
-;     draw_status_panel:            1
-;     draw_ten_thousands_loop:      1
-;     draw_view_frames:             1
-;     drop_key:                     1
-;     erase_boots_icon:             1
-;     evntv:                        1
-;     evntv + 1:                    1
-;     exit_offset_x_1:              1
-;     exit_offset_x_2:              1
-;     exit_offset_x_3:              1
-;     exit_offset_y_1:              1
-;     exit_offset_y_2:              1
-;     exit_offset_y_3:              1
-;     exit_offset_y_4:              1
-;     find_open_neighbour:          1
-;     fire_missile:                 1
-;     flip_firer_frame:             1
-;     game_over_message:            1
-;     game_over_music:              1
-;     hero_appearance_sprites:      1
-;     hero_direction - 1:           1
-;     hero_enters_exit:             1
-;     hero_faces:                   1
-;     hero_frame - 1:               1
-;     hero_health_tens - 1:         1
-;     hero_key_down:                1
-;     hero_key_fire:                1
-;     hero_key_left:                1
-;     hero_key_right:               1
-;     hero_key_up:                  1
-;     hero_magic_key:               1
-;     hero_menu:                    1
-;     hero_missile_sprites:         1
-;     hero_start_damage_taken:      1
-;     hero_start_max_missiles:      1
-;     hero_start_missile_damage:    1
-;     level_checksums:              1
-;     level_door_sprite:            1
-;     level_door_x:                 1
-;     level_door_y:                 1
-;     level_filename_digits + 1:    1
-;     level_key_x:                  1
-;     level_key_y:                  1
-;     level_loop:                   1
-;     level_object_free_map:        1
-;     level_object_type:            1
-;     level_object_x:               1
-;     level_object_y:               1
-;     level_trapdoor_x:             1
-;     level_trapdoor_y:             1
-;     level_wall_sprite:            1
-;     level_walls:                  1
-;     load_level:                   1
-;     load_stones:                  1
-;     loop_0745:                    1
-;     loop_076c:                    1
-;     loop_091d:                    1
-;     loop_0929:                    1
-;     loop_0e09:                    1
-;     loop_0e6d:                    1
-;     loop_0ea8:                    1
-;     loop_0eae:                    1
-;     loop_0eb9:                    1
-;     loop_0efc:                    1
-;     loop_0f3a:                    1
-;     loop_1079:                    1
-;     loop_1084:                    1
-;     loop_10ba:                    1
-;     loop_10c7:                    1
-;     loop_113e:                    1
-;     loop_1140:                    1
-;     loop_11de:                    1
-;     loop_11ec:                    1
-;     loop_1485:                    1
-;     loop_150f:                    1
-;     loop_1546:                    1
-;     loop_154d:                    1
-;     loop_1573:                    1
-;     loop_158a:                    1
-;     loop_15a1:                    1
-;     loop_15b2:                    1
-;     loop_15c5:                    1
-;     loop_15d8:                    1
-;     loop_15e6:                    1
-;     loop_15fd:                    1
-;     loop_16b4:                    1
-;     loop_1d03:                    1
-;     loop_1dce:                    1
-;     loop_1f17:                    1
-;     loop_1f38:                    1
-;     loop_2009:                    1
-;     loop_2014:                    1
-;     loop_205f:                    1
-;     loop_206c:                    1
-;     loop_6f28:                    1
-;     loop_7007:                    1
-;     loop_7173:                    1
-;     loop_71dd:                    1
-;     loop_71f4:                    1
-;     loop_7256:                    1
-;     loop_730d:                    1
-;     loop_73a7:                    1
-;     loop_742b:                    1
-;     loop_7498:                    1
-;     loop_7667:                    1
-;     loop_77e4:                    1
-;     loop_77fe:                    1
-;     loop_7827:                    1
-;     loop_7976:                    1
-;     loop_7997:                    1
-;     loop_79aa:                    1
-;     loop_79cd:                    1
-;     loop_c6dc:                    1
-;     loop_d81d:                    1
-;     loop_d829:                    1
-;     menu_done:                    1
-;     menu_hero_off:                1
-;     menu_reprint:                 1
-;     menu_set_sound:               1
-;     menu_sound_key:               1
-;     menu_sound_off:               1
-;     menu_space:                   1
-;     menu_space_check_hero:        1
-;     missile_spent:                1
-;     monster_reappears:            1
-;     mos120_reset_entry:           1
-;     move_heroes:                  1
-;     move_missiles:                1
-;     music_event:                  1
-;     next_monster_update:          1
-;     object_free_map:              1
-;     object_free_map + 58:         1
-;     os_irq_a:                     1
-;     os_zp_fa:                     1
-;     panel_hero - 1:               1
-;     pause_check:                  1
-;     plot_boots_icon:              1
-;     plot_sprite + 1:              1
-;     plot_sprite + 2:              1
-;     print_menu_loop:              1
-;     print_menu_string:            1
-;     print_menu_string_loop:       1
-;     queue_exit_marker:            1
-;     remove_absent_heroes:         1
-;     remove_absent_heroes_check:   1
-;     remove_absent_heroes_loop:    1
-;     remove_absent_heroes_next:    1
-;     reset_call_address:           1
-;     reset_call_address + 1:       1
-;     reset_monsters:               1
-;     reset_vector:                 1
-;     reset_vector + 1:             1
-;     reset_workspace:              1
-;     return_1:                     1
-;     return_11:                    1
-;     return_12:                    1
-;     return_2:                     1
-;     return_3:                     1
-;     return_4:                     1
-;     return_5:                     1
-;     return_6:                     1
-;     return_7:                     1
-;     return_8:                     1
-;     return_9:                     1
-;     rhythm_pattern:               1
-;     room_walls:                   1
-;     room_walls + 58:              1
-;     screen_address:               1
-;     screen_address_hazel:         1
-;     section_ptrs_hi:              1
-;     section_ptrs_lo:              1
-;     set_bell:                     1
-;     set_menu_no:                  1
-;     set_menu_off:                 1
-;     set_menu_on:                  1
-;     set_menu_yes:                 1
-;     sprite_chalice:               1
-;     sprite_chalice - 1:           1
-;     start_level:                  1
-;     start_monster_step:           1
-;     start_music:                  1
-;     sub_7305:                     1
-;     teleport_last:                1
-;     trapdoor_x - 1:               1
-;     trapdoor_y - 1:               1
-;     unpack_level:                 1
-;     update_game:                  1
-;     update_monsters:              1
-;     update_rest:                  1
-;     victory_sequence:             1
-;     victory_sprite_copy:          1
-;     wall_sprite:                  1
-;     workspace_template:           1
-;     wrchv:                        1
-;     wrchv + 1:                    1
+;     cell_x:                        59
+;     cell_y:                        55
+;     oswrch:                        54
+;     scratch:                       52
+;     sprite_number:                 45
+;     plot_x:                        41
+;     plot_y:                        30
+;     hero_x:                        29
+;     hero_y:                        27
+;     screen_ptr:                    26
+;     osword:                        24
+;     osbyte:                        23
+;     map_ptr:                       21
+;     plot_sprite:                   21
+;     hero_offset_y:                 20
+;     hero_offset_x:                 19
+;     monster_sprite:                19
+;     plot_at_cell:                  19
+;     hero_direction:                18
+;     plot_offset_x:                 18
+;     plot_offset_y:                 18
+;     screen_ptr_hi:                 18
+;     monster_offset_y:              17
+;     monster_x:                     17
+;     monster_y:                     16
+;     monster_offset_x:              15
+;     hero_frame:                    14
+;     hero_step:                     12
+;     missile_direction:             12
+;     plot_victory_sprite:           12
+;     previous_x:                    11
+;     previous_y:                    11
+;     tune_ptr:                      11
+;     hero_health_tens:              10
+;     hero_key:                      10
+;     hero_panel_y:                  10
+;     hero_max_missiles:              9
+;     level_bcd:                      9
+;     object_x:                       9
+;     object_y:                       9
+;     returning_hero_queue:           9
+;     lose_health_point:              8
+;     panel_hero:                     8
+;     ring_x:                         8
+;     scratch2:                       8
+;     sprite_width:                   8
+;     test_wall:                      8
+;     cell_room:                      7
+;     hero_damage_taken:              7
+;     hero_health_units:              7
+;     hero_missile_damage:            7
+;     hero_score_units:               7
+;     key_x:                          7
+;     key_y:                          7
+;     level_number:                   7
+;     menu_text:                      7
+;     monster_step:                   7
+;     object_type:                    7
+;     os_vsync_counter:               7
+;     oscli:                          7
+;     play_level:                     7
+;     ring_y:                         7
+;     draw_monster:                   6
+;     hero_score_ten_thousands:       6
+;     menu_key_loop:                  6
+;     missile_x:                      6
+;     missile_y:                      6
+;     music_rhythm_step:              6
+;     music_section:                  6
+;     sprite_data_ptr:                6
+;     test_key:                       6
+;     tune_ptr + 1:                   6
+;     victory_pitch:                  6
+;     victory_sprite:                 6
+;     add_point:                      5
+;     check_missile_hero:             5
+;     code_c566:                      5
+;     count:                          5
+;     erase_hero:                     5
+;     exit_busy:                      5
+;     exit_spin:                      5
+;     hero_score_hundreds:            5
+;     hero_score_tens:                5
+;     hero_score_thousands:           5
+;     music_transpose:                5
+;     next_trapdoor:                  5
+;     plot_panel_sprite:              5
+;     sprite_heights:                 5
+;     victory_delay:                  5
+;     view_room:                      5
+;     add_ten_points:                 4
+;     door_x:                         4
+;     door_y:                         4
+;     draw_moved_hero:                4
+;     draw_room:                      4
+;     exit_saved_x:                   4
+;     exit_saved_y:                   4
+;     exit_x:                         4
+;     exit_y:                         4
+;     find_creature:                  4
+;     hero_absent:                    4
+;     hero_door_x:                    4
+;     hero_door_y:                    4
+;     hero_key_dropped:               4
+;     hero_sprites:                   4
+;     map_ptr_hi:                     4
+;     menu_text + 1:                  4
+;     missile_sprite_base:            4
+;     monster_at_edge:                4
+;     monster_hit_points:             4
+;     next_hero:                      4
+;     next_hero_keys:                 4
+;     next_other_hero:                4
+;     plot_keeping_x:                 4
+;     row_start_ptr:                  4
+;     row_start_ptr_hi:               4
+;     shrunk_hero:                    4
+;     sprite_data_ptr_hi:             4
+;     sprite_height:                  4
+;     sprite_widths:                  4
+;     start_hero_step:                4
+;     step_hero:                      4
+;     bit_masks:                      3
+;     check_exit:                     3
+;     credit_owner:                   3
+;     draw_health:                    3
+;     draw_score:                     3
+;     exit_shrinks_left:              3
+;     exiting_hero:                   3
+;     first_level_flag:               3
+;     hero_has_boots:                 3
+;     hero_magic_delay:               3
+;     magic_kill_count:               3
+;     missile_damage:                 3
+;     monster_done:                   3
+;     monster_frame:                  3
+;     monster_start_hit_points:       3
+;     next_door:                      3
+;     next_monster_find:              3
+;     next_object:                    3
+;     next_victory_sprite:            3
+;     osasci:                         3
+;     print_menu:                     3
+;     system_via_t1c_l:               3
+;     victory_pitch_step:             3
+;     wait_p_released:                3
+;     check_door_y:                   2
+;     check_key_swap:                 2
+;     check_missile_object:           2
+;     check_room_edge:                2
+;     clear_text_area:                2
+;     credit_missile_owner:           2
+;     decrypt_level:                  2
+;     decrypt_level_loop:             2
+;     door_sprite:                    2
+;     draw_hero:                      2
+;     draw_missile_damage:            2
+;     draw_ten_thousands:             2
+;     draw_victory_ring:              2
+;     draw_view_0:                    2
+;     draw_view_1:                    2
+;     draw_view_2:                    2
+;     draw_view_3:                    2
+;     exit_offsets_x:                 2
+;     exit_offsets_y:                 2
+;     find_previous_teleporter:       2
+;     food_sound + 4:                 2
+;     get_hero_cell:                  2
+;     grow_offset_y:                  2
+;     hero_frame + 1:                 2
+;     hero_frame + 2:                 2
+;     hero_frame + 3:                 2
+;     hit_sound + 4:                  2
+;     key_not_pressed:                2
+;     level_command_digits:           2
+;     level_command_digits + 1:       2
+;     level_filename_digits:          2
+;     menu_text + 2:                  2
+;     missile_spent_pop:              2
+;     monster_move_on:                2
+;     monster_x + 35:                 2
+;     monster_y + 35:                 2
+;     mos320_osbyte_default:          2
+;     new_game:                       2
+;     next_hero_exit:                 2
+;     next_hero_find:                 2
+;     next_hero_hit:                  2
+;     next_key:                       2
+;     next_missile:                   2
+;     next_monster_magic:             2
+;     next_object_drainer:            2
+;     no_drainer:                     2
+;     osrdch:                         2
+;     play_pickup_sound:              2
+;     plot_chalice:                   2
+;     point_at_boots_icon:            2
+;     previous_offset_x:              2
+;     previous_offset_y:              2
+;     read_hero_keys:                 2
+;     remove_object:                  2
+;     reset_hero:                     2
+;     restore_hero_sprites:           2
+;     return_10:                      2
+;     returning_hero_queue + 1:       2
+;     returning_hero_queue + 2:       2
+;     returning_hero_queue + 3:       2
+;     row_offsets:                    2
+;     row_offsets_lo:                 2
+;     saved_page_0d:                  2
+;     shorten_victory_delay:          2
+;     show_hero_room:                 2
+;     sprite_addr_hi:                 2
+;     sprite_addr_lo:                 2
+;     start_hero_animation:           2
+;     start_victory:                  2
+;     stop_music:                     2
+;     store_victory_sprite:           2
+;     take_magic_cost:                2
+;     test_object_free:               2
+;     trapdoor_x:                     2
+;     trapdoor_y:                     2
+;     victory_steps_left:             2
+;     view_room + 2:                  2
+;     view_room + 4:                  2
+;     view_room + 6:                  2
+;     workspace_template + 208:       2
+;     absent_frame_due:               1
+;     add_thousand_points:            1
+;     add_thousand_points_done:       1
+;     advance_dying_monster:          1
+;     animate_absent:                 1
+;     animate_absent_hero:            1
+;     cancel_hero_step:               1
+;     channel_1_sound + 4:            1
+;     channel_2_sound + 4:            1
+;     channel_3_sound + 2:            1
+;     channel_3_sound + 4:            1
+;     check_boots:                    1
+;     check_cross:                    1
+;     check_death_finished:           1
+;     check_door:                     1
+;     check_door_cell_y:              1
+;     check_door_key:                 1
+;     check_door_x:                   1
+;     check_doors:                    1
+;     check_exit_busy:                1
+;     check_first_sprite:             1
+;     check_food:                     1
+;     check_for_victory:              1
+;     check_helmet:                   1
+;     check_hero:                     1
+;     check_hero_dead:                1
+;     check_hero_hit:                 1
+;     check_hero_in_cell:             1
+;     check_hero_keys:                1
+;     check_hero_loop:                1
+;     check_hero_on_exit:             1
+;     check_just_fired:               1
+;     check_key:                      1
+;     check_key_cell:                 1
+;     check_key_down:                 1
+;     check_key_fire:                 1
+;     check_key_left:                 1
+;     check_key_right:                1
+;     check_kills:                    1
+;     check_magic:                    1
+;     check_magic_every_frame:        1
+;     check_magic_item:               1
+;     check_magic_key:                1
+;     check_missile_monster:          1
+;     check_missile_wall:             1
+;     check_monster:                  1
+;     check_monster_blocked:          1
+;     check_monster_in_cell:          1
+;     check_monster_step:             1
+;     check_object:                   1
+;     check_object_drainer:           1
+;     check_object_y:                 1
+;     check_other_hero:               1
+;     check_potion:                   1
+;     check_queue_empty:              1
+;     check_teleporter:               1
+;     check_trapdoor:                 1
+;     check_view_1:                   1
+;     check_view_1_room:              1
+;     check_view_2:                   1
+;     check_view_2_room:              1
+;     check_view_3_room:              1
+;     check_weapons:                  1
+;     clear_chalice_sprite:           1
+;     clear_hero_carrying:            1
+;     clear_text_area_top:            1
+;     code_07c0:                      1
+;     code_1419:                      1
+;     code_147d:                      1
+;     code_14a7:                      1
+;     code_14bf:                      1
+;     code_14f1:                      1
+;     code_c51b:                      1
+;     code_c529:                      1
+;     code_c538:                      1
+;     code_c546:                      1
+;     code_c555:                      1
+;     code_c569:                      1
+;     code_c77a:                      1
+;     code_c781:                      1
+;     code_c793:                      1
+;     code_c7a5:                      1
+;     code_c7be:                      1
+;     code_c7e0:                      1
+;     code_c7f0:                      1
+;     code_c80b:                      1
+;     coder_display_vdu:              1
+;     collect_objects:                1
+;     continue_down:                  1
+;     continue_hero_step:             1
+;     continue_left:                  1
+;     continue_monster_step:          1
+;     continue_right:                 1
+;     copy_workspace_template:        1
+;     count_heroes_in_play:           1
+;     count_level:                    1
+;     credit_drainer_hit:             1
+;     cross_done:                     1
+;     dasmos_start:                   1
+;     decrypt_level_done:             1
+;     decrypt_level_next:             1
+;     dissolve_chalice:               1
+;     doors_done:                     1
+;     double_offsets:                 1
+;     draw_all_views:                 1
+;     draw_armour_rating:             1
+;     draw_each_key:                  1
+;     draw_each_object:               1
+;     draw_keys:                      1
+;     draw_missile_icon:              1
+;     draw_missile_icons:             1
+;     draw_monster_death:             1
+;     draw_new_missile_icon:          1
+;     draw_objects:                   1
+;     draw_panel_hero:                1
+;     draw_room_cell:                 1
+;     draw_room_doors:                1
+;     draw_room_row:                  1
+;     draw_room_walls:                1
+;     draw_status_panel:              1
+;     draw_ten_thousands_loop:        1
+;     draw_view_frame:                1
+;     draw_view_frames:               1
+;     drop_key:                       1
+;     emerge_at_trapdoor:             1
+;     emerge_done:                    1
+;     end_level_filename:             1
+;     erase_boots_icon:               1
+;     erase_door_loop:                1
+;     erase_missile:                  1
+;     erase_victory_ring:             1
+;     evntv:                          1
+;     evntv + 1:                      1
+;     exit_offset_x_1:                1
+;     exit_offset_x_2:                1
+;     exit_offset_x_3:                1
+;     exit_offset_y_1:                1
+;     exit_offset_y_2:                1
+;     exit_offset_y_3:                1
+;     exit_offset_y_4:                1
+;     find_missile_slot:              1
+;     find_monster_room:              1
+;     find_open_neighbour:            1
+;     find_queue_end:                 1
+;     find_queue_slot:                1
+;     fire_missile:                   1
+;     firer_axe:                      1
+;     firer_fireball:                 1
+;     firer_sword:                    1
+;     flip_firer_frame:               1
+;     game_over_message:              1
+;     game_over_music:                1
+;     grow_offset_x:                  1
+;     grow_offset_x_right:            1
+;     grow_offset_y_down:             1
+;     hero_appearance_sprites:        1
+;     hero_direction - 1:             1
+;     hero_enters_exit:               1
+;     hero_faces:                     1
+;     hero_frame - 1:                 1
+;     hero_health_tens - 1:           1
+;     hero_key_down:                  1
+;     hero_key_fire:                  1
+;     hero_key_left:                  1
+;     hero_key_right:                 1
+;     hero_key_up:                    1
+;     hero_magic_key:                 1
+;     hero_menu:                      1
+;     hero_missile_sprites:           1
+;     hero_no_offsets:                1
+;     hero_start_damage_taken:        1
+;     hero_start_max_missiles:        1
+;     hero_start_missile_damage:      1
+;     hero_step_down:                 1
+;     hero_step_left:                 1
+;     hero_step_right:                1
+;     keys_done:                      1
+;     level_checksums:                1
+;     level_door_sprite:              1
+;     level_door_x:                   1
+;     level_door_y:                   1
+;     level_filename_digits + 1:      1
+;     level_key_x:                    1
+;     level_key_y:                    1
+;     level_loop:                     1
+;     level_object_free_map:          1
+;     level_object_type:              1
+;     level_object_x:                 1
+;     level_object_y:                 1
+;     level_trapdoor_x:               1
+;     level_trapdoor_y:               1
+;     level_wall_sprite:              1
+;     level_walls:                    1
+;     load_level:                     1
+;     load_stones:                    1
+;     loop_0745:                      1
+;     loop_076c:                      1
+;     loop_1485:                      1
+;     loop_c6dc:                      1
+;     magic_cast:                     1
+;     magic_item:                     1
+;     magic_sword:                    1
+;     magic_user_cost:                1
+;     menu_done:                      1
+;     menu_hero_off:                  1
+;     menu_reprint:                   1
+;     menu_set_sound:                 1
+;     menu_sound_key:                 1
+;     menu_sound_off:                 1
+;     menu_space:                     1
+;     menu_space_check_hero:          1
+;     missile_down:                   1
+;     missile_left:                   1
+;     missile_right:                  1
+;     missile_spent:                  1
+;     missile_up:                     1
+;     monster_continue_down:          1
+;     monster_continue_left:          1
+;     monster_continue_right:         1
+;     monster_down:                   1
+;     monster_hit:                    1
+;     monster_killed:                 1
+;     monster_left:                   1
+;     monster_no_offsets:             1
+;     monster_reappears:              1
+;     monster_right:                  1
+;     monster_step_down:              1
+;     monster_step_left:              1
+;     monster_step_right:             1
+;     monster_vertical:               1
+;     mos120_reset_entry:             1
+;     move_hero:                      1
+;     move_heroes:                    1
+;     move_missile:                   1
+;     move_missiles:                  1
+;     music_event:                    1
+;     next_hero_dead:                 1
+;     next_hero_doors:                1
+;     next_hero_in_play:              1
+;     next_hero_victory:              1
+;     next_missile_slot:              1
+;     next_monster_update:            1
+;     next_queue_entry:               1
+;     next_queue_slot:                1
+;     next_room_cell:                 1
+;     next_turn:                      1
+;     no_magic:                       1
+;     note_new_cell:                  1
+;     nothing_found:                  1
+;     object_found:                   1
+;     object_free_map:                1
+;     object_free_map + 58:           1
+;     open_door:                      1
+;     os_irq_a:                       1
+;     os_zp_fa:                       1
+;     owner_axe:                      1
+;     owner_fireball:                 1
+;     owner_sword:                    1
+;     panel_hero - 1:                 1
+;     pause_check:                    1
+;     plot_blank:                     1
+;     plot_boots_icon:                1
+;     plot_sprite + 1:                1
+;     plot_sprite + 2:                1
+;     plot_sprite_byte:               1
+;     plot_sprite_byte_hazel:         1
+;     plot_sprite_count_byte:         1
+;     plot_sprite_count_byte_hazel:   1
+;     plot_sprite_next_data:          1
+;     plot_sprite_next_data_hazel:    1
+;     plot_sprite_next_row:           1
+;     plot_sprite_next_row_hazel:     1
+;     plot_sprite_row:                1
+;     plot_sprite_row_hazel:          1
+;     print_ending_message:           1
+;     print_game_over:                1
+;     print_menu_loop:                1
+;     print_menu_string:              1
+;     print_menu_string_loop:         1
+;     print_victory_text:             1
+;     queue_exit_marker:              1
+;     raise_victory_pitch:            1
+;     redraw_armour:                  1
+;     redraw_exit:                    1
+;     redraw_health:                  1
+;     redraw_health_loop:             1
+;     remember_hero_position:         1
+;     remove_absent_heroes:           1
+;     remove_absent_heroes_check:     1
+;     remove_absent_heroes_loop:      1
+;     remove_absent_heroes_next:      1
+;     reset_call_address:             1
+;     reset_call_address + 1:         1
+;     reset_each_hero:                1
+;     reset_each_monster:             1
+;     reset_monsters:                 1
+;     reset_vector:                   1
+;     reset_vector + 1:               1
+;     reset_workspace:                1
+;     restore_exit:                   1
+;     restore_message_spaces:         1
+;     restore_sprite_heights:         1
+;     restore_sprite_widths:          1
+;     return_1:                       1
+;     return_11:                      1
+;     return_12:                      1
+;     return_2:                       1
+;     return_3:                       1
+;     return_4:                       1
+;     return_5:                       1
+;     return_6:                       1
+;     return_7:                       1
+;     return_8:                       1
+;     return_9:                       1
+;     reverse_down:                   1
+;     reverse_left:                   1
+;     reverse_right:                  1
+;     rhythm_pattern:                 1
+;     room_walls:                     1
+;     room_walls + 58:                1
+;     screen_address:                 1
+;     screen_address_hazel:           1
+;     section_ptrs_hi:                1
+;     section_ptrs_lo:                1
+;     send_frame_vdu:                 1
+;     set_bell:                       1
+;     set_menu_no:                    1
+;     set_menu_off:                   1
+;     set_menu_on:                    1
+;     set_menu_yes:                   1
+;     set_monster_step:               1
+;     shift_returning_queue:          1
+;     show_view_3:                    1
+;     shrink_hero_height:             1
+;     shrink_hero_width:              1
+;     sound_victory_bell:             1
+;     sprite_chalice:                 1
+;     sprite_chalice - 1:             1
+;     start_level:                    1
+;     start_monster_move:             1
+;     start_monster_step:             1
+;     start_music:                    1
+;     stay_in_old_cell:               1
+;     step_down:                      1
+;     step_left:                      1
+;     step_right:                     1
+;     store_hero_frame:               1
+;     store_level_units:              1
+;     store_monster_health:           1
+;     take_health_unit:               1
+;     take_missile_damage:            1
+;     take_returning_hero:            1
+;     take_ten_health:                1
+;     teleport:                       1
+;     teleport_last:                  1
+;     trapdoor_x - 1:                 1
+;     trapdoor_y - 1:                 1
+;     try_cell_below:                 1
+;     try_cell_left:                  1
+;     try_cell_right:                 1
+;     turn_monster:                   1
+;     two_level_digits:               1
+;     unpack_doors:                   1
+;     unpack_keys:                    1
+;     unpack_level:                   1
+;     unpack_objects:                 1
+;     unpack_trapdoors:               1
+;     unpack_wall_sprite:             1
+;     unpack_walls:                   1
+;     update_game:                    1
+;     update_monsters:                1
+;     update_rest:                    1
+;     victory_delay_inner:            1
+;     victory_delay_loop:             1
+;     victory_delay_outer:            1
+;     victory_sequence:               1
+;     victory_sprite_copy:            1
+;     wait_vsync_chalice:             1
+;     wait_vsync_game_over:           1
+;     wall_sprite:                    1
+;     workspace_template:             1
+;     wrchv:                          1
+;     wrchv + 1:                      1
 
 ; Automatically generated labels:
 ;     code_07c0
-;     code_0938
-;     code_093e
-;     code_0961
-;     code_0e00
-;     code_0e34
-;     code_0e36
-;     code_0e52
-;     code_0e7a
-;     code_108a
-;     code_1097
-;     code_110a
-;     code_111c
-;     code_1124
-;     code_113c
-;     code_11bb
-;     code_11d3
 ;     code_1419
 ;     code_147d
 ;     code_14a7
 ;     code_14bf
 ;     code_14f1
 ;     code_162d
-;     code_16bf
-;     code_1cc5
-;     code_1cd8
-;     code_1ce3
-;     code_1cee
-;     code_1cfa
-;     code_1db2
-;     code_1db8
-;     code_1dba
-;     code_1df3
-;     code_1e28
-;     code_1e35
-;     code_1e45
-;     code_1ebe
-;     code_1ec4
-;     code_1ec6
-;     code_1f2a
-;     code_1f36
-;     code_1f91
-;     code_1f96
-;     code_1f9e
-;     code_1ff2
-;     code_2026
-;     code_2076
-;     code_20db
-;     code_20e9
-;     code_20f7
-;     code_6e82
-;     code_6e91
-;     code_6e97
-;     code_6eba
-;     code_6ed4
-;     code_6ee7
-;     code_6efa
-;     code_6f0d
-;     code_6f70
-;     code_6f83
-;     code_6f8a
-;     code_6f91
-;     code_6f98
-;     code_6fc7
-;     code_6fd5
-;     code_7002
-;     code_703b
-;     code_7053
-;     code_7069
-;     code_70d2
-;     code_70da
-;     code_70e7
-;     code_70fe
-;     code_7108
-;     code_710f
-;     code_7116
-;     code_711d
-;     code_713a
-;     code_7150
-;     code_7156
-;     code_71a0
-;     code_71b4
-;     code_71c0
-;     code_71cc
-;     code_71d4
-;     code_71d7
-;     code_71d9
-;     code_7201
-;     code_7227
-;     code_7263
-;     code_7266
-;     code_72bc
-;     code_7337
-;     code_7342
-;     code_734d
-;     code_738a
-;     code_73a0
-;     code_73c3
-;     code_73c7
-;     code_73d9
-;     code_740d
-;     code_7429
-;     code_744c
-;     code_7464
-;     code_7467
-;     code_7470
-;     code_7477
-;     code_74b6
-;     code_74eb
-;     code_74fc
-;     code_74ff
-;     code_7516
-;     code_7529
-;     code_7551
-;     code_755b
-;     code_7565
-;     code_756b
-;     code_757c
-;     code_75a6
-;     code_761f
-;     code_7650
-;     code_7652
-;     code_7692
-;     code_769c
-;     code_76ab
-;     code_76ae
-;     code_76c0
-;     code_76c9
-;     code_76d2
-;     code_76d4
-;     code_76e0
-;     code_770b
-;     code_772e
-;     code_7757
-;     code_7764
-;     code_7771
-;     code_783e
-;     code_7845
-;     code_78ad
-;     code_78c7
-;     code_78e1
-;     code_798d
-;     code_79b7
-;     code_79bc
-;     code_7a17
-;     code_7a23
-;     code_7a2d
-;     code_7a34
-;     code_7a3b
-;     code_7a42
-;     code_7a81
-;     code_7a87
-;     code_7ac1
-;     code_7adc
-;     code_7aea
-;     code_7af8
-;     code_7b3f
-;     code_7b79
-;     code_7b88
-;     code_7b97
-;     code_7bb9
-;     code_7bc0
-;     code_7bc7
-;     code_7bce
-;     code_7bd6
-;     code_7c02
-;     code_7c11
-;     code_7c20
-;     code_7c42
-;     code_7c49
-;     code_7c50
-;     code_7c57
-;     code_7c5f
-;     code_7c6c
-;     code_7c6f
-;     code_7c82
-;     code_7cae
-;     code_7cc2
-;     code_7cfb
 ;     code_c51b
 ;     code_c529
 ;     code_c538
@@ -8600,71 +8448,11 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     code_c7e0
 ;     code_c7f0
 ;     code_c80b
-;     code_d838
-;     code_d83e
-;     code_d861
-;     data_0fea
+;     data_7f92
 ;     loop_0745
 ;     loop_076c
-;     loop_091d
-;     loop_0929
-;     loop_0e09
-;     loop_0e6d
-;     loop_0ea8
-;     loop_0eae
-;     loop_0eb9
-;     loop_0efc
-;     loop_0f3a
-;     loop_1079
-;     loop_1084
-;     loop_10ba
-;     loop_10c7
-;     loop_113e
-;     loop_1140
-;     loop_11de
-;     loop_11ec
 ;     loop_1485
-;     loop_150f
-;     loop_1546
-;     loop_154d
-;     loop_1573
-;     loop_158a
-;     loop_15a1
-;     loop_15b2
-;     loop_15c5
-;     loop_15d8
-;     loop_15e6
-;     loop_15fd
-;     loop_16b4
-;     loop_1d03
-;     loop_1dce
-;     loop_1f17
-;     loop_1f38
-;     loop_2009
-;     loop_2014
-;     loop_205f
-;     loop_206c
-;     loop_6f28
-;     loop_7007
-;     loop_7173
-;     loop_71dd
-;     loop_71f4
-;     loop_7256
-;     loop_730d
-;     loop_73a7
-;     loop_742b
-;     loop_7498
-;     loop_7667
-;     loop_77e4
-;     loop_77fe
-;     loop_7827
-;     loop_7976
-;     loop_7997
-;     loop_79aa
-;     loop_79cd
 ;     loop_c6dc
-;     loop_d81d
-;     loop_d829
 ;     return_1
 ;     return_10
 ;     return_11
@@ -8677,7 +8465,6 @@ save "Code3", dasmos_code3_start, dasmos_code3_end, &d800, &d800
 ;     return_7
 ;     return_8
 ;     return_9
-;     sub_7305
 
 ; Stats:
 ;     Total size (Code + Data) = 20187 bytes

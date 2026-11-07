@@ -644,6 +644,17 @@
       }
     },
     {
+      "addr": 29445,
+      "name": "draw_objects",
+      "title": "Draw the level's objects",
+      "description": "Plot each of objects 30 to 1 at its cell in every view that shows it, with no pixel offset.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "0",
+        "Y": "corrupted"
+      }
+    },
+    {
       "addr": 29481,
       "name": "collect_objects",
       "title": "Pick up the object in a hero's cell",
@@ -1096,6 +1107,7 @@
     },
     {
       "addr": 32658,
+      "name": "data_7f92",
       "title": "The game-font WRCHV handler, unused",
       "description": "The rest of the cassette game's wrch_handler, which prints letters and digits in the game's own font. On this side WRCHV's entry at &7F8F jumps straight to the MOS, so none of this runs and text appears in the MOS font.",
       "align": "before_label"
@@ -1207,6 +1219,7 @@
     "missile_x": 3392,
     "missile_y": 3404,
     "missile_direction": 3416,
+    "set_wrchv_low": 3427,
     "missile_sprite_base": 3428,
     "hero_key_up": 3440,
     "hero_key_down": 3444,
@@ -1771,6 +1784,11 @@
         "b"
       ],
       "description": "Direction of each missile: 1 up, 2 right, 3 down, 4 left; bit 7 set for a missile just fired; 0 for an empty slot."
+    },
+    {
+      "addr": 3427,
+      "name": "set_wrchv_low",
+      "group": "game_state"
     },
     {
       "addr": 3428,
@@ -7403,9 +7421,9 @@
       "comment_inline": "...and start a new game",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_0e00",
+      "operand": "new_game",
       "target": 3584,
-      "target_label": "code_0e00"
+      "target_label": "new_game"
     },
     {
       "addr": 1997,
@@ -8127,7 +8145,7 @@
       ],
       "image": 1,
       "labels": [
-        "loop_091d"
+        "plot_sprite_row"
       ],
       "comment_inline": "Remember where this pixel row starts...",
       "xref_summaries": [
@@ -8229,7 +8247,7 @@
       ],
       "image": 1,
       "labels": [
-        "loop_0929"
+        "plot_sprite_byte"
       ],
       "comment_inline": "Copy one sprite byte...",
       "xref_summaries": [
@@ -8321,9 +8339,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcc",
-      "operand": "code_0938",
+      "operand": "plot_sprite_next_data",
       "target": 2360,
-      "target_label": "code_0938"
+      "target_label": "plot_sprite_next_data"
     },
     {
       "addr": 2358,
@@ -8347,7 +8365,7 @@
       ],
       "image": 1,
       "labels": [
-        "code_0938"
+        "plot_sprite_next_data"
       ],
       "comment_inline": "Next sprite data byte",
       "xref_summaries": [
@@ -8375,9 +8393,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_093e",
+      "operand": "plot_sprite_count_byte",
       "target": 2366,
-      "target_label": "code_093e"
+      "target_label": "plot_sprite_count_byte"
     },
     {
       "addr": 2364,
@@ -8400,7 +8418,7 @@
       ],
       "image": 1,
       "labels": [
-        "code_093e"
+        "plot_sprite_count_byte"
       ],
       "comment_inline": "Count the bytes across",
       "xref_summaries": [
@@ -8425,9 +8443,9 @@
       "comment_inline": "Loop until the row is done",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_0929",
+      "operand": "plot_sprite_byte",
       "target": 2345,
-      "target_label": "loop_0929"
+      "target_label": "plot_sprite_byte"
     },
     {
       "addr": 2369,
@@ -8555,9 +8573,9 @@
       "comment_inline": "No: carry on",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_0961",
+      "operand": "plot_sprite_next_row",
       "target": 2401,
-      "target_label": "code_0961"
+      "target_label": "plot_sprite_next_row"
     },
     {
       "addr": 2388,
@@ -8656,7 +8674,7 @@
       ],
       "image": 1,
       "labels": [
-        "code_0961"
+        "plot_sprite_next_row"
       ],
       "comment_inline": "Recover the row count",
       "xref_summaries": [
@@ -8701,9 +8719,9 @@
       "comment_inline": "Loop until the sprite is done",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_091d",
+      "operand": "plot_sprite_row",
       "target": 2333,
-      "target_label": "loop_091d"
+      "target_label": "plot_sprite_row"
     },
     {
       "addr": 2406,
@@ -12109,7 +12127,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_0e00"
+        "new_game"
       ],
       "comment_inline": "New game: level 0...",
       "xref_summaries": [
@@ -12178,7 +12196,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_0e09"
+        "reset_each_hero"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -12228,9 +12246,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_0e09",
+      "operand": "reset_each_hero",
       "target": 3593,
-      "target_label": "loop_0e09"
+      "target_label": "reset_each_hero"
     },
     {
       "addr": 3601,
@@ -12433,9 +12451,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcs",
-      "operand": "code_0e34",
+      "operand": "two_level_digits",
       "target": 3636,
-      "target_label": "code_0e34"
+      "target_label": "two_level_digits"
     },
     {
       "addr": 3632,
@@ -12459,9 +12477,9 @@
       "comment_inline": "...(always branches)",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_0e36",
+      "operand": "store_level_units",
       "target": 3638,
-      "target_label": "code_0e36"
+      "target_label": "store_level_units"
     },
     {
       "addr": 3636,
@@ -12471,7 +12489,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_0e34"
+        "two_level_digits"
       ],
       "comment_inline": "X = 1: two digits",
       "xref_summaries": [
@@ -12496,7 +12514,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_0e36"
+        "store_level_units"
       ],
       "comment_inline": "Units digit...",
       "xref_summaries": [
@@ -12585,9 +12603,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_0e52",
+      "operand": "end_level_filename",
       "target": 3666,
-      "target_label": "code_0e52"
+      "target_label": "end_level_filename"
     },
     {
       "addr": 3653,
@@ -12689,7 +12707,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_0e52"
+        "end_level_filename"
       ],
       "comment_inline": "Terminate the filename with a carriage return",
       "xref_summaries": [
@@ -12842,7 +12860,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_0e6d"
+        "check_hero_dead"
       ],
       "comment_inline": "Dead?",
       "xref_summaries": [
@@ -12882,9 +12900,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_0e7a",
+      "operand": "next_hero_dead",
       "target": 3706,
-      "target_label": "code_0e7a"
+      "target_label": "next_hero_dead"
     },
     {
       "addr": 3700,
@@ -12923,7 +12941,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_0e7a"
+        "next_hero_dead"
       ],
       "comment_inline": "Next hero",
       "xref_summaries": [
@@ -12960,9 +12978,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_0e6d",
+      "operand": "check_hero_dead",
       "target": 3693,
-      "target_label": "loop_0e6d"
+      "target_label": "check_hero_dead"
     },
     {
       "addr": 3711,
@@ -13208,7 +13226,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_0ea8"
+        "restore_message_spaces"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -13245,9 +13263,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_0ea8",
+      "operand": "restore_message_spaces",
       "target": 3752,
-      "target_label": "loop_0ea8"
+      "target_label": "restore_message_spaces"
     },
     {
       "addr": 3758,
@@ -13258,7 +13276,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_0eae"
+        "print_game_over"
       ],
       "comment_inline": "Print game_over_message...",
       "xref_summaries": [
@@ -13323,9 +13341,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_0eae",
+      "operand": "print_game_over",
       "target": 3758,
-      "target_label": "loop_0eae"
+      "target_label": "print_game_over"
     },
     {
       "addr": 3769,
@@ -13336,7 +13354,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_0eb9"
+        "wait_vsync_game_over"
       ],
       "comment_inline": "Wait for the vertical sync counter to run out",
       "xref_summaries": [
@@ -13364,9 +13382,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_0eb9",
+      "operand": "wait_vsync_game_over",
       "target": 3769,
-      "target_label": "loop_0eb9"
+      "target_label": "wait_vsync_game_over"
     },
     {
       "addr": 3774,
@@ -13469,9 +13487,9 @@
       "comment_inline": "...then start a new game",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_0e00",
+      "operand": "new_game",
       "target": 3584,
-      "target_label": "code_0e00"
+      "target_label": "new_game"
     },
     {
       "addr": 3791,
@@ -13748,7 +13766,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_0efc"
+        "draw_panel_hero"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -14103,7 +14121,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_0f3a"
+        "draw_missile_icons"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -14234,9 +14252,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcc",
-      "operand": "loop_0f3a",
+      "operand": "draw_missile_icons",
       "target": 3898,
-      "target_label": "loop_0f3a"
+      "target_label": "draw_missile_icons"
     },
     {
       "addr": 3917,
@@ -14381,9 +14399,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_0efc",
+      "operand": "draw_panel_hero",
       "target": 3836,
-      "target_label": "loop_0efc"
+      "target_label": "draw_panel_hero"
     },
     {
       "addr": 3943,
@@ -14907,7 +14925,7 @@
       ],
       "image": 2,
       "labels": [
-        "data_0fea"
+        "game_over_you_all"
       ],
       "sub_labels": {
         "4081": [
@@ -15270,7 +15288,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_1079"
+        "check_door_x"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -15310,9 +15328,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_108a",
+      "operand": "check_door_y",
       "target": 4234,
-      "target_label": "code_108a"
+      "target_label": "check_door_y"
     },
     {
       "addr": 4224,
@@ -15336,9 +15354,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_108a",
+      "operand": "check_door_y",
       "target": 4234,
-      "target_label": "code_108a"
+      "target_label": "check_door_y"
     },
     {
       "addr": 4228,
@@ -15347,7 +15365,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_1084"
+        "next_hero_victory"
       ],
       "comment_inline": "Next hero",
       "xref_summaries": [
@@ -15384,9 +15402,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_1079",
+      "operand": "check_door_x",
       "target": 4217,
-      "target_label": "loop_1079"
+      "target_label": "check_door_x"
     },
     {
       "addr": 4233,
@@ -15419,7 +15437,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_108a"
+        "check_door_y"
       ],
       "comment_inline": "...and y 4 or 5?",
       "xref_summaries": [
@@ -15463,9 +15481,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_1097",
+      "operand": "start_victory",
       "target": 4247,
-      "target_label": "code_1097"
+      "target_label": "start_victory"
     },
     {
       "addr": 4241,
@@ -15489,9 +15507,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_1097",
+      "operand": "start_victory",
       "target": 4247,
-      "target_label": "code_1097"
+      "target_label": "start_victory"
     },
     {
       "addr": 4245,
@@ -15503,9 +15521,9 @@
       "comment_inline": "No: next hero",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_1084",
+      "operand": "next_hero_victory",
       "target": 4228,
-      "target_label": "loop_1084"
+      "target_label": "next_hero_victory"
     },
     {
       "addr": 4247,
@@ -15516,7 +15534,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_1097"
+        "start_victory"
       ],
       "comment_inline": "Yes: play the victory sequence",
       "xref_summaries": [
@@ -15721,7 +15739,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_10ba"
+        "print_victory_text"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -15785,9 +15803,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_10ba",
+      "operand": "print_victory_text",
       "target": 4282,
-      "target_label": "loop_10ba"
+      "target_label": "print_victory_text"
     },
     {
       "addr": 4293,
@@ -15810,7 +15828,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_10c7"
+        "print_ending_message"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -15874,9 +15892,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_10c7",
+      "operand": "print_ending_message",
       "target": 4295,
-      "target_label": "loop_10c7"
+      "target_label": "print_ending_message"
     },
     {
       "addr": 4306,
@@ -16007,7 +16025,14 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "tune_ptr",
+      "operand": "&00",
+      "expr": {
+        "text": "&00",
+        "tree": {
+          "int": 0,
+          "radix": "hex"
+        }
+      },
       "target": 0,
       "target_label": "tune_ptr"
     },
@@ -16245,7 +16270,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_110a"
+        "raise_victory_pitch"
       ],
       "comment_inline": "Raise the pitch",
       "xref_summaries": [
@@ -16312,9 +16337,9 @@
       "comment_inline": "No carry: carry on",
       "type": "code",
       "mnemonic": "bcc",
-      "operand": "code_111c",
+      "operand": "shorten_victory_delay",
       "target": 4380,
-      "target_label": "code_111c"
+      "target_label": "shorten_victory_delay"
     },
     {
       "addr": 4371,
@@ -16354,9 +16379,9 @@
       "comment_inline": "More to come",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_111c",
+      "operand": "shorten_victory_delay",
       "target": 4380,
-      "target_label": "code_111c"
+      "target_label": "shorten_victory_delay"
     },
     {
       "addr": 4377,
@@ -16369,9 +16394,9 @@
       "comment_inline": "Done: finish",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_11d3",
+      "operand": "erase_victory_ring",
       "target": 4563,
-      "target_label": "code_11d3"
+      "target_label": "erase_victory_ring"
     },
     {
       "addr": 4380,
@@ -16381,7 +16406,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_111c"
+        "shorten_victory_delay"
       ],
       "comment_inline": "Shorten the delay...",
       "xref_summaries": [
@@ -16413,9 +16438,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_1124",
+      "operand": "sound_victory_bell",
       "target": 4388,
-      "target_label": "code_1124"
+      "target_label": "sound_victory_bell"
     },
     {
       "addr": 4384,
@@ -16451,7 +16476,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_1124"
+        "sound_victory_bell"
       ],
       "comment_inline": "OSBYTE &D5: the bell's pitch...",
       "xref_summaries": [
@@ -16580,9 +16605,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_113c",
+      "operand": "victory_delay_loop",
       "target": 4412,
-      "target_label": "code_113c"
+      "target_label": "victory_delay_loop"
     },
     {
       "addr": 4409,
@@ -16607,7 +16632,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_113c"
+        "victory_delay_loop"
       ],
       "comment_inline": "Wait for the delay",
       "xref_summaries": [
@@ -16633,7 +16658,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_113e"
+        "victory_delay_outer"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -16656,7 +16681,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_1140"
+        "victory_delay_inner"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -16681,9 +16706,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_1140",
+      "operand": "victory_delay_inner",
       "target": 4416,
-      "target_label": "loop_1140"
+      "target_label": "victory_delay_inner"
     },
     {
       "addr": 4419,
@@ -16705,9 +16730,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_113e",
+      "operand": "victory_delay_outer",
       "target": 4414,
-      "target_label": "loop_113e"
+      "target_label": "victory_delay_outer"
     },
     {
       "addr": 4422,
@@ -16720,9 +16745,9 @@
       "comment_inline": "Next frame",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_110a",
+      "operand": "raise_victory_pitch",
       "target": 4362,
-      "target_label": "code_110a"
+      "target_label": "raise_victory_pitch"
     },
     {
       "addr": 4425,
@@ -17433,9 +17458,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_11bb",
+      "operand": "store_victory_sprite",
       "target": 4539,
-      "target_label": "code_11bb"
+      "target_label": "store_victory_sprite"
     },
     {
       "addr": 4530,
@@ -17481,9 +17506,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_11bb",
+      "operand": "store_victory_sprite",
       "target": 4539,
-      "target_label": "code_11bb"
+      "target_label": "store_victory_sprite"
     },
     {
       "addr": 4537,
@@ -17505,7 +17530,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_11bb"
+        "store_victory_sprite"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -17700,7 +17725,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_11d3"
+        "erase_victory_ring"
       ],
       "comment_inline": "Erase the ring",
       "xref_summaries": [
@@ -17778,7 +17803,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_11de"
+        "clear_chalice_sprite"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -17815,9 +17840,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_11de",
+      "operand": "clear_chalice_sprite",
       "target": 4574,
-      "target_label": "loop_11de"
+      "target_label": "clear_chalice_sprite"
     },
     {
       "addr": 4580,
@@ -17870,7 +17895,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_11ec"
+        "wait_vsync_chalice"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -17898,9 +17923,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_11ec",
+      "operand": "wait_vsync_chalice",
       "target": 4588,
-      "target_label": "loop_11ec"
+      "target_label": "wait_vsync_chalice"
     },
     {
       "addr": 4593,
@@ -21024,7 +21049,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_150f"
+        "copy_workspace_template"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -21077,9 +21102,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_150f",
+      "operand": "copy_workspace_template",
       "target": 5391,
-      "target_label": "loop_150f"
+      "target_label": "copy_workspace_template"
     },
     {
       "addr": 5400,
@@ -21348,7 +21373,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_1546"
+        "draw_view_frame"
       ],
       "comment_inline": "VDU 25...",
       "xref_summaries": [
@@ -21399,7 +21424,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_154d"
+        "send_frame_vdu"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -21464,9 +21489,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_154d",
+      "operand": "send_frame_vdu",
       "target": 5453,
-      "target_label": "loop_154d"
+      "target_label": "send_frame_vdu"
     },
     {
       "addr": 5463,
@@ -21550,9 +21575,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_1546",
+      "operand": "draw_view_frame",
       "target": 5446,
-      "target_label": "loop_1546"
+      "target_label": "draw_view_frame"
     },
     {
       "addr": 5475,
@@ -21665,7 +21690,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_1573"
+        "unpack_objects"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -21778,9 +21803,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_1573",
+      "operand": "unpack_objects",
       "target": 5491,
-      "target_label": "loop_1573"
+      "target_label": "unpack_objects"
     },
     {
       "addr": 5512,
@@ -21803,7 +21828,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_158a"
+        "unpack_doors"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -21916,9 +21941,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_158a",
+      "operand": "unpack_doors",
       "target": 5514,
-      "target_label": "loop_158a"
+      "target_label": "unpack_doors"
     },
     {
       "addr": 5535,
@@ -21941,7 +21966,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_15a1"
+        "unpack_keys"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -22024,9 +22049,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_15a1",
+      "operand": "unpack_keys",
       "target": 5537,
-      "target_label": "loop_15a1"
+      "target_label": "unpack_keys"
     },
     {
       "addr": 5552,
@@ -22049,7 +22074,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_15b2"
+        "unpack_trapdoors"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -22144,9 +22169,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_15b2",
+      "operand": "unpack_trapdoors",
       "target": 5554,
-      "target_label": "loop_15b2"
+      "target_label": "unpack_trapdoors"
     },
     {
       "addr": 5571,
@@ -22169,7 +22194,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_15c5"
+        "unpack_walls"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -22264,9 +22289,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_15c5",
+      "operand": "unpack_walls",
       "target": 5573,
-      "target_label": "loop_15c5"
+      "target_label": "unpack_walls"
     },
     {
       "addr": 5590,
@@ -22289,7 +22314,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_15d8"
+        "unpack_wall_sprite"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -22354,9 +22379,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_15d8",
+      "operand": "unpack_wall_sprite",
       "target": 5592,
-      "target_label": "loop_15d8"
+      "target_label": "unpack_wall_sprite"
     },
     {
       "addr": 5603,
@@ -22400,7 +22425,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_15e6"
+        "reset_each_monster"
       ],
       "comment_inline": "...dying, so that they emerge from the trapdoors...",
       "xref_summaries": [
@@ -22508,9 +22533,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_15e6",
+      "operand": "reset_each_monster",
       "target": 5606,
-      "target_label": "loop_15e6"
+      "target_label": "reset_each_monster"
     },
     {
       "addr": 5625,
@@ -22545,7 +22570,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_15fd"
+        "clear_hero_carrying"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -22655,9 +22680,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_15fd",
+      "operand": "clear_hero_carrying",
       "target": 5629,
-      "target_label": "loop_15fd"
+      "target_label": "clear_hero_carrying"
     },
     {
       "addr": 5649,
@@ -23415,7 +23440,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_16b4"
+        "find_queue_end"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -23443,9 +23468,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_16bf",
+      "operand": "next_queue_entry",
       "target": 5823,
-      "target_label": "code_16bf"
+      "target_label": "next_queue_entry"
     },
     {
       "addr": 5817,
@@ -23491,7 +23516,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_16bf"
+        "next_queue_entry"
       ],
       "comment_inline": "Next entry",
       "xref_summaries": [
@@ -23516,9 +23541,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_16b4",
+      "operand": "find_queue_end",
       "target": 5812,
-      "target_label": "loop_16b4"
+      "target_label": "find_queue_end"
     },
     {
       "addr": 5826,
@@ -27350,7 +27375,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_1cc5"
+        "check_doors"
       ],
       "comment_inline": "...look for a door at the cell the hero is moving into",
       "xref_summaries": [
@@ -27469,7 +27494,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_1cd8"
+        "check_door"
       ],
       "comment_inline": "This door's x?",
       "xref_summaries": [
@@ -27512,9 +27537,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_1ce3",
+      "operand": "check_door_cell_y",
       "target": 7395,
-      "target_label": "code_1ce3"
+      "target_label": "check_door_cell_y"
     },
     {
       "addr": 7392,
@@ -27527,9 +27552,9 @@
       "comment_inline": "No: next door",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_1db2",
+      "operand": "next_door",
       "target": 7602,
-      "target_label": "code_1db2"
+      "target_label": "next_door"
     },
     {
       "addr": 7395,
@@ -27540,7 +27565,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_1ce3"
+        "check_door_cell_y"
       ],
       "comment_inline": "...and y?",
       "xref_summaries": [
@@ -27583,9 +27608,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_1cee",
+      "operand": "check_door_key",
       "target": 7406,
-      "target_label": "code_1cee"
+      "target_label": "check_door_key"
     },
     {
       "addr": 7403,
@@ -27598,9 +27623,9 @@
       "comment_inline": "No: next door",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_1db2",
+      "operand": "next_door",
       "target": 7602,
-      "target_label": "code_1db2"
+      "target_label": "next_door"
     },
     {
       "addr": 7406,
@@ -27609,7 +27634,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_1cee"
+        "check_door_key"
       ],
       "comment_inline": "Does the hero carry this door's key?",
       "xref_summaries": [
@@ -27679,9 +27704,9 @@
       "comment_inline": "Yes",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_1cfa",
+      "operand": "open_door",
       "target": 7418,
-      "target_label": "code_1cfa"
+      "target_label": "open_door"
     },
     {
       "addr": 7415,
@@ -27694,9 +27719,9 @@
       "comment_inline": "No: next door",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_1db2",
+      "operand": "next_door",
       "target": 7602,
-      "target_label": "code_1db2"
+      "target_label": "next_door"
     },
     {
       "addr": 7418,
@@ -27705,7 +27730,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_1cfa"
+        "open_door"
       ],
       "comment_inline": "Open the door: 7 points...",
       "xref_summaries": [
@@ -27784,7 +27809,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_1d03"
+        "erase_door_loop"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -27864,9 +27889,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_1d03",
+      "operand": "erase_door_loop",
       "target": 7427,
-      "target_label": "loop_1d03"
+      "target_label": "erase_door_loop"
     },
     {
       "addr": 7437,
@@ -28881,9 +28906,9 @@
       "comment_inline": "Next hero",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_1dba",
+      "operand": "next_hero_doors",
       "target": 7610,
-      "target_label": "code_1dba"
+      "target_label": "next_hero_doors"
     },
     {
       "addr": 7602,
@@ -28892,7 +28917,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_1db2"
+        "next_door"
       ],
       "comment_inline": "Next door",
       "xref_summaries": [
@@ -28925,9 +28950,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_1db8",
+      "operand": "doors_done",
       "target": 7608,
-      "target_label": "code_1db8"
+      "target_label": "doors_done"
     },
     {
       "addr": 7605,
@@ -28940,9 +28965,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_1cd8",
+      "operand": "check_door",
       "target": 7384,
-      "target_label": "code_1cd8"
+      "target_label": "check_door"
     },
     {
       "addr": 7608,
@@ -28951,7 +28976,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_1db8"
+        "doors_done"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -28983,7 +29008,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_1dba"
+        "next_hero_doors"
       ],
       "comment_inline": "Next hero",
       "xref_summaries": [
@@ -29035,9 +29060,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_1cc5",
+      "operand": "check_doors",
       "target": 7365,
-      "target_label": "code_1cc5"
+      "target_label": "check_doors"
     },
     {
       "addr": 7618,
@@ -29138,7 +29163,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_1dce"
+        "draw_each_key"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -29276,9 +29301,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_1dce",
+      "operand": "draw_each_key",
       "target": 7630,
-      "target_label": "loop_1dce"
+      "target_label": "draw_each_key"
     },
     {
       "addr": 7652,
@@ -29329,9 +29354,9 @@
       "comment_inline": "Yes",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_1e28",
+      "operand": "check_key_swap",
       "target": 7720,
-      "target_label": "code_1e28"
+      "target_label": "check_key_swap"
     },
     {
       "addr": 7659,
@@ -29358,9 +29383,9 @@
       "comment_inline": "Yes",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_1df3",
+      "operand": "check_death_finished",
       "target": 7667,
-      "target_label": "code_1df3"
+      "target_label": "check_death_finished"
     },
     {
       "addr": 7664,
@@ -29373,9 +29398,9 @@
       "comment_inline": "No: next hero",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_1ec6",
+      "operand": "next_hero_keys",
       "target": 7878,
-      "target_label": "code_1ec6"
+      "target_label": "next_hero_keys"
     },
     {
       "addr": 7667,
@@ -29386,7 +29411,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_1df3"
+        "check_death_finished"
       ],
       "comment_inline": "Death animation finished?",
       "xref_summaries": [
@@ -29426,9 +29451,9 @@
       "comment_inline": "Not yet",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_1e28",
+      "operand": "check_key_swap",
       "target": 7720,
-      "target_label": "code_1e28"
+      "target_label": "check_key_swap"
     },
     {
       "addr": 7674,
@@ -29701,9 +29726,9 @@
       "comment_inline": "Next hero",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_1ec6",
+      "operand": "next_hero_keys",
       "target": 7878,
-      "target_label": "code_1ec6"
+      "target_label": "next_hero_keys"
     },
     {
       "addr": 7720,
@@ -29714,7 +29739,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_1e28"
+        "check_key_swap"
       ],
       "comment_inline": "Just swapped keys?",
       "xref_summaries": [
@@ -29746,9 +29771,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_1e35",
+      "operand": "check_key_cell",
       "target": 7733,
-      "target_label": "code_1e35"
+      "target_label": "check_key_cell"
     },
     {
       "addr": 7725,
@@ -29788,9 +29813,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_1ec6",
+      "operand": "next_hero_keys",
       "target": 7878,
-      "target_label": "code_1ec6"
+      "target_label": "next_hero_keys"
     },
     {
       "addr": 7733,
@@ -29801,7 +29826,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_1e35"
+        "check_key_cell"
       ],
       "comment_inline": "Is there a key at the hero's cell?",
       "xref_summaries": [
@@ -29905,7 +29930,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_1e45"
+        "check_key"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -29948,9 +29973,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_1ebe",
+      "operand": "next_key",
       "target": 7870,
-      "target_label": "code_1ebe"
+      "target_label": "next_key"
     },
     {
       "addr": 7757,
@@ -29992,9 +30017,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_1ebe",
+      "operand": "next_key",
       "target": 7870,
-      "target_label": "code_1ebe"
+      "target_label": "next_key"
     },
     {
       "addr": 7765,
@@ -30725,9 +30750,9 @@
       "comment_inline": "Next hero",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_1ec6",
+      "operand": "next_hero_keys",
       "target": 7878,
-      "target_label": "code_1ec6"
+      "target_label": "next_hero_keys"
     },
     {
       "addr": 7870,
@@ -30736,7 +30761,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_1ebe"
+        "next_key"
       ],
       "comment_inline": "Next key",
       "xref_summaries": [
@@ -30765,9 +30790,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_1ec4",
+      "operand": "keys_done",
       "target": 7876,
-      "target_label": "code_1ec4"
+      "target_label": "keys_done"
     },
     {
       "addr": 7873,
@@ -30780,9 +30805,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_1e45",
+      "operand": "check_key",
       "target": 7749,
-      "target_label": "code_1e45"
+      "target_label": "check_key"
     },
     {
       "addr": 7876,
@@ -30791,7 +30816,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_1ec4"
+        "keys_done"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -30823,7 +30848,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_1ec6"
+        "next_hero_keys"
       ],
       "comment_inline": "Next hero",
       "xref_summaries": [
@@ -30914,9 +30939,9 @@
       ],
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "sub_7305",
+      "operand": "draw_objects",
       "target": 29445,
-      "target_label": "sub_7305"
+      "target_label": "draw_objects"
     },
     {
       "addr": 7889,
@@ -31211,9 +31236,9 @@
       "comment_inline": "Yes: carry on",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_1f36",
+      "operand": "check_exit",
       "target": 7990,
-      "target_label": "code_1f36"
+      "target_label": "check_exit"
     },
     {
       "addr": 7957,
@@ -31236,7 +31261,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_1f17"
+        "count_heroes_in_play"
       ],
       "comment_inline": "In play?",
       "xref_summaries": [
@@ -31263,9 +31288,9 @@
       "comment_inline": "Yes: carry on",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_1f36",
+      "operand": "check_exit",
       "target": 7990,
-      "target_label": "code_1f36"
+      "target_label": "check_exit"
     },
     {
       "addr": 7964,
@@ -31303,9 +31328,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_1f2a",
+      "operand": "next_hero_in_play",
       "target": 7978,
-      "target_label": "code_1f2a"
+      "target_label": "next_hero_in_play"
     },
     {
       "addr": 7971,
@@ -31343,9 +31368,9 @@
       "comment_inline": "Yes: carry on",
       "type": "code",
       "mnemonic": "bcc",
-      "operand": "code_1f36",
+      "operand": "check_exit",
       "target": 7990,
-      "target_label": "code_1f36"
+      "target_label": "check_exit"
     },
     {
       "addr": 7978,
@@ -31354,7 +31379,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_1f2a"
+        "next_hero_in_play"
       ],
       "comment_inline": "Next hero",
       "xref_summaries": [
@@ -31379,9 +31404,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_1f17",
+      "operand": "count_heroes_in_play",
       "target": 7959,
-      "target_label": "loop_1f17"
+      "target_label": "count_heroes_in_play"
     },
     {
       "addr": 7981,
@@ -31457,7 +31482,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_1f36"
+        "check_exit"
       ],
       "comment_inline": "Is a hero on the exit?",
       "xref_summaries": [
@@ -31490,7 +31515,7 @@
       ],
       "image": 2,
       "labels": [
-        "loop_1f38"
+        "check_hero_on_exit"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -31533,9 +31558,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_1f91",
+      "operand": "next_hero_exit",
       "target": 8081,
-      "target_label": "code_1f91"
+      "target_label": "next_hero_exit"
     },
     {
       "addr": 8000,
@@ -31577,9 +31602,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_1f91",
+      "operand": "next_hero_exit",
       "target": 8081,
-      "target_label": "code_1f91"
+      "target_label": "next_hero_exit"
     },
     {
       "addr": 8008,
@@ -31986,9 +32011,9 @@
       "comment_inline": "Reached by the RTS at the end of the level",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_1f96",
+      "operand": "check_exit_busy",
       "target": 8086,
-      "target_label": "code_1f96"
+      "target_label": "check_exit_busy"
     },
     {
       "addr": 8081,
@@ -31997,7 +32022,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_1f91"
+        "next_hero_exit"
       ],
       "comment_inline": "Next hero",
       "xref_summaries": [
@@ -32038,9 +32063,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_1f38",
+      "operand": "check_hero_on_exit",
       "target": 7992,
-      "target_label": "loop_1f38"
+      "target_label": "check_hero_on_exit"
     },
     {
       "addr": 8086,
@@ -32051,7 +32076,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_1f96"
+        "check_exit_busy"
       ],
       "comment_inline": "A hero going down the exit?",
       "xref_summaries": [
@@ -32079,9 +32104,9 @@
       "comment_inline": "Yes",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_1f9e",
+      "operand": "redraw_exit",
       "target": 8094,
-      "target_label": "code_1f9e"
+      "target_label": "redraw_exit"
     },
     {
       "addr": 8091,
@@ -32107,7 +32132,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_1f9e"
+        "redraw_exit"
       ],
       "comment_inline": "Redraw the exit",
       "xref_summaries": [
@@ -32355,9 +32380,9 @@
       "comment_inline": "Yes: shrink the hero",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_1ff2",
+      "operand": "next_turn",
       "target": 8178,
-      "target_label": "code_1ff2"
+      "target_label": "next_turn"
     },
     {
       "addr": 8138,
@@ -32584,7 +32609,7 @@
       ],
       "image": 2,
       "labels": [
-        "code_1ff2"
+        "next_turn"
       ],
       "comment_inline": "Start the next turn",
       "xref_summaries": [
@@ -32640,9 +32665,9 @@
       "comment_inline": "Yes: the hero has gone",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_2026",
+      "operand": "restore_exit",
       "target": 8230,
-      "target_label": "code_2026"
+      "target_label": "restore_exit"
     },
     {
       "addr": 8188,
@@ -32737,7 +32762,7 @@
       ],
       "image": 3,
       "labels": [
-        "loop_2009"
+        "shrink_hero_width"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -32790,9 +32815,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_2009",
+      "operand": "shrink_hero_width",
       "target": 8201,
-      "target_label": "loop_2009"
+      "target_label": "shrink_hero_width"
     },
     {
       "addr": 8210,
@@ -32821,7 +32846,7 @@
       ],
       "image": 3,
       "labels": [
-        "loop_2014"
+        "shrink_hero_height"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -32913,9 +32938,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_2014",
+      "operand": "shrink_hero_height",
       "target": 8212,
-      "target_label": "loop_2014"
+      "target_label": "shrink_hero_height"
     },
     {
       "addr": 8227,
@@ -32941,7 +32966,7 @@
       ],
       "image": 3,
       "labels": [
-        "code_2026"
+        "restore_exit"
       ],
       "comment_inline": "Put the exit back...",
       "xref_summaries": [
@@ -33140,9 +33165,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bmi",
-      "operand": "code_2076",
+      "operand": "start_hero_animation",
       "target": 8310,
-      "target_label": "code_2076"
+      "target_label": "start_hero_animation"
     },
     {
       "addr": 8266,
@@ -33170,9 +33195,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_2076",
+      "operand": "start_hero_animation",
       "target": 8310,
-      "target_label": "code_2076"
+      "target_label": "start_hero_animation"
     },
     {
       "addr": 8272,
@@ -33295,7 +33320,7 @@
       ],
       "image": 3,
       "labels": [
-        "loop_205f"
+        "restore_sprite_widths"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -33348,9 +33373,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_205f",
+      "operand": "restore_sprite_widths",
       "target": 8287,
-      "target_label": "loop_205f"
+      "target_label": "restore_sprite_widths"
     },
     {
       "addr": 8296,
@@ -33393,7 +33418,7 @@
       ],
       "image": 3,
       "labels": [
-        "loop_206c"
+        "restore_sprite_heights"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -33446,9 +33471,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_206c",
+      "operand": "restore_sprite_heights",
       "target": 8300,
-      "target_label": "loop_206c"
+      "target_label": "restore_sprite_heights"
     },
     {
       "addr": 8309,
@@ -33468,7 +33493,7 @@
       ],
       "image": 3,
       "labels": [
-        "code_2076"
+        "start_hero_animation"
       ],
       "comment_inline": "Start the animation for this hero...",
       "xref_summaries": [
@@ -34078,9 +34103,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_20db",
+      "operand": "try_cell_right",
       "target": 8411,
-      "target_label": "code_20db"
+      "target_label": "try_cell_right"
     },
     {
       "addr": 8410,
@@ -34101,7 +34126,7 @@
       ],
       "image": 3,
       "labels": [
-        "code_20db"
+        "try_cell_right"
       ],
       "comment_inline": "The cell to the right",
       "xref_summaries": [
@@ -34171,9 +34196,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_20e9",
+      "operand": "try_cell_below",
       "target": 8425,
-      "target_label": "code_20e9"
+      "target_label": "try_cell_below"
     },
     {
       "addr": 8424,
@@ -34194,7 +34219,7 @@
       ],
       "image": 3,
       "labels": [
-        "code_20e9"
+        "try_cell_below"
       ],
       "comment_inline": "The cell below",
       "xref_summaries": [
@@ -34264,9 +34289,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_20f7",
+      "operand": "try_cell_left",
       "target": 8439,
-      "target_label": "code_20f7"
+      "target_label": "try_cell_left"
     },
     {
       "addr": 8438,
@@ -34287,7 +34312,7 @@
       ],
       "image": 3,
       "labels": [
-        "code_20f7"
+        "try_cell_left"
       ],
       "comment_inline": "Otherwise the cell to the left",
       "xref_summaries": [
@@ -43510,7 +43535,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_6e82"
+        "move_hero"
       ],
       "comment_inline": "In play?",
       "xref_summaries": [
@@ -43538,9 +43563,9 @@
       "comment_inline": "Yes",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_6e97",
+      "operand": "remember_hero_position",
       "target": 28311,
-      "target_label": "code_6e97"
+      "target_label": "remember_hero_position"
     },
     {
       "addr": 28295,
@@ -43579,9 +43604,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_6e91",
+      "operand": "animate_absent",
       "target": 28305,
-      "target_label": "code_6e91"
+      "target_label": "animate_absent"
     },
     {
       "addr": 28302,
@@ -43607,7 +43632,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_6e91"
+        "animate_absent"
       ],
       "comment_inline": "No: dying or returning, so animate them",
       "xref_summaries": [
@@ -43649,7 +43674,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_6e97"
+        "remember_hero_position"
       ],
       "comment_inline": "Remember the hero's position and offsets before moving",
       "xref_summaries": [
@@ -43797,9 +43822,9 @@
       "comment_inline": "No: read the keys",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_6eba",
+      "operand": "check_magic_key",
       "target": 28346,
-      "target_label": "code_6eba"
+      "target_label": "check_magic_key"
     },
     {
       "addr": 28340,
@@ -43839,7 +43864,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_6eba"
+        "check_magic_key"
       ],
       "comment_inline": "Heroes 0 and 1 check their magic key first",
       "xref_summaries": [
@@ -43940,9 +43965,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_6ed4",
+      "operand": "check_key_down",
       "target": 28372,
-      "target_label": "code_6ed4"
+      "target_label": "check_key_down"
     },
     {
       "addr": 28361,
@@ -44010,7 +44035,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_6ed4"
+        "check_key_down"
       ],
       "comment_inline": "Down key?",
       "xref_summaries": [
@@ -44053,9 +44078,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_6ee7",
+      "operand": "check_key_right",
       "target": 28391,
-      "target_label": "code_6ee7"
+      "target_label": "check_key_right"
     },
     {
       "addr": 28380,
@@ -44123,7 +44148,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_6ee7"
+        "check_key_right"
       ],
       "comment_inline": "Right key?",
       "xref_summaries": [
@@ -44166,9 +44191,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_6efa",
+      "operand": "check_key_left",
       "target": 28410,
-      "target_label": "code_6efa"
+      "target_label": "check_key_left"
     },
     {
       "addr": 28399,
@@ -44236,7 +44261,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_6efa"
+        "check_key_left"
       ],
       "comment_inline": "Left key?",
       "xref_summaries": [
@@ -44279,9 +44304,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_6f0d",
+      "operand": "check_key_fire",
       "target": 28429,
-      "target_label": "code_6f0d"
+      "target_label": "check_key_fire"
     },
     {
       "addr": 28418,
@@ -44349,7 +44374,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_6f0d"
+        "check_key_fire"
       ],
       "comment_inline": "Fire key?",
       "xref_summaries": [
@@ -44532,7 +44557,7 @@
       ],
       "image": 4,
       "labels": [
-        "loop_6f28"
+        "find_missile_slot"
       ],
       "comment_inline": "Slot free?",
       "xref_summaries": [
@@ -44560,9 +44585,9 @@
       "comment_inline": "No: try the next",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_6f70",
+      "operand": "next_missile_slot",
       "target": 28528,
-      "target_label": "code_6f70"
+      "target_label": "next_missile_slot"
     },
     {
       "addr": 28461,
@@ -44947,7 +44972,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_6f70"
+        "next_missile_slot"
       ],
       "comment_inline": "Next slot",
       "xref_summaries": [
@@ -44987,9 +45012,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_6f28",
+      "operand": "find_missile_slot",
       "target": 28456,
-      "target_label": "loop_6f28"
+      "target_label": "find_missile_slot"
     },
     {
       "addr": 28534,
@@ -45067,9 +45092,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_6f83",
+      "operand": "step_right",
       "target": 28547,
-      "target_label": "code_6f83"
+      "target_label": "step_right"
     },
     {
       "addr": 28544,
@@ -45094,7 +45119,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_6f83"
+        "step_right"
       ],
       "comment_inline": "...right...",
       "xref_summaries": [
@@ -45120,9 +45145,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_6f8a",
+      "operand": "step_down",
       "target": 28554,
-      "target_label": "code_6f8a"
+      "target_label": "step_down"
     },
     {
       "addr": 28551,
@@ -45147,7 +45172,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_6f8a"
+        "step_down"
       ],
       "comment_inline": "...down...",
       "xref_summaries": [
@@ -45173,9 +45198,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_6f91",
+      "operand": "step_left",
       "target": 28561,
-      "target_label": "code_6f91"
+      "target_label": "step_left"
     },
     {
       "addr": 28558,
@@ -45200,7 +45225,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_6f91"
+        "step_left"
       ],
       "comment_inline": "...left",
       "xref_summaries": [
@@ -45226,9 +45251,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_6f98",
+      "operand": "note_new_cell",
       "target": 28568,
-      "target_label": "code_6f98"
+      "target_label": "note_new_cell"
     },
     {
       "addr": 28565,
@@ -45254,7 +45279,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_6f98"
+        "note_new_cell"
       ],
       "comment_inline": "Note the new cell for the door and key checks",
       "xref_summaries": [
@@ -45454,9 +45479,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_6fd5",
+      "operand": "check_monster_in_cell",
       "target": 28629,
-      "target_label": "code_6fd5"
+      "target_label": "check_monster_in_cell"
     },
     {
       "addr": 28603,
@@ -45526,7 +45551,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_6fc7"
+        "cancel_hero_step"
       ],
       "comment_inline": "Cancel the step",
       "xref_summaries": [
@@ -45610,7 +45635,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_6fd5"
+        "check_monster_in_cell"
       ],
       "comment_inline": "Is there a monster in the new cell?",
       "xref_summaries": [
@@ -45718,9 +45743,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_7002",
+      "operand": "check_hero_in_cell",
       "target": 28674,
-      "target_label": "code_7002"
+      "target_label": "check_hero_in_cell"
     },
     {
       "addr": 28645,
@@ -45878,7 +45903,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7002"
+        "check_hero_in_cell"
       ],
       "comment_inline": "Is another hero in play in the new cell?",
       "xref_summaries": [
@@ -45917,7 +45942,7 @@
       ],
       "image": 4,
       "labels": [
-        "loop_7007"
+        "check_other_hero"
       ],
       "comment_inline": "Not this hero",
       "xref_summaries": [
@@ -45945,9 +45970,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_703b",
+      "operand": "next_other_hero",
       "target": 28731,
-      "target_label": "code_703b"
+      "target_label": "next_other_hero"
     },
     {
       "addr": 28684,
@@ -45989,9 +46014,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_703b",
+      "operand": "next_other_hero",
       "target": 28731,
-      "target_label": "code_703b"
+      "target_label": "next_other_hero"
     },
     {
       "addr": 28692,
@@ -46033,9 +46058,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_703b",
+      "operand": "next_other_hero",
       "target": 28731,
-      "target_label": "code_703b"
+      "target_label": "next_other_hero"
     },
     {
       "addr": 28700,
@@ -46062,9 +46087,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_703b",
+      "operand": "next_other_hero",
       "target": 28731,
-      "target_label": "code_703b"
+      "target_label": "next_other_hero"
     },
     {
       "addr": 28705,
@@ -46205,7 +46230,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_703b"
+        "next_other_hero"
       ],
       "comment_inline": "Next hero",
       "xref_summaries": [
@@ -46254,9 +46279,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_7007",
+      "operand": "check_other_hero",
       "target": 28679,
-      "target_label": "loop_7007"
+      "target_label": "check_other_hero"
     },
     {
       "addr": 28736,
@@ -46327,9 +46352,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_7053",
+      "operand": "check_boots",
       "target": 28755,
-      "target_label": "code_7053"
+      "target_label": "check_boots"
     },
     {
       "addr": 28746,
@@ -46387,9 +46412,9 @@
       "comment_inline": "...and cancel the step",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_6fc7",
+      "operand": "cancel_hero_step",
       "target": 28615,
-      "target_label": "code_6fc7"
+      "target_label": "cancel_hero_step"
     },
     {
       "addr": 28755,
@@ -46398,7 +46423,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7053"
+        "check_boots"
       ],
       "comment_inline": "Same room. Wearing Boots of Speed?",
       "xref_summaries": [
@@ -46458,9 +46483,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_7069",
+      "operand": "stay_in_old_cell",
       "target": 28777,
-      "target_label": "code_7069"
+      "target_label": "stay_in_old_cell"
     },
     {
       "addr": 28763,
@@ -46543,7 +46568,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7069"
+        "stay_in_old_cell"
       ],
       "comment_inline": "No boots: stay in the old cell for now; continue_hero_step moves on at the end of the step",
       "xref_summaries": [
@@ -47182,9 +47207,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_6e82",
+      "operand": "move_hero",
       "target": 28290,
-      "target_label": "code_6e82"
+      "target_label": "move_hero"
     },
     {
       "addr": 28873,
@@ -47281,7 +47306,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_70d2"
+        "move_missile"
       ],
       "comment_inline": "In flight?",
       "xref_summaries": [
@@ -47309,9 +47334,9 @@
       "comment_inline": "Yes",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_70da",
+      "operand": "check_just_fired",
       "target": 28890,
-      "target_label": "code_70da"
+      "target_label": "check_just_fired"
     },
     {
       "addr": 28887,
@@ -47336,7 +47361,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_70da"
+        "check_just_fired"
       ],
       "comment_inline": "Just fired (bit 7 set)?",
       "xref_summaries": [
@@ -47350,9 +47375,9 @@
       ],
       "type": "code",
       "mnemonic": "bpl",
-      "operand": "code_70e7",
+      "operand": "erase_missile",
       "target": 28903,
-      "target_label": "code_70e7"
+      "target_label": "erase_missile"
     },
     {
       "addr": 28892,
@@ -47407,9 +47432,9 @@
       "comment_inline": "...and move it without erasing (it is on the hero)",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_70fe",
+      "operand": "missile_up",
       "target": 28926,
-      "target_label": "code_70fe"
+      "target_label": "missile_up"
     },
     {
       "addr": 28903,
@@ -47419,7 +47444,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_70e7"
+        "erase_missile"
       ],
       "comment_inline": "Erase the missile at its old cell",
       "xref_summaries": [
@@ -47573,7 +47598,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_70fe"
+        "missile_up"
       ],
       "comment_inline": "Move it one cell: up...",
       "xref_summaries": [
@@ -47613,9 +47638,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7108",
+      "operand": "missile_right",
       "target": 28936,
-      "target_label": "code_7108"
+      "target_label": "missile_right"
     },
     {
       "addr": 28933,
@@ -47640,7 +47665,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7108"
+        "missile_right"
       ],
       "comment_inline": "...right...",
       "xref_summaries": [
@@ -47666,9 +47691,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_710f",
+      "operand": "missile_down",
       "target": 28943,
-      "target_label": "code_710f"
+      "target_label": "missile_down"
     },
     {
       "addr": 28940,
@@ -47693,7 +47718,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_710f"
+        "missile_down"
       ],
       "comment_inline": "...down...",
       "xref_summaries": [
@@ -47719,9 +47744,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7116",
+      "operand": "missile_left",
       "target": 28950,
-      "target_label": "code_7116"
+      "target_label": "missile_left"
     },
     {
       "addr": 28947,
@@ -47746,7 +47771,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7116"
+        "missile_left"
       ],
       "comment_inline": "...left",
       "xref_summaries": [
@@ -47772,9 +47797,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_711d",
+      "operand": "check_missile_wall",
       "target": 28957,
-      "target_label": "code_711d"
+      "target_label": "check_missile_wall"
     },
     {
       "addr": 28954,
@@ -47800,7 +47825,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_711d"
+        "check_missile_wall"
       ],
       "comment_inline": "Wall in the new cell?",
       "xref_summaries": [
@@ -47908,9 +47933,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_713a",
+      "operand": "check_missile_monster",
       "target": 28986,
-      "target_label": "code_713a"
+      "target_label": "check_missile_monster"
     },
     {
       "addr": 28976,
@@ -48010,7 +48035,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_713a"
+        "check_missile_monster"
       ],
       "comment_inline": "Monster in the new cell (not checking heroes)?",
       "xref_summaries": [
@@ -48066,9 +48091,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_7156",
+      "operand": "check_missile_object",
       "target": 29014,
-      "target_label": "code_7156"
+      "target_label": "check_missile_object"
     },
     {
       "addr": 28996,
@@ -48107,9 +48132,9 @@
       "comment_inline": "No: fly on",
       "type": "code",
       "mnemonic": "bcs",
-      "operand": "code_7156",
+      "operand": "check_missile_object",
       "target": 29014,
-      "target_label": "code_7156"
+      "target_label": "check_missile_object"
     },
     {
       "addr": 29003,
@@ -48142,9 +48167,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_757c",
+      "operand": "monster_hit",
       "target": 30076,
-      "target_label": "code_757c"
+      "target_label": "monster_hit"
     },
     {
       "addr": 29008,
@@ -48155,7 +48180,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7150"
+        "monster_killed"
       ],
       "comment_inline": "Monster killed: a point to the hero who fired...",
       "xref_summaries": [
@@ -48195,7 +48220,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7156"
+        "check_missile_object"
       ],
       "comment_inline": "Can the new cell hold an object?",
       "xref_summaries": [
@@ -48361,9 +48386,9 @@
       "comment_inline": "No: check for heroes",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_71d9",
+      "operand": "check_missile_hero",
       "target": 29145,
-      "target_label": "code_71d9"
+      "target_label": "check_missile_hero"
     },
     {
       "addr": 29039,
@@ -48406,7 +48431,7 @@
       ],
       "image": 4,
       "labels": [
-        "loop_7173"
+        "check_object_drainer"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -48449,9 +48474,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_71d4",
+      "operand": "next_object_drainer",
       "target": 29140,
-      "target_label": "code_71d4"
+      "target_label": "next_object_drainer"
     },
     {
       "addr": 29051,
@@ -48493,9 +48518,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_71d4",
+      "operand": "next_object_drainer",
       "target": 29140,
-      "target_label": "code_71d4"
+      "target_label": "next_object_drainer"
     },
     {
       "addr": 29059,
@@ -48534,9 +48559,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bcc",
-      "operand": "code_71d7",
+      "operand": "no_drainer",
       "target": 29143,
-      "target_label": "code_71d7"
+      "target_label": "no_drainer"
     },
     {
       "addr": 29066,
@@ -48560,9 +48585,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bcs",
-      "operand": "code_71d7",
+      "operand": "no_drainer",
       "target": 29143,
-      "target_label": "code_71d7"
+      "target_label": "no_drainer"
     },
     {
       "addr": 29070,
@@ -48616,9 +48641,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_71a0",
+      "operand": "credit_drainer_hit",
       "target": 29088,
-      "target_label": "code_71a0"
+      "target_label": "credit_drainer_hit"
     },
     {
       "addr": 29080,
@@ -48669,7 +48694,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_71a0"
+        "credit_drainer_hit"
       ],
       "comment_inline": "A point to the hero who fired",
       "xref_summaries": [
@@ -48746,9 +48771,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_71b4",
+      "operand": "reverse_right",
       "target": 29108,
-      "target_label": "code_71b4"
+      "target_label": "reverse_right"
     },
     {
       "addr": 29100,
@@ -48788,9 +48813,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_71d9",
+      "operand": "check_missile_hero",
       "target": 29145,
-      "target_label": "code_71d9"
+      "target_label": "check_missile_hero"
     },
     {
       "addr": 29108,
@@ -48800,7 +48825,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_71b4"
+        "reverse_right"
       ],
       "comment_inline": "...right becomes left...",
       "xref_summaries": [
@@ -48826,9 +48851,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_71c0",
+      "operand": "reverse_down",
       "target": 29120,
-      "target_label": "code_71c0"
+      "target_label": "reverse_down"
     },
     {
       "addr": 29112,
@@ -48868,9 +48893,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_71d9",
+      "operand": "check_missile_hero",
       "target": 29145,
-      "target_label": "code_71d9"
+      "target_label": "check_missile_hero"
     },
     {
       "addr": 29120,
@@ -48880,7 +48905,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_71c0"
+        "reverse_down"
       ],
       "comment_inline": "...down becomes up...",
       "xref_summaries": [
@@ -48906,9 +48931,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_71cc",
+      "operand": "reverse_left",
       "target": 29132,
-      "target_label": "code_71cc"
+      "target_label": "reverse_left"
     },
     {
       "addr": 29124,
@@ -48948,9 +48973,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_71d9",
+      "operand": "check_missile_hero",
       "target": 29145,
-      "target_label": "code_71d9"
+      "target_label": "check_missile_hero"
     },
     {
       "addr": 29132,
@@ -48960,7 +48985,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_71cc"
+        "reverse_left"
       ],
       "comment_inline": "...and left becomes right",
       "xref_summaries": [
@@ -49002,9 +49027,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_71d9",
+      "operand": "check_missile_hero",
       "target": 29145,
-      "target_label": "code_71d9"
+      "target_label": "check_missile_hero"
     },
     {
       "addr": 29140,
@@ -49013,7 +49038,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_71d4"
+        "next_object_drainer"
       ],
       "comment_inline": "Next object",
       "xref_summaries": [
@@ -49042,9 +49067,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_7173",
+      "operand": "check_object_drainer",
       "target": 29043,
-      "target_label": "loop_7173"
+      "target_label": "check_object_drainer"
     },
     {
       "addr": 29143,
@@ -49053,7 +49078,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_71d7"
+        "no_drainer"
       ],
       "comment_inline": "No drainer here",
       "xref_summaries": [
@@ -49089,7 +49114,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_71d9"
+        "check_missile_hero"
       ],
       "comment_inline": "Is a hero in the new cell?",
       "xref_summaries": [
@@ -49149,7 +49174,7 @@
       ],
       "image": 4,
       "labels": [
-        "loop_71dd"
+        "check_hero_hit"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -49224,9 +49249,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7201",
+      "operand": "next_hero_hit",
       "target": 29185,
-      "target_label": "code_7201"
+      "target_label": "next_hero_hit"
     },
     {
       "addr": 29160,
@@ -49268,9 +49293,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7201",
+      "operand": "next_hero_hit",
       "target": 29185,
-      "target_label": "code_7201"
+      "target_label": "next_hero_hit"
     },
     {
       "addr": 29168,
@@ -49304,7 +49329,7 @@
       ],
       "image": 4,
       "labels": [
-        "loop_71f4"
+        "take_missile_damage"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -49384,9 +49409,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_71f4",
+      "operand": "take_missile_damage",
       "target": 29172,
-      "target_label": "loop_71f4"
+      "target_label": "take_missile_damage"
     },
     {
       "addr": 29182,
@@ -49410,7 +49435,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7201"
+        "next_hero_hit"
       ],
       "comment_inline": "Next hero",
       "xref_summaries": [
@@ -49451,9 +49476,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_71dd",
+      "operand": "check_hero_hit",
       "target": 29149,
-      "target_label": "loop_71dd"
+      "target_label": "check_hero_hit"
     },
     {
       "addr": 29190,
@@ -49647,9 +49672,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_70d2",
+      "operand": "move_missile",
       "target": 28882,
-      "target_label": "code_70d2"
+      "target_label": "move_missile"
     },
     {
       "addr": 29216,
@@ -49738,9 +49763,9 @@
       "comment_inline": "Yes",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7227",
+      "operand": "take_health_unit",
       "target": 29223,
-      "target_label": "code_7227"
+      "target_label": "take_health_unit"
     },
     {
       "addr": 29222,
@@ -49761,7 +49786,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7227"
+        "take_health_unit"
       ],
       "comment_inline": "Take one from the units digit",
       "xref_summaries": [
@@ -49816,9 +49841,9 @@
       "comment_inline": "No: redraw",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7266",
+      "operand": "draw_health",
       "target": 29286,
-      "target_label": "code_7266"
+      "target_label": "draw_health"
     },
     {
       "addr": 29233,
@@ -49899,9 +49924,9 @@
       "comment_inline": "No: redraw",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7266",
+      "operand": "draw_health",
       "target": 29286,
-      "target_label": "code_7266"
+      "target_label": "draw_health"
     },
     {
       "addr": 29248,
@@ -50034,7 +50059,7 @@
       ],
       "image": 4,
       "labels": [
-        "loop_7256"
+        "find_queue_slot"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -50062,9 +50087,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7263",
+      "operand": "next_queue_slot",
       "target": 29283,
-      "target_label": "code_7263"
+      "target_label": "next_queue_slot"
     },
     {
       "addr": 29275,
@@ -50130,7 +50155,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7263"
+        "next_queue_slot"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -50155,9 +50180,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_7256",
+      "operand": "find_queue_slot",
       "target": 29270,
-      "target_label": "loop_7256"
+      "target_label": "find_queue_slot"
     },
     {
       "addr": 29286,
@@ -50168,7 +50193,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7266"
+        "draw_health"
       ],
       "comment_inline": "Draw the health: tens digit at column &45...",
       "xref_summaries": [
@@ -50518,9 +50543,9 @@
       "comment_inline": "No: redraw",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_72bc",
+      "operand": "draw_score",
       "target": 29372,
-      "target_label": "code_72bc"
+      "target_label": "draw_score"
     },
     {
       "addr": 29334,
@@ -50625,9 +50650,9 @@
       "comment_inline": "No: redraw",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_72bc",
+      "operand": "draw_score",
       "target": 29372,
-      "target_label": "code_72bc"
+      "target_label": "draw_score"
     },
     {
       "addr": 29349,
@@ -50708,9 +50733,9 @@
       "comment_inline": "No: redraw",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_72bc",
+      "operand": "draw_score",
       "target": 29372,
-      "target_label": "code_72bc"
+      "target_label": "draw_score"
     },
     {
       "addr": 29364,
@@ -50761,7 +50786,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_72bc"
+        "draw_score"
       ],
       "comment_inline": "Draw the score twelve rows below the health: thousands at column &45...",
       "xref_summaries": [
@@ -51283,7 +51308,7 @@
       ],
       "image": 4,
       "labels": [
-        "sub_7305"
+        "draw_objects"
       ],
       "comment_inline": "No pixel offsets",
       "xref_summaries": [
@@ -51348,7 +51373,7 @@
       ],
       "image": 4,
       "labels": [
-        "loop_730d"
+        "draw_each_object"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -51515,9 +51540,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_730d",
+      "operand": "draw_each_object",
       "target": 29453,
-      "target_label": "loop_730d"
+      "target_label": "draw_each_object"
     },
     {
       "addr": 29480,
@@ -51622,7 +51647,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7337"
+        "check_object"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -51665,9 +51690,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_7342",
+      "operand": "check_object_y",
       "target": 29506,
-      "target_label": "code_7342"
+      "target_label": "check_object_y"
     },
     {
       "addr": 29503,
@@ -51680,9 +51705,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_7470",
+      "operand": "next_object",
       "target": 29808,
-      "target_label": "code_7470"
+      "target_label": "next_object"
     },
     {
       "addr": 29506,
@@ -51693,7 +51718,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7342"
+        "check_object_y"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -51736,9 +51761,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_734d",
+      "operand": "object_found",
       "target": 29517,
-      "target_label": "code_734d"
+      "target_label": "object_found"
     },
     {
       "addr": 29514,
@@ -51751,9 +51776,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_7470",
+      "operand": "next_object",
       "target": 29808,
-      "target_label": "code_7470"
+      "target_label": "next_object"
     },
     {
       "addr": 29517,
@@ -51762,7 +51787,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_734d"
+        "object_found"
       ],
       "comment_inline": "Found: picking up anything loses Boots of Speed",
       "xref_summaries": [
@@ -51901,9 +51926,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_738a",
+      "operand": "check_food",
       "target": 29578,
-      "target_label": "code_738a"
+      "target_label": "check_food"
     },
     {
       "addr": 29539,
@@ -52216,9 +52241,9 @@
       "comment_inline": "Remove it",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_7467",
+      "operand": "remove_object",
       "target": 29799,
-      "target_label": "code_7467"
+      "target_label": "remove_object"
     },
     {
       "addr": 29578,
@@ -52228,7 +52253,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_738a"
+        "check_food"
       ],
       "comment_inline": "Food?",
       "xref_summaries": [
@@ -52254,9 +52279,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_73c3",
+      "operand": "check_teleporter",
       "target": 29635,
-      "target_label": "code_73c3"
+      "target_label": "check_teleporter"
     },
     {
       "addr": 29582,
@@ -52310,9 +52335,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_73a0",
+      "operand": "redraw_health",
       "target": 29600,
-      "target_label": "code_73a0"
+      "target_label": "redraw_health"
     },
     {
       "addr": 29592,
@@ -52363,7 +52388,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_73a0"
+        "redraw_health"
       ],
       "comment_inline": "Redraw the health",
       "xref_summaries": [
@@ -52399,9 +52424,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jsr",
-      "operand": "code_7266",
+      "operand": "draw_health",
       "target": 29286,
-      "target_label": "code_7266"
+      "target_label": "draw_health"
     },
     {
       "addr": 29605,
@@ -52422,7 +52447,7 @@
       ],
       "image": 4,
       "labels": [
-        "loop_73a7"
+        "redraw_health_loop"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -52502,9 +52527,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_73a7",
+      "operand": "redraw_health_loop",
       "target": 29607,
-      "target_label": "loop_73a7"
+      "target_label": "redraw_health_loop"
     },
     {
       "addr": 29617,
@@ -52652,9 +52677,9 @@
       "comment_inline": "Remove it",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_7467",
+      "operand": "remove_object",
       "target": 29799,
-      "target_label": "code_7467"
+      "target_label": "remove_object"
     },
     {
       "addr": 29635,
@@ -52664,7 +52689,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_73c3"
+        "check_teleporter"
       ],
       "comment_inline": "Teleporter?",
       "xref_summaries": [
@@ -52690,9 +52715,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_740d",
+      "operand": "check_cross",
       "target": 29709,
-      "target_label": "code_740d"
+      "target_label": "check_cross"
     },
     {
       "addr": 29639,
@@ -52701,7 +52726,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_73c7"
+        "find_previous_teleporter"
       ],
       "comment_inline": "Yes: find the previous teleporter in the list...",
       "xref_summaries": [
@@ -52757,9 +52782,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_73d9",
+      "operand": "teleport",
       "target": 29657,
-      "target_label": "code_73d9"
+      "target_label": "teleport"
     },
     {
       "addr": 29647,
@@ -52783,9 +52808,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_73c7",
+      "operand": "find_previous_teleporter",
       "target": 29639,
-      "target_label": "code_73c7"
+      "target_label": "find_previous_teleporter"
     },
     {
       "addr": 29651,
@@ -52813,9 +52838,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_73c7",
+      "operand": "find_previous_teleporter",
       "target": 29639,
-      "target_label": "code_73c7"
+      "target_label": "find_previous_teleporter"
     },
     {
       "addr": 29657,
@@ -52824,7 +52849,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_73d9"
+        "teleport"
       ],
       "comment_inline": "Play the teleport sound",
       "xref_summaries": [
@@ -53176,7 +53201,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_740d"
+        "check_cross"
       ],
       "comment_inline": "Cross of Resurrection?",
       "xref_summaries": [
@@ -53202,9 +53227,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7477",
+      "operand": "check_magic_item",
       "target": 29815,
-      "target_label": "code_7477"
+      "target_label": "check_magic_item"
     },
     {
       "addr": 29713,
@@ -53323,9 +53348,9 @@
       "comment_inline": "Yes",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7429",
+      "operand": "take_returning_hero",
       "target": 29737,
-      "target_label": "code_7429"
+      "target_label": "take_returning_hero"
     },
     {
       "addr": 29734,
@@ -53365,7 +53390,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7429"
+        "take_returning_hero"
       ],
       "comment_inline": "Take the first entry off the queue, appending 0...",
       "xref_summaries": [
@@ -53390,7 +53415,7 @@
       ],
       "image": 4,
       "labels": [
-        "loop_742b"
+        "shift_returning_queue"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -53539,9 +53564,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_744c",
+      "operand": "check_queue_empty",
       "target": 29772,
-      "target_label": "code_744c"
+      "target_label": "check_queue_empty"
     },
     {
       "addr": 29768,
@@ -53565,9 +53590,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_742b",
+      "operand": "shift_returning_queue",
       "target": 29739,
-      "target_label": "loop_742b"
+      "target_label": "shift_returning_queue"
     },
     {
       "addr": 29772,
@@ -53577,7 +53602,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_744c"
+        "check_queue_empty"
       ],
       "comment_inline": "Queue empty?",
       "xref_summaries": [
@@ -53603,9 +53628,9 @@
       "comment_inline": "Yes: nobody returns",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_7464",
+      "operand": "cross_done",
       "target": 29796,
-      "target_label": "code_7464"
+      "target_label": "cross_done"
     },
     {
       "addr": 29776,
@@ -53722,7 +53747,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7464"
+        "cross_done"
       ],
       "comment_inline": "Return",
       "xref_summaries": [
@@ -53765,7 +53790,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7467"
+        "remove_object"
       ],
       "comment_inline": "Remove object Y from the level",
       "xref_summaries": [
@@ -53832,7 +53857,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7470"
+        "next_object"
       ],
       "comment_inline": "Next object",
       "xref_summaries": [
@@ -53880,9 +53905,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_7337",
+      "operand": "check_object",
       "target": 29495,
-      "target_label": "code_7337"
+      "target_label": "check_object"
     },
     {
       "addr": 29814,
@@ -53914,7 +53939,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7477"
+        "check_magic_item"
       ],
       "comment_inline": "One of the magic items (&5F and up)?",
       "xref_summaries": [
@@ -53940,9 +53965,9 @@
       "comment_inline": "Yes",
       "type": "code",
       "mnemonic": "bcs",
-      "operand": "code_74b6",
+      "operand": "magic_item",
       "target": 29878,
-      "target_label": "code_74b6"
+      "target_label": "magic_item"
     },
     {
       "addr": 29819,
@@ -53966,9 +53991,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_7470",
+      "operand": "next_object",
       "target": 29808,
-      "target_label": "code_7470"
+      "target_label": "next_object"
     },
     {
       "addr": 29823,
@@ -54156,7 +54181,7 @@
       ],
       "image": 4,
       "labels": [
-        "loop_7498"
+        "take_ten_health"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -54236,9 +54261,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_7498",
+      "operand": "take_ten_health",
       "target": 29848,
-      "target_label": "loop_7498"
+      "target_label": "take_ten_health"
     },
     {
       "addr": 29858,
@@ -54435,7 +54460,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_74b6"
+        "magic_item"
       ],
       "comment_inline": "A magic item: keep its type",
       "xref_summaries": [
@@ -54679,9 +54704,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_74eb",
+      "operand": "check_helmet",
       "target": 29931,
-      "target_label": "code_74eb"
+      "target_label": "check_helmet"
     },
     {
       "addr": 29919,
@@ -54758,7 +54783,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_74eb"
+        "check_helmet"
       ],
       "comment_inline": "Magic helmet?",
       "xref_summaries": [
@@ -54784,9 +54809,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_74ff",
+      "operand": "check_potion",
       "target": 29951,
-      "target_label": "code_74ff"
+      "target_label": "check_potion"
     },
     {
       "addr": 29935,
@@ -54840,9 +54865,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcs",
-      "operand": "code_74fc",
+      "operand": "redraw_armour",
       "target": 29948,
-      "target_label": "code_74fc"
+      "target_label": "redraw_armour"
     },
     {
       "addr": 29945,
@@ -54868,7 +54893,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_74fc"
+        "redraw_armour"
       ],
       "comment_inline": "Redraw the armour rating",
       "xref_summaries": [
@@ -54894,7 +54919,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_74ff"
+        "check_potion"
       ],
       "comment_inline": "Potion of healing?",
       "xref_summaries": [
@@ -54920,9 +54945,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7516",
+      "operand": "check_weapons",
       "target": 29974,
-      "target_label": "code_7516"
+      "target_label": "check_weapons"
     },
     {
       "addr": 29955,
@@ -55032,7 +55057,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7516"
+        "check_weapons"
       ],
       "comment_inline": "Pile of weapons?",
       "xref_summaries": [
@@ -55058,9 +55083,9 @@
       "comment_inline": "No: a magic sword",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_756b",
+      "operand": "magic_sword",
       "target": 30059,
-      "target_label": "code_756b"
+      "target_label": "magic_sword"
     },
     {
       "addr": 29978,
@@ -55114,9 +55139,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7529",
+      "operand": "draw_missile_icon",
       "target": 29993,
-      "target_label": "code_7529"
+      "target_label": "draw_missile_icon"
     },
     {
       "addr": 29988,
@@ -55154,7 +55179,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7529"
+        "draw_missile_icon"
       ],
       "comment_inline": "Draw the new missile icon",
       "xref_summaries": [
@@ -55384,9 +55409,9 @@
       "comment_inline": "Top-left view?",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7551",
+      "operand": "check_view_1",
       "target": 30033,
-      "target_label": "code_7551"
+      "target_label": "check_view_1"
     },
     {
       "addr": 30027,
@@ -55441,7 +55466,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7551"
+        "check_view_1"
       ],
       "comment_inline": "Top-right view?",
       "xref_summaries": [
@@ -55467,9 +55492,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_755b",
+      "operand": "check_view_2",
       "target": 30043,
-      "target_label": "code_755b"
+      "target_label": "check_view_2"
     },
     {
       "addr": 30037,
@@ -55524,7 +55549,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_755b"
+        "check_view_2"
       ],
       "comment_inline": "Bottom-left view?",
       "xref_summaries": [
@@ -55550,9 +55575,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7565",
+      "operand": "show_view_3",
       "target": 30053,
-      "target_label": "code_7565"
+      "target_label": "show_view_3"
     },
     {
       "addr": 30047,
@@ -55608,7 +55633,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7565"
+        "show_view_3"
       ],
       "comment_inline": "Otherwise the bottom-right view",
       "xref_summaries": [
@@ -55665,7 +55690,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_756b"
+        "magic_sword"
       ],
       "comment_inline": "A magic sword: more missile damage...",
       "xref_summaries": [
@@ -55772,7 +55797,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_757c"
+        "monster_hit"
       ],
       "comment_inline": "Play the hit sound",
       "xref_summaries": [
@@ -55982,9 +56007,9 @@
       "comment_inline": "Still alive?",
       "type": "code",
       "mnemonic": "bpl",
-      "operand": "code_75a6",
+      "operand": "store_monster_health",
       "target": 30118,
-      "target_label": "code_75a6"
+      "target_label": "store_monster_health"
     },
     {
       "addr": 30102,
@@ -56074,9 +56099,9 @@
       "comment_inline": "...a point to its hero, and the missile is spent",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_7150",
+      "operand": "monster_killed",
       "target": 29008,
-      "target_label": "code_7150"
+      "target_label": "monster_killed"
     },
     {
       "addr": 30118,
@@ -56087,7 +56112,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_75a6"
+        "store_monster_health"
       ],
       "comment_inline": "Alive: store the hit points left",
       "xref_summaries": [
@@ -56966,9 +56991,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_761f",
+      "operand": "check_magic_every_frame",
       "target": 30239,
-      "target_label": "code_761f"
+      "target_label": "check_magic_every_frame"
     },
     {
       "addr": 30238,
@@ -56988,7 +57013,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_761f"
+        "check_magic_every_frame"
       ],
       "comment_inline": "Check the key every frame from now on",
       "xref_summaries": [
@@ -57059,9 +57084,9 @@
       "comment_inline": "No: carry on reading the keys",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_76ab",
+      "operand": "no_magic",
       "target": 30379,
-      "target_label": "code_76ab"
+      "target_label": "no_magic"
     },
     {
       "addr": 30252,
@@ -57302,9 +57327,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_7650",
+      "operand": "magic_user_cost",
       "target": 30288,
-      "target_label": "code_7650"
+      "target_label": "magic_user_cost"
     },
     {
       "addr": 30283,
@@ -57329,9 +57354,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_7652",
+      "operand": "take_magic_cost",
       "target": 30290,
-      "target_label": "code_7652"
+      "target_label": "take_magic_cost"
     },
     {
       "addr": 30288,
@@ -57341,7 +57366,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7650"
+        "magic_user_cost"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -57364,7 +57389,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7652"
+        "take_magic_cost"
       ],
       "comment_inline": "Take the cost",
       "xref_summaries": [
@@ -57448,9 +57473,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7652",
+      "operand": "take_magic_cost",
       "target": 30290,
-      "target_label": "code_7652"
+      "target_label": "take_magic_cost"
     },
     {
       "addr": 30300,
@@ -57534,7 +57559,7 @@
       ],
       "image": 4,
       "labels": [
-        "loop_7667"
+        "find_monster_room"
       ],
       "comment_inline": "...find its room",
       "xref_summaries": [
@@ -57705,9 +57730,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7692",
+      "operand": "next_monster_magic",
       "target": 30354,
-      "target_label": "code_7692"
+      "target_label": "next_monster_magic"
     },
     {
       "addr": 30339,
@@ -57746,9 +57771,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bcs",
-      "operand": "code_7692",
+      "operand": "next_monster_magic",
       "target": 30354,
-      "target_label": "code_7692"
+      "target_label": "next_monster_magic"
     },
     {
       "addr": 30346,
@@ -57799,7 +57824,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7692"
+        "next_monster_magic"
       ],
       "comment_inline": "Next monster",
       "xref_summaries": [
@@ -57828,9 +57853,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_7667",
+      "operand": "find_monster_room",
       "target": 30311,
-      "target_label": "loop_7667"
+      "target_label": "find_monster_room"
     },
     {
       "addr": 30357,
@@ -57889,7 +57914,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_769c"
+        "check_kills"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -57915,9 +57940,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_76ae",
+      "operand": "magic_cast",
       "target": 30382,
-      "target_label": "code_76ae"
+      "target_label": "magic_cast"
     },
     {
       "addr": 30368,
@@ -57995,9 +58020,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_769c",
+      "operand": "check_kills",
       "target": 30364,
-      "target_label": "code_769c"
+      "target_label": "check_kills"
     },
     {
       "addr": 30379,
@@ -58008,7 +58033,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_76ab"
+        "no_magic"
       ],
       "comment_inline": "No magic: carry on with the keys",
       "xref_summaries": [
@@ -58035,7 +58060,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_76ae"
+        "magic_cast"
       ],
       "comment_inline": "Magic cast: redraw the hero",
       "xref_summaries": [
@@ -58136,9 +58161,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_76c0",
+      "operand": "owner_fireball",
       "target": 30400,
-      "target_label": "code_76c0"
+      "target_label": "owner_fireball"
     },
     {
       "addr": 30395,
@@ -58163,9 +58188,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_76d4",
+      "operand": "credit_owner",
       "target": 30420,
-      "target_label": "code_76d4"
+      "target_label": "credit_owner"
     },
     {
       "addr": 30400,
@@ -58175,7 +58200,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_76c0"
+        "owner_fireball"
       ],
       "comment_inline": "Fireballs: the Magic-User",
       "xref_summaries": [
@@ -58201,9 +58226,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_76c9",
+      "operand": "owner_axe",
       "target": 30409,
-      "target_label": "code_76c9"
+      "target_label": "owner_axe"
     },
     {
       "addr": 30404,
@@ -58228,9 +58253,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_76d4",
+      "operand": "credit_owner",
       "target": 30420,
-      "target_label": "code_76d4"
+      "target_label": "credit_owner"
     },
     {
       "addr": 30409,
@@ -58240,7 +58265,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_76c9"
+        "owner_axe"
       ],
       "comment_inline": "Axes: the Barbarian",
       "xref_summaries": [
@@ -58266,9 +58291,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_76d2",
+      "operand": "owner_sword",
       "target": 30418,
-      "target_label": "code_76d2"
+      "target_label": "owner_sword"
     },
     {
       "addr": 30413,
@@ -58293,9 +58318,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_76d4",
+      "operand": "credit_owner",
       "target": 30420,
-      "target_label": "code_76d4"
+      "target_label": "credit_owner"
     },
     {
       "addr": 30418,
@@ -58305,7 +58330,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_76d2"
+        "owner_sword"
       ],
       "comment_inline": "Otherwise swords: the Fighter",
       "xref_summaries": [
@@ -58330,7 +58355,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_76d4"
+        "credit_owner"
       ],
       "comment_inline": "One point to that hero",
       "xref_summaries": [
@@ -58423,9 +58448,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_76e0",
+      "operand": "absent_frame_due",
       "target": 30432,
-      "target_label": "code_76e0"
+      "target_label": "absent_frame_due"
     },
     {
       "addr": 30431,
@@ -58445,7 +58470,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_76e0"
+        "absent_frame_due"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -58702,9 +58727,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcc",
-      "operand": "code_770b",
+      "operand": "check_first_sprite",
       "target": 30475,
-      "target_label": "code_770b"
+      "target_label": "check_first_sprite"
     },
     {
       "addr": 30473,
@@ -58726,7 +58751,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_770b"
+        "check_first_sprite"
       ],
       "comment_inline": "Reached the first sprite (returning)?",
       "xref_summaries": [
@@ -58752,9 +58777,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_772e",
+      "operand": "store_hero_frame",
       "target": 30510,
-      "target_label": "code_772e"
+      "target_label": "store_hero_frame"
     },
     {
       "addr": 30479,
@@ -58931,7 +58956,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_772e"
+        "store_hero_frame"
       ],
       "comment_inline": "Store the frame",
       "xref_summaries": [
@@ -59162,9 +59187,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7757",
+      "operand": "firer_fireball",
       "target": 30551,
-      "target_label": "code_7757"
+      "target_label": "firer_fireball"
     },
     {
       "addr": 30542,
@@ -59226,7 +59251,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7757"
+        "firer_fireball"
       ],
       "comment_inline": "Fireballs: the Magic-User's",
       "xref_summaries": [
@@ -59252,9 +59277,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7764",
+      "operand": "firer_axe",
       "target": 30564,
-      "target_label": "code_7764"
+      "target_label": "firer_axe"
     },
     {
       "addr": 30555,
@@ -59314,7 +59339,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7764"
+        "firer_axe"
       ],
       "comment_inline": "Axes: the Barbarian's",
       "xref_summaries": [
@@ -59340,9 +59365,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7771",
+      "operand": "firer_sword",
       "target": 30577,
-      "target_label": "code_7771"
+      "target_label": "firer_sword"
     },
     {
       "addr": 30568,
@@ -59403,7 +59428,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7771"
+        "firer_sword"
       ],
       "comment_inline": "Otherwise swords: the Fighter's",
       "xref_summaries": [
@@ -60205,7 +60230,7 @@
       ],
       "image": 4,
       "labels": [
-        "loop_77e4"
+        "draw_room_walls"
       ],
       "comment_inline": "...take its eight wall bits...",
       "xref_summaries": [
@@ -60375,9 +60400,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_77e4",
+      "operand": "draw_room_walls",
       "target": 30692,
-      "target_label": "loop_77e4"
+      "target_label": "draw_room_walls"
     },
     {
       "addr": 30716,
@@ -60400,7 +60425,7 @@
       ],
       "image": 4,
       "labels": [
-        "loop_77fe"
+        "draw_room_doors"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -60607,9 +60632,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_77fe",
+      "operand": "draw_room_doors",
       "target": 30718,
-      "target_label": "loop_77fe"
+      "target_label": "draw_room_doors"
     },
     {
       "addr": 30751,
@@ -60681,7 +60706,7 @@
       ],
       "image": 4,
       "labels": [
-        "loop_7827"
+        "draw_room_cell"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -60761,9 +60786,9 @@
       "comment_inline": "No: plot the blank",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_783e",
+      "operand": "plot_blank",
       "target": 30782,
-      "target_label": "code_783e"
+      "target_label": "plot_blank"
     },
     {
       "addr": 30772,
@@ -60817,9 +60842,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_7845",
+      "operand": "next_room_cell",
       "target": 30789,
-      "target_label": "code_7845"
+      "target_label": "next_room_cell"
     },
     {
       "addr": 30782,
@@ -60829,7 +60854,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_783e"
+        "plot_blank"
       ],
       "comment_inline": "Plot the blank (sprite &15)",
       "xref_summaries": [
@@ -60881,7 +60906,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7845"
+        "next_room_cell"
       ],
       "comment_inline": "Four byte columns right",
       "xref_summaries": [
@@ -60976,9 +61001,9 @@
       "comment_inline": "...until all eight are done",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_7827",
+      "operand": "draw_room_cell",
       "target": 30759,
-      "target_label": "loop_7827"
+      "target_label": "draw_room_cell"
     },
     {
       "addr": 30801,
@@ -61495,9 +61520,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_78ad",
+      "operand": "check_view_1_room",
       "target": 30893,
-      "target_label": "code_78ad"
+      "target_label": "check_view_1_room"
     },
     {
       "addr": 30875,
@@ -61615,7 +61640,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_78ad"
+        "check_view_1_room"
       ],
       "comment_inline": "Does the top-right view show it?",
       "xref_summaries": [
@@ -61657,9 +61682,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_78c7",
+      "operand": "check_view_2_room",
       "target": 30919,
-      "target_label": "code_78c7"
+      "target_label": "check_view_2_room"
     },
     {
       "addr": 30901,
@@ -61777,7 +61802,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_78c7"
+        "check_view_2_room"
       ],
       "comment_inline": "Does the bottom-left view show it?",
       "xref_summaries": [
@@ -61819,9 +61844,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_78e1",
+      "operand": "check_view_3_room",
       "target": 30945,
-      "target_label": "code_78e1"
+      "target_label": "check_view_3_room"
     },
     {
       "addr": 30927,
@@ -61939,7 +61964,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_78e1"
+        "check_view_3_room"
       ],
       "comment_inline": "Does the bottom-right view show it?",
       "xref_summaries": [
@@ -62933,7 +62958,7 @@
       ],
       "image": 4,
       "labels": [
-        "loop_7976"
+        "check_monster"
       ],
       "comment_inline": "...except the one being moved",
       "xref_summaries": [
@@ -62961,9 +62986,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_798d",
+      "operand": "next_monster_find",
       "target": 31117,
-      "target_label": "code_798d"
+      "target_label": "next_monster_find"
     },
     {
       "addr": 31099,
@@ -63005,9 +63030,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_798d",
+      "operand": "next_monster_find",
       "target": 31117,
-      "target_label": "code_798d"
+      "target_label": "next_monster_find"
     },
     {
       "addr": 31107,
@@ -63049,9 +63074,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_798d",
+      "operand": "next_monster_find",
       "target": 31117,
-      "target_label": "code_798d"
+      "target_label": "next_monster_find"
     },
     {
       "addr": 31115,
@@ -63080,7 +63105,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_798d"
+        "next_monster_find"
       ],
       "comment_inline": "Next monster",
       "xref_summaries": [
@@ -63113,9 +63138,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_7976",
+      "operand": "check_monster",
       "target": 31094,
-      "target_label": "loop_7976"
+      "target_label": "check_monster"
     },
     {
       "addr": 31120,
@@ -63142,9 +63167,9 @@
       "comment_inline": "No: return 0",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_79bc",
+      "operand": "nothing_found",
       "target": 31164,
-      "target_label": "code_79bc"
+      "target_label": "nothing_found"
     },
     {
       "addr": 31125,
@@ -63167,7 +63192,7 @@
       ],
       "image": 4,
       "labels": [
-        "loop_7997"
+        "check_hero"
       ],
       "comment_inline": "...at cell_x...",
       "xref_summaries": [
@@ -63210,9 +63235,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_79b7",
+      "operand": "next_hero_find",
       "target": 31159,
-      "target_label": "code_79b7"
+      "target_label": "next_hero_find"
     },
     {
       "addr": 31135,
@@ -63254,9 +63279,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_79b7",
+      "operand": "next_hero_find",
       "target": 31159,
-      "target_label": "code_79b7"
+      "target_label": "next_hero_find"
     },
     {
       "addr": 31143,
@@ -63280,7 +63305,7 @@
       ],
       "image": 4,
       "labels": [
-        "loop_79aa"
+        "check_hero_loop"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -63360,9 +63385,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_79aa",
+      "operand": "check_hero_loop",
       "target": 31146,
-      "target_label": "loop_79aa"
+      "target_label": "check_hero_loop"
     },
     {
       "addr": 31156,
@@ -63393,7 +63418,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_79b7"
+        "next_hero_find"
       ],
       "comment_inline": "Next hero",
       "xref_summaries": [
@@ -63434,9 +63459,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_7997",
+      "operand": "check_hero",
       "target": 31127,
-      "target_label": "loop_7997"
+      "target_label": "check_hero"
     },
     {
       "addr": 31164,
@@ -63446,7 +63471,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_79bc"
+        "nothing_found"
       ],
       "comment_inline": "Nothing there: return A = Y = 0",
       "xref_summaries": [
@@ -63583,7 +63608,7 @@
       ],
       "image": 4,
       "labels": [
-        "loop_79cd"
+        "check_trapdoor"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -63719,9 +63744,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_79cd",
+      "operand": "check_trapdoor",
       "target": 31181,
-      "target_label": "loop_79cd"
+      "target_label": "check_trapdoor"
     },
     {
       "addr": 31203,
@@ -64023,9 +64048,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bcc",
-      "operand": "code_7a17",
+      "operand": "check_monster_step",
       "target": 31255,
-      "target_label": "code_7a17"
+      "target_label": "check_monster_step"
     },
     {
       "addr": 31252,
@@ -64051,7 +64076,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7a17"
+        "check_monster_step"
       ],
       "comment_inline": "Part way through a step?",
       "xref_summaries": [
@@ -64079,9 +64104,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_7a23",
+      "operand": "start_monster_move",
       "target": 31267,
-      "target_label": "code_7a23"
+      "target_label": "start_monster_move"
     },
     {
       "addr": 31260,
@@ -64132,7 +64157,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7a23"
+        "start_monster_move"
       ],
       "comment_inline": "Start a step: move the cell in the direction it faces, up...",
       "xref_summaries": [
@@ -64172,9 +64197,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7a2d",
+      "operand": "monster_right",
       "target": 31277,
-      "target_label": "code_7a2d"
+      "target_label": "monster_right"
     },
     {
       "addr": 31274,
@@ -64199,7 +64224,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7a2d"
+        "monster_right"
       ],
       "comment_inline": "...right...",
       "xref_summaries": [
@@ -64225,9 +64250,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7a34",
+      "operand": "monster_down",
       "target": 31284,
-      "target_label": "code_7a34"
+      "target_label": "monster_down"
     },
     {
       "addr": 31281,
@@ -64252,7 +64277,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7a34"
+        "monster_down"
       ],
       "comment_inline": "...down...",
       "xref_summaries": [
@@ -64278,9 +64303,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7a3b",
+      "operand": "monster_left",
       "target": 31291,
-      "target_label": "code_7a3b"
+      "target_label": "monster_left"
     },
     {
       "addr": 31288,
@@ -64305,7 +64330,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7a3b"
+        "monster_left"
       ],
       "comment_inline": "...left",
       "xref_summaries": [
@@ -64331,9 +64356,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7a42",
+      "operand": "set_monster_step",
       "target": 31298,
-      "target_label": "code_7a42"
+      "target_label": "set_monster_step"
     },
     {
       "addr": 31295,
@@ -64359,7 +64384,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7a42"
+        "set_monster_step"
       ],
       "comment_inline": "Set the step's offsets",
       "xref_summaries": [
@@ -64462,9 +64487,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_7a87",
+      "operand": "check_monster_blocked",
       "target": 31367,
-      "target_label": "code_7a87"
+      "target_label": "check_monster_blocked"
     },
     {
       "addr": 31318,
@@ -64689,9 +64714,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_7a81",
+      "operand": "turn_monster",
       "target": 31361,
-      "target_label": "code_7a81"
+      "target_label": "turn_monster"
     },
     {
       "addr": 31358,
@@ -64717,7 +64742,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7a81"
+        "turn_monster"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -64757,7 +64782,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7a87"
+        "check_monster_blocked"
       ],
       "comment_inline": "Is another monster, or a hero, in the new cell? (A hero there is hurt)",
       "xref_summaries": [
@@ -64834,9 +64859,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_7ac1",
+      "operand": "monster_vertical",
       "target": 31425,
-      "target_label": "code_7ac1"
+      "target_label": "monster_vertical"
     },
     {
       "addr": 31379,
@@ -65102,7 +65127,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7ac1"
+        "monster_vertical"
       ],
       "comment_inline": "Moving vertically...",
       "xref_summaries": [
@@ -65164,9 +65189,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_7adc",
+      "operand": "check_room_edge",
       "target": 31452,
-      "target_label": "code_7adc"
+      "target_label": "check_room_edge"
     },
     {
       "addr": 31434,
@@ -65190,9 +65215,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_7adc",
+      "operand": "check_room_edge",
       "target": 31452,
-      "target_label": "code_7adc"
+      "target_label": "check_room_edge"
     },
     {
       "addr": 31438,
@@ -65231,9 +65256,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_7aea",
+      "operand": "monster_at_edge",
       "target": 31466,
-      "target_label": "code_7aea"
+      "target_label": "monster_at_edge"
     },
     {
       "addr": 31445,
@@ -65257,9 +65282,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_7aea",
+      "operand": "monster_at_edge",
       "target": 31466,
-      "target_label": "code_7aea"
+      "target_label": "monster_at_edge"
     },
     {
       "addr": 31449,
@@ -65272,9 +65297,9 @@
       "comment_inline": "No: move on",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_7af8",
+      "operand": "monster_move_on",
       "target": 31480,
-      "target_label": "code_7af8"
+      "target_label": "monster_move_on"
     },
     {
       "addr": 31452,
@@ -65285,7 +65310,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7adc"
+        "check_room_edge"
       ],
       "comment_inline": "Yes: at the top or bottom edge of a room?",
       "xref_summaries": [
@@ -65329,9 +65354,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_7aea",
+      "operand": "monster_at_edge",
       "target": 31466,
-      "target_label": "code_7aea"
+      "target_label": "monster_at_edge"
     },
     {
       "addr": 31459,
@@ -65355,9 +65380,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_7aea",
+      "operand": "monster_at_edge",
       "target": 31466,
-      "target_label": "code_7aea"
+      "target_label": "monster_at_edge"
     },
     {
       "addr": 31463,
@@ -65370,9 +65395,9 @@
       "comment_inline": "No: move on",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_7af8",
+      "operand": "monster_move_on",
       "target": 31480,
-      "target_label": "code_7af8"
+      "target_label": "monster_move_on"
     },
     {
       "addr": 31466,
@@ -65382,7 +65407,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7aea"
+        "monster_at_edge"
       ],
       "comment_inline": "At a room edge: cancel the step, so it arrives at once",
       "xref_summaries": [
@@ -65479,7 +65504,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7af8"
+        "monster_move_on"
       ],
       "comment_inline": "Move on: stay in the old cell until the step ends",
       "xref_summaries": [
@@ -65960,9 +65985,9 @@
       "comment_inline": "No",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7b3f",
+      "operand": "draw_monster_death",
       "target": 31551,
-      "target_label": "code_7b3f"
+      "target_label": "draw_monster_death"
     },
     {
       "addr": 31548,
@@ -65986,7 +66011,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7b3f"
+        "draw_monster_death"
       ],
       "comment_inline": "Draw the death frame",
       "xref_summaries": [
@@ -66276,9 +66301,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7b79",
+      "operand": "hero_step_right",
       "target": 31609,
-      "target_label": "code_7b79"
+      "target_label": "hero_step_right"
     },
     {
       "addr": 31598,
@@ -66352,7 +66377,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7b79"
+        "hero_step_right"
       ],
       "comment_inline": "Facing right: 2 columns right",
       "xref_summaries": [
@@ -66378,9 +66403,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7b88",
+      "operand": "hero_step_down",
       "target": 31624,
-      "target_label": "code_7b88"
+      "target_label": "hero_step_down"
     },
     {
       "addr": 31613,
@@ -66454,7 +66479,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7b88"
+        "hero_step_down"
       ],
       "comment_inline": "Facing down: 6 rows down",
       "xref_summaries": [
@@ -66480,9 +66505,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7b97",
+      "operand": "hero_step_left",
       "target": 31639,
-      "target_label": "code_7b97"
+      "target_label": "hero_step_left"
     },
     {
       "addr": 31628,
@@ -66556,7 +66581,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7b97"
+        "hero_step_left"
       ],
       "comment_inline": "Facing left: 2 columns left",
       "xref_summaries": [
@@ -66703,9 +66728,9 @@
       "comment_inline": "Not over",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7bd6",
+      "operand": "double_offsets",
       "target": 31702,
-      "target_label": "code_7bd6"
+      "target_label": "double_offsets"
     },
     {
       "addr": 31663,
@@ -66744,9 +66769,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7bb9",
+      "operand": "continue_right",
       "target": 31673,
-      "target_label": "code_7bb9"
+      "target_label": "continue_right"
     },
     {
       "addr": 31670,
@@ -66771,7 +66796,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7bb9"
+        "continue_right"
       ],
       "comment_inline": "...right...",
       "xref_summaries": [
@@ -66797,9 +66822,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7bc0",
+      "operand": "continue_down",
       "target": 31680,
-      "target_label": "code_7bc0"
+      "target_label": "continue_down"
     },
     {
       "addr": 31677,
@@ -66824,7 +66849,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7bc0"
+        "continue_down"
       ],
       "comment_inline": "...down...",
       "xref_summaries": [
@@ -66850,9 +66875,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7bc7",
+      "operand": "continue_left",
       "target": 31687,
-      "target_label": "code_7bc7"
+      "target_label": "continue_left"
     },
     {
       "addr": 31684,
@@ -66877,7 +66902,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7bc7"
+        "continue_left"
       ],
       "comment_inline": "...left",
       "xref_summaries": [
@@ -66903,9 +66928,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7bce",
+      "operand": "hero_no_offsets",
       "target": 31694,
-      "target_label": "code_7bce"
+      "target_label": "hero_no_offsets"
     },
     {
       "addr": 31691,
@@ -66930,7 +66955,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7bce"
+        "hero_no_offsets"
       ],
       "comment_inline": "...with no offsets",
       "xref_summaries": [
@@ -66983,7 +67008,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7bd6"
+        "double_offsets"
       ],
       "comment_inline": "Double the offsets",
       "xref_summaries": [
@@ -67184,9 +67209,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7c02",
+      "operand": "monster_step_right",
       "target": 31746,
-      "target_label": "code_7c02"
+      "target_label": "monster_step_right"
     },
     {
       "addr": 31735,
@@ -67260,7 +67285,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7c02"
+        "monster_step_right"
       ],
       "comment_inline": "Moving right...",
       "xref_summaries": [
@@ -67286,9 +67311,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7c11",
+      "operand": "monster_step_down",
       "target": 31761,
-      "target_label": "code_7c11"
+      "target_label": "monster_step_down"
     },
     {
       "addr": 31750,
@@ -67362,7 +67387,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7c11"
+        "monster_step_down"
       ],
       "comment_inline": "Moving down...",
       "xref_summaries": [
@@ -67388,9 +67413,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7c20",
+      "operand": "monster_step_left",
       "target": 31776,
-      "target_label": "code_7c20"
+      "target_label": "monster_step_left"
     },
     {
       "addr": 31765,
@@ -67464,7 +67489,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7c20"
+        "monster_step_left"
       ],
       "comment_inline": "Left: 1 column left",
       "xref_summaries": [
@@ -67611,9 +67636,9 @@
       "comment_inline": "Not over: grow the offsets",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7c5f",
+      "operand": "grow_offset_x",
       "target": 31839,
-      "target_label": "code_7c5f"
+      "target_label": "grow_offset_x"
     },
     {
       "addr": 31800,
@@ -67652,9 +67677,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7c42",
+      "operand": "monster_continue_right",
       "target": 31810,
-      "target_label": "code_7c42"
+      "target_label": "monster_continue_right"
     },
     {
       "addr": 31807,
@@ -67679,7 +67704,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7c42"
+        "monster_continue_right"
       ],
       "comment_inline": "...right...",
       "xref_summaries": [
@@ -67705,9 +67730,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7c49",
+      "operand": "monster_continue_down",
       "target": 31817,
-      "target_label": "code_7c49"
+      "target_label": "monster_continue_down"
     },
     {
       "addr": 31814,
@@ -67732,7 +67757,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7c49"
+        "monster_continue_down"
       ],
       "comment_inline": "...down...",
       "xref_summaries": [
@@ -67758,9 +67783,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7c50",
+      "operand": "monster_continue_left",
       "target": 31824,
-      "target_label": "code_7c50"
+      "target_label": "monster_continue_left"
     },
     {
       "addr": 31821,
@@ -67785,7 +67810,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7c50"
+        "monster_continue_left"
       ],
       "comment_inline": "...left",
       "xref_summaries": [
@@ -67811,9 +67836,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7c57",
+      "operand": "monster_no_offsets",
       "target": 31831,
-      "target_label": "code_7c57"
+      "target_label": "monster_no_offsets"
     },
     {
       "addr": 31828,
@@ -67838,7 +67863,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7c57"
+        "monster_no_offsets"
       ],
       "comment_inline": "...with no offsets",
       "xref_summaries": [
@@ -67893,7 +67918,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7c5f"
+        "grow_offset_x"
       ],
       "comment_inline": "Grow the horizontal offset by a column, away from zero",
       "xref_summaries": [
@@ -67921,9 +67946,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_7c6f",
+      "operand": "grow_offset_y",
       "target": 31855,
-      "target_label": "code_7c6f"
+      "target_label": "grow_offset_y"
     },
     {
       "addr": 31844,
@@ -67935,9 +67960,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bpl",
-      "operand": "code_7c6c",
+      "operand": "grow_offset_x_right",
       "target": 31852,
-      "target_label": "code_7c6c"
+      "target_label": "grow_offset_x_right"
     },
     {
       "addr": 31846,
@@ -67965,9 +67990,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "jmp",
-      "operand": "code_7c6f",
+      "operand": "grow_offset_y",
       "target": 31855,
-      "target_label": "code_7c6f"
+      "target_label": "grow_offset_y"
     },
     {
       "addr": 31852,
@@ -67978,7 +68003,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7c6c"
+        "grow_offset_x_right"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -68005,7 +68030,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7c6f"
+        "grow_offset_y"
       ],
       "comment_inline": "Grow the vertical offset by three rows, away from zero",
       "xref_summaries": [
@@ -68051,9 +68076,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bpl",
-      "operand": "code_7c82",
+      "operand": "grow_offset_y_down",
       "target": 31874,
-      "target_label": "code_7c82"
+      "target_label": "grow_offset_y_down"
     },
     {
       "addr": 31862,
@@ -68129,7 +68154,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7c82"
+        "grow_offset_y_down"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -68388,9 +68413,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7cae",
+      "operand": "key_not_pressed",
       "target": 31918,
-      "target_label": "code_7cae"
+      "target_label": "key_not_pressed"
     },
     {
       "addr": 31909,
@@ -68414,9 +68439,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7cae",
+      "operand": "key_not_pressed",
       "target": 31918,
-      "target_label": "code_7cae"
+      "target_label": "key_not_pressed"
     },
     {
       "addr": 31913,
@@ -68467,7 +68492,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7cae"
+        "key_not_pressed"
       ],
       "comment_inline": "Not pressed: restore X and return A = 1",
       "xref_summaries": [
@@ -68582,9 +68607,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_7cc2",
+      "operand": "emerge_at_trapdoor",
       "target": 31938,
-      "target_label": "code_7cc2"
+      "target_label": "emerge_at_trapdoor"
     },
     {
       "addr": 31933,
@@ -68622,7 +68647,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7cc2"
+        "emerge_at_trapdoor"
       ],
       "comment_inline": "...",
       "xref_summaries": [
@@ -68856,9 +68881,9 @@
       "comment_inline": "No: done",
       "type": "code",
       "mnemonic": "beq",
-      "operand": "code_7cfb",
+      "operand": "emerge_done",
       "target": 31995,
-      "target_label": "code_7cfb"
+      "target_label": "emerge_done"
     },
     {
       "addr": 31981,
@@ -68956,7 +68981,7 @@
       ],
       "image": 4,
       "labels": [
-        "code_7cfb"
+        "emerge_done"
       ],
       "comment_inline": "Done",
       "xref_summaries": [
@@ -71385,6 +71410,35 @@
         0
       ],
       "image": 4,
+      "labels": [
+        "data_7f92"
+      ],
+      "sub_labels": {
+        "32693": [
+          "capital_letter"
+        ],
+        "32696": [
+          "glyph_offset"
+        ],
+        "32701": [
+          "copy_glyph"
+        ],
+        "32709": [
+          "copy_letter_glyph"
+        ],
+        "32721": [
+          "restore_registers"
+        ],
+        "32730": [
+          "digit_glyph"
+        ],
+        "32744": [
+          "copy_digit_glyph"
+        ],
+        "32758": [
+          "pass_character"
+        ]
+      },
       "comment_inline": "... ...and Y ... Classify the character Below '0': print it unchanged ... '0'-'9': a digit ... ':'-'@': print it unchanged ... 'A'-'Z': a capital letter ... '['-'`': print it unchanged ... Above 'z': print it unchanged ... A lower-case letter: letter number 0-25 ... ... A capital letter: letter number 0-25 ... x 8: offset of the glyph in font_letters ... ... Branch to the next instruction either way X = offset of the first glyph byte Stop after eight bytes ... ... Y indexes the character 128 definition Copy a glyph byte... ...into the character 128 definition ... ... ... Loop for eight bytes Restore Y... ... ...and X ... Print character 128, now showing the glyph... ...through the MOS 1.20 OSWRCH routine A digit: digit number 0-9 ... x 8: offset of the glyph in font_digits ... ... X = offset of the first glyph byte Stop after eight bytes ... ... Y indexes the character 128 definition Copy a glyph byte... ...into the character 128 definition ... ... ... Loop for eight bytes Print character 128 (always branches) Any other character: restore Y... ... ...and X ... Recover the character ...and print it through the MOS 1.20 OSWRCH routine",
       "type": "byte",
       "values": [
@@ -83862,7 +83916,7 @@
       ],
       "image": 8,
       "labels": [
-        "loop_d81d"
+        "plot_sprite_row_hazel"
       ],
       "comment_inline": "Remember where this pixel row starts...",
       "xref_summaries": [
@@ -83964,7 +84018,7 @@
       ],
       "image": 8,
       "labels": [
-        "loop_d829"
+        "plot_sprite_byte_hazel"
       ],
       "comment_inline": "Copy one sprite byte...",
       "xref_summaries": [
@@ -84056,9 +84110,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bcc",
-      "operand": "code_d838",
+      "operand": "plot_sprite_next_data_hazel",
       "target": 55352,
-      "target_label": "code_d838"
+      "target_label": "plot_sprite_next_data_hazel"
     },
     {
       "addr": 55350,
@@ -84082,7 +84136,7 @@
       ],
       "image": 8,
       "labels": [
-        "code_d838"
+        "plot_sprite_next_data_hazel"
       ],
       "comment_inline": "Next sprite data byte",
       "xref_summaries": [
@@ -84110,9 +84164,9 @@
       "comment_inline": "...",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_d83e",
+      "operand": "plot_sprite_count_byte_hazel",
       "target": 55358,
-      "target_label": "code_d83e"
+      "target_label": "plot_sprite_count_byte_hazel"
     },
     {
       "addr": 55356,
@@ -84135,7 +84189,7 @@
       ],
       "image": 8,
       "labels": [
-        "code_d83e"
+        "plot_sprite_count_byte_hazel"
       ],
       "comment_inline": "Count the bytes across",
       "xref_summaries": [
@@ -84160,9 +84214,9 @@
       "comment_inline": "Loop until the row is done",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_d829",
+      "operand": "plot_sprite_byte_hazel",
       "target": 55337,
-      "target_label": "loop_d829"
+      "target_label": "plot_sprite_byte_hazel"
     },
     {
       "addr": 55361,
@@ -84290,9 +84344,9 @@
       "comment_inline": "No: carry on",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "code_d861",
+      "operand": "plot_sprite_next_row_hazel",
       "target": 55393,
-      "target_label": "code_d861"
+      "target_label": "plot_sprite_next_row_hazel"
     },
     {
       "addr": 55380,
@@ -84391,7 +84445,7 @@
       ],
       "image": 8,
       "labels": [
-        "code_d861"
+        "plot_sprite_next_row_hazel"
       ],
       "comment_inline": "Recover the row count",
       "xref_summaries": [
@@ -84436,9 +84490,9 @@
       "comment_inline": "Loop until the sprite is done",
       "type": "code",
       "mnemonic": "bne",
-      "operand": "loop_d81d",
+      "operand": "plot_sprite_row_hazel",
       "target": 55325,
-      "target_label": "loop_d81d"
+      "target_label": "plot_sprite_row_hazel"
     },
     {
       "addr": 55398,

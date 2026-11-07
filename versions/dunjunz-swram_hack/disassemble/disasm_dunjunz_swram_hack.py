@@ -18,6 +18,7 @@ import sys
 from pathlib import Path
 
 import dasmos
+from dasmos.expr import hexlit
 
 VERSION_DIRPATH = Path(__file__).resolve().parent.parent
 REPO_DIRPATH = VERSION_DIRPATH.parent.parent
@@ -74,6 +75,7 @@ annotator.region(0x6E60, "level_osfile_block", (0, 17), group="screen_workspace"
                 description=(
                     "OSFILE parameter block for loading the level, built in "
                     "screen memory below Dunjun6."))
+annotator.expr(0x149B, hexlit(0x3000))  # patched with FILEV before the call
 annotator.region(0x149B, "filev_call_address", (0, 1), description=(
     "Operand of the JSR at load_level_call, set to the contents of FILEV."))
 annotator.sub(0x1446, "load_level", "Load the level file",

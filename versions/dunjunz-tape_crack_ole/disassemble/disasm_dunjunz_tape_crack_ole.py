@@ -18,6 +18,7 @@ import sys
 from pathlib import Path
 
 import dasmos
+from dasmos.expr import hexlit, hi, lo, sym
 
 VERSION_DIRPATH = Path(__file__).resolve().parent.parent
 REPO_DIRPATH = VERSION_DIRPATH.parent.parent
@@ -182,6 +183,46 @@ for addr, text in [
     (0x1489, "Return to start_level"),
 ]:
     annotator.c(addr, text)
+
+# ---------------------------------------------------------------------------
+# The self-modifying page copies, and the moved copies they run from.
+
+d.constant(IMAGE_STORED_ADDR - IMAGE_RUN_ADDR, "image_offset",
+           comment="How far above its run address DUNJ4 stores the game image")
+for addr, name in [(0x045A, "save_page_byte"), (0x0460, "clear_page_byte"),
+                   (0x0464, "store_saved_byte"), (0x1473, "restore_page_byte"),
+                   (0x1476, "put_back_byte"), (0x500E, "copy_image_page")]:
+    annotator.label(addr, name)
+for addr, name, text in [
+    (0x045C, "save_source_page", "Page that save_game_pages copies from, &0E-&18."),
+    (0x0462, "save_clear_page", "Page that save_game_pages clears, &0E-&18."),
+    (0x0466, "save_dest_page", "Page that save_game_pages copies to, &4E-&58."),
+    (0x1475, "restore_source_page", "Page that load_level_from_copy copies from, &4E-&58 (patched in its moved copy)."),
+    (0x1478, "restore_dest_page", "Page that load_level_from_copy copies to, &0E-&18 (patched in its moved copy)."),
+    (0x149A, "level_command_digits", "The level number's digits in the crack's level command."),
+]:
+    annotator.label(addr, name, description=text)
+# The page copies' operands are patched at run time; they start at these pages.
+for operand_addr, page_addr in [(0x045B, 0x0E00), (0x0461, 0x0E00), (0x0465, 0x4E00),
+                                (0x1474, 0x4E00), (0x1477, 0x0E00)]:
+    d.expr(operand_addr, hexlit(page_addr), move=game_image)
+d.label(0x4E00, "saved_pages", group="game_state", description=(
+    "Where save_game_pages keeps pages &0E-&18 while a level loads, "
+    "&4E00-&58FF."))
+d.label(0x5100, "cheat_start_level", group="game_state", description=(
+    "The level less one that DUNJ's @ cheat asks for and pokes here."))
+d.label(0x545C, "moved_load_level_from_copy", group="game_state", description=(
+    "load_level_from_copy as save_game_pages moves it, where it runs."))
+d.label(0x5475, "moved_restore_source_page", group="game_state")
+d.label(0x5478, "moved_restore_dest_page", group="game_state")
+d.label(0x5495, "moved_level_command", group="game_state")
+d.label(0x549A, "moved_level_command_digits", group="game_state")
+d.expr_label(0x549B, "moved_level_command_digits+1")
+d.label(0x549D, "moved_disc_command", group="game_state")
+for operand_addr, name in [(0x145D, "moved_disc_command"), (0x1464, "moved_level_command")]:
+    d.expr(operand_addr, lo(sym(name)), move=game_image)
+    d.expr(operand_addr + 2, hi(sym(name)), move=game_image)
+d.expr(0x5043, sym("first_level") + 1 + sym("image_offset"))
 
 ir = d.disassemble()
 asm_filepath.parent.mkdir(parents=True, exist_ok=True)

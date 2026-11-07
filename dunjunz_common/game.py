@@ -6,6 +6,8 @@ official disc release (see tools/runtime_images.py for the differences).
 Where the versions differ, the drivers add their own annotations.
 """
 
+from dasmos.expr import hexlit
+
 from dunjunz_common.annotator import Annotator
 
 
@@ -29,6 +31,7 @@ def annotate(a: Annotator) -> None:
     annotate_menu_and_panel_comments(a)
     annotate_victory_and_helpers(a)
     annotate_shared_continuations(a)
+    annotate_branch_labels(a)
 
 
 # ---------------------------------------------------------------------------
@@ -712,6 +715,10 @@ def annotate_routines(a: Annotator) -> None:
           "that shows it.", on_entry=X_HERO, on_exit=X_KEPT)
     a.sub(0x777A, "get_hero_cell", "Copy a hero's position to cell_x, cell_y",
           on_entry=X_HERO, on_exit=X_KEPT)
+    a.sub(0x7305, "draw_objects", "Draw the level's objects",
+          "Plot each of objects 30 to 1 at its cell in every view that shows "
+          "it, with no pixel offset.",
+          on_exit={"A": "corrupted", "X": "0", "Y": "corrupted"})
     a.sub(0x7329, "collect_objects", "Pick up the object in a hero's cell",
           "Find the object at hero X's cell and act on it: score, health, "
           "teleport, resurrection, energy drain, or one of the magic items.",
@@ -937,6 +944,10 @@ def annotate_cassette_level_loop(a: Annotator) -> None:
     a.label(0x16D5, "level_filename_digits", description=(
         "Where the level number's digits are written into the level's "
         "filename."))
+    for addr, name in [(0x0E00, "new_game"), (0x0E34, "two_level_digits"),
+                       (0x0E36, "store_level_units"),
+                       (0x0E52, "end_level_filename")]:
+        a.label(addr, name)
     a.label(0x0E14, "level_loop")
     a.block(0x0E14, "Play each level in turn until every hero is dead.")
     a.c(0x0E14, "Monster hit points = 8 + 2 x (levels played)...")
@@ -1013,6 +1024,9 @@ def annotate_level_end(a: Annotator) -> None:
     a.label(0x0F90, "game_over_message", description=(
         "The message printed when every hero has died, terminated by a zero "
         "byte."))
+    a.label(0x0FEA, "game_over_you_all", description=(
+        "The \"YOU ALL.\" line of game_over_message, whose bytes after the "
+        "text double as panel_hero and count."))
     a.label(0x0FF1, "panel_hero", description=(
         "Hero counter for draw_status_panel. It is a byte of "
         "game_over_message, which is repaired before printing."))
@@ -2581,6 +2595,9 @@ def annotate_cassette_pause(a: Annotator) -> None:
         (0x1EF1, "..."), (0x1EF3, "..."),
     ]:
         a.c(addr, text)
+    for addr, name in [(0x1EE0, "wait_pause_release"), (0x1EE7, "wait_pause_press"),
+                       (0x1EEE, "wait_pause_release_again")]:
+        a.label(addr, name)
 
 
 def annotate_menu_and_panel_comments(a: Annotator) -> None:
@@ -2728,6 +2745,7 @@ def annotate_menu_and_panel_comments(a: Annotator) -> None:
 
 def annotate_victory_and_helpers(a: Annotator) -> None:
     a.label(0x10E6, "reset_call")
+    a.expr(0x10E7, hexlit(0x0000))
     for addr, name, description in [
         (0x0080, "ring_x", "Map x of the cell being drawn in the victory ring."),
         (0x0081, "ring_y", "Map y of the cell being drawn in the victory ring."),
@@ -3316,6 +3334,246 @@ def annotate_hack_continuations(a: Annotator) -> None:
         (0x146B, '...'),
     ]:
         a.c(addr, text)
+
+
+
+def annotate_branch_labels(a: Annotator) -> None:
+    """Names for the branch targets within the game's routines."""
+    for addr, name in {
+        0x091D: "plot_sprite_row",
+        0x0929: "plot_sprite_byte",
+        0x0938: "plot_sprite_next_data",
+        0x093E: "plot_sprite_count_byte",
+        0x0961: "plot_sprite_next_row",
+        0x0D63: "set_wrchv_low",
+        0x0E09: "reset_each_hero",
+        0x0E6D: "check_hero_dead",
+        0x0E7A: "next_hero_dead",
+        0x0EA8: "restore_message_spaces",
+        0x0EAE: "print_game_over",
+        0x0EB9: "wait_vsync_game_over",
+        0x0EFC: "draw_panel_hero",
+        0x0F3A: "draw_missile_icons",
+        0x1079: "check_door_x",
+        0x1084: "next_hero_victory",
+        0x108A: "check_door_y",
+        0x1097: "start_victory",
+        0x10BA: "print_victory_text",
+        0x10C7: "print_ending_message",
+        0x110A: "raise_victory_pitch",
+        0x111C: "shorten_victory_delay",
+        0x1124: "sound_victory_bell",
+        0x113C: "victory_delay_loop",
+        0x113E: "victory_delay_outer",
+        0x1140: "victory_delay_inner",
+        0x11BB: "store_victory_sprite",
+        0x11D3: "erase_victory_ring",
+        0x11DE: "clear_chalice_sprite",
+        0x11EC: "wait_vsync_chalice",
+        0x14A2: "copy_workspace_template",
+        0x14E5: "draw_view_frame",
+        0x14EC: "send_frame_vdu",
+        0x1512: "unpack_objects",
+        0x1529: "unpack_doors",
+        0x1540: "unpack_keys",
+        0x1551: "unpack_trapdoors",
+        0x1564: "unpack_walls",
+        0x1577: "unpack_wall_sprite",
+        0x1585: "reset_each_monster",
+        0x159C: "clear_hero_carrying",
+        0x16B4: "find_queue_end",
+        0x16BF: "next_queue_entry",
+        0x1CC5: "check_doors",
+        0x1CD8: "check_door",
+        0x1CE3: "check_door_cell_y",
+        0x1CEE: "check_door_key",
+        0x1CFA: "open_door",
+        0x1D03: "erase_door_loop",
+        0x1DB2: "next_door",
+        0x1DB8: "doors_done",
+        0x1DBA: "next_hero_doors",
+        0x1DCE: "draw_each_key",
+        0x1DF3: "check_death_finished",
+        0x1E28: "check_key_swap",
+        0x1E35: "check_key_cell",
+        0x1E45: "check_key",
+        0x1EBE: "next_key",
+        0x1EC4: "keys_done",
+        0x1EC6: "next_hero_keys",
+        0x1F17: "count_heroes_in_play",
+        0x1F2A: "next_hero_in_play",
+        0x1F36: "check_exit",
+        0x1F38: "check_hero_on_exit",
+        0x1F91: "next_hero_exit",
+        0x1F96: "check_exit_busy",
+        0x1F9E: "redraw_exit",
+        0x1FF2: "next_turn",
+        0x2009: "shrink_hero_width",
+        0x2014: "shrink_hero_height",
+        0x2026: "restore_exit",
+        0x205F: "restore_sprite_widths",
+        0x206C: "restore_sprite_heights",
+        0x2076: "start_hero_animation",
+        0x20DB: "try_cell_right",
+        0x20E9: "try_cell_below",
+        0x20F7: "try_cell_left",
+        0x6E82: "move_hero",
+        0x6E91: "animate_absent",
+        0x6E97: "remember_hero_position",
+        0x6EBA: "check_magic_key",
+        0x6ED4: "check_key_down",
+        0x6EE7: "check_key_right",
+        0x6EFA: "check_key_left",
+        0x6F0D: "check_key_fire",
+        0x6F28: "find_missile_slot",
+        0x6F70: "next_missile_slot",
+        0x6F83: "step_right",
+        0x6F8A: "step_down",
+        0x6F91: "step_left",
+        0x6F98: "note_new_cell",
+        0x6FC7: "cancel_hero_step",
+        0x6FD5: "check_monster_in_cell",
+        0x7002: "check_hero_in_cell",
+        0x7007: "check_other_hero",
+        0x703B: "next_other_hero",
+        0x7053: "check_boots",
+        0x7069: "stay_in_old_cell",
+        0x70D2: "move_missile",
+        0x70DA: "check_just_fired",
+        0x70E7: "erase_missile",
+        0x70FE: "missile_up",
+        0x7108: "missile_right",
+        0x710F: "missile_down",
+        0x7116: "missile_left",
+        0x711D: "check_missile_wall",
+        0x713A: "check_missile_monster",
+        0x7150: "monster_killed",
+        0x7156: "check_missile_object",
+        0x7173: "check_object_drainer",
+        0x71A0: "credit_drainer_hit",
+        0x71B4: "reverse_right",
+        0x71C0: "reverse_down",
+        0x71CC: "reverse_left",
+        0x71D4: "next_object_drainer",
+        0x71D7: "no_drainer",
+        0x71D9: "check_missile_hero",
+        0x71DD: "check_hero_hit",
+        0x71F4: "take_missile_damage",
+        0x7201: "next_hero_hit",
+        0x7227: "take_health_unit",
+        0x7256: "find_queue_slot",
+        0x7263: "next_queue_slot",
+        0x7266: "draw_health",
+        0x72BC: "draw_score",
+        0x730D: "draw_each_object",
+        0x7337: "check_object",
+        0x7342: "check_object_y",
+        0x734D: "object_found",
+        0x738A: "check_food",
+        0x73A0: "redraw_health",
+        0x73A7: "redraw_health_loop",
+        0x73C3: "check_teleporter",
+        0x73C7: "find_previous_teleporter",
+        0x73D9: "teleport",
+        0x740D: "check_cross",
+        0x7429: "take_returning_hero",
+        0x742B: "shift_returning_queue",
+        0x744C: "check_queue_empty",
+        0x7464: "cross_done",
+        0x7467: "remove_object",
+        0x7470: "next_object",
+        0x7477: "check_magic_item",
+        0x7498: "take_ten_health",
+        0x74B6: "magic_item",
+        0x74EB: "check_helmet",
+        0x74FC: "redraw_armour",
+        0x74FF: "check_potion",
+        0x7516: "check_weapons",
+        0x7529: "draw_missile_icon",
+        0x7551: "check_view_1",
+        0x755B: "check_view_2",
+        0x7565: "show_view_3",
+        0x756B: "magic_sword",
+        0x757C: "monster_hit",
+        0x75A6: "store_monster_health",
+        0x761F: "check_magic_every_frame",
+        0x7650: "magic_user_cost",
+        0x7652: "take_magic_cost",
+        0x7667: "find_monster_room",
+        0x7692: "next_monster_magic",
+        0x769C: "check_kills",
+        0x76AB: "no_magic",
+        0x76AE: "magic_cast",
+        0x76C0: "owner_fireball",
+        0x76C9: "owner_axe",
+        0x76D2: "owner_sword",
+        0x76D4: "credit_owner",
+        0x76E0: "absent_frame_due",
+        0x770B: "check_first_sprite",
+        0x772E: "store_hero_frame",
+        0x7757: "firer_fireball",
+        0x7764: "firer_axe",
+        0x7771: "firer_sword",
+        0x77E4: "draw_room_walls",
+        0x77FE: "draw_room_doors",
+        0x7827: "draw_room_cell",
+        0x783E: "plot_blank",
+        0x7845: "next_room_cell",
+        0x78AD: "check_view_1_room",
+        0x78C7: "check_view_2_room",
+        0x78E1: "check_view_3_room",
+        0x7976: "check_monster",
+        0x798D: "next_monster_find",
+        0x7997: "check_hero",
+        0x79AA: "check_hero_loop",
+        0x79B7: "next_hero_find",
+        0x79BC: "nothing_found",
+        0x79CD: "check_trapdoor",
+        0x7A17: "check_monster_step",
+        0x7A23: "start_monster_move",
+        0x7A2D: "monster_right",
+        0x7A34: "monster_down",
+        0x7A3B: "monster_left",
+        0x7A42: "set_monster_step",
+        0x7A81: "turn_monster",
+        0x7A87: "check_monster_blocked",
+        0x7AC1: "monster_vertical",
+        0x7ADC: "check_room_edge",
+        0x7AEA: "monster_at_edge",
+        0x7AF8: "monster_move_on",
+        0x7B3F: "draw_monster_death",
+        0x7B79: "hero_step_right",
+        0x7B88: "hero_step_down",
+        0x7B97: "hero_step_left",
+        0x7BB9: "continue_right",
+        0x7BC0: "continue_down",
+        0x7BC7: "continue_left",
+        0x7BCE: "hero_no_offsets",
+        0x7BD6: "double_offsets",
+        0x7C02: "monster_step_right",
+        0x7C11: "monster_step_down",
+        0x7C20: "monster_step_left",
+        0x7C42: "monster_continue_right",
+        0x7C49: "monster_continue_down",
+        0x7C50: "monster_continue_left",
+        0x7C57: "monster_no_offsets",
+        0x7C5F: "grow_offset_x",
+        0x7C6C: "grow_offset_x_right",
+        0x7C6F: "grow_offset_y",
+        0x7C82: "grow_offset_y_down",
+        0x7CAE: "key_not_pressed",
+        0x7CC2: "emerge_at_trapdoor",
+        0x7CFB: "emerge_done",
+        0x7FB5: "capital_letter",
+        0x7FB8: "glyph_offset",
+        0x7FBD: "copy_glyph",
+        0x7FC5: "copy_letter_glyph",
+        0x7FD1: "restore_registers",
+        0x7FDA: "digit_glyph",
+        0x7FE8: "copy_digit_glyph",
+        0x7FF6: "pass_character",
+    }.items():
+        a.label(addr, name)
 
 
 def annotate_regions(a: Annotator) -> None:
