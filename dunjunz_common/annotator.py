@@ -111,6 +111,19 @@ class Annotator:
         for move, suffix in self._each(addr):
             if suffix is not None:
                 self.d.label(addr, name + suffix, move=move, **kwargs)
+                self._describe_in_image(addr, kwargs.get("description"), move)
+
+    def _describe_in_image(self, addr, description, move):
+        """dasmos drops the description of a label inside an image
+        (acornaeology/dasmos#61), so repeat it as a block comment there."""
+        if not description:
+            return
+        if move is None:
+            if not self.d.moves.is_loaded_in_place(addr):
+                return
+        elif not move.is_in_move_dest(addr, include_end_address=False):
+            return
+        self.d.comment(addr, description, move=move)
 
     def region(self, addr, name, window, **kwargs):
         """Name a table and render references within `window` (inclusive
@@ -120,6 +133,7 @@ class Annotator:
             return
         if self._each(addr) == [(None, "")]:
             self.d.index_region(addr, name, window=window, **kwargs)
+            self._describe_in_image(addr, kwargs.get("description"), None)
             return
         self.label(addr, name, **kwargs)
         lo, hi = window
