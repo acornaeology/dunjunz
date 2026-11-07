@@ -30858,15 +30858,14 @@
     {
       "addr": 4823,
       "bytes": [
-        60,
-        66,
-        66
+        60
       ],
       "binary_addr": 14871,
       "move": "game_core",
       "labels": [
         "font_letters"
       ],
+      "comment_inline": "'A'",
       "xref_summaries": [
         "&3a17 used as index base 1 time by &7fc5"
       ],
@@ -30876,543 +30875,2402 @@
           "kind": "indexed"
         }
       ],
-      "type": "string",
-      "string": "<BB"
+      "type": "byte",
+      "values": [
+        60
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4824,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 14872,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4825,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 14873,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
     },
     {
       "addr": 4826,
       "bytes": [
-        142,
-        242,
-        130,
-        198,
-        0
+        142
       ],
       "binary_addr": 14874,
       "move": "game_core",
       "type": "byte",
       "values": [
-        142,
-        242,
-        130,
-        198,
+        142
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4827,
+      "bytes": [
+        242
+      ],
+      "binary_addr": 14875,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        242
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4828,
+      "bytes": [
+        130
+      ],
+      "binary_addr": 14876,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        130
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4829,
+      "bytes": [
+        198
+      ],
+      "binary_addr": 14877,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        198
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4830,
+      "bytes": [
         0
+      ],
+      "binary_addr": 14878,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
       ]
     },
     {
       "addr": 4831,
       "bytes": [
-        120,
-        68,
-        66
+        120
       ],
       "binary_addr": 14879,
       "move": "game_core",
-      "type": "string",
-      "string": "xDB"
+      "comment_inline": "'B'",
+      "type": "byte",
+      "values": [
+        120
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4832,
+      "bytes": [
+        68
+      ],
+      "binary_addr": 14880,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        68
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4833,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 14881,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
     },
     {
       "addr": 4834,
       "bytes": [
-        188,
-        130,
-        130,
-        252,
-        0
+        188
       ],
       "binary_addr": 14882,
       "move": "game_core",
       "type": "byte",
       "values": [
-        188,
-        130,
-        130,
-        252,
+        188
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4835,
+      "bytes": [
+        130
+      ],
+      "binary_addr": 14883,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        130
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4836,
+      "bytes": [
+        130
+      ],
+      "binary_addr": 14884,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        130
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4837,
+      "bytes": [
+        252
+      ],
+      "binary_addr": 14885,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        252
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4838,
+      "bytes": [
         0
+      ],
+      "binary_addr": 14886,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
       ]
     },
     {
       "addr": 4839,
       "bytes": [
-        60,
-        66,
-        64
+        60
       ],
       "binary_addr": 14887,
       "move": "game_core",
-      "type": "string",
-      "string": "<B@"
+      "comment_inline": "'C'",
+      "type": "byte",
+      "values": [
+        60
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4840,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 14888,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4841,
+      "bytes": [
+        64
+      ],
+      "binary_addr": 14889,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        64
+      ],
+      "format_hints": [
+        "binary"
+      ]
     },
     {
       "addr": 4842,
       "bytes": [
-        128,
-        128,
-        130,
-        124,
-        0,
-        124,
-        130,
-        130,
-        130,
-        132,
-        132,
-        248,
-        0,
-        14,
-        112,
-        64,
-        206,
-        240,
-        128,
-        254,
-        0,
-        30,
-        224,
-        128,
-        142,
-        240,
-        128,
-        192,
-        0
+        128
       ],
       "binary_addr": 14890,
       "move": "game_core",
       "type": "byte",
       "values": [
-        128,
-        128,
-        130,
-        124,
-        0,
-        124,
-        130,
-        130,
-        130,
-        132,
-        132,
-        248,
-        0,
-        14,
-        112,
-        64,
-        206,
-        240,
-        128,
-        254,
-        0,
-        30,
-        224,
-        128,
-        142,
-        240,
-        128,
-        192,
+        128
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4843,
+      "bytes": [
+        128
+      ],
+      "binary_addr": 14891,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        128
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4844,
+      "bytes": [
+        130
+      ],
+      "binary_addr": 14892,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        130
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4845,
+      "bytes": [
+        124
+      ],
+      "binary_addr": 14893,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        124
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4846,
+      "bytes": [
         0
+      ],
+      "binary_addr": 14894,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4847,
+      "bytes": [
+        124
+      ],
+      "binary_addr": 14895,
+      "move": "game_core",
+      "comment_inline": "'D'",
+      "type": "byte",
+      "values": [
+        124
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4848,
+      "bytes": [
+        130
+      ],
+      "binary_addr": 14896,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        130
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4849,
+      "bytes": [
+        130
+      ],
+      "binary_addr": 14897,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        130
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4850,
+      "bytes": [
+        130
+      ],
+      "binary_addr": 14898,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        130
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4851,
+      "bytes": [
+        132
+      ],
+      "binary_addr": 14899,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        132
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4852,
+      "bytes": [
+        132
+      ],
+      "binary_addr": 14900,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        132
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4853,
+      "bytes": [
+        248
+      ],
+      "binary_addr": 14901,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        248
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4854,
+      "bytes": [
+        0
+      ],
+      "binary_addr": 14902,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4855,
+      "bytes": [
+        14
+      ],
+      "binary_addr": 14903,
+      "move": "game_core",
+      "comment_inline": "'E'",
+      "type": "byte",
+      "values": [
+        14
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4856,
+      "bytes": [
+        112
+      ],
+      "binary_addr": 14904,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        112
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4857,
+      "bytes": [
+        64
+      ],
+      "binary_addr": 14905,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        64
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4858,
+      "bytes": [
+        206
+      ],
+      "binary_addr": 14906,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        206
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4859,
+      "bytes": [
+        240
+      ],
+      "binary_addr": 14907,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        240
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4860,
+      "bytes": [
+        128
+      ],
+      "binary_addr": 14908,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        128
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4861,
+      "bytes": [
+        254
+      ],
+      "binary_addr": 14909,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        254
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4862,
+      "bytes": [
+        0
+      ],
+      "binary_addr": 14910,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4863,
+      "bytes": [
+        30
+      ],
+      "binary_addr": 14911,
+      "move": "game_core",
+      "comment_inline": "'F'",
+      "type": "byte",
+      "values": [
+        30
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4864,
+      "bytes": [
+        224
+      ],
+      "binary_addr": 14912,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        224
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4865,
+      "bytes": [
+        128
+      ],
+      "binary_addr": 14913,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        128
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4866,
+      "bytes": [
+        142
+      ],
+      "binary_addr": 14914,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        142
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4867,
+      "bytes": [
+        240
+      ],
+      "binary_addr": 14915,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        240
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4868,
+      "bytes": [
+        128
+      ],
+      "binary_addr": 14916,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        128
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4869,
+      "bytes": [
+        192
+      ],
+      "binary_addr": 14917,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        192
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4870,
+      "bytes": [
+        0
+      ],
+      "binary_addr": 14918,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
       ]
     },
     {
       "addr": 4871,
       "bytes": [
-        60,
-        66,
-        66
+        60
       ],
       "binary_addr": 14919,
       "move": "game_core",
-      "type": "string",
-      "string": "<BB"
+      "comment_inline": "'G'",
+      "type": "byte",
+      "values": [
+        60
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4872,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 14920,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4873,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 14921,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
     },
     {
       "addr": 4874,
       "bytes": [
-        128,
-        158,
-        130,
-        126,
-        0
+        128
       ],
       "binary_addr": 14922,
       "move": "game_core",
       "type": "byte",
       "values": [
-        128,
-        158,
-        130,
-        126,
+        128
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4875,
+      "bytes": [
+        158
+      ],
+      "binary_addr": 14923,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        158
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4876,
+      "bytes": [
+        130
+      ],
+      "binary_addr": 14924,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        130
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4877,
+      "bytes": [
+        126
+      ],
+      "binary_addr": 14925,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        126
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4878,
+      "bytes": [
         0
+      ],
+      "binary_addr": 14926,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
       ]
     },
     {
       "addr": 4879,
       "bytes": [
-        98,
-        66,
-        66
+        98
       ],
       "binary_addr": 14927,
       "move": "game_core",
-      "type": "string",
-      "string": "bBB"
+      "comment_inline": "'H'",
+      "type": "byte",
+      "values": [
+        98
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4880,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 14928,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4881,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 14929,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
     },
     {
       "addr": 4882,
       "bytes": [
-        158,
-        226,
-        130,
-        198,
-        0,
-        30,
-        8,
-        8,
-        16,
-        16,
-        16,
-        124,
-        0,
-        254,
-        2,
-        2,
-        4,
-        196,
-        132,
-        120,
-        0
+        158
       ],
       "binary_addr": 14930,
       "move": "game_core",
       "type": "byte",
       "values": [
-        158,
-        226,
-        130,
-        198,
-        0,
-        30,
-        8,
-        8,
-        16,
-        16,
-        16,
-        124,
-        0,
-        254,
-        2,
-        2,
-        4,
-        196,
-        132,
-        120,
+        158
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4883,
+      "bytes": [
+        226
+      ],
+      "binary_addr": 14931,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        226
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4884,
+      "bytes": [
+        130
+      ],
+      "binary_addr": 14932,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        130
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4885,
+      "bytes": [
+        198
+      ],
+      "binary_addr": 14933,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        198
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4886,
+      "bytes": [
         0
+      ],
+      "binary_addr": 14934,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4887,
+      "bytes": [
+        30
+      ],
+      "binary_addr": 14935,
+      "move": "game_core",
+      "comment_inline": "'I'",
+      "type": "byte",
+      "values": [
+        30
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4888,
+      "bytes": [
+        8
+      ],
+      "binary_addr": 14936,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        8
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4889,
+      "bytes": [
+        8
+      ],
+      "binary_addr": 14937,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        8
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4890,
+      "bytes": [
+        16
+      ],
+      "binary_addr": 14938,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        16
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4891,
+      "bytes": [
+        16
+      ],
+      "binary_addr": 14939,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        16
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4892,
+      "bytes": [
+        16
+      ],
+      "binary_addr": 14940,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        16
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4893,
+      "bytes": [
+        124
+      ],
+      "binary_addr": 14941,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        124
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4894,
+      "bytes": [
+        0
+      ],
+      "binary_addr": 14942,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4895,
+      "bytes": [
+        254
+      ],
+      "binary_addr": 14943,
+      "move": "game_core",
+      "comment_inline": "'J'",
+      "type": "byte",
+      "values": [
+        254
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4896,
+      "bytes": [
+        2
+      ],
+      "binary_addr": 14944,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        2
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4897,
+      "bytes": [
+        2
+      ],
+      "binary_addr": 14945,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        2
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4898,
+      "bytes": [
+        4
+      ],
+      "binary_addr": 14946,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        4
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4899,
+      "bytes": [
+        196
+      ],
+      "binary_addr": 14947,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        196
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4900,
+      "bytes": [
+        132
+      ],
+      "binary_addr": 14948,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        132
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4901,
+      "bytes": [
+        120
+      ],
+      "binary_addr": 14949,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        120
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4902,
+      "bytes": [
+        0
+      ],
+      "binary_addr": 14950,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
       ]
     },
     {
       "addr": 4903,
       "bytes": [
-        64,
-        78,
-        112
+        64
       ],
       "binary_addr": 14951,
       "move": "game_core",
-      "type": "string",
-      "string": "@Np"
+      "comment_inline": "'K'",
+      "type": "byte",
+      "values": [
+        64
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4904,
+      "bytes": [
+        78
+      ],
+      "binary_addr": 14952,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        78
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4905,
+      "bytes": [
+        112
+      ],
+      "binary_addr": 14953,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        112
+      ],
+      "format_hints": [
+        "binary"
+      ]
     },
     {
       "addr": 4906,
       "bytes": [
-        136,
-        136,
-        132,
-        194,
-        0
+        136
       ],
       "binary_addr": 14954,
       "move": "game_core",
       "type": "byte",
       "values": [
-        136,
-        136,
-        132,
-        194,
+        136
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4907,
+      "bytes": [
+        136
+      ],
+      "binary_addr": 14955,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        136
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4908,
+      "bytes": [
+        132
+      ],
+      "binary_addr": 14956,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        132
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4909,
+      "bytes": [
+        194
+      ],
+      "binary_addr": 14957,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        194
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4910,
+      "bytes": [
         0
+      ],
+      "binary_addr": 14958,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
       ]
     },
     {
       "addr": 4911,
       "bytes": [
-        96,
-        64,
-        64
+        96
       ],
       "binary_addr": 14959,
       "move": "game_core",
-      "type": "string",
-      "string": "`@@"
+      "comment_inline": "'L'",
+      "type": "byte",
+      "values": [
+        96
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4912,
+      "bytes": [
+        64
+      ],
+      "binary_addr": 14960,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        64
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4913,
+      "bytes": [
+        64
+      ],
+      "binary_addr": 14961,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        64
+      ],
+      "format_hints": [
+        "binary"
+      ]
     },
     {
       "addr": 4914,
       "bytes": [
-        128,
-        128,
-        130,
-        254,
-        0
+        128
       ],
       "binary_addr": 14962,
       "move": "game_core",
       "type": "byte",
       "values": [
-        128,
-        128,
-        130,
-        254,
+        128
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4915,
+      "bytes": [
+        128
+      ],
+      "binary_addr": 14963,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        128
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4916,
+      "bytes": [
+        130
+      ],
+      "binary_addr": 14964,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        130
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4917,
+      "bytes": [
+        254
+      ],
+      "binary_addr": 14965,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        254
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4918,
+      "bytes": [
         0
+      ],
+      "binary_addr": 14966,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
       ]
     },
     {
       "addr": 4919,
       "bytes": [
-        70,
-        110,
-        106
+        70
       ],
       "binary_addr": 14967,
       "move": "game_core",
-      "type": "string",
-      "string": "Fnj"
+      "comment_inline": "'M'",
+      "type": "byte",
+      "values": [
+        70
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4920,
+      "bytes": [
+        110
+      ],
+      "binary_addr": 14968,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        110
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4921,
+      "bytes": [
+        106
+      ],
+      "binary_addr": 14969,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        106
+      ],
+      "format_hints": [
+        "binary"
+      ]
     },
     {
       "addr": 4922,
       "bytes": [
-        218,
-        146,
-        130,
-        198,
-        0
+        218
       ],
       "binary_addr": 14970,
       "move": "game_core",
       "type": "byte",
       "values": [
-        218,
-        146,
-        130,
-        198,
+        218
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4923,
+      "bytes": [
+        146
+      ],
+      "binary_addr": 14971,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        146
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4924,
+      "bytes": [
+        130
+      ],
+      "binary_addr": 14972,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        130
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4925,
+      "bytes": [
+        198
+      ],
+      "binary_addr": 14973,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        198
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4926,
+      "bytes": [
         0
+      ],
+      "binary_addr": 14974,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
       ]
     },
     {
       "addr": 4927,
       "bytes": [
-        102,
-        82,
-        82
+        102
       ],
       "binary_addr": 14975,
       "move": "game_core",
-      "type": "string",
-      "string": "fRR"
+      "comment_inline": "'N'",
+      "type": "byte",
+      "values": [
+        102
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4928,
+      "bytes": [
+        82
+      ],
+      "binary_addr": 14976,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        82
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4929,
+      "bytes": [
+        82
+      ],
+      "binary_addr": 14977,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        82
+      ],
+      "format_hints": [
+        "binary"
+      ]
     },
     {
       "addr": 4930,
       "bytes": [
-        138,
-        138,
-        138,
-        198,
-        0
+        138
       ],
       "binary_addr": 14978,
       "move": "game_core",
       "type": "byte",
       "values": [
-        138,
-        138,
-        138,
-        198,
+        138
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4931,
+      "bytes": [
+        138
+      ],
+      "binary_addr": 14979,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        138
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4932,
+      "bytes": [
+        138
+      ],
+      "binary_addr": 14980,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        138
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4933,
+      "bytes": [
+        198
+      ],
+      "binary_addr": 14981,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        198
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4934,
+      "bytes": [
         0
+      ],
+      "binary_addr": 14982,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
       ]
     },
     {
       "addr": 4935,
       "bytes": [
-        60,
-        66,
-        66
+        60
       ],
       "binary_addr": 14983,
       "move": "game_core",
-      "type": "string",
-      "string": "<BB"
+      "comment_inline": "'O'",
+      "type": "byte",
+      "values": [
+        60
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4936,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 14984,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4937,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 14985,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
     },
     {
       "addr": 4938,
       "bytes": [
-        130,
-        130,
-        130,
-        124,
-        0
+        130
       ],
       "binary_addr": 14986,
       "move": "game_core",
       "type": "byte",
       "values": [
-        130,
-        130,
-        130,
-        124,
+        130
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4939,
+      "bytes": [
+        130
+      ],
+      "binary_addr": 14987,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        130
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4940,
+      "bytes": [
+        130
+      ],
+      "binary_addr": 14988,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        130
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4941,
+      "bytes": [
+        124
+      ],
+      "binary_addr": 14989,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        124
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4942,
+      "bytes": [
         0
+      ],
+      "binary_addr": 14990,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
       ]
     },
     {
       "addr": 4943,
       "bytes": [
-        124,
-        66,
-        66
+        124
       ],
       "binary_addr": 14991,
       "move": "game_core",
-      "type": "string",
-      "string": "|BB"
+      "comment_inline": "'P'",
+      "type": "byte",
+      "values": [
+        124
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4944,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 14992,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4945,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 14993,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
     },
     {
       "addr": 4946,
       "bytes": [
-        188,
-        128,
-        128,
-        192,
-        0
+        188
       ],
       "binary_addr": 14994,
       "move": "game_core",
       "type": "byte",
       "values": [
-        188,
-        128,
-        128,
-        192,
+        188
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4947,
+      "bytes": [
+        128
+      ],
+      "binary_addr": 14995,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        128
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4948,
+      "bytes": [
+        128
+      ],
+      "binary_addr": 14996,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        128
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4949,
+      "bytes": [
+        192
+      ],
+      "binary_addr": 14997,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        192
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4950,
+      "bytes": [
         0
+      ],
+      "binary_addr": 14998,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
       ]
     },
     {
       "addr": 4951,
       "bytes": [
-        60,
-        66,
-        66
+        60
       ],
       "binary_addr": 14999,
       "move": "game_core",
-      "type": "string",
-      "string": "<BB"
+      "comment_inline": "'Q'",
+      "type": "byte",
+      "values": [
+        60
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4952,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 15000,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4953,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 15001,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
     },
     {
       "addr": 4954,
       "bytes": [
-        154,
-        138,
-        134,
-        126,
-        0
+        154
       ],
       "binary_addr": 15002,
       "move": "game_core",
       "type": "byte",
       "values": [
-        154,
-        138,
-        134,
-        126,
+        154
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4955,
+      "bytes": [
+        138
+      ],
+      "binary_addr": 15003,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        138
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4956,
+      "bytes": [
+        134
+      ],
+      "binary_addr": 15004,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        134
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4957,
+      "bytes": [
+        126
+      ],
+      "binary_addr": 15005,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        126
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4958,
+      "bytes": [
         0
+      ],
+      "binary_addr": 15006,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
       ]
     },
     {
       "addr": 4959,
       "bytes": [
-        124,
-        66,
-        66
+        124
       ],
       "binary_addr": 15007,
       "move": "game_core",
-      "type": "string",
-      "string": "|BB"
+      "comment_inline": "'R'",
+      "type": "byte",
+      "values": [
+        124
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4960,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 15008,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4961,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 15009,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
     },
     {
       "addr": 4962,
       "bytes": [
-        188,
-        136,
-        132,
-        194,
-        0,
-        30
+        188
       ],
       "binary_addr": 15010,
       "move": "game_core",
       "type": "byte",
       "values": [
-        188,
-        136,
-        132,
-        194,
-        0,
+        188
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4963,
+      "bytes": [
+        136
+      ],
+      "binary_addr": 15011,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        136
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4964,
+      "bytes": [
+        132
+      ],
+      "binary_addr": 15012,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        132
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4965,
+      "bytes": [
+        194
+      ],
+      "binary_addr": 15013,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        194
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4966,
+      "bytes": [
+        0
+      ],
+      "binary_addr": 15014,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4967,
+      "bytes": [
         30
+      ],
+      "binary_addr": 15015,
+      "move": "game_core",
+      "comment_inline": "'S'",
+      "type": "byte",
+      "values": [
+        30
+      ],
+      "format_hints": [
+        "binary"
       ]
     },
     {
       "addr": 4968,
       "bytes": [
-        34,
-        64,
-        60
+        34
       ],
       "binary_addr": 15016,
       "move": "game_core",
-      "type": "string",
-      "string": "\"@<"
+      "type": "byte",
+      "values": [
+        34
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4969,
+      "bytes": [
+        64
+      ],
+      "binary_addr": 15017,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        64
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4970,
+      "bytes": [
+        60
+      ],
+      "binary_addr": 15018,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        60
+      ],
+      "format_hints": [
+        "binary"
+      ]
     },
     {
       "addr": 4971,
       "bytes": [
-        2,
-        130,
-        252,
-        0,
-        254,
-        146,
-        16
+        2
       ],
       "binary_addr": 15019,
       "move": "game_core",
       "type": "byte",
       "values": [
-        2,
-        130,
-        252,
-        0,
-        254,
-        146,
+        2
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4972,
+      "bytes": [
+        130
+      ],
+      "binary_addr": 15020,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        130
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4973,
+      "bytes": [
+        252
+      ],
+      "binary_addr": 15021,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        252
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4974,
+      "bytes": [
+        0
+      ],
+      "binary_addr": 15022,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4975,
+      "bytes": [
+        254
+      ],
+      "binary_addr": 15023,
+      "move": "game_core",
+      "comment_inline": "'T'",
+      "type": "byte",
+      "values": [
+        254
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4976,
+      "bytes": [
+        146
+      ],
+      "binary_addr": 15024,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        146
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4977,
+      "bytes": [
         16
+      ],
+      "binary_addr": 15025,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        16
+      ],
+      "format_hints": [
+        "binary"
       ]
     },
     {
       "addr": 4978,
       "bytes": [
-        32,
-        32,
-        32,
-        112
+        32
       ],
       "binary_addr": 15026,
       "move": "game_core",
-      "type": "string",
-      "string": "   p"
+      "type": "byte",
+      "values": [
+        32
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4979,
+      "bytes": [
+        32
+      ],
+      "binary_addr": 15027,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        32
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4980,
+      "bytes": [
+        32
+      ],
+      "binary_addr": 15028,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        32
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4981,
+      "bytes": [
+        112
+      ],
+      "binary_addr": 15029,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        112
+      ],
+      "format_hints": [
+        "binary"
+      ]
     },
     {
       "addr": 4982,
@@ -31424,164 +33282,748 @@
       "type": "byte",
       "values": [
         0
+      ],
+      "format_hints": [
+        "binary"
       ]
     },
     {
       "addr": 4983,
       "bytes": [
-        102,
-        66,
-        66
+        102
       ],
       "binary_addr": 15031,
       "move": "game_core",
-      "type": "string",
-      "string": "fBB"
+      "comment_inline": "'U'",
+      "type": "byte",
+      "values": [
+        102
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4984,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 15032,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4985,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 15033,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
     },
     {
       "addr": 4986,
       "bytes": [
-        130,
-        130,
-        130,
-        124,
-        0,
-        198,
-        66,
-        66,
-        130,
-        132,
-        72,
-        48,
-        0
+        130
       ],
       "binary_addr": 15034,
       "move": "game_core",
       "type": "byte",
       "values": [
-        130,
-        130,
-        130,
-        124,
-        0,
-        198,
-        66,
-        66,
-        130,
-        132,
-        72,
-        48,
+        130
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4987,
+      "bytes": [
+        130
+      ],
+      "binary_addr": 15035,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        130
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4988,
+      "bytes": [
+        130
+      ],
+      "binary_addr": 15036,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        130
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4989,
+      "bytes": [
+        124
+      ],
+      "binary_addr": 15037,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        124
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4990,
+      "bytes": [
         0
+      ],
+      "binary_addr": 15038,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4991,
+      "bytes": [
+        198
+      ],
+      "binary_addr": 15039,
+      "move": "game_core",
+      "comment_inline": "'V'",
+      "type": "byte",
+      "values": [
+        198
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4992,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 15040,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4993,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 15041,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4994,
+      "bytes": [
+        130
+      ],
+      "binary_addr": 15042,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        130
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4995,
+      "bytes": [
+        132
+      ],
+      "binary_addr": 15043,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        132
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4996,
+      "bytes": [
+        72
+      ],
+      "binary_addr": 15044,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        72
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4997,
+      "bytes": [
+        48
+      ],
+      "binary_addr": 15045,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        48
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 4998,
+      "bytes": [
+        0
+      ],
+      "binary_addr": 15046,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
       ]
     },
     {
       "addr": 4999,
       "bytes": [
-        102,
-        66,
-        66
+        102
       ],
       "binary_addr": 15047,
       "move": "game_core",
-      "type": "string",
-      "string": "fBB"
+      "comment_inline": "'W'",
+      "type": "byte",
+      "values": [
+        102
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5000,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 15048,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5001,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 15049,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
     },
     {
       "addr": 5002,
       "bytes": [
-        146,
-        170,
-        74,
-        68,
-        0
+        146
       ],
       "binary_addr": 15050,
       "move": "game_core",
       "type": "byte",
       "values": [
-        146,
-        170,
-        74,
-        68,
+        146
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5003,
+      "bytes": [
+        170
+      ],
+      "binary_addr": 15051,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        170
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5004,
+      "bytes": [
+        74
+      ],
+      "binary_addr": 15052,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        74
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5005,
+      "bytes": [
+        68
+      ],
+      "binary_addr": 15053,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        68
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5006,
+      "bytes": [
         0
+      ],
+      "binary_addr": 15054,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
       ]
     },
     {
       "addr": 5007,
       "bytes": [
-        102,
-        34,
-        36
+        102
       ],
       "binary_addr": 15055,
       "move": "game_core",
-      "type": "string",
-      "string": "f\"$"
+      "comment_inline": "'X'",
+      "type": "byte",
+      "values": [
+        102
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5008,
+      "bytes": [
+        34
+      ],
+      "binary_addr": 15056,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        34
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5009,
+      "bytes": [
+        36
+      ],
+      "binary_addr": 15057,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        36
+      ],
+      "format_hints": [
+        "binary"
+      ]
     },
     {
       "addr": 5010,
       "bytes": [
-        24,
-        24,
-        36,
-        198,
-        0,
-        134,
-        66,
-        50,
-        12,
-        8,
-        16,
-        112,
-        0,
-        126,
-        2,
-        4,
-        24,
-        32,
-        66,
-        254,
-        0
+        24
       ],
       "binary_addr": 15058,
       "move": "game_core",
       "type": "byte",
       "values": [
-        24,
-        24,
-        36,
-        198,
-        0,
-        134,
-        66,
-        50,
-        12,
-        8,
-        16,
-        112,
-        0,
-        126,
-        2,
-        4,
-        24,
-        32,
-        66,
-        254,
+        24
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5011,
+      "bytes": [
+        24
+      ],
+      "binary_addr": 15059,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        24
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5012,
+      "bytes": [
+        36
+      ],
+      "binary_addr": 15060,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        36
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5013,
+      "bytes": [
+        198
+      ],
+      "binary_addr": 15061,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        198
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5014,
+      "bytes": [
         0
+      ],
+      "binary_addr": 15062,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5015,
+      "bytes": [
+        134
+      ],
+      "binary_addr": 15063,
+      "move": "game_core",
+      "comment_inline": "'Y'",
+      "type": "byte",
+      "values": [
+        134
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5016,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 15064,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5017,
+      "bytes": [
+        50
+      ],
+      "binary_addr": 15065,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        50
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5018,
+      "bytes": [
+        12
+      ],
+      "binary_addr": 15066,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        12
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5019,
+      "bytes": [
+        8
+      ],
+      "binary_addr": 15067,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        8
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5020,
+      "bytes": [
+        16
+      ],
+      "binary_addr": 15068,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        16
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5021,
+      "bytes": [
+        112
+      ],
+      "binary_addr": 15069,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        112
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5022,
+      "bytes": [
+        0
+      ],
+      "binary_addr": 15070,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5023,
+      "bytes": [
+        126
+      ],
+      "binary_addr": 15071,
+      "move": "game_core",
+      "comment_inline": "'Z'",
+      "type": "byte",
+      "values": [
+        126
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5024,
+      "bytes": [
+        2
+      ],
+      "binary_addr": 15072,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        2
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5025,
+      "bytes": [
+        4
+      ],
+      "binary_addr": 15073,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        4
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5026,
+      "bytes": [
+        24
+      ],
+      "binary_addr": 15074,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        24
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5027,
+      "bytes": [
+        32
+      ],
+      "binary_addr": 15075,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        32
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5028,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 15076,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5029,
+      "bytes": [
+        254
+      ],
+      "binary_addr": 15077,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        254
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5030,
+      "bytes": [
+        0
+      ],
+      "binary_addr": 15078,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
       ]
     },
     {
       "addr": 5031,
       "bytes": [
-        60,
-        70,
-        74
+        60
       ],
       "binary_addr": 15079,
       "move": "game_core",
       "labels": [
         "font_digits"
       ],
+      "comment_inline": "'0'",
       "xref_summaries": [
         "&3ae7 used as index base 1 time by &7fe8"
       ],
@@ -31591,202 +34033,1206 @@
           "kind": "indexed"
         }
       ],
-      "type": "string",
-      "string": "<FJ"
+      "type": "byte",
+      "values": [
+        60
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5032,
+      "bytes": [
+        70
+      ],
+      "binary_addr": 15080,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        70
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5033,
+      "bytes": [
+        74
+      ],
+      "binary_addr": 15081,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        74
+      ],
+      "format_hints": [
+        "binary"
+      ]
     },
     {
       "addr": 5034,
       "bytes": [
-        146,
-        162,
-        196,
-        120,
-        0,
-        8,
-        24,
-        8,
-        16,
-        16,
-        16,
-        60,
-        0,
-        60,
-        66,
-        2,
-        12,
-        48,
-        66,
-        252,
-        0,
-        126,
-        2,
-        4,
-        24,
-        6,
-        130,
-        124,
-        0,
-        24,
-        40,
-        72,
-        144,
-        252,
-        16,
-        56,
-        0,
-        31,
-        32,
-        32,
-        24,
-        4,
-        130,
-        124,
-        0,
-        14,
-        16,
-        32,
-        124,
-        130,
-        130,
-        124,
-        0,
-        126,
-        2,
-        2,
-        4,
-        8,
-        16,
-        120,
-        0,
-        28
+        146
       ],
       "binary_addr": 15082,
       "move": "game_core",
       "type": "byte",
       "values": [
-        146,
-        162,
-        196,
-        120,
-        0,
-        8,
-        24,
-        8,
-        16,
-        16,
-        16,
-        60,
-        0,
-        60,
-        66,
-        2,
-        12,
-        48,
-        66,
-        252,
-        0,
-        126,
-        2,
-        4,
-        24,
-        6,
-        130,
-        124,
-        0,
-        24,
-        40,
-        72,
-        144,
-        252,
-        16,
-        56,
-        0,
-        31,
-        32,
-        32,
-        24,
-        4,
-        130,
-        124,
-        0,
-        14,
-        16,
-        32,
-        124,
-        130,
-        130,
-        124,
-        0,
-        126,
-        2,
-        2,
-        4,
-        8,
-        16,
-        120,
-        0,
+        146
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5035,
+      "bytes": [
+        162
+      ],
+      "binary_addr": 15083,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        162
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5036,
+      "bytes": [
+        196
+      ],
+      "binary_addr": 15084,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        196
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5037,
+      "bytes": [
+        120
+      ],
+      "binary_addr": 15085,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        120
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5038,
+      "bytes": [
+        0
+      ],
+      "binary_addr": 15086,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5039,
+      "bytes": [
+        8
+      ],
+      "binary_addr": 15087,
+      "move": "game_core",
+      "comment_inline": "'1'",
+      "type": "byte",
+      "values": [
+        8
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5040,
+      "bytes": [
+        24
+      ],
+      "binary_addr": 15088,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        24
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5041,
+      "bytes": [
+        8
+      ],
+      "binary_addr": 15089,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        8
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5042,
+      "bytes": [
+        16
+      ],
+      "binary_addr": 15090,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        16
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5043,
+      "bytes": [
+        16
+      ],
+      "binary_addr": 15091,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        16
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5044,
+      "bytes": [
+        16
+      ],
+      "binary_addr": 15092,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        16
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5045,
+      "bytes": [
+        60
+      ],
+      "binary_addr": 15093,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        60
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5046,
+      "bytes": [
+        0
+      ],
+      "binary_addr": 15094,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5047,
+      "bytes": [
+        60
+      ],
+      "binary_addr": 15095,
+      "move": "game_core",
+      "comment_inline": "'2'",
+      "type": "byte",
+      "values": [
+        60
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5048,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 15096,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5049,
+      "bytes": [
+        2
+      ],
+      "binary_addr": 15097,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        2
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5050,
+      "bytes": [
+        12
+      ],
+      "binary_addr": 15098,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        12
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5051,
+      "bytes": [
+        48
+      ],
+      "binary_addr": 15099,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        48
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5052,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 15100,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5053,
+      "bytes": [
+        252
+      ],
+      "binary_addr": 15101,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        252
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5054,
+      "bytes": [
+        0
+      ],
+      "binary_addr": 15102,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5055,
+      "bytes": [
+        126
+      ],
+      "binary_addr": 15103,
+      "move": "game_core",
+      "comment_inline": "'3'",
+      "type": "byte",
+      "values": [
+        126
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5056,
+      "bytes": [
+        2
+      ],
+      "binary_addr": 15104,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        2
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5057,
+      "bytes": [
+        4
+      ],
+      "binary_addr": 15105,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        4
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5058,
+      "bytes": [
+        24
+      ],
+      "binary_addr": 15106,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        24
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5059,
+      "bytes": [
+        6
+      ],
+      "binary_addr": 15107,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        6
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5060,
+      "bytes": [
+        130
+      ],
+      "binary_addr": 15108,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        130
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5061,
+      "bytes": [
+        124
+      ],
+      "binary_addr": 15109,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        124
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5062,
+      "bytes": [
+        0
+      ],
+      "binary_addr": 15110,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5063,
+      "bytes": [
+        24
+      ],
+      "binary_addr": 15111,
+      "move": "game_core",
+      "comment_inline": "'4'",
+      "type": "byte",
+      "values": [
+        24
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5064,
+      "bytes": [
+        40
+      ],
+      "binary_addr": 15112,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        40
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5065,
+      "bytes": [
+        72
+      ],
+      "binary_addr": 15113,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        72
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5066,
+      "bytes": [
+        144
+      ],
+      "binary_addr": 15114,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        144
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5067,
+      "bytes": [
+        252
+      ],
+      "binary_addr": 15115,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        252
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5068,
+      "bytes": [
+        16
+      ],
+      "binary_addr": 15116,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        16
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5069,
+      "bytes": [
+        56
+      ],
+      "binary_addr": 15117,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        56
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5070,
+      "bytes": [
+        0
+      ],
+      "binary_addr": 15118,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5071,
+      "bytes": [
+        31
+      ],
+      "binary_addr": 15119,
+      "move": "game_core",
+      "comment_inline": "'5'",
+      "type": "byte",
+      "values": [
+        31
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5072,
+      "bytes": [
+        32
+      ],
+      "binary_addr": 15120,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        32
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5073,
+      "bytes": [
+        32
+      ],
+      "binary_addr": 15121,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        32
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5074,
+      "bytes": [
+        24
+      ],
+      "binary_addr": 15122,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        24
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5075,
+      "bytes": [
+        4
+      ],
+      "binary_addr": 15123,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        4
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5076,
+      "bytes": [
+        130
+      ],
+      "binary_addr": 15124,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        130
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5077,
+      "bytes": [
+        124
+      ],
+      "binary_addr": 15125,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        124
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5078,
+      "bytes": [
+        0
+      ],
+      "binary_addr": 15126,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5079,
+      "bytes": [
+        14
+      ],
+      "binary_addr": 15127,
+      "move": "game_core",
+      "comment_inline": "'6'",
+      "type": "byte",
+      "values": [
+        14
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5080,
+      "bytes": [
+        16
+      ],
+      "binary_addr": 15128,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        16
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5081,
+      "bytes": [
+        32
+      ],
+      "binary_addr": 15129,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        32
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5082,
+      "bytes": [
+        124
+      ],
+      "binary_addr": 15130,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        124
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5083,
+      "bytes": [
+        130
+      ],
+      "binary_addr": 15131,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        130
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5084,
+      "bytes": [
+        130
+      ],
+      "binary_addr": 15132,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        130
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5085,
+      "bytes": [
+        124
+      ],
+      "binary_addr": 15133,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        124
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5086,
+      "bytes": [
+        0
+      ],
+      "binary_addr": 15134,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5087,
+      "bytes": [
+        126
+      ],
+      "binary_addr": 15135,
+      "move": "game_core",
+      "comment_inline": "'7'",
+      "type": "byte",
+      "values": [
+        126
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5088,
+      "bytes": [
+        2
+      ],
+      "binary_addr": 15136,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        2
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5089,
+      "bytes": [
+        2
+      ],
+      "binary_addr": 15137,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        2
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5090,
+      "bytes": [
+        4
+      ],
+      "binary_addr": 15138,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        4
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5091,
+      "bytes": [
+        8
+      ],
+      "binary_addr": 15139,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        8
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5092,
+      "bytes": [
+        16
+      ],
+      "binary_addr": 15140,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        16
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5093,
+      "bytes": [
+        120
+      ],
+      "binary_addr": 15141,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        120
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5094,
+      "bytes": [
+        0
+      ],
+      "binary_addr": 15142,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5095,
+      "bytes": [
         28
+      ],
+      "binary_addr": 15143,
+      "move": "game_core",
+      "comment_inline": "'8'",
+      "type": "byte",
+      "values": [
+        28
+      ],
+      "format_hints": [
+        "binary"
       ]
     },
     {
       "addr": 5096,
       "bytes": [
-        34,
-        34,
-        124
+        34
       ],
       "binary_addr": 15144,
       "move": "game_core",
-      "type": "string",
-      "string": "\"\"|"
+      "type": "byte",
+      "values": [
+        34
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5097,
+      "bytes": [
+        34
+      ],
+      "binary_addr": 15145,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        34
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5098,
+      "bytes": [
+        124
+      ],
+      "binary_addr": 15146,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        124
+      ],
+      "format_hints": [
+        "binary"
+      ]
     },
     {
       "addr": 5099,
       "bytes": [
-        130,
-        130,
-        124,
-        0
+        130
       ],
       "binary_addr": 15147,
       "move": "game_core",
       "type": "byte",
       "values": [
-        130,
-        130,
-        124,
+        130
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5100,
+      "bytes": [
+        130
+      ],
+      "binary_addr": 15148,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        130
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5101,
+      "bytes": [
+        124
+      ],
+      "binary_addr": 15149,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        124
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5102,
+      "bytes": [
         0
+      ],
+      "binary_addr": 15150,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
       ]
     },
     {
       "addr": 5103,
       "bytes": [
-        60,
-        66,
-        66,
-        62
+        60
       ],
       "binary_addr": 15151,
       "move": "game_core",
-      "type": "string",
-      "string": "<BB>"
+      "comment_inline": "'9'",
+      "type": "byte",
+      "values": [
+        60
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5104,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 15152,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5105,
+      "bytes": [
+        66
+      ],
+      "binary_addr": 15153,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        66
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5106,
+      "bytes": [
+        62
+      ],
+      "binary_addr": 15154,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        62
+      ],
+      "format_hints": [
+        "binary"
+      ]
     },
     {
       "addr": 5107,
       "bytes": [
-        2,
-        4,
-        24,
-        0
+        2
       ],
       "binary_addr": 15155,
       "move": "game_core",
       "type": "byte",
       "values": [
-        2,
-        4,
-        24,
+        2
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5108,
+      "bytes": [
+        4
+      ],
+      "binary_addr": 15156,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        4
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5109,
+      "bytes": [
+        24
+      ],
+      "binary_addr": 15157,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        24
+      ],
+      "format_hints": [
+        "binary"
+      ]
+    },
+    {
+      "addr": 5110,
+      "bytes": [
         0
+      ],
+      "binary_addr": 15158,
+      "move": "game_core",
+      "type": "byte",
+      "values": [
+        0
+      ],
+      "format_hints": [
+        "binary"
       ]
     },
     {

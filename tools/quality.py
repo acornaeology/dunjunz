@@ -4,8 +4,8 @@
 
 For each listing, counts what the comment-coverage figure does not show:
 auto-generated labels (dasmos's code_/loop_/data_/sub_ names), subroutines
-without a calling convention (on_entry/on_exit), data items with no
-inline comment, and code whose operand is a raw address or a hex
+without a calling convention (on_entry/on_exit), data items other than strings
+with no inline comment, and code whose operand is a raw address or a hex
 immediate. `--list KIND` prints the addresses of one kind: auto, conv,
 data, rawaddr or hexconst.
 """
@@ -41,7 +41,7 @@ def analyse(json_filepath):
                 found["rawaddr"].append((item["addr"], f"{mnemonic} {operand}"))
             if HEX_IMM_RE.match(operand):
                 found["hexconst"].append((item["addr"], f"{mnemonic} {operand}"))
-        elif not item.get("comment_inline") and not item.get("labels"):
+        elif item["type"] != "string" and not item.get("comment_inline") and not item.get("labels"):
             found["data"].append((item["addr"], f"{item['type']} x{len(item['bytes'])}"))
     for sub in listing["subroutines"]:
         if "title" not in sub:

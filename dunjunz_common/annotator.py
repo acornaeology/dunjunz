@@ -154,6 +154,10 @@ class Annotator:
         for move, _ in self._each(addr):
             self.d.inkey_number(addr, count, move=move)
 
+    def format_hint(self, addr, hint):
+        for move, _ in self._each(addr):
+            self.d.format_hint(addr, hint, move=move)
+
     def word(self, addr, length=2, cols=None):
         for move, _ in self._each(addr):
             self.d.word(addr, length, cols=cols, move=move)

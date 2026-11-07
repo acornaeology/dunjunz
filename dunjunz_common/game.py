@@ -6,6 +6,7 @@ official disc release (see tools/runtime_images.py for the differences).
 Where the versions differ, the drivers add their own annotations.
 """
 
+import dasmos
 from dasmos.expr import char, hexlit, hi, lo, sym
 
 from dunjunz_common.annotator import Annotator
@@ -256,6 +257,13 @@ def _text_output(a: Annotator) -> None:
     a.banner(0x13A7, "Font: digits 0-9",
              "Eight bytes per digit, copied into the definition of character "
              "128 by the WRCHV handler.")
+    for base, chars in [(0x12D7, "ABCDEFGHIJKLMNOPQRSTUVWXYZ"), (0x13A7, "0123456789")]:
+        for i, ch in enumerate(chars):
+            for row in range(8):
+                addr = base + 8 * i + row
+                a.byte(addr, 1)
+                a.format_hint(addr, dasmos.FormatHint.BINARY)
+            a.c(base + 8 * i, f"'{ch}'")
 
     a.sub(0x7F8F, "wrch_handler", "WRCHV handler: print letters and digits in the game font",
           description=(

@@ -1606,50 +1606,214 @@ reset_call_address = reset_call+1
 ; handler.
 ; &12d7 used as index base 1 time by &7fc5
 .font_letters
-    equs "<BB"
-    equb &8e, &f2, &82, &c6, &00
-    equs "xDB"
-    equb &bc, &82, &82, &fc, &00
-    equs "<B@"
-    equb &80, &80, &82, &7c, &00, &7c, &82, &82
-    equb &82, &84, &84, &f8, &00, &0e, &70, &40
-    equb &ce, &f0, &80, &fe, &00, &1e, &e0, &80
-    equb &8e, &f0, &80, &c0, &00
-    equs "<BB"
-    equb &80, &9e, &82, &7e, &00
-    equs "bBB"
-    equb &9e, &e2, &82, &c6, &00, &1e, &08, &08
-    equb &10, &10, &10, &7c, &00, &fe, &02, &02
-    equb &04, &c4, &84, &78, &00
-    equs "@Np"
-    equb &88, &88, &84, &c2, &00
-    equs "`@@"
-    equb &80, &80, &82, &fe, &00
-    equs "Fnj"
-    equb &da, &92, &82, &c6, &00
-    equs "fRR"
-    equb &8a, &8a, &8a, &c6, &00
-    equs "<BB"
-    equb &82, &82, &82, &7c, &00
-    equs "|BB"
-    equb &bc, &80, &80, &c0, &00
-    equs "<BB"
-    equb &9a, &8a, &86, &7e, &00
-    equs "|BB"
-    equb &bc, &88, &84, &c2, &00, &1e
-    equb &22, "@<"
-    equb &02, &82, &fc, &00, &fe, &92, &10
-    equs "   p"
-    equb &00
-    equs "fBB"
-    equb &82, &82, &82, &7c, &00, &c6, &42, &42
-    equb &82, &84, &48, &30, &00
-    equs "fBB"
-    equb &92, &aa, &4a, &44, &00
-    equs "f", &22, "$"
-    equb &18, &18, &24, &c6, &00, &86, &42, &32
-    equb &0c, &08, &10, &70, &00, &7e, &02, &04
-    equb &18, &20, &42, &fe, &00
+    equb %00111100                      ; 'A'
+    equb %01000010
+    equb %01000010
+    equb %10001110
+    equb %11110010
+    equb %10000010
+    equb %11000110
+    equb %00000000
+    equb %01111000                      ; 'B'
+    equb %01000100
+    equb %01000010
+    equb %10111100
+    equb %10000010
+    equb %10000010
+    equb %11111100
+    equb %00000000
+    equb %00111100                      ; 'C'
+    equb %01000010
+    equb %01000000
+    equb %10000000
+    equb %10000000
+    equb %10000010
+    equb %01111100
+    equb %00000000
+    equb %01111100                      ; 'D'
+    equb %10000010
+    equb %10000010
+    equb %10000010
+    equb %10000100
+    equb %10000100
+    equb %11111000
+    equb %00000000
+    equb %00001110                      ; 'E'
+    equb %01110000
+    equb %01000000
+    equb %11001110
+    equb %11110000
+    equb %10000000
+    equb %11111110
+    equb %00000000
+    equb %00011110                      ; 'F'
+    equb %11100000
+    equb %10000000
+    equb %10001110
+    equb %11110000
+    equb %10000000
+    equb %11000000
+    equb %00000000
+    equb %00111100                      ; 'G'
+    equb %01000010
+    equb %01000010
+    equb %10000000
+    equb %10011110
+    equb %10000010
+    equb %01111110
+    equb %00000000
+    equb %01100010                      ; 'H'
+    equb %01000010
+    equb %01000010
+    equb %10011110
+    equb %11100010
+    equb %10000010
+    equb %11000110
+    equb %00000000
+    equb %00011110                      ; 'I'
+    equb %00001000
+    equb %00001000
+    equb %00010000
+    equb %00010000
+    equb %00010000
+    equb %01111100
+    equb %00000000
+    equb %11111110                      ; 'J'
+    equb %00000010
+    equb %00000010
+    equb %00000100
+    equb %11000100
+    equb %10000100
+    equb %01111000
+    equb %00000000
+    equb %01000000                      ; 'K'
+    equb %01001110
+    equb %01110000
+    equb %10001000
+    equb %10001000
+    equb %10000100
+    equb %11000010
+    equb %00000000
+    equb %01100000                      ; 'L'
+    equb %01000000
+    equb %01000000
+    equb %10000000
+    equb %10000000
+    equb %10000010
+    equb %11111110
+    equb %00000000
+    equb %01000110                      ; 'M'
+    equb %01101110
+    equb %01101010
+    equb %11011010
+    equb %10010010
+    equb %10000010
+    equb %11000110
+    equb %00000000
+    equb %01100110                      ; 'N'
+    equb %01010010
+    equb %01010010
+    equb %10001010
+    equb %10001010
+    equb %10001010
+    equb %11000110
+    equb %00000000
+    equb %00111100                      ; 'O'
+    equb %01000010
+    equb %01000010
+    equb %10000010
+    equb %10000010
+    equb %10000010
+    equb %01111100
+    equb %00000000
+    equb %01111100                      ; 'P'
+    equb %01000010
+    equb %01000010
+    equb %10111100
+    equb %10000000
+    equb %10000000
+    equb %11000000
+    equb %00000000
+    equb %00111100                      ; 'Q'
+    equb %01000010
+    equb %01000010
+    equb %10011010
+    equb %10001010
+    equb %10000110
+    equb %01111110
+    equb %00000000
+    equb %01111100                      ; 'R'
+    equb %01000010
+    equb %01000010
+    equb %10111100
+    equb %10001000
+    equb %10000100
+    equb %11000010
+    equb %00000000
+    equb %00011110                      ; 'S'
+    equb %00100010
+    equb %01000000
+    equb %00111100
+    equb %00000010
+    equb %10000010
+    equb %11111100
+    equb %00000000
+    equb %11111110                      ; 'T'
+    equb %10010010
+    equb %00010000
+    equb %00100000
+    equb %00100000
+    equb %00100000
+    equb %01110000
+    equb %00000000
+    equb %01100110                      ; 'U'
+    equb %01000010
+    equb %01000010
+    equb %10000010
+    equb %10000010
+    equb %10000010
+    equb %01111100
+    equb %00000000
+    equb %11000110                      ; 'V'
+    equb %01000010
+    equb %01000010
+    equb %10000010
+    equb %10000100
+    equb %01001000
+    equb %00110000
+    equb %00000000
+    equb %01100110                      ; 'W'
+    equb %01000010
+    equb %01000010
+    equb %10010010
+    equb %10101010
+    equb %01001010
+    equb %01000100
+    equb %00000000
+    equb %01100110                      ; 'X'
+    equb %00100010
+    equb %00100100
+    equb %00011000
+    equb %00011000
+    equb %00100100
+    equb %11000110
+    equb %00000000
+    equb %10000110                      ; 'Y'
+    equb %01000010
+    equb %00110010
+    equb %00001100
+    equb %00001000
+    equb %00010000
+    equb %01110000
+    equb %00000000
+    equb %01111110                      ; 'Z'
+    equb %00000010
+    equb %00000100
+    equb %00011000
+    equb %00100000
+    equb %01000010
+    equb %11111110
+    equb %00000000
 ; ***************************************************************************************
 ; Font: digits 0-9
 ;
@@ -1657,19 +1821,86 @@ reset_call_address = reset_call+1
 ; handler.
 ; &13a7 used as index base 1 time by &7fe8
 .font_digits
-    equs "<FJ"
-    equb &92, &a2, &c4, &78, &00, &08, &18, &08
-    equb &10, &10, &10, &3c, &00, &3c, &42, &02
-    equb &0c, &30, &42, &fc, &00, &7e, &02, &04
-    equb &18, &06, &82, &7c, &00, &18, &28, &48
-    equb &90, &fc, &10, &38, &00, &1f, &20, &20
-    equb &18, &04, &82, &7c, &00, &0e, &10, &20
-    equb &7c, &82, &82, &7c, &00, &7e, &02, &02
-    equb &04, &08, &10, &78, &00, &1c
-    equb &22, &22, "|"
-    equb &82, &82, &7c, &00
-    equs "<BB>"
-    equb &02, &04, &18, &00
+    equb %00111100                      ; '0'
+    equb %01000110
+    equb %01001010
+    equb %10010010
+    equb %10100010
+    equb %11000100
+    equb %01111000
+    equb %00000000
+    equb %00001000                      ; '1'
+    equb %00011000
+    equb %00001000
+    equb %00010000
+    equb %00010000
+    equb %00010000
+    equb %00111100
+    equb %00000000
+    equb %00111100                      ; '2'
+    equb %01000010
+    equb %00000010
+    equb %00001100
+    equb %00110000
+    equb %01000010
+    equb %11111100
+    equb %00000000
+    equb %01111110                      ; '3'
+    equb %00000010
+    equb %00000100
+    equb %00011000
+    equb %00000110
+    equb %10000010
+    equb %01111100
+    equb %00000000
+    equb %00011000                      ; '4'
+    equb %00101000
+    equb %01001000
+    equb %10010000
+    equb %11111100
+    equb %00010000
+    equb %00111000
+    equb %00000000
+    equb %00011111                      ; '5'
+    equb %00100000
+    equb %00100000
+    equb %00011000
+    equb %00000100
+    equb %10000010
+    equb %01111100
+    equb %00000000
+    equb %00001110                      ; '6'
+    equb %00010000
+    equb %00100000
+    equb %01111100
+    equb %10000010
+    equb %10000010
+    equb %01111100
+    equb %00000000
+    equb %01111110                      ; '7'
+    equb %00000010
+    equb %00000010
+    equb %00000100
+    equb %00001000
+    equb %00010000
+    equb %01111000
+    equb %00000000
+    equb %00011100                      ; '8'
+    equb %00100010
+    equb %00100010
+    equb %01111100
+    equb %10000010
+    equb %10000010
+    equb %01111100
+    equb %00000000
+    equb %00111100                      ; '9'
+    equb %01000010
+    equb %01000010
+    equb %00111110
+    equb %00000010
+    equb %00000100
+    equb %00011000
+    equb %00000000
     equs "<BB>"
     equb &02, &04, &18, &00, &74
 ; ***************************************************************************************
@@ -9939,7 +10170,7 @@ save "Coder", &5000, &59b0, &5000, &5000
 ;     Data                     = 16788 bytes (68%)
 ;
 ;     Number of instructions   = 3574
-;     Number of data bytes     = 15773 bytes
+;     Number of data bytes     = 15838 bytes
 ;     Number of data words     = 64 bytes
-;     Number of string bytes   = 951 bytes
-;     Number of strings        = 116
+;     Number of string bytes   = 886 bytes
+;     Number of strings        = 95
