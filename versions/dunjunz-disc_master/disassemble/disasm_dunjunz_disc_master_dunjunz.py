@@ -130,7 +130,7 @@ comments(loader, [
 ])
 def no_return(disassembler, jsr_binary_addr):
     """leave_title never returns: stop the trace at its JSR, so that the
-    command strings after the call are not decoded as code."""
+    padding after the call is not decoded as code."""
     return jsr_binary_addr
 
 

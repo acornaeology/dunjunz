@@ -63,6 +63,10 @@
     {
       "name": "osbyte_inkey",
       "value": 129
+    },
+    {
+      "name": "inkey_key_a",
+      "value": 190
     }
   ],
   "macros": [],
@@ -11888,7 +11892,7 @@
         244,
         255
       ],
-      "comment_inline": "... INKEY: Scan for a key with positive X, or read internal key number EOR 128 for negative X",
+      "comment_inline": "... Test whether the key with negative INKEY number X is pressed",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -18386,7 +18390,13 @@
       ],
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&be"
+      "operand": "#inkey_key_a",
+      "expr": {
+        "text": "inkey_key_a",
+        "tree": {
+          "sym": "inkey_key_a"
+        }
+      }
     },
     {
       "addr": 9448,
@@ -18650,7 +18660,7 @@
         244,
         255
       ],
-      "comment_inline": "... INKEY: Scan for a key with positive X, or read internal key number EOR 128 for negative X",
+      "comment_inline": "... Test for a key pressed",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -31195,7 +31205,7 @@
         244,
         255
       ],
-      "comment_inline": "... INKEY: Scan for a key with positive X, or read internal key number EOR 128 for negative X",
+      "comment_inline": "... Test whether the key with negative INKEY number X is pressed",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",

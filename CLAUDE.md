@@ -146,13 +146,6 @@ feature or defect met along the way, and note the workaround here.
   &7F read ID returns no IDs.
 - `Beebium.launch` needs `variant=` repeated alongside `preset=`
   (rob-smallshire/beebium#269).
-- dasmos traces a jump's target even from bytes declared as data
-  (acornaeology/dasmos#58). The *DUNJUNZ driver hooks `leave_title` with a
-  no-return hook, so the command strings after its call (which read as
-  JMPs) are not traced.
-- dasmos's OSBYTE &81 hook takes X >= &80 as a key scan even when Y is a
-  time limit (acornaeology/dasmos#59): `d.expr(0x0EC4, hexlit(0xF4))` in
-  the Master driver; the hook's "Test for f5" inline comment remains.
 - Shared annotations meet the Master side's differing code through
   `Annotator(skip=...)` (ignore calls at addresses where the code
   differs), `default_group=` (memory-map groups for labels outside plain

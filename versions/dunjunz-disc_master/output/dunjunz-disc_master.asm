@@ -7,7 +7,6 @@ osbyte_bell_envelope                 = &d4
 osbyte_bell_frequency                = &d5
 osbyte_bell_duration                 = &d6
 osbyte_inkey                         = &81
-inkey_key_f5                         = &8b
 osword_envelope                      = &08
 osword_sound                         = &07
 osbyte_read_adc_or_get_buffer_status = &80
@@ -1287,7 +1286,7 @@ reset_vector                    = &fffc  ; 6502 RESET vector, in the MOS ROM.
     ldx #&f4                            ; Wait up to &1F4 centiseconds (5 s) for a key...
     ldy #1                              ; ...
     lda #osbyte_inkey                   ; ...
-    jsr osbyte                          ; ...  Test for f5 key pressed
+    jsr osbyte                          ; ...  Read a key, waiting up to 500 centiseconds
     jmp code_0e00                       ; ...then start a new game
 ; ***************************************************************************************
 ; Give a hero their starting attributes
@@ -6625,7 +6624,7 @@ clear_text_area_top = code_162d+1
     tax                                 ; ...
     lda #osbyte_inkey                   ; OSBYTE &81 with Y = &FF: scan the key
     ldy #&ff                            ; ...
-    jsr osbyte                          ; ...  INKEY: Scan for a key with positive X, or read internal key number EOR 128 for negative X
+    jsr osbyte                          ; ...  Test whether the key with negative INKEY number X is pressed
     cpy #&ff                            ; X = Y = &FF if it is pressed
     bne code_7cae                       ; ...
     cpx #&ff                            ; ...

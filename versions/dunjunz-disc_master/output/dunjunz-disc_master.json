@@ -95,10 +95,6 @@
       "value": 129
     },
     {
-      "name": "inkey_key_f5",
-      "value": 139
-    },
-    {
       "name": "osword_envelope",
       "value": 8
     },
@@ -13323,14 +13319,7 @@
       "comment_inline": "Wait up to &1F4 centiseconds (5 s) for a key...",
       "type": "code",
       "mnemonic": "ldx",
-      "operand": "#&f4",
-      "expr": {
-        "text": "&f4",
-        "tree": {
-          "int": 244,
-          "radix": "hex"
-        }
-      }
+      "operand": "#&f4"
     },
     {
       "addr": 3781,
@@ -13370,7 +13359,7 @@
         255
       ],
       "image": 2,
-      "comment_inline": "... Test for f5 key pressed",
+      "comment_inline": "... Read a key, waiting up to 500 centiseconds",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -68278,7 +68267,7 @@
         255
       ],
       "image": 4,
-      "comment_inline": "... INKEY: Scan for a key with positive X, or read internal key number EOR 128 for negative X",
+      "comment_inline": "... Test whether the key with negative INKEY number X is pressed",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",

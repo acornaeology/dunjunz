@@ -29,7 +29,7 @@ import sys
 from pathlib import Path
 
 import dasmos
-from dasmos.expr import hexlit, hi, lo, sym
+from dasmos.expr import hi, lo, sym
 
 VERSION_DIRPATH = Path(__file__).resolve().parent.parent
 REPO_DIRPATH = VERSION_DIRPATH.parent.parent
@@ -313,7 +313,6 @@ master.c(0x0E89, "Padding")
 master.c(0x0E8A, "...")
 master.c(0x0EC3, "Wait up to &1F4 centiseconds (5 s) for a key...")
 master.c(0x0EC5, "...")
-d.expr(0x0EC4, hexlit(0xF4))
 
 master.c(0x1ED7, "Check the pause key (the routine is in Table)")
 master.banner(0x1EDA, "Unused",

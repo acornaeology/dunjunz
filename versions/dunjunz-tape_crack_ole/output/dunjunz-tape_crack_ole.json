@@ -20327,7 +20327,7 @@
       "binary_addr": 11977,
       "image": 0,
       "move": "game_image",
-      "comment_inline": "... INKEY: Scan for a key with positive X, or read internal key number EOR 128 for negative X",
+      "comment_inline": "... Read a key, waiting up to 6000 centiseconds",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
@@ -81783,7 +81783,7 @@
         255
       ],
       "image": 1,
-      "comment_inline": "... INKEY: Scan for a key with positive X, or read internal key number EOR 128 for negative X",
+      "comment_inline": "... Test whether the key with negative INKEY number X is pressed",
       "type": "code",
       "mnemonic": "jsr",
       "operand": "osbyte",
