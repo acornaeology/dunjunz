@@ -24,7 +24,8 @@
         "level_file": "Level file (&6B00)",
         "loader": "*DUNJUNZ and Coder2",
         "leftovers": "Leftovers from development",
-        "private_ram": "Private RAM (HAZEL)"
+        "private_ram": "Private RAM (HAZEL)",
+        "editor_workspace": "Editor workspace"
     },
     "disassemblies": [
         {
@@ -54,6 +55,21 @@
                     "exec": "0x2000",
                     "size": 38,
                     "sha256": "a32ffa23236c7aae944d6d3201bf41ded524362436f8002ca9b1713a276c8770"
+                }
+            ]
+        },
+        {
+            "label": "*EDITOR: level editor",
+            "slug": "editor",
+            "json": "output/dunjunz-disc_master-editor.json",
+            "runtime": "Editor, load &1910, exec &23B2, &158E bytes. Loads a level file (or starts an empty one), shows its map in MODE 2 to be edited with a cursor, and saves it with a wall block from Stones and its checksum balanced, encrypted as the game expects.",
+            "files": [
+                {
+                    "name": "Editor",
+                    "load": "0x1910",
+                    "exec": "0x23B2",
+                    "size": 5518,
+                    "sha256": "b97927871258742ac7a1da946c64aa404042c73cc05b7f50392b972f113266e6"
                 }
             ]
         },
