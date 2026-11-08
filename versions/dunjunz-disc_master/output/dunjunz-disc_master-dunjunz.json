@@ -4355,6 +4355,113 @@
         16,
         212,
         152
+      ],
+      "expressions": [
+        {
+          "text": "<(star_frame_data)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "sym": "star_frame_data"
+            }
+          }
+        },
+        {
+          "text": "<(star_frame_data + &c4)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "sym": "star_frame_data"
+              },
+              "right": {
+                "int": 196,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(star_frame_data + &0188)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "sym": "star_frame_data"
+              },
+              "right": {
+                "int": 392,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(star_frame_data + &024c)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "sym": "star_frame_data"
+              },
+              "right": {
+                "int": 588,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(star_frame_data + &0310)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "sym": "star_frame_data"
+              },
+              "right": {
+                "int": 784,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(star_frame_data + &03d4)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "sym": "star_frame_data"
+              },
+              "right": {
+                "int": 980,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": "<(star_frame_data + &0498)",
+          "tree": {
+            "op": "lowbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "sym": "star_frame_data"
+              },
+              "right": {
+                "int": 1176,
+                "radix": "auto"
+              }
+            }
+          }
+        }
       ]
     },
     {
@@ -4420,6 +4527,113 @@
         45,
         45,
         46
+      ],
+      "expressions": [
+        {
+          "text": ">(star_frame_data)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "sym": "star_frame_data"
+            }
+          }
+        },
+        {
+          "text": ">(star_frame_data + &c4)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "sym": "star_frame_data"
+              },
+              "right": {
+                "int": 196,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(star_frame_data + &0188)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "sym": "star_frame_data"
+              },
+              "right": {
+                "int": 392,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(star_frame_data + &024c)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "sym": "star_frame_data"
+              },
+              "right": {
+                "int": 588,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(star_frame_data + &0310)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "sym": "star_frame_data"
+              },
+              "right": {
+                "int": 784,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(star_frame_data + &03d4)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "sym": "star_frame_data"
+              },
+              "right": {
+                "int": 980,
+                "radix": "auto"
+              }
+            }
+          }
+        },
+        {
+          "text": ">(star_frame_data + &0498)",
+          "tree": {
+            "op": "highbyte",
+            "operand": {
+              "op": "add",
+              "left": {
+                "sym": "star_frame_data"
+              },
+              "right": {
+                "int": 1176,
+                "radix": "auto"
+              }
+            }
+          }
+        }
       ]
     },
     {

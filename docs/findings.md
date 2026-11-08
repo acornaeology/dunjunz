@@ -295,6 +295,24 @@ the reports that only DFS 0.90 works (see
 [stardot-dunjunz-versions-thread.md](stardot-dunjunz-versions-thread.md)).
 How the game uses &0D00 in this version is still to be traced.
 
+### The interrupt flag when a program is run
+
+`*DUNJUNZ` typed at the keyboard is entered (at &2700) with interrupts
+enabled under each filing system tried: P = &23 with DFS 0.90, &21 with
+DNFS 1.20 and &31 with DFS 2.26. `Coder`, run by `*DUNJUNZ` through
+OSCLI, is entered at &5000 with P = &23 under DFS 0.90 and &21 under DFS
+2.26; under DNFS 1.20 the title never reaches it, as reported
+**[confirmed in beebium]**. It has been
+reported that under DFS 2.26 and DNFS 1.20 a `*RUN` program can instead
+be entered with the I flag set (P = &35, &25), and that a program
+waiting in OSRDCH then never sees a key, as MOS 1.20's OSRDCH does not
+enable interrupts itself **[reported, from work on a revised edition;
+the conditions that set the flag are not yet known]**. This matters to the
+game: in play it reads keys with OSBYTE &81 and negative INKEY numbers,
+but the hero menu (`menu_key_loop`) and the ending
+(`print_ending_message`) wait in OSRDCH, so they rely on being entered
+with interrupts enabled.
+
 ### Each new level starts with a reset of the machine
 
 At the end of a level the game does not call `Coder` directly. At &1460

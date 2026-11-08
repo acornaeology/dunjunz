@@ -513,12 +513,12 @@ oscli               = &fff7
 ; Low bytes of the seven star frames' addresses (&2A00 + &C4 x frame), indexed by frame 0-6 and read by title_plot_star.
 ; &28c0 used as index base 1 time by &280a
 .star_frames_lo
-    equb &00, &c4, &88, &4c, &10, &d4, &98  ; Frames 0-6, low bytes
+    equb <(star_frame_data), <(star_frame_data + &c4), <(star_frame_data + &0188), <(star_frame_data + &024c), <(star_frame_data + &0310), <(star_frame_data + &03d4), <(star_frame_data + &0498)  ; Frames 0-6, low bytes
     equb &15, &4a, &29, &fe, &a8, &b9, &75, &c3, &18  ; Not used
 ; High bytes of the seven star frames' addresses, indexed by frame 0-6 and read by title_plot_star.
 ; &28d0 used as index base 1 time by &280f
 .star_frames_hi
-    equb &2a, &2a, &2b, &2c, &2d, &2d, &2e  ; Frames 0-6, high bytes
+    equb >(star_frame_data), >(star_frame_data + &c4), >(star_frame_data + &0188), >(star_frame_data + &024c), >(star_frame_data + &0310), >(star_frame_data + &03d4), >(star_frame_data + &0498)  ; Frames 0-6, high bytes
     equb &22, &74, &a5, &71, &29, &07, &65, &74
     equb &85, &2a, &2a, &2b, &2c, &2d, &2d, &2e
     equb &22, &2a, &2a, &18, &65, &75, &85, &75

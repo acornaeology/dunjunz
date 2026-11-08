@@ -405,6 +405,10 @@ def annotate(d, model_b=False):
                  "indexed by frame 0-6 and read by title_plot_star.")
     loader.byte(0x28D0, 7, cols=7)
     loader.c(0x28D0, "Frames 0-6, high bytes")
+    for frame in range(7):
+        target = sym("star_frame_data") + 0xC4 * frame if frame else sym("star_frame_data")
+        loader.expr(0x28C0 + frame, lo(target))
+        loader.expr(0x28D0 + frame, hi(target))
     loader.byte(0x28D7, 0x29, cols=8)
     loader.c(0x28D7, "Not used")
 

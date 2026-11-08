@@ -87,7 +87,7 @@ import sys
 from pathlib import Path
 
 import dasmos
-from dasmos.expr import hi, lo, sym
+from dasmos.expr import hi, lo, ref, sym
 
 VERSION_DIRPATH = Path(__file__).resolve().parent.parent
 REPO_DIRPATH = VERSION_DIRPATH.parent.parent
@@ -1020,7 +1020,19 @@ master.banner(0xC8CC, "The tune",
               "The music's data: sections of three-byte steps (transposition "
               "or &FF, channel 2 pitch, channel 3 pitch), reached through "
               "section_ptrs_lo and section_ptrs_hi.")
-master.byte(0xC8CD, 0xD75A - 0xC8CD, cols=12)
+# The tune's sections, in address order: section_ptrs_lo and section_ptrs_hi
+# point at these, some more than once.
+tune_parts = sorted({master.byte_value(0xC83D + n) + 256 * master.byte_value(0xC856 + n)
+                     for n in range(25)})
+for part, (addr, end) in enumerate(zip(tune_parts, tune_parts[1:] + [0xD75A])):
+    master.byte(addr, end - addr, cols=12)
+    if part:
+        master.label(addr, f"tune_part_{part}")
+        master.block(addr, f"Part {part} of the tune.")
+for n in range(25):
+    target = master.byte_value(0xC83D + n) + 256 * master.byte_value(0xC856 + n)
+    master.expr(0xC83D + n, lo(ref(target)))
+    master.expr(0xC856 + n, hi(ref(target)))
 
 # ---------------------------------------------------------------------------
 # Branch targets in the Master's own code.
