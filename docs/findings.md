@@ -568,6 +568,16 @@ program stops showing anything at line 0, until a VDU 6 or a reset.
 `DUNJUNZ`'s `REM` goes on &01 and "XXXXXX", `PLOAD`'s &03 and 24 zeros
 **[confirmed from the files]**. Ole's `PLOAD` has no line 0.
 
+### The cassette loads and starts in beebjit
+
+`tools/tape_probe.py` types `*TAPE` and `CHAIN""` on a Model B (MOS
+1.20) with the image in the tape deck. The chain runs as the listings
+describe: `TITLE` is entered at &28CE, and `game_entry` (&0D31) is
+reached after about 1,362 million cycles, with `Dunjunz5` at &2000,
+`load_core`'s JSR patched to &F27D (FILEV) and its control block holding
+&0D70 and &00002000, with the file's length, &1000, written into bytes
+10-13 by the load **[confirmed in beebjit]**.
+
 ### `TITLE` is entered inside its first loop
 
 `TITLE`'s execution address, &28CE, is the `INX` of the loop that sends

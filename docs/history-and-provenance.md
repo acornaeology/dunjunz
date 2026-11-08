@@ -308,9 +308,14 @@ Ole's crack **[confirmed]**:
     &3000, and &0D80–&0D85, which holds &0D70 and &00002000. These are
     the operands that the cassette's `boot_loader` (&0740) and
     `load_core` (&0D00) patch with FILEV, which is &F27D on MOS 1.20, and
-    the control block `load_core` builds. So the hack's files were saved
-    from memory after the cassette had loaded **[confirmed from the
-    bytes]**;
+    the control block `load_core` builds: run in beebjit, the cassette
+    leaves the same bytes there by the time it reaches `game_entry`
+    **[confirmed in beebjit, `tools/tape_probe.py`]**. So the hack's
+    files were saved from memory after the cassette's loaders had run
+    **[inference]**. Not quite as that run leaves it, though: the load
+    also writes `Dunjunz5`'s length into the block's bytes 10–13
+    (&0D8A–&0D8D, &00001000), where the hack still has the leftover bytes
+    the cassette's file holds **[confirmed]**;
   - &0800–&08BF, which the cassette does not load, and so holds whatever
     was in memory then **[inference]**.
 
