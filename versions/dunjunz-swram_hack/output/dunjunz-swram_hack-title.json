@@ -126,7 +126,7 @@
       "addr": 14534,
       "name": "title_start",
       "title": "TITLE: draw the title page and wait for a key",
-      "description": "The title page between the intro and the game's loader. Entered by */TITLE from the BASIC program DUNJUNZ, after its \"Please wait....\" screen in MODE 4; it returns to BASIC, which does *FX225 and *TV255 and chains DUNK, the sideways RAM loader. The run is a straight line in four phases, marked by block comments below. Screen: MODE 5 with colour 2 blue, then stripe_pattern copied into every character cell from &5800 to &7FFF. Picture: title_picture, &A00 bytes, copied a byte at a time over character rows 1-8. Text: page_text (the credits, the title in a black window and the keys in a white one), then blank_line_text unless INKEY(-256) reports an Electron, then black_window_vdu. Wait: the cursor is turned off by writing the 6845 directly (register 10 = &20, at &FE00/&FE01, even on an Electron), the input buffer is flushed and OSBYTE &81 waits up to &2FF centiseconds (7.67 s) for a key. It leaves the page on the screen, with the last text window (columns 2-17, rows 26-28) still set, the cursor off, and the key, if one was pressed, read from the buffer.",
+      "description": "The title page between the intro and the game's loader. Entered by */TITLE from the BASIC program DUNJUNZ, after its \"Please wait....\" screen in MODE 4; it returns to BASIC, which does *FX225 and *TV255 and chains DUNK, the sideways RAM loader. The run is a straight line in four phases, marked by block comments below. Screen: MODE 5 with colour 2 blue, then stripe_pattern copied into every character cell from &5800 to &7FFF. Picture: title_picture, &A00 bytes, copied a byte at a time over character rows 1-8. Text: page_text (the credits, the title in a black window and a white window of text), then blank_line_text unless INKEY(-256) reports an Electron, then black_window_vdu. Wait: the cursor is turned off by writing the 6845 directly (register 10 = &20, at &FE00/&FE01, even on an Electron), the input buffer is flushed and OSBYTE &81 waits up to &2FF centiseconds (7.67 s) for a key. It leaves the page on the screen, with the last text window (columns 2-17, rows 26-28) still set, the cursor off, and the key, if one was pressed, read from the buffer.",
       "on_exit": {
         "A": "corrupted",
         "X": "corrupted",
@@ -160,7 +160,7 @@
       "addr": 14495,
       "name": "blank_line_text",
       "title": "Text: a line of spaces",
-      "description": "Eighteen spaces and the &FF terminator, the width of the keys window. title_start prints them after the keys on any machine but an Electron; they fall on the window's next line, which is already white.",
+      "description": "Eighteen spaces and the &FF terminator, the width of the white window. title_start prints them after its text on any machine but an Electron; they fall on the window's next line, which is already white.",
       "align": "before_label"
     },
     {
@@ -1778,7 +1778,7 @@
         0
       ],
       "comments_before_label": [
-        "Print the credits, title and keys, then (except on an Electron) a line of spaces, then open the black window."
+        "Print the credits, the title and the white window's text, then (except on an Electron) a line of spaces, then open the black window."
       ],
       "comment_inline": "Print page_text up to its &FF terminator",
       "type": "code",
@@ -1795,7 +1795,7 @@
       "labels": [
         "print_page_text"
       ],
-      "comment_inline": "...this byte of the credits, title and keys...",
+      "comment_inline": "...this byte of the credits, title and text...",
       "xref_summaries": [
         "&3939 referenced 1 time by &3945"
       ],

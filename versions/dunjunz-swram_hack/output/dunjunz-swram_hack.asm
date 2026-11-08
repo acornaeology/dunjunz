@@ -224,7 +224,7 @@ level_object_free_map = &6cb0  ; Level file: Map of cells without objects (&C9 b
 ; &6cb0 used as index base 1 time by &156a
 level_wall_sprite     = &6d80  ; Level file: The level's wall block, copied to wall_sprite.
 ; &6d80 used as index base 1 time by &1577
-level_osfile_block    = &6e60  ; The 18-byte OSFILE parameter block load_level passes to FILEV's routine: bytes 0-1 the filename's address (level_filename), bytes 2-5 the load address &00006B00, byte 6 the exec address's low byte, which must be 0 for the load address to be used. It lies in character row 24 of the screen, just below Dunjun6, hidden while the level loads; only bytes 0-5 are written, and the rest are 0 from show_level_number's screen clear.
+level_osfile_block    = &6e60  ; The 18-byte OSFILE parameter block load_level passes to FILEV's routine: bytes 0-1 the filename's address (level_filename), bytes 2-5 the load address &00006B00, byte 6 the exec address's low byte, which must be 0 for the load address to be used. It lies in character row 24 of the screen, just below the game's code at &6E80, hidden while the level loads; only bytes 0-5 are written, and the rest are 0 from show_level_number's screen clear.
 ; &6e60 referenced 1 time by &1474
 mos_row_offsets       = &c375  ; MOS 1.20 table of screen row offsets for 640-byte rows (row x 640, high byte then low byte, one pair per character row). Read directly by screen_address; it is not part of any documented interface.
 ; &c375 used as index base 1 time by &096e

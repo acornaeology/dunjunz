@@ -75,8 +75,8 @@ osbyte                = &fff4
 ; ***************************************************************************************
 ; Text: a line of spaces
 ;
-; Eighteen spaces and the &FF terminator, the width of the keys window. title_start
-; prints them after the keys on any machine but an Electron; they fall on the window's
+; Eighteen spaces and the &FF terminator, the width of the white window. title_start
+; prints them after its text on any machine but an Electron; they fall on the window's
 ; next line, which is already white.
 ; &389f used as index base 2 times by &3956, &395d
 .blank_line_text
@@ -113,8 +113,8 @@ osbyte                = &fff4
 ; is a straight line in four phases, marked by block comments below. Screen: MODE 5 with
 ; colour 2 blue, then stripe_pattern copied into every character cell from &5800 to
 ; &7FFF. Picture: title_picture, &A00 bytes, copied a byte at a time over character rows
-; 1-8. Text: page_text (the credits, the title in a black window and the keys in a white
-; one), then blank_line_text unless INKEY(-256) reports an Electron, then
+; 1-8. Text: page_text (the credits, the title in a black window and a white window of
+; text), then blank_line_text unless INKEY(-256) reports an Electron, then
 ; black_window_vdu. Wait: the cursor is turned off by writing the 6845 directly (register
 ; 10 = &20, at &FE00/&FE01, even on an Electron), the input buffer is flushed and OSBYTE
 ; &81 waits up to &2FF centiseconds (7.67 s) for a key. It leaves the page on the screen,
@@ -193,11 +193,11 @@ osbyte                = &fff4
     lda copy_from_high                  ; Repeat until copy_from reaches the end of the file, &4400
     cmp #>(title_picture + &0a00)       ; ...past the picture's last page?
     bne copy_picture                    ; No: copy the next byte
-; Print the credits, title and keys, then (except on an Electron) a line of spaces, then open the black window.
+; Print the credits, the title and the white window's text, then (except on an Electron) a line of spaces, then open the black window.
     ldx #0                              ; Print page_text up to its &FF terminator
 ; &3939 referenced 1 time by &3945
 .print_page_text
-    lda page_text,x                     ; ...this byte of the credits, title and keys...
+    lda page_text,x                     ; ...this byte of the credits, title and text...
     jsr oswrch                          ; ...printed or obeyed as VDU codes
     inx                                 ; ...on to the next
     lda page_text,x                     ; ...look at it...

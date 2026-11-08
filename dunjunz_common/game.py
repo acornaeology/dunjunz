@@ -2056,7 +2056,7 @@ def annotate_page7_leftovers(a: Annotator, saved_as: str) -> None:
 
 
 def annotate_boot_loader(a: Annotator, operand_note: str = "", sets_bytev: bool = False,
-                         stored_call: int = 0x3000) -> None:
+                         stored_call: int = 0x3000, used: bool = False) -> None:
     """A loader left in page &07 of each &0400-&07FF image, at the
     execution address of the *SAVE command left in the line buffer. It
     loads the game file named at &07F0 to &2000 through FILEV and jumps
@@ -2068,13 +2068,24 @@ def annotate_boot_loader(a: Annotator, operand_note: str = "", sets_bytev: bool 
     start = entry + (10 if sets_bytev else 0)
     prelude = ("Point BYTEV at joystick_bytev (&0780), then build"
                if sets_bytev else "Build")
-    a.sub(entry, "boot_loader", "Load the game file and run it (not used)",
+    if used:
+        title = "Load the game's loader and run it"
+        reached = ("&0740 is DUNK's execution address (as in the *SAVE command "
+                   "left at &0700), so this runs when TITLE's */ runs DUNK, the "
+                   "next file on the tape. The file it loads, Dunjunz1, is the "
+                   "next one after DUNK; it loads the rest of the game and "
+                   "jumps into it, so nothing returns here. The control "
+                   "block lies in the level buffer, which the first level "
+                   "overwrites.")
+    else:
+        title = "Load the game file and run it (not used)"
+        reached = ("&0740 is the execution address in the *SAVE command left "
+                   "at &0700, so this is the image's own entry point when it "
+                   "is *RUN, but nothing in this release reaches it.")
+    a.sub(entry, "boot_loader", title,
           prelude + " an OSFILE control block at &6B00 naming boot_filename with "
           "load address &2000, call the filing system's FILEV handler to "
-          "load the file, and jump to &2000. &0740 is the execution address "
-          "in the *SAVE command left at &0700, so this is the image's own "
-          "entry point when it is *RUN, but nothing in this release reaches "
-          "it." + operand_note)
+          "load the file, and jump to &2000. " + reached + operand_note)
     call = start + 0x2C
     a.region(call, "boot_load_call", (0, 2))
     a.label(BOOT_FILENAME_ADDR, "boot_filename", group="leftovers",
@@ -2125,6 +2136,182 @@ def annotate_boot_loader(a: Annotator, operand_note: str = "", sets_bytev: bool 
         ]:
             a.c(entry + offset, text)
     a.banner(BOOT_FILENAME_ADDR, "Name of the file boot_loader loads")
+
+
+LEVEL_LOADER_SOURCES = {
+    "romfs": {
+        "fs_name": "ROMFS", "fs_long": "the ROM filing system",
+        "from": "ROMFS", "from_long": "sideways RAM",
+        "selected": ("since DUNK's loader leaves *ROM selected, and the ROM "
+                     "filing system finds LEVELn in the ROMFS images DUNK put "
+                     "in sideways RAM."),
+    },
+    "tape": {
+        "fs_name": "the cassette", "fs_long": "the cassette filing system",
+        "from": "tape", "from_long": "the cassette, where the levels follow the game's files,",
+        "selected": ("since TITLE selected *TAPE, and the cassette filing "
+                     "system reads on through the tape until it finds LEVELn."),
+    },
+}
+
+
+def annotate_filev_level_loader(a: Annotator, source: str) -> None:
+    """&1446-&149F and &6E60: the cassette's level loader, which calls
+    FILEV directly; the sideways RAM hack keeps it to read from ROMFS."""
+    from dasmos.expr import hexlit, hi, lo, sym
+
+    v = LEVEL_LOADER_SOURCES[source]
+
+    a.label(0x16D0, "level_filename", length=8, description=(
+        f"The level's filename for {v['fs_name']}: \"LEVEL\", then the level number in "
+        "one or two ASCII digits (level_filename_digits) and a carriage "
+        "return. level_loop writes the digits and the CR before each level; "
+        "load_level puts the name's address in level_osfile_block, and "
+        f"{v['fs_long']} reads it from there."))
+    a.region(0x6E60, "level_osfile_block", (0, 17), group="screen_workspace",
+                    description=(
+                        "The 18-byte OSFILE parameter block load_level passes to "
+                        "FILEV's routine: bytes 0-1 the filename's address "
+                        "(level_filename), bytes 2-5 the load address &00006B00, "
+                        "byte 6 the exec address's low byte, which must be 0 for "
+                        "the load address to be used. It lies in character row 24 "
+                        "of the screen, just below the game's code at &6E80, hidden while the "
+                        "level loads; only bytes 0-5 are written, and the rest "
+                        "are 0 from show_level_number's screen clear."))
+    a.expr(0x149B, hexlit(0x3000))  # patched with FILEV before the call
+    a.region(0x149B, "filev_call_address", (0, 1), description=(
+        "Operand of the JSR at load_level_call. Stored as &3000; load_level "
+        "overwrites it with the contents of FILEV before each call."))
+    a.sub(0x1446, "load_level", f"Load the level file from {v['from']}",
+                  f"Bring the next level's file, LEVELn, from {v['from_long']} into "
+                  "&6B00-&6DAF, then decrypt and check it. Called by start_level "
+                  "once per level, after show_level_number has cleared the screen "
+                  "and counted level_number, and before unpack_level copies the "
+                  "level into play.\n\n"
+                  "The level file and the OSFILE block both lie in the screen's "
+                  "bottom two character rows, so the 6845 is first set to show only "
+                  "23 rows (start_level restores 25 later). The block gets the "
+                  "address of level_filename, which level_loop has just written, "
+                  "and the load address &00006B00. Rather than calling OSFILE, "
+                  "the routine copies FILEV into the operand of its own JSR and "
+                  "calls that routine with A = &FF: it is the MOS's cassette and "
+                  "ROM filing system handler, " + v["selected"] + " It ends by jumping to "
+                  "decrypt_level, which returns to start_level, or resets the "
+                  "machine if the checksum is wrong.\n\n"
+                  "The block's byte 6 (the exec address's low byte, which must be "
+                  "0 for the load address to be used) is not set here: it relies "
+                  "on show_level_number having cleared the screen, which the "
+                  "block lies in.",
+                   on_exit={"A": "corrupted", "X": "corrupted", "Y": "corrupted"})
+    a.block(0x1446, "Show only 23 character rows, hiding rows 23-24, where "
+                            "the level file and the OSFILE block are about to go.")
+    a.block(0x146E, "Build the OSFILE block: the filename's address and "
+                            "the load address &00006B00.")
+    a.block(0x148C, "Call FILEV's routine directly, through a JSR whose "
+                            "operand is set from FILEV, to load the file.")
+    for addr, text in [
+        (0x1446, "VDU 23,0,6,23,0,0,0,0,0,0: hide rows 23-24 while loading..."),
+        (0x1450, "...register 6, rows displayed..."),
+        (0x1455, "...to 23 character rows displayed"),
+        (0x145A, "...then six zeros to finish the command"),
+        (0x146E, "X, Y = address of the OSFILE block, in screen memory..."),
+        (0x1470, "...&6E60, as OSFILE's routine expects"),
+        (0x1472, "Filename address = level_filename (\"LEVELn\")..."),
+        (0x1474, "...in the block's bytes 0-1: low byte at 0..."),
+        (0x1477, "...and the name's page..."),
+        (0x1479, "...in the block's first two bytes"),
+        (0x147C, "Load address = &00006B00..."),
+        (0x147E, "...byte 0 is 0..."),
+        (0x1481, "...byte 2 is 0..."),
+        (0x1484, "...byte 3 is 0..."),
+        (0x1487, "...byte 1 is &6B..."),
+        (0x1489, "...giving &00006B00, the start of the level buffer"),
+        (0x148C, "Copy FILEV into the operand of the JSR below..."),
+        (0x148F, "...the routine's low byte into the JSR..."),
+        (0x1492, "...and its page..."),
+        (0x1495, "...so the JSR goes straight to the ROM filing system"),
+        (0x1498, "A = &FF: load the file at the block's load address"),
+        (0x149A, f"Load LEVELn from {v['from']} through FILEV's routine"),
+        (0x149D, "Decrypt and check the level; it returns to start_level"),
+    ]:
+        a.c(addr, text)
+    a.label(0x149A, "load_level_call")
+
+    for lo_addr, hi_addr, name in [(0x146F, 0x1471, "level_osfile_block"),
+                                   (0x1473, 0x1478, "level_filename")]:
+        a.expr(lo_addr, lo(sym(name)))
+        a.expr(hi_addr, hi(sym(name)))
+    a.expr(0x1488, hi(sym("level_object_x")))  # the level file's page, &6B
+
+
+def annotate_load_core(a: Annotator) -> None:
+    """&0D00-&0D30 and &0D70-&0D85: the cassette's last loading step, in
+    page &0D before game_entry. The sideways RAM hack has the same bytes,
+    as left after it ran."""
+    from dasmos.expr import hexlit, hi, lo, sym
+
+    a.sub(0x0D00, "load_core", "Load the last game file and start the game",
+          "Dunjunz1 jumps here once it has loaded the game's other files: "
+          "build an OSFILE control block at &0D80 naming core_filename "
+          "(\"Dunjunz5\") with load address &00002000, call the filing "
+          "system's FILEV handler directly, as boot_loader does, to load the "
+          "game's &2000-&2FFF over Dunjunz1, and fall into game_entry. Like "
+          "game_entry, this lies in page &0D, the per-level workspace that "
+          "reset_workspace overwrites at the start of every level, so the "
+          "labels of that workspace fall inside these instructions, and "
+          "core_filename (&0D70) and core_osfile_block (&0D80) share their "
+          "addresses with hero_key_up and hero_key_fire. "
+          "\n\n"
+          "The block is built over leftover text, \"Dungeon5\" and a CR, and "
+          "only bytes 0-5 are set, so byte 6, the exec address's low byte, "
+          "is the \"n\" (&6E). That is not 0, so the file goes to its own "
+          "load address, &2000, which is the same.",
+          on_entry={"FILEV": "the cassette filing system's handler, *TAPE having been selected by TITLE"})
+    a.region(0x0D2F, "load_core_call_address", (0, 1), description=(
+        "Operand of the JSR at load_core_call. Stored as &3000; load_core "
+        "overwrites it with the contents of FILEV before the call."))
+    a.label(0x0D2E, "load_core_call")
+    for addr, name in [(0x0D05, "load_core_name_page"), (0x0D0F, "load_core_load_page"),
+                       (0x0D14, "load_core_block_address"), (0x0D23, "load_core_store_filev"),
+                       (0x0D29, "load_core_store_filev_high")]:
+        a.label(addr, name)
+    a.label(0x0D70, "core_filename")
+    a.label(0x0D80, "core_osfile_block")
+    a.expr(0x0D01, lo(sym("core_filename")))
+    a.expr(0x0D06, hi(sym("core_filename")))
+    a.expr(0x0D03, sym("core_osfile_block"))
+    a.expr(0x0D08, sym("core_osfile_block") + 1)
+    a.expr(0x0D0D, sym("core_osfile_block") + 2)
+    a.expr(0x0D12, sym("core_osfile_block") + 3)
+    a.expr(0x0D15, lo(sym("core_osfile_block")))
+    a.expr(0x0D17, hi(sym("core_osfile_block")))
+    a.expr(0x0D1B, sym("core_osfile_block") + 4)
+    a.expr(0x0D1E, sym("core_osfile_block") + 5)
+    a.expr(0x0D24, sym("load_core_call_address"))
+    a.expr(0x0D2A, sym("load_core_call_address") + 1)
+    a.expr(0x0D2F, hexlit(0x3000))
+    for addr, text in [
+        (0x0D00, "Filename address: core_filename..."),
+        (0x0D02, "...into the block's bytes 0-1, low byte..."),
+        (0x0D05, "...and its page..."),
+        (0x0D07, "...into byte 1"),
+        (0x0D0A, "Load address &00002000..."),
+        (0x0D0C, "...byte 2 is 0..."),
+        (0x0D0F, "...byte 3 is &20..."),
+        (0x0D11, "...the game's &2000-&2FFF, over Dunjunz1"),
+        (0x0D14, "X, Y = core_osfile_block..."),
+        (0x0D16, "...its page"),
+        (0x0D18, "...bytes 4 and 5 are 0..."),
+        (0x0D1A, "...byte 4..."),
+        (0x0D1D, "...and byte 5: the I/O processor"),
+        (0x0D20, "Copy FILEV into the JSR below..."),
+        (0x0D23, "...its low byte..."),
+        (0x0D26, "...and its high byte..."),
+        (0x0D29, "...so the JSR calls the filing system's routine"),
+        (0x0D2C, "A = &FF: load the file"),
+        (0x0D2E, "Load Dunjunz5, then fall into game_entry"),
+    ]:
+        a.c(addr, text)
 
 
 def annotate_menu_tables(a: Annotator, base: int) -> None:

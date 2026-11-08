@@ -1,0 +1,2341 @@
+{
+  "meta": {
+    "schema_version": 4,
+    "load_addr": 8192,
+    "end_addr": 8553,
+    "program": {
+      "exec_addr": 8192
+    },
+    "images": [
+      {
+        "name": "Dunjunz1",
+        "load_addr": 8192,
+        "end_addr": 8553,
+        "exec_addr": 8192
+      }
+    ],
+    "moves": []
+  },
+  "constants": [],
+  "macros": [],
+  "subroutines": [
+    {
+      "addr": 65465,
+      "name": "osrdsc"
+    },
+    {
+      "addr": 65468,
+      "name": "vduchr"
+    },
+    {
+      "addr": 65471,
+      "name": "oseven"
+    },
+    {
+      "addr": 65474,
+      "name": "gsinit"
+    },
+    {
+      "addr": 65477,
+      "name": "gsread"
+    },
+    {
+      "addr": 65480,
+      "name": "nvrdch"
+    },
+    {
+      "addr": 65483,
+      "name": "nvwrch"
+    },
+    {
+      "addr": 65486,
+      "name": "osfind"
+    },
+    {
+      "addr": 65489,
+      "name": "osgbpb"
+    },
+    {
+      "addr": 65492,
+      "name": "osbput"
+    },
+    {
+      "addr": 65495,
+      "name": "osbget"
+    },
+    {
+      "addr": 65498,
+      "name": "osargs"
+    },
+    {
+      "addr": 65501,
+      "name": "osfile"
+    },
+    {
+      "addr": 65504,
+      "name": "osrdch"
+    },
+    {
+      "addr": 65507,
+      "name": "osasci"
+    },
+    {
+      "addr": 65511,
+      "name": "osnewl"
+    },
+    {
+      "addr": 65516,
+      "name": "oswrcr"
+    },
+    {
+      "addr": 65518,
+      "name": "oswrch"
+    },
+    {
+      "addr": 65521,
+      "name": "osword"
+    },
+    {
+      "addr": 65524,
+      "name": "osbyte"
+    },
+    {
+      "addr": 65527,
+      "name": "oscli"
+    },
+    {
+      "addr": 8192,
+      "name": "loader_start",
+      "title": "Prepare the screen and load the game",
+      "description": "Entered from DUNK's loader at &0740, which loads this file to &2000 and jumps here. It does *FX 200,3 (clear memory on BREAK), selects MODE 2 with the cursor off and the 6845 showing 25 character rows, as in play, and makes logical colours 1-7 black and colour 8 green, so the loading screen arrives unseen. It sets a three-row text window at the bottom, rows 22-24, in colour 8, then calls load_files and jumps to load_core in the game, which loads the last file and starts it.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
+    },
+    {
+      "addr": 8391,
+      "name": "load_file",
+      "title": "Load a file through FILEV",
+      "description": "Load the file that osfile_block names to the load address in it, by calling the filing system's FILEV routine directly: its address is copied into the operand of this routine's own JSR, then called with A = &FF (load). With *TAPE selected, as TITLE left it, the file comes from the cassette. The caller sets the filename's address and the load address's low two bytes; this routine clears the top two.",
+      "on_entry": {
+        "osfile_block": "filename address and load address, bytes 0-3"
+      },
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
+    },
+    {
+      "addr": 8421,
+      "name": "load_files",
+      "title": "Load the loading screen and two game files",
+      "description": "Load Dunjunz2, the loading screen, to &3280; restore the default colours (VDU 20), which shows it at once, clear the text window and set colour 2; then load Dunjunz3 to &6E80 and Dunjunz4 to &08C0. Each file is named by one of the filenames after the code and loaded by load_file.",
+      "on_exit": {
+        "A": "corrupted",
+        "X": "corrupted",
+        "Y": "corrupted"
+      }
+    }
+  ],
+  "banners": [
+    {
+      "addr": 8501,
+      "title": "Unused",
+      "description": "Leftover bytes from the machine the file was saved on: the end of a filename and fragments of code.",
+      "align": "before_label"
+    },
+    {
+      "addr": 8512,
+      "name": "screen_filename",
+      "title": "Filename: Dunjunz2",
+      "description": "The name of Dunjunz2, the loading screen, CR-terminated.",
+      "align": "before_label"
+    },
+    {
+      "addr": 8521,
+      "title": "Unused",
+      "description": "Leftover bytes.",
+      "align": "before_label"
+    },
+    {
+      "addr": 8528,
+      "name": "dunjunz3_filename",
+      "title": "Filename: Dunjunz3",
+      "description": "The name of Dunjunz3, the game's &6E80-&7FFF, CR-terminated.",
+      "align": "before_label"
+    },
+    {
+      "addr": 8537,
+      "title": "Unused",
+      "description": "Leftover bytes.",
+      "align": "before_label"
+    },
+    {
+      "addr": 8544,
+      "name": "dunjunz4_filename",
+      "title": "Filename: Dunjunz4",
+      "description": "The name of Dunjunz4, the game's &08C0-&1FFF, CR-terminated.",
+      "align": "before_label"
+    }
+  ],
+  "external_labels": {
+    "os_text_ptr": 242,
+    "romsel_copy": 244,
+    "osrdsc_ptr": 246,
+    "userv": 512,
+    "brkv": 514,
+    "irq1v": 516,
+    "irq2v": 518,
+    "cliv": 520,
+    "bytev": 522,
+    "wordv": 524,
+    "wrchv": 526,
+    "rdchv": 528,
+    "filev": 530,
+    "argsv": 532,
+    "bgetv": 534,
+    "bputv": 536,
+    "gbpbv": 538,
+    "findv": 540,
+    "fscv": 542,
+    "evntv": 544,
+    "uptv": 546,
+    "netv": 548,
+    "vduv": 550,
+    "keyv": 552,
+    "insv": 554,
+    "remv": 556,
+    "cnpv": 558,
+    "ind1v": 560,
+    "ind2v": 562,
+    "ind3v": 564,
+    "dunjunz4_start": 2240,
+    "load_core": 3328,
+    "osfile_block": 8560,
+    "osfile_load_addr": 8562,
+    "osfile_load_addr_high": 8564,
+    "loading_screen": 12928,
+    "dunjunz3_start": 28288,
+    "scsi_data": 64576,
+    "scsi_status": 64577,
+    "scsi_select": 64578,
+    "scsi_irq_enable": 64579,
+    "crtc_address_register": 65024,
+    "crtc_register_data": 65025,
+    "acia_control_or_status": 65032,
+    "acia_data": 65033,
+    "serial_ula_set_baud_cassette_and_motor": 65040,
+    "station_id_disable_net_nmis": 65048,
+    "video_ula_control": 65056,
+    "video_ula_palette": 65057,
+    "video_ula_border_colour_and_palette_control": 65058,
+    "video_ula_palette_selection": 65059,
+    "romsel": 65072,
+    "acccon": 65076,
+    "system_via_orb_irb": 65088,
+    "system_via_ora_ira": 65089,
+    "system_via_ddrb": 65090,
+    "system_via_ddra": 65091,
+    "system_via_t1c_l": 65092,
+    "system_via_t1c_h": 65093,
+    "system_via_t1l_l": 65094,
+    "system_via_t1l_h": 65095,
+    "system_via_t2c_l": 65096,
+    "system_via_t2c_h": 65097,
+    "system_via_sr": 65098,
+    "system_via_acr": 65099,
+    "system_via_pcr": 65100,
+    "system_via_ifr": 65101,
+    "system_via_ier": 65102,
+    "user_via_orb_irb": 65120,
+    "user_via_ora_ira": 65121,
+    "user_via_ddrb": 65122,
+    "user_via_ddra": 65123,
+    "user_via_t1c_l": 65124,
+    "user_via_t1c_h": 65125,
+    "user_via_t1l_l": 65126,
+    "user_via_t1l_h": 65127,
+    "user_via_t2c_l": 65128,
+    "user_via_t2c_h": 65129,
+    "user_via_sr": 65130,
+    "user_via_acr": 65131,
+    "user_via_pcr": 65132,
+    "user_via_ifr": 65133,
+    "user_via_ier": 65134,
+    "econet_control1_or_status1": 65184,
+    "econet_control23_or_status2": 65185,
+    "econet_data_continue_frame": 65186,
+    "econet_data_terminate_frame": 65187,
+    "adc_start_conversion_or_status": 65216,
+    "adc_read_data_high_byte": 65217,
+    "adc_read_data_low_byte": 65218,
+    "tube_status_1_and_tube_control": 65248,
+    "tube_data_register_1": 65249,
+    "tube_status_register_2": 65250,
+    "tube_data_register_2": 65251,
+    "tube_status_register_3": 65252,
+    "tube_data_register_3": 65253,
+    "tube_status_register_4_and_cpu_control": 65254,
+    "tube_data_register_4": 65255,
+    "cube_tube_data_out_from_host": 65264,
+    "cube_tube_data_in_to_host": 65265,
+    "cube_tube_status": 65277,
+    "osrdsc": 65465,
+    "vduchr": 65468,
+    "oseven": 65471,
+    "gsinit": 65474,
+    "gsread": 65477,
+    "nvrdch": 65480,
+    "nvwrch": 65483,
+    "osfind": 65486,
+    "osgbpb": 65489,
+    "osbput": 65492,
+    "osbget": 65495,
+    "osargs": 65498,
+    "osfile": 65501,
+    "osrdch": 65504,
+    "osasci": 65507,
+    "osnewl": 65511,
+    "oswrcr": 65516,
+    "oswrch": 65518,
+    "osword": 65521,
+    "osbyte": 65524,
+    "oscli": 65527
+  },
+  "memory_map": [
+    {
+      "addr": 2240,
+      "name": "dunjunz4_start",
+      "group": "game",
+      "description": "Where Dunjunz4, the game's &08C0-&1FFF, loads."
+    },
+    {
+      "addr": 3328,
+      "name": "load_core",
+      "group": "game",
+      "description": "In Dunjunz4: loads Dunjunz5 to &2000, over this loader, and falls into game_entry (&0D31)."
+    },
+    {
+      "addr": 8560,
+      "name": "osfile_block",
+      "group": "workspace",
+      "description": "The OSFILE control block that load_file passes to FILEV's routine, just past the end of the file: bytes 0-1 the filename's address, bytes 2-5 the load address. Byte 6, the exec address's low byte, is never set; whatever it holds, each file loads at the load address given here or, if the byte is not 0, at its own, which is the same."
+    },
+    {
+      "addr": 8562,
+      "name": "osfile_load_addr",
+      "group": "workspace",
+      "description": "Bytes 2-5 of osfile_block: the load address."
+    },
+    {
+      "addr": 8564,
+      "name": "osfile_load_addr_high",
+      "group": "workspace",
+      "description": "Bytes 4-5 of osfile_block: the load address's top half, 0."
+    },
+    {
+      "addr": 12928,
+      "name": "loading_screen",
+      "group": "screen",
+      "description": "Where Dunjunz2, the MODE 2 loading screen, loads."
+    },
+    {
+      "addr": 28288,
+      "name": "dunjunz3_start",
+      "group": "game",
+      "description": "Where Dunjunz3, the game's &6E80-&7FFF, loads."
+    }
+  ],
+  "regions": [
+    {
+      "anchor": 8418,
+      "name": "load_file_call_address",
+      "window": [
+        0,
+        1
+      ],
+      "named_slots": false,
+      "description": "Operand of the JSR at load_file_call. Stored as &3000; load_file overwrites it with the contents of FILEV before each call."
+    }
+  ],
+  "items": [
+    {
+      "addr": 8192,
+      "bytes": [
+        169,
+        120
+      ],
+      "labels": [
+        "loader_start"
+      ],
+      "comment_inline": "A = &78...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&78"
+    },
+    {
+      "addr": 8194,
+      "bytes": [
+        24
+      ],
+      "comment_inline": "...clear the carry...",
+      "type": "code",
+      "mnemonic": "clc"
+    },
+    {
+      "addr": 8195,
+      "bytes": [
+        105,
+        80
+      ],
+      "comment_inline": "...plus &50: OSBYTE &C8, the BREAK and ESCAPE effect",
+      "type": "code",
+      "mnemonic": "adc",
+      "operand": "#&50"
+    },
+    {
+      "addr": 8197,
+      "bytes": [
+        162,
+        2
+      ],
+      "comment_inline": "X = 2...",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#2"
+    },
+    {
+      "addr": 8199,
+      "bytes": [
+        232
+      ],
+      "comment_inline": "...plus 1: 3, clear memory on BREAK",
+      "type": "code",
+      "mnemonic": "inx"
+    },
+    {
+      "addr": 8200,
+      "bytes": [
+        32,
+        244,
+        255
+      ],
+      "comment_inline": "*FX 200,3",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "osbyte",
+      "target": 65524,
+      "target_label": "osbyte"
+    },
+    {
+      "addr": 8203,
+      "bytes": [
+        169,
+        22
+      ],
+      "comments_before_label": [
+        "MODE 2, with the cursor off and 25 rows of text shown"
+      ],
+      "comment_inline": "VDU 22: select a mode...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&16"
+    },
+    {
+      "addr": 8205,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...send it",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8208,
+      "bytes": [
+        169,
+        2
+      ],
+      "comment_inline": "...2",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#2"
+    },
+    {
+      "addr": 8210,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...send it: MODE 2",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8213,
+      "bytes": [
+        169,
+        23
+      ],
+      "comment_inline": "VDU 23,0: write a 6845 register...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&17"
+    },
+    {
+      "addr": 8215,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...send the 23",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8218,
+      "bytes": [
+        169,
+        0
+      ],
+      "comment_inline": "...0: a 6845 register follows",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#0"
+    },
+    {
+      "addr": 8220,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...send it",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8223,
+      "bytes": [
+        169,
+        10
+      ],
+      "comment_inline": "...register 10, cursor start...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&0a"
+    },
+    {
+      "addr": 8225,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...send the number",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8228,
+      "bytes": [
+        169,
+        32
+      ],
+      "comment_inline": "...&20: cursor off",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&20"
+    },
+    {
+      "addr": 8230,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...send the value",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8233,
+      "bytes": [
+        169,
+        0
+      ],
+      "comment_inline": "...then six zeros to finish the command",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#0"
+    },
+    {
+      "addr": 8235,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...the first",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8238,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...the second",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8241,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...the third",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8244,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...the fourth",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8247,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...the fifth",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8250,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...the sixth",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8253,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "A seventh 0: a VDU 0, which does nothing",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8256,
+      "bytes": [
+        169,
+        23
+      ],
+      "comment_inline": "VDU 23,0: write another 6845 register...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&17"
+    },
+    {
+      "addr": 8258,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...send the 23",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8261,
+      "bytes": [
+        169,
+        0
+      ],
+      "comment_inline": "...0: a 6845 register follows",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#0"
+    },
+    {
+      "addr": 8263,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...send it",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8266,
+      "bytes": [
+        169,
+        6
+      ],
+      "comment_inline": "...register 6, character rows displayed...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#6"
+    },
+    {
+      "addr": 8268,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...send the number",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8271,
+      "bytes": [
+        169,
+        25
+      ],
+      "comment_inline": "...25 rows, as in play",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&19"
+    },
+    {
+      "addr": 8273,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...send the value",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8276,
+      "bytes": [
+        169,
+        0
+      ],
+      "comment_inline": "...then six zeros to finish the command",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#0"
+    },
+    {
+      "addr": 8278,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...the first",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8281,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...the second",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8284,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...the third",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8287,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...the fourth",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8290,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...the fifth",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8293,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...the sixth",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8296,
+      "bytes": [
+        162,
+        7
+      ],
+      "comments_before_label": [
+        "Logical colours 7 down to 1 black, colour 8 green: the loading screen is drawn unseen"
+      ],
+      "comment_inline": "From logical colour 7 down to 1...",
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#7"
+    },
+    {
+      "addr": 8298,
+      "bytes": [
+        169,
+        19
+      ],
+      "labels": [
+        "blacken_colour"
+      ],
+      "comment_inline": "VDU 19: set a logical colour...",
+      "xref_summaries": [
+        "&206a referenced 1 time by &2082"
+      ],
+      "references": [
+        {
+          "addr": 8322,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&13"
+    },
+    {
+      "addr": 8300,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...send the 19",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8303,
+      "bytes": [
+        138
+      ],
+      "comment_inline": "...this one...",
+      "type": "code",
+      "mnemonic": "txa"
+    },
+    {
+      "addr": 8304,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...send its number",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8307,
+      "bytes": [
+        169,
+        0
+      ],
+      "comment_inline": "...to physical colour 0, black, and three zeros",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#0"
+    },
+    {
+      "addr": 8309,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...send the black",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8312,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...the first zero",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8315,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...the second",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8318,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...the third",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8321,
+      "bytes": [
+        202
+      ],
+      "comment_inline": "Next colour down...",
+      "type": "code",
+      "mnemonic": "dex"
+    },
+    {
+      "addr": 8322,
+      "bytes": [
+        208,
+        230
+      ],
+      "comment_inline": "...until colour 1 is black",
+      "type": "code",
+      "mnemonic": "bne",
+      "operand": "blacken_colour",
+      "target": 8298,
+      "target_label": "blacken_colour"
+    },
+    {
+      "addr": 8324,
+      "bytes": [
+        169,
+        19
+      ],
+      "comment_inline": "VDU 19: set a logical colour...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&13"
+    },
+    {
+      "addr": 8326,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...send the 19",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8329,
+      "bytes": [
+        169,
+        8
+      ],
+      "comment_inline": "...colour 8...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#8"
+    },
+    {
+      "addr": 8331,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...send its number",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8334,
+      "bytes": [
+        169,
+        2
+      ],
+      "comment_inline": "...to physical colour 2, green...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#2"
+    },
+    {
+      "addr": 8336,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...send it",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8339,
+      "bytes": [
+        169,
+        0
+      ],
+      "comment_inline": "...then three zeros",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#0"
+    },
+    {
+      "addr": 8341,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...the first",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8344,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...the second",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8347,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...the third",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8350,
+      "bytes": [
+        169,
+        17
+      ],
+      "comment_inline": "VDU 17: set the text colour...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&11"
+    },
+    {
+      "addr": 8352,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...send the 17",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8355,
+      "bytes": [
+        169,
+        8
+      ],
+      "comment_inline": "...colour 8, green",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#8"
+    },
+    {
+      "addr": 8357,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...send it",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8360,
+      "bytes": [
+        169,
+        28
+      ],
+      "comments_before_label": [
+        "A text window at the bottom, columns 0-19, rows 22-24"
+      ],
+      "comment_inline": "VDU 28: set a text window...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&1c"
+    },
+    {
+      "addr": 8362,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...send the 28",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8365,
+      "bytes": [
+        169,
+        0
+      ],
+      "comment_inline": "...left column 0",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#0"
+    },
+    {
+      "addr": 8367,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...send it",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8370,
+      "bytes": [
+        169,
+        24
+      ],
+      "comment_inline": "...bottom row 24",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&18"
+    },
+    {
+      "addr": 8372,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...send it",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8375,
+      "bytes": [
+        169,
+        19
+      ],
+      "comment_inline": "...right column 19",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&13"
+    },
+    {
+      "addr": 8377,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...send it",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8380,
+      "bytes": [
+        169,
+        22
+      ],
+      "comment_inline": "...top row 22",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&16"
+    },
+    {
+      "addr": 8382,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...send it: the window is set",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8385,
+      "bytes": [
+        32,
+        229,
+        32
+      ],
+      "comment_inline": "Load the loading screen, Dunjunz3 and Dunjunz4",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "load_files",
+      "target": 8421,
+      "target_label": "load_files"
+    },
+    {
+      "addr": 8388,
+      "bytes": [
+        76,
+        0,
+        13
+      ],
+      "comment_inline": "Load Dunjunz5 and start the game; this file is overwritten",
+      "type": "code",
+      "mnemonic": "jmp",
+      "operand": "load_core",
+      "expr": {
+        "text": "load_core",
+        "tree": {
+          "sym": "load_core"
+        }
+      },
+      "target": 3328,
+      "target_label": "load_core"
+    },
+    {
+      "addr": 8391,
+      "bytes": [
+        162,
+        112
+      ],
+      "labels": [
+        "load_file"
+      ],
+      "comment_inline": "X, Y = osfile_block...",
+      "xref_summaries": [
+        "&20c7 referenced 3 times by &20f9, &211f, &2131"
+      ],
+      "references": [
+        {
+          "addr": 8441,
+          "kind": "direct"
+        },
+        {
+          "addr": 8479,
+          "kind": "direct"
+        },
+        {
+          "addr": 8497,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#<(osfile_block)",
+      "expr": {
+        "text": "<(osfile_block)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "osfile_block"
+          }
+        }
+      }
+    },
+    {
+      "addr": 8393,
+      "bytes": [
+        160,
+        33
+      ],
+      "comment_inline": "...its page",
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#>(osfile_block)",
+      "expr": {
+        "text": ">(osfile_block)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "osfile_block"
+          }
+        }
+      }
+    },
+    {
+      "addr": 8395,
+      "bytes": [
+        169,
+        0
+      ],
+      "comment_inline": "The load address's top two bytes are 0...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#0"
+    },
+    {
+      "addr": 8397,
+      "bytes": [
+        141,
+        116,
+        33
+      ],
+      "comment_inline": "...byte 4...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "osfile_load_addr_high",
+      "expr": {
+        "text": "osfile_load_addr_high",
+        "tree": {
+          "sym": "osfile_load_addr_high"
+        }
+      },
+      "target": 8564,
+      "target_label": "osfile_load_addr_high"
+    },
+    {
+      "addr": 8400,
+      "bytes": [
+        141,
+        117,
+        33
+      ],
+      "comment_inline": "...and byte 5: the I/O processor",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "osfile_load_addr_high + 1",
+      "expr": {
+        "text": "osfile_load_addr_high + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "osfile_load_addr_high"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      },
+      "target": 8565
+    },
+    {
+      "addr": 8403,
+      "bytes": [
+        173,
+        18,
+        2
+      ],
+      "comment_inline": "Copy FILEV into the JSR below...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "filev",
+      "target": 530,
+      "target_label": "filev"
+    },
+    {
+      "addr": 8406,
+      "bytes": [
+        141,
+        226,
+        32
+      ],
+      "comment_inline": "...its low byte...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "load_file_call_address",
+      "target": 8418,
+      "target_label": "load_file_call_address"
+    },
+    {
+      "addr": 8409,
+      "bytes": [
+        173,
+        19,
+        2
+      ],
+      "comment_inline": "...and its high byte...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "filev + 1",
+      "target": 531
+    },
+    {
+      "addr": 8412,
+      "bytes": [
+        141,
+        227,
+        32
+      ],
+      "comment_inline": "...so the JSR calls the filing system's routine",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "load_file_call_address + 1",
+      "target": 8419
+    },
+    {
+      "addr": 8415,
+      "bytes": [
+        169,
+        255
+      ],
+      "comment_inline": "A = &FF: load the file",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&ff"
+    },
+    {
+      "addr": 8417,
+      "bytes": [
+        32,
+        0,
+        48
+      ],
+      "labels": [
+        "load_file_call"
+      ],
+      "sub_labels": {
+        "8418": [
+          "load_file_call_address"
+        ]
+      },
+      "comment_inline": "Call FILEV's routine; the operand, &3000 as stored, is set above",
+      "xref_summaries": [
+        "&20e2 referenced 1 time by &20d6",
+        "&20e3 referenced 1 time by &20dc"
+      ],
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "&3000",
+      "expr": {
+        "text": "&3000",
+        "tree": {
+          "int": 12288,
+          "radix": "hex"
+        }
+      },
+      "target": 12288
+    },
+    {
+      "addr": 8420,
+      "bytes": [
+        96
+      ],
+      "comment_inline": "Return with the file loaded",
+      "type": "code",
+      "mnemonic": "rts"
+    },
+    {
+      "addr": 8421,
+      "bytes": [
+        169,
+        64
+      ],
+      "labels": [
+        "load_files"
+      ],
+      "comment_inline": "Filename: screen_filename, \"Dunjunz2\"...",
+      "xref_summaries": [
+        "&20e5 referenced 1 time by &20c1"
+      ],
+      "references": [
+        {
+          "addr": 8385,
+          "kind": "direct"
+        }
+      ],
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#<(screen_filename)",
+      "expr": {
+        "text": "<(screen_filename)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "screen_filename"
+          }
+        }
+      }
+    },
+    {
+      "addr": 8423,
+      "bytes": [
+        141,
+        112,
+        33
+      ],
+      "comment_inline": "...its low byte into the block...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "osfile_block",
+      "expr": {
+        "text": "osfile_block",
+        "tree": {
+          "sym": "osfile_block"
+        }
+      },
+      "target": 8560,
+      "target_label": "osfile_block"
+    },
+    {
+      "addr": 8426,
+      "bytes": [
+        169,
+        33
+      ],
+      "comment_inline": "...and its page...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#>(screen_filename)",
+      "expr": {
+        "text": ">(screen_filename)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "screen_filename"
+          }
+        }
+      }
+    },
+    {
+      "addr": 8428,
+      "bytes": [
+        141,
+        113,
+        33
+      ],
+      "comment_inline": "...into byte 1",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "osfile_block + 1",
+      "expr": {
+        "text": "osfile_block + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "osfile_block"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      },
+      "target": 8561
+    },
+    {
+      "addr": 8431,
+      "bytes": [
+        169,
+        128
+      ],
+      "comment_inline": "Load address &3280, loading_screen...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#<(loading_screen)",
+      "expr": {
+        "text": "<(loading_screen)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "loading_screen"
+          }
+        }
+      }
+    },
+    {
+      "addr": 8433,
+      "bytes": [
+        141,
+        114,
+        33
+      ],
+      "comment_inline": "...low byte...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "osfile_load_addr",
+      "expr": {
+        "text": "osfile_load_addr",
+        "tree": {
+          "sym": "osfile_load_addr"
+        }
+      },
+      "target": 8562,
+      "target_label": "osfile_load_addr"
+    },
+    {
+      "addr": 8436,
+      "bytes": [
+        169,
+        50
+      ],
+      "comment_inline": "...and page...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#>(loading_screen)",
+      "expr": {
+        "text": ">(loading_screen)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "loading_screen"
+          }
+        }
+      }
+    },
+    {
+      "addr": 8438,
+      "bytes": [
+        141,
+        115,
+        33
+      ],
+      "comment_inline": "...into bytes 2-3",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "osfile_load_addr + 1",
+      "expr": {
+        "text": "osfile_load_addr + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "osfile_load_addr"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      },
+      "target": 8563
+    },
+    {
+      "addr": 8441,
+      "bytes": [
+        32,
+        199,
+        32
+      ],
+      "comment_inline": "Load the loading screen, in black",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "load_file",
+      "target": 8391,
+      "target_label": "load_file"
+    },
+    {
+      "addr": 8444,
+      "bytes": [
+        169,
+        20
+      ],
+      "comment_inline": "VDU 20: the default colours...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&14"
+    },
+    {
+      "addr": 8446,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...so the loading screen appears",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8449,
+      "bytes": [
+        169,
+        12
+      ],
+      "comment_inline": "VDU 12: clear the text window...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&0c"
+    },
+    {
+      "addr": 8451,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...send it",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8454,
+      "bytes": [
+        169,
+        17
+      ],
+      "comment_inline": "VDU 17: set the text colour...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&11"
+    },
+    {
+      "addr": 8456,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...send the 17",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8459,
+      "bytes": [
+        169,
+        2
+      ],
+      "comment_inline": "...colour 2, green",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#2"
+    },
+    {
+      "addr": 8461,
+      "bytes": [
+        32,
+        238,
+        255
+      ],
+      "comment_inline": "...send it",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "oswrch",
+      "target": 65518,
+      "target_label": "oswrch"
+    },
+    {
+      "addr": 8464,
+      "bytes": [
+        169,
+        80
+      ],
+      "comment_inline": "Filename: dunjunz3_filename (same page)...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#<(dunjunz3_filename)",
+      "expr": {
+        "text": "<(dunjunz3_filename)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "dunjunz3_filename"
+          }
+        }
+      }
+    },
+    {
+      "addr": 8466,
+      "bytes": [
+        141,
+        112,
+        33
+      ],
+      "comment_inline": "...into the block",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "osfile_block",
+      "expr": {
+        "text": "osfile_block",
+        "tree": {
+          "sym": "osfile_block"
+        }
+      },
+      "target": 8560,
+      "target_label": "osfile_block"
+    },
+    {
+      "addr": 8469,
+      "bytes": [
+        169,
+        128
+      ],
+      "comment_inline": "Load address &6E80, dunjunz3_start...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#<(dunjunz3_start)",
+      "expr": {
+        "text": "<(dunjunz3_start)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "dunjunz3_start"
+          }
+        }
+      }
+    },
+    {
+      "addr": 8471,
+      "bytes": [
+        141,
+        114,
+        33
+      ],
+      "comment_inline": "...low byte...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "osfile_load_addr",
+      "expr": {
+        "text": "osfile_load_addr",
+        "tree": {
+          "sym": "osfile_load_addr"
+        }
+      },
+      "target": 8562,
+      "target_label": "osfile_load_addr"
+    },
+    {
+      "addr": 8474,
+      "bytes": [
+        169,
+        110
+      ],
+      "comment_inline": "...and page...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#>(dunjunz3_start)",
+      "expr": {
+        "text": ">(dunjunz3_start)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "dunjunz3_start"
+          }
+        }
+      }
+    },
+    {
+      "addr": 8476,
+      "bytes": [
+        141,
+        115,
+        33
+      ],
+      "comment_inline": "...into bytes 2-3",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "osfile_load_addr + 1",
+      "expr": {
+        "text": "osfile_load_addr + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "osfile_load_addr"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      },
+      "target": 8563
+    },
+    {
+      "addr": 8479,
+      "bytes": [
+        32,
+        199,
+        32
+      ],
+      "comment_inline": "Load Dunjunz3, the game's &6E80-&7FFF",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "load_file",
+      "target": 8391,
+      "target_label": "load_file"
+    },
+    {
+      "addr": 8482,
+      "bytes": [
+        169,
+        96
+      ],
+      "comment_inline": "Filename: dunjunz4_filename (same page)...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#<(dunjunz4_filename)",
+      "expr": {
+        "text": "<(dunjunz4_filename)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "dunjunz4_filename"
+          }
+        }
+      }
+    },
+    {
+      "addr": 8484,
+      "bytes": [
+        141,
+        112,
+        33
+      ],
+      "comment_inline": "...into the block",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "osfile_block",
+      "expr": {
+        "text": "osfile_block",
+        "tree": {
+          "sym": "osfile_block"
+        }
+      },
+      "target": 8560,
+      "target_label": "osfile_block"
+    },
+    {
+      "addr": 8487,
+      "bytes": [
+        169,
+        192
+      ],
+      "comment_inline": "Load address &08C0, dunjunz4_start...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#<(dunjunz4_start)",
+      "expr": {
+        "text": "<(dunjunz4_start)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "dunjunz4_start"
+          }
+        }
+      }
+    },
+    {
+      "addr": 8489,
+      "bytes": [
+        141,
+        114,
+        33
+      ],
+      "comment_inline": "...low byte...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "osfile_load_addr",
+      "expr": {
+        "text": "osfile_load_addr",
+        "tree": {
+          "sym": "osfile_load_addr"
+        }
+      },
+      "target": 8562,
+      "target_label": "osfile_load_addr"
+    },
+    {
+      "addr": 8492,
+      "bytes": [
+        169,
+        8
+      ],
+      "comment_inline": "...and page...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#>(dunjunz4_start)",
+      "expr": {
+        "text": ">(dunjunz4_start)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "dunjunz4_start"
+          }
+        }
+      }
+    },
+    {
+      "addr": 8494,
+      "bytes": [
+        141,
+        115,
+        33
+      ],
+      "comment_inline": "...into bytes 2-3",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "osfile_load_addr + 1",
+      "expr": {
+        "text": "osfile_load_addr + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "osfile_load_addr"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      },
+      "target": 8563
+    },
+    {
+      "addr": 8497,
+      "bytes": [
+        32,
+        199,
+        32
+      ],
+      "comment_inline": "Load Dunjunz4, the game's &08C0-&1FFF",
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "load_file",
+      "target": 8391,
+      "target_label": "load_file"
+    },
+    {
+      "addr": 8500,
+      "bytes": [
+        96
+      ],
+      "comment_inline": "Return to loader_start",
+      "type": "code",
+      "mnemonic": "rts"
+    },
+    {
+      "addr": 8501,
+      "bytes": [
+        111,
+        110,
+        50,
+        13,
+        244,
+        255,
+        169,
+        213,
+        162,
+        100,
+        32
+      ],
+      "comment_inline": "Not referenced: \"on2\", a CR, then leftover bytes",
+      "type": "byte",
+      "values": [
+        111,
+        110,
+        50,
+        13,
+        244,
+        255,
+        169,
+        213,
+        162,
+        100,
+        32
+      ]
+    },
+    {
+      "addr": 8512,
+      "bytes": [
+        68,
+        117,
+        110,
+        106,
+        117,
+        110,
+        122,
+        50,
+        13
+      ],
+      "labels": [
+        "screen_filename"
+      ],
+      "comment_inline": "\"Dunjunz2\" and a CR",
+      "type": "string",
+      "string": "Dunjunz2."
+    },
+    {
+      "addr": 8521,
+      "bytes": [
+        173,
+        14,
+        2,
+        141,
+        211,
+        18,
+        173
+      ],
+      "comment_inline": "Not referenced",
+      "type": "byte",
+      "values": [
+        173,
+        14,
+        2,
+        141,
+        211,
+        18,
+        173
+      ]
+    },
+    {
+      "addr": 8528,
+      "bytes": [
+        68,
+        117,
+        110,
+        106,
+        117,
+        110,
+        122,
+        51,
+        13
+      ],
+      "labels": [
+        "dunjunz3_filename"
+      ],
+      "comment_inline": "\"Dunjunz3\" and a CR",
+      "type": "string",
+      "string": "Dunjunz3."
+    },
+    {
+      "addr": 8537,
+      "bytes": [
+        2,
+        169,
+        127,
+        141,
+        15,
+        2,
+        96
+      ],
+      "comment_inline": "Not referenced",
+      "type": "byte",
+      "values": [
+        2,
+        169,
+        127,
+        141,
+        15,
+        2,
+        96
+      ]
+    },
+    {
+      "addr": 8544,
+      "bytes": [
+        68,
+        117,
+        110,
+        106,
+        117,
+        110,
+        122,
+        52,
+        13
+      ],
+      "labels": [
+        "dunjunz4_filename"
+      ],
+      "comment_inline": "\"Dunjunz4\" and a CR",
+      "type": "string",
+      "string": "Dunjunz4."
+    }
+  ]
+}

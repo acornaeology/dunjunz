@@ -18,6 +18,34 @@ command = ["beebasm", "-i", "{asm}"]
 cwd = "{output_dirpath}"
 output = "{image}"
 
+# The 1986 cassette: the resident game (four files), TITLE, its title
+# page, and Dunjunz1, its game loader.
+[[targets]]
+id = "tape"
+images = [
+  "versions/dunjunz-tape/binary/DUNK",
+  "versions/dunjunz-tape/binary/Dunjunz4",
+  "versions/dunjunz-tape/binary/Dunjunz5",
+  "versions/dunjunz-tape/binary/Dunjunz3",
+]
+driver = "versions/dunjunz-tape/disassemble/disasm_dunjunz_tape.py"
+asm = "versions/dunjunz-tape/output/dunjunz-tape.asm"
+json = "versions/dunjunz-tape/output/dunjunz-tape.json"
+
+[[targets]]
+id = "tape-title"
+binary = "versions/dunjunz-tape/binary/TITLE"
+driver = "versions/dunjunz-tape/disassemble/disasm_dunjunz_tape_title.py"
+asm = "versions/dunjunz-tape/output/dunjunz-tape-title.asm"
+json = "versions/dunjunz-tape/output/dunjunz-tape-title.json"
+
+[[targets]]
+id = "tape-dunjunz1"
+binary = "versions/dunjunz-tape/binary/Dunjunz1"
+driver = "versions/dunjunz-tape/disassemble/disasm_dunjunz_tape_dunjunz1.py"
+asm = "versions/dunjunz-tape/output/dunjunz-tape-dunjunz1.asm"
+json = "versions/dunjunz-tape/output/dunjunz-tape-dunjunz1.json"
+
 # The sideways RAM hack: the resident game (four files), and TITLE, its
 # title page.
 [[targets]]

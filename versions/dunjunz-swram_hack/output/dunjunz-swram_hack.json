@@ -2228,7 +2228,7 @@
       "addr": 28256,
       "name": "level_osfile_block",
       "group": "screen_workspace",
-      "description": "The 18-byte OSFILE parameter block load_level passes to FILEV's routine: bytes 0-1 the filename's address (level_filename), bytes 2-5 the load address &00006B00, byte 6 the exec address's low byte, which must be 0 for the load address to be used. It lies in character row 24 of the screen, just below Dunjun6, hidden while the level loads; only bytes 0-5 are written, and the rest are 0 from show_level_number's screen clear."
+      "description": "The 18-byte OSFILE parameter block load_level passes to FILEV's routine: bytes 0-1 the filename's address (level_filename), bytes 2-5 the load address &00006B00, byte 6 the exec address's low byte, which must be 0 for the load address to be used. It lies in character row 24 of the screen, just below the game's code at &6E80, hidden while the level loads; only bytes 0-5 are written, and the rest are 0 from show_level_number's screen clear."
     },
     {
       "addr": 50037,
@@ -2479,7 +2479,7 @@
       ],
       "named_slots": false,
       "group": "screen_workspace",
-      "description": "The 18-byte OSFILE parameter block load_level passes to FILEV's routine: bytes 0-1 the filename's address (level_filename), bytes 2-5 the load address &00006B00, byte 6 the exec address's low byte, which must be 0 for the load address to be used. It lies in character row 24 of the screen, just below Dunjun6, hidden while the level loads; only bytes 0-5 are written, and the rest are 0 from show_level_number's screen clear."
+      "description": "The 18-byte OSFILE parameter block load_level passes to FILEV's routine: bytes 0-1 the filename's address (level_filename), bytes 2-5 the load address &00006B00, byte 6 the exec address's low byte, which must be 0 for the load address to be used. It lies in character row 24 of the screen, just below the game's code at &6E80, hidden while the level loads; only bytes 0-5 are written, and the rest are 0 from show_level_number's screen clear."
     },
     {
       "anchor": 5275,
