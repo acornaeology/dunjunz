@@ -1,10 +1,11 @@
 {
     "slug": "dunjunz",
     "name": "Dunjunz",
-    "description": "Annotated disassemblies of Dunjunz, the four-player dungeon game for the BBC Micro by Julian Avis, published by Bug-Byte on cassette in 1986 and on a flippy disc in 1987. The reference version is the official disc's Model B side, from flux captures of both its sides; its Master 128 side is the official Master conversion; the others are Ole's crack of the cassette and an unofficial sideways RAM hack built from the cassette's files. Each version's separate programs (loaders, title pages, the level editor and restorer, a picture unpacker) are listings of their own, and its BASIC programs are shown as source. The game code is annotated once and applied to all four, and every listing reassembles byte for byte to the original files. The original game is © 1986–1987 Bug-Byte; the annotations and disassembly scripts here are © 2026 Acornaeology.",
+    "description": "Annotated disassemblies of Dunjunz, the four-player dungeon game for the BBC Micro by Julian Avis, published by Bug-Byte on cassette in 1986 and on a flippy disc in 1987. The reference version is the official disc's Model B side, from flux captures of both its sides; its Master 128 side is the official Master conversion; the 1986 cassette is from a tape image; the others are Ole's crack of the cassette and an unofficial sideways RAM hack built from the cassette's files. Each version's separate programs (loaders, title pages, the level editor and restorer, a picture unpacker) are listings of their own, and its BASIC programs are shown as source. The game code is annotated once and applied to all five, and every listing reassembles byte for byte to the original files. The original game is © 1986–1987 Bug-Byte; the annotations and disassembly scripts here are © 2026 Acornaeology.",
     "versions": [
         "disc",
         "disc_master",
+        "tape",
         "tape_crack_ole",
         "swram_hack"
     ],

@@ -560,6 +560,14 @@ reset vector at &FFFC. So ESCAPE or any other error while the BASIC runs
 restarts the machine, and BREAK clears the memory
 **[confirmed from the BASIC; the effect is inference]**.
 
+### Line 0 of each BASIC program hides the listing
+
+`DUNJUNZ` and `PLOAD` each start with a line 0 `REM` followed by
+character &15, VDU 21, which turns off the VDU drivers: listing the
+program stops showing anything at line 0, until a VDU 6 or a reset.
+`DUNJUNZ`'s `REM` goes on &01 and "XXXXXX", `PLOAD`'s &03 and 24 zeros
+**[confirmed from the files]**. Ole's `PLOAD` has no line 0.
+
 ### The cassette passes its own level 5 check
 
 Its checksum table holds &4D for level 5, which its level 5 sums to, so

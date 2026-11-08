@@ -27,9 +27,14 @@ Four versions live under `versions/` (see `versions/README.md`):
   (`disasm_dunjunz_disc_master_<program>.py`), declared to the site under
   `disassemblies` in `binary.json`; the game (nine files) is the primary
   listing.
-- `dunjunz-tape/`: a UEF image of the 1986 cassette, from The Stairway to
-  Hell (`Dunjunz_B.uef`; `tools/read_uef.py` lists and exports its
-  files). Not yet a disassembled version.
+- `dunjunz-tape/`: the 1986 cassette, from a UEF image from The Stairway
+  to Hell (`Dunjunz_B.uef`; `tools/read_uef.py` lists and exports its
+  files). `binary/` holds its machine-code files. The game (`DUNK`,
+  `Dunjunz4`, `Dunjunz5`, `Dunjunz3`) is the primary listing; `TITLE` and
+  `Dunjunz1` are listings of their own; `DUNJUNZ` and `PLOAD` are source
+  files, with line 0's control codes written as Unicode control
+  pictures. `TITLE`'s annotations are shared with the hack's
+  (`dunjunz_common/title_page.py`).
 - `dunjunz-tape_crack_ole/`: Ole's crack of the 1986 cassette.
   `EXPAND` (the intro's picture unpacker) is a separate listing; the BASIC
   `PLOAD` and `DUNJ`, and the manual `DUNJ` carries, are source files
@@ -64,6 +69,10 @@ on the official release.
 | `Coder` (disc) | &5000 | &5000 | &09B0 | level loader, run for every level; holds the keyboard and joystick &0400 images |
 | `DUNJ4` (crack) | &2400 | &5000 | &2C50 | the &0400–&2FFF game image stored &2000 high, plus start-up at &5000 |
 | `DUNJ3` (crack) | &6E80 | — | &2E80 | its first &1180 bytes are the game's &6E80–&7FFF |
+| `DUNK` (cassette) | &0400 | &0740 | &03FF | the game's &0400–&07FE; its loader at &0740 loads `Dunjunz1` |
+| `Dunjunz1` (cassette) | &2000 | &2000 | &0169 | game loader: screen, `Dunjunz3`, `Dunjunz4`, then &0D00 |
+| `Dunjunz4`/`Dunjunz5`/`Dunjunz3` (cassette) | &08C0/&2000/&6E80 | — | &1740/&1000/&1180 | the rest of the game; &0D00 (`load_core`) loads `Dunjunz5` |
+| `TITLE` (cassette) | &2800 | &28CE | &0C00 | title page (MODE 5), its own listing |
 | `Dunjun4` (hack) | &0400 | — | &0900 | game code/data |
 | `Dunjun7` (hack) | &0D00 | — | &0400 | game code/data; loaded at &3000 then copied to &0D00; game entry &0D31 |
 | `Dunjun5` (hack) | &1100 | — | &1F00 | game code/data |

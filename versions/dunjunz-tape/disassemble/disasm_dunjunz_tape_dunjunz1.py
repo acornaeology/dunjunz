@@ -37,22 +37,22 @@ def comments(pairs):
 # ---------------------------------------------------------------------------
 # Addresses outside the file.
 
-d.label(0x2170, "osfile_block", group="workspace", description=(
+d.label(0x2170, "osfile_block", group="loader_workspace", description=(
     "The OSFILE control block that load_file passes to FILEV's routine, "
     "just past the end of the file: bytes 0-1 the filename's address, "
     "bytes 2-5 the load address. Byte 6, the exec address's low byte, is "
     "never set; whatever it holds, each file loads at the load address "
     "given here or, if the byte is not 0, at its own, which is the same."))
-d.label(0x2172, "osfile_load_addr", group="workspace",
+d.label(0x2172, "osfile_load_addr", group="loader_workspace",
         description="Bytes 2-5 of osfile_block: the load address.")
-d.label(0x2174, "osfile_load_addr_high", group="workspace",
+d.label(0x2174, "osfile_load_addr_high", group="loader_workspace",
         description="Bytes 4-5 of osfile_block: the load address's top half, 0.")
-d.label(0x0D00, "load_core", group="game", description=(
+d.label(0x0D00, "load_core", group="game_files", description=(
     "In Dunjunz4: loads Dunjunz5 to &2000, over this loader, and falls "
     "into game_entry (&0D31)."))
-d.label(0x08C0, "dunjunz4_start", group="game",
+d.label(0x08C0, "dunjunz4_start", group="game_files",
         description="Where Dunjunz4, the game's &08C0-&1FFF, loads.")
-d.label(0x6E80, "dunjunz3_start", group="game",
+d.label(0x6E80, "dunjunz3_start", group="game_files",
         description="Where Dunjunz3, the game's &6E80-&7FFF, loads.")
 d.label(0x3280, "loading_screen", group="screen",
         description="Where Dunjunz2, the MODE 2 loading screen, loads.")
