@@ -1496,6 +1496,16 @@
         "X": "corrupted",
         "Y": "corrupted"
       }
+    },
+    {
+      "addr": 3328,
+      "name": "load_core",
+      "title": "Load the last game file and start the game (not used)",
+      "description": "The cassette's last loading step, kept with the rest of its page &0D. On the cassette, Dunjunz1 jumps here to build an OSFILE control block at &0D80 naming core_filename (\"Dunjunz5\") with load address &00002000, call the filing system's FILEV handler directly, as boot_loader does, to load the game's &2000-&2FFF over Dunjunz1, and fall into game_entry. Nothing in this release runs it: DUNK's loader enters the game at game_entry. The bytes are as the cassette's run leaves them: the JSR's stored operand is &F27D, the MOS 1.20 FILEV handler for the cassette and ROM filing systems, and core_osfile_block holds the block it built, so the image was saved after load_core had run. Like game_entry, this lies in page &0D, the per-level workspace that reset_workspace overwrites at the start of every level, so the labels of that workspace fall inside these instructions, and core_filename (&0D70) and core_osfile_block (&0D80) share their addresses with hero_key_up and hero_key_fire.",
+      "on_entry": {
+        "FILEV": "the cassette filing system's handler (on the cassette)"
+      },
+      "fall_through": true
     }
   ],
   "banners": [
@@ -2490,6 +2500,16 @@
       ],
       "named_slots": false,
       "description": "Operand of the JSR at load_level_call. Stored as &3000; load_level overwrites it with the contents of FILEV before each call."
+    },
+    {
+      "anchor": 3375,
+      "name": "load_core_call_address",
+      "window": [
+        0,
+        1
+      ],
+      "named_slots": false,
+      "description": "Operand of the JSR at load_core_call. Stored as &F27D, the FILEV handler that load_core copied there when the cassette ran it."
     }
   ],
   "items": [
@@ -12801,17 +12821,27 @@
     {
       "addr": 3328,
       "bytes": [
-        169
+        169,
+        112
       ],
       "image": 1,
       "labels": [
-        "scratch"
+        "scratch",
+        "load_core"
       ],
+      "sub_labels": {
+        "3329": [
+          "scratch2"
+        ]
+      },
       "comments_before_label": [
-        "General-purpose scratch byte."
+        "General-purpose scratch byte.",
+        "Second scratch byte."
       ],
+      "comment_inline": "Filename address: core_filename...",
       "xref_summaries": [
-        "&0d00 referenced 49 times by &1cc5, &1d00, &1d4e, &1d52, &1d55, &1d58, &1d77, &1d82, &2006, &200d, &201e, &205a, &2063, &2070, &6f19, &6f1e, &6f25, &6f71, &6fd7, &7002, &7007, &713c, &74b6, &74c3, &74d8, &77e6, &782c, &7857, &785b, &785e, &7861, &7886, &788b, &7901, &7905, &7908, &790b, &7926, &7931, &793d, &7941, &7944, &7947, &7962, &796d, &7976, &7990, &7a89, &7ce3; also used as index base 1 time by &14a5"
+        "&0d00 referenced 49 times by &1cc5, &1d00, &1d4e, &1d52, &1d55, &1d58, &1d77, &1d82, &2006, &200d, &201e, &205a, &2063, &2070, &6f19, &6f1e, &6f25, &6f71, &6fd7, &7002, &7007, &713c, &74b6, &74c3, &74d8, &77e6, &782c, &7857, &785b, &785e, &7861, &7886, &788b, &7901, &7905, &7908, &790b, &7926, &7931, &793d, &7941, &7944, &7947, &7962, &796d, &7976, &7990, &7a89, &7ce3; also used as index base 1 time by &14a5",
+        "&0d01 referenced 8 times by &203a, &207b, &74d2, &7503, &7509, &750c, &7829, &782f"
       ],
       "references": [
         {
@@ -13015,79 +13045,48 @@
           "kind": "direct"
         }
       ],
-      "type": "byte",
-      "values": [
-        169
-      ]
-    },
-    {
-      "addr": 3329,
-      "bytes": [
-        112
-      ],
-      "image": 1,
-      "labels": [
-        "scratch2"
-      ],
-      "comments_before_label": [
-        "Second scratch byte."
-      ],
-      "xref_summaries": [
-        "&0d01 referenced 8 times by &203a, &207b, &74d2, &7503, &7509, &750c, &7829, &782f"
-      ],
-      "references": [
-        {
-          "addr": 8250,
-          "kind": "direct"
-        },
-        {
-          "addr": 8315,
-          "kind": "direct"
-        },
-        {
-          "addr": 29906,
-          "kind": "direct"
-        },
-        {
-          "addr": 29955,
-          "kind": "direct"
-        },
-        {
-          "addr": 29961,
-          "kind": "direct"
-        },
-        {
-          "addr": 29964,
-          "kind": "direct"
-        },
-        {
-          "addr": 30761,
-          "kind": "direct"
-        },
-        {
-          "addr": 30767,
-          "kind": "direct"
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#<(core_filename)",
+      "expr": {
+        "text": "<(core_filename)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "core_filename"
+          }
         }
-      ],
-      "type": "byte",
-      "values": [
-        112
-      ]
+      }
     },
     {
       "addr": 3330,
       "bytes": [
-        141
+        141,
+        128,
+        13
       ],
       "image": 1,
       "labels": [
         "cell_x"
       ],
+      "sub_labels": {
+        "3331": [
+          "cell_y"
+        ],
+        "3332": [
+          "cell_room"
+        ]
+      },
       "comments_before_label": [
-        "Map x of the cell being drawn, tested or moved to. plot_at_cell replaces it with the pixel offset within the room."
+        "Map x of the cell being drawn, tested or moved to. plot_at_cell replaces it with the pixel offset within the room.",
+        "Map y of the cell being drawn, tested or moved to. plot_at_cell replaces it with the pixel offset within the room.",
+        "Room of the cell being drawn, as an offset into room_walls."
       ],
+      "comment_inline": "...into the block's bytes 0-1, low byte...",
       "xref_summaries": [
-        "&0d02 referenced 59 times by &119c, &11f4, &1ccb, &1cdb, &1d26, &1d3c, &1d5d, &1d6c, &1dd1, &1e38, &1e48, &1f58, &1faa, &1fd6, &2094, &20a7, &20de, &20e9, &20fa, &6fa7, &700f, &707c, &70aa, &70ee, &7120, &715b, &7176, &71e3, &7310, &732c, &733a, &73f0, &752f, &766a, &777d, &779b, &77ad, &77bf, &77d1, &7801, &7820, &7867, &7872, &787c, &789e, &78b8, &78d2, &78ec, &7910, &791d, &794c, &7959, &797b, &7997, &79d0, &79ea, &7a48, &7b07, &7b44"
+        "&0d02 referenced 59 times by &119c, &11f4, &1ccb, &1cdb, &1d26, &1d3c, &1d5d, &1d6c, &1dd1, &1e38, &1e48, &1f58, &1faa, &1fd6, &2094, &20a7, &20de, &20e9, &20fa, &6fa7, &700f, &707c, &70aa, &70ee, &7120, &715b, &7176, &71e3, &7310, &732c, &733a, &73f0, &752f, &766a, &777d, &779b, &77ad, &77bf, &77d1, &7801, &7820, &7867, &7872, &787c, &789e, &78b8, &78d2, &78ec, &7910, &791d, &794c, &7959, &797b, &7997, &79d0, &79ea, &7a48, &7b07, &7b44",
+        "&0d03 referenced 55 times by &11a1, &11f9, &1cd1, &1ce6, &1d20, &1d42, &1d49, &1d7a, &1dd7, &1e3e, &1e50, &1f5e, &1fb0, &1fdc, &209a, &20ad, &20d0, &20db, &20ec, &20f7, &6fad, &7017, &7082, &70b0, &70f4, &7126, &7161, &717e, &71eb, &7316, &7332, &7345, &73fc, &7535, &7670, &7783, &7807, &7852, &787f, &7890, &78a5, &78bf, &78d9, &78f3, &78fc, &7929, &7938, &7965, &7983, &799f, &79d6, &79f3, &7a4e, &7b0d, &7b4a",
+        "&0d04 referenced 7 times by &7864, &786c, &786f, &7896, &78b0, &78ca, &78e4"
       ],
       "references": [
         {
@@ -13327,385 +13326,82 @@
           "kind": "direct"
         }
       ],
-      "type": "byte",
-      "values": [
-        141
-      ]
-    },
-    {
-      "addr": 3331,
-      "bytes": [
-        128
-      ],
-      "image": 1,
-      "labels": [
-        "cell_y"
-      ],
-      "comments_before_label": [
-        "Map y of the cell being drawn, tested or moved to. plot_at_cell replaces it with the pixel offset within the room."
-      ],
-      "xref_summaries": [
-        "&0d03 referenced 55 times by &11a1, &11f9, &1cd1, &1ce6, &1d20, &1d42, &1d49, &1d7a, &1dd7, &1e3e, &1e50, &1f5e, &1fb0, &1fdc, &209a, &20ad, &20d0, &20db, &20ec, &20f7, &6fad, &7017, &7082, &70b0, &70f4, &7126, &7161, &717e, &71eb, &7316, &7332, &7345, &73fc, &7535, &7670, &7783, &7807, &7852, &787f, &7890, &78a5, &78bf, &78d9, &78f3, &78fc, &7929, &7938, &7965, &7983, &799f, &79d6, &79f3, &7a4e, &7b0d, &7b4a"
-      ],
-      "references": [
-        {
-          "addr": 4513,
-          "kind": "direct"
-        },
-        {
-          "addr": 4601,
-          "kind": "direct"
-        },
-        {
-          "addr": 7377,
-          "kind": "direct"
-        },
-        {
-          "addr": 7398,
-          "kind": "direct"
-        },
-        {
-          "addr": 7456,
-          "kind": "direct"
-        },
-        {
-          "addr": 7490,
-          "kind": "direct"
-        },
-        {
-          "addr": 7497,
-          "kind": "direct"
-        },
-        {
-          "addr": 7546,
-          "kind": "direct"
-        },
-        {
-          "addr": 7639,
-          "kind": "direct"
-        },
-        {
-          "addr": 7742,
-          "kind": "direct"
-        },
-        {
-          "addr": 7760,
-          "kind": "direct"
-        },
-        {
-          "addr": 8030,
-          "kind": "direct"
-        },
-        {
-          "addr": 8112,
-          "kind": "direct"
-        },
-        {
-          "addr": 8156,
-          "kind": "direct"
-        },
-        {
-          "addr": 8346,
-          "kind": "direct"
-        },
-        {
-          "addr": 8365,
-          "kind": "direct"
-        },
-        {
-          "addr": 8400,
-          "kind": "direct"
-        },
-        {
-          "addr": 8411,
-          "kind": "direct"
-        },
-        {
-          "addr": 8428,
-          "kind": "direct"
-        },
-        {
-          "addr": 8439,
-          "kind": "direct"
-        },
-        {
-          "addr": 28589,
-          "kind": "direct"
-        },
-        {
-          "addr": 28695,
-          "kind": "direct"
-        },
-        {
-          "addr": 28802,
-          "kind": "direct"
-        },
-        {
-          "addr": 28848,
-          "kind": "direct"
-        },
-        {
-          "addr": 28916,
-          "kind": "direct"
-        },
-        {
-          "addr": 28966,
-          "kind": "direct"
-        },
-        {
-          "addr": 29025,
-          "kind": "direct"
-        },
-        {
-          "addr": 29054,
-          "kind": "direct"
-        },
-        {
-          "addr": 29163,
-          "kind": "direct"
-        },
-        {
-          "addr": 29462,
-          "kind": "direct"
-        },
-        {
-          "addr": 29490,
-          "kind": "direct"
-        },
-        {
-          "addr": 29509,
-          "kind": "direct"
-        },
-        {
-          "addr": 29692,
-          "kind": "direct"
-        },
-        {
-          "addr": 30005,
-          "kind": "direct"
-        },
-        {
-          "addr": 30320,
-          "kind": "direct"
-        },
-        {
-          "addr": 30595,
-          "kind": "direct"
-        },
-        {
-          "addr": 30727,
-          "kind": "direct"
-        },
-        {
-          "addr": 30802,
-          "kind": "direct"
-        },
-        {
-          "addr": 30847,
-          "kind": "direct"
-        },
-        {
-          "addr": 30864,
-          "kind": "direct"
-        },
-        {
-          "addr": 30885,
-          "kind": "direct"
-        },
-        {
-          "addr": 30911,
-          "kind": "direct"
-        },
-        {
-          "addr": 30937,
-          "kind": "direct"
-        },
-        {
-          "addr": 30963,
-          "kind": "direct"
-        },
-        {
-          "addr": 30972,
-          "kind": "direct"
-        },
-        {
-          "addr": 31017,
-          "kind": "direct"
-        },
-        {
-          "addr": 31032,
-          "kind": "direct"
-        },
-        {
-          "addr": 31077,
-          "kind": "direct"
-        },
-        {
-          "addr": 31107,
-          "kind": "direct"
-        },
-        {
-          "addr": 31135,
-          "kind": "direct"
-        },
-        {
-          "addr": 31190,
-          "kind": "direct"
-        },
-        {
-          "addr": 31219,
-          "kind": "direct"
-        },
-        {
-          "addr": 31310,
-          "kind": "direct"
-        },
-        {
-          "addr": 31501,
-          "kind": "direct"
-        },
-        {
-          "addr": 31562,
-          "kind": "direct"
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "core_osfile_block",
+      "expr": {
+        "text": "core_osfile_block",
+        "tree": {
+          "sym": "core_osfile_block"
         }
-      ],
-      "type": "byte",
-      "values": [
-        128
-      ]
+      },
+      "target": 3456,
+      "target_label": "hero_key_fire"
     },
     {
-      "addr": 3332,
+      "addr": 3333,
       "bytes": [
-        13,
-        169
-      ],
-      "image": 1,
-      "labels": [
-        "cell_room"
-      ],
-      "comments_before_label": [
-        "Room of the cell being drawn, as an offset into room_walls."
-      ],
-      "xref_summaries": [
-        "&0d04 referenced 7 times by &7864, &786c, &786f, &7896, &78b0, &78ca, &78e4"
-      ],
-      "references": [
-        {
-          "addr": 30820,
-          "kind": "direct"
-        },
-        {
-          "addr": 30828,
-          "kind": "direct"
-        },
-        {
-          "addr": 30831,
-          "kind": "direct"
-        },
-        {
-          "addr": 30870,
-          "kind": "direct"
-        },
-        {
-          "addr": 30896,
-          "kind": "direct"
-        },
-        {
-          "addr": 30922,
-          "kind": "direct"
-        },
-        {
-          "addr": 30948,
-          "kind": "direct"
-        }
-      ],
-      "type": "byte",
-      "values": [
-        13,
-        169
-      ]
-    },
-    {
-      "addr": 3334,
-      "bytes": [
+        169,
         13
       ],
       "image": 1,
       "labels": [
-        "previous_x"
+        "load_core_name_page"
       ],
+      "sub_labels": {
+        "3334": [
+          "previous_x"
+        ]
+      },
       "comments_before_label": [
         "Map x of the creature being moved, before the move."
       ],
+      "comment_inline": "...and its page...",
       "xref_summaries": [
         "&0d06 referenced 11 times by &6e9a, &6f56, &6fbb, &6fe5, &7021, &7069, &7079, &79ed, &7a58, &7a95, &7af8"
       ],
-      "references": [
-        {
-          "addr": 28314,
-          "kind": "direct"
-        },
-        {
-          "addr": 28502,
-          "kind": "direct"
-        },
-        {
-          "addr": 28603,
-          "kind": "direct"
-        },
-        {
-          "addr": 28645,
-          "kind": "direct"
-        },
-        {
-          "addr": 28705,
-          "kind": "direct"
-        },
-        {
-          "addr": 28777,
-          "kind": "direct"
-        },
-        {
-          "addr": 28793,
-          "kind": "direct"
-        },
-        {
-          "addr": 31213,
-          "kind": "direct"
-        },
-        {
-          "addr": 31320,
-          "kind": "direct"
-        },
-        {
-          "addr": 31381,
-          "kind": "direct"
-        },
-        {
-          "addr": 31480,
-          "kind": "direct"
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#>(core_filename)",
+      "expr": {
+        "text": ">(core_filename)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "core_filename"
+          }
         }
-      ],
-      "type": "byte",
-      "values": [
-        13
-      ]
+      }
     },
     {
       "addr": 3335,
       "bytes": [
-        141
+        141,
+        129,
+        13
       ],
       "image": 1,
       "labels": [
         "previous_y"
       ],
+      "sub_labels": {
+        "3336": [
+          "previous_offset_x"
+        ],
+        "3337": [
+          "previous_offset_y"
+        ]
+      },
       "comments_before_label": [
-        "Map y of the creature being moved, before the move."
+        "Map y of the creature being moved, before the move.",
+        "Pixel offset of the hero being moved, before the move.",
+        "Pixel offset of the hero being moved, before the move."
       ],
+      "comment_inline": "...into byte 1",
       "xref_summaries": [
-        "&0d07 referenced 11 times by &6ea0, &6f5c, &6fc1, &6feb, &7027, &706f, &707f, &79f6, &7a5e, &7a9b, &7afe"
+        "&0d07 referenced 11 times by &6ea0, &6f5c, &6fc1, &6feb, &7027, &706f, &707f, &79f6, &7a5e, &7a9b, &7afe",
+        "&0d08 referenced 2 times by &6ea6, &7085",
+        "&0d09 referenced 2 times by &6eac, &708a"
       ],
       "references": [
         {
@@ -13753,376 +13449,192 @@
           "kind": "direct"
         }
       ],
-      "type": "byte",
-      "values": [
-        141
-      ]
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "core_osfile_block + 1",
+      "expr": {
+        "text": "core_osfile_block + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "core_osfile_block"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
+        }
+      },
+      "target": 3457
     },
     {
-      "addr": 3336,
+      "addr": 3338,
       "bytes": [
-        129
+        169,
+        0
       ],
       "image": 1,
-      "labels": [
-        "previous_offset_x"
-      ],
-      "comments_before_label": [
-        "Pixel offset of the hero being moved, before the move."
-      ],
-      "xref_summaries": [
-        "&0d08 referenced 2 times by &6ea6, &7085"
-      ],
-      "references": [
-        {
-          "addr": 28326,
-          "kind": "direct"
-        },
-        {
-          "addr": 28805,
-          "kind": "direct"
-        }
-      ],
-      "type": "byte",
-      "values": [
-        129
-      ]
+      "comment_inline": "Load address &00002000...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#0"
     },
     {
-      "addr": 3337,
+      "addr": 3340,
       "bytes": [
-        13,
-        169,
-        0,
         141,
         130,
-        13,
-        169
+        13
       ],
       "image": 1,
-      "labels": [
-        "previous_offset_y"
-      ],
-      "comments_before_label": [
-        "Pixel offset of the hero being moved, before the move."
-      ],
-      "xref_summaries": [
-        "&0d09 referenced 2 times by &6eac, &708a"
-      ],
-      "references": [
-        {
-          "addr": 28332,
-          "kind": "direct"
-        },
-        {
-          "addr": 28810,
-          "kind": "direct"
+      "comment_inline": "...byte 2 is 0...",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "core_osfile_block + 2",
+      "expr": {
+        "text": "core_osfile_block + 2",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "core_osfile_block"
+          },
+          "right": {
+            "int": 2,
+            "radix": "auto"
+          }
         }
-      ],
-      "type": "byte",
-      "values": [
-        13,
-        169,
-        0,
-        141,
-        130,
-        13,
-        169
-      ]
+      },
+      "target": 3458
     },
     {
-      "addr": 3344,
+      "addr": 3343,
       "bytes": [
-        32,
-        141,
-        131,
-        13,
-        162
+        169,
+        32
       ],
       "image": 1,
       "labels": [
-        "hero_x"
+        "load_core_load_page"
       ],
+      "sub_labels": {
+        "3344": [
+          "hero_x"
+        ]
+      },
       "comments_before_label": [
         "Map x of each hero."
       ],
+      "comment_inline": "...byte 3 is &20...",
       "xref_summaries": [
         "&0d10 used as index base 29 times by &06e7, &1dfd, &1e35, &1e89, &1f38, &1f55, &1f74, &2091, &6e97, &6f39, &6f59, &6f87, &6f95, &6f98, &6fa4, &6fbe, &6fe8, &700c, &7024, &706c, &70a7, &71e0, &7329, &73ed, &752c, &777a, &799a, &7bbd, &7bcb"
       ],
-      "references": [
-        {
-          "addr": 1767,
-          "kind": "indexed"
-        },
-        {
-          "addr": 7677,
-          "kind": "indexed"
-        },
-        {
-          "addr": 7733,
-          "kind": "indexed"
-        },
-        {
-          "addr": 7817,
-          "kind": "indexed"
-        },
-        {
-          "addr": 7992,
-          "kind": "indexed"
-        },
-        {
-          "addr": 8021,
-          "kind": "indexed"
-        },
-        {
-          "addr": 8052,
-          "kind": "indexed"
-        },
-        {
-          "addr": 8337,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28311,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28473,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28505,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28551,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28565,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28568,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28580,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28606,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28648,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28684,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28708,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28780,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28839,
-          "kind": "indexed"
-        },
-        {
-          "addr": 29152,
-          "kind": "indexed"
-        },
-        {
-          "addr": 29481,
-          "kind": "indexed"
-        },
-        {
-          "addr": 29677,
-          "kind": "indexed"
-        },
-        {
-          "addr": 29996,
-          "kind": "indexed"
-        },
-        {
-          "addr": 30586,
-          "kind": "indexed"
-        },
-        {
-          "addr": 31130,
-          "kind": "indexed"
-        },
-        {
-          "addr": 31677,
-          "kind": "indexed"
-        },
-        {
-          "addr": 31691,
-          "kind": "indexed"
-        }
-      ],
-      "type": "byte",
-      "values": [
-        32,
-        141,
-        131,
-        13,
-        162
-      ]
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&20"
     },
     {
-      "addr": 3349,
+      "addr": 3345,
       "bytes": [
-        128,
+        141,
+        131,
+        13
+      ],
+      "image": 1,
+      "comment_inline": "...the game's &2000-&2FFF, over Dunjunz1",
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "core_osfile_block + 3",
+      "expr": {
+        "text": "core_osfile_block + 3",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "core_osfile_block"
+          },
+          "right": {
+            "int": 3,
+            "radix": "auto"
+          }
+        }
+      },
+      "target": 3459
+    },
+    {
+      "addr": 3348,
+      "bytes": [
+        162,
+        128
+      ],
+      "image": 1,
+      "labels": [
+        "load_core_block_address"
+      ],
+      "sub_labels": {
+        "3349": [
+          "hero_y"
+        ]
+      },
+      "comments_before_label": [
+        "Map y of each hero."
+      ],
+      "comment_inline": "X, Y = core_osfile_block...",
+      "xref_summaries": [
+        "&0d15 used as index base 27 times by &1e03, &1e3b, &1e8f, &1f40, &1f5b, &2097, &6e9d, &6f3f, &6f5f, &6f80, &6f8e, &6f9e, &6faa, &6fc4, &6fee, &7014, &702a, &7072, &70ad, &71e8, &732f, &73f9, &7532, &7780, &79a2, &7bb6, &7bc4"
+      ],
+      "type": "code",
+      "mnemonic": "ldx",
+      "operand": "#<(core_osfile_block)",
+      "expr": {
+        "text": "<(core_osfile_block)",
+        "tree": {
+          "op": "lowbyte",
+          "operand": {
+            "sym": "core_osfile_block"
+          }
+        }
+      }
+    },
+    {
+      "addr": 3350,
+      "bytes": [
         160,
-        13,
+        13
+      ],
+      "image": 1,
+      "comment_inline": "...its page",
+      "type": "code",
+      "mnemonic": "ldy",
+      "operand": "#>(core_osfile_block)",
+      "expr": {
+        "text": ">(core_osfile_block)",
+        "tree": {
+          "op": "highbyte",
+          "operand": {
+            "sym": "core_osfile_block"
+          }
+        }
+      }
+    },
+    {
+      "addr": 3352,
+      "bytes": [
         169,
         0
       ],
       "image": 1,
-      "labels": [
-        "hero_y"
-      ],
-      "comments_before_label": [
-        "Map y of each hero."
-      ],
+      "comment_inline": "...bytes 4 and 5 are 0...",
       "xref_summaries": [
-        "&0d15 used as index base 27 times by &1e03, &1e3b, &1e8f, &1f40, &1f5b, &2097, &6e9d, &6f3f, &6f5f, &6f80, &6f8e, &6f9e, &6faa, &6fc4, &6fee, &7014, &702a, &7072, &70ad, &71e8, &732f, &73f9, &7532, &7780, &79a2, &7bb6, &7bc4",
         "&0d19 used as index base 1 time by &1f17"
       ],
-      "references": [
-        {
-          "addr": 7683,
-          "kind": "indexed"
-        },
-        {
-          "addr": 7739,
-          "kind": "indexed"
-        },
-        {
-          "addr": 7823,
-          "kind": "indexed"
-        },
-        {
-          "addr": 8000,
-          "kind": "indexed"
-        },
-        {
-          "addr": 8027,
-          "kind": "indexed"
-        },
-        {
-          "addr": 8343,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28317,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28479,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28511,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28544,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28558,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28574,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28586,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28612,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28654,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28692,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28714,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28786,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28845,
-          "kind": "indexed"
-        },
-        {
-          "addr": 29160,
-          "kind": "indexed"
-        },
-        {
-          "addr": 29487,
-          "kind": "indexed"
-        },
-        {
-          "addr": 29689,
-          "kind": "indexed"
-        },
-        {
-          "addr": 30002,
-          "kind": "indexed"
-        },
-        {
-          "addr": 30592,
-          "kind": "indexed"
-        },
-        {
-          "addr": 31138,
-          "kind": "indexed"
-        },
-        {
-          "addr": 31670,
-          "kind": "indexed"
-        },
-        {
-          "addr": 31684,
-          "kind": "indexed"
-        }
-      ],
-      "type": "byte",
-      "values": [
-        128,
-        160,
-        13,
-        169,
-        0
-      ]
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#0"
     },
     {
       "addr": 3354,
       "bytes": [
         141,
         132,
-        13,
-        141,
-        133,
         13
       ],
       "image": 1,
@@ -14132,9 +13644,9 @@
       "comments_before_label": [
         "Direction each hero faces: 1 up, 3 right, 5 down, 7 left; 0 when the hero is not in play."
       ],
+      "comment_inline": "...byte 4...",
       "xref_summaries": [
-        "&0d1a used as index base 18 times by &06d0, &1de6, &1f52, &6e82, &6ecb, &6ede, &6ef1, &6f04, &6f2d, &6f79, &701c, &7097, &7221, &7249, &7452, &7711, &7b67, &7baf",
-        "&0d1f used as index base 1 time by &1f23"
+        "&0d1a used as index base 18 times by &06d0, &1de6, &1f52, &6e82, &6ecb, &6ede, &6ef1, &6f04, &6f2d, &6f79, &701c, &7097, &7221, &7249, &7452, &7711, &7b67, &7baf"
       ],
       "references": [
         {
@@ -14210,24 +13722,60 @@
           "kind": "indexed"
         }
       ],
-      "type": "byte",
-      "values": [
-        141,
-        132,
-        13,
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "core_osfile_block + 4",
+      "expr": {
+        "text": "core_osfile_block + 4",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "core_osfile_block"
+          },
+          "right": {
+            "int": 4,
+            "radix": "auto"
+          }
+        }
+      },
+      "target": 3460
+    },
+    {
+      "addr": 3357,
+      "bytes": [
         141,
         133,
         13
-      ]
+      ],
+      "image": 1,
+      "comment_inline": "...and byte 5: the I/O processor",
+      "xref_summaries": [
+        "&0d1f used as index base 1 time by &1f23"
+      ],
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "core_osfile_block + 5",
+      "expr": {
+        "text": "core_osfile_block + 5",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "core_osfile_block"
+          },
+          "right": {
+            "int": 5,
+            "radix": "auto"
+          }
+        }
+      },
+      "target": 3461
     },
     {
       "addr": 3360,
       "bytes": [
         173,
         18,
-        2,
-        141,
-        47
+        2
       ],
       "image": 1,
       "labels": [
@@ -14236,11 +13784,11 @@
       "comments_before_label": [
         "Animation frame of each hero (0 or 1), added to its sprite."
       ],
+      "comment_inline": "Copy FILEV into the JSR below...",
       "xref_summaries": [
         "&0d20 referenced 2 times by &774e, &7753; also used as index base 12 times by &06da, &1df3, &6f62, &6f67, &709c, &7457, &76ee, &76ff, &771f, &772e, &7ba2, &7ba7",
         "&0d21 referenced 2 times by &775b, &7760",
-        "&0d22 referenced 2 times by &7768, &776d",
-        "&0d23 referenced 2 times by &7771, &7776"
+        "&0d22 referenced 2 times by &7768, &776d"
       ],
       "references": [
         {
@@ -14300,302 +13848,164 @@
           "kind": "indexed"
         }
       ],
-      "type": "byte",
-      "values": [
-        173,
-        18,
-        2,
-        141,
-        47
-      ]
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "filev",
+      "target": 530,
+      "target_label": "filev"
     },
     {
-      "addr": 3365,
+      "addr": 3363,
       "bytes": [
-        13,
-        173,
-        19,
-        2,
-        141
+        141,
+        47,
+        13
       ],
       "image": 1,
       "labels": [
-        "hero_step"
+        "load_core_store_filev"
       ],
+      "sub_labels": {
+        "3365": [
+          "hero_step"
+        ]
+      },
       "comments_before_label": [
         "Frames left in each hero's step between cells."
       ],
+      "comment_inline": "...its low byte...",
       "xref_summaries": [
+        "&0d23 referenced 2 times by &7771, &7776",
         "&0d25 used as index base 12 times by &06d5, &1f4d, &6e87, &6eaf, &6fc9, &6ff3, &702f, &7063, &7401, &7716, &7b64, &7baa"
       ],
       "references": [
         {
-          "addr": 1749,
-          "kind": "indexed"
+          "addr": 30577,
+          "kind": "direct"
         },
         {
-          "addr": 8013,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28295,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28335,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28617,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28659,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28719,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28771,
-          "kind": "indexed"
-        },
-        {
-          "addr": 29697,
-          "kind": "indexed"
-        },
-        {
-          "addr": 30486,
-          "kind": "indexed"
-        },
-        {
-          "addr": 31588,
-          "kind": "indexed"
-        },
-        {
-          "addr": 31658,
-          "kind": "indexed"
+          "addr": 30582,
+          "kind": "direct"
         }
       ],
-      "type": "byte",
-      "values": [
-        13,
-        173,
-        19,
-        2,
-        141
-      ]
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "load_core_call_address",
+      "expr": {
+        "text": "load_core_call_address",
+        "tree": {
+          "sym": "load_core_call_address"
+        }
+      },
+      "target": 3375,
+      "target_label": "load_core_call_address"
     },
     {
-      "addr": 3370,
+      "addr": 3366,
       "bytes": [
+        173,
+        19,
+        2
+      ],
+      "image": 1,
+      "comment_inline": "...and its high byte...",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "filev + 1",
+      "target": 531
+    },
+    {
+      "addr": 3369,
+      "bytes": [
+        141,
         48,
-        13,
-        169,
-        255,
-        32,
-        125
+        13
       ],
       "image": 1,
       "labels": [
-        "hero_offset_x"
+        "load_core_store_filev_high"
       ],
+      "sub_labels": {
+        "3370": [
+          "hero_offset_x"
+        ]
+      },
       "comments_before_label": [
         "Each hero's horizontal pixel offset while between cells."
       ],
+      "comment_inline": "...so the JSR calls the filing system's routine",
       "xref_summaries": [
         "&0d2a used as index base 19 times by &6ea3, &6fcc, &6ff6, &7032, &705d, &724e, &7404, &745c, &7702, &7719, &7735, &7b70, &7b84, &7b8e, &7b9e, &7bd0, &7bd7, &7bda, &7bdd"
       ],
-      "references": [
-        {
-          "addr": 28323,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28620,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28662,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28722,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28765,
-          "kind": "indexed"
-        },
-        {
-          "addr": 29262,
-          "kind": "indexed"
-        },
-        {
-          "addr": 29700,
-          "kind": "indexed"
-        },
-        {
-          "addr": 29788,
-          "kind": "indexed"
-        },
-        {
-          "addr": 30466,
-          "kind": "indexed"
-        },
-        {
-          "addr": 30489,
-          "kind": "indexed"
-        },
-        {
-          "addr": 30517,
-          "kind": "indexed"
-        },
-        {
-          "addr": 31600,
-          "kind": "indexed"
-        },
-        {
-          "addr": 31620,
-          "kind": "indexed"
-        },
-        {
-          "addr": 31630,
-          "kind": "indexed"
-        },
-        {
-          "addr": 31646,
-          "kind": "indexed"
-        },
-        {
-          "addr": 31696,
-          "kind": "indexed"
-        },
-        {
-          "addr": 31703,
-          "kind": "indexed"
-        },
-        {
-          "addr": 31706,
-          "kind": "indexed"
-        },
-        {
-          "addr": 31709,
-          "kind": "indexed"
+      "type": "code",
+      "mnemonic": "sta",
+      "operand": "load_core_call_address + 1",
+      "expr": {
+        "text": "load_core_call_address + 1",
+        "tree": {
+          "op": "add",
+          "left": {
+            "sym": "load_core_call_address"
+          },
+          "right": {
+            "int": 1,
+            "radix": "auto"
+          }
         }
-      ],
-      "type": "byte",
-      "values": [
-        48,
-        13,
-        169,
-        255,
-        32,
-        125
-      ]
+      },
+      "target": 3376,
+      "target_label": "hero_offset_y"
     },
     {
-      "addr": 3376,
+      "addr": 3372,
       "bytes": [
+        169,
+        255
+      ],
+      "image": 1,
+      "comment_inline": "A = &FF: load the file",
+      "type": "code",
+      "mnemonic": "lda",
+      "operand": "#&ff"
+    },
+    {
+      "addr": 3374,
+      "bytes": [
+        32,
+        125,
         242
       ],
       "image": 1,
       "labels": [
-        "hero_offset_y"
+        "load_core_call"
       ],
+      "sub_labels": {
+        "3375": [
+          "load_core_call_address"
+        ],
+        "3376": [
+          "hero_offset_y"
+        ]
+      },
       "comments_before_label": [
+        "Operand of the JSR at load_core_call. Stored as &F27D, the FILEV handler that load_core copied there when the cassette ran it.",
         "Each hero's vertical pixel offset while between cells."
       ],
+      "comment_inline": "Load Dunjunz5, then fall into game_entry",
       "xref_summaries": [
         "&0d30 used as index base 20 times by &6ea9, &6fcf, &6ff9, &7035, &7060, &7251, &7407, &7461, &76da, &76e2, &771c, &773a, &7b75, &7b7f, &7b93, &7b99, &7bd3, &7be1, &7be4, &7be7"
       ],
-      "references": [
-        {
-          "addr": 28329,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28623,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28665,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28725,
-          "kind": "indexed"
-        },
-        {
-          "addr": 28768,
-          "kind": "indexed"
-        },
-        {
-          "addr": 29265,
-          "kind": "indexed"
-        },
-        {
-          "addr": 29703,
-          "kind": "indexed"
-        },
-        {
-          "addr": 29793,
-          "kind": "indexed"
-        },
-        {
-          "addr": 30426,
-          "kind": "indexed"
-        },
-        {
-          "addr": 30434,
-          "kind": "indexed"
-        },
-        {
-          "addr": 30492,
-          "kind": "indexed"
-        },
-        {
-          "addr": 30522,
-          "kind": "indexed"
-        },
-        {
-          "addr": 31605,
-          "kind": "indexed"
-        },
-        {
-          "addr": 31615,
-          "kind": "indexed"
-        },
-        {
-          "addr": 31635,
-          "kind": "indexed"
-        },
-        {
-          "addr": 31641,
-          "kind": "indexed"
-        },
-        {
-          "addr": 31699,
-          "kind": "indexed"
-        },
-        {
-          "addr": 31713,
-          "kind": "indexed"
-        },
-        {
-          "addr": 31716,
-          "kind": "indexed"
-        },
-        {
-          "addr": 31719,
-          "kind": "indexed"
+      "type": "code",
+      "mnemonic": "jsr",
+      "operand": "&f27d",
+      "expr": {
+        "text": "&f27d",
+        "tree": {
+          "int": 62077,
+          "radix": "hex"
         }
-      ],
-      "type": "byte",
-      "values": [
-        242
-      ]
+      },
+      "target": 62077
     },
     {
       "addr": 3377,
@@ -15139,7 +14549,8 @@
       ],
       "image": 1,
       "labels": [
-        "hero_key_up"
+        "hero_key_up",
+        "core_filename"
       ],
       "comments_before_label": [
         "INKEY key number of each hero's up key."
@@ -15255,28 +14666,19 @@
         0,
         32,
         0,
-        0,
-        110,
-        53,
-        13,
-        24,
-        189,
-        4,
-        13,
-        105,
-        3,
-        157
+        0
       ],
       "image": 1,
       "labels": [
-        "hero_key_fire"
+        "hero_key_fire",
+        "core_osfile_block"
       ],
       "comments_before_label": [
         "INKEY key number of each hero's fire key."
       ],
+      "comment_inline": "core_osfile_block as load_core left it: core_filename (&0D70) and &00002000",
       "xref_summaries": [
-        "&0d80 used as index base 1 time by &6f0d",
-        "&0d8f used as index base 1 time by &1f1c"
+        "&0d80 used as index base 1 time by &6f0d"
       ],
       "references": [
         {
@@ -15291,7 +14693,30 @@
         0,
         32,
         0,
-        0,
+        0
+      ]
+    },
+    {
+      "addr": 3462,
+      "bytes": [
+        110,
+        53,
+        13,
+        24,
+        189,
+        4,
+        13,
+        105,
+        3,
+        157
+      ],
+      "image": 1,
+      "comment_inline": "Leftover: the end of \"Dungeon5\", a CR and a fragment of code",
+      "xref_summaries": [
+        "&0d8f used as index base 1 time by &1f1c"
+      ],
+      "type": "byte",
+      "values": [
         110,
         53,
         13,
@@ -71260,8 +70685,9 @@
       ],
       "type": "code",
       "mnemonic": "lda",
-      "operand": "hero_frame + 3",
-      "target": 3363
+      "operand": "load_core_store_filev",
+      "target": 3363,
+      "target_label": "load_core_store_filev"
     },
     {
       "addr": 30580,
@@ -71286,8 +70712,9 @@
       "comment_inline": "...so the Fighter's sprite changes as they throw",
       "type": "code",
       "mnemonic": "sta",
-      "operand": "hero_frame + 3",
-      "target": 3363
+      "operand": "load_core_store_filev",
+      "target": 3363,
+      "target_label": "load_core_store_filev"
     },
     {
       "addr": 30585,

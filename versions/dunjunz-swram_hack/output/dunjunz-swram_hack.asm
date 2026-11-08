@@ -195,7 +195,7 @@ os_irq_a              = &fc  ; MOS 1.20: A at the last interrupt, read by dissol
 wrchv                 = &020e
 ; &020e referenced 4 times by &0d55, &0d63, &14da, &1507
 filev                 = &0212
-; &0212 referenced 2 times by &075e, &148c
+; &0212 referenced 3 times by &075e, &0d20, &148c
 os_vsync_counter      = &0240  ; MOS 1.20 counter decremented on every vertical sync interrupt. The game sets it and waits for it to run out to pace itself.
 ; &0240 referenced 6 times by &0e62, &0eb9, &11e9, &11ec, &1f00, &1f07
 level_object_x        = &6b00  ; Level file: Objects' map x (entries 1-30, entry 30 the exit).
@@ -1302,74 +1302,102 @@ reset_vector          = &fffc  ; 6502 RESET vector, in the MOS ROM.
 
 .dasmos_dunjun7_start
 ; General-purpose scratch byte.
+; ***************************************************************************************
+; Load the last game file and start the game (not used)
+;
+; The cassette's last loading step, kept with the rest of its page &0D. On the cassette,
+; Dunjunz1 jumps here to build an OSFILE control block at &0D80 naming core_filename
+; ("Dunjunz5") with load address &00002000, call the filing system's FILEV handler
+; directly, as boot_loader does, to load the game's &2000-&2FFF over Dunjunz1, and fall
+; into game_entry. Nothing in this release runs it: DUNK's loader enters the game at
+; game_entry. The bytes are as the cassette's run leaves them: the JSR's stored operand
+; is &F27D, the MOS 1.20 FILEV handler for the cassette and ROM filing systems, and
+; core_osfile_block holds the block it built, so the image was saved after load_core had
+; run. Like game_entry, this lies in page &0D, the per-level workspace that
+; reset_workspace overwrites at the start of every level, so the labels of that workspace
+; fall inside these instructions, and core_filename (&0D70) and core_osfile_block (&0D80)
+; share their addresses with hero_key_up and hero_key_fire.
+;
+; On Entry:
+;     FILEV: the cassette filing system's handler (on the cassette)
 ; &0d00 referenced 49 times by &1cc5, &1d00, &1d4e, &1d52, &1d55, &1d58, &1d77, &1d82, &2006, &200d, &201e, &205a, &2063, &2070, &6f19, &6f1e, &6f25, &6f71, &6fd7, &7002, &7007, &713c, &74b6, &74c3, &74d8, &77e6, &782c, &7857, &785b, &785e, &7861, &7886, &788b, &7901, &7905, &7908, &790b, &7926, &7931, &793d, &7941, &7944, &7947, &7962, &796d, &7976, &7990, &7a89, &7ce3; also used as index base 1 time by &14a5
 .scratch
-    equb &a9
-; Second scratch byte.
+.load_core
 ; &0d01 referenced 8 times by &203a, &207b, &74d2, &7503, &7509, &750c, &7829, &782f
-.scratch2
-    equb &70
+; Second scratch byte.
+scratch2 = scratch+1
+    lda #<(core_filename)               ; Filename address: core_filename...
 ; Map x of the cell being drawn, tested or moved to. plot_at_cell replaces it with the pixel offset within the room.
 ; &0d02 referenced 59 times by &119c, &11f4, &1ccb, &1cdb, &1d26, &1d3c, &1d5d, &1d6c, &1dd1, &1e38, &1e48, &1f58, &1faa, &1fd6, &2094, &20a7, &20de, &20e9, &20fa, &6fa7, &700f, &707c, &70aa, &70ee, &7120, &715b, &7176, &71e3, &7310, &732c, &733a, &73f0, &752f, &766a, &777d, &779b, &77ad, &77bf, &77d1, &7801, &7820, &7867, &7872, &787c, &789e, &78b8, &78d2, &78ec, &7910, &791d, &794c, &7959, &797b, &7997, &79d0, &79ea, &7a48, &7b07, &7b44
 .cell_x
-    equb &8d
-; Map y of the cell being drawn, tested or moved to. plot_at_cell replaces it with the pixel offset within the room.
 ; &0d03 referenced 55 times by &11a1, &11f9, &1cd1, &1ce6, &1d20, &1d42, &1d49, &1d7a, &1dd7, &1e3e, &1e50, &1f5e, &1fb0, &1fdc, &209a, &20ad, &20d0, &20db, &20ec, &20f7, &6fad, &7017, &7082, &70b0, &70f4, &7126, &7161, &717e, &71eb, &7316, &7332, &7345, &73fc, &7535, &7670, &7783, &7807, &7852, &787f, &7890, &78a5, &78bf, &78d9, &78f3, &78fc, &7929, &7938, &7965, &7983, &799f, &79d6, &79f3, &7a4e, &7b0d, &7b4a
-.cell_y
-    equb &80
-; Room of the cell being drawn, as an offset into room_walls.
+; Map y of the cell being drawn, tested or moved to. plot_at_cell replaces it with the pixel offset within the room.
+cell_y = cell_x+1
 ; &0d04 referenced 7 times by &7864, &786c, &786f, &7896, &78b0, &78ca, &78e4
-.cell_room
-    equb &0d, &a9
-; Map x of the creature being moved, before the move.
+; Room of the cell being drawn, as an offset into room_walls.
+cell_room = cell_x+2
+    sta core_osfile_block               ; ...into the block's bytes 0-1, low byte...
+.load_core_name_page
 ; &0d06 referenced 11 times by &6e9a, &6f56, &6fbb, &6fe5, &7021, &7069, &7079, &79ed, &7a58, &7a95, &7af8
-.previous_x
-    equb &0d
+; Map x of the creature being moved, before the move.
+previous_x = load_core_name_page+1
+    lda #>(core_filename)               ; ...and its page...
 ; Map y of the creature being moved, before the move.
 ; &0d07 referenced 11 times by &6ea0, &6f5c, &6fc1, &6feb, &7027, &706f, &707f, &79f6, &7a5e, &7a9b, &7afe
 .previous_y
-    equb &8d
-; Pixel offset of the hero being moved, before the move.
 ; &0d08 referenced 2 times by &6ea6, &7085
-.previous_offset_x
-    equb &81
 ; Pixel offset of the hero being moved, before the move.
+previous_offset_x = previous_y+1
 ; &0d09 referenced 2 times by &6eac, &708a
-.previous_offset_y
-    equb &0d, &a9, &00, &8d, &82, &0d, &a9
-; Map x of each hero.
+; Pixel offset of the hero being moved, before the move.
+previous_offset_y = previous_y+2
+    sta core_osfile_block + 1           ; ...into byte 1
+    lda #0                              ; Load address &00002000...
+    sta core_osfile_block + 2           ; ...byte 2 is 0...
+.load_core_load_page
 ; &0d10 used as index base 29 times by &06e7, &1dfd, &1e35, &1e89, &1f38, &1f55, &1f74, &2091, &6e97, &6f39, &6f59, &6f87, &6f95, &6f98, &6fa4, &6fbe, &6fe8, &700c, &7024, &706c, &70a7, &71e0, &7329, &73ed, &752c, &777a, &799a, &7bbd, &7bcb
-.hero_x
-    equb &20, &8d, &83, &0d, &a2
-; Map y of each hero.
+; Map x of each hero.
+hero_x = load_core_load_page+1
+    lda #&20 ; ' '                      ; ...byte 3 is &20...
+    sta core_osfile_block + 3           ; ...the game's &2000-&2FFF, over Dunjunz1
+.load_core_block_address
 ; &0d15 used as index base 27 times by &1e03, &1e3b, &1e8f, &1f40, &1f5b, &2097, &6e9d, &6f3f, &6f5f, &6f80, &6f8e, &6f9e, &6faa, &6fc4, &6fee, &7014, &702a, &7072, &70ad, &71e8, &732f, &73f9, &7532, &7780, &79a2, &7bb6, &7bc4
-.hero_y
-; &0d19 used as index base 1 time by &1f17
-    equb &80, &a0, &0d, &a9, &00
+; Map y of each hero.
+hero_y = load_core_block_address+1
+    ldx #<(core_osfile_block)           ; X, Y = core_osfile_block...
+    ldy #>(core_osfile_block)           ; ...its page
+    lda #0                              ; ...bytes 4 and 5 are 0...
 ; Direction each hero faces: 1 up, 3 right, 5 down, 7 left; 0 when the hero is not in play.
 ; &0d1a used as index base 18 times by &06d0, &1de6, &1f52, &6e82, &6ecb, &6ede, &6ef1, &6f04, &6f2d, &6f79, &701c, &7097, &7221, &7249, &7452, &7711, &7b67, &7baf
 .hero_direction
-; &0d1f used as index base 1 time by &1f23
-    equb &8d, &84, &0d, &8d, &85, &0d
+    sta core_osfile_block + 4           ; ...byte 4...
+    sta core_osfile_block + 5           ; ...and byte 5: the I/O processor
 ; Animation frame of each hero (0 or 1), added to its sprite.
 ; &0d20 referenced 2 times by &774e, &7753; also used as index base 12 times by &06da, &1df3, &6f62, &6f67, &709c, &7457, &76ee, &76ff, &771f, &772e, &7ba2, &7ba7
 .hero_frame
 ; &0d21 referenced 2 times by &775b, &7760
 ; &0d22 referenced 2 times by &7768, &776d
+    lda filev                           ; Copy FILEV into the JSR below...
 ; &0d23 referenced 2 times by &7771, &7776
-    equb &ad, &12, &02, &8d, &2f
-; Frames left in each hero's step between cells.
+.load_core_store_filev
 ; &0d25 used as index base 12 times by &06d5, &1f4d, &6e87, &6eaf, &6fc9, &6ff3, &702f, &7063, &7401, &7716, &7b64, &7baa
-.hero_step
-    equb &0d, &ad, &13, &02, &8d
-; Each hero's horizontal pixel offset while between cells.
+; Frames left in each hero's step between cells.
+hero_step = load_core_store_filev+2
+    sta load_core_call_address          ; ...its low byte...
+    lda filev + 1                       ; ...and its high byte...
+.load_core_store_filev_high
 ; &0d2a used as index base 19 times by &6ea3, &6fcc, &6ff6, &7032, &705d, &724e, &7404, &745c, &7702, &7719, &7735, &7b70, &7b84, &7b8e, &7b9e, &7bd0, &7bd7, &7bda, &7bdd
-.hero_offset_x
-    equb &30, &0d, &a9, &ff, &20, &7d
-; Each hero's vertical pixel offset while between cells.
+; Each hero's horizontal pixel offset while between cells.
+hero_offset_x = load_core_store_filev_high+1
+    sta load_core_call_address + 1      ; ...so the JSR calls the filing system's routine
+    lda #&ff                            ; A = &FF: load the file
+.load_core_call
+; Operand of the JSR at load_core_call. Stored as &F27D, the FILEV handler that load_core copied there when the cassette ran it.
+load_core_call_address = load_core_call+1
 ; &0d30 used as index base 20 times by &6ea9, &6fcf, &6ff9, &7035, &7060, &7251, &7407, &7461, &76da, &76e2, &771c, &773a, &7b75, &7b7f, &7b93, &7b99, &7bd3, &7be1, &7be4, &7be7
-.hero_offset_y
-    equb &f2
+; Each hero's vertical pixel offset while between cells.
+hero_offset_y = load_core_call+2
+    jsr &f27d                           ; Load Dunjunz5, then fall into game_entry
 ; ***************************************************************************************
 ; Start the game
 ;
@@ -1432,6 +1460,7 @@ missile_sprite_base = set_wrchv_low+1
 ; INKEY key number of each hero's up key.
 ; &0d70 used as index base 1 time by &6ec1
 .hero_key_up
+.core_filename
     equs "Dunj"
 ; INKEY key number of each hero's down key.
 ; &0d74 used as index base 1 time by &6ed4
@@ -1448,9 +1477,9 @@ missile_sprite_base = set_wrchv_low+1
 ; INKEY key number of each hero's fire key.
 ; &0d80 used as index base 1 time by &6f0d
 .hero_key_fire
-; &0d8f used as index base 1 time by &1f1c
-    equb &70, &0d, &00, &20, &00, &00, &6e, &35
-    equb &0d, &18, &bd, &04, &0d, &69, &03, &9d
+.core_osfile_block
+    equb &70, &0d, &00, &20, &00, &00   ; core_osfile_block as load_core left it: core_filename (&0D70) and &00002000
+    equb &6e, &35, &0d, &18, &bd, &04, &0d, &69, &03, &9d  ; Leftover: the end of "Dungeon5", a CR and a fragment of code
 ; Health tens digit, as a digit sprite (&1E-&27); &1D when the hero is dead.
 ; &0d90 used as index base 10 times by &06df, &0e6d, &7236, &7239, &726f, &738e, &7391, &739a, &7506, &7724
 .hero_health_tens
@@ -7256,9 +7285,9 @@ filev_call_address = load_level_call+1
     rts                                 ; Return; X is still the missile slot
 ; &7771 referenced 1 time by &7766
 .firer_sword
-    lda hero_frame + 3                  ; Otherwise swords: the Fighter's frame...
+    lda load_core_store_filev           ; Otherwise swords: the Fighter's frame...
     eor #1                              ; ...flipped between 0 and 1...
-    sta hero_frame + 3                  ; ...so the Fighter's sprite changes as they throw
+    sta load_core_store_filev           ; ...so the Fighter's sprite changes as they throw
     rts                                 ; Return; X is still the missile slot
 ; ***************************************************************************************
 ; Copy a hero's position to cell_x, cell_y
@@ -8748,6 +8777,7 @@ save "Dunjun6", dasmos_dunjun6_start, dasmos_dunjun6_end, &6e80, &6e80
 ;     oswrch:                      66
 ;     cell_x:                      59
 ;     cell_y:                      55
+;     load_core:                   50
 ;     scratch:                     50
 ;     plot_x:                      47
 ;     sprite_number:               45
@@ -8864,6 +8894,8 @@ save "Dunjun6", dasmos_dunjun6_start, dasmos_dunjun6_end, &6e80, &6e80
 ;     draw_score:                   3
 ;     exit_shrinks_left:            3
 ;     exiting_hero:                 3
+;     filev:                        3
+;     filev + 1:                    3
 ;     hero_has_boots:               3
 ;     hero_magic_delay:             3
 ;     magic_kill_count:             3
@@ -8900,18 +8932,16 @@ save "Dunjun6", dasmos_dunjun6_start, dasmos_dunjun6_end, &6e80, &6e80
 ;     draw_view_3:                  2
 ;     exit_offsets_x:               2
 ;     exit_offsets_y:               2
-;     filev:                        2
-;     filev + 1:                    2
 ;     find_previous_teleporter:     2
 ;     food_sound + 4:               2
 ;     get_hero_cell:                2
 ;     grow_offset_y:                2
 ;     hero_frame + 1:               2
 ;     hero_frame + 2:               2
-;     hero_frame + 3:               2
 ;     hit_sound + 4:                2
 ;     key_not_pressed:              2
 ;     level_filename_digits:        2
+;     load_core_store_filev:        2
 ;     menu_text + 2:                2
 ;     missile_spent_pop:            2
 ;     monster_move_on:              2
@@ -9034,6 +9064,8 @@ save "Dunjun6", dasmos_dunjun6_start, dasmos_dunjun6_end, &6e80, &6e80
 ;     copy_glyph:                   1
 ;     copy_letter_glyph:            1
 ;     copy_workspace_template:      1
+;     core_filename:                1
+;     core_osfile_block:            1
 ;     count_heroes_in_play:         1
 ;     credit_drainer_hit:           1
 ;     cross_done:                   1
@@ -9321,11 +9353,11 @@ save "Dunjun6", dasmos_dunjun6_start, dasmos_dunjun6_end, &6e80, &6e80
 
 ; Stats:
 ;     Total size (Code + Data) = 15744 bytes
-;     Code                     = 6984 bytes (44%)
-;     Data                     = 8760 bytes (56%)
+;     Code                     = 7033 bytes (45%)
+;     Data                     = 8711 bytes (55%)
 ;
-;     Number of instructions   = 3200
-;     Number of data bytes     = 8150 bytes
+;     Number of instructions   = 3219
+;     Number of data bytes     = 8101 bytes
 ;     Number of data words     = 64 bytes
 ;     Number of string bytes   = 546 bytes
 ;     Number of strings        = 52

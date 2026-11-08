@@ -2244,32 +2244,46 @@ def annotate_filev_level_loader(a: Annotator, source: str) -> None:
     a.expr(0x1488, hi(sym("level_object_x")))  # the level file's page, &6B
 
 
-def annotate_load_core(a: Annotator) -> None:
+def annotate_load_core(a: Annotator, used: bool = True, stored_call: int = 0x3000) -> None:
     """&0D00-&0D30 and &0D70-&0D85: the cassette's last loading step, in
     page &0D before game_entry. The sideways RAM hack has the same bytes,
-    as left after it ran."""
+    as left after it ran, and never runs them (used=False)."""
     from dasmos.expr import hexlit, hi, lo, sym
 
-    a.sub(0x0D00, "load_core", "Load the last game file and start the game",
-          "Dunjunz1 jumps here once it has loaded the game's other files: "
-          "build an OSFILE control block at &0D80 naming core_filename "
-          "(\"Dunjunz5\") with load address &00002000, call the filing "
-          "system's FILEV handler directly, as boot_loader does, to load the "
-          "game's &2000-&2FFF over Dunjunz1, and fall into game_entry. Like "
-          "game_entry, this lies in page &0D, the per-level workspace that "
-          "reset_workspace overwrites at the start of every level, so the "
-          "labels of that workspace fall inside these instructions, and "
-          "core_filename (&0D70) and core_osfile_block (&0D80) share their "
-          "addresses with hero_key_up and hero_key_fire. "
-          "\n\n"
-          "The block is built over leftover text, \"Dungeon5\" and a CR, and "
-          "only bytes 0-5 are set, so byte 6, the exec address's low byte, "
-          "is the \"n\" (&6E). That is not 0, so the file goes to its own "
-          "load address, &2000, which is the same.",
-          on_entry={"FILEV": "the cassette filing system's handler, *TAPE having been selected by TITLE"})
+    what = ("build an OSFILE control block at &0D80 naming core_filename "
+            "(\"Dunjunz5\") with load address &00002000, call the filing "
+            "system's FILEV handler directly, as boot_loader does, to load the "
+            "game's &2000-&2FFF over Dunjunz1, and fall into game_entry. ")
+    page = ("Like game_entry, this lies in page &0D, the per-level workspace "
+            "that reset_workspace overwrites at the start of every level, so "
+            "the labels of that workspace fall inside these instructions, and "
+            "core_filename (&0D70) and core_osfile_block (&0D80) share their "
+            "addresses with hero_key_up and hero_key_fire.")
+    if used:
+        a.sub(0x0D00, "load_core", "Load the last game file and start the game",
+              "Dunjunz1 jumps here once it has loaded the game's other files: "
+              + what + page + "\n\n"
+              "The block is built over leftover text, \"Dungeon5\" and a CR, and "
+              "only bytes 0-5 are set, so byte 6, the exec address's low byte, "
+              "is the \"n\" (&6E). That is not 0, so the file goes to its own "
+              "load address, &2000, which is the same.",
+              on_entry={"FILEV": "the cassette filing system's handler, *TAPE having been selected by TITLE"})
+        stored = "Stored as &3000; load_core overwrites it with the contents of FILEV before the call."
+    else:
+        a.sub(0x0D00, "load_core", "Load the last game file and start the game (not used)",
+              "The cassette's last loading step, kept with the rest of its "
+              "page &0D. On the cassette, Dunjunz1 jumps here to "
+              + what + "Nothing in this release runs it: DUNK's loader enters "
+              "the game at game_entry. The bytes are as the cassette's run "
+              f"leaves them: the JSR's stored operand is &{stored_call:04X}, "
+              "the MOS 1.20 FILEV handler for the cassette and ROM filing "
+              "systems, and core_osfile_block holds the block it built, so "
+              "the image was saved after load_core had run. " + page,
+              on_entry={"FILEV": "the cassette filing system's handler (on the cassette)"})
+        stored = (f"Stored as &{stored_call:04X}, the FILEV handler that load_core "
+                  "copied there when the cassette ran it.")
     a.region(0x0D2F, "load_core_call_address", (0, 1), description=(
-        "Operand of the JSR at load_core_call. Stored as &3000; load_core "
-        "overwrites it with the contents of FILEV before the call."))
+        "Operand of the JSR at load_core_call. " + stored))
     a.label(0x0D2E, "load_core_call")
     for addr, name in [(0x0D05, "load_core_name_page"), (0x0D0F, "load_core_load_page"),
                        (0x0D14, "load_core_block_address"), (0x0D23, "load_core_store_filev"),
@@ -2289,7 +2303,7 @@ def annotate_load_core(a: Annotator) -> None:
     a.expr(0x0D1E, sym("core_osfile_block") + 5)
     a.expr(0x0D24, sym("load_core_call_address"))
     a.expr(0x0D2A, sym("load_core_call_address") + 1)
-    a.expr(0x0D2F, hexlit(0x3000))
+    a.expr(0x0D2F, hexlit(stored_call))
     for addr, text in [
         (0x0D00, "Filename address: core_filename..."),
         (0x0D02, "...into the block's bytes 0-1, low byte..."),

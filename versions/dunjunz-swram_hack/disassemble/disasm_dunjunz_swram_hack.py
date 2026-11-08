@@ -116,6 +116,11 @@ game.annotate_boot_loader(annotator, stored_call=0xF27D, operand_note=(" The JSR
 game.annotate_cassette_level_loop(annotator)
 
 game.annotate_filev_level_loader(annotator, "romfs")
+game.annotate_load_core(annotator, used=False, stored_call=0xF27D)
+annotator.byte(0x0D80, 6)
+annotator.byte(0x0D86, 10, cols=10)
+annotator.c(0x0D80, "core_osfile_block as load_core left it: core_filename (&0D70) and &00002000")
+annotator.c(0x0D86, "Leftover: the end of \"Dungeon5\", a CR and a fragment of code")
 
 annotator.c(0x0D6E, "Not referenced")  # after game_entry
 annotator.c(0x0772, "Not referenced")
