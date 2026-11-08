@@ -87,6 +87,21 @@ Key *n* opens door *n*. A hero carries one key at a time (`hero_key`); in
 walking into the matching door opens it. The level's monsters emerge, in
 turn, from its eight trapdoors.
 
+The heroes start in the four cells at x 11-12, y 11-12 (Ranger 11,11;
+Magic-User 11,12; Barbarian 12,11; Fighter 12,12), and some levels put a
+key in one or more of them, which the hero there picks up on the first
+frame:
+
+| Level | Official disc | Cassette (crack and hack) |
+|---|---|---|
+| 1 | key 4 Ranger, key 3 Fighter | key 5 Ranger, key 6 Fighter |
+| 4 | key 6 Ranger, key 3 Magic-User, key 5 Barbarian | key 1 Ranger, key 4 Magic-User, key 2 Barbarian |
+| 11 | key 4 Barbarian, key 5 Fighter | the same |
+| 14 | key 1 Ranger | the same |
+| 22 | keys 7-10: Ranger, Fighter, Barbarian, Magic-User | keys 6, 5, 4, 3: Ranger, Fighter, Barbarian, Magic-User |
+
+No level puts an object in a starting cell.
+
 ## Level 25 carries the ending message
 
 When a hero reaches the Chalice on level 25, `check_for_victory` prints

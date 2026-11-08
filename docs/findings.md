@@ -726,6 +726,17 @@ affected **[confirmed from the code]**. Dying heroes go on doing this:
 at &1DF8 a hero out of play whose death animation has not reached frame 8
 still reaches `check_key_swap` **[confirmed from the code]**.
 
+A key under a hero is drawn over them every frame: `move_heroes` redraws
+each hero first, and `draw_keys` (&1DC2) then redraws every key on the
+floor through `plot_at_cell`, whose plotter stores the sprite over what
+is on the screen **[confirmed from the code]**. Because of the swapping,
+a hero who stays on a key's cell always has one key or the other under
+them, so the cell shows the hero and the key in turn within each frame.
+Keys under the starting cells (levels 1, 4, 11, 14 and 22; see
+level-format.md) are picked up on the first frame, without moving
+**[confirmed from the level files; reported from a lockstep run of the
+disc's level 1, which gave hero_key 4, 0, 0, 3 at the first frame]**.
+
 ### Survivors gain a free point at every new level
 
 `draw_status_panel` calls `add_point` (&0F02) to draw each score, and
