@@ -145,16 +145,14 @@ Origin **[confirmed by comparing the archived releases]**:
   revises eight of the cassette's levels" below). Level 5 sums to &4D in
   all of them.
 - The checksum table at &0491 is the same in the crack and the hack, with
-  &1A for level 5. The official disc's table has &4D.
+  &1A for level 5. The cassette image (`versions/dunjunz-tape/`) and
+  the official disc have &4D, so the original cassette loads level 5
+  normally; the &1A came in with the copy the crack and the hack come
+  from **[inference]**.
 - The crack never checks the sum: Ole replaced the routine at &0450 with
   his own level loader, so level 5 loads normally there.
-- The hack restored the checksum routine from the official disc release
-  (its &0450–&0484 is byte-identical to the disc's) but kept the crack's
+- The hack has the cassette's checksum routine at &0450 but the crack's
   table, so it resets at level 5.
-
-Whether the original cassette had the same mismatch (its table entry
-wrong, or a different level 5) can't be told without an image of the
-original cassette.
 
 Fix: set &0495 in `Dunjun4` to &4D. Confirmed in beebium: with that byte
 changed, loading level 5 passes the check.

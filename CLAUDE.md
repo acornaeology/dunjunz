@@ -27,13 +27,15 @@ Four versions live under `versions/` (see `versions/README.md`):
   (`disasm_dunjunz_disc_master_<program>.py`), declared to the site under
   `disassemblies` in `binary.json`; the game (nine files) is the primary
   listing.
-- `dunjunz-tape_crack_ole/`: Ole's crack of the 1986 cassette. No image of
-  the original cassette has been found; it would go in `dunjunz-tape/`.
+- `dunjunz-tape/`: a UEF image of the 1986 cassette, from The Stairway to
+  Hell (`Dunjunz_B.uef`; `tools/read_uef.py` lists and exports its
+  files). Not yet a disassembled version.
+- `dunjunz-tape_crack_ole/`: Ole's crack of the 1986 cassette.
   `EXPAND` (the intro's picture unpacker) is a separate listing; the BASIC
   `PLOAD` and `DUNJ`, and the manual `DUNJ` carries, are source files
   (`basic/`, `text/`).
 - `dunjunz-swram_hack/`: the unofficial sideways RAM hack, built from the
-  crack and the disc (the BBC Micro Games Archive "Sideways RAM version",
+  cassette's files (the BBC Micro Games Archive "Sideways RAM version",
   `Disc060-DunjunzRx2.ssd`; see `docs/disc-contents-and-loading.md` for
   its catalogue, boot chain and runtime memory map). `TITLE` is a separate
   listing; `!BOOT`, `DUNJUNZ` (with its controls page) and `DUNK` are

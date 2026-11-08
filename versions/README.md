@@ -14,8 +14,7 @@ derived from them.
 | `dunjunz-disc_master/` | `binary/`: the Master side's thirteen machine-code files (the game's `Coder`, `Dunj2`–`Dunj5`, `Code`, `Code2`, `Code3`, `Table`; the loaders `Dunjunz` and `Coder2`; `Editor`; `Default`), `BOOT`, `!BOOT` and `README`, exported with oaknut-hfe from `../dunjunz-disc/Dunjunz_D1S1_40T_HG3_8518BF40_1.hfe` and byte-identical to the NVG archive's directory `2/` | The Master side of the same capture | `Dunj4` `eea3437a16b47ce67a0827624bcfd1423e18874c71bb44dac2381a5cfcc12fda`; `Dunj2` `beaf537792185dd503fc75c7ee270031ea2419f320ae590afa6b48f9e183252b`; `Dunj3` `7bd2914816b9e7cd78c9d2e2c32476ca7a5b31ea0762f30f091d535d7b3bc09b`; `Dunj5` `9570db6679b6891014282d340787d1b285190c5e0a52e4bb2230928796f69599`; `Coder` `5644ad487550f31773733036717cac829049c779f72c21ca61b00a5caccbd5da`; `Coder2` `a32ffa23236c7aae944d6d3201bf41ded524362436f8002ca9b1713a276c8770`; `Dunjunz` `0aa7fe8a18a33d4a06fdbc24c0fdb1e73996cadc371c71f1d0045c9e6b025edc`; `Code` `74334c347574b3ddde2453cff2af1407fff26c3df86935202c0913de8494ca46`; `Table` `d1e827713b361d9aae10867625d720ee7a6ebf8886e27c8ee12fc61aaca766f6`; `Code2` `3932a404d63de87ab4a57a538cc0dff42baceff89a198d92ba8426eab2b8c565`; `Code3` `6b928cb975a0c5b5b77b12ec0f114af0796cf97fde85e29054227dc7245c416f`; `Editor` `b97927871258742ac7a1da946c64aa404042c73cc05b7f50392b972f113266e6`; `Default` `5595a8c171a280816365f1654d0a7c76732382d398a8cb301ba7ae28e71c4873`; `BOOT` `d779f055abdc816925da91b4a66f6c1a0baacf36f117df7aadef5fc47e74a4ef` |
 | `dunjunz-tape_crack_ole/` | `Dunjunz-tape.zip`: a crack of the cassette, files with `.inf` (`DUNJ`, `DUNJ2`–`DUNJ4`, `EXPAND`, `GIRL1`, `PLOAD`, `L1`–`L25`). `binary/` holds `DUNJ4`, `DUNJ3` and `EXPAND` (SHA-256 `6a18d63bf6abef3b2a5e8c65d9c886719c6eb203dfa24635d8f0271cd028e8d1`); `basic/` and `text/` hold `PLOAD`, `DUNJ` and its manual as text | <https://rk.nvg.ntnu.no/bbc/sw/BugByte/Dunjunz-tape.zip> | `d5bb5d5b50aeed51696a9d120ae55c970ef51c0417559ee7ea9d4cf24927d547` |
 | `dunjunz-swram_hack/` | `Disc060-DunjunzRx2.ssd`: an unofficial sideways RAM hack with the levels in ROMFS. `binary/` holds the game's `Dunjun4`–`Dunjun7` and `TITLE` (SHA-256 `113244818d180f139e3b1d8553776409a7ba9f7f7e60e34bc2f4c8d8ef16fe09`); `basic/` and `text/` hold `DUNJUNZ`, `DUNK`, `!BOOT` and `DUNJUNZ`'s controls page as text | BBC Micro Games Archive, <https://bbcmicro.co.uk/game.php?id=1068> | `868bbd3beedd8657ceb7fd8038e550375ff71888f19d941d2471bf9c26eac754` |
-
-An image of the original cassette would go in `dunjunz-tape/`.
+| `dunjunz-tape/` | `Dunjunz_B.uef`: a UEF image of the 1986 cassette (35 files: `DUNJUNZ`, `PLOAD`, `PIC`, `TITLE`, `DUNK`, `Dunjunz1`–`Dunjunz5`, `LEVEL1`–`LEVEL25`), read by `tools/read_uef.py`, and its `Dunjunz_B.txt` | The Stairway to Hell archive (www.stairwaytohell.com), via an associate of Rob's | `2994c207c786a678378243022d5abd02401e0b930c81beac35e6eed041213006` |
 
 - **The official disc** has no copy protection. Its Model B side carries
   the game, `Coder`, its loader `Dunjunz`, the level editor `Editor` and
@@ -33,10 +32,13 @@ An image of the original cassette would go in `dunjunz-tape/`.
   &6E80), and runs `DUNJ4`. That file is the &0400–&2FFF game image stored
   &2000 higher, at &2400, followed by start-up code at &5000 that selects
   `*TAPE`, applies the cheat and copies the image into place. The
-  original protected tape is reported on bbcmicro.co.uk as
-  `Dunjunz_B.uef` (stardot thread, see `../docs`).
-- **The sideways RAM disc is a hack of Ole's crack.** Its intro
-  (`DUNJUNZ` lines 510–570) is `PLOAD` with new text and picture, its game
-  code is the crack's with a rewritten level loader, and its level files
-  come from the official disc release. See
+  cassette it was cracked from is in `dunjunz-tape/`.
+- **The cassette image** has no copy protection and every mark of the
+  original: Bug-Byte's credits, the `PLOAD` that Ole's is an edit of,
+  and the level checksum and loader code the crack lacks.
+- **The sideways RAM disc is a hack of the cassette.** Its picture,
+  loading screen, title page, game code and levels are the cassette's
+  (the title page moved to &3800), with two of the crack's differences
+  (the level 5 checksum and a leftover command). See
+  [`../docs/history-and-provenance.md`](../docs/history-and-provenance.md) and
   [`../docs/findings.md`](../docs/findings.md).

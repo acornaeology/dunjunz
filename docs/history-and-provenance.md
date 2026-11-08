@@ -6,9 +6,10 @@ how they relate to one another, and the evidence for each relationship.
 
 The reference copy is the official 1987 flippy disc, from flux captures
 of both its sides (`versions/dunjunz-disc/`). The other copies are
-variations on the game: an archive of the same disc's files, a crack of
-the 1986 cassette, and an unofficial sideways RAM hack built from the
-crack and the disc. No image of the original cassette has been found.
+variations on the game: an archive of the same disc's files, an image
+of the 1986 cassette that has every mark of the original
+(`versions/dunjunz-tape/`), Ole's crack of the cassette, and an
+unofficial sideways RAM hack built from the cassette's files.
 Statements are tagged by their basis:
 
 - **[confirmed]**: checked against the files or by running them in
@@ -21,15 +22,66 @@ Statements are tagged by their basis:
 
 ### Cassette (1986)
 
-The cassette version was the first release. The 1986 date comes from the
-sideways RAM hack's title page (`TITLE`: "(c) Bugbyte 1986") and
-instructions ("(c) Bug Byte 1986"); no date appears in the files of Ole's
-crack **[confirmed]**. The cassette loads each level from tape as the game
+The cassette version was the first release; its `PLOAD` scroller ends
+"(c) Bug Byte 1986" and its title page reads "Author Julian Avis (c)
+Bugbyte 1986" **[confirmed]**. It loads each level from tape as the game
 progresses.
 
-No pristine image of the original protected cassette has been found for
-this project. The stardot thread on Dunjunz versions reports a tape image,
-`Dunjunz_B.uef`, on bbcmicro.co.uk **[reported]**.
+`versions/dunjunz-tape/Dunjunz_B.uef` is an image of it from The
+Stairway to Hell archive. Its text file names Bug-Byte, and its origin
+chunk says it was made with MakeUEF 0.3b; the files are dated June 2002
+**[confirmed]**. It reached the project from an associate of Rob's, who
+cannot vouch that it is unaltered **[reported]**. The stardot thread
+reports an image of the same name on bbcmicro.co.uk **[reported]**.
+
+`tools/read_uef.py` reads it as 35 files in standard Acorn cassette
+blocks, every header and data CRC correct, with no copy protection
+**[confirmed]**:
+
+| File | Load | Exec | Length | Contents |
+|---|---|---|---|---|
+| `DUNJUNZ` | &0E00 | BASIC | &2FF | Refuses the Electron and the Master, warns on other machines (`INKEY-256`), then `CHAIN"PLOAD"` |
+| `PLOAD` | &0E00 | BASIC | &3C8 | Shows `PIC`, scrolls its text down a one-character text window, then `*/` runs the next file |
+| `PIC` | &3000 | &3000 | &4FFF | MODE 2 picture of a face |
+| `TITLE` | &2800 | &28CE | &C00 | Title page: "See Inlay Card For Play instructions and Keys"; ends with `*TAPE` and `*/` |
+| `DUNK` | &0400 | &0740 | &3FF | The game's &0400–&07FE |
+| `Dunjunz1` | &2000 | &2000 | &169 | A short program that names `Dunjunz2`–`Dunjunz4` |
+| `Dunjunz2` | &3280 | &3280 | &3200 | The loading screen |
+| `Dunjunz4` | &08C0 | &08C0 | &1740 | The game's &08C0–&1FFF |
+| `Dunjunz5` | &2000 | &2000 | &1000 | The game's &2000–&2FFF |
+| `Dunjunz3` | &6E80 | &6E80 | &1180 | The game's &6E80–&7FFF |
+| `LEVEL1`–`LEVEL25` | various | | &2B0 each | The levels, encrypted |
+
+The levels are saved from consecutive addresses (&2000 + &2B0 × (n − 1)),
+except `LEVEL8` and `LEVEL12`, saved from &6B00, where the game holds a
+level **[confirmed]**.
+
+Why it is taken to be the original **[inference]**: the Bug-Byte
+credits and the inlay card reference; Ole's `PLOAD` is this `PLOAD` with
+his own text; the official Master conversion's files keep this tape's
+division of the game (see below); and the level checksum table agrees
+with its levels, as the crack's does not. Nothing in it is
+inconsistent with an unaltered copy, but nothing proves it either.
+
+What it settles **[confirmed by comparison]**:
+
+- **Levels.** Decrypted, its 25 levels are byte-identical to the
+  crack's `L1`–`L25`. Encrypted, levels 1–24 are byte-identical to the
+  disc's `Level` files except the eight the disc revises, and `LEVEL25`
+  to the end of the disc's `Stones`.
+- **Checksums.** Its table at &0491 holds &4D for level 5, which is what
+  level 5 sums to, so this cassette loads level 5 normally. The &1A of
+  the crack and the hack is not the cassette's (see
+  [findings.md](findings.md)).
+- **Level loading.** The decrypt-and-check routine at &0450 is
+  byte-identical to the disc's. The level loader at &1447–&149F, which
+  calls FILEV directly with an OSFILE block at &6E60, is the one the
+  sideways RAM hack has, and its last ten bytes are those left after the
+  disc's own loader in `Dun1`. So the disc's loader was written over the
+  cassette's.
+- **A leftover command.** &0700 holds `*SAVE"DUNK" 400 +3FF 740`, the
+  command that saved `DUNK`. The crack and the hack have `*SAVE
+  Dunjunz.K 400 7FF 740` there, and the disc `*SA. DANK 400+3FF 740`.
 
 ### Flippy disc (1987)
 
@@ -63,6 +115,11 @@ captures' **[confirmed]**. The contents of the two sides are:
   Model B disc **[confirmed]**. So the conversion was made from the
   cassette game's code, with the disc release's parts added
   **[inference]**.
+  The cassette image bears this out: the Master's `Coder` holds
+  `DUNK`'s first &303 bytes unchanged, with its own loader from &0740;
+  `Dunj5` is byte-identical to `Dunjunz5`; `Dunj3` differs from the
+  first &43F bytes of `Dunjunz4` in 3 bytes and `Dunj2` from `Dunjunz3`
+  in 22 **[confirmed]**.
 - **Side 0 is the Model B version.** `Dunjunz` (load &26C0, exec &2700),
   the game `Dun1` (&2000, &6000 bytes, up to &8000), `Screen` (&3280, the
   loading screen), `Stones` (&6E80), `Coder` (&5000), `Editor`,
@@ -204,11 +261,17 @@ not the original cassette. It is a crack **[confirmed]**:
   decrypted. They are the same levels as the disc release's, whose files
   are encrypted (each byte XORed with the low byte of its address)
   **[confirmed]**.
-- The code still carries the level checksum table at &0491 (&1A for
-  level 5), but the routine at &0450 that would decrypt and check a level
-  has been replaced by the cracker's own code **[confirmed]**. The
-  cassette presumably had the decrypt-and-check routine that the disc
-  release has at &0450 **[inference]**.
+- Its `PLOAD` is the cassette's, with Ole's scroller text, without the
+  nine-second pause, and with `EXPAND GIRL1` in place of `*L. PIC 3000`;
+  it then chains `DUNJ` where the cassette's runs the next file
+  **[confirmed]**.
+- Its &0400–&2FFF image differs from the cassette's only at &0450–&0484
+  (the decrypt-and-check routine, replaced by Ole's level loader),
+  &0495 (&1A for level 5 where the cassette has &4D), &0705–&0718 (the
+  leftover command), &0800–&08BF (which the cassette does not load),
+  &0E00–&0E06, &1447–&149F (the cassette's level loader, no longer
+  needed) and &16D1–&16D3 (the level filename). Its &6E80–&7FFF is the
+  cassette's **[confirmed]**.
 
 duikkie reports that the tape version works reliably where the disc
 versions do not, because it "uses &A00 rather than &D00"
@@ -221,44 +284,47 @@ Micro Games Archive, is an unofficial conversion that keeps all 25 levels
 in two banks of sideways RAM as ROMFS images and loads them through the
 MOS's ROM filing system **[reported as unofficial: billcarr2005,
 stardot]**. Its credits say only "(c) Bug Byte 1986"; whoever made it is
-not named. It is built mostly from Ole's crack, with pieces of the official disc
-release:
+not named. It is built from the cassette's files, with two traces of
+Ole's crack **[confirmed]**:
 
-- **Intro.** Lines 510–570 of its `DUNJUNZ` are `PLOAD`'s scroller and
-  palette effects, with new text and the `PIC` picture (a face, presented
-  as Mackscrane the Demon) in place of `GIRL1` **[confirmed]**.
-- **Game code.** `Dunjun6` is byte-identical to the first &1180 bytes of
-  the crack's `DUNJ3` **[confirmed]**. `Dunjun4`, `Dunjun7` and `Dunjun5`
-  match the crack's `DUNJ4` except at:
-  - &0450–&0484, which holds the routine that decrypts a level and checks
-    its checksum, byte-identical to the official disc release's;
-  - &1447–&149F, the level loader, replaced by one that loads `LEVELn`
-    by calling the filing system's FILEV handler directly, with an OSFILE
-    block at &6E60. Its last ten bytes, at &1496–&149F (`STA &149C: LDA
-    #&FF: JSR &3000: JMP &0450`), are byte-identical, at the same
-    addresses, to leftover bytes after the official disc's own loader in
-    `Dun1`, and the crack has neither **[confirmed]**. So the FILEV
-    loader looks older than the disc release, part of its development
-    that the disc's loader was written over, rather than new work for the
-    hack **[inference]**;
-  - &0E00–&0E06, identical to the official disc release's, and the
-    filename at &16D0;
-  - bytes in &0800–&08BF, &0D2F–&0D30 and &0D80–&0D85. These look like
-    values from a running game, i.e. the files were saved from memory
-    **[inference]**.
+- **Intro.** Its `PIC` (the face, presented as Mackscrane the Demon) is
+  byte-identical to the cassette's, and lines 510–570 of its `DUNJUNZ`
+  are the cassette's `PLOAD` scroller and palette effects with new text.
+  `Dunjun3`, the loading screen, is byte-identical to the cassette's
+  `Dunjunz2` (and the crack's `DUNJ2`).
+- **Title page.** `TITLE` is the cassette's, moved from &2800 to &3800,
+  with its addresses moved to match, the inlay card line replaced by
+  "f1 Pause On/Off 5 Sound On 6 Sound Off", and its last instructions
+  changed: where the cassette's ends with `*TAPE` and `*/` (run the next
+  file on the tape), the hack's turns the cursor off, flushes the input
+  buffer and waits for a key. It is entered at &38C6, eight bytes before
+  the cassette's entry (&28CE) moves to.
+- **Game code.** `Dunjun6` is byte-identical to the cassette's
+  `Dunjunz3`. `Dunjun4`, `Dunjun7` and `Dunjun5` match the cassette's
+  game except at:
+  - &0495 and &0705–&0718, which are the crack's: &1A for level 5, and
+    the leftover `*SAVE Dunjunz.K 400 7FF 740`;
+  - &076D–&076E and &0D2F–&0D30, where two calls go to &F27D instead of
+    &3000;
+  - &0D80–&0D85 and &0800–&08BF (which the cassette does not load).
+    These look like values from a running game, i.e. the files were
+    saved from memory **[inference]**.
+
+  So the decrypt-and-check routine at &0450, the FILEV level loader at
+  &1447 and the filename at &16D0, which the crack lacks, are the
+  cassette's own code. The crack and the hack share two things the
+  cassette image does not have, so they share an ancestor that is not
+  this image: another copy or issue of the cassette, or a transfer of
+  it **[inference]**.
 - **Levels.** Its 25 `LEVELn` files, in Beebug ROMFS images (`RFS (C)
-  BEEBUG`), decrypt with the disc release's scheme, and their sums match
-  the disc release's table **[confirmed]**. (The same level data appears,
-  decrypted, as the crack's `L1`–`L25`.) Its `LEVEL25` is
-  byte-identical to the level 25 data at the end of the disc release's
-  `Stones` **[confirmed]**. The checksum table, however, is the crack's,
-  with &1A for level 5 where the disc's has &4D. With the disc's checksum
-  routine restored, the hack therefore resets the machine on reaching
-  level 5 **[confirmed in beebium]**; see [findings.md](findings.md).
+  BEEBUG`), are byte-identical to the cassette's. The
+  checksum table, however, holds the crack's &1A for level 5, so the
+  hack resets the machine on reaching level 5 **[confirmed in
+  beebium]**; see [findings.md](findings.md).
 - **Loading.** It selects `*TAPE` then `*ROM` and reads levels through
-  ROMFS, so after start-up it never needs DFS, whose workspace the game
-  overwrites. Whether this was the reason for the design is
-  **[inference]**.
+  ROMFS with the cassette's loader, so after start-up it never needs
+  DFS, whose workspace the game overwrites. Whether this was the reason
+  for the design is **[inference]**.
 - **Loader.** `DUNK` copies the two ROMFS images into the first two
   sockets above 3 that look like sideways RAM, refuses to run on a
   Master 128, and assembles a machine-code loader at &6480. Its
@@ -270,25 +336,28 @@ release:
 
 ```
 Cassette (Bug-Byte, 1986) ──cracked──> Ole's crack (NVG Dunjunz-tape.zip)
-        │                                        │
-        │                          code, intro, checksum table
-        v                                        v
-Flippy disc (Bug-Byte, 1987) ──levels, checksum routine──> Sideways RAM hack
-  (HFE captures, both sides;                                 (BBC Micro Games Archive
-   files archived as NVG Dunjunz.zip)                         Disc060-DunjunzRx2.ssd)
+  (STH Dunjunz_B.uef)                          │
+   │   │                                       │ checksum table entry,
+   │   │                                       │ leftover command
+   │   └──files: game, levels, title, pictures─┴──> Sideways RAM hack
+   v                                                (BBC Micro Games Archive
+Flippy disc (Bug-Byte, 1987)                         Disc060-DunjunzRx2.ssd)
+  Model B side: the cassette's game, reworked
+  Master side: converted from the cassette's files
+  (HFE captures, both sides; files archived as NVG Dunjunz.zip)
 ```
 
-That the crack's code comes from the cassette, and that the 1987 disc's
-code descends from the cassette's, are **[inference]**; the original
-images needed to confirm them have not been found.
+The crack and the hack share two differences from the
+cassette image (&0495 and the leftover command at &0705), so they may
+come from a common copy of the cassette rather than the hack from the
+crack **[inference]**.
 
 ## Wanted
 
-- An image of the original protected cassette (reportedly
-  `Dunjunz_B.uef` on bbcmicro.co.uk).
 - The stardot thread mentions STH archive images
   `Dunjunz-Master-side0_M.ssd` and `Dunjunz-Master-side1_B.ssd`
   **[reported]**, which could be compared with the captures.
+- Another copy of the cassette, to confirm that this image is unaltered.
 
 ## Sources
 
