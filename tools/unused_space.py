@@ -22,7 +22,9 @@ runs shorter than BYTES (totals still count them).
 The listing's markings are only as good as the annotation: a byte the
 listing calls unused may still be reached by an indexed access past a
 table's end, or be code that doubles as data, so check each run before
-reusing it.
+reusing it. Any unused item that an instruction refers to (from the same
+image) is listed under "referenced" for checking: a `table - 1,x` base
+is usually harmless, a `label + 1` operand is a live byte.
 """
 
 import argparse
@@ -35,7 +37,7 @@ UNUSED = re.compile(r"^(Not referenced|Unused|Zeros?\b|Padding|Leftover)", re.I)
 def unused_runs(listing, in_play):
     banner_at = {(b["addr"], b.get("move")): b["title"] for b in listing["banners"]}
     current = {}
-    runs = {"unused": [], "overwritten": []}
+    runs = {"unused": [], "overwritten": [], "referenced": []}
     for item in listing["items"]:
         move = item.get("move") or ""
         key = (item["addr"], item.get("move"))
@@ -58,7 +60,15 @@ def unused_runs(listing, in_play):
                         or (not move and 0x3000 <= item["addr"] < 0x6E80)):
             continue
         runs[kind].append([item["addr"], len(item["bytes"]), move, title, comment])
+        if kind == "unused":
+            refs = sorted({r["addr"] for r in item.get("references") or []
+                           if (r.get("move") or "") == move or not r.get("move")})
+            if refs:
+                runs["referenced"].append([item["addr"], len(item["bytes"]), move, title,
+                                           "by " + ", ".join(f"&{r:04X}" for r in refs)])
     for kind, items in runs.items():
+        if kind == "referenced":
+            continue
         merged = []
         for addr, n, move, title, comment in sorted(items, key=lambda r: (r[2], r[0])):
             if merged and merged[-1][2] == move and merged[-1][0] + merged[-1][1] == addr:
