@@ -703,6 +703,34 @@ The hero is put one row above the destination teleporter (&73EA-&73F9)
 without a test for a wall, monster or hero there. A level with one
 teleporter sends the hero back to it **[confirmed from the code]**.
 
+On the levels as released, landings that are not plain floor are these
+(each teleporter leads to the one before it in the object list; levels
+1-24 from the disc, 25 from the cassette) **[confirmed from the level
+files]**:
+
+| Level | Teleporter | Lands at | On |
+|---|---|---|---|
+| 5 | 6 to 22 | 4,24 | an energy drainer (object 23) |
+| 6 | 3 to 10 | 12,27 | the exit |
+| 6 | 10 to 3 | 2,43 | the closed door 2,43 |
+| 11 | 24 to 9 | 9,20 | a key |
+| 12 | 18 to 2 | 19,45 | a closed door; teleporter 2 is walled in on all four sides, so it is only arrived at |
+| 13 | 20 to 8 | 1,9 | a key |
+| 15 | 28 to itself | 28,41 | an energy drainer (object 27); the level's only teleporter |
+| 16 | 9 to 16 | 27,18 | a treasure (object 15) |
+
+`collect_objects` runs every frame for a hero in play, moved or not, and
+all these cells can hold an object, so a hero who lands on an object
+meets it on the next frame: the treasure is picked up, the drainer takes
+10 health each frame they stay, and on level 6 the exit takes them down
+(`check_hero_on_exit`). A landed-on key is picked up the same way
+(`check_hero_keys`) **[confirmed from the code]**. A closed door is a
+wall bit in `room_walls`, so the hero stands inside it; moves are tested
+against the cell moved into, so they can walk out of it **[inference
+from the code]**: on level 12 that is the only way out of the landing,
+up into the room at 19,44. A landing cell walled on its other three
+sides is no trap, since stepping back down rides the teleporter on.
+
 ### A Cross of Resurrection is used up when nobody is waiting
 
 The object is removed (&7411) before the returning queue is tested
