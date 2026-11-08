@@ -305,10 +305,14 @@ Ole's crack **[confirmed]**:
   - &0495 and &0705–&0718, which are the crack's: &1A for level 5, and
     the leftover `*SAVE Dunjunz.K 400 7FF 740`;
   - &076D–&076E and &0D2F–&0D30, where two calls go to &F27D instead of
-    &3000;
-  - &0D80–&0D85 and &0800–&08BF (which the cassette does not load).
-    These look like values from a running game, i.e. the files were
-    saved from memory **[inference]**.
+    &3000, and &0D80–&0D85, which holds &0D70 and &00002000. These are
+    the operands that the cassette's `boot_loader` (&0740) and
+    `load_core` (&0D00) patch with FILEV, which is &F27D on MOS 1.20, and
+    the control block `load_core` builds. So the hack's files were saved
+    from memory after the cassette had loaded **[confirmed from the
+    bytes]**;
+  - &0800–&08BF, which the cassette does not load, and so holds whatever
+    was in memory then **[inference]**.
 
   So the decrypt-and-check routine at &0450, the FILEV level loader at
   &1447 and the filename at &16D0, which the crack lacks, are the
