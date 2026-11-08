@@ -45,7 +45,8 @@ There are 120 sprites, described by four tables indexed by sprite
 number: data address (`sprite_addr_lo`, `sprite_addr_hi`), width and
 height. Some routines change the tables while the game runs: the exit
 animation shrinks a hero by rewriting their sprites' sizes, and the
-victory sequence clears the Chalice's data byte by byte.
+victory sequence clears the Chalice's data byte by byte. All 120 are
+pictured in [the sprite sheet](../sprites.md).
 
 Text is printed by the MOS, but with the game's font. The WRCHV handler
 (`wrch_handler`) copies the glyph of each letter or digit over the

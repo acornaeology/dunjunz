@@ -3881,7 +3881,7 @@ restore_dest_page = put_back_byte+2
     cpx #4                              ; All four heroes done?
     beq draw_keys                       ; Yes: on to the keys
     jmp check_doors                     ; No: check this hero against the doors
-; Keys. Redraw the keys on the floor, then for each hero: drop a dead hero's key where they fell, or pick up the key at the hero's cell, leaving any key carried in its place. The swap flag only skips the frame after a swap, so a hero who stays on the cell swaps back on the frame after that.
+; Keys. Redraw the keys on the floor, then for each hero: drop a dead hero's key where they fell, or pick up the key at the hero's cell, leaving any key carried in its place. The swap flag only skips the frame after a swap, so a hero who stays on the cell swaps back on the frame after that. The heroes were drawn earlier in the frame, so a key under a hero is drawn over them.
 ; &1dc2 referenced 1 time by &3dbd
 .draw_keys
     lda #0                              ; Redraw every key lying on the floor, 20 to 1
@@ -8068,8 +8068,9 @@ restore_dest_page = put_back_byte+2
 ; monster killed by a missile or magic this frame starts its death here.
 ;
 ; The eight trapdoors are drawn first, because erasing a creature or missile that crossed
-; one has blanked its cell. Then each monster, 30 down to 1, is erased where it was drawn
-; last frame and moved on according to its state.
+; one has blanked its cell. They are drawn over whatever stands on them, so a hero or
+; missile on a trapdoor is overdrawn by it every frame. Then each monster, 30 down to 1,
+; is erased where it was drawn last frame and moved on according to its state.
 ;
 ; Moving: a monster mid-step slides a quarter cell further (continue_monster_step). One
 ; that is not stepping tries the next cell the way it faces. If that cell is open and

@@ -1564,7 +1564,9 @@ def annotate_routines(a: Annotator) -> None:
           "missile or magic this frame starts its death here."
           "\n\n"
           "The eight trapdoors are drawn first, because erasing a creature "
-          "or missile that crossed one has blanked its cell. Then each "
+          "or missile that crossed one has blanked its cell. They are drawn "
+          "over whatever stands on them, so a hero or missile on a trapdoor "
+          "is overdrawn by it every frame. Then each "
           "monster, 30 down to 1, is erased where it was drawn last frame "
           "and moved on according to its state."
           "\n\n"
@@ -4043,7 +4045,9 @@ def annotate_update_game_comments(a: Annotator) -> None:
             "hero: drop a dead hero's key where they fell, or pick up the "
             "key at the hero's cell, leaving any key carried in its place. "
             "The swap flag only skips the frame after a swap, so a hero "
-            "who stays on the cell swaps back on the frame after that.")
+            "who stays on the cell swaps back on the frame after that. The "
+            "heroes were drawn earlier in the frame, so a key under a hero "
+            "is drawn over them.")
     for addr, text in [
         (0x1D0D, "The door sound: food_sound played at a lower pitch."),
         (0x1D20, "Erase the door from every view showing it, keeping its "
