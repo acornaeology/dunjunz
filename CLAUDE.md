@@ -113,8 +113,7 @@ on the official release.
 
 - `uv run python tools/sprites.py` writes `docs/sprites.md` and its
   images (`docs/sprites/`) from the disc's resident image and level 1's
-  wall sprite; rerun it if `game.SPRITES` changes. The site does not yet copy
-  analysis images (acornaeology/acornaeology.github.io#17).
+  wall sprite; rerun it if `game.SPRITES` changes.
 - `uv run python tools/unused_space.py LISTING_JSON --in-play` lists the
   bytes a listing marks unused (and initial contents overwritten), the
   space a revised version could recover; record redundant code in
