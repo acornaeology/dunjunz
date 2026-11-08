@@ -127,7 +127,7 @@ oscli                = &fff7
 .send_mode_vdu
     lda mode_vdu,x                      ; Next byte of the MODE 5 and palette set-up...
     jsr oswrch                          ; ...to the VDU drivers
-; The file's execution address, where */ enters TITLE: the INX of the loop that sends mode_vdu, two instructions after title_start's LDX #0. So the loop starts from whatever X the MOS enters with, plus one, and sends the mode_vdu bytes from there until X reaches 8.
+; The file's execution address, where */ enters TITLE: the INX of the loop that sends mode_vdu, two instructions after title_start's LDX #0. So the loop starts from whatever X the MOS enters with, plus one, and sends from mode_vdu + X until X wraps round to 8. Run from PLOAD on MOS 1.20, X is &E4, so 27 bytes of this code (&28ED-&2907) go to the VDU drivers first: a few characters and a VDU 24 that sets a graphics window, both undone by the MODE 5 that follows intact.
 .title_entry
     inx                                 ; ...on to the next
     txa                                 ; ...count into A for the test

@@ -568,6 +568,21 @@ program stops showing anything at line 0, until a VDU 6 or a reset.
 `DUNJUNZ`'s `REM` goes on &01 and "XXXXXX", `PLOAD`'s &03 and 24 zeros
 **[confirmed from the files]**. Ole's `PLOAD` has no line 0.
 
+### `TITLE` is entered inside its first loop
+
+`TITLE`'s execution address, &28CE, is the `INX` of the loop that sends
+its eight MODE 5 and palette bytes, two instructions after the `LDX #0`
+that starts it, so the loop runs from whatever X it is entered with
+**[confirmed from the code]**. Run by `PLOAD`'s `*/` on MOS 1.20, it is
+entered with X = &E4 **[confirmed in beebjit, `tools/tape_probe.py
+beebjit 28ce`]**, so it first sends 27 bytes of its own code
+(&28ED-&2907) as VDU codes: a few characters on the MODE 4 screen and a
+VDU 24 graphics window, then the eight intended bytes, whose MODE 5
+clears the screen and resets the windows. So the title page appears as
+meant, after a moment's junk **[inference from the VDU stream]**. A
+different X on entry could leave a VDU command unfinished and swallow the
+MODE 5. The sideways RAM hack's copy is entered at the `LDX #0`.
+
 ### The cassette passes its own level 5 check
 
 Its checksum table holds &4D for level 5, which its level 5 sums to, so

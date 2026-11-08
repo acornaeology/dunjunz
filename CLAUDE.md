@@ -140,6 +140,12 @@ on the official release.
   memory at a breakpoint. Its docstring says how to build beebjit outside
   its checkout.
 
+- `uv run python tools/tape_probe.py BEEBJIT_FILEPATH ADDR [DUMP ...]`
+  runs the cassette in beebjit (beebium has no tape): types `*TAPE` and
+  `CHAIN""` and reports registers and memory at a breakpoint. It runs at
+  about real speed (TITLE is reached after some six minutes).
+  `tools/read_uef.py UEF_FILEPATH [OUT_DIRPATH]` lists or exports a UEF.
+
 - `uv run python tools/quality.py LISTING_JSON ... [--list KIND]` reports what
   comment coverage does not: dasmos-generated labels, routines without a
   calling convention, uncommented data, raw-address operands, hex
