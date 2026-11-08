@@ -533,6 +533,40 @@ The Model B side's lost ten-thousands digit does not arise here: the game
 is resident, and every routine uses the cassette's tables at &06F8
 (`hero_score_ten_thousands`) **[confirmed]**.
 
+## Original cassette
+
+The image is `versions/dunjunz-tape/Dunjunz_B.uef`; see
+[history-and-provenance.md](history-and-provenance.md) for what it is
+and how it relates to the other releases.
+
+### `DUNJUNZ` lets through the OS 0.10 it warns about
+
+`DUNJUNZ` reads `T%=INKEY(-256)` and goes on to load the game only if
+`T%` is 0 or less (`IF T%>0 THEN PRINT''"SORRY..." ELSE GOTO 150`).
+For a positive value it prints "SORRY..." and a message for the machine
+it recognises: will not run on the Electron (1) or the Master series (253; 254 for
+"MOS 1.00 or 1.1"), has not been tested on the ABC (250), OS 2.00 (251)
+or the German BBC (252), and stops. Its message for 0 ("has not been
+tested on a machine fitted with a O.S 0.10") can never be printed,
+because 0 takes the loading branch **[confirmed from the BASIC]**. On
+MOS 1.20, `INKEY(-256)` must give a value of 0 or less for the tape to
+load at all **[inference]**.
+
+### Errors restart the machine while it loads
+
+`DUNJUNZ` and `PLOAD` start with `*FX 200,3` (clear memory on BREAK),
+and `DUNJUNZ` sets `ON ERROR CALL !-4`, which calls the address in the
+reset vector at &FFFC. So ESCAPE or any other error while the BASIC runs
+restarts the machine, and BREAK clears the memory
+**[confirmed from the BASIC; the effect is inference]**.
+
+### The cassette passes its own level 5 check
+
+Its checksum table holds &4D for level 5, which its level 5 sums to, so
+it does not reset at level 5 as the sideways RAM hack does (see "This
+disc resets the machine on reaching level 5")
+**[confirmed from the files; not yet run]**.
+
 ## Ole's crack of the cassette
 
 ### `EXPAND` finds a picture's length with OSARGS 2
