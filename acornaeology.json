@@ -28,6 +28,12 @@
             "note": "The &2B0-byte level files: their encryption and checksum, the tables of objects, doors, keys and trapdoors, the wall and object-free maps, and the ending message hidden in level 25's map."
         },
         {
+            "label": "The sprites",
+            "url": "docs/sprites.md",
+            "icon": "doc",
+            "note": "All 120 sprites as the game starts, drawn in the MODE 2 palette, with their numbers, sizes and data addresses."
+        },
+        {
             "label": "Releases, cracks and hacks",
             "url": "docs/history-and-provenance.md",
             "icon": "doc",

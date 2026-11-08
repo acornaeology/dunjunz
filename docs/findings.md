@@ -737,6 +737,11 @@ level-format.md) are picked up on the first frame, without moving
 **[confirmed from the level files; reported from a lockstep run of the
 disc's level 1, which gave hero_key 4, 0, 0, 3 at the first frame]**.
 
+Trapdoors are the same: `update_monsters` (&79C1) begins by redrawing all
+eight trapdoors (sprite &2C), after `move_heroes` and `move_missiles` have
+drawn the heroes and missiles, so a hero or missile on a trapdoor is drawn
+over by it every frame **[confirmed from the code]**.
+
 ### Survivors gain a free point at every new level
 
 `draw_status_panel` calls `add_point` (&0F02) to draw each score, and
