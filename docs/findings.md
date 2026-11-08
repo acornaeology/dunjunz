@@ -302,12 +302,19 @@ enabled under each filing system tried: P = &23 with DFS 0.90, &21 with
 DNFS 1.20 and &31 with DFS 2.26. `Coder`, run by `*DUNJUNZ` through
 OSCLI, is entered at &5000 with P = &23 under DFS 0.90 and &21 under DFS
 2.26; under DNFS 1.20 the title never reaches it, as reported
-**[confirmed in beebium]**. It has been
-reported that under DFS 2.26 and DNFS 1.20 a `*RUN` program can instead
-be entered with the I flag set (P = &35, &25), and that a program
-waiting in OSRDCH then never sees a key, as MOS 1.20's OSRDCH does not
-enable interrupts itself **[reported, from work on a revised edition;
-the conditions that set the flag are not yet known]**. This matters to the
+**[confirmed in beebium]**.
+
+Auto-booting is different. With the same `Dunjunz` file saved as
+`!BOOT` on a copy of the disc with boot option 2 (`*RUN`), SHIFT+BREAK
+enters it at &2700 with P = &23 under DFS 0.90 but &25 under DNFS 1.20
+and &35 under DFS 2.26: the I flag set **[confirmed in beebium]**. A
+program run that way, and anything it starts through OSCLI, keeps
+interrupts disabled until something enables them, and a wait in OSRDCH
+then never sees a key, since MOS 1.20's OSRDCH does not enable
+interrupts itself **[reported, from work on a revised edition]**. The
+1987 disc avoids this: the Model B side has boot option 0 and the Master
+side option 3 (`*EXEC`), so `*DUNJUNZ` is always entered as a typed
+command, with interrupts enabled. This matters to the
 game: in play it reads keys with OSBYTE &81 and negative INKEY numbers,
 but the hero menu (`menu_key_loop`) and the ending
 (`print_ending_message`) wait in OSRDCH, so they rely on being entered
