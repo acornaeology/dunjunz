@@ -912,10 +912,10 @@ images) **[from the listings' annotations]**:
 
 | Version | Unused in play | Runs |
 |---|---|---|
-| Official disc, Model B side | 1,046 bytes | 66 |
-| Official disc, Master side | 903 bytes | 57 |
-| Ole's crack | 1,129 bytes | 63 |
-| Sideways RAM hack | 1,082 bytes | 56 |
+| Official disc, Model B side | 1,044 bytes | 66 |
+| Official disc, Master side | 915 bytes | 58 |
+| Ole's crack | 1,125 bytes | 63 |
+| Sideways RAM hack | 1,092 bytes | 58 |
 
 The larger runs on the disc's Model B side:
 
@@ -975,7 +975,12 @@ Time rather than space:
 - `object_free_map` is never updated as objects are collected, so a
   collected object's cell goes on triggering a search of the object list.
 - The final clear of the Chalice (&11DA-&11E2) clears &C1 bytes, one more
-  than the sprite.
+  than the sprite: the extra byte is &12D0, after `sprite_chalice`
+  (&1210-&12CF), which nothing else uses. Harmless, but a revised
+  version reusing &12D0 would lose it at the victory.
+- `saved_wrchv` (&12D3) is two bytes, the high byte read as
+  `saved_wrchv + 1`; only &12D5-&12D6 after it are unused. The Master
+  side never saves WRCHV, so there all four bytes are unused.
 
 In the separate programs (Master addresses for the Editor):
 

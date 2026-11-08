@@ -30055,16 +30055,27 @@
     {
       "addr": 4816,
       "bytes": [
-        61,
+        61
+      ],
+      "binary_addr": 14864,
+      "move": "game_core",
+      "comment_inline": "Written only by erase_victory_ring, whose clear of sprite_chalice runs one byte past its end",
+      "type": "byte",
+      "values": [
+        61
+      ]
+    },
+    {
+      "addr": 4817,
+      "bytes": [
         38,
         0
       ],
-      "binary_addr": 14864,
+      "binary_addr": 14865,
       "move": "game_core",
       "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
-        61,
         38,
         0
       ]
@@ -30082,7 +30093,7 @@
       "comments_before_label": [
         "The WRCHV contents found at start-up, restored while the game uses the MOS's own text output."
       ],
-      "comment_inline": "WRCHV as saved at start-up (&E0A4 as loaded)",
+      "comment_inline": "WRCHV as saved at start-up, low byte (&A4 as loaded)",
       "xref_summaries": [
         "&3a13 referenced 2 times by &0d58[1], &14d7[1]"
       ],
@@ -30108,13 +30119,11 @@
     {
       "addr": 4820,
       "bytes": [
-        224,
-        0,
-        115
+        224
       ],
       "binary_addr": 14868,
       "move": "game_core",
-      "comment_inline": "Not referenced",
+      "comment_inline": "...and high byte (&E0 as loaded)",
       "xref_summaries": [
         "&3a14 referenced 2 times by &0d5e[1], &14dd[1]"
       ],
@@ -30134,7 +30143,20 @@
       ],
       "type": "byte",
       "values": [
-        224,
+        224
+      ]
+    },
+    {
+      "addr": 4821,
+      "bytes": [
+        0,
+        115
+      ],
+      "binary_addr": 14869,
+      "move": "game_core",
+      "comment_inline": "Not referenced",
+      "type": "byte",
+      "values": [
         0,
         115
       ]

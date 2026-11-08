@@ -25758,17 +25758,29 @@
     {
       "addr": 4816,
       "bytes": [
-        61,
+        61
+      ],
+      "binary_addr": 13008,
+      "image": 0,
+      "move": "game_image",
+      "comment_inline": "Written only by erase_victory_ring, whose clear of sprite_chalice runs one byte past its end",
+      "type": "byte",
+      "values": [
+        61
+      ]
+    },
+    {
+      "addr": 4817,
+      "bytes": [
         38,
         0
       ],
-      "binary_addr": 13008,
+      "binary_addr": 13009,
       "image": 0,
       "move": "game_image",
       "comment_inline": "Not referenced",
       "type": "byte",
       "values": [
-        61,
         38,
         0
       ]
@@ -25787,7 +25799,7 @@
       "comments_before_label": [
         "The WRCHV contents found at start-up, restored while the game uses the MOS's own text output."
       ],
-      "comment_inline": "WRCHV as saved at start-up (&E0A4 as loaded)",
+      "comment_inline": "WRCHV as saved at start-up, low byte (&A4 as loaded)",
       "xref_summaries": [
         "&32d3 referenced 3 times by &0d58[1], &14d7[1], &5022"
       ],
@@ -25817,14 +25829,12 @@
     {
       "addr": 4820,
       "bytes": [
-        224,
-        0,
-        115
+        224
       ],
       "binary_addr": 13012,
       "image": 0,
       "move": "game_image",
-      "comment_inline": "Not referenced",
+      "comment_inline": "...and high byte (&E0 as loaded)",
       "xref_summaries": [
         "&32d4 referenced 3 times by &0d5e[1], &14dd[1], &5028"
       ],
@@ -25848,7 +25858,21 @@
       ],
       "type": "byte",
       "values": [
-        224,
+        224
+      ]
+    },
+    {
+      "addr": 4821,
+      "bytes": [
+        0,
+        115
+      ],
+      "binary_addr": 13013,
+      "image": 0,
+      "move": "game_image",
+      "comment_inline": "Not referenced",
+      "type": "byte",
+      "values": [
         0,
         115
       ]
@@ -35580,21 +35604,12 @@
       "addr": 5846,
       "bytes": [
         13,
-        13,
-        112,
-        0,
-        141,
-        53,
-        248,
-        0,
-        0,
-        0,
-        0
+        13
       ],
       "binary_addr": 14038,
       "image": 0,
       "move": "game_image",
-      "comment_inline": "Not referenced",
+      "comment_inline": "The second digit and CR, or the CR after one digit",
       "xref_summaries": [
         "&36d6 referenced 1 time by &0454[1]; also used as index base 1 time by &0e54[1]"
       ],
@@ -35615,7 +35630,28 @@
       "type": "byte",
       "values": [
         13,
-        13,
+        13
+      ]
+    },
+    {
+      "addr": 5848,
+      "bytes": [
+        112,
+        0,
+        141,
+        53,
+        248,
+        0,
+        0,
+        0,
+        0
+      ],
+      "binary_addr": 14040,
+      "image": 0,
+      "move": "game_image",
+      "comment_inline": "Not referenced",
+      "type": "byte",
+      "values": [
         112,
         0,
         141,

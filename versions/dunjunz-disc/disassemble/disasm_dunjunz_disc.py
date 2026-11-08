@@ -727,7 +727,6 @@ DISC_UNREFERENCED = [
     ('game_core', 0x0E21),
     ('game_core', 0x0E4C),
     ('game_core', 0x120F),
-    ('game_core', 0x12D4),
     ('game_core', 0x15F4),
     ('game_core', 0x16D6),
     ('game_core', 0x1EF4),

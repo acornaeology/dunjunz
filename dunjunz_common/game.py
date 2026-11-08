@@ -1833,6 +1833,11 @@ def annotate_cassette_level_loop(a: Annotator) -> None:
     a.label(0x16D5, "level_filename_digits", description=(
         "Where the level number's digits are written into the level's "
         "filename."))
+    a.byte(0x16D5, 1)
+    a.byte(0x16D6, 2)
+    a.c(0x16D6, "The second digit and CR, or the CR after one digit")
+    a.byte(0x16D8, 9)
+    a.c(0x16D8, "Not referenced")
     for addr, name in [(0x0E00, "new_game"), (0x0E34, "two_level_digits"),
                        (0x0E36, "store_level_units"),
                        (0x0E52, "end_level_filename")]:
@@ -4314,7 +4319,15 @@ def annotate_victory_and_helpers(a: Annotator) -> None:
          "which is left where the hero fell; 4 bytes by 12 rows each."),
     ]:
         a.banner(addr, title, description)
-    a.c(0x12D3, "WRCHV as saved at start-up (&E0A4 as loaded)")
+    a.byte(0x12D3, 1)
+    a.c(0x12D3, "WRCHV as saved at start-up, low byte (&A4 as loaded)")
+    a.byte(0x12D4, 1)
+    a.c(0x12D4, "...and high byte (&E0 as loaded)")
+    a.byte(0x12D5, 2)
+    a.byte(0x12D0, 1)
+    a.c(0x12D0, "Written only by erase_victory_ring, whose clear of "
+                "sprite_chalice runs one byte past its end")
+    a.byte(0x12D1, 2)
     for addr, name, description in [
         (0x0080, "ring_x", "Map x of the cell being drawn in the victory ring."),
         (0x0081, "ring_y", "Map y of the cell being drawn in the victory ring."),
@@ -5362,7 +5375,8 @@ UNREFERENCED = [
     (0x0DED, 16),
     (0x0F7D, 3),
     (0x1069, 7),
-    (0x12D0, 3),
+    (0x12D1, 2),
+    (0x12D5, 2),
     (0x13FB, 5),
     (0x1639, 1),
     (0x169E, 1),

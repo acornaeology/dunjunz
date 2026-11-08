@@ -442,10 +442,8 @@ TAPE_UNREFERENCED = [
     ('game_image', 0x0D88),
     ('game_image', 0x0D8F),
     ('game_image', 0x120F),
-    ('game_image', 0x12D4),
     ('game_image', 0x148A),
     ('game_image', 0x1491),
-    ('game_image', 0x16D6),
     (None, 0x504A),
 ]
 TAPE_TABLE_ENTRIES = [

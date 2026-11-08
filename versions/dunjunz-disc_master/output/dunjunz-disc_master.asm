@@ -2229,10 +2229,10 @@ reset_call_address = reset_call+1
     equb &00, &05, &0b, &03, &03, &07, &0a, &00
     equb &00, &00, &0f, &07, &0b, &0f, &00, &00
     equb &00, &00, &05, &0f, &0f, &0a, &00, &00
-    equb &3d, &26, &00                  ; Not referenced
-; The WRCHV contents found at start-up, restored while the game uses the MOS's own text output.
-.saved_wrchv
-    equb &a4, &e0, &00, &73             ; WRCHV as saved at start-up (&E0A4 as loaded)
+    equb &3d                            ; Written only by erase_victory_ring, whose clear of sprite_chalice runs one byte past its end
+    equb &26, &00                       ; Not referenced
+    equb &a4, &e0                       ; Not referenced: WRCHV is never saved on this side
+    equb &00, &73                       ; Not referenced
 ; The game's font for the letters A-Z: eight bytes per letter, one per pixel row, in MOS character-definition format.
 ; ***************************************************************************************
 ; Font: letters A-Z
@@ -3064,9 +3064,11 @@ clear_text_area_top = set_text_window_top+1
 ; Where level_loop writes the level number's digits. load_level builds level_command instead, so they are not used.
 ; &16d5 referenced 1 time by &0e4f; also used as index base 1 time by &0e3e
 .level_filename_digits
+    equb &31
 ; &16d6 used as index base 1 time by &0e54
-    equb &31, &0d, &0d, &70, &00, &8d, &35, &f8
-    equb &00, &00, &00, &00
+    equb &0d, &0d                       ; The second digit and CR, or the CR after one digit
+    equb &70, &00, &8d, &35, &f8, &00, &00, &00
+    equb &00                            ; Not referenced
     equs "code"
     equb &00, &54, &12, &03, &17, &74, &00, &8c
     equb &50, &00, &00, &00, &fa, &16, &78, &00

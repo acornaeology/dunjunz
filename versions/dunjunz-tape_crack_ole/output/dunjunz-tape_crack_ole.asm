@@ -2332,13 +2332,15 @@ reset_call_address = reset_call+1
     equb &00, &05, &0b, &03, &03, &07, &0a, &00
     equb &00, &00, &0f, &07, &0b, &0f, &00, &00
     equb &00, &00, &05, &0f, &0f, &0a, &00, &00
-    equb &3d, &26, &00                  ; Not referenced
+    equb &3d                            ; Written only by erase_victory_ring, whose clear of sprite_chalice runs one byte past its end
+    equb &26, &00                       ; Not referenced
 ; The WRCHV contents found at start-up, restored while the game uses the MOS's own text output.
 ; &12d3 referenced 3 times by &2d58, &34d7, &5022
 .saved_wrchv
-    equb &a4                            ; WRCHV as saved at start-up (&E0A4 as loaded)
+    equb &a4                            ; WRCHV as saved at start-up, low byte (&A4 as loaded)
 ; &12d4 referenced 3 times by &2d5e, &34dd, &5028
-    equb &e0, &00, &73                  ; Not referenced
+    equb &e0                            ; ...and high byte (&E0 as loaded)
+    equb &00, &73                       ; Not referenced
 ; The game's font for the letters A-Z: eight bytes per letter, one per pixel row, in MOS character-definition format.
 ; ***************************************************************************************
 ; Font: letters A-Z
@@ -3219,8 +3221,9 @@ restore_dest_page = put_back_byte+2
 .level_filename_digits
     equb &31
 ; &16d6 referenced 1 time by &2454; also used as index base 1 time by &2e54
-    equb &0d, &0d, &70, &00, &8d, &35, &f8, &00
-    equb &00, &00, &00                  ; Not referenced
+    equb &0d, &0d                       ; The second digit and CR, or the CR after one digit
+    equb &70, &00, &8d, &35, &f8, &00, &00, &00
+    equb &00                            ; Not referenced
     equs "code"
     equb &00, &54, &12, &03, &17, &74, &00, &8c
     equb &50, &00, &00, &00, &fa, &16, &78, &00

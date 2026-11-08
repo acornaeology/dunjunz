@@ -141,6 +141,7 @@ DIFFERENT_RANGES = [
     (0x0E02, 0x0E03),  # new game: level_number is counted by count_level
     (0x0E86, 0x0E8B),  # game over: stop the music
     (0x0EC3, 0x0EC7),  # a shorter wait after game over
+    (0x12D3, 0x12D5),  # saved_wrchv: this side never saves WRCHV
     (0x1400, 0x163A),  # starting a level: rewritten for DFS loading
     (0x1ED7, 0x1EF7),  # the pause key, moved to Table
     (0x6F45, 0x6F4A),  # the bell, removed
@@ -1057,6 +1058,8 @@ for lo_addr, hi_addr, name in [
     master.expr(hi_addr, hi(sym(name)))
 
 master.c(0x0D6E, "Not referenced")  # after game_entry
+master.byte(0x12D3, 2)
+master.c(0x12D3, "Not referenced: WRCHV is never saved on this side")
 
 # Bytes no instruction refers to.
 master.byte(0x08C0, 0x40, cols=8)
