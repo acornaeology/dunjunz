@@ -776,6 +776,46 @@ over by it every frame **[confirmed from the code]**.
 only heroes who died (&0E74) are reset first, so each surviving hero
 gains a point per level **[confirmed from the code]**.
 
+### Phantom keys from the keyboard matrix
+
+`test_key` reads each key with OSBYTE &81 and a negative INKEY number,
+which tests that one switch of the keyboard matrix directly. The matrix
+is 8 rows by 10 columns (13 on the Master, for the keypad), and a key's
+internal number is 16 x its row + its column. Only row 0 (SHIFT, CTRL
+and the keyboard links) has diodes **[reported: [Deskthority's BBC
+Micro page](https://deskthority.net/wiki/BBC_Microcomputer); a [BBC
+Micro mailing list post](https://mdfs.net/Archive/BBCMicro/2010/06/29/225811.htm)
+finds none on the Master Compact]**. Without diodes, three keys held at
+three corners of a rectangle in the matrix make the fourth read as held
+too. A suggestion that the heroes' keys were chosen to avoid this was
+checked against the key tables (`workspace_template`'s `hero_key_*` and
+`hero_magic_key`). The keys test up, down, right, left, then fire, and
+the first held key wins, so a phantom key matters only when it comes
+before any key the hero really holds.
+
+On the Model B releases (disc, crack and hack), the 22 keys form 9
+rectangles. One lies partly in row 0 (Ranger: SHIFT, CTRL, TAB, Z), and
+the diodes protect it. Of the other eight, most need one hero to hold two
+of their own keys at once, but three are completed by three heroes each
+holding one key **[inference from the key tables]**:
+
+| Held | Phantom | Effect |
+|---|---|---|
+| O (Fighter fire), K (Barbarian up), ↑ (Magic-User down) | RETURN | the Magic-User casts magic, for 3 health |
+| O (Fighter fire), K (Barbarian up), RETURN (Magic-User magic) | ↑ | the Magic-User walks down |
+| O (Fighter fire), comma (Barbarian down), COPY (Magic-User right) | ↑ | the Magic-User walks down instead of right |
+
+On the Master side, whose conversion moves the Magic-User to the keypad
+and gives the Barbarian and Fighter other keys, the 22 keys form 11
+rectangles, one of them the Ranger's in row 0. Each of the other ten
+holds two keys of each of two heroes, so no phantom arises unless a
+player holds two of their own keys at once (two directions, or a
+direction and fire) **[inference from the key tables, assuming the
+Master's keyboard is wired the same way]**. So the Master's set does
+avoid the phantoms of single held keys, and the Model B set mostly
+does, but not entirely. Longer chains through the matrix need at
+least five held keys.
+
 ### Pause can be missed while another key is held
 
 OSBYTE &7A reports only the lowest-numbered key held from 16 up, so the
