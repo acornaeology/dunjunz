@@ -835,6 +835,40 @@ eight trapdoors (sprite &2C), after `move_heroes` and `move_missiles` have
 drawn the heroes and missiles, so a hero or missile on a trapdoor is drawn
 over by it every frame **[confirmed from the code]**.
 
+### A dead hero's skull flickers if they died with a key
+
+When a dead hero's death animation reaches the skull (`hero_frame` 8),
+`draw_keys` drops their key on the cell where they fell (&1DF3-&1E0D):
+`key_x`/`key_y` are set to `hero_x`/`hero_y` and `hero_key` is cleared
+**[confirmed from the code; confirmed in beebium that the key's cell is
+the skull's]**. From the next frame, then, there is a key under the
+skull.
+
+The two are drawn at different rates. `animate_absent_hero` (&76DA) plots
+the skull only every other frame, on a two-frame timer kept in
+`hero_offset_y`, which it goes on running while the hero is held at the
+skull. `draw_keys` redraws every key on the floor every frame, after
+`move_heroes`, and the plotter stores the sprite over the screen rather
+than masking it **[confirmed from the code]**. So on one frame the skull
+is plotted and then covered by the key later in the same frame. On the
+next, only the key is plotted. The skull is on the screen only for the
+time between its plot and the key's. That is the rest of `move_heroes`
+and `draw_keys` up to that key, and whether the raster scans the cell
+in that time depends on where the beam is **[inference from the code]**.
+Frames start three vsyncs apart, so a skull plotted every other frame
+can appear at most about 8 times a second, over a steady key. A hero who
+died without a key leaves a steady skull. A dying hero who stands on a
+key on the floor picks it up (see the key swap above) and drops it at the
+skull just the same.
+
+On real hardware, skulls were seen to "often flicker a lot" during play
+at an event in November 2026 **[reported]**. Which skulls flickered was
+not recorded.
+
+A skull on a trapdoor should flicker the same way, since `update_monsters`
+redraws the trapdoors every frame after `move_heroes` **[inference from
+the code, not tested]**.
+
 ### Survivors gain a free point at every new level
 
 `draw_status_panel` calls `add_point` (&0F02) to draw each score, and
