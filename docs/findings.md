@@ -869,6 +869,18 @@ A skull on a trapdoor should flicker the same way, since `update_monsters`
 redraws the trapdoors every frame after `move_heroes` **[inference from
 the code, not tested]**.
 
+A hero in play can also stand on another hero's skull. Only a hero in
+play refuses a move into their cell (&7677); a hero out of play does not.
+`move_heroes` takes the heroes in order, 0 to 3. In each hero's turn it
+draws a hero in play every frame, or calls `animate_absent_hero` for one
+out of play, which plots only every other frame **[confirmed from the
+code]**. So where the dead hero's number is higher, their skull is
+plotted over the standing hero on its due frames, and the cell shows
+the two in turn. Where it is lower, the standing hero is plotted after
+the skull every frame and stays in front. The same goes for a dying
+hero's sparkles and a returning hero's sequence **[inference from the
+plot order, not run]**.
+
 ### Survivors gain a free point at every new level
 
 `draw_status_panel` calls `add_point` (&0F02) to draw each score, and
