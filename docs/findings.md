@@ -855,8 +855,9 @@ next, only the key is plotted. The skull is on the screen only for the
 time between its plot and the key's. That is the rest of `move_heroes`
 and `draw_keys` up to that key, and whether the raster scans the cell
 in that time depends on where the beam is **[inference from the code]**.
-Frames start three vsyncs apart, so a skull plotted every other frame
-can appear at most about 8 times a second, over a steady key. A hero who
+Frames start at least three vsyncs apart, and in play usually later
+(see "Play is paced by its own work" below), so a skull plotted every
+other frame can appear at most about 8 times a second, over a steady key. A hero who
 died without a key leaves a steady skull. A dying hero who stands on a
 key on the floor picks it up (see the key swap above) and drops it at the
 skull just the same.
@@ -870,7 +871,7 @@ redraws the trapdoors every frame after `move_heroes` **[inference from
 the code, not tested]**.
 
 A hero in play can also stand on another hero's skull. Only a hero in
-play refuses a move into their cell (&7677); a hero out of play does not.
+play refuses a move into their cell (&7002); a hero out of play does not.
 `move_heroes` takes the heroes in order, 0 to 3. In each hero's turn it
 draws a hero in play every frame, or calls `animate_absent_hero` for one
 out of play, which plots only every other frame **[confirmed from the
@@ -880,6 +881,53 @@ the two in turn. Where it is lower, the standing hero is plotted after
 the skull every frame and stays in front. The same goes for a dying
 hero's sparkles and a returning hero's sequence **[inference from the
 plot order, not run]**.
+
+### Play is paced by its own work, not by the vsync wait
+
+`play_level` waits for `os_vsync_counter` to go negative and sets it to
+2, so a frame starts no sooner than three vsyncs (60 ms, 120,000 cycles)
+after the last, or at once if the last frame took longer **[confirmed
+from the code]**. In play it usually takes longer. On the disc's Model B
+side in beebium (DFS 0.90), four heroes played 300 scripted frames
+(seed 1, no magic). The cycles from one `update_game` to the next were:
+median about 133,000, 90th percentile 187,000, highest 323,000, lowest
+107,000 **[reported from a measurement in beebium]**. So most frames
+overrun the three vsyncs and the wait falls straight through. The game
+slows down as a frame gets busier.
+
+### Two heroes can end up in one cell
+
+A hero's step takes two frames. On the first, `start_hero_step` sets the
+half-cell offsets, and `stay_in_old_cell` (&7069) leaves `hero_x`/`hero_y`
+on the cell being left. On the second, `continue_hero_step` (&7BA2)
+moves the hero into the new cell without testing it again. The test for
+another hero in the way (`check_hero_in_cell`, &7002) compares the cell
+tried with each hero's `hero_x`/`hero_y`. So two heroes can start steps
+into the same empty cell from different sides in the same frame, and
+both arrive in it on the next **[confirmed from the code]**. A hero with
+the Boots of Speed, who moves a whole cell in one frame, can likewise
+step into a cell another hero is halfway into.
+
+While they share it, the higher-numbered hero blanks the cell whenever
+they leave it, or try to and are refused. `erase_hero` (&7075) plots the
+blank at `previous_x`/`previous_y` with the previous offsets. This
+happens in that hero's turn, after `move_heroes` has drawn the
+lower-numbered one there. So the hero left behind vanishes from the
+screen until their next turn redraws them, a frame later. A
+lower-numbered hero leaving does no such harm, since the other is drawn
+after them **[inference from the code; the shared cell was reported from
+a run in beebium]**.
+
+### A view drawn for a new room misses heroes already drawn that frame
+
+When a hero steps into another room, `move_heroes` calls `show_hero_room`
+(&752C) in that hero's turn, which redraws the view's walls and doors.
+Heroes are drawn in order 0 to 3, so any lower-numbered hero standing
+in the newly shown room has already been drawn that frame. They do not
+appear in the view until their next turn, a frame later. Keys, objects,
+missiles and monsters are drawn after `move_heroes` and appear in the
+same frame. A teleporter, which also calls `show_hero_room`, does the
+same **[confirmed from the code; the visible frame's delay is inference]**.
 
 ### Survivors gain a free point at every new level
 
